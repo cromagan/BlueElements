@@ -17,7 +17,10 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Windows.Forms;
 using BlueBasics;
+using BlueBasics.EventArgs;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
@@ -25,9 +28,9 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueScript;
-using System.Collections.Generic;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
+using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -39,7 +42,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     public ItemCollectionPad? ParentCol;
 
-    private readonly ListExt<System.Windows.Forms.Control> _parents = new();
+    private readonly ListExt<Control> _parents = new();
 
     private readonly string _showformat;
 
@@ -76,7 +79,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     #region Properties
 
-    public ListExt<System.Windows.Forms.Control> Childs { get; } = new();
+    public ListExt<Control> Childs { get; } = new();
     public DatabaseAbstract? Database { get; set; }
 
     public RowItem? Row {
@@ -316,7 +319,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         UpdateMyCollection();
     }
 
-    private void Childs_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) => DoChilds(this, _row);
+    private void Childs_ItemAdded(object sender, ListEventArgs e) => DoChilds(this, _row);
 
     private void GetParentsList() {
         if (_disposing || IsDisposed || Parent == null) { return; }
@@ -332,7 +335,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     private void Parent_ValueChanged(object sender, System.EventArgs e) => CalculateRows();
 
-    private void Parents_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+    private void Parents_ItemAdded(object sender, ListEventArgs e) {
         if (e.Item is FlexiControlForCell fcfc) {
             fcfc.ValueChanged += Parent_ValueChanged;
         } else if (e.Item is FlexiControl fc) {
@@ -343,7 +346,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         CalculateRows();
     }
 
-    private void Parents_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+    private void Parents_ItemRemoving(object sender, ListEventArgs e) {
         if (e.Item is FlexiControlForCell fcfc) {
             fcfc.ValueChanged -= Parent_ValueChanged;
         }

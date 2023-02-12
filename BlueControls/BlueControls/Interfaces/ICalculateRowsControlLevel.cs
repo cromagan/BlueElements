@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.Windows.Forms;
 using BlueBasics;
 using BlueScript;
 
@@ -31,7 +32,7 @@ public interface ICalculateRowsControlLevel : IHasDatabase {
 
     #region Properties
 
-    public ListExt<System.Windows.Forms.Control> Childs { get; }
+    public ListExt<Control> Childs { get; }
 
     public Script? Script { get; set; }
 

@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
 
 namespace BlueBasics;

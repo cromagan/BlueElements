@@ -17,11 +17,12 @@
 
 #nullable enable
 
-using BlueControls;
-using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Windows.Forms;
+using BlueControls;
+using BlueControls.EventArgs;
 using static BlueBasics.Generic;
 using static BlueBasics.Geometry;
 
@@ -50,7 +51,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
 
         e.DrawLine(PenRedTransp, -1, e.Current.TrimmedY, pic.Width, e.Current.TrimmedY);
         e.DrawLine(PenRedTransp, e.Current.TrimmedX, -1, e.Current.TrimmedX, pic.Height);
-        if (e.Current.Button != System.Windows.Forms.MouseButtons.Left || e.MouseDown == null) {
+        if (e.Current.Button != MouseButtons.Left || e.MouseDown == null) {
             return;
         }
 

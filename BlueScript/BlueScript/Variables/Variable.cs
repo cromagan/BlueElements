@@ -17,14 +17,15 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Structures;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
@@ -289,8 +290,8 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     private static long _dummyCount;
     private string _comment = string.Empty;
-    private bool _readOnly = false;
-    private bool _systemVariable = false;
+    private bool _readOnly;
+    private bool _systemVariable;
 
     #endregion
 
@@ -528,7 +529,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     public string ReplaceInText(string txt) {
         if (!txt.ToLower().Contains("~" + Name.ToLower() + "~")) { return txt; }
-        return txt.Replace("~" + Name + "~", ReadableText, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        return txt.Replace("~" + Name + "~", ReadableText, RegexOptions.IgnoreCase);
     }
 
     public new string ToString() {

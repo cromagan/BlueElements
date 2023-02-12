@@ -18,10 +18,13 @@
 #nullable enable
 
 using BlueBasics.Enums;
+using BlueBasics.MultiUserFile;
 using BlueControls;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Forms;
 using BlueDatabase;
+using BluePaint;
+using System;
 using static BlueBasics.Develop;
 
 namespace BeCreative;
@@ -41,15 +44,15 @@ public partial class Start : Form {
 
         var p = Progressbar.Show("Programm wird beendet<br><i>Speichern aller Datenbanken");
         DatabaseAbstract.ForceSaveAll();
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
+        MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
 
         p?.Update("Programm wird beendet<br><i>Speichern aller Datenbanken");
         DatabaseAbstract.ForceSaveAll();
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false); // Fonts und Dictionarys werden noch benötigt
+        MultiUserFile.SaveAll(false); // Fonts und Dictionarys werden noch benötigt
 
         DebugPrint(FehlerArt.Info, "Schließe Programm, noch ein SaveAll.");
         p?.Update("Programm wird beendet<br><i>Fast geschafft!");
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true); // Nun aber
+        MultiUserFile.SaveAll(true); // Nun aber
 
         p?.Close();
         TraceLogging_End();
@@ -57,15 +60,15 @@ public partial class Start : Form {
 
     internal static System.Windows.Forms.Form NewForm() => new Start();
 
-    private void btnBildEditor_Click(object sender, System.EventArgs e) => DoForm(new BluePaint.MainWindow(true));
+    private void btnBildEditor_Click(object sender, EventArgs e) => DoForm(new MainWindow(true));
 
-    private void btnDatenbank_Click(object sender, System.EventArgs e) => DoForm(new TableView(null, true, true));
+    private void btnDatenbank_Click(object sender, EventArgs e) => DoForm(new TableView(null, true, true));
 
-    private void btnFormular_Click(object sender, System.EventArgs e) => DoForm(new ConnectedFormulaEditor());
+    private void btnFormular_Click(object sender, EventArgs e) => DoForm(new ConnectedFormulaEditor());
 
-    private void btnHierachie_Click(object sender, System.EventArgs e) => DoForm(new RelationDiagram(null));
+    private void btnHierachie_Click(object sender, EventArgs e) => DoForm(new RelationDiagram(null));
 
-    private void btnLayout_Click(object sender, System.EventArgs e) => DoForm(new LayoutPadEditor(null));
+    private void btnLayout_Click(object sender, EventArgs e) => DoForm(new LayoutPadEditor(null));
 
     private void DoForm(System.Windows.Forms.Form frm) {
         FormManager.Current.RegisterForm(frm);

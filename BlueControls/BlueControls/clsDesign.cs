@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.Collections.Generic;
+using System.Drawing;
 using BlueBasics;
 using BlueControls;
 using BlueControls.Enums;
-using System.Collections.Generic;
-using System.Drawing;
 
 public static class clsDesignExtensions {
 

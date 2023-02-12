@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Windows.Forms;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueControls.Enums;
@@ -27,8 +30,6 @@ using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
-using System;
-using System.Collections.Generic;
 
 namespace BlueControls;
 
@@ -43,7 +44,7 @@ public static class Allgemein {
     #region Methods
 
     public static T? ParentControl<T>(this object o) {
-        if (o is not System.Windows.Forms.Control co) {
+        if (o is not Control co) {
             return default;
         }
 

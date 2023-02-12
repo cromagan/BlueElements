@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -27,10 +32,6 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -182,7 +183,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         return l;
     }
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
 
@@ -220,10 +221,10 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
         l.Add(new FlexiControlForProperty<string>(() => Spalte_bearbeiten, ImageCode.Spalte));
 
-        var u = new ItemCollection.ItemCollectionList.ItemCollectionList(false);
+        var u = new ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
-        var b = new ItemCollection.ItemCollectionList.ItemCollectionList(false);
+        var b = new ItemCollectionList.ItemCollectionList(false);
         b.AddRange(GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
         l.Add(new FlexiControl());

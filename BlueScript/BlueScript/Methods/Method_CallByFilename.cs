@@ -17,10 +17,11 @@
 
 #nullable enable
 
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
+using BlueScript.Structures;
+using BlueScript.Variables;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
@@ -57,9 +58,9 @@ internal class Method_CallByFilename : Method {
 
         try {
             if (FileExists(vs.ValueString)) {
-                f = File.ReadAllText(vs.ValueString, System.Text.Encoding.UTF8);
+                f = File.ReadAllText(vs.ValueString, Encoding.UTF8);
             } else if (FileExists(s.AdditionalFilesPath + vs.ValueString)) {
-                f = File.ReadAllText(s.AdditionalFilesPath + vs.ValueString, System.Text.Encoding.UTF8);
+                f = File.ReadAllText(s.AdditionalFilesPath + vs.ValueString, Encoding.UTF8);
             } else {
                 return new DoItFeedback("Datei nicht gefunden: " + vs.ValueString, line);
             }

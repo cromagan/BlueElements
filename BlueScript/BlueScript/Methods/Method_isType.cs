@@ -17,9 +17,10 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -47,7 +48,7 @@ internal class Method_IsType : Method {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
-        if (string.Equals(attvar.Attributes[1].ReadableText, attvar.Attributes[0].MyClassId, System.StringComparison.OrdinalIgnoreCase)) {
+        if (string.Equals(attvar.Attributes[1].ReadableText, attvar.Attributes[0].MyClassId, StringComparison.OrdinalIgnoreCase)) {
             return DoItFeedback.Wahr(line);
         }
         return DoItFeedback.Falsch(line);

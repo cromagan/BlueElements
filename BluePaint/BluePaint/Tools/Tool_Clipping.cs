@@ -15,17 +15,18 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
-using System;
-using System.Drawing;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
-
-#nullable enable
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BluePaint;
 
@@ -63,7 +64,7 @@ public partial class Tool_Clipping {
         e.DrawLine(penBlau, e.Current.TrimmedX, -1, e.Current.TrimmedX, originalPic.Height);
         e.DrawLine(penBlau, -1, e.Current.TrimmedY, originalPic.Width, e.Current.TrimmedY);
 
-        if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
+        if (e.Current.Button == MouseButtons.Left && e.MouseDown != null) {
             e.DrawLine(penBlau, e.MouseDown.X, -1, e.MouseDown.X, originalPic.Height);
             e.DrawLine(penBlau, -1, e.MouseDown.Y, originalPic.Width, e.MouseDown.Y);
         }

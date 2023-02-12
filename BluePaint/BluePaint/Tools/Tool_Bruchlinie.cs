@@ -15,9 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.Controls;
 using System;
 using System.Drawing;
+using BlueControls.Controls;
 
 namespace BluePaint;
 

@@ -17,10 +17,10 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -55,7 +55,7 @@ internal class Method_DeleteFile : Method {
         if (!s.ChangeValues) { return new DoItFeedback("Löschen im Testmodus deaktiviert.", line); }
 
         try {
-            return new DoItFeedback(BlueBasics.IO.DeleteFile(((VariableString)attvar.Attributes[0]).ValueString, false), line);
+            return new DoItFeedback(IO.DeleteFile(((VariableString)attvar.Attributes[0]).ValueString, false), line);
         } catch {
             return new DoItFeedback("Fehler beim Löschen: " + ((VariableString)attvar.Attributes[0]).ValueString, line);
         }

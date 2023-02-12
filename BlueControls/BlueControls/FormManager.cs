@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using BlueBasics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using BlueBasics;
 
 //https://stackoverflow.com/questions/9462592/best-practices-for-multi-form-applications-to-show-and-hide-forms
 namespace BlueControls;

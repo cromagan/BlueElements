@@ -18,10 +18,11 @@
 #nullable enable
 
 using BlueDatabase;
+using BlueDatabase.EventArgs;
 
 namespace BlueControls.EventArgs;
 
-public class CellValueChangingByUserEventArgs : BlueDatabase.EventArgs.CellCancelEventArgs {
+public class CellValueChangingByUserEventArgs : CellCancelEventArgs {
 
     #region Constructors
 

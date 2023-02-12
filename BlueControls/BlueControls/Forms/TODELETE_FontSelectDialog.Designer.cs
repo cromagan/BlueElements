@@ -2,8 +2,12 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
+using System.Windows.Forms;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using Button = BlueControls.Controls.Button;
+using GroupBox = BlueControls.Controls.GroupBox;
+using ListBox = BlueControls.Controls.ListBox;
 
 namespace BlueControls.Forms
     {
@@ -47,8 +51,8 @@ namespace BlueControls.Forms
             this.cRandF = new Button();
             this.Ok = new Button();
             this.BlueFrame2 = new GroupBox();
-            this.Sample = new System.Windows.Forms.PictureBox();
-            this.ColorDia = new System.Windows.Forms.ColorDialog();
+            this.Sample = new PictureBox();
+            this.ColorDia = new ColorDialog();
             this.BlueFrame1.SuspendLayout();
             this.BlueFrame2.SuspendLayout();
             ((ISupportInitialize)(this.Sample)).BeginInit();
@@ -234,7 +238,7 @@ namespace BlueControls.Forms
             // FontSelectDialog
             // 
             this.AutoScaleDimensions = new SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.AutoScaleMode = AutoScaleMode.Font;
             this.ClientSize = new Size(501, 499);
             this.Controls.Add(this.BlueFrame2);
             this.Controls.Add(this.Ok);
@@ -245,7 +249,7 @@ namespace BlueControls.Forms
             this.Controls.Add(this.Größe);
             this.Controls.Add(this.Caption1);
             this.Controls.Add(this.FName);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.FormBorderStyle = FormBorderStyle.FixedToolWindow;
             this.Name = "FontSelectDialog";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
@@ -270,8 +274,8 @@ namespace BlueControls.Forms
 			internal Button cRandF;
 			internal Button Ok;
 			internal GroupBox BlueFrame2;
-			internal System.Windows.Forms.PictureBox Sample;
-			internal System.Windows.Forms.ColorDialog ColorDia;
+			internal PictureBox Sample;
+			internal ColorDialog ColorDia;
 			internal Button OnlyUpper;
 			internal Button OnlyLow;
 		}

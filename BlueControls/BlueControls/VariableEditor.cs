@@ -17,15 +17,16 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueDatabase;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BlueControls;
 
-public partial class VariableEditor : System.Windows.Forms.UserControl {
+public partial class VariableEditor : UserControl {
 
     #region Fields
 
@@ -140,13 +141,13 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
         }
 
         if (Editabe) {
-            var l = new List<ColumnItem?>() { na, inh, kom };
+            var l = new List<ColumnItem?> { na, inh, kom };
 
             foreach (var thisColumn2 in l) {
                 if (thisColumn2 != null) {
                     thisColumn2.TextBearbeitungErlaubt = true;
                     thisColumn2.MultiLine = false;
-                    thisColumn2.PermissionGroupsChangeCell = new(new List<string>() { "#Everybody" });
+                    thisColumn2.PermissionGroupsChangeCell = new(new List<string> { "#Everybody" });
                 }
             }
 
@@ -154,7 +155,7 @@ public partial class VariableEditor : System.Windows.Forms.UserControl {
             if (inh != null) { inh.Caption = "Inhalt"; }
             if (kom != null) { kom.Caption = "Kommentar"; }
 
-            x.PermissionGroupsNewRow = new(new List<string>() { "#Everybody" });
+            x.PermissionGroupsNewRow = new(new List<string> { "#Everybody" });
         }
 
         x.RepairAfterParse();

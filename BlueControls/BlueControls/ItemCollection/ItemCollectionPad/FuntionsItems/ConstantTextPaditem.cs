@@ -17,15 +17,15 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueDatabase.Enums;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace BlueControls.ItemCollection;
 
@@ -39,7 +39,7 @@ public class ConstantTextPadItem : CustomizableShowPadItem, IReadableText, ICont
 
     #region Constructors
 
-    public ConstantTextPadItem() : this(BlueBasics.Generic.UniqueInternal()) { }
+    public ConstantTextPadItem() : this(Generic.UniqueInternal()) { }
 
     //Size = new Size(150, 24);
     public ConstantTextPadItem(string intern) : base(intern) { }

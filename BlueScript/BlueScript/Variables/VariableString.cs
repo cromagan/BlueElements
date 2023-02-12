@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueScript.Structures;
 
 namespace BlueScript.Variables;
@@ -104,7 +105,7 @@ public class VariableString : Variable {
         if (x is string val) {
             _valueString = val.RestoreCriticalVariableChars();
         } else {
-            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Variablenfehler!");
+            Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler!");
         }
     }
 

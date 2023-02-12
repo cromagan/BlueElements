@@ -17,10 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -66,7 +67,7 @@ public class Method_Lookup : MethodDatabase {
             return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[2]).ValueString, line);
         }
 
-        var r = RowCollection.MatchesTo(new FilterItem(c, Enums.FilterType.Istgleich_GroßKleinEgal, ((VariableString)attvar.Attributes[1]).ValueString));
+        var r = RowCollection.MatchesTo(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, ((VariableString)attvar.Attributes[1]).ValueString));
 
         if (r == null || r.Count == 0) {
             if (attvar.Attributes.Count > 3) {

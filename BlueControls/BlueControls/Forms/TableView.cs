@@ -17,8 +17,17 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.MultiUserFile;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -28,13 +37,6 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
@@ -223,7 +225,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     public void ResetDatabaseSettings() {
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
-            if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<object> s) {
+            if (thisT is TabPage tp && tp.Tag is List<object> s) {
                 s[1] = string.Empty;
                 tp.Tag = s;
             }
@@ -242,10 +244,10 @@ public partial class TableView : Form, IHasStatusbar {
             return;
         }
 
-        var nTabPage = new System.Windows.Forms.TabPage {
+        var nTabPage = new TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
             Text = ci.TableName.ToTitleCase(),
-            Tag = new List<object>() { ci, string.Empty }
+            Tag = new List<object> { ci, string.Empty }
         };
         tbcDatabaseSelector.Controls.Add(nTabPage);
     }
@@ -256,7 +258,7 @@ public partial class TableView : Form, IHasStatusbar {
     }
 
     protected virtual void btnDrucken_ItemClicked(object sender, BasicListItemEventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
 
         switch (e.Item.KeyName) {
@@ -293,7 +295,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => Table.Export_HTML();
 
-    protected void ChangeDatabaseInTab(ConnectionInfo connectionId, System.Windows.Forms.TabPage? xtab) {
+    protected void ChangeDatabaseInTab(ConnectionInfo connectionId, TabPage? xtab) {
         if (xtab == null) {
             return;
         }
@@ -308,8 +310,8 @@ public partial class TableView : Form, IHasStatusbar {
         s[1] = string.Empty;
         xtab.Tag = s;
         tbcDatabaseSelector_Selected(null,
-            new System.Windows.Forms.TabControlEventArgs(xtab, tbcDatabaseSelector.TabPages.IndexOf(xtab),
-                System.Windows.Forms.TabControlAction.Selected));
+            new TabControlEventArgs(xtab, tbcDatabaseSelector.TabPages.IndexOf(xtab),
+                TabControlAction.Selected));
     }
 
     protected virtual void CheckButtons() {
@@ -424,9 +426,9 @@ public partial class TableView : Form, IHasStatusbar {
         }
     }
 
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
         DatabaseSet(null, string.Empty);
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
+        MultiUserFile.SaveAll(true);
         DatabaseAbstract.ForceSaveAll();
 
         base.OnFormClosing(e);
@@ -446,15 +448,15 @@ public partial class TableView : Form, IHasStatusbar {
         if (connectionInfo is null) { return false; }
 
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
-            if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<object> s && s[0] is ConnectionInfo ci) {
+            if (thisT is TabPage tp && tp.Tag is List<object> s && s[0] is ConnectionInfo ci) {
                 if (ci.UniqueID.Equals(connectionInfo.UniqueID, StringComparison.OrdinalIgnoreCase)) {
                     tbcDatabaseSelector.SelectedTab = tp;
 
                     if (_firstOne) {
                         _firstOne = false;
                         tbcDatabaseSelector_Selected(null,
-                            new System.Windows.Forms.TabControlEventArgs(tp, tbcDatabaseSelector.TabPages.IndexOf(tp),
-                                System.Windows.Forms.TabControlAction.Selected));
+                            new TabControlEventArgs(tp, tbcDatabaseSelector.TabPages.IndexOf(tp),
+                                TabControlAction.Selected));
                     }
 
                     return true;
@@ -715,7 +717,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnDatenbankenSpeicherort_Click(object sender, System.EventArgs e) {
         DatabaseAbstract.ForceSaveAll();
-        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.ForceLoadSaveAll();
 
         if (Table.Database is DatabaseMultiUser bdbm) {
             _ = ExecuteFile(bdbm.Filename.FilePath());
@@ -749,7 +751,7 @@ public partial class TableView : Form, IHasStatusbar {
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
 
         _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.KeyName, PreveredDatabaseID));
@@ -786,7 +788,7 @@ public partial class TableView : Form, IHasStatusbar {
     }
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
 
         _ = SaveTab.ShowDialog();
@@ -811,7 +813,7 @@ public partial class TableView : Form, IHasStatusbar {
         Table.ShowNumber = btnNummerierung.Checked;
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
         _ = LoadTab.ShowDialog();
     }
@@ -822,7 +824,7 @@ public partial class TableView : Form, IHasStatusbar {
     }
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
 
         if (Table.Database is Database db) {
@@ -845,7 +847,7 @@ public partial class TableView : Form, IHasStatusbar {
     }
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
+        MultiUserFile.SaveAll(true);
         DatabaseAbstract.ForceSaveAll();
     }
 
@@ -873,7 +875,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
         DatabaseAbstract.ForceSaveAll();
-        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.ForceLoadSaveAll();
         _ = ExecuteFile(Path.GetTempPath());
     }
 
@@ -1216,7 +1218,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     private void TableView_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
 
-    private void tbcDatabaseSelector_Deselecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e) {
+    private void tbcDatabaseSelector_Deselecting(object sender, TabControlCancelEventArgs e) {
         var s = (List<object>)e.TabPage.Tag;
         s[1] = ViewToString();
         e.TabPage.Tag = s;
@@ -1228,7 +1230,7 @@ public partial class TableView : Form, IHasStatusbar {
     /// <param name="sender"></param>
     /// <param name="e"></param>
 
-    private void tbcDatabaseSelector_Selected(object? sender, System.Windows.Forms.TabControlEventArgs e) {
+    private void tbcDatabaseSelector_Selected(object? sender, TabControlEventArgs e) {
         Table.ShowWaitScreen = true;
         tbcDatabaseSelector.Enabled = false;
         Table.Enabled = false;
@@ -1236,7 +1238,7 @@ public partial class TableView : Form, IHasStatusbar {
 
         DatabaseAbstract.ForceSaveAll();
 
-        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.ForceLoadSaveAll();
 
         if (e.TabPage == null) {
             return;

@@ -1,9 +1,16 @@
-﻿namespace BlueControls.BlueDatabaseDialogs {
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+using BlueControls.Controls;
+using Button = BlueControls.Controls.Button;
+using ComboBox = BlueControls.Controls.ComboBox;
+using GroupBox = BlueControls.Controls.GroupBox;
+
+namespace BlueControls.BlueDatabaseDialogs {
     partial class ColumnArrangementPadEditor {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -266,19 +273,19 @@
 
         #endregion
 
-        private System.Windows.Forms.TabPage tabAnsichten;
-        internal Controls.GroupBox grpAnsichtsVerwaltung;
-        private Controls.Button btnAnsichtUmbenennen;
-        internal Controls.Caption capAktuellAngezeigteAnsicht;
-        private Controls.ComboBox cbxInternalColumnArrangementSelector;
-        private Controls.Button btnNeueAnsichtErstellen;
-        private Controls.Button btnAktuelleAnsichtLoeschen;
-        internal Controls.GroupBox grpAktuelleAnsicht;
-        private Controls.Button btnSystemspaltenAusblenden;
-        private Controls.Button btnSpalteEinblenden;
-        private Controls.Button btnAlleSpaltenEinblenden;
-        private Controls.Button btnBerechtigungsgruppen;
-        internal Controls.GroupBox grpSpalten;
-        private Controls.Button btnNeueSpalte;
+        private TabPage tabAnsichten;
+        internal GroupBox grpAnsichtsVerwaltung;
+        private Button btnAnsichtUmbenennen;
+        internal Caption capAktuellAngezeigteAnsicht;
+        private ComboBox cbxInternalColumnArrangementSelector;
+        private Button btnNeueAnsichtErstellen;
+        private Button btnAktuelleAnsichtLoeschen;
+        internal GroupBox grpAktuelleAnsicht;
+        private Button btnSystemspaltenAusblenden;
+        private Button btnSpalteEinblenden;
+        private Button btnAlleSpaltenEinblenden;
+        private Button btnBerechtigungsgruppen;
+        internal GroupBox grpSpalten;
+        private Button btnNeueSpalte;
     }
 }

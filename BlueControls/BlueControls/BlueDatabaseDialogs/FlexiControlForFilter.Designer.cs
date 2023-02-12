@@ -1,7 +1,7 @@
 ﻿
     using System.ComponentModel;
 
-namespace BlueControls.Controls
+    namespace BlueControls.Controls
 {
     partial class FlexiControlForFilter
     {

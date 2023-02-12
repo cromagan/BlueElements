@@ -19,6 +19,7 @@
 
 using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.EventArgs;
@@ -53,7 +54,7 @@ public class AdditionalDrawing : MouseEventArgs1_1DownAndCurrent {
         }
 
         var r = new RectangleF(0, 0, bmp.Width, bmp.Height).ZoomAndMoveRect(Zoom, ShiftX, ShiftY, true);
-        G.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+        G.PixelOffsetMode = PixelOffsetMode.Half;
         G.DrawImage(bmp, r);
     }
 

@@ -17,12 +17,14 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls.Controls;
-using BlueControls.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueControls.Controls;
+using BlueControls.Interfaces;
+using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
@@ -62,7 +64,7 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Methods
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new EasyPic {
             OriginalText = Bild_Dateiname,
             Name = DefaultItemToControlName()
@@ -106,7 +108,7 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
             DrawColorScheme(gr, positionModified, zoom, id);
         }
 
-        DrawFakeControl(gr, positionModified, zoom, BlueDatabase.Enums.ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");
+        DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }

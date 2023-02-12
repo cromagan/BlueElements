@@ -17,6 +17,13 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -24,13 +31,8 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Reflection;
-using System.Windows.Forms;
 using static BlueBasics.Polygons;
+using Size = System.Drawing.Size;
 
 //  = A3 & ".Design.GenerateAndAdd(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
 
@@ -837,7 +839,7 @@ public static class Skin {
     public const int Padding = 9;
     public const int PaddingSmal = 3;
     public static readonly Dictionary<Design, Dictionary<States, clsDesign>> Design = new();
-    public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / System.Windows.SystemParameters.VirtualScreenWidth, 2);
+    public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2);
     public static bool Inited;
     public static DatabaseAbstract? StyleDb;
     internal static Pen PenLinieDick;
@@ -1211,7 +1213,7 @@ public static class Skin {
 
     public static BlueFont GetBlueFont(PadStyles format, RowItem? rowOfStyle) {
         if (StyleDb == null) { InitStyles(); }
-        return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, "X" + ((int)format).ToString(), rowOfStyle);
+        return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, "X" + ((int)format), rowOfStyle);
     }
 
     public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).bFont;

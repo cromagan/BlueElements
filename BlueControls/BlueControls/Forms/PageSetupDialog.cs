@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Globalization;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.EventArgs;
 using static BlueBasics.Converter;
 
 namespace BlueControls.Forms;

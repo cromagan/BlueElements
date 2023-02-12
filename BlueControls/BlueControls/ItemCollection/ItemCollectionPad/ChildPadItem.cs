@@ -17,16 +17,17 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -114,13 +115,13 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         return l;
     }
 
-    public bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, float cZoom, float shiftX, float shiftY) {
+    public bool KeyUp(object sender, KeyEventArgs e, float cZoom, float shiftX, float shiftY) {
         if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         PadInternal.DoKeyUp(e, false);
         return true;
     }
 
-    public bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, float cZoom, float shiftX, float shiftY) {
+    public bool MouseDown(object sender, MouseEventArgs e, float cZoom, float shiftX, float shiftY) {
         if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         var l1 = UsedArea.ZoomAndMoveRect(cZoom, shiftX, shiftY, false);
         var l2 = PadInternal.Item.MaxBounds(ZoomItems);
@@ -140,12 +141,12 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         y = Math.Min(y, int.MaxValue / 2f);
         x = Math.Max(x, int.MinValue / 2f);
         y = Math.Max(y, int.MinValue / 2f);
-        System.Windows.Forms.MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
+        MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
         PadInternal.DoMouseDown(e2);
         return true;
     }
 
-    public bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+    public bool MouseMove(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY) {
         if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
         var l2 = PadInternal.Item.MaxBounds(ZoomItems);
@@ -166,12 +167,12 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         y = Math.Min(y, int.MaxValue / 2f);
         x = Math.Max(x, int.MinValue / 2f);
         y = Math.Max(y, int.MinValue / 2f);
-        System.Windows.Forms.MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
+        MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
         PadInternal.DoMouseMove(e2);
         return true;
     }
 
-    public bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+    public bool MouseUp(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY) {
         if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
         var l2 = PadInternal.Item.MaxBounds(ZoomItems);
@@ -191,7 +192,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         y = Math.Min(y, int.MaxValue / 2f);
         x = Math.Max(x, int.MinValue / 2f);
         y = Math.Max(y, int.MinValue / 2f);
-        System.Windows.Forms.MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
+        MouseEventArgs e2 = new(e.Button, e.Clicks, (int)x, (int)y, e.Delta);
         PadInternal.DoMouseUp(e2);
         return true;
     }

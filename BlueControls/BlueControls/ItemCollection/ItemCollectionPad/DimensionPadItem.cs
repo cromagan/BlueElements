@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
+using BlueBasics;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 using static BlueBasics.Polygons;

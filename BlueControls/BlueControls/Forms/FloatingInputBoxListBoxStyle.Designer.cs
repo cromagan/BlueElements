@@ -1,4 +1,7 @@
-﻿using BlueControls.Enums;
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+using BlueControls.Enums;
+using ListBox = BlueControls.Controls.ListBox;
 
 namespace BlueControls.Forms
 {
@@ -7,7 +10,7 @@ namespace BlueControls.Forms
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -65,7 +68,7 @@ namespace BlueControls.Forms
         }
         #endregion
 
-        private Controls.ListBox lstbx;
-        private System.Windows.Forms.Timer timer1;
+        private ListBox lstbx;
+        private Timer timer1;
     }
 }

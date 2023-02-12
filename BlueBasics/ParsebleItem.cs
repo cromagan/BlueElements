@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 
 namespace BlueBasics;
 
@@ -35,7 +35,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable {
     #region Constructors
 
     public ParsebleItem(string keyname) {
-        KeyName = string.IsNullOrEmpty(keyname) ? BlueBasics.Generic.UniqueInternal() : keyname;
+        KeyName = string.IsNullOrEmpty(keyname) ? Generic.UniqueInternal() : keyname;
         if (string.IsNullOrEmpty(KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
     }
 
@@ -133,7 +133,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable {
     public override string ToString() {
         var result = new List<string>();
 
-        var ci = (string)this.GetType().GetProperty("ClassId").GetValue(null, null);
+        var ci = (string)GetType().GetProperty("ClassId").GetValue(null, null);
 
         result.ParseableAdd("ClassId", ci);
         result.ParseableAdd("Key", KeyName);

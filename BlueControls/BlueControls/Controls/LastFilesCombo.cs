@@ -17,15 +17,17 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.IO;
+using System.Text;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection.ItemCollectionList;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
 using static BlueBasics.IO;
 
 namespace BlueControls.Controls;
@@ -102,7 +104,7 @@ public sealed class LastFilesCombo : ComboBox {
                 _lastD.Add(s);
 
                 if (CanWriteInDirectory(SaveFileName().FilePath())) {
-                    _lastD.Save(SaveFileName(), System.Text.Encoding.UTF8, false);
+                    _lastD.Save(SaveFileName(), Encoding.UTF8, false);
                 }
             }
         }
@@ -166,13 +168,13 @@ public sealed class LastFilesCombo : ComboBox {
     private void LoadFromDisk() {
         _lastD = new List<string?>();
         if (FileExists(SaveFileName())) {
-            var t = File.ReadAllText(SaveFileName(), System.Text.Encoding.UTF8);
+            var t = File.ReadAllText(SaveFileName(), Encoding.UTF8);
             t = t.RemoveChars("\n");
             _lastD.AddRange(t.SplitAndCutByCr());
         }
     }
 
-    private string SaveFileName() => !string.IsNullOrEmpty(_filename) ? _filename.CheckFile() : System.Windows.Forms.Application.StartupPath + "\\" + Name + "-Files.laf";
+    private string SaveFileName() => !string.IsNullOrEmpty(_filename) ? _filename.CheckFile() : Application.StartupPath + "\\" + Name + "-Files.laf";
 
     private void SetLastFilesStyle() {
         if (DrawStyle == ComboboxStyle.TextBox) {

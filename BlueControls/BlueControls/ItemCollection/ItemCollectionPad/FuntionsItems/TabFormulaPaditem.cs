@@ -17,18 +17,22 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
+using ListBox = BlueControls.Controls.ListBox;
+using TabControl = BlueControls.Controls.TabControl;
 
 namespace BlueControls.ItemCollection;
 
@@ -44,7 +48,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
     #region Constructors
 
-    public TabFormulaPadItem() : this(BlueBasics.Generic.UniqueInternal(), null) { }
+    public TabFormulaPadItem() : this(Generic.UniqueInternal(), null) { }
 
     public TabFormulaPadItem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
         _cf = cf;
@@ -68,7 +72,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
     #region Methods
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new Controls.TabControl {
+        var con = new TabControl {
             Name = DefaultItemToControlName()
         };
 
@@ -80,7 +84,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         return con;
     }
 
-    public void CreateTabs(Controls.TabControl c3, string? myGroup, string? myName) {
+    public void CreateTabs(TabControl c3, string? myGroup, string? myName) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -229,16 +233,16 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
     //    return null;
     //}
 
-    private Controls.ListBox Childs() {
-        var childs = new Controls.ListBox {
+    private ListBox Childs() {
+        var childs = new ListBox {
             AddAllowed = AddType.OnlySuggests,
             RemoveAllowed = true,
             MoveAllowed = true
         };
         childs.Suggestions.Clear();
 
-        if (_cf != null && System.IO.File.Exists(_cf.Filename)) {
-            foreach (var thisf in System.IO.Directory.GetFiles(_cf.Filename.FilePath(), "*.cfo")) {
+        if (_cf != null && File.Exists(_cf.Filename)) {
+            foreach (var thisf in Directory.GetFiles(_cf.Filename.FilePath(), "*.cfo")) {
                 if (!_cf.NotAllowedChilds.Contains(thisf)) {
                     _ = childs.Suggestions.Add(thisf, ImageCode.Diskette);
                 }
@@ -254,7 +258,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         }
 
         foreach (var thisf in _childs) {
-            _ = childs.Item.Add(thisf, System.IO.File.Exists(thisf) ? ImageCode.Diskette : ImageCode.Formel);
+            _ = childs.Item.Add(thisf, File.Exists(thisf) ? ImageCode.Diskette : ImageCode.Formel);
         }
 
         childs.ListOrItemChanged += Childs_ListOrItemChanged;
@@ -265,9 +269,9 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         return childs;
     }
 
-    private void Childs_ContextMenuInit(object sender, EventArgs.ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuComands.Bearbeiten);
+    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuComands.Bearbeiten);
 
-    private void Childs_ContextMenuItemClicked(object sender, EventArgs.ContextMenuItemClickedEventArgs e) {
+    private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.ClickedComand.ToLower() == "bearbeiten") {
             MultiUserFile.SaveAll(false);
 
@@ -279,7 +283,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
     }
 
     private void Childs_Disposed(object sender, System.EventArgs e) {
-        if (sender is Controls.ListBox childs) {
+        if (sender is ListBox childs) {
             childs.ListOrItemChanged -= Childs_ListOrItemChanged;
             childs.ContextMenuInit -= Childs_ContextMenuInit;
             childs.ContextMenuItemClicked -= Childs_ContextMenuItemClicked;
@@ -289,7 +293,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
     private void Childs_ListOrItemChanged(object sender, System.EventArgs e) {
         _childs.Clear();
-        _childs.AddRange(((Controls.ListBox)sender).Item.ToListOfString());
+        _childs.AddRange(((ListBox)sender).Item.ToListOfString());
         OnChanged();
         RaiseVersion();
     }

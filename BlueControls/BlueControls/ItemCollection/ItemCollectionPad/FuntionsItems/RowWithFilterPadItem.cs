@@ -17,21 +17,25 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -99,7 +103,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     public string Datenbank_wählen {
         get => string.Empty;
         set {
-            var db = Forms.CommonDialogs.ChooseKnownDatabase();
+            var db = CommonDialogs.ChooseKnownDatabase();
 
             if (db == null) { return; }
 
@@ -116,7 +120,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         get => string.Empty;
         set {
             if (Database == null || Database.IsDisposed) { return; }
-            Forms.TableView.OpenDatabaseHeadEditor(Database);
+            TableView.OpenDatabaseHeadEditor(Database);
         }
     }
 
@@ -132,7 +136,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 }
             }
 
-            var t = Forms.InputBoxListBoxStyle.Show("Filter für welche Spalte?", c, AddType.None, true);
+            var t = InputBoxListBoxStyle.Show("Filter für welche Spalte?", c, AddType.None, true);
 
             if (t == null || t.Count != 1) { return; }
 
@@ -196,7 +200,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));
 
-        var u = new ItemCollection.ItemCollectionList.ItemCollectionList(false);
+        var u = new ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
         l.Add(new FlexiControl());
@@ -338,7 +342,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     //    return null;
     //}
 
-    private void Cell_CellValueChanged(object sender, BlueDatabase.EventArgs.CellEventArgs e) => RepairConnections();
+    private void Cell_CellValueChanged(object sender, CellEventArgs e) => RepairConnections();
 
     private void FilterDatabaseUpdate() {
         if (FilterDefiniton == null) { return; }
@@ -356,7 +360,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                     or2.Add(thisc.Name + "|" + thisc.ReadableText());
                 }
                 hs.OpticalReplace = new(or2);
-                hs.DropDownItems = new System.Collections.ObjectModel.ReadOnlyCollection<string>(Database.Column.ToListOfString());
+                hs.DropDownItems = new ReadOnlyCollection<string>(Database.Column.ToListOfString());
             } else {
                 hs.OpticalReplace = new(Array.Empty<string>());
                 hs.DropDownItems = new(Array.Empty<string>());
@@ -406,7 +410,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             Events = Events.value_changed | Events.new_row
         };
         eves.Add(l);
-        FilterDefiniton.EventScript = new System.Collections.ObjectModel.ReadOnlyCollection<EventScript>(eves);
+        FilterDefiniton.EventScript = new ReadOnlyCollection<EventScript>(eves);
 
         #endregion
 
@@ -419,7 +423,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         #endregion
     }
 
-    private void FilterTable_ContextMenuInit(object sender, EventArgs.ContextMenuInitEventArgs e) {
+    private void FilterTable_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         var bt = (Table)sender;
         var cellKey = e.Tags.TagGet("CellKey");
         if (string.IsNullOrEmpty(cellKey)) { return; }
@@ -430,7 +434,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         _ = e.UserMenu.Add(ContextMenuComands.Löschen);
     }
 
-    private void Filtertable_ContextMenuItemClicked(object sender, EventArgs.ContextMenuItemClickedEventArgs e) {
+    private void Filtertable_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         var bt = (Table)sender;
         var cellKey = e.Tags.TagGet("CellKey");
         if (string.IsNullOrEmpty(cellKey)) { return; }
@@ -473,8 +477,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         fa.TextBearbeitungErlaubt = false;
         fa.DropdownAllesAbwählenErlaubt = true;
         fa.DropdownBearbeitungErlaubt = true;
-        fa.DropDownItems = new(new List<string>() { "=", "=!empty" });
-        fa.OpticalReplace = new(new List<string>() { "=|ist (GK egal)", "=!empty|wenn nicht leer, ist" });
+        fa.DropDownItems = new(new List<string> { "=", "=!empty" });
+        fa.OpticalReplace = new(new List<string> { "=|ist (GK egal)", "=!empty|wenn nicht leer, ist" });
 
         var b1 = x.Column.GenerateAndAdd("suchsym", " ", ColumnFormatHolder.Text);
         b1.BehaviorOfImageAndText = BildTextVerhalten.Nur_Bild;

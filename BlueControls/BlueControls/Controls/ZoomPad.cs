@@ -15,14 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.ItemCollection;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.ItemCollection;
 
 namespace BlueControls.Controls;
 

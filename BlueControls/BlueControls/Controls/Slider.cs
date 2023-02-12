@@ -17,13 +17,14 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.Interfaces;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -69,7 +70,7 @@ public partial class Slider : IBackgroundNone {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
-        SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
+        SetStyle(ControlStyles.ContainerControl, true);
     }
 
     #endregion
@@ -165,7 +166,7 @@ public partial class Slider : IBackgroundNone {
 
     public new bool Focused() => base.Focused || But1.Focused || But2.Focused;
 
-    internal void DoMouseWheel(System.Windows.Forms.MouseEventArgs e) => OnMouseWheel(e);
+    internal void DoMouseWheel(MouseEventArgs e) => OnMouseWheel(e);
 
     protected override void DrawControl(Graphics gr, States state) {
         var vStateBack = state;
@@ -209,7 +210,7 @@ public partial class Slider : IBackgroundNone {
         CheckButtonEnabledState();
     }
 
-    protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseDown(MouseEventArgs e) {
         base.OnMouseDown(e);
         lock (_lockUserAction) {
             _sliderContainsMouse = _slider.Contains(e.X, e.Y);
@@ -235,28 +236,28 @@ public partial class Slider : IBackgroundNone {
         Invalidate();
     }
 
-    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
         lock (_lockUserAction) {
             _sliderContainsMouse = _slider.Contains(e.X, e.Y);
             _clickAreaContainsMouse = _clickArea.Contains(e.X, e.Y);
             if (!Enabled) { return; }
-            if (e.Button == System.Windows.Forms.MouseButtons.Left) { DoMouseAction(e, true); }
+            if (e.Button == MouseButtons.Left) { DoMouseAction(e, true); }
         }
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         lock (_lockUserAction) {
             _sliderContainsMouse = _slider.Contains(e.X, e.Y);
             _clickAreaContainsMouse = _clickArea.Contains(e.X, e.Y);
             if (!Enabled) { return; }
-            if (e.Button == System.Windows.Forms.MouseButtons.Left) { DoMouseAction(e, false); }
+            if (e.Button == MouseButtons.Left) { DoMouseAction(e, false); }
             Invalidate();
         }
     }
 
-    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (!Enabled) { return; }
         if (e.Delta > 0) { But1_Click(But1, e); }
@@ -311,7 +312,7 @@ public partial class Slider : IBackgroundNone {
         return valueToCheck < min ? min : valueToCheck > max ? max : valueToCheck;
     }
 
-    private void DoMouseAction(System.Windows.Forms.MouseEventArgs e, bool mouseisMoving) {
+    private void DoMouseAction(MouseEventArgs e, bool mouseisMoving) {
         _clickAreaContainsMouse = _clickArea.Contains(e.X, e.Y);
         if (!_clickAreaContainsMouse && !mouseisMoving) { return; }
         if (_sliderContainsMouse && !mouseisMoving) { return; }

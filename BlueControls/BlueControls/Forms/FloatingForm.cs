@@ -17,14 +17,15 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Enums;
 
 namespace BlueControls.Forms;
 
@@ -177,7 +178,7 @@ public partial class FloatingForm : Form {
         // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
         if (IsClosed || IsDisposed) { return; }
         if (BackgroundImage == null || Width != BackgroundImage.Width || Height != BackgroundImage.Height) {
-            BackgroundImage = new Bitmap(Width, Height, System.Drawing.Imaging.PixelFormat.Format32bppPArgb);
+            BackgroundImage = new Bitmap(Width, Height, PixelFormat.Format32bppPArgb);
         }
         var tmpgr = Graphics.FromImage(BackgroundImage);
         Skin.Draw_Back(tmpgr, Design, States.Standard, DisplayRectangle, null, false);

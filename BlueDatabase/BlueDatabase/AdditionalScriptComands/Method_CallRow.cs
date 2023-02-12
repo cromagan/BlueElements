@@ -17,10 +17,10 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -28,7 +28,7 @@ public class Method_CallRow : MethodDatabase {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string>() { VariableString.ShortName_Plain }, new List<string>() { VariableRowItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableRowItem.ShortName_Variable } };
 
     public override string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
         "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +

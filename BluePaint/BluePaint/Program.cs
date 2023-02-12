@@ -15,8 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Enums;
 using System;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
 
 namespace BluePaint;
 
@@ -27,12 +29,12 @@ internal static class Program {
     private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
         try {
             var ex = (Exception)e.ExceptionObject;
-            BlueBasics.Develop.DebugPrint(FehlerArt.Fehler, ex);
-            BlueBasics.Develop.TraceLogging_End();
+            Develop.DebugPrint(FehlerArt.Fehler, ex);
+            Develop.TraceLogging_End();
         } finally {
-            BlueBasics.Develop.AbortExe();
+            Develop.AbortExe();
         }
-        BlueBasics.Develop.AbortExe();
+        Develop.AbortExe();
     }
 
     /// <summary>
@@ -40,7 +42,7 @@ internal static class Program {
     /// </summary>
     [STAThread]
     private static void Main() {
-        BlueBasics.Develop.StartService();
+        Develop.StartService();
         var currentDomain = AppDomain.CurrentDomain;
         currentDomain.UnhandledException += CurrentDomain_UnhandledException;
         //CultureInfo culture = new("de-DE");
@@ -48,7 +50,7 @@ internal static class Program {
         //CultureInfo.DefaultThreadCurrentUICulture = culture;
         //System.Windows.Forms.Application.EnableVisualStyles();
         //System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
-        System.Windows.Forms.Application.Run(new MainWindow(true));
+        Application.Run(new MainWindow(true));
     }
 
     #endregion

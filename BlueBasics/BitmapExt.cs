@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -28,7 +26,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using static BlueBasics.IO;
 
 namespace BlueBasics;
@@ -306,8 +307,8 @@ public class BitmapExt : IDisposableExtended {
         }
     }
 
-    public static System.Windows.Forms.Padding GetAutoValuesForCrop(Bitmap? pic, double minBrightness) {
-        System.Windows.Forms.Padding pa = new(0, 0, 0, 0);
+    public static Padding GetAutoValuesForCrop(Bitmap? pic, double minBrightness) {
+        Padding pa = new(0, 0, 0, 0);
         if (pic == null) { return pa; }
         var x = 0;
         var exitNow = false;

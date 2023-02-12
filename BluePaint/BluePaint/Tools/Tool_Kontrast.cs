@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System.Drawing;
 using BlueBasics;
 using BlueControls.EventArgs;
-using System.Drawing;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.Converter;
-
-#nullable enable
 
 namespace BluePaint;
 

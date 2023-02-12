@@ -17,11 +17,12 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueScript.Methods;
-using BlueScript.Structures;
 using System.Collections.Generic;
 using System.Linq;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueScript.Methods;
+using BlueScript.Structures;
 
 namespace BlueScript.Variables;
 
@@ -129,7 +130,7 @@ public class VariableListString : Variable {
         if (x is List<string> val) {
             _list = val;
         } else {
-            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Variablenfehler!");
+            Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler!");
         }
     }
 
@@ -141,7 +142,7 @@ public class VariableListString : Variable {
                 return new List<string>();
             } // Leere Liste
 
-            var l = Method.SplitAttributeToVars(t, s, new List<List<string>>() { new() { VariableString.ShortName_Plain } }, true, 1);
+            var l = Method.SplitAttributeToVars(t, s, new List<List<string>> { new() { VariableString.ShortName_Plain } }, true, 1);
             if (!string.IsNullOrEmpty(l.ErrorMessage)) {
                 return null;
             }

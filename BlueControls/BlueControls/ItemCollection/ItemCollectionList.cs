@@ -17,6 +17,13 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -25,12 +32,6 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Drawing;
-using System.Linq;
 
 namespace BlueControls.ItemCollection.ItemCollectionList;
 
@@ -40,7 +41,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
 
     private BlueListBoxAppearance _appearance;
 
-    private bool _autoSort = false;
+    private bool _autoSort;
 
     private CheckBehavior _checkBehavior;
 
@@ -952,7 +953,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
 
     private void PreComputeSize() {
         try {
-            _ = System.Threading.Tasks.Parallel.ForEach(this, thisItem => {
+            _ = Parallel.ForEach(this, thisItem => {
                 _ = thisItem.SizeUntouchedForListBox(ItemDesign);
             });
         } catch {

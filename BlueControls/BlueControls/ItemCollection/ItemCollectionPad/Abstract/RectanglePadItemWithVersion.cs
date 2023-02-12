@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueBasics;
 using System.Collections.Generic;
+using BlueBasics;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;

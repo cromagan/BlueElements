@@ -17,13 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueDatabase;
-using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -32,6 +25,13 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.Interfaces;
+using BlueDatabase;
+using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -776,7 +776,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
                     break;
 
                 case "item":
-                    var i = BlueBasics.ParsebleItem.NewByParsing<BasicPadItem>(pair.Value);
+                    var i = ParsebleItem.NewByParsing<BasicPadItem>(pair.Value);
                     if (i != null) { Add(i); }
                     break;
 

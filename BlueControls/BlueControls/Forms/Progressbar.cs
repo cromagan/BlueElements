@@ -18,6 +18,8 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
+using BlueControls.Enums;
 
 namespace BlueControls.Forms;
 
@@ -36,13 +38,13 @@ public partial class Progressbar : FloatingForm {
 
     #region Constructors
 
-    private Progressbar() : base(Enums.Design.Form_BitteWarten) => InitializeComponent();
+    private Progressbar() : base(Design.Form_BitteWarten) => InitializeComponent();
 
     private Progressbar(string text) : this() {
         // InitializeComponent();
         capTXT.Text = text;
-        var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-        var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+        var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+        var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
         Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
     }
 

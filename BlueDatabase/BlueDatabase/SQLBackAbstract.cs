@@ -18,13 +18,13 @@
 // https://stackoverflow.com/questions/34002901/need-for-sqlconnection-and-oracleconnection-if-odbcconnection-can-be-used-in-th
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -438,7 +438,7 @@ public abstract class SQLBackAbstract {
 
         if (!string.IsNullOrEmpty(tablename)) {
             if (!x.Contains(tablename.ToUpper())) {
-                _ = CreateTable(tablename.ToUpper(), new List<string>() { "RK" });
+                _ = CreateTable(tablename.ToUpper(), new List<string> { "RK" });
                 ChangeDataType(tablename.ToUpper(), "RK", 15);
             }
         }
@@ -448,7 +448,7 @@ public abstract class SQLBackAbstract {
         #region Style
 
         if (!x.Contains(SYS_STYLE)) {
-            _ = CreateTable(SYS_STYLE, new List<string>() { "TABLENAME", "COLUMNNAME", "TYPE", "PART" });
+            _ = CreateTable(SYS_STYLE, new List<string> { "TABLENAME", "COLUMNNAME", "TYPE", "PART" });
             ChangeDataType(tablename.ToUpper(), "COLUMNNAME", 128);
             ChangeDataType(tablename.ToUpper(), "TABLENAME", 128);
             ChangeDataType(tablename.ToUpper(), "PART", 3);

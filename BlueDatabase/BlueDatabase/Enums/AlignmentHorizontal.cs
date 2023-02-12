@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Windows.Forms;
 
 namespace BlueDatabase.Enums;
 
@@ -23,8 +24,8 @@ namespace BlueDatabase.Enums;
 public enum AlignmentHorizontal {
 
     //Keine_Präferenz = -1,
-    Links = System.Windows.Forms.TextFormatFlags.Left,
+    Links = TextFormatFlags.Left,
 
-    Rechts = System.Windows.Forms.TextFormatFlags.Right,
-    Zentriert = System.Windows.Forms.TextFormatFlags.HorizontalCenter
+    Rechts = TextFormatFlags.Right,
+    Zentriert = TextFormatFlags.HorizontalCenter
 }

@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueControls;
 
 namespace BluePaint;
@@ -36,7 +37,7 @@ public partial class Tool_Screenshot {
 
     private void DoScreenShot() {
         OnHideMainWindow();
-        BlueBasics.Generic.Pause(1, true);
+        Generic.Pause(1, true);
         var pic = ScreenShot.GrabArea(null);
         if (pic != null) { OnOverridePic(pic); }
         OnShowMainWindow();

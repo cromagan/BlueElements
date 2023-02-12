@@ -15,8 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.MultiUserFile;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -29,18 +41,10 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
-
-#nullable enable
+using Clipboard = System.Windows.Clipboard;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -556,7 +560,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (columnArrangementSelector != null) {
             columnArrangementSelector.Item.Clear();
             columnArrangementSelector.Enabled = false;
-            columnArrangementSelector.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            columnArrangementSelector.DropDownStyle = ComboBoxStyle.DropDownList;
         }
 
         if (database == null || columnArrangementSelector == null) {
@@ -656,7 +660,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Database.ProgressbarInfo -= _Database_ProgressbarInfo;
             Database.Disposing -= _Database_Disposing;
             DatabaseAbstract.ForceSaveAll();
-            BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+            MultiUserFile.ForceLoadSaveAll();
             //_database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
         }
         ShowWaitScreen = true;
@@ -883,10 +887,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
         DatabaseAbstract.ForceSaveAll();
-        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.ForceLoadSaveAll();
 
         //Database?.Load_Reload();
         if (e == null) {
@@ -905,12 +909,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void ImportClipboard() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-        if (!System.Windows.Clipboard.ContainsText()) {
+        if (!Clipboard.ContainsText()) {
             Notification.Show("Abbruch,<br>kein Text im Zwischenspeicher!", ImageCode.Information);
             return;
         }
 
-        var nt = System.Windows.Clipboard.GetText();
+        var nt = Clipboard.GetText();
         ImportCsv(nt);
     }
 
@@ -1261,11 +1265,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    protected override bool IsInputKey(System.Windows.Forms.Keys keyData) =>
+    protected override bool IsInputKey(Keys keyData) =>
             // Ganz wichtig diese Routine!
             // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
             keyData switch {
-                System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
+                Keys.Up or Keys.Down or Keys.Left or Keys.Right => true,
                 _ => false
             };
 
@@ -1306,7 +1310,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
+    protected override void OnKeyDown(KeyEventArgs e) {
         base.OnKeyDown(e);
 
         if (Database == null || Database.IsDisposed) { return; }
@@ -1318,8 +1322,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             //_database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
             switch (e.KeyCode) {
-                case System.Windows.Forms.Keys.Oemcomma: // normales ,
-                    if (e.Modifiers == System.Windows.Forms.Keys.Control) {
+                case Keys.Oemcomma: // normales ,
+                    if (e.Modifiers == Keys.Control) {
                         var lp = CellCollection.ErrorReason(CursorPosColumn, CursorPosRow?.Row, ErrorReason.EditGeneral);
                         Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
                         if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
@@ -1331,8 +1335,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     }
                     break;
 
-                case System.Windows.Forms.Keys.X:
-                    if (e.Modifiers == System.Windows.Forms.Keys.Control) {
+                case Keys.X:
+                    if (e.Modifiers == Keys.Control) {
                         CopyToClipboard(CursorPosColumn, CursorPosRow?.Row, true);
                         if (CursorPosRow?.Row is null || CursorPosRow.Row.CellIsNullOrEmpty(CursorPosColumn)) {
                             _isinKeyDown = false;
@@ -1347,7 +1351,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     }
                     break;
 
-                case System.Windows.Forms.Keys.Delete:
+                case Keys.Delete:
                     if (CursorPosRow?.Row is null || CursorPosRow.Row.CellIsNullOrEmpty(CursorPosColumn)) {
                         _isinKeyDown = false;
                         return;
@@ -1360,81 +1364,81 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     }
                     break;
 
-                case System.Windows.Forms.Keys.Left:
+                case Keys.Left:
                     Cursor_Move(Direction.Links);
                     break;
 
-                case System.Windows.Forms.Keys.Right:
+                case Keys.Right:
                     Cursor_Move(Direction.Rechts);
                     break;
 
-                case System.Windows.Forms.Keys.Up:
+                case Keys.Up:
                     Cursor_Move(Direction.Oben);
                     break;
 
-                case System.Windows.Forms.Keys.Down:
+                case Keys.Down:
                     Cursor_Move(Direction.Unten);
                     break;
 
-                case System.Windows.Forms.Keys.PageDown:
+                case Keys.PageDown:
                     if (SliderY.Enabled) {
                         CursorPos_Reset();
                         SliderY.Value += SliderY.LargeChange;
                     }
                     break;
 
-                case System.Windows.Forms.Keys.PageUp: //Bildab
+                case Keys.PageUp: //Bildab
                     if (SliderY.Enabled) {
                         CursorPos_Reset();
                         SliderY.Value -= SliderY.LargeChange;
                     }
                     break;
 
-                case System.Windows.Forms.Keys.Home:
+                case Keys.Home:
                     if (SliderY.Enabled) {
                         CursorPos_Reset();
                         SliderY.Value = SliderY.Minimum;
                     }
                     break;
 
-                case System.Windows.Forms.Keys.End:
+                case Keys.End:
                     if (SliderY.Enabled) {
                         CursorPos_Reset();
                         SliderY.Value = SliderY.Maximum;
                     }
                     break;
 
-                case System.Windows.Forms.Keys.C:
-                    if (e.Modifiers == System.Windows.Forms.Keys.Control) {
+                case Keys.C:
+                    if (e.Modifiers == Keys.Control) {
                         CopyToClipboard(CursorPosColumn, CursorPosRow?.Row, true);
                     }
                     break;
 
-                case System.Windows.Forms.Keys.F:
-                    if (e.Modifiers == System.Windows.Forms.Keys.Control) {
+                case Keys.F:
+                    if (e.Modifiers == Keys.Control) {
                         Search x = new(this);
                         x.Show();
                     }
                     break;
 
-                case System.Windows.Forms.Keys.F2:
+                case Keys.F2:
                     Cell_Edit(CursorPosColumn, CursorPosRow, true);
                     break;
 
-                case System.Windows.Forms.Keys.V:
-                    if (e.Modifiers == System.Windows.Forms.Keys.Control) {
+                case Keys.V:
+                    if (e.Modifiers == Keys.Control) {
                         if (CursorPosColumn != null && CursorPosRow?.Row != null) {
                             if (!CursorPosColumn.Format.TextboxEditPossible() && CursorPosColumn.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                                 NotEditableInfo("Die Zelle hat kein passendes Format.");
                                 _isinKeyDown = false;
                                 return;
                             }
-                            if (!System.Windows.Clipboard.ContainsText()) {
+                            if (!Clipboard.ContainsText()) {
                                 NotEditableInfo("Kein Text in der Zwischenablage.");
                                 _isinKeyDown = false;
                                 return;
                             }
-                            var ntxt = System.Windows.Clipboard.GetText();
+                            var ntxt = Clipboard.GetText();
                             if (CursorPosRow?.Row.CellGetString(CursorPosColumn) == ntxt) {
                                 _isinKeyDown = false;
                                 return;
@@ -1453,7 +1457,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseDown(MouseEventArgs e) {
         base.OnMouseDown(e);
         if (Database == null || Database.IsDisposed) { return; }
         lock (_lockUserAction) {
@@ -1510,14 +1514,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
         lock (_lockUserAction) {
             if (_isinMouseMove) { return; }
             _isinMouseMove = true;
             _mouseOverText = string.Empty;
             CellOnCoordinate(e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
-            if (e.Button != System.Windows.Forms.MouseButtons.None) {
+            if (e.Button != MouseButtons.None) {
                 //_database?.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
             } else {
                 if (_mouseOverColumn != null && e.Y < HeadSize()) {
@@ -1560,7 +1564,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
 
         if (Database == null || Database.IsDisposed) { return; }
@@ -1578,11 +1582,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             var viewItem = CurrentArrangement?[_mouseOverColumn];
 
-            if (e.Button == System.Windows.Forms.MouseButtons.Left) {
+            if (e.Button == MouseButtons.Left) {
                 if (_mouseOverColumn != null) {
                     if (Mouse_IsInAutofilter(viewItem, e)) {
-                        var screenX = System.Windows.Forms.Cursor.Position.X - e.X;
-                        var screenY = System.Windows.Forms.Cursor.Position.Y - e.Y;
+                        var screenX = Cursor.Position.X - e.X;
+                        var screenY = Cursor.Position.Y - e.Y;
                         AutoFilter_Show(viewItem, screenX, screenY);
                         return;
                     }
@@ -1601,13 +1605,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
             }
 
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+            if (e.Button == MouseButtons.Right) {
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
             }
         }
     }
 
-    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (Database == null || Database.IsDisposed) { return; }
 
@@ -1689,9 +1693,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private static int GetPix(int pix, BlueFont? f, double scale) => Skin.FormatedText_NeededSize("@|", null, f, (int)((pix * scale) + 0.5)).Height;
 
-    private static bool Mouse_IsInAutofilter(ColumnViewItem? viewItem, System.Windows.Forms.MouseEventArgs e) => viewItem?.Column != null && viewItem.TmpAutoFilterLocation.Width != 0 && viewItem.Column.AutoFilterSymbolPossible() && viewItem.TmpAutoFilterLocation.Contains(e.X, e.Y);
+    private static bool Mouse_IsInAutofilter(ColumnViewItem? viewItem, MouseEventArgs e) => viewItem?.Column != null && viewItem.TmpAutoFilterLocation.Width != 0 && viewItem.Column.AutoFilterSymbolPossible() && viewItem.TmpAutoFilterLocation.Contains(e.X, e.Y);
 
-    private static bool Mouse_IsInRedcueButton(ColumnViewItem? viewItem, System.Windows.Forms.MouseEventArgs e) => viewItem != null && viewItem.TmpReduceLocation.Width != 0 && viewItem.TmpReduceLocation.Contains(e.X, e.Y);
+    private static bool Mouse_IsInRedcueButton(ColumnViewItem? viewItem, MouseEventArgs e) => viewItem != null && viewItem.TmpReduceLocation.Width != 0 && viewItem.TmpReduceLocation.Contains(e.X, e.Y);
 
     private static void NotEditableInfo(string reason) => Notification.Show(reason, ImageCode.Kreuz);
 
@@ -1926,7 +1930,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             //    }
 
             case "doclipboard": {
-                    var clipTmp = System.Windows.Clipboard.GetText();
+                    var clipTmp = Clipboard.GetText();
                     clipTmp = clipTmp.RemoveChars(Constants.Char_NotFromClip);
                     clipTmp = clipTmp.TrimEnd("\r\n");
                     var searchValue = new List<string>(clipTmp.SplitAndCutByCr()).SortedDistinctList();
@@ -1938,7 +1942,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
 
             case "donotclipboard": {
-                    var clipTmp = System.Windows.Clipboard.GetText();
+                    var clipTmp = Clipboard.GetText();
                     clipTmp = clipTmp.RemoveChars(Constants.Char_NotFromClip);
                     clipTmp = clipTmp.TrimEnd("\r\n");
                     var columInhalt = Database.Export_CSV(FirstRow.Without, e.Column, null).SplitAndCutByCrToList().SortedDistinctList();
@@ -2606,7 +2610,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 currentRow.CaptionPos = Rectangle.Empty;
                 if (currentRow.ShowCap) {
                     var si = gr.MeasureString(currentRow.Chapter, _chapterFont.Font());
-                    gr.FillRectangle(new SolidBrush(Skin.Color_Back(BlueControls.Enums.Design.Table_And_Pad, States.Standard).SetAlpha(50)), 1, DrawY(currentRow) - RowCaptionSizeY, displayRectangleWoSlider.Width - 2, RowCaptionSizeY);
+                    gr.FillRectangle(new SolidBrush(Skin.Color_Back(Enums.Design.Table_And_Pad, States.Standard).SetAlpha(50)), 1, DrawY(currentRow) - RowCaptionSizeY, displayRectangleWoSlider.Width - 2, RowCaptionSizeY);
                     currentRow.CaptionPos = new Rectangle(1, DrawY(currentRow) - _rowCaptionFontY, (int)si.Width + 28, (int)si.Height);
 
                     if (_collapsed.Contains(currentRow.Chapter)) {
@@ -2675,7 +2679,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (Focused()) { stat = States.Standard_HasFocus; }
 
         if (onlyCursorLines) {
-            Pen pen = new(Skin.Color_Border(BlueControls.Enums.Design.Table_Cursor, stat).SetAlpha(180));
+            Pen pen = new(Skin.Color_Border(Enums.Design.Table_Cursor, stat).SetAlpha(180));
             gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top - 1, displayRectangleWoSlider.Width + 2, _tmpCursorRect.Height + 1));
         } else {
             Skin.Draw_Back(gr, Enums.Design.Table_Cursor, stat, _tmpCursorRect, this, false);

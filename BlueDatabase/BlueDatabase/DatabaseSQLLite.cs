@@ -17,12 +17,13 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Threading;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -43,7 +44,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// <summary>
     /// Der Globale Timer, der die Sys_Undo Datenbank abfrägt
     /// </summary>
-    private static System.Threading.Timer? _timer;
+    private static Timer? _timer;
 
     /// <summary>
     /// Der Zeitstempel der letzten Abfrage des _timer
@@ -404,7 +405,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     private void GenerateTimer() {
         if (_timer != null) { return; }
         _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
-        _timer = new System.Threading.Timer(CheckSysUndo);
+        _timer = new Timer(CheckSysUndo);
         _ = _timer.Change(10000, 10000);
     }
 

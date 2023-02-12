@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BlueDatabase;
 

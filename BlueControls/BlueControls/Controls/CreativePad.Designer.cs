@@ -1,5 +1,8 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Printing;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls
 {
@@ -11,29 +14,29 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CreativePad));
-            this.PrintPreviewDialog1 = new System.Windows.Forms.PrintPreviewDialog();
-            this.DruckerDokument = new System.Drawing.Printing.PrintDocument();
-            this.PrintDialog1 = new System.Windows.Forms.PrintDialog();
-            this.PicsSave = new System.Windows.Forms.SaveFileDialog();
+            ComponentResourceManager resources = new ComponentResourceManager(typeof(CreativePad));
+            this.PrintPreviewDialog1 = new PrintPreviewDialog();
+            this.DruckerDokument = new PrintDocument();
+            this.PrintDialog1 = new PrintDialog();
+            this.PicsSave = new SaveFileDialog();
             this.SuspendLayout();
             // 
             // PrintPreviewDialog1
             // 
-            this.PrintPreviewDialog1.AutoScrollMargin = new System.Drawing.Size(0, 0);
-            this.PrintPreviewDialog1.AutoScrollMinSize = new System.Drawing.Size(0, 0);
-            this.PrintPreviewDialog1.ClientSize = new System.Drawing.Size(400, 300);
+            this.PrintPreviewDialog1.AutoScrollMargin = new Size(0, 0);
+            this.PrintPreviewDialog1.AutoScrollMinSize = new Size(0, 0);
+            this.PrintPreviewDialog1.ClientSize = new Size(400, 300);
             this.PrintPreviewDialog1.Document = this.DruckerDokument;
             this.PrintPreviewDialog1.Enabled = true;
-            this.PrintPreviewDialog1.Icon = ((System.Drawing.Icon)(resources.GetObject("PrintPreviewDialog1.Icon")));
+            this.PrintPreviewDialog1.Icon = ((Icon)(resources.GetObject("PrintPreviewDialog1.Icon")));
             this.PrintPreviewDialog1.Name = "PrintPreviewDialog1";
             this.PrintPreviewDialog1.Visible = false;
             // 
             // DruckerDokument
             // 
-            this.DruckerDokument.BeginPrint += new System.Drawing.Printing.PrintEventHandler(this.DruckerDokument_BeginPrint);
-            this.DruckerDokument.EndPrint += new System.Drawing.Printing.PrintEventHandler(this.DruckerDokument_EndPrint);
-            this.DruckerDokument.PrintPage += new System.Drawing.Printing.PrintPageEventHandler(this.DruckerDokument_PrintPage);
+            this.DruckerDokument.BeginPrint += new PrintEventHandler(this.DruckerDokument_BeginPrint);
+            this.DruckerDokument.EndPrint += new PrintEventHandler(this.DruckerDokument_EndPrint);
+            this.DruckerDokument.PrintPage += new PrintPageEventHandler(this.DruckerDokument_PrintPage);
             // 
             // PrintDialog1
             // 
@@ -44,16 +47,16 @@ namespace BlueControls.Controls
             this.PicsSave.Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap" +
     "|*.bmp";
             this.PicsSave.Title = "Bitte neuen Dateinamen der Datei wählen.";
-            this.PicsSave.FileOk += new System.ComponentModel.CancelEventHandler(this.PicsSave_FileOk);
+            this.PicsSave.FileOk += new CancelEventHandler(this.PicsSave_FileOk);
             // 
             // CreativePad
             // 
-            this.Size = new System.Drawing.Size(498, 362);
+            this.Size = new Size(498, 362);
             this.ResumeLayout(false);
         }
-        private System.Windows.Forms.PrintPreviewDialog PrintPreviewDialog1;
+        private PrintPreviewDialog PrintPreviewDialog1;
         private PrintDocument DruckerDokument;
-        private System.Windows.Forms.PrintDialog PrintDialog1;
-        public System.Windows.Forms.SaveFileDialog PicsSave;
+        private PrintDialog PrintDialog1;
+        public SaveFileDialog PicsSave;
     }
 }

@@ -17,15 +17,16 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Interfaces;
 using System;
 using System.ComponentModel;
+using BlueBasics;
+using BlueBasics.Interfaces;
+using BlueControls.Controls;
 
 namespace BlueControls.Classes_Editor;
 
 [DefaultEvent("Changed")]
-internal partial class AbstractClassEditor<T> : Controls.GroupBox, IChangedFeedback, IDisposableExtended where T : IParseable {
+internal partial class AbstractClassEditor<T> : GroupBox, IChangedFeedback, IDisposableExtended where T : IParseable {
 
     #region Fields
 

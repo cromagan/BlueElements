@@ -17,10 +17,11 @@
 
 #nullable enable
 
-using BlueControls.Controls;
-using BlueControls.Enums;
 using System;
 using System.Drawing;
+using System.Windows.Forms;
+using BlueControls.Controls;
+using BlueControls.Enums;
 using static BlueBasics.Develop;
 
 namespace BlueControls.Forms;
@@ -46,11 +47,11 @@ public partial class DialogWithOkAndCancel : Form {
         _cancelPossible = cancelPossible;
 
         if (Owner == null) {
-            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterScreen;
         }
 
         if (sizeable) {
-            FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            FormBorderStyle = FormBorderStyle.SizableToolWindow;
         }
     }
 
@@ -104,7 +105,7 @@ public partial class DialogWithOkAndCancel : Form {
         wi = Math.Max(wi + BorderWidth, minWidth);
         Setup(wi, he);
         if (centerControl != null) {
-            centerControl.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            centerControl.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
         }
     }
 

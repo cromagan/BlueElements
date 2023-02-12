@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -53,15 +54,15 @@ public sealed class SystemInputHook {
 
     #region Events
 
-    public event System.EventHandler<KeyEventArgs>? KeyDown;
+    public event EventHandler<KeyEventArgs>? KeyDown;
 
-    public event System.EventHandler<KeyEventArgs>? KeyUp;
+    public event EventHandler<KeyEventArgs>? KeyUp;
 
-    public event System.EventHandler<MouseEventArgs>? MouseDown;
+    public event EventHandler<MouseEventArgs>? MouseDown;
 
-    public event System.EventHandler<MouseEventArgs>? MouseMove;
+    public event EventHandler<MouseEventArgs>? MouseMove;
 
-    public event System.EventHandler<MouseEventArgs>? MouseUp;
+    public event EventHandler<MouseEventArgs>? MouseUp;
 
     #endregion
 

@@ -17,15 +17,17 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls.Enums;
-using BlueControls.Forms;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.Design;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Drawing.Imaging;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueControls.Enums;
+using BlueControls.Forms;
+using Form = System.Windows.Forms.Form;
 
 //Inherits UserControl ' -> Gibt Focus an Child!
 //Inherits ContainerControl -> ?
@@ -34,7 +36,7 @@ using System.Drawing.Imaging;
 
 namespace BlueControls.Controls;
 
-public class GenericControl : System.Windows.Forms.Control {
+public class GenericControl : Control {
 
     #region Fields
 
@@ -64,13 +66,13 @@ public class GenericControl : System.Windows.Forms.Control {
         // Dieser Aufruf ist für den Designer erforderlich.
         // InitializeComponent()
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, false);
-        SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw, false);
-        SetStyle(System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
-        SetStyle(System.Windows.Forms.ControlStyles.Opaque, true);
+        SetStyle(ControlStyles.ContainerControl, false);
+        SetStyle(ControlStyles.ResizeRedraw, false);
+        SetStyle(ControlStyles.SupportsTransparentBackColor, false);
+        SetStyle(ControlStyles.Opaque, true);
         //The next 3 styles are allefor double buffering
-        SetStyle(System.Windows.Forms.ControlStyles.UserPaint, true);
-        SetStyle(System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
+        SetStyle(ControlStyles.UserPaint, true);
+        SetStyle(ControlStyles.AllPaintingInWmPaint, true);
         if (doubleBuffer) {
             SetDoubleBuffering();
         }
@@ -110,12 +112,12 @@ public class GenericControl : System.Windows.Forms.Control {
 
     #region Methods
 
-    public static System.Windows.Forms.Form? ParentForm(System.Windows.Forms.Control? o) {
+    public static Form? ParentForm(Control? o) {
         if (o == null || o.IsDisposed) { return null; }
 
         do {
             switch (o) {
-                case Form frm:
+                case Forms.Form frm:
                     return frm;
 
                 case null:
@@ -128,13 +130,13 @@ public class GenericControl : System.Windows.Forms.Control {
         } while (true);
     }
 
-    public static PartentType Typ(System.Windows.Forms.Control control) {
+    public static PartentType Typ(Control control) {
         switch (control) {
             case null:
                 return PartentType.Nothing;
 
             case GroupBox: {
-                    if (control.Parent is System.Windows.Forms.TabPage tp) {
+                    if (control.Parent is TabPage tp) {
                         if (tp.Parent == null) { return PartentType.Unbekannt; }
                         if (tp.Parent is RibbonBar) { return PartentType.RibbonGroupBox; }
                     }
@@ -159,10 +161,10 @@ public class GenericControl : System.Windows.Forms.Control {
                 return PartentType.TabControl;
             // Is = "BlueBasics.TabPage"
 
-            case System.Windows.Forms.TabPage when control.Parent is RibbonBar:
+            case TabPage when control.Parent is RibbonBar:
                 return PartentType.RibbonPage;
 
-            case System.Windows.Forms.TabPage:
+            case TabPage:
                 return PartentType.TabPage;
             //Is = "BlueBasics.Slider"
 
@@ -197,13 +199,13 @@ public class GenericControl : System.Windows.Forms.Control {
             //case Formula:
             //    return PartentType.Formula;
 
-            case Form:
+            case Forms.Form:
                 return PartentType.Form;
 
             case Table:
                 return PartentType.Table;
 
-            case System.Windows.Forms.Panel:
+            case Panel:
                 return PartentType.Panel;
 
             case FlexiControlForCell:
@@ -225,7 +227,7 @@ public class GenericControl : System.Windows.Forms.Control {
         return _bitmapOfControl;
     }
 
-    public bool ContainsMouse() => ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position));
+    public bool ContainsMouse() => ClientRectangle.Contains(PointToClient(Cursor.Position));
 
     public void DoQuickInfo() {
         if (string.IsNullOrEmpty(_quickInfo) && string.IsNullOrEmpty(QuickInfoText)) {
@@ -244,7 +246,7 @@ public class GenericControl : System.Windows.Forms.Control {
             return (Point)Invoke(new Func<Point>(MousePos));
         }
         if (IsDisposed) { return default; }
-        return PointToClient(System.Windows.Forms.Cursor.Position);
+        return PointToClient(Cursor.Position);
     }
 
     // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
@@ -265,7 +267,7 @@ public class GenericControl : System.Windows.Forms.Control {
         // NIX TUN!!!!
     }
 
-    internal static bool AllEnabled(System.Windows.Forms.Control control) {
+    internal static bool AllEnabled(Control control) {
         if (control.IsDisposed) { return false; }
         do {
             if (control == null) { return true; }
@@ -286,7 +288,7 @@ public class GenericControl : System.Windows.Forms.Control {
     protected virtual void DrawControl(Graphics gr, States state) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
     //MyBase.ScaleChildren
-    protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
+    protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
 
     protected bool MousePressing() => _mousePressing;
 
@@ -302,7 +304,7 @@ public class GenericControl : System.Windows.Forms.Control {
 
     protected override void OnGotFocus(System.EventArgs e) {
         if (IsDisposed) { return; }
-        if (!GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
+        if (!GetStyle(ControlStyles.Selectable)) {
             _ = Parent.SelectNextControl(this, true, true, true, true);
         } else {
             base.OnGotFocus(e);
@@ -310,24 +312,24 @@ public class GenericControl : System.Windows.Forms.Control {
         }
     }
 
-    protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
+    protected override void OnKeyDown(KeyEventArgs e) {
         if (IsDisposed) { return; }
         base.OnKeyDown(e);
     }
 
-    protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
+    protected override void OnKeyPress(KeyPressEventArgs e) {
         if (IsDisposed) { return; }
         base.OnKeyPress(e);
     }
 
-    protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) {
+    protected override void OnKeyUp(KeyEventArgs e) {
         if (IsDisposed) { return; }
         base.OnKeyUp(e);
     }
 
     protected override void OnLostFocus(System.EventArgs e) {
         if (IsDisposed) { return; }
-        if (GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
+        if (GetStyle(ControlStyles.Selectable)) {
             //if (_MousePressing) { OnMouseUp(new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0)); }
             MouseHighlight = false;
             base.OnLostFocus(e);
@@ -335,14 +337,14 @@ public class GenericControl : System.Windows.Forms.Control {
         }
     }
 
-    protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseDown(MouseEventArgs e) {
         lock (this) {
             if (IsDisposed) { return; }
             if (_mousePressing) { return; }
             _mousePressing = true;
             Forms.QuickInfo.Close();
             if (Enabled) {
-                if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && Focus()) { _ = Focus(); }
+                if (GetStyle(ControlStyles.Selectable) && Focus()) { _ = Focus(); }
             }
             base.OnMouseDown(e);
         }
@@ -360,7 +362,7 @@ public class GenericControl : System.Windows.Forms.Control {
         DoQuickInfo();
     }
 
-    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseMove(MouseEventArgs e) {
         lock (this) {
             if (IsDisposed) { return; }
             base.OnMouseMove(e);
@@ -368,24 +370,24 @@ public class GenericControl : System.Windows.Forms.Control {
         }
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         if (IsDisposed) { return; }
         if (!_mousePressing) { return; }
         _mousePressing = false;
         base.OnMouseUp(e);
     }
 
-    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseWheel(MouseEventArgs e) {
         if (IsDisposed) { return; }
         _mousePressing = false;
         base.OnMouseWheel(e);
     }
 
-    protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) =>
+    protected override void OnPaint(PaintEventArgs e) =>
         // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
         DoDraw(e.Graphics);
 
-    protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) {
+    protected override void OnPaintBackground(PaintEventArgs pevent) {
         // do not allow the background to be painted
         // Um flimmern zu vermeiden!
     }
@@ -406,7 +408,7 @@ public class GenericControl : System.Windows.Forms.Control {
         base.OnSizeChanged(e);
     }
 
-    protected System.Windows.Forms.Form? ParentForm() => ParentForm(Parent);
+    protected Form? ParentForm() => ParentForm(Parent);
 
     protected PartentType ParentType() {
         if (Parent == null) { return PartentType.Unbekannt; }
@@ -415,9 +417,9 @@ public class GenericControl : System.Windows.Forms.Control {
         return _myParentType;
     }
 
-    protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
-    protected void SetDoubleBuffering() => SetStyle(System.Windows.Forms.ControlStyles.DoubleBuffer, true);
+    protected void SetDoubleBuffering() => SetStyle(ControlStyles.DoubleBuffer, true);
 
     //MyBase.GetScaledBounds(bounds, factor, specified)
 
@@ -426,12 +428,12 @@ public class GenericControl : System.Windows.Forms.Control {
         TabStop = false;
         TabIndex = 0;
         CausesValidation = false;
-        SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
+        SetStyle(ControlStyles.Selectable, false);
         //SetStyle(System.Windows.Forms.ControlStyles.StandardClick, false);
         //SetStyle(System.Windows.Forms.ControlStyles.StandardDoubleClick, false);
     }
 
-    protected override void WndProc(ref System.Windows.Forms.Message m) {
+    protected override void WndProc(ref Message m) {
         try {
             //https://www.vb-paradise.de/allgemeines/tipps-tricks-und-tutorials/windows-forms/50038-wndproc-kleine-liste-aller-messages/
             if (m.Msg == (int)Enums.WndProc.WM_ERASEBKGND) { return; }
@@ -487,9 +489,9 @@ public class GenericControl : System.Windows.Forms.Control {
         if (MouseHighlight && ContainsMouse()) { s |= States.Standard_MouseOver; }
         if (_mousePressing) {
             if (MouseHighlight) { s |= States.Standard_MousePressed; }
-            if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) { s |= States.Standard_HasFocus; }
+            if (GetStyle(ControlStyles.Selectable) && CanFocus) { s |= States.Standard_HasFocus; }
         } else {
-            if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus && Focused) { s |= States.Standard_HasFocus; }
+            if (GetStyle(ControlStyles.Selectable) && CanFocus && Focused) { s |= States.Standard_HasFocus; }
         }
         return s;
     }

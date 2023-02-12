@@ -17,6 +17,12 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -24,12 +30,6 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -232,7 +232,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
     public Point CellGetPoint(ColumnItem? column) => Database?.Cell.GetPoint(column, this) ?? Point.Empty;
 
-    public string CellGetString(string columnName) => Database?.Cell.GetString(Database.Column[columnName], this) ?? default;
+    public string CellGetString(string columnName) => Database?.Cell.GetString(Database.Column[columnName], this) ?? string.Empty;
 
     public string CellGetString(ColumnItem? column) {
         if (Database == null || Database.IsDisposed || column == null) { return string.Empty; }
@@ -273,18 +273,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
     public void CellSet(ColumnItem? column, DateTime value) => Database?.Cell.Set(column, this, value);
 
-    /// <summary>
-    /// Überschreibt alle Zellen-Werte mit der der Vorlage.
-    /// </summary>
-    /// <param name="source"></param>
-
     public string CheckRowData() {
         if (Database is null || Database.IsDisposed) { return "Datenbank verworfen"; }
         //if (r?.Database != Database) { return "Datenbank Konflikt"; }
 
         if (Database.Row.LastCheckedRow != Key) {
             Database.Row.LastCheckedRowFeedback.Clear();
-            ExecuteScript(BlueDatabase.Enums.Events.error_check, string.Empty, false, false, true, 0);
+            ExecuteScript(Events.error_check, string.Empty, false, false, true, 0);
         }
 
         var infoTxt = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
@@ -358,11 +353,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
     /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
     /// </summary>
+    /// <param name="scriptname"></param>
     /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
     /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgefphrt</param>
+    /// <param name="changevalues"></param>
     /// <param name="tryforsceonds"></param>
+    /// <param name="eventname"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-
     public ScriptEndedFeedback ExecuteScript(Events? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
         var t = DateTime.Now;
@@ -373,16 +370,22 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         } while (true);
     }
 
-    public bool IsNullOrEmpty() => Database.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
+    public bool IsNullOrEmpty() {
+        if (Database == null || Database.IsDisposed) { return true; }
+        return Database.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
+    }
 
-    public bool IsNullOrEmpty(ColumnItem? column) => Database.Cell.IsNullOrEmpty(column, this);
+    public bool IsNullOrEmpty(ColumnItem? column) {
+        if (Database == null || Database.IsDisposed) { return true; }
+        return Database.Cell.IsNullOrEmpty(column, this);
+    }
 
-    public bool MatchesTo(FilterItem filter) {
+    public bool MatchesTo(FilterItem? filter) {
         if (Database == null || Database.IsDisposed) { return false; }
 
-        filter.Column?.RefreshColumnsData();
-
         if (filter != null) {
+            filter.Column?.RefreshColumnsData();
+
             if (filter.FilterType is FilterType.KeinFilter or FilterType.GroßKleinEgal) { return true; } // Filter ohne Funktion
             if (filter.Column == null) {
                 if (!filter.FilterType.HasFlag(FilterType.GroßKleinEgal)) { filter.FilterType |= FilterType.GroßKleinEgal; }
@@ -448,14 +451,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         return erg;
     }
 
-    /// <summary>
-    /// Ersetzt Spaltennamen mit dem dementsprechenden Wert der Zelle. Format: &Spaltenname; oder &Spaltenname(L,8);
-    /// </summary>
-    /// <param name="formel"></param>
-    /// <param name="fulltext">Bei TRUE wird der Text so zurückgegeben, wie er in der Zelle angezeigt werden würde: Mit Suffix und Ersetzungen. Zeilenumbrüche werden eleminiert!</param>
-    /// <returns></returns>
     public void VariableToCell(ColumnItem? column, ICollection<Variable> vars) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
+        if (Database == null || Database.IsDisposed || Database.ReadOnly || column == null) { return; }
 
         var columnVar = vars.Get(column.Name);
         if (columnVar == null || columnVar.ReadOnly) { return; }
@@ -581,12 +578,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     }
 
     private void GenerateQuickInfo() {
-        if (string.IsNullOrEmpty(Database.ZeilenQuickInfo)) { _tmpQuickInfo = string.Empty; return; }
+        if (Database == null || Database.IsDisposed ||
+            string.IsNullOrEmpty(Database.ZeilenQuickInfo)) {
+            _tmpQuickInfo = string.Empty;
+            return;
+        }
+
         _tmpQuickInfo = ReplaceVariables(Database.ZeilenQuickInfo, true, false);
     }
 
     private bool RowFilterMatch(string searchText) {
         if (string.IsNullOrEmpty(searchText)) { return true; }
+        if (Database == null || Database.IsDisposed) { return false; }
+
         searchText = searchText.ToUpper();
         foreach (var thisColumnItem in Database.Column) {
             {

@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -24,8 +27,6 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BlueControls.Forms;
 
@@ -84,7 +85,7 @@ public partial class RelationDiagram : PadEditor {
         return null;
     }
 
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
         if (_database != null) {
             _database.Disposing -= Database_Disposing;
@@ -274,7 +275,7 @@ public partial class RelationDiagram : PadEditor {
     //}
 
     private void btnTextExport_Click(object sender, System.EventArgs e) {
-        System.Windows.Forms.FolderBrowserDialog fl = new();
+        FolderBrowserDialog fl = new();
         _ = fl.ShowDialog();
         List<string> l = new();
         foreach (var thisR in Pad.Item) {

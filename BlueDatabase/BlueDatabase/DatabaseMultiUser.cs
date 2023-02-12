@@ -17,15 +17,16 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.MultiUserFile;
+using BlueDatabase.Enums;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
@@ -37,7 +38,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     #region Fields
 
     public ListExt<WorkItem>? Works;
-    private readonly BlueBasics.MultiUserFile.MultiUserFile? _muf;
+    private readonly MultiUserFile? _muf;
 
     #endregion
 
@@ -48,7 +49,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     public DatabaseMultiUser(bool readOnly, string tablename) : this(string.Empty, readOnly, true, tablename) { }
 
     public DatabaseMultiUser(string filename, bool readOnly, bool create, string tablename) : base(tablename, readOnly) {
-        _muf = new BlueBasics.MultiUserFile.MultiUserFile();
+        _muf = new MultiUserFile();
 
         _muf.Loaded += _muf_Loaded;
         _muf.Loading += _muf_Loading;

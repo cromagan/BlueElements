@@ -17,18 +17,19 @@
 
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Design;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
+using BlueDatabase;
 using BlueDatabase.Interfaces;
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Design;
-using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
@@ -193,7 +194,7 @@ public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
             var tmpPic = QuickImage.Get(QuickImage.GenerateCode(pic.Name, control.Width - 6, 28, pic.Effekt, pic.Färbung, pic.ChangeGreenTo, pic.Sättigung, pic.Helligkeit, pic.DrehWinkel, pic.Transparenz, pic.Zweitsymbol));
             Skin.Draw_FormatedText(gr, string.Empty, tmpPic, design, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, control.Width, 44), control, false, translate);
 
-            var tt = BlueDatabase.LanguageTool.DoTranslate(text, translate);
+            var tt = LanguageTool.DoTranslate(text, translate);
 
             if (!string.IsNullOrWhiteSpace(tt)) {
                 // Mehrzeiligen Text generieren und Zeichnen
@@ -209,7 +210,7 @@ public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
         } else if (buttontype is not Design.OptionButton_TextStyle and not Design.CheckBox_TextStyle) {
             Skin.Draw_FormatedText(gr, text, pic, design, align, displayRectangle, control, false, translate);
         } else {
-            var tt = "<ImageCode=" + design.Image + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(text, translate);
+            var tt = "<ImageCode=" + design.Image + "> <zbx_store><top>" + LanguageTool.DoTranslate(text, translate);
             //etxt = new ExtText(buttontype, state);
             etxt.Design = buttontype;
             etxt.State = state;

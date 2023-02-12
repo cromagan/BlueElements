@@ -1,6 +1,7 @@
-using BlueControls.Forms;
 using System.Diagnostics;
 using System.Drawing;
+using System.Windows.Forms;
+using Form = BlueControls.Forms.Form;
 
 namespace BlueControls
 {
@@ -25,10 +26,10 @@ namespace BlueControls
             //
             //frmScreenShot
             //
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.AutoScaleMode = AutoScaleMode.None;
             this.ClientSize = new Size(292, 272);
             this.DoubleBuffered = true;
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
+            this.FormBorderStyle = FormBorderStyle.None;
             this.Name = "frmScreenShot";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;

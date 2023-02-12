@@ -17,17 +17,17 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 
 namespace BlueDatabase;
 
@@ -156,7 +156,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         } while (true);
     }
 
-    public List<RowData?> AllRows() {
+    public List<RowData> AllRows() {
         var sortedRows = new List<RowData>();
         foreach (var thisRowItem in this) {
             if (thisRowItem != null) {

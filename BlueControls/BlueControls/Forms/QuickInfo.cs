@@ -15,9 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using System;
 using System.Drawing;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueControls.Enums;
 
 namespace BlueControls.Forms;
 
@@ -34,13 +36,13 @@ public partial class QuickInfo : FloatingForm {
 
     #region Constructors
 
-    private QuickInfo() : base(Enums.Design.Form_QuickInfo) => InitializeComponent();
+    private QuickInfo() : base(Design.Form_QuickInfo) => InitializeComponent();
 
     private QuickInfo(string text) : this() {
         //InitializeComponent();
         capTXT.Text = text;
-        var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-        var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+        var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+        var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
         Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
         Visible = false;
         timQI.Enabled = true;

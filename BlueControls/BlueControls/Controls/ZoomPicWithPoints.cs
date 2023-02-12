@@ -17,19 +17,23 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Text;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection.ItemCollectionList;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.IO;
-using System.Windows.Forms;
 using static BlueBasics.IO;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -44,7 +48,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
     private readonly List<PointM?> _points = new();
     private Helpers _helper = Helpers.Ohne;
-    private BlueBasics.Enums.Orientation _mittelLinie = BlueBasics.Enums.Orientation.Ohne;
+    private Orientation _mittelLinie = Orientation.Ohne;
     private bool _pointAdding;
 
     #endregion
@@ -67,8 +71,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         }
     }
 
-    [DefaultValue((BlueBasics.Enums.Orientation)(-1))]
-    public BlueBasics.Enums.Orientation Mittellinie {
+    [DefaultValue((Orientation)(-1))]
+    public Orientation Mittellinie {
         get => _mittelLinie;
         set {
             if (_mittelLinie == value) { return; }
@@ -107,7 +111,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         }
         var ftxt = FilenameTxt(pathOfPicture);
         if (FileExists(ftxt)) {
-            tags = File.ReadAllText(ftxt, System.Text.Encoding.UTF8).SplitAndCutByCrToList();
+            tags = File.ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCrToList();
         }
         tags.TagSet("ImageFile", pathOfPicture);
         return new Tuple<Bitmap?, List<string>>(bmp, tags);
@@ -116,7 +120,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     public static Tuple<Bitmap?, List<string>> ResizeData(Bitmap? pic, List<string> tags, int width, int height) {
         var zoomx = (float)width / pic.Width;
         var zoomy = (float)height / pic.Height;
-        var pic2 = BitmapExt.Resize(pic, width, height, SizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
+        var pic2 = BitmapExt.Resize(pic, width, height, SizeModes.Verzerren, InterpolationMode.HighQualityBicubic, true);
         List<string> tags2 = new(tags);
         var names = tags2.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
         foreach (var thisO in names) {
@@ -136,7 +140,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     public PointM? GetPoint(string name) => _points?.Get(name);
 
-    public void LetUserAddAPoint(string pointName, Helpers helper, BlueBasics.Enums.Orientation mittelline) {
+    public void LetUserAddAPoint(string pointName, Helpers helper, Orientation mittelline) {
         _mittelLinie = mittelline;
         _helper = helper;
         Feedback = pointName;
@@ -191,7 +195,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         var path = Tags.TagGet("ImageFile");
         var pathtxt = FilenameTxt(path);
         try {
-            Bmp?.Save(path, System.Drawing.Imaging.ImageFormat.Png);
+            Bmp?.Save(path, ImageFormat.Png);
             if (Tags != null) {
                 Tags.TagSet("Erstellt", Generic.UserName());
                 Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
@@ -274,13 +278,13 @@ public partial class ZoomPicWithPoints : ZoomPic {
         //TMPGR.Clear(Color.Transparent);
         // Mittellinie
         var picturePos = base.MaxBounds();
-        if (_mittelLinie.HasFlag(BlueBasics.Enums.Orientation.Waagerecht)) {
+        if (_mittelLinie.HasFlag(Orientation.Waagerecht)) {
             var p1 = picturePos.PointOf(Alignment.VerticalCenter_Left).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
             var p2 = picturePos.PointOf(Alignment.VerticalCenter_Right).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
             eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
             eg.G.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
         }
-        if (_mittelLinie.HasFlag(BlueBasics.Enums.Orientation.Senkrecht)) {
+        if (_mittelLinie.HasFlag(Orientation.Senkrecht)) {
             var p1 = picturePos.PointOf(Alignment.Top_HorizontalCenter).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
             var p2 = picturePos.PointOf(Alignment.Bottom_HorizontalCenter).ZoomAndMove(eg.Zoom, eg.ShiftX, eg.ShiftY);
             eg.G.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);

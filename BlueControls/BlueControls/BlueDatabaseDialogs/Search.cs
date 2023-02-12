@@ -17,13 +17,15 @@
 
 #nullable enable
 
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
+using Form = BlueControls.Forms.Form;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -52,7 +54,7 @@ public sealed partial class Search : Form {
 
     #region Methods
 
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
         _blueTable.SelectedCellChanged -= SelectedCellChanged;
     }

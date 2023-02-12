@@ -17,16 +17,16 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueDatabase.Enums;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace BlueControls.ItemCollection;
 
@@ -40,7 +40,7 @@ public class RowInputPadItem : RectanglePadItemWithVersion, IReadableText, ICont
 
     #region Constructors
 
-    public RowInputPadItem() : this(BlueBasics.Generic.UniqueInternal(), string.Empty) { }
+    public RowInputPadItem() : this(Generic.UniqueInternal(), string.Empty) { }
 
     public RowInputPadItem(string intern, string spaltenname) : base(intern) => _spaltenname = spaltenname;
 

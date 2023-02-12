@@ -17,15 +17,17 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
+using BlueBasics.MultiUserFile;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
@@ -46,7 +48,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     private string _creator;
     private int _id = -1;
     private string _loadedVersion = "0.00";
-    private BlueBasics.MultiUserFile.MultiUserFile? _muf;
+    private MultiUserFile? _muf;
     private ItemCollectionPad? _padData;
 
     private bool _saved;
@@ -60,7 +62,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     private ConnectedFormula(string filename) {
         AllFiles.Add(this);
-        _muf = new BlueBasics.MultiUserFile.MultiUserFile();
+        _muf = new MultiUserFile();
 
         //_muf.ConnectedControlsStopAllWorking += OnConnectedControlsStopAllWorking;
         _muf.Loaded += OnLoaded;
@@ -280,7 +282,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         }
     }
 
-    private void _muf_Saving(object sender, System.ComponentModel.CancelEventArgs e) {
+    private void _muf_Saving(object sender, CancelEventArgs e) {
         if (e.Cancel) { return; }
 
         e.Cancel = IntParse(_loadedVersion.Replace(".", string.Empty)) > IntParse(Version.Replace(".", string.Empty));

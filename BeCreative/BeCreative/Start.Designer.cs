@@ -1,10 +1,13 @@
 ﻿
+using BlueControls.Controls;
+using System.ComponentModel;
+
 namespace BeCreative {
     partial class Start {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -118,11 +121,11 @@ namespace BeCreative {
 
         #endregion
 
-        private BlueControls.Controls.Button btnDatenbank;
-        private BlueControls.Controls.Button btnFormular;
-        private BlueControls.Controls.Button btnLayout;
-        private BlueControls.Controls.Button btnTextEditor;
-        private BlueControls.Controls.Button btnBildEditor;
-        private BlueControls.Controls.Button btnHierachie;
+        private Button btnDatenbank;
+        private Button btnFormular;
+        private Button btnLayout;
+        private Button btnTextEditor;
+        private Button btnBildEditor;
+        private Button btnHierachie;
     }
 }

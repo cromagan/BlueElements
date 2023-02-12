@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls;
 using BlueControls.Forms;
-using System.Drawing;
 
 namespace BluePaint;
 

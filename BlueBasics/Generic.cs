@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -32,8 +30,12 @@ using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Windows;
+using System.Windows.Forms;
+using BlueBasics.Enums;
+using Microsoft.Win32;
 using static BlueBasics.IO;
+using Clipboard = System.Windows.Clipboard;
+using Point = System.Drawing.Point;
 
 namespace BlueBasics;
 
@@ -257,9 +259,9 @@ public static class Generic {
         } while (akTimer.TotalSeconds < sekunden);
     }
 
-    public static int PointOnScreenNr(System.Drawing.Point pointToCheck) {
-        for (var zSc = 0; zSc <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSc++) {
-            if (pointToCheck.X >= System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Left && pointToCheck.Y >= System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Top && pointToCheck.X < System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Right && pointToCheck.Y < System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Bottom) {
+    public static int PointOnScreenNr(Point pointToCheck) {
+        for (var zSc = 0; zSc <= Screen.AllScreens.GetUpperBound(0); zSc++) {
+            if (pointToCheck.X >= Screen.AllScreens[zSc].Bounds.Left && pointToCheck.Y >= Screen.AllScreens[zSc].Bounds.Top && pointToCheck.X < Screen.AllScreens[zSc].Bounds.Right && pointToCheck.Y < Screen.AllScreens[zSc].Bounds.Bottom) {
                 return zSc;
             }
         }
@@ -271,14 +273,14 @@ public static class Generic {
         var y1 = int.MaxValue;
         var x2 = int.MinValue;
         var y2 = int.MinValue;
-        for (var zSc = 0; zSc <= System.Windows.Forms.Screen.AllScreens.GetUpperBound(0); zSc++) {
-            x1 = Math.Min(x1, System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Left);
-            y1 = Math.Min(y1, System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Top);
-            x2 = Math.Max(x2, System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Right);
-            y2 = Math.Max(y2, System.Windows.Forms.Screen.AllScreens[zSc].Bounds.Bottom);
+        for (var zSc = 0; zSc <= Screen.AllScreens.GetUpperBound(0); zSc++) {
+            x1 = Math.Min(x1, Screen.AllScreens[zSc].Bounds.Left);
+            y1 = Math.Min(y1, Screen.AllScreens[zSc].Bounds.Top);
+            x2 = Math.Max(x2, Screen.AllScreens[zSc].Bounds.Right);
+            y2 = Math.Max(y2, Screen.AllScreens[zSc].Bounds.Bottom);
         }
-        System.Drawing.Point gp = new(x1, y1);
-        System.Drawing.Size sz = new(-x1 + x2, -y1 + y2);
+        Point gp = new(x1, y1);
+        Size sz = new(-x1 + x2, -y1 + y2);
         return new Rectangle(gp, sz);
     }
 

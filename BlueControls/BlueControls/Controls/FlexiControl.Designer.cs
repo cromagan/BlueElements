@@ -1,5 +1,8 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls
 {
@@ -34,22 +37,22 @@ namespace BlueControls.Controls
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this._IdleTimer = new System.Windows.Forms.Timer(this.components);
+            this.components = new Container();
+            this._IdleTimer = new Timer(this.components);
             this.SuspendLayout();
             // 
             // _IdleTimer
             // 
             this._IdleTimer.Enabled = true;
             this._IdleTimer.Interval = 1000;
-            this._IdleTimer.Tick += new System.EventHandler(this._IdleTimer_Tick);
+            this._IdleTimer.Tick += new EventHandler(this._IdleTimer_Tick);
             // 
             // FlexiControl
             // 
             this.Name = "FlexiControl";
-            this.Size = new System.Drawing.Size(100, 100);
+            this.Size = new Size(100, 100);
             this.ResumeLayout(false);
         }
-        protected System.Windows.Forms.Timer _IdleTimer;
+        protected Timer _IdleTimer;
     }
 }

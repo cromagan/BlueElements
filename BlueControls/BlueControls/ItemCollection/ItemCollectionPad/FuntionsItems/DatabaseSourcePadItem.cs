@@ -17,17 +17,18 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -58,7 +59,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
         get => string.Empty;
         set {
             if (Database == null || Database.IsDisposed) { return; }
-            Forms.TableView.OpenDatabaseHeadEditor(Database);
+            TableView.OpenDatabaseHeadEditor(Database);
         }
     }
 

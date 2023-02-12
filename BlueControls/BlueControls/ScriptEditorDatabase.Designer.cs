@@ -1,10 +1,17 @@
 ﻿
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+using BlueControls.EventArgs;
+using TextBox = BlueControls.Controls.TextBox;
+
 namespace BlueControls {
     partial class ScriptEditorDatabase {
         /// <summary> 
         /// Erforderliche Designervariable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary> 
         /// Verwendete Ressourcen bereinigen.
@@ -24,7 +31,7 @@ namespace BlueControls {
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
         private void InitializeComponent() {
-            this.txbTestZeile = new BlueControls.Controls.TextBox();
+            this.txbTestZeile = new TextBox();
             this.grpMainBar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -38,26 +45,26 @@ namespace BlueControls {
             // 
             // btnBefehlsUebersicht
             // 
-            this.btnBefehlsUebersicht.Location = new System.Drawing.Point(384, 8);
+            this.btnBefehlsUebersicht.Location = new Point(384, 8);
             // 
             // btnZusatzDateien
             // 
-            this.btnZusatzDateien.Location = new System.Drawing.Point(528, 8);
+            this.btnZusatzDateien.Location = new Point(528, 8);
             // 
             // txbTestZeile
             // 
-            this.txbTestZeile.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbTestZeile.Cursor = Cursors.IBeam;
             this.txbTestZeile.Enabled = false;
-            this.txbTestZeile.Location = new System.Drawing.Point(120, 8);
+            this.txbTestZeile.Location = new Point(120, 8);
             this.txbTestZeile.Name = "txbTestZeile";
-            this.txbTestZeile.Size = new System.Drawing.Size(256, 32);
+            this.txbTestZeile.Size = new Size(256, 32);
             this.txbTestZeile.TabIndex = 4;
             // 
             // ScriptEditorDatabase
             // 
             this.Name = "ScriptEditorDatabase";
-            this.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.scriptEditor_ContextMenuInit);
-            this.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.scriptEditor_ContextMenuItemClicked);
+            this.ContextMenuInit += new EventHandler<ContextMenuInitEventArgs>(this.scriptEditor_ContextMenuInit);
+            this.ContextMenuItemClicked += new EventHandler<ContextMenuItemClickedEventArgs>(this.scriptEditor_ContextMenuItemClicked);
             this.grpMainBar.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -65,7 +72,7 @@ namespace BlueControls {
 
         #endregion
 
-        private Controls.TextBox txbTestZeile;
+        private TextBox txbTestZeile;
 
     }
 }

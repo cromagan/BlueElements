@@ -17,6 +17,14 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Drawing;
+using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
@@ -26,11 +34,7 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
@@ -259,7 +263,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public new bool Focused() => base.Focused || Plus.Focused || Minus.Focused || Up.Focused || Down.Focused || SliderY.Focused() || FilterCap.Focused || FilterTxt.Focused;
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
@@ -311,7 +315,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
         _mouseOverItem = MouseOverNode(MousePos().X, MousePos().Y);
         object locker = new();
-        _ = System.Threading.Tasks.Parallel.ForEach(Item.ItemOrder, thisItem => {
+        _ = Parallel.ForEach(Item.ItemOrder, thisItem => {
             if (thisItem.Pos.IntersectsWith(visArea)) {
                 var vStateItem = tmpState;
                 if (_mouseOverItem == thisItem && Enabled) { vStateItem |= States.Standard_MouseOver; }
@@ -351,7 +355,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     //protected void OnItemRemoving(ListEventArgs e) => ItemRemoving?.Invoke(this, e);
-    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
         var nd = MouseOverNode(MousePos().X, MousePos().Y);
         if (nd != _mouseOverItem) {
@@ -362,13 +366,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     //protected void OnItemRemoved(System.EventArgs e) => ItemRemoved?.Invoke(this, e);
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         if (!Enabled) { return; }
         var nd = MouseOverNode(e.X, e.Y);
         if (nd != null && !nd.Enabled) { return; }
         switch (e.Button) {
-            case System.Windows.Forms.MouseButtons.Left:
+            case MouseButtons.Left:
                 if (nd != null) {
                     if (Appearance is BlueListBoxAppearance.Listbox or BlueListBoxAppearance.Autofilter or BlueListBoxAppearance.Gallery or BlueListBoxAppearance.FileSystem) {
                         if (nd.IsClickable()) { nd.Checked = !nd.Checked; }
@@ -377,14 +381,14 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 }
                 break;
 
-            case System.Windows.Forms.MouseButtons.Right:
+            case MouseButtons.Right:
                 FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                 break;
         }
     }
 
     //protected void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
-    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (!SliderY.Visible) { return; }
         SliderY.DoMouseWheel(e);
@@ -483,7 +487,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void FilterTxt_TextChanged(object sender, System.EventArgs e) => Invalidate();
 
-    private void Item_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+    private void Item_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (IsDisposed) { return; }
         //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
         Invalidate();

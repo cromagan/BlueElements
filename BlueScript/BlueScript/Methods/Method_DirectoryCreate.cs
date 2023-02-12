@@ -17,9 +17,10 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.IO;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
@@ -53,7 +54,7 @@ internal class Method_DirectoryCreate : Method {
         if (DirectoryExists(p)) { return DoItFeedback.Wahr(line); }
 
         try {
-            _ = System.IO.Directory.CreateDirectory(p);
+            _ = Directory.CreateDirectory(p);
         } catch { }
 
         return !DirectoryExists(p) ? DoItFeedback.Falsch(line) : DoItFeedback.Wahr(line);

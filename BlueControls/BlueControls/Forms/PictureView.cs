@@ -17,11 +17,12 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Interfaces;
 
 namespace BlueControls.Forms;
 
@@ -52,17 +53,17 @@ public partial class PictureView : Form, IDisposableExtended {
         InitializeComponent();
 
         if (mitScreenResize) {
-            if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0) {
-                var opScNr = Generic.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
-                Width = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Width / 1.5);
-                Height = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Height / 1.5);
-                Left = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Width - Width) / 2.0));
-                Top = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Top + ((System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Height - Height) / 2.0));
+            if (Screen.AllScreens.Length == 1 || openOnScreen < 0) {
+                var opScNr = Generic.PointOnScreenNr(Cursor.Position);
+                Width = (int)(Screen.AllScreens[opScNr].WorkingArea.Width / 1.5);
+                Height = (int)(Screen.AllScreens[opScNr].WorkingArea.Height / 1.5);
+                Left = (int)(Screen.AllScreens[opScNr].WorkingArea.Left + ((Screen.AllScreens[opScNr].WorkingArea.Width - Width) / 2.0));
+                Top = (int)(Screen.AllScreens[opScNr].WorkingArea.Top + ((Screen.AllScreens[opScNr].WorkingArea.Height - Height) / 2.0));
             } else {
-                Width = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Width;
-                Height = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Height;
-                Left = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Left;
-                Top = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Top;
+                Width = Screen.AllScreens[openOnScreen].WorkingArea.Width;
+                Height = Screen.AllScreens[openOnScreen].WorkingArea.Height;
+                Left = Screen.AllScreens[openOnScreen].WorkingArea.Left;
+                Top = Screen.AllScreens[openOnScreen].WorkingArea.Top;
             }
         }
 
@@ -140,7 +141,7 @@ public partial class PictureView : Form, IDisposableExtended {
         LoadPic(_nr);
     }
 
-    private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
+    private void Pad_MouseUp(object sender, MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
     }

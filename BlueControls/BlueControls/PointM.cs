@@ -17,6 +17,9 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -25,9 +28,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
 
@@ -68,21 +68,21 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable {
         //Tag = tag;
     }
 
-    public PointM() : this((object?)null, string.Empty, (float)0f, (float)0f) { }
+    public PointM() : this(null, string.Empty, 0f, 0f) { }
 
-    public PointM(object? parent) : this(parent, string.Empty, (float)0f, (float)0f) { }
+    public PointM(object? parent) : this(parent, string.Empty, 0f, 0f) { }
 
-    public PointM(string name, float x, float y) : this((object?)null, name, x, y) { }
+    public PointM(string name, float x, float y) : this(null, name, x, y) { }
 
-    public PointM(object? parent, string name, int x, int y) : this(parent, name, (float)x, (float)y) { }
+    public PointM(object? parent, string name, int x, int y) : this(parent, name, x, (float)y) { }
 
-    public PointM(PointF point) : this((object?)null, string.Empty, point.X, point.Y) { }
+    public PointM(PointF point) : this(null, string.Empty, point.X, point.Y) { }
 
-    public PointM(int x, int y) : this(null, string.Empty, (float)x, (float)y) { }
+    public PointM(int x, int y) : this(null, string.Empty, x, (float)y) { }
 
-    public PointM(float x, float y) : this((object?)null, string.Empty, x, y) { }
+    public PointM(float x, float y) : this(null, string.Empty, x, y) { }
 
-    public PointM(PointM point) : this((object?)null, string.Empty, point.X, point.Y) { }
+    public PointM(PointM point) : this(null, string.Empty, point.X, point.Y) { }
 
     public PointM(object parent, PointM template) : this(parent, template.KeyName, template.X, template.Y) { }
 

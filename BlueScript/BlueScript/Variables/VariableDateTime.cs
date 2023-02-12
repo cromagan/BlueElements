@@ -17,9 +17,9 @@
 
 #nullable enable
 
+using System;
 using BlueBasics;
 using BlueScript.Structures;
-using System;
 
 namespace BlueScript.Variables;
 

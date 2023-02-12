@@ -17,14 +17,16 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using BlueBasics.Enums;
 using static BlueBasics.Generic;
 
 namespace BlueBasics;
@@ -128,8 +130,8 @@ public static class IO {
         if (pfad.Contains("/")) { pfad = pfad.Replace("/", "\\"); }
 
         var homep = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
-        pfad = pfad.Replace("%homepath%\\", homep, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
-        pfad = pfad.Replace("%homepath%", homep, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+        pfad = pfad.Replace("%homepath%\\", homep, RegexOptions.IgnoreCase);
+        pfad = pfad.Replace("%homepath%", homep, RegexOptions.IgnoreCase);
 
         if (pfad.Substring(pfad.Length - 1) != "\\") { pfad += "\\"; }
         if (pfad.IndexOf("\\\\", 1, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
@@ -436,7 +438,7 @@ public static class IO {
     /// <param name="contents"></param>
     /// <param name="encoding"></param>
     /// <param name="executeAfter"></param>
-    public static void WriteAllText(string filename, string contents, System.Text.Encoding encoding, bool executeAfter) {
+    public static void WriteAllText(string filename, string contents, Encoding encoding, bool executeAfter) {
         try {
             filename = filename.CheckFile();
 

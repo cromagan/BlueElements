@@ -18,13 +18,13 @@
 // https://stackoverflow.com/questions/34002901/need-for-sqlconnection-and-oracleconnection-if-odbcconnection-can-be-used-in-th
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using BlueBasics;
+using BlueBasics.Enums;
 
 namespace BlueDatabase;
 

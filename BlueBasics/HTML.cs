@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using System.Text;
 
 namespace BlueBasics;
 
@@ -99,7 +100,7 @@ public class Html {
 
     public void RowEnd() => Code.Add("      </tr>");
 
-    public void Save(string filename, bool executeafter) => Code.Save(filename, System.Text.Encoding.UTF8, executeafter);
+    public void Save(string filename, bool executeafter) => Code.Save(filename, Encoding.UTF8, executeafter);
 
     public void TableBeginn() {
         // da.Add("  <Font face=\"Arial\" Size=\"2\"><table border=\"1\" BORDERCOLOR=\"#aaaaaa\" cellspacing=\"0\" cellpadding=\"0\" align=\"left\">");

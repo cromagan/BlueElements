@@ -17,8 +17,9 @@
 
 #nullable enable
 
-using BlueControls.ItemCollection.ItemCollectionList;
 using System.Collections.Generic;
+using System.Windows.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Forms;
 
@@ -41,7 +42,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
             cbxText.Item.CheckBehavior = suggestOriginal.CheckBehavior;
             cbxText.Item.AddClonesFrom(suggestOriginal);
         }
-        cbxText.DropDownStyle = texteingabeErlaubt ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
+        cbxText.DropDownStyle = texteingabeErlaubt ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList;
         Setup(txt, cbxText, 250);
         _giveBack = vorschlagsText;
     }

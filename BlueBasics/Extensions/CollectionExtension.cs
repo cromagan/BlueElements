@@ -17,10 +17,11 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using BlueBasics.Enums;
 
 namespace BlueBasics;
 
@@ -30,7 +31,7 @@ public static partial class Extensions {
 
     public static bool Contains(this ICollection<string> collection, string searchKeyword, bool caseSensitive) {
         if (caseSensitive) { Develop.DebugPrint(FehlerArt.Fehler, "CaseSensitive = True"); }
-        return collection.Any(item => string.Equals(item, searchKeyword, System.StringComparison.OrdinalIgnoreCase));
+        return collection.Any(item => string.Equals(item, searchKeyword, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>

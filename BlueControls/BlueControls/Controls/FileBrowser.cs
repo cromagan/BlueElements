@@ -17,6 +17,14 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -27,11 +35,6 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueScript.Variables;
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -333,7 +336,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
                     var no = l.IndexOf(e.Item.KeyName);
                     if (no > -1) {
                         var d = new PictureView(l, true, e.Item.KeyName.FilePath(), no) {
-                            WindowState = System.Windows.Forms.FormWindowState.Maximized
+                            WindowState = FormWindowState.Maximized
                         };
                         d.Show();
                     }
@@ -365,9 +368,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
             }
 
             x = x.Replace("%1", e.Item.KeyName);
-            var process = new System.Diagnostics.Process();
-            var startInfo = new System.Diagnostics.ProcessStartInfo {
-                WindowStyle = System.Diagnostics.ProcessWindowStyle.Hidden,
+            var process = new Process();
+            var startInfo = new ProcessStartInfo {
+                WindowStyle = ProcessWindowStyle.Hidden,
                 FileName = "cmd.exe",
                 Arguments = "/C \"" + x + "\""
             };
@@ -475,7 +478,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         return true;
     }
 
-    private void ThumbGenerator_DoWork(object sender, System.ComponentModel.DoWorkEventArgs e) {
+    private void ThumbGenerator_DoWork(object sender, DoWorkEventArgs e) {
         //ThumbGenerator.SetApartmentState
 
         var newPath = txbPfad.Text.Trim("\\") + "\\";
@@ -525,7 +528,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         }
     }
 
-    private void ThumbGenerator_ProgressChanged(object sender, System.ComponentModel.ProgressChangedEventArgs e) {
+    private void ThumbGenerator_ProgressChanged(object sender, ProgressChangedEventArgs e) {
         var gb = (List<object>)e.UserState;
         var file = (string)gb[0];
 

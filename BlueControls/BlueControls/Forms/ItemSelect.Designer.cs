@@ -1,9 +1,8 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
-using BlueControls.Controls;
+using System.Windows.Forms;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
+using ListBox = BlueControls.Controls.ListBox;
 
 namespace BlueControls.Forms
     {
@@ -30,28 +29,28 @@ namespace BlueControls.Forms
 			[DebuggerStepThrough()]
 			private void InitializeComponent()
 			{
-            this.List = new BlueControls.Controls.ListBox();
+            this.List = new ListBox();
             this.SuspendLayout();
             // 
             // List
             // 
-            this.List.AddAllowed = BlueControls.Enums.AddType.None;
-            this.List.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.List.Appearance = BlueControls.Enums.BlueListBoxAppearance.Gallery;
-            this.List.Location = new System.Drawing.Point(8, 8);
+            this.List.AddAllowed = AddType.None;
+            this.List.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
+                                                 | AnchorStyles.Left) 
+                                                | AnchorStyles.Right)));
+            this.List.Appearance = BlueListBoxAppearance.Gallery;
+            this.List.Location = new Point(8, 8);
             this.List.Name = "List";
-            this.List.Size = new System.Drawing.Size(677, 427);
+            this.List.Size = new Size(677, 427);
             this.List.TabIndex = 0;
             // 
             // ItemSelect
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(692, 492);
+            this.AutoScaleDimensions = new SizeF(6F, 13F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.ClientSize = new Size(692, 492);
             this.Controls.Add(this.List);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.FormBorderStyle = FormBorderStyle.SizableToolWindow;
             this.Name = "ItemSelect";
             this.Text = "Wähle:";
             this.Controls.SetChildIndex(this.List, 0);

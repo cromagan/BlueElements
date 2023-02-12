@@ -17,14 +17,16 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Extended_Text;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Enums;
+using BlueControls.Extended_Text;
+using BlueDatabase;
 using static BlueBasics.Converter;
+using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;
 
@@ -51,8 +53,8 @@ public partial class MessageBox : Form {
         InitializeComponent();
         Text = Develop.AppName();
         capText.Text = pic != ImageCode.None
-            ? "<ImageCode=" + QuickImage.Get(pic, 32) + "> <zbx_store><top>" + BlueDatabase.LanguageTool.DoTranslate(txt, false)
-            : BlueDatabase.LanguageTool.DoTranslate(txt, false);
+            ? "<ImageCode=" + QuickImage.Get(pic, 32) + "> <zbx_store><top>" + LanguageTool.DoTranslate(txt, false)
+            : LanguageTool.DoTranslate(txt, false);
         Size = new Size((capText.Left * 2) + capText.Width + BorderWidth, (capText.Top * 3) + capText.Height + 35 + BorderHeight);
         if (buttons.Length == 0) { buttons = new[] { "OK" }; }
         var b = Generate_Buttons(buttons);
@@ -64,7 +66,7 @@ public partial class MessageBox : Form {
         }
         _pressed = null;
         if (Owner == null) {
-            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            StartPosition = FormStartPosition.CenterScreen;
         }
     }
 
@@ -158,7 +160,7 @@ public partial class MessageBox : Form {
                 myX = b.Location.X - Skin.Padding;
                 b.ButtonStyle = ButtonStyle.Button;
                 b.Visible = true;
-                b.Anchor = System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
+                b.Anchor = AnchorStyles.Right | AnchorStyles.Bottom;
                 Controls.Add(b);
                 buts.Add(b);
             }

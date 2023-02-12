@@ -1,10 +1,16 @@
 ﻿
+using System.ComponentModel;
+using System.Windows.Forms;
+using BlueControls.Controls;
+using Button = BlueControls.Controls.Button;
+using GroupBox = BlueControls.Controls.GroupBox;
+
 namespace BlueControls.Forms {
     partial class ConnectedFormulaEditor {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -471,32 +477,32 @@ namespace BlueControls.Forms {
 
         #endregion
 
-        private System.Windows.Forms.TabPage tabEditorStd;
-        private Controls.GroupBox grpFelder;
-        private Controls.Button btnZeileHinzu;
-        private Controls.Button btnFeldHinzu;
-        private Controls.Button btnKonstante;
-        private Controls.GroupBox grpVorschau;
-        private Controls.Button btnPfeileAusblenden;
-        private Controls.Button btnVorschauÖffnen;
-        private Controls.Button btnTabControlAdd;
-        private System.Windows.Forms.TabPage tabFile;
-        private Controls.GroupBox grpDatei;
-        private Controls.LastFilesCombo btnLetzteFormulare;
-        private Controls.Button btnOeffnen;
-        private Controls.Button btnSaveAs;
-        private Controls.Button btnNeuDB;
-        private System.Windows.Forms.OpenFileDialog LoadTab;
-        private System.Windows.Forms.SaveFileDialog SaveTab;
-        private Controls.Button btnFileExplorer;
-        private Controls.GroupBox groupBox1;
-        private Controls.GroupBox grpOptik;
-        private Controls.Button btnVariable;
-        private Controls.Button btnEingangsZeile;
-        private System.Windows.Forms.TabPage tabPage1;
-        private Controls.Button btnRegisterKarte;
-        private Controls.Button btnBild;
-        private Controls.Button btnSpeichern;
-        private System.Windows.Forms.TabPage tabEditorNewRow;
+        private TabPage tabEditorStd;
+        private GroupBox grpFelder;
+        private Button btnZeileHinzu;
+        private Button btnFeldHinzu;
+        private Button btnKonstante;
+        private GroupBox grpVorschau;
+        private Button btnPfeileAusblenden;
+        private Button btnVorschauÖffnen;
+        private Button btnTabControlAdd;
+        private TabPage tabFile;
+        private GroupBox grpDatei;
+        private LastFilesCombo btnLetzteFormulare;
+        private Button btnOeffnen;
+        private Button btnSaveAs;
+        private Button btnNeuDB;
+        private OpenFileDialog LoadTab;
+        private SaveFileDialog SaveTab;
+        private Button btnFileExplorer;
+        private GroupBox groupBox1;
+        private GroupBox grpOptik;
+        private Button btnVariable;
+        private Button btnEingangsZeile;
+        private TabPage tabPage1;
+        private Button btnRegisterKarte;
+        private Button btnBild;
+        private Button btnSpeichern;
+        private TabPage tabEditorNewRow;
     }
 }

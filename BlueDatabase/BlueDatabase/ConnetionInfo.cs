@@ -18,11 +18,11 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Interfaces;
-using System.Collections.Generic;
 
 namespace BlueDatabase;
 

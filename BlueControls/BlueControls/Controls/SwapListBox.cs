@@ -17,14 +17,15 @@
 
 #nullable enable
 
-using BlueBasics.EventArgs;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using BlueBasics.EventArgs;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Controls;
 
@@ -128,13 +129,13 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     //    OnItemAdded(e);
     //}
 
-    private void Main_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
+    private void Main_ItemClicked(object sender, BasicListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
 
     //private void Main_ItemRemoved(object sender, System.EventArgs e) => OnItemRemoved(e);
 
     //private void Main_ItemRemoving(object sender, ListEventArgs e) => MoveItemBetweenList(Main, Suggest, ((BasicListItem)e.Item).Internal, false);
 
-    private void Suggest_ItemClicked(object sender, EventArgs.BasicListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
+    private void Suggest_ItemClicked(object sender, BasicListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
 
     #endregion
 

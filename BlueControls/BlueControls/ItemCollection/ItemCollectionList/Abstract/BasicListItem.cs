@@ -17,12 +17,12 @@
 
 #nullable enable
 
+using System;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
-using System;
-using System.Drawing;
 
 namespace BlueControls.ItemCollection.ItemCollectionList;
 
@@ -64,7 +64,7 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, ICha
     #region Constructors
 
     protected BasicListItem(string internalname, bool enabled) {
-        Internal = string.IsNullOrEmpty(internalname) ? BlueBasics.Generic.UniqueInternal() : internalname;
+        Internal = string.IsNullOrEmpty(internalname) ? Generic.UniqueInternal() : internalname;
         if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
         _checked = false;
         _enabled = enabled;

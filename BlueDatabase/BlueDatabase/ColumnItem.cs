@@ -17,19 +17,20 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
@@ -1217,11 +1218,13 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (m <= 0) {
             return 8;
-        } else if (m == 1) {
-            return 1;
-        } else {
-            return Math.Min((int)(m * prozentZuschlag) + 1, 4000);
         }
+
+        if (m == 1) {
+            return 1;
+        }
+
+        return Math.Min((int)(m * prozentZuschlag) + 1, 4000);
     }
 
     /// <summary>
@@ -1516,10 +1519,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (_textBearbeitungErlaubt) {
             if (tmpEditDialog == EditTypeTable.Dropdown_Single) { return "Format unterstützt nur Dropdown-Menü."; }
             if (tmpEditDialog == EditTypeTable.None) { return "Format unterstützt keine Standard-Bearbeitung."; }
-        } else {
-            //if (_vorschlagsColumn > -1) { return "'Vorschlags-Text-Spalte' nur bei Texteingabe möglich."; }
-            //if (!string.IsNullOrEmpty(_AllowedChars)) { return "'Erlaubte Zeichen' nur bei Texteingabe nötig."; }
         }
+
         if (_dropdownBearbeitungErlaubt) {
             //if (_SpellCheckingEnabled) { return "Entweder Dropdownmenü oder Rechtschreibprüfung."; }
             if (tmpEditDialog == EditTypeTable.None) { return "Format unterstützt keine Auswahlmenü-Bearbeitung."; }
@@ -1707,7 +1708,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (Database == null || Database.IsDisposed) { return; }
         if (Name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
 
-        var x = new ListExt<ColumnItem>() { this };
+        var x = new ListExt<ColumnItem> { this };
         Database?.RefreshColumnsData(x);
     }
 
@@ -2122,7 +2123,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             l.Add(maxCount + " - " + keyValue);
         } while (d.Count > 0);
 
-        l.Save(TempFile(string.Empty, string.Empty, "txt"), System.Text.Encoding.UTF8, true);
+        l.Save(TempFile(string.Empty, string.Empty, "txt"), Encoding.UTF8, true);
     }
 
     //public string SimplyFile(string fullFileName) {

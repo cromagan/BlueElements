@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Text;
 
 // http://www.carlosag.net/tools/codetranslator/
 // http://converter.telerik.com/
@@ -126,7 +127,7 @@ public static class Constants {
 
     //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
     //    var enc1252 = Encoding.GetEncoding(1252);
-    public static readonly System.Text.Encoding Win1252 = System.Text.Encoding.GetEncoding(1252);
+    public static readonly Encoding Win1252 = Encoding.GetEncoding(1252);
 
     #endregion
 

@@ -17,10 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using BlueBasics.Enums;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -57,7 +58,7 @@ public class Method_SoftMessage : MethodDatabase {
         if (db == null) { return new DoItFeedback("Datenbankfehler!", line); }
 
         var txt = "<b>Skript:</b> " + ((VariableString)attvar.Attributes[0]).ValueString;
-        db.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, txt);
+        db.OnDropMessage(FehlerArt.Info, txt);
 
         return DoItFeedback.Null(line);
     }

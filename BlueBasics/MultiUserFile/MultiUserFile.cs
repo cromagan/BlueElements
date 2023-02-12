@@ -17,16 +17,17 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -434,7 +435,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             // Nach 15 Minuten versuchen die Datei zu reparieren
             if (sec >= 900) {
                 if (!FileExists(Filename)) { return; }
-                _ = File.ReadAllText(Blockdateiname(), System.Text.Encoding.UTF8);
+                _ = File.ReadAllText(Blockdateiname(), Encoding.UTF8);
                 if (!CreateBlockDatei()) { return; }
                 var autoRepairName = TempFile(Filename.FilePath(), Filename.FileNameWithoutSuffix() + "_BeforeAutoRepair", "AUT");
                 if (!CopyFile(Filename, autoRepairName, false)) {
@@ -543,7 +544,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             return false;
         }
         try {
-            var inhalt2 = File.ReadAllText(Blockdateiname(), System.Text.Encoding.UTF8);
+            var inhalt2 = File.ReadAllText(Blockdateiname(), Encoding.UTF8);
             if (_inhaltBlockdatei != inhalt2) {
                 //Develop.DebugPrint(enFehlerArt.Info, "Block-Datei Konflikt: Inhalte unterschiedlich\r\n" + Filename + "\r\nSoll: " + _inhaltBlockdatei + "\r\n\r\nIst: " + Inhalt2);
                 return false;

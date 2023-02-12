@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -28,12 +33,8 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -836,7 +837,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private Line Control_Create_Line() {
         Line control = new() {
             Enabled = Enabled,
-            Orientation = BlueBasics.Enums.Orientation.Waagerecht
+            Orientation = Orientation.Waagerecht
         };
         StandardBehandlung(control);
         return control;

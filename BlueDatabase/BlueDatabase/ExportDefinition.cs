@@ -17,15 +17,16 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
@@ -89,7 +90,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndK
         BereitsExportiert = new ListExt<string>();
         BereitsExportiert.Changed += _BereitsExportiert_ListOrItemChanged;
         _lastExportTimeUtc = new DateTime(1900, 1, 1);
-        _id = BlueBasics.Generic.UniqueInternal();
+        _id = Generic.UniqueInternal();
     }
 
     #endregion
@@ -464,7 +465,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndK
             result.ParseableAdd("aud", _autoDelete);
             result.ParseableAdd("exc", _exportSpaltenAnsicht);
             result.ParseableAdd("exid", _exportFormularId);
-            result.ParseableAdd("flt", (IStringable?)_filter);
+            result.ParseableAdd("flt", _filter);
 
             var tmp = string.Empty;
             if (BereitsExportiert.Count > 0) {
@@ -563,7 +564,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndK
         } else if (!string.IsNullOrEmpty(Database.DefaultBackupPath())) {
             savePath = Database.DefaultBackupPath();
         } else {
-            savePath = (System.Windows.Forms.Application.StartupPath + "\\Backup\\").CheckPath();
+            savePath = (Application.StartupPath + "\\Backup\\").CheckPath();
         }
 
         if (!DirectoryExists(savePath)) { _ = Directory.CreateDirectory(savePath); }

@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using BlueScript.Methods;
-using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueScript.Methods;
+using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 

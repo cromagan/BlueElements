@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
-using BlueControls.Controls;
+using System.Windows.Forms;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using Button = BlueControls.Controls.Button;
+using GroupBox = BlueControls.Controls.GroupBox;
 
 namespace BlueControls.Forms {
     public partial class RelationDiagram {
@@ -22,9 +24,9 @@ namespace BlueControls.Forms {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.Hinzu = new BlueControls.Controls.Button();
-            this.grpExtras = new BlueControls.Controls.GroupBox();
-            this.btnTextExport = new BlueControls.Controls.Button();
+            this.Hinzu = new Button();
+            this.grpExtras = new GroupBox();
+            this.btnTextExport = new Button();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpKomponenteHinzufügen.SuspendLayout();
@@ -35,72 +37,72 @@ namespace BlueControls.Forms {
             // 
             // Pad
             // 
-            this.Pad.Size = new System.Drawing.Size(1290, 528);
-            this.Pad.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Pad_ContextMenuInit);
-            this.Pad.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.Pad_ContextMenuItemClicked);
+            this.Pad.Size = new Size(1290, 528);
+            this.Pad.ContextMenuInit += new EventHandler<ContextMenuInitEventArgs>(this.Pad_ContextMenuInit);
+            this.Pad.ContextMenuItemClicked += new EventHandler<ContextMenuItemClickedEventArgs>(this.Pad_ContextMenuItemClicked);
             // 
             // Ribbon
             // 
             this.Ribbon.SelectedIndex = 0;
-            this.Ribbon.Size = new System.Drawing.Size(1290, 110);
+            this.Ribbon.Size = new Size(1290, 110);
             // 
             //  System.Windows.Forms.tabStart
             // 
             this.tabStart.Controls.Add(this.grpExtras);
-            this.tabStart.Size = new System.Drawing.Size(1282, 81);
+            this.tabStart.Size = new Size(1282, 81);
             this.tabStart.Controls.SetChildIndex(this.grpKomponenteHinzufügen, 0);
             this.tabStart.Controls.SetChildIndex(this.grpExtras, 0);
             // 
             // grpKomponenteHinzufügen
             // 
             this.grpKomponenteHinzufügen.Controls.Add(this.Hinzu);
-            this.grpKomponenteHinzufügen.Size = new System.Drawing.Size(336, 81);
+            this.grpKomponenteHinzufügen.Size = new Size(336, 81);
             this.grpKomponenteHinzufügen.Controls.SetChildIndex(this.Hinzu, 0);
             // 
             // ArbeitsbreichSetup
             // 
-            this.btnArbeitsbreichSetup.ButtonStyle = BlueControls.Enums.ButtonStyle.Button;
+            this.btnArbeitsbreichSetup.ButtonStyle = ButtonStyle.Button;
             // 
             // Hinzu
             // 
             this.Hinzu.ImageCode = "PlusZeichen";
-            this.Hinzu.Location = new System.Drawing.Point(264, 2);
+            this.Hinzu.Location = new Point(264, 2);
             this.Hinzu.Name = "Hinzu";
-            this.Hinzu.Size = new System.Drawing.Size(64, 66);
+            this.Hinzu.Size = new Size(64, 66);
             this.Hinzu.TabIndex = 3;
             this.Hinzu.Text = "Eintrag hinzufügen";
-            this.Hinzu.Click += new System.EventHandler(this.Hinzu_Click);
+            this.Hinzu.Click += new EventHandler(this.Hinzu_Click);
             // 
             // grpExtras
             // 
-            this.grpExtras.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpExtras.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpExtras.Controls.Add(this.btnTextExport);
-            this.grpExtras.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpExtras.Location = new System.Drawing.Point(576, 0);
+            this.grpExtras.GroupBoxStyle = GroupBoxStyle.RibbonBar;
+            this.grpExtras.Location = new Point(576, 0);
             this.grpExtras.Name = "grpExtras";
-            this.grpExtras.Size = new System.Drawing.Size(392, 80);
+            this.grpExtras.Size = new Size(392, 80);
             this.grpExtras.TabIndex = 2;
             this.grpExtras.TabStop = false;
             this.grpExtras.Text = "Extras";
             // 
             // btnTextExport
             // 
-            this.btnTextExport.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnTextExport.ButtonStyle = ButtonStyle.Button_Big_Borderless;
             this.btnTextExport.ImageCode = "Textdatei||||||||||Pfeil_Unten";
-            this.btnTextExport.Location = new System.Drawing.Point(80, 2);
+            this.btnTextExport.Location = new Point(80, 2);
             this.btnTextExport.Name = "btnTextExport";
-            this.btnTextExport.Size = new System.Drawing.Size(64, 66);
+            this.btnTextExport.Size = new Size(64, 66);
             this.btnTextExport.TabIndex = 1;
             this.btnTextExport.Text = "Text-Export";
-            this.btnTextExport.Click += new System.EventHandler(this.btnTextExport_Click);
+            this.btnTextExport.Click += new EventHandler(this.btnTextExport_Click);
             // 
             // RelationDiagram
             // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(1290, 638);
+            this.AutoScaleMode = AutoScaleMode.None;
+            this.ClientSize = new Size(1290, 638);
             this.Name = "RelationDiagram";
             this.Text = "Beziehungs-Editor";
-            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.WindowState = FormWindowState.Maximized;
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
             this.grpKomponenteHinzufügen.ResumeLayout(false);

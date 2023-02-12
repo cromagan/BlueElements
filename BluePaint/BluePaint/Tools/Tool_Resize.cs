@@ -15,11 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System.Drawing.Drawing2D;
 using BlueBasics;
 using BlueBasics.Enums;
 using static BlueBasics.Converter;
-
-#nullable enable
 
 namespace BluePaint;
 
@@ -60,7 +61,7 @@ public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
         var wi = (int)(p.Width * pr);
         var he = (int)(p.Height * pr);
         if (pr is 1 or < 0.01 or > 1000 || wi < 1 || he < 1) { return; }
-        var bmp2 = BitmapExt.Resize(p, wi, he, SizeModes.Verzerren, System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic, true);
+        var bmp2 = BitmapExt.Resize(p, wi, he, SizeModes.Verzerren, InterpolationMode.HighQualityBicubic, true);
         OnOverridePic(bmp2);
         OnZoomFit();
         DoCapInfo();

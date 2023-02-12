@@ -19,11 +19,11 @@
 
 using System;
 using System.Collections.Generic;
-using BlueBasics.Enums;
-using BlueControls.Enums;
 using System.ComponentModel;
 using System.Drawing;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Enums;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection;

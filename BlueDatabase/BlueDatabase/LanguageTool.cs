@@ -17,9 +17,9 @@
 
 #nullable enable
 
+using System;
 using BlueBasics;
 using BlueDatabase.Enums;
-using System;
 using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;

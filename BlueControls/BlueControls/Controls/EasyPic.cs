@@ -17,6 +17,12 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
@@ -26,11 +32,6 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Imaging;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -148,7 +149,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         return false;
     }
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
         if (_bitmap != null) {
             _ = items.Add("Externes Fenster öffnen", "ExF");
@@ -205,9 +206,9 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         _PanelMover.Enabled = true;
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+        if (e.Button == MouseButtons.Right) {
             FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
         }
     }

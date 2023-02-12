@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -27,6 +25,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
 
@@ -105,7 +105,7 @@ public static partial class Extensions {
             // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
             list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
-    public static void Load(this List<string> l, string filename, System.Text.Encoding code) {
+    public static void Load(this List<string> l, string filename, Encoding code) {
         var t = File.ReadAllText(filename, code);
         l.Clear();
         l.AddRange(t.SplitAndCutByCr());
@@ -194,9 +194,9 @@ public static partial class Extensions {
         col.Add(tagname + "=" + l.ToString().TrimEnd("|"));
     }
 
-    public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T? value) where T : System.Enum {
+    public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T? value) where T : Enum {
         if (value == null) { return; }
-        col.Add(tagname + "=" + ((int)(object)value).ToString());
+        col.Add(tagname + "=" + ((int)(object)value));
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {
@@ -304,7 +304,7 @@ public static partial class Extensions {
         }
     }
 
-    public static void Save(this ICollection<string> l, string dateiName, System.Text.Encoding code, bool executeAfter) {
+    public static void Save(this ICollection<string> l, string dateiName, Encoding code, bool executeAfter) {
         var t = l.JoinWith("\r\n").TrimEnd("\r\n");
         if (!DirectoryExists(dateiName.FilePath())) {
             _ = Directory.CreateDirectory(dateiName.FilePath());

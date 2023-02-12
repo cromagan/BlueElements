@@ -17,13 +17,13 @@
 
 #nullable enable
 
+using System.Drawing;
 using BlueBasics;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System.Drawing;
 
 namespace BlueControls.Classes_Editor;
 

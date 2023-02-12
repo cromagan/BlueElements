@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.Windows.Forms;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 
@@ -35,7 +36,7 @@ public interface IItemToControl : IHasKeyName {
 
     #region Methods
 
-    public System.Windows.Forms.Control? CreateControl(ConnectedFormulaView parent);
+    public Control? CreateControl(ConnectedFormulaView parent);
 
     #endregion
 }

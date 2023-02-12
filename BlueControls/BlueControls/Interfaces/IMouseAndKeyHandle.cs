@@ -15,19 +15,21 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.Windows.Forms;
+
 namespace BlueControls.Interfaces;
 
 public interface IMouseAndKeyHandle {
 
     #region Methods
 
-    bool KeyUp(object sender, System.Windows.Forms.KeyEventArgs e, float zoom, float shiftX, float shiftY);
+    bool KeyUp(object sender, KeyEventArgs e, float zoom, float shiftX, float shiftY);
 
-    bool MouseDown(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY);
+    bool MouseDown(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY);
 
-    bool MouseMove(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY);
+    bool MouseMove(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY);
 
-    bool MouseUp(object sender, System.Windows.Forms.MouseEventArgs e, float zoom, float shiftX, float shiftY);
+    bool MouseUp(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY);
 
     #endregion
 

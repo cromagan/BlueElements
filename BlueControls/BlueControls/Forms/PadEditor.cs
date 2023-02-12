@@ -15,13 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
-using System;
-using System.Drawing;
 using static BlueBasics.Converter;
 
 namespace BlueControls.Forms;
@@ -169,7 +170,7 @@ public partial class PadEditor : PadEditorReadOnly {
                 tabElementEigenschaften.Controls.Add(thisFlexi);
                 thisFlexi.Left = Skin.Padding;
                 thisFlexi.Top = top;
-                thisFlexi.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+                thisFlexi.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 top = top + Skin.Padding + thisFlexi.Height;
                 thisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
             }

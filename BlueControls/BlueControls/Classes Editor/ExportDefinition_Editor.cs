@@ -15,15 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.EventArgs;
-using BlueControls.ItemCollection.ItemCollectionList;
-using BlueDatabase;
-using BlueDatabase.Enums;
 using System;
 using System.Drawing;
 using System.Linq;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
+using BlueControls.ItemCollection.ItemCollectionList;
+using BlueDatabase;
+using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
@@ -103,7 +104,7 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
 
     protected override void PrepaireFormula(ExportDefinition data) {
         cbxExportFormularID.Item.Clear();
-        Forms.ExportDialog.AddLayoutsOff(cbxExportFormularID.Item, Item.Database, true);
+        ExportDialog.AddLayoutsOff(cbxExportFormularID.Item, Item.Database, true);
         ExportSpaltenAnsicht.Item.Clear();
         for (var spa = 0; spa < Item.Database.ColumnArrangements.Count; spa++) {
             _ = ExportSpaltenAnsicht.Item.Add(data.Database.ColumnArrangements[spa].Name, spa.ToString());

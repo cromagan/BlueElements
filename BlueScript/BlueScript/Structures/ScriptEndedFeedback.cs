@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 
@@ -29,13 +30,13 @@ public readonly struct ScriptEndedFeedback {
     public readonly string ErrorMessage;
     public readonly int LastlineNo;
 
-    public readonly List<Variables.Variable>? Variables;
+    public readonly List<Variable>? Variables;
 
     #endregion
 
     #region Constructors
 
-    public ScriptEndedFeedback(int lastlineNo, string errormessage, string errorcode, List<Variables.Variable> variables) {
+    public ScriptEndedFeedback(int lastlineNo, string errormessage, string errorcode, List<Variable> variables) {
         ErrorMessage = errormessage;
         ErrorCode = errorcode;
         LastlineNo = lastlineNo;
@@ -49,7 +50,7 @@ public readonly struct ScriptEndedFeedback {
         Variables = null;
     }
 
-    public ScriptEndedFeedback(List<Variables.Variable> variables, int lastlineNo) {
+    public ScriptEndedFeedback(List<Variable> variables, int lastlineNo) {
         ErrorMessage = string.Empty;
         ErrorCode = string.Empty;
         LastlineNo = lastlineNo;

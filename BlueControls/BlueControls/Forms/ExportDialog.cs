@@ -17,6 +17,13 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Drawing;
+using System.Drawing.Printing;
+using System.IO;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -25,12 +32,6 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Printing;
-using System.IO;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
@@ -293,7 +294,7 @@ public sealed partial class ExportDialog {
                 break;
 
             case "Kopieren":
-                var x = new System.Collections.Specialized.StringCollection {
+                var x = new StringCollection {
                     tl.KeyName
                 };
                 Clipboard.SetFileDropList(x);

@@ -15,14 +15,15 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-#nullable enable
+using System.Text;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 
 namespace BlueBasics;
 
@@ -260,7 +261,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
         if (IsDisposed) { return string.Empty; }
         try {
             if (typeof(IStringable).IsAssignableFrom(typeof(T))) {
-                System.Text.StringBuilder a = new();
+                StringBuilder a = new();
                 foreach (var thisItem in this) {
                     if (thisItem is IStringable t) {
                         _ = a.Append(t.ToString());

@@ -15,6 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -22,13 +29,7 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.EventArgs;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
-
-#nullable enable
 
 namespace BlueControls.Controls;
 
@@ -120,7 +121,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
-    public System.Windows.Forms.Control? SearchOrGenerate(IItemToControl? thisit) {
+    public Control? SearchOrGenerate(IItemToControl? thisit) {
         if (thisit == null) { return null; }
 
         //if (thisit.Page != Page) {
@@ -129,7 +130,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         //}
 
         foreach (var thisC in Controls) {
-            if (thisC is System.Windows.Forms.Control c) {
+            if (thisC is Control c) {
                 if (c.Name is string s) {
                     if (s == thisit.KeyName + "-" + thisit.Version) { return c; }
                 }
@@ -239,9 +240,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     private void GenerateView() {
         if (_generated) { return; }
 
-        var unused = new List<System.Windows.Forms.Control>();
+        var unused = new List<Control>();
         foreach (var thisco in Controls) {
-            if (thisco is System.Windows.Forms.Control c) {
+            if (thisco is Control c) {
                 unused.Add(c);
             }
         }
@@ -254,7 +255,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
                     if (thisit.IsVisibleOnPage(_pageToShow) && thisit is IItemToControl thisitco) {
                         var o = SearchOrGenerate(thisitco);
 
-                        if (o is System.Windows.Forms.Control c) {
+                        if (o is Control c) {
                             _ = unused.Remove(c);
 
                             if (thisit is CustomizableShowPadItem cspi) {

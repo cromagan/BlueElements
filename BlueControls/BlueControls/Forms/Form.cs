@@ -15,15 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
-using System;
-using System.ComponentModel;
-using System.Drawing;
 
 namespace BlueControls.Forms;
 
@@ -90,7 +92,7 @@ public partial class Form : System.Windows.Forms.Form {
 
     public bool IsClosed { get; private set; }
 
-    protected override System.Windows.Forms.CreateParams CreateParams {
+    protected override CreateParams CreateParams {
         get {
             var oParam = base.CreateParams;
             if (!CloseButtonEnabled) {
@@ -106,7 +108,7 @@ public partial class Form : System.Windows.Forms.Form {
 
     #region Methods
 
-    public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(System.Windows.Forms.Cursor.Position);
+    public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(Cursor.Position);
 
     // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
     public new void PerformAutoScale() {
@@ -137,7 +139,7 @@ public partial class Form : System.Windows.Forms.Form {
             message = message.Replace("\r\n", "; ");
             message = message.Replace("\r", "; ");
             message = message.Replace("\n", "; ");
-            message = message.Replace("<BR>", "; ", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+            message = message.Replace("<BR>", "; ", RegexOptions.IgnoreCase);
             message = message.Replace("; ; ", "; ");
             message = message.TrimEnd("; ");
 
@@ -163,7 +165,7 @@ public partial class Form : System.Windows.Forms.Form {
     }
 
     //MyBase.ScaleChildren
-    protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, System.Windows.Forms.BoundsSpecified specified) => bounds;
+    protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
 
     protected override void OnCreateControl() {
         Develop.StartService();
@@ -171,7 +173,7 @@ public partial class Form : System.Windows.Forms.Form {
         base.OnCreateControl();
     }
 
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
         //https://docs.microsoft.com/en-us/dotnet/api/system.windows.forms.form.closed?view=netframework-4.8
         if (IsClosed) { return; }
 
@@ -186,7 +188,7 @@ public partial class Form : System.Windows.Forms.Form {
         }
     }
 
-    protected override void OnInvalidated(System.Windows.Forms.InvalidateEventArgs e) {
+    protected override void OnInvalidated(InvalidateEventArgs e) {
         if (!IsClosed) { base.OnInvalidated(e); }
     }
 
@@ -195,7 +197,7 @@ public partial class Form : System.Windows.Forms.Form {
         base.OnLoad(e);
     }
 
-    protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
+    protected override void OnPaint(PaintEventArgs e) {
         if (!IsClosed && !IsDisposed) { base.OnPaint(e); }
     }
 
@@ -215,7 +217,7 @@ public partial class Form : System.Windows.Forms.Form {
         if (!IsClosed) { base.OnSizeChanged(e); }
     }
 
-    protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
+    protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
     #endregion
 }

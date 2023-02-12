@@ -15,10 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.ComponentModel;
+using System.IO;
 using BlueBasics;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
-using System.IO;
 using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
@@ -79,7 +80,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();
 
-    private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
+    private void LoadTab_FileOk(object sender, CancelEventArgs e) {
         if (sender == btnOeffnen) {
             LoadFile(LoadTab.FileName, LoadTab.FileName);
         } else {
@@ -88,7 +89,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         }
     }
 
-    private void SaveTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) {
+    private void SaveTab_FileOk(object sender, CancelEventArgs e) {
         if (Pad?.Item == null) { return; }
 
         var t = Pad.Item.ToString(false);

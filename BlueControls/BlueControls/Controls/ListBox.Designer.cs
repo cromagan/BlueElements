@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
-using BlueBasics.Enums;
+using System.Windows.Forms;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls
 {
@@ -39,8 +40,8 @@ namespace BlueControls.Controls
             // 
             // SliderY
             // 
-            this.SliderY.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                                                   | System.Windows.Forms.AnchorStyles.Right)));
+            this.SliderY.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Bottom)
+                                                   | AnchorStyles.Right)));
             this.SliderY.Location = new Point(159, 0);
             this.SliderY.Name = "SliderY";
             this.SliderY.Orientation = Orientation.Senkrecht;
@@ -50,7 +51,7 @@ namespace BlueControls.Controls
             // 
             // Down
             // 
-            this.Down.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Down.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
             this.Down.ImageCode = "Pfeil_Unten|16";
             this.Down.Location = new Point(24, 144);
             this.Down.Name = "Down";
@@ -60,7 +61,7 @@ namespace BlueControls.Controls
             // 
             // Up
             // 
-            this.Up.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.Up.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
             this.Up.ImageCode = "Pfeil_Oben|16";
             this.Up.Location = new Point(0, 144);
             this.Up.Name = "Up";
@@ -70,7 +71,7 @@ namespace BlueControls.Controls
             // 
             // Plus
             // 
-            this.Plus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.Plus.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
             this.Plus.ImageCode = "PlusZeichen|16";
             this.Plus.Location = new Point(152, 144);
             this.Plus.Name = "Plus";
@@ -80,7 +81,7 @@ namespace BlueControls.Controls
             // 
             // Minus
             // 
-            this.Minus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.Minus.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
             this.Minus.ImageCode = "MinusZeichen|16";
             this.Minus.Location = new Point(128, 144);
             this.Minus.Name = "Minus";
@@ -90,9 +91,9 @@ namespace BlueControls.Controls
             // 
             // FilterTxt
             // 
-            this.FilterTxt.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)
-                                                     | System.Windows.Forms.AnchorStyles.Right)));
-            this.FilterTxt.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.FilterTxt.Anchor = ((AnchorStyles)(((AnchorStyles.Bottom | AnchorStyles.Left)
+                                                     | AnchorStyles.Right)));
+            this.FilterTxt.Cursor = Cursors.IBeam;
             this.FilterTxt.Location = new Point(40, 144);
             this.FilterTxt.Name = "FilterTxt";
             this.FilterTxt.Size = new Size(80, 24);
@@ -102,7 +103,7 @@ namespace BlueControls.Controls
             // 
             // FilterCap
             // 
-            this.FilterCap.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.FilterCap.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
             this.FilterCap.CausesValidation = false;
             this.FilterCap.Location = new Point(0, 144);
             this.FilterCap.Name = "FilterCap";

@@ -1,7 +1,15 @@
-﻿using BlueControls.Controls;
-using BlueControls.Enums;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Drawing;
+using System.Windows.Forms;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using Button = BlueControls.Controls.Button;
+using ListBox = BlueControls.Controls.ListBox;
+using TextBox = BlueControls.Controls.TextBox;
+using Timer = System.Windows.Forms.Timer;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
@@ -31,110 +39,110 @@ namespace BlueControls.BlueDatabaseDialogs
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AutoFilter));
-            this.txbEingabe = new BlueControls.Controls.TextBox();
-            this.Timer1x = new System.Windows.Forms.Timer(this.components);
-            this.Line = new BlueControls.Controls.Line();
-            this.lsbFilterItems = new BlueControls.Controls.ListBox();
-            this.lsbStandardFilter = new BlueControls.Controls.ListBox();
-            this.capWas = new BlueControls.Controls.Caption();
-            this.butFertig = new BlueControls.Controls.Button();
-            this.capInfo = new BlueControls.Controls.Caption();
+            this.components = new Container();
+            ComponentResourceManager resources = new ComponentResourceManager(typeof(AutoFilter));
+            this.txbEingabe = new TextBox();
+            this.Timer1x = new Timer(this.components);
+            this.Line = new Line();
+            this.lsbFilterItems = new ListBox();
+            this.lsbStandardFilter = new ListBox();
+            this.capWas = new Caption();
+            this.butFertig = new Button();
+            this.capInfo = new Caption();
             this.SuspendLayout();
             // 
             // txbEingabe
             // 
-            this.txbEingabe.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbEingabe.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbEingabe.Location = new System.Drawing.Point(8, 100);
+            this.txbEingabe.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
+                                                      | AnchorStyles.Right)));
+            this.txbEingabe.Cursor = Cursors.IBeam;
+            this.txbEingabe.Location = new Point(8, 100);
             this.txbEingabe.Name = "txbEingabe";
-            this.txbEingabe.Size = new System.Drawing.Size(150, 24);
+            this.txbEingabe.Size = new Size(150, 24);
             this.txbEingabe.TabIndex = 2;
-            this.txbEingabe.Enter += new System.EventHandler(this.TXTBox_Enter);
-            this.txbEingabe.LostFocus += new System.EventHandler(this.Something_LostFocus);
+            this.txbEingabe.Enter += new EventHandler(this.TXTBox_Enter);
+            this.txbEingabe.LostFocus += new EventHandler(this.Something_LostFocus);
             // 
             // Timer1x
             // 
             this.Timer1x.Enabled = true;
-            this.Timer1x.Tick += new System.EventHandler(this.Timer1_Tick);
+            this.Timer1x.Tick += new EventHandler(this.Timer1_Tick);
             // 
             // Line
             // 
-            this.Line.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.Line.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
+                                                | AnchorStyles.Right)));
             this.Line.CausesValidation = false;
-            this.Line.Location = new System.Drawing.Point(8, 132);
+            this.Line.Location = new Point(8, 132);
             this.Line.Name = "Line";
-            this.Line.Size = new System.Drawing.Size(152, 2);
+            this.Line.Size = new Size(152, 2);
             this.Line.Text = "BlueLine1";
             // 
             // lsbFilterItems
             // 
-            this.lsbFilterItems.AddAllowed = BlueControls.Enums.AddType.None;
-            this.lsbFilterItems.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lsbFilterItems.Appearance = BlueControls.Enums.BlueListBoxAppearance.Autofilter;
-            this.lsbFilterItems.Location = new System.Drawing.Point(8, 140);
+            this.lsbFilterItems.AddAllowed = AddType.None;
+            this.lsbFilterItems.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
+                                                           | AnchorStyles.Left) 
+                                                          | AnchorStyles.Right)));
+            this.lsbFilterItems.Appearance = BlueListBoxAppearance.Autofilter;
+            this.lsbFilterItems.Location = new Point(8, 140);
             this.lsbFilterItems.Name = "lsbFilterItems";
-            this.lsbFilterItems.Size = new System.Drawing.Size(150, 12);
+            this.lsbFilterItems.Size = new Size(150, 12);
             this.lsbFilterItems.TabIndex = 5;
-            this.lsbFilterItems.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.FiltItems_ItemClicked);
-            this.lsbFilterItems.LostFocus += new System.EventHandler(this.Something_LostFocus);
+            this.lsbFilterItems.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.FiltItems_ItemClicked);
+            this.lsbFilterItems.LostFocus += new EventHandler(this.Something_LostFocus);
             // 
             // lsbStandardFilter
             // 
-            this.lsbStandardFilter.AddAllowed = BlueControls.Enums.AddType.None;
-            this.lsbStandardFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lsbStandardFilter.Appearance = BlueControls.Enums.BlueListBoxAppearance.Autofilter;
-            this.lsbStandardFilter.Location = new System.Drawing.Point(8, 8);
+            this.lsbStandardFilter.AddAllowed = AddType.None;
+            this.lsbStandardFilter.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
+                                                             | AnchorStyles.Right)));
+            this.lsbStandardFilter.Appearance = BlueListBoxAppearance.Autofilter;
+            this.lsbStandardFilter.Location = new Point(8, 8);
             this.lsbStandardFilter.Name = "lsbStandardFilter";
-            this.lsbStandardFilter.Size = new System.Drawing.Size(150, 72);
+            this.lsbStandardFilter.Size = new Size(150, 72);
             this.lsbStandardFilter.TabIndex = 1;
             this.lsbStandardFilter.Text = "Standard";
-            this.lsbStandardFilter.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.sFilter_ItemClicked);
-            this.lsbStandardFilter.LostFocus += new System.EventHandler(this.Something_LostFocus);
+            this.lsbStandardFilter.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.sFilter_ItemClicked);
+            this.lsbStandardFilter.LostFocus += new EventHandler(this.Something_LostFocus);
             // 
             // capWas
             // 
             this.capWas.CausesValidation = false;
-            this.capWas.Location = new System.Drawing.Point(8, 84);
+            this.capWas.Location = new Point(8, 84);
             this.capWas.Name = "capWas";
-            this.capWas.Size = new System.Drawing.Size(112, 16);
+            this.capWas.Size = new Size(112, 16);
             this.capWas.Text = "...oder Text:";
             // 
             // butFertig
             // 
-            this.butFertig.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.butFertig.Anchor = ((AnchorStyles)((AnchorStyles.Top | AnchorStyles.Right)));
             this.butFertig.ImageCode = "Häkchen|16";
-            this.butFertig.Location = new System.Drawing.Point(72, 96);
+            this.butFertig.Location = new Point(72, 96);
             this.butFertig.Name = "butFertig";
-            this.butFertig.Size = new System.Drawing.Size(88, 32);
+            this.butFertig.Size = new Size(88, 32);
             this.butFertig.TabIndex = 6;
             this.butFertig.Text = "fertig";
             this.butFertig.Visible = false;
-            this.butFertig.Click += new System.EventHandler(this.butFertig_Click);
+            this.butFertig.Click += new EventHandler(this.butFertig_Click);
             // 
             // capInfo
             // 
-            this.capInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+            this.capInfo.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
+                                                   | AnchorStyles.Right)));
             this.capInfo.CausesValidation = false;
-            this.capInfo.Location = new System.Drawing.Point(8, 8);
+            this.capInfo.Location = new Point(8, 8);
             this.capInfo.Name = "capInfo";
-            this.capInfo.Size = new System.Drawing.Size(152, 72);
-            this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capInfo.Size = new Size(152, 72);
+            this.capInfo.TextAnzeigeVerhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             this.capInfo.Visible = false;
             // 
             // AutoFilter
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
-            this.ClientSize = new System.Drawing.Size(165, 159);
+            this.AutoScaleDimensions = new SizeF(6F, 13F);
+            this.AutoScaleMode = AutoScaleMode.Font;
+            this.BackgroundImage = ((Image)(resources.GetObject("$this.BackgroundImage")));
+            this.ClientSize = new Size(165, 159);
             this.Controls.Add(this.capInfo);
             this.Controls.Add(this.butFertig);
             this.Controls.Add(this.capWas);
@@ -147,7 +155,7 @@ namespace BlueControls.BlueDatabaseDialogs
 
         }
         internal TextBox txbEingabe;
-        internal System.Windows.Forms.Timer Timer1x;
+        internal Timer Timer1x;
         internal Line Line;
         internal ListBox lsbFilterItems;
         internal ListBox lsbStandardFilter;

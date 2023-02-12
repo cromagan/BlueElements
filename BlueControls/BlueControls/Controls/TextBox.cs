@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
@@ -29,11 +34,10 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using static BlueBasics.Converter;
+using Clipboard = System.Windows.Clipboard;
+using MessageBox = BlueControls.Forms.MessageBox;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -347,7 +351,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     //    base.Focus();
     //}
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         AbortSpellChecking();
         hotItem = null;
         tags.TagSet("CursorPosBeforeClick", _cursorCharPos.ToString());
@@ -380,10 +384,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _ = items.AddSeparator();
             }
         }
-        if (this is not ComboBox cbx || cbx.DropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
+        if (this is not ComboBox cbx || cbx.DropDownStyle == ComboBoxStyle.DropDown) {
             _ = items.Add(ContextMenuComands.Ausschneiden, Convert.ToBoolean(_markStart >= 0) && Enabled);
             _ = items.Add(ContextMenuComands.Kopieren, Convert.ToBoolean(_markStart >= 0));
-            _ = items.Add(ContextMenuComands.Einfügen, System.Windows.Clipboard.ContainsText() && Enabled);
+            _ = items.Add(ContextMenuComands.Einfügen, Clipboard.ContainsText() && Enabled);
             if (_formatierungErlaubt) {
                 _ = items.AddSeparator();
                 _ = items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1);
@@ -611,12 +615,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     protected virtual Design GetDesign() => Design.TextBox;
 
-    protected override bool IsInputKey(System.Windows.Forms.Keys keyData) =>
+    protected override bool IsInputKey(Keys keyData) =>
         // Ganz wichtig diese Routine!
         // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
         // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
         keyData switch {
-            System.Windows.Forms.Keys.Up or System.Windows.Forms.Keys.Down or System.Windows.Forms.Keys.Left or System.Windows.Forms.Keys.Right => true,
+            Keys.Up or Keys.Down or Keys.Left or Keys.Right => true,
             _ => false
         };
 
@@ -647,7 +651,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     // Tastatur
 
-    protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
+    protected override void OnKeyDown(KeyEventArgs e) {
         base.OnKeyDown(e);
 
         if (!Enabled) { return; }
@@ -655,23 +659,23 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (_mouseValue != 0 || e == null) { return; }
 
         switch (e.KeyCode) {
-            case System.Windows.Forms.Keys.Left:
+            case Keys.Left:
                 Cursor_Richtung(-1, 0);
                 break;
 
-            case System.Windows.Forms.Keys.Right:
+            case Keys.Right:
                 Cursor_Richtung(1, 0);
                 break;
 
-            case System.Windows.Forms.Keys.Down:
+            case Keys.Down:
                 Cursor_Richtung(0, 1);
                 break;
 
-            case System.Windows.Forms.Keys.Up:
+            case Keys.Up:
                 Cursor_Richtung(0, -1);
                 break;
 
-            case System.Windows.Forms.Keys.Delete:
+            case Keys.Delete:
                 KeyPress(AsciiKey.DEL);
                 CheckIfTextIsChanded(_eTxt.HtmlText);
                 break;
@@ -681,7 +685,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate();
     }
 
-    protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
+    protected override void OnKeyPress(KeyPressEventArgs e) {
         base.OnKeyPress(e);
         _lastUserActionForSpellChecking = DateTime.Now;
         if (!Enabled) {
@@ -722,11 +726,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     // Mouse
-    protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseDown(MouseEventArgs e) {
         base.OnMouseDown(e);
         _lastUserActionForSpellChecking = DateTime.Now;
         if (!Enabled) { return; }
-        if (e.Button == System.Windows.Forms.MouseButtons.Right) { return; }
+        if (e.Button == MouseButtons.Right) { return; }
         _mouseValue = 1;
         _markStart = Cursor_PosAt(e.X, e.Y);
         _markEnd = _markStart;
@@ -735,10 +739,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate();
     }
 
-    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
         if (_eTxt == null) { return; }
-        if (e.Button != System.Windows.Forms.MouseButtons.Left) { return; }
+        if (e.Button != MouseButtons.Left) { return; }
         if (!Enabled) { return; }
         _lastUserActionForSpellChecking = DateTime.Now;
         CursorClear();
@@ -747,7 +751,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate();
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         _lastUserActionForSpellChecking = DateTime.Now;
         if (Enabled) {
@@ -757,13 +761,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 if (_markStart == _markEnd || _markEnd < 0) {
                     _cursorCharPos = Cursor_PosAt(e.X, e.Y);
                     MarkClear();
-                    if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+                    if (e.Button == MouseButtons.Right) {
                         FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                     }
                 } else {
                     CursorClear();
                     Selection_Repair(true);
-                    if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+                    if (e.Button == MouseButtons.Right) {
                         FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
                     }
                 }
@@ -775,7 +779,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate();
     }
 
-    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (_sliderY == null || !_sliderY.Visible) { return; }
         _lastUserActionForSpellChecking = DateTime.Now;
@@ -862,9 +866,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         // Anscheinend wird bei den Clipboard operationen ein DoEventXsx ausgelöst.
         // Dadurch kommt es zum Refresh des übergeordneten Steuerelementes, warscheinlich der Textbox.
         // Deshalb  muss 'Char_DelBereich' NACH den Clipboard-Operationen stattfinden.
-        if (!System.Windows.Clipboard.ContainsText()) { return; }
+        if (!Clipboard.ContainsText()) { return; }
         Char_DelBereich(-1, -1);
-        InsertText(System.Windows.Clipboard.GetText());
+        InsertText(Clipboard.GetText());
     }
 
     /// <summary>
@@ -965,7 +969,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             return;
         }
         _sliderY = new Slider {
-            Dock = System.Windows.Forms.DockStyle.Right,
+            Dock = DockStyle.Right,
             LargeChange = 10f,
             Location = new Point(Width - 18, 0),
             Maximum = 100f,

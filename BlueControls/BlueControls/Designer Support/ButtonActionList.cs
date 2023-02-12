@@ -1,7 +1,7 @@
-﻿using BlueControls.Controls;
-using BlueControls.Enums;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.Design;
+using BlueControls.Controls;
+using BlueControls.Enums;
 
 namespace BlueControls.Designer_Support;
 

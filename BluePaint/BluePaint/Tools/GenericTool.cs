@@ -15,11 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.Controls;
-using BluePaint.EventArgs;
-using System.Drawing;
-
 #nullable enable
+
+using System;
+using System.Drawing;
+using BlueBasics;
+using BlueControls.Controls;
+using BlueControls.EventArgs;
+using BluePaint.EventArgs;
 
 namespace BluePaint;
 
@@ -42,19 +45,19 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
 
     #region Events
 
-    public event System.EventHandler? DoInvalidate;
+    public event EventHandler? DoInvalidate;
 
-    public event System.EventHandler? ForceUndoSaving;
+    public event EventHandler? ForceUndoSaving;
 
-    public event System.EventHandler? HideMainWindow;
+    public event EventHandler? HideMainWindow;
 
-    public event System.EventHandler<BitmapEventArgs>? NeedCurrentPic;
+    public event EventHandler<BitmapEventArgs>? NeedCurrentPic;
 
-    public event System.EventHandler<BitmapEventArgs>? OverridePic;
+    public event EventHandler<BitmapEventArgs>? OverridePic;
 
-    public event System.EventHandler? ShowMainWindow;
+    public event EventHandler? ShowMainWindow;
 
-    public event System.EventHandler? ZoomFit;
+    public event EventHandler? ZoomFit;
 
     #endregion
 
@@ -64,27 +67,27 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-    public virtual void DoAdditionalDrawing(BlueControls.EventArgs.AdditionalDrawing e, Bitmap? originalPic) { }
+    public virtual void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) { }
 
-    public virtual void ExcuteCommand(string command) => BlueBasics.Develop.DebugPrint_RoutineMussUeberschriebenWerden();
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-    public virtual new void MouseDown(BlueControls.EventArgs.MouseEventArgs1_1 e, Bitmap? originalPic) { }
+    public virtual void ExcuteCommand(string command) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-    public virtual new void MouseMove(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) { }
+    public virtual new void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) { }
 
     /// <summary>
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-    public virtual new void MouseUp(BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) { }
+    public virtual new void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) { }
+
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
+    public virtual new void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) { }
 
     /// <summary>
     ///

@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -27,10 +32,8 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using static BlueBasics.Converter;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -87,7 +90,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         if (MessageBox.Show("Anordung <b>'" + ca.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         var car = Database.ColumnArrangements.CloneWithClones();
         car.RemoveAt(_arrangement);
-        Database.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(car);
+        Database.ColumnArrangements = new ReadOnlyCollection<ColumnViewCollection>(car);
         _arrangement = 1;
         UpdateCombobox();
         ShowOrder();
@@ -153,7 +156,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
             car.Add(new ColumnViewCollection(Database, string.Empty, newname));
         }
 
-        Database.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(car);
+        Database.ColumnArrangements = new ReadOnlyCollection<ColumnViewCollection>(car);
         _arrangement = car.Count - 1;
         UpdateCombobox();
 
@@ -340,7 +343,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
         Fixing--;
 
-        Database.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(cloneOfColumnArrangements);
+        Database.ColumnArrangements = new ReadOnlyCollection<ColumnViewCollection>(cloneOfColumnArrangements);
 
         if (did) {
             Database?.RepairAfterParse();
@@ -384,7 +387,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         return found;
     }
 
-    private void Pad_MouseUp(object? sender, System.Windows.Forms.MouseEventArgs? e) {
+    private void Pad_MouseUp(object? sender, MouseEventArgs? e) {
         if (Generating || Sorting || Fixing > 0) { return; }
         SortColumns();
         FixColumnArrangement();

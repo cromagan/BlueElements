@@ -18,10 +18,11 @@
 #nullable enable
 
 using BlueDatabase;
+using BlueDatabase.EventArgs;
 
 namespace BlueControls.EventArgs;
 
-public class CellDoubleClickEventArgs : BlueDatabase.EventArgs.CellEventArgs {
+public class CellDoubleClickEventArgs : CellEventArgs {
 
     #region Constructors
 

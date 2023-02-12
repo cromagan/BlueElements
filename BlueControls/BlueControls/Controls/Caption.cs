@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
@@ -26,11 +31,9 @@ using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
+using BlueDatabase;
 using BlueDatabase.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
+using Form = BlueControls.Forms.Form;
 
 namespace BlueControls.Controls;
 
@@ -151,7 +154,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) => hotItem = null;
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) => hotItem = null;
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
@@ -197,7 +200,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                 }
 
                 _eText ??= new ExtText(_design, state) {
-                    HtmlText = BlueDatabase.LanguageTool.DoTranslate(_text, Translate),
+                    HtmlText = LanguageTool.DoTranslate(_text, Translate),
                     State = state,
                     Multiline = true
                 };
@@ -228,9 +231,9 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         } catch { }
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (e.Button == System.Windows.Forms.MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
+        if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
     }
 
     private void GetDesign() {

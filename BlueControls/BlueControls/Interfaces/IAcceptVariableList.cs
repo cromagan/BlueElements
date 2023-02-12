@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueScript.Variables;
 using System.Collections.Generic;
+using BlueScript.Variables;
 
 namespace BlueControls.Interfaces;
 

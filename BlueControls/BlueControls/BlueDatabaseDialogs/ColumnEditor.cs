@@ -17,6 +17,13 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Drawing;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -24,12 +31,8 @@ using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text.RegularExpressions;
 using static BlueBasics.Converter;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -55,7 +58,7 @@ internal sealed partial class ColumnEditor {
 
     #region Methods
 
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
         if (!AllOk()) {
             e.Cancel = true;
@@ -462,7 +465,7 @@ internal sealed partial class ColumnEditor {
         _column.FilterOptions = tmpf;
         _column.IgnoreAtRowFilter = btnZeilenFilterIgnorieren.Checked;
         _column.PermissionGroupsChangeCell = new(lbxCellEditor.Item.ToListOfString());
-        _column.DropDownItems = new System.Collections.ObjectModel.ReadOnlyCollection<string>(tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList());
+        _column.DropDownItems = new ReadOnlyCollection<string>(tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList());
         _column.OpticalReplace = new(txbReplacer.Text.SplitAndCutByCrToList());
         _column.AfterEditAutoReplace = new(txbAutoReplace.Text.SplitAndCutByCrToList());
 
@@ -543,7 +546,7 @@ internal sealed partial class ColumnEditor {
                 or.Add("~" + thisColumn.Name.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
             }
 
-            b.DropDownItems = new System.Collections.ObjectModel.ReadOnlyCollection<string>(dd);
+            b.DropDownItems = new ReadOnlyCollection<string>(dd);
             b.OpticalReplace = new(or);
 
             db.RepairAfterParse();
@@ -556,7 +559,7 @@ internal sealed partial class ColumnEditor {
             //car[1].Hide("visible");
             //car[1].HideSystemColumns();
 
-            db.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(car);
+            db.ColumnArrangements = new ReadOnlyCollection<ColumnViewCollection>(car);
 
             db.SortDefinition = new RowSortDefinition(db, "Spalte", false);
             tblFilterliste.DatabaseSet(db, string.Empty);
@@ -564,7 +567,7 @@ internal sealed partial class ColumnEditor {
 
             var t = db.Tags.Clone();
             t.TagSet("Filename", linkdb.ConnectionData.UniqueID);
-            db.Tags = new System.Collections.ObjectModel.ReadOnlyCollection<string>(t);
+            db.Tags = new ReadOnlyCollection<string>(t);
 
             tblFilterliste.Filter.Add(vis, FilterType.Istgleich, "+");
         }

@@ -17,15 +17,19 @@
 
 #nullable enable
 
+using System;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using System;
-using System.Drawing;
 using static BlueBasics.IO;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -99,7 +103,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
                 DisablePad();
                 TextPadItem x = new("x", "Nicht editierbares Layout aus dem Dateisystem");
                 Pad.Item.Add(x);
-                x.Stil = Enums.PadStyles.Style_Überschrift_Haupt;
+                x.Stil = PadStyles.Style_Überschrift_Haupt;
                 x.SetCoordinates(new RectangleF(0, 0, 1000, 400), true);
                 ItemChanged();
             }
@@ -108,7 +112,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
         }
     }
 
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
         if (Database != null && !Database.IsDisposed) {
             Database.Disposing -= Database_Disposing;
         }
@@ -168,7 +172,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
         CheckButtons();
     }
 
-    private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, string.Empty, false);
+    private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, string.Empty);
 
     private void btnLayoutUmbenennen_Click(object sender, System.EventArgs e) {
         SaveCurrentLayout();
@@ -193,7 +197,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
         _ = ExecuteFile(Database.DefaultLayoutPath());
     }
 
-    private void btnTextEditor_Click(object sender, System.EventArgs e) => ExecuteFile("notepad.exe", cbxLayout.Text, false);
+    private void btnTextEditor_Click(object sender, System.EventArgs e) => ExecuteFile("notepad.exe", cbxLayout.Text);
 
     private void cbxLayout_ItemClicked(object sender, BasicListItemEventArgs e) => LoadLayout(e.Item.KeyName);
 
@@ -255,7 +259,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
             var id = newl.Substring(4, ko - 4);
             Database.InvalidateExports(id);
         } else if (Pad.Item.Id.FileSuffix().ToUpper() == "BCR") {
-            WriteAllText(Pad.Item.Id, newl, System.Text.Encoding.UTF8, false);
+            WriteAllText(Pad.Item.Id, newl, Encoding.UTF8, false);
         }
     }
 

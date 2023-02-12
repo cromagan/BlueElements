@@ -17,14 +17,16 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueDatabase;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
+using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
@@ -71,7 +73,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         get => string.Empty;
         set {
             if (Column == null) { return; }
-            Forms.TableView.OpenColumnEditor(Column, null, null);
+            TableView.OpenColumnEditor(Column, null, null);
         }
     }
 
@@ -165,7 +167,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         var r = Column.Database.Row.First();
         if (r != null) {
-            Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, BlueDatabase.Enums.ShortenStyle.Replaced, Column.BehaviorOfImageAndText);
+            Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, ShortenStyle.Replaced, Column.BehaviorOfImageAndText);
         }
 
         GeneratedBitmap = bmp;

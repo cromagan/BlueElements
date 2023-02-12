@@ -1,5 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueControls.Controls;
+using Button = BlueControls.Controls.Button;
+using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.Classes_Editor
 {
@@ -26,40 +31,40 @@ namespace BlueControls.Classes_Editor
         [DebuggerStepThrough()]
         private void InitializeComponent()
         {
-            this.cbxColumns = new BlueControls.Controls.ComboBox();
-            this.capSpalte = new BlueControls.Controls.Caption();
-            this.btnFilterWahl = new BlueControls.Controls.Button();
+            this.cbxColumns = new ComboBox();
+            this.capSpalte = new Caption();
+            this.btnFilterWahl = new Button();
             this.SuspendLayout();
             // 
             // cbxColumns
             // 
-            this.cbxColumns.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxColumns.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxColumns.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxColumns.Location = new System.Drawing.Point(8, 40);
+            this.cbxColumns.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
+                                                      | AnchorStyles.Right)));
+            this.cbxColumns.Cursor = Cursors.IBeam;
+            this.cbxColumns.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.cbxColumns.Location = new Point(8, 40);
             this.cbxColumns.Name = "cbxColumns";
-            this.cbxColumns.Size = new System.Drawing.Size(216, 24);
+            this.cbxColumns.Size = new Size(216, 24);
             this.cbxColumns.TabIndex = 0;
-            this.cbxColumns.TextChanged += new System.EventHandler(this.cbxColumns_TextChanged);
+            this.cbxColumns.TextChanged += new EventHandler(this.cbxColumns_TextChanged);
             // 
             // capSpalte
             // 
-            this.capSpalte.Location = new System.Drawing.Point(8, 16);
+            this.capSpalte.Location = new Point(8, 16);
             this.capSpalte.Name = "capSpalte";
-            this.capSpalte.Size = new System.Drawing.Size(120, 18);
+            this.capSpalte.Size = new Size(120, 18);
             this.capSpalte.Text = "Filter der Spalte:";
             // 
             // btnFilterWahl
             // 
-            this.btnFilterWahl.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnFilterWahl.Anchor = ((AnchorStyles)((AnchorStyles.Top | AnchorStyles.Right)));
             this.btnFilterWahl.ImageCode = "Trichter|16";
-            this.btnFilterWahl.Location = new System.Drawing.Point(232, 40);
+            this.btnFilterWahl.Location = new Point(232, 40);
             this.btnFilterWahl.Name = "btnFilterWahl";
-            this.btnFilterWahl.Size = new System.Drawing.Size(112, 24);
+            this.btnFilterWahl.Size = new Size(112, 24);
             this.btnFilterWahl.TabIndex = 1;
             this.btnFilterWahl.Text = "Filter wählen";
-            this.btnFilterWahl.Click += new System.EventHandler(this.btnFilterWahl_Click);
+            this.btnFilterWahl.Click += new EventHandler(this.btnFilterWahl_Click);
             // 
             // FilterItem_Editor
             // 
@@ -67,7 +72,7 @@ namespace BlueControls.Classes_Editor
             this.Controls.Add(this.btnFilterWahl);
             this.Controls.Add(this.capSpalte);
             this.Name = "FilterItem_Editor";
-            this.Size = new System.Drawing.Size(354, 72);
+            this.Size = new Size(354, 72);
             this.ResumeLayout(false);
         }
         internal ComboBox cbxColumns;

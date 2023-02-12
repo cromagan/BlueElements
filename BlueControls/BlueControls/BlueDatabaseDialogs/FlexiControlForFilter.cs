@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueDatabaseDialogs;
@@ -28,10 +33,6 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 
 namespace BlueControls.Controls;
 
@@ -84,7 +85,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         switch (e.ClickedComand.ToLower()) {
             case "#columnedit":
                 if (e.HotItem is ColumnItem col) {
-                    BlueControls.Forms.TableView.OpenColumnEditor(col, null);
+                    Forms.TableView.OpenColumnEditor(col, null);
                 }
                 return true;
 
@@ -123,7 +124,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         return false;
     }
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
         if (Filter?.Column?.Database == null || !Filter.Column.Database.IsAdministrator()) { return; }
 
@@ -156,7 +157,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         return cb != null && cb.WasThisValueClicked();
     }
 
-    protected override void OnControlAdded(System.Windows.Forms.ControlEventArgs e) {
+    protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
         e.Control.MouseUp += Control_MouseUp;
         if (e.Control is ComboBox cbx) {
@@ -169,7 +170,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
             //{
             //    Item2.GenerateAndAdd("|" + thiss, thiss));
             //}
-            StyleComboBox(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDown, false);
+            StyleComboBox(cbx, item2, ComboBoxStyle.DropDown, false);
             cbx.DropDownShowing += Cbx_DropDownShowing;
         }
         if (e.Control is Button btn) {
@@ -190,9 +191,9 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         }
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+        if (e.Button == MouseButtons.Right) {
             FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
         }
     }
@@ -216,8 +217,8 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         }
     }
 
-    private void Control_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
-        if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+    private void Control_MouseUp(object sender, MouseEventArgs e) {
+        if (e.Button == MouseButtons.Right) {
             FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
         }
     }

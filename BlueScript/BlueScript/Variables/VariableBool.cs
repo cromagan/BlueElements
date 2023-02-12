@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Extensions;
@@ -95,7 +96,7 @@ public class VariableBool : Variable {
         if (x is bool val) {
             _valuebool = val;
         } else {
-            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Variablenfehler!");
+            Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler!");
         }
     }
 

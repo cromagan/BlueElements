@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueScript.Structures;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -99,7 +100,7 @@ public class VariableFloat : Variable {
         } else if (x is double vald) {
             _double = vald;
         } else {
-            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Variablenfehler!");
+            Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler!");
         }
     }
 

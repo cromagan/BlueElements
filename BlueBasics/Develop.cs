@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -26,9 +24,14 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Windows.Forms;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using static BlueBasics.IO;
+using Timer = System.Windows.Forms.Timer;
 
 namespace BlueBasics;
 
@@ -68,10 +71,10 @@ public static class Develop {
         Exited = true;
         // http://geekswithblogs.net/mtreadwell/archive/2004/06/06/6123.aspx
         Environment.Exit(-1);
-        System.Windows.Forms.Application.Exit();
+        Application.Exit();
     }
 
-    public static string AppExe() => System.Windows.Forms.Application.StartupPath + "\\" + AppName() + ".exe";
+    public static string AppExe() => Application.StartupPath + "\\" + AppName() + ".exe";
 
     public static string AppName() {
         try {
@@ -103,7 +106,7 @@ public static class Develop {
 
     public static void DebugPrint(Exception warnung) => DebugPrint(FehlerArt.Warnung, warnung);
 
-    public static void DebugPrint<T>(T @enum) where T : System.Enum => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
+    public static void DebugPrint<T>(T @enum) where T : Enum => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
 
     public static void DebugPrint(FehlerArt art, string meldung) {
         lock (SyncLockObject) {
@@ -196,7 +199,7 @@ public static class Develop {
                         endl.AddRange(l);
                     }
                     HTML_AddFoot(endl);
-                    endl.Save(TempFile(string.Empty, "Endmeldung", "html"), System.Text.Encoding.UTF8, true);
+                    endl.Save(TempFile(string.Empty, "Endmeldung", "html"), Encoding.UTF8, true);
                     AbortExe();
                     return;
                 }
@@ -229,7 +232,7 @@ public static class Develop {
         DebugPrint(FehlerArt.Warnung, "Diese Funktion muss noch überschrieben werden.");
     }
 
-    public static void DoEvents() => System.Windows.Forms.Application.DoEvents();
+    public static void DoEvents() => Application.DoEvents();
 
     public static void HTML_AddFoot(List<string> l) {
         l.Add("  </body>");
@@ -265,18 +268,18 @@ public static class Develop {
         ci.NumberFormat.NumberGroupSeparator = string.Empty;
         ci.NumberFormat.PercentGroupSeparator = string.Empty;
         ci.NumberFormat.NumberDecimalSeparator = ",";
-        System.Windows.Forms.Application.CurrentCulture = ci;
+        Application.CurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentUICulture = ci;
-        System.Windows.Forms.Application.EnableVisualStyles();
+        Application.EnableVisualStyles();
 
         try {
             // Try Block erforderlich, weil im der Designmode ab und zu abstürzt
-            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
+            Application.SetCompatibleTextRenderingDefault(false);
         } catch { }
 
         TraceLogging_Start(TempFile(string.Empty, AppName() + "-Trace.html"));
-        System.Windows.Forms.Timer check = new();
+        Timer check = new();
         check.Tick += CloseAfter12Hours;
         check.Interval = 60000;
         check.Enabled = true;

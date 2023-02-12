@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Drawing;
+using System.Drawing.Drawing2D;
 
 namespace BlueControls.ItemCollection;
 
@@ -81,11 +82,11 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
         try {
             if (_generatedBitmap != null) {
                 if (forPrinting) {
-                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.HighQualityBicubic;
-                    gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                    gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    gr.PixelOffsetMode = PixelOffsetMode.Half;
                 } else {
-                    gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Low;
-                    gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+                    gr.InterpolationMode = InterpolationMode.Low;
+                    gr.PixelOffsetMode = PixelOffsetMode.Half;
                 }
                 gr.DrawImage(_generatedBitmap, positionModified);
             }

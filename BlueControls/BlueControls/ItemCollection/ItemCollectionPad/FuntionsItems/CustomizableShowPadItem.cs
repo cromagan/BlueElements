@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -24,11 +29,6 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -45,7 +45,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public static BlueFont? CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
     public List<string> VisibleFor = new();
-    private string? _getValueFromkey = null;
+    private string? _getValueFromkey;
     private ICalculateRowsItemLevel? _tmpgetValueFrom;
 
     #endregion

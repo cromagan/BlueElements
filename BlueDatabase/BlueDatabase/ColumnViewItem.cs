@@ -17,11 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
-using System;
-using System.Drawing;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;

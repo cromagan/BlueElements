@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
-using BlueBasics.Enums;
+using System.Windows.Forms;
 using BlueControls.Enums;
+using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls
 {
@@ -34,12 +35,12 @@ namespace BlueControls.Controls
             this.BTB = new TextBox();
             this.SliderX = new Slider();
             this.SliderY = new Slider();
-            this.ColDia = new System.Windows.Forms.ColorDialog();
+            this.ColDia = new ColorDialog();
             this.SuspendLayout();
             // 
             // BCB
             // 
-            this.BCB.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.BCB.Cursor = Cursors.IBeam;
             this.BCB.Location = new Point(48, 160);
             this.BCB.Name = "BCB";
             this.BCB.Size = new Size(120, 24);
@@ -53,7 +54,7 @@ namespace BlueControls.Controls
             // 
             // BTB
             // 
-            this.BTB.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.BTB.Cursor = Cursors.IBeam;
             this.BTB.Location = new Point(48, 136);
             this.BTB.Name = "BTB";
             this.BTB.Size = new Size(120, 24);
@@ -68,7 +69,7 @@ namespace BlueControls.Controls
             // 
             // SliderX
             // 
-            this.SliderX.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.SliderX.Dock = DockStyle.Bottom;
             this.SliderX.Enabled = false;
             this.SliderX.Location = new Point(0, 414);
             this.SliderX.Name = "SliderX";
@@ -78,7 +79,7 @@ namespace BlueControls.Controls
             // 
             // SliderY
             // 
-            this.SliderY.Dock = System.Windows.Forms.DockStyle.Right;
+            this.SliderY.Dock = DockStyle.Right;
             this.SliderY.Enabled = false;
             this.SliderY.Location = new Point(1107, 0);
             this.SliderY.Name = "SliderY";
@@ -101,6 +102,6 @@ namespace BlueControls.Controls
         private TextBox BTB;
         private Slider SliderX;
         private Slider SliderY;
-        private System.Windows.Forms.ColorDialog ColDia;
+        private ColorDialog ColDia;
     }
 }

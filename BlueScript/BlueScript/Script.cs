@@ -17,13 +17,14 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using BlueBasics;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using static BlueBasics.Generic;
 
 namespace BlueScript;
@@ -150,7 +151,7 @@ public class Script {
     }
 
     public static string ReduceText(string txt) {
-        System.Text.StringBuilder s = new();
+        StringBuilder s = new();
         var gänsef = false;
         var comment = false;
 

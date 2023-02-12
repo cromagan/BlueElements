@@ -1,12 +1,16 @@
 ﻿
+using System.ComponentModel;
+using System.Windows.Forms;
 using BlueControls.Controls;
+using Button = BlueControls.Controls.Button;
+using GroupBox = BlueControls.Controls.GroupBox;
 
 namespace BlueControls.Forms {
     partial class PadEditorWithFileAccess {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -197,7 +201,7 @@ namespace BlueControls.Forms {
 
         #endregion
 
-        protected System.Windows.Forms.TabPage tabDatei;
+        protected TabPage tabDatei;
         protected GroupBox grpDateiSystem;
         private Button btnDruckerDialog;
         private Button btnImport;
@@ -205,7 +209,7 @@ namespace BlueControls.Forms {
         private Button btnNeu;
         protected Button btnOeffnen;
         private Button btnSpeichern;
-        private System.Windows.Forms.OpenFileDialog LoadTab;
-        private System.Windows.Forms.SaveFileDialog SaveTab;
+        private OpenFileDialog LoadTab;
+        private SaveFileDialog SaveTab;
     }
 }

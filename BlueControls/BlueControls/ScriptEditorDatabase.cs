@@ -19,6 +19,7 @@
 
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueDatabase;
 using BlueScript.Structures;
 using static BlueBasics.IO;
@@ -31,7 +32,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 
     private DatabaseAbstract? _database;
 
-    private bool _isRowSkript = false;
+    private bool _isRowSkript;
 
     #endregion
 
@@ -92,7 +93,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
                 return new ScriptEndedFeedback("Zeile nicht gefunden.");
             }
         }
-        var s = _database.ExecuteScript(base.ScriptText, false, r);
+        var s = _database.ExecuteScript(ScriptText, false, r);
         //var (_, m, s) = r.ExecuteScript(null, true, _skriptname);
         //message = m;
         //sc = s;
@@ -131,7 +132,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
         switch (e.ClickedComand.ToLower()) {
             case "spalteneigenschaftenbearbeiten":
                 if (c != null) {
-                    Forms.TableView.OpenColumnEditor(c, null, null);
+                    TableView.OpenColumnEditor(c, null, null);
                 }
 
                 break;

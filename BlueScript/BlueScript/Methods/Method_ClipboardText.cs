@@ -17,9 +17,10 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Windows;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -48,8 +49,8 @@ internal class Method_ClipboardText : Method {
             return DoItFeedback.AttributFehler(this, attvar, line);
         }
 
-        if (System.Windows.Clipboard.ContainsText()) {
-            return new DoItFeedback(System.Windows.Clipboard.GetText(), string.Empty, line);
+        if (Clipboard.ContainsText()) {
+            return new DoItFeedback(Clipboard.GetText(), string.Empty, line);
         }
         return DoItFeedback.Null(line);
     }

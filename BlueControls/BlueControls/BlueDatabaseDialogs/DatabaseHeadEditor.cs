@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -25,10 +30,6 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -66,7 +67,7 @@ public sealed partial class DatabaseHeadEditor {
 
     #region Methods
 
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
         if (_frmHeadEditorFormClosingIsin) { return; }
         _frmHeadEditorFormClosingIsin = true;
         base.OnFormClosing(e);
@@ -321,7 +322,7 @@ public sealed partial class DatabaseHeadEditor {
         }
     }
 
-    private void GlobalTab_Selecting(object sender, System.Windows.Forms.TabControlCancelEventArgs e) {
+    private void GlobalTab_Selecting(object sender, TabControlCancelEventArgs e) {
         if (e.TabPage == tabScripts) {
             eventScriptEditor.Database = _database;
         }

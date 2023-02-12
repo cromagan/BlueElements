@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Concurrent;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Text;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
 
 namespace BlueBasics;

@@ -1,7 +1,8 @@
-﻿using BlueControls.Forms;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Windows.Forms;
+using BlueControls.Forms;
 
 namespace BlueControls.Controls
 {
@@ -37,14 +38,14 @@ namespace BlueControls.Controls
             // 
             // btnDropDown
             // 
-            this.btnDropDown.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-                                              | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDropDown.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Bottom) 
+                                                       | AnchorStyles.Right)));
             this.btnDropDown.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";
             this.btnDropDown.Location = new Point(476, 0);
             this.btnDropDown.Name = "btnDropDown";
             this.btnDropDown.Size = new Size(24, 150);
             this.btnDropDown.TabIndex = 1;
-            this.btnDropDown.MouseUp += new System.Windows.Forms.MouseEventHandler(this.ShowMenu);
+            this.btnDropDown.MouseUp += new MouseEventHandler(this.ShowMenu);
             this.btnDropDown.LostFocus += new EventHandler(this.btnDropDown_LostFocus);
             // 
             // ComboBox

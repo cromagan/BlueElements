@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls
 {
@@ -41,7 +42,7 @@ namespace BlueControls.Controls
         private void InitializeComponent()
         {
             this.components = new Container();
-            this.Blinker = new System.Windows.Forms.Timer(this.components);
+            this.Blinker = new Timer(this.components);
             this.SpellChecker = new BackgroundWorker();
             this.SuspendLayout();
             //
@@ -60,11 +61,11 @@ namespace BlueControls.Controls
             //
             //TextBox
             //
-            this.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.Cursor = Cursors.IBeam;
             Name = "TextBox";
             this.ResumeLayout(false);
         }
-        internal System.Windows.Forms.Timer Blinker;
+        internal Timer Blinker;
         internal BackgroundWorker SpellChecker;
     }
 }

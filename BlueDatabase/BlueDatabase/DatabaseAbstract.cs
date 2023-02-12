@@ -17,15 +17,6 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueScript;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -35,9 +26,18 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueScript;
+using BlueScript.Structures;
+using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
-
 using Timer = System.Threading.Timer;
 
 namespace BlueDatabase;
@@ -539,45 +539,45 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 switch (x) {
                     case 0:
                         // BeCreative, At Home, 31.11.2021
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 1:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 2:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 3:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 4:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\" + name;
+                        pf = Application.StartupPath + "\\" + name;
                         break;
 
                     case 5:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 6:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 7:
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 8:
                         // warscheinlich BeCreative, Firma
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
                         break;
 
                     case 9:
                         // Bildzeichen-Liste, Firma, 25.10.2021
-                        pf = System.Windows.Forms.Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
+                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressourcen\\" + blueBasicsSubDir + "\\" + name;
                         break;
                 }
                 if (FileExists(pf)) {
@@ -1382,7 +1382,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public void RefreshColumnsData(ColumnItem? column) {
         if (column == null || column.IsInCache != null) { return; }
-        RefreshColumnsData(new List<ColumnItem?>() { column });
+        RefreshColumnsData(new List<ColumnItem?> { column });
     }
 
     public abstract void RefreshColumnsData(List<ColumnItem> columns);
@@ -1413,7 +1413,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return RefreshRowData(r, refreshAlways);
     }
 
-    public bool RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem>() { row }, refreshAlways);
+    public bool RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem> { row }, refreshAlways);
 
     public virtual void RepairAfterParse() {
         Column.Repair();

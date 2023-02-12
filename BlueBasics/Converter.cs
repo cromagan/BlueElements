@@ -15,16 +15,16 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Enums;
+#nullable enable
+
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using BlueBasics.Enums;
 using static BlueBasics.IO;
-
-#nullable enable
 
 namespace BlueBasics;
 

@@ -17,18 +17,19 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -189,7 +190,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     public object? Clone() {
         var x = ToString();
 
-        var i = BlueBasics.ParsebleItem.NewByParsing<BasicPadItem>(x);
+        var i = NewByParsing<BasicPadItem>(x);
         i?.Parse(x);
 
         return i;
@@ -563,7 +564,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     //protected abstract BasicPadItem? TryCreate(string id, string name);
 
-    private void ConnectsTo_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+    private void ConnectsTo_ItemAdded(object sender, ListEventArgs e) {
         var x = (ItemConnection)e.Item;
 
         x.OtherItem.Changed += Item_Changed;
@@ -572,21 +573,21 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     private void ConnectsTo_ItemRemoved(object sender, System.EventArgs e) => OnChanged();
 
-    private void ConnectsTo_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+    private void ConnectsTo_ItemRemoving(object sender, ListEventArgs e) {
         var x = (ItemConnection)e.Item;
         x.OtherItem.Changed -= Item_Changed;
     }
 
     private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 
-    private void Points_ItemAdded(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+    private void Points_ItemAdded(object sender, ListEventArgs e) {
         if (e.Item is PointM p) {
             p.Moving += PointMoving;
             p.Moved += PointMoved;
         }
     }
 
-    private void Points_ItemRemoving(object sender, BlueBasics.EventArgs.ListEventArgs e) {
+    private void Points_ItemRemoving(object sender, ListEventArgs e) {
         if (e.Item is PointM p) {
             p.Moving -= PointMoving;
             p.Moved -= PointMoved;

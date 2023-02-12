@@ -17,9 +17,12 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
@@ -27,9 +30,7 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript;
 using BlueScript.Structures;
 using FastColoredTextBoxNS;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using GroupBox = BlueControls.Controls.GroupBox;
 
 namespace BlueControls;
 
@@ -82,7 +83,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         return false;
     }
 
-    public void GetContextMenuItems(System.Windows.Forms.MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
             _ = items.Add("Variableninhalt kopieren");
         }
@@ -176,13 +177,13 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
 
     private void btnZusatzDateien_Click(object sender, System.EventArgs e) => OpenAdditionalFileFolder();
 
-    private void TxtSkript_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
-        if (e.Button == System.Windows.Forms.MouseButtons.Right) {
+    private void TxtSkript_MouseUp(object sender, MouseEventArgs e) {
+        if (e.Button == MouseButtons.Right) {
             FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
         }
     }
 
-    private void TxtSkript_TextChanged(object sender, FastColoredTextBoxNS.TextChangedEventArgs e) => OnChanged();
+    private void TxtSkript_TextChanged(object sender, TextChangedEventArgs e) => OnChanged();
 
     private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
         if (Script.Comands == null) { return; }

@@ -17,22 +17,24 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using static BlueBasics.IO;
 
 namespace BlueControls.Controls;
@@ -162,7 +164,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         //TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
         switch (e.ClickedComand.ToLower()) {
             case "spalteneigenschaftenbearbeiten":
-                Forms.TableView.OpenColumnEditor(_tmpColumn, null);
+                TableView.OpenColumnEditor(_tmpColumn, null);
                 return true;
 
             case "vorherigeninhaltwiederherstellen":
@@ -592,7 +594,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             case "bild öffnen":
                 if (e.HotItem is BitmapListItem bi) {
                     if (bi.ImageLoaded()) {
-                        Forms.PictureView x = new(bi.Bitmap);
+                        PictureView x = new(bi.Bitmap);
                         x.Show();
                         //var b = modConverter.FileToByte(t.Internal);
                         //b = Generic.SimpleCrypt(b, FileEncryptionKey, -1);
@@ -643,7 +645,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                     do {
                         Develop.DoEvents();
                         if (Marker.CancellationPending || initT != txb.Text) { return; }
-                        var fo = initT.IndexOfWord(thisWord, cap, System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+                        var fo = initT.IndexOfWord(thisWord, cap, RegexOptions.IgnoreCase);
                         if (fo < 0) { break; }
                         if (thisWord == myname) {
                             Marker.ReportProgress(0, new List<object?> { txb, "Mark1", fo, fo + thisWord.Length - 1 });

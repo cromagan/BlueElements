@@ -1,10 +1,13 @@
 ﻿
+using System.ComponentModel;
+using BlueControls.Controls;
+
 namespace BlueControls {
     partial class Befehlsreferenz {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -64,7 +67,7 @@ namespace BlueControls {
 
         #endregion
 
-        private Controls.ListBox lstComands;
-        private Controls.TextBox txbComms;
+        private ListBox lstComands;
+        private TextBox txbComms;
     }
 }

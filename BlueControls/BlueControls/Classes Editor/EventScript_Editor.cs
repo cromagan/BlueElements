@@ -17,6 +17,7 @@
 
 using BlueControls.Interfaces;
 using BlueDatabase;
+using BlueDatabase.Enums;
 
 namespace BlueControls.Classes_Editor;
 
@@ -92,7 +93,6 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
         chkAuslöser_valuechanged.Checked = data.Events.HasFlag(BlueDatabase.Enums.Events.value_changed);
         chkAuslöser_errorcheck.Checked = data.Events.HasFlag(BlueDatabase.Enums.Events.error_check);
 
-
         chkExternVerfügbar.Checked = data.ManualExecutable;
         chkAendertWerte.Checked = data.ChangeValues;
     }
@@ -102,7 +102,7 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
     private void CheckEvents() {
         if (Item == null) { return; }
 
-        BlueDatabase.Enums.Events tmp = 0;
+        Events tmp = 0;
         if (chkAuslöser_newrow.Checked) { tmp |= BlueDatabase.Enums.Events.new_row; }
         if (chkAuslöser_valuechanged.Checked) { tmp |= BlueDatabase.Enums.Events.value_changed; }
         if (chkAuslöser_errorcheck.Checked) { tmp |= BlueDatabase.Enums.Events.error_check; }

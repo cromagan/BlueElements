@@ -17,14 +17,19 @@
 
 #nullable enable
 
+using System;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BluePaint.EventArgs;
-using System;
-using System.Drawing;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.IO;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BluePaint;
 
@@ -88,7 +93,7 @@ public partial class MainWindow {
         if (newTool != null) {
             _currentTool = newTool;
             Split.Panel1.Controls.Add(newTool);
-            newTool.Dock = System.Windows.Forms.DockStyle.Fill;
+            newTool.Dock = DockStyle.Fill;
             _currentTool.ZoomFit += CurrentTool_ZoomFit;
             _currentTool.HideMainWindow += CurrentTool_HideMainWindow;
             _currentTool.ShowMainWindow += CurrentTool_ShowMainWindow;
@@ -107,7 +112,7 @@ public partial class MainWindow {
         return P.Bmp;
     }
 
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
         if (!IsSaved()) { e.Cancel = true; }
         base.OnFormClosing(e);
     }
@@ -134,7 +139,7 @@ public partial class MainWindow {
     private void btnCopy_Click(object sender, System.EventArgs e) {
         SetTool(null); // um OnToolChangeAuszulösen
         if (P.Bmp is Bitmap pic) {
-            System.Windows.Forms.Clipboard.SetImage(pic);
+            Clipboard.SetImage(pic);
             //System.Windows.Clipboard.SetDataObject(P.Bmp, false);
             Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", ImageCode.Clipboard);
 
@@ -149,7 +154,7 @@ public partial class MainWindow {
             Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", ImageCode.Information);
             return;
         }
-        SetPic((Bitmap)System.Windows.Forms.Clipboard.GetImage());
+        SetPic((Bitmap)Clipboard.GetImage());
         _isSaved = false;
         _filename = "*";
         P.ZoomFit();
@@ -157,7 +162,7 @@ public partial class MainWindow {
 
     private void btnGrößeÄndern_Click(object sender, System.EventArgs e) => SetTool(new Tool_Resize());
 
-    private void btnLetzteDateien_ItemClicked(object sender, BlueControls.EventArgs.BasicListItemEventArgs e) {
+    private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
         if (!IsSaved() || e.Item == null) { return; }
         LoadFromDisk(e.Item.KeyName);
     }
@@ -264,18 +269,18 @@ public partial class MainWindow {
         P.ZoomFit();
     }
 
-    private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) => LoadFromDisk(LoadTab.FileName);
+    private void LoadTab_FileOk(object sender, CancelEventArgs e) => LoadFromDisk(LoadTab.FileName);
 
     private void OK_Click(object sender, System.EventArgs e) {
         SetTool(null); // um OnToolChangeAuszulösen
         Close();
     }
 
-    private void P_DoAdditionalDrawing(object sender, BlueControls.EventArgs.AdditionalDrawing e) => _currentTool?.DoAdditionalDrawing(e, P.Bmp);
+    private void P_DoAdditionalDrawing(object sender, AdditionalDrawing e) => _currentTool?.DoAdditionalDrawing(e, P.Bmp);
 
-    private void P_ImageMouseDown(object sender, BlueControls.EventArgs.MouseEventArgs1_1 e) => _currentTool?.MouseDown(e, P.Bmp);
+    private void P_ImageMouseDown(object sender, MouseEventArgs1_1 e) => _currentTool?.MouseDown(e, P.Bmp);
 
-    private void P_ImageMouseMove(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) {
+    private void P_ImageMouseMove(object sender, MouseEventArgs1_1DownAndCurrent e) {
         _currentTool?.MouseMove(e, P.Bmp);
         if (e.Current.IsInPic && P.Bmp != null) {
             var c = P.Bmp.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
@@ -287,7 +292,7 @@ public partial class MainWindow {
         }
     }
 
-    private void P_ImageMouseUp(object sender, BlueControls.EventArgs.MouseEventArgs1_1DownAndCurrent e) => _currentTool?.MouseUp(e, P.Bmp);
+    private void P_ImageMouseUp(object sender, MouseEventArgs1_1DownAndCurrent e) => _currentTool?.MouseUp(e, P.Bmp);
 
     private void P_MouseLeave(object sender, System.EventArgs e) => InfoText.Text = string.Empty;
 
@@ -320,17 +325,17 @@ public partial class MainWindow {
         try {
             switch (_filename.FileSuffix().ToUpper()) {
                 case "JPG":
-                    P.Bmp.Save(_filename, System.Drawing.Imaging.ImageFormat.Jpeg);
+                    P.Bmp.Save(_filename, ImageFormat.Jpeg);
                     _isSaved = true;
                     break;
 
                 case "BMP":
-                    P.Bmp.Save(_filename, System.Drawing.Imaging.ImageFormat.Bmp);
+                    P.Bmp.Save(_filename, ImageFormat.Bmp);
                     _isSaved = true;
                     break;
 
                 case "PNG":
-                    P.Bmp.Save(_filename, System.Drawing.Imaging.ImageFormat.Png);
+                    P.Bmp.Save(_filename, ImageFormat.Png);
                     _isSaved = true;
                     break;
             }

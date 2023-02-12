@@ -1,4 +1,6 @@
 ﻿
+using System.ComponentModel;
+
 namespace BlueControls.Controls
 {
     partial class ZoomPicWithPoints
@@ -6,7 +8,7 @@ namespace BlueControls.Controls
         /// <summary>
         /// Erforderliche Designervariable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
         /// <summary>
         /// Verwendete Ressourcen bereinigen.
         /// </summary>
@@ -27,7 +29,7 @@ namespace BlueControls.Controls
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
+            components = new Container();
         }
         #endregion
 

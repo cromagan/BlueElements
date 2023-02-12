@@ -1,4 +1,5 @@
-﻿using System.Drawing;
+﻿using System.ComponentModel;
+using BlueControls.Controls;
 
 namespace BlueControls.Forms
 {
@@ -6,7 +7,7 @@ namespace BlueControls.Forms
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -51,6 +52,6 @@ namespace BlueControls.Forms
         }
         #endregion
 
-        private Controls.ConnectedFormulaView formToEdit;
+        private ConnectedFormulaView formToEdit;
     }
 }

@@ -1,4 +1,6 @@
-﻿using BlueControls.Enums;
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+using BlueControls.Controls;
 
 namespace BlueControls.Forms
 {
@@ -7,7 +9,7 @@ namespace BlueControls.Forms
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -59,7 +61,7 @@ namespace BlueControls.Forms
         }
         #endregion
 
-        private Controls.Caption capTXT;
-        private System.Windows.Forms.Timer timQI;
+        private Caption capTXT;
+        private Timer timQI;
     }
 }

@@ -17,10 +17,12 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueControls.EventArgs;
 using System;
 using System.Drawing;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.EventArgs;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.Converter;
 
@@ -47,7 +49,7 @@ public partial class Tool_Eraser : GenericTool {
 
         var pic = OnNeedCurrentPic();
         Point p1, p2;
-        if (e.Current.Button == System.Windows.Forms.MouseButtons.Left && e.MouseDown != null) {
+        if (e.Current.Button == MouseButtons.Left && e.MouseDown != null) {
             p1 = new Point(Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX), Math.Min(e.Current.TrimmedY, e.MouseDown.TrimmedY));
             p2 = new Point(Math.Max(e.Current.TrimmedX, e.MouseDown.TrimmedX), Math.Max(e.Current.TrimmedY, e.MouseDown.TrimmedY));
             e.FillRectangle(BrushRedTransp, e.TrimmedRectangle());
@@ -83,7 +85,7 @@ public partial class Tool_Eraser : GenericTool {
     }
 
     public override void MouseMove(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
-        if (e.Current.Button == System.Windows.Forms.MouseButtons.Left) {
+        if (e.Current.Button == MouseButtons.Left) {
             if (Razi.Checked) {
                 var pic = OnNeedCurrentPic();
                 FillCircle(pic, Color.White, e.Current.TrimmedX, e.Current.TrimmedY, 3);
@@ -94,10 +96,10 @@ public partial class Tool_Eraser : GenericTool {
 
     public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
         if (e == null) {
-            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Warnung, "e = null");
+            Develop.DebugPrint(FehlerArt.Warnung, "e = null");
             return;
         }
-        if (e.Current.Button != System.Windows.Forms.MouseButtons.Left) { return; }
+        if (e.Current.Button != MouseButtons.Left) { return; }
 
         if (Razi.Checked) { return; }
         var pic = OnNeedCurrentPic();

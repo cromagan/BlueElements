@@ -17,6 +17,11 @@
 
 #nullable enable
 
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -26,10 +31,6 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -107,7 +108,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         }
 
         var prefSize = lsbFilterItems.Item.CalculateColumnAndSize();
-        lsbFilterItems.Anchor = System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Top;
+        lsbFilterItems.Anchor = AnchorStyles.Left | AnchorStyles.Top;
         lsbFilterItems.Width = Math.Min(Table.CalculateColumnContentWidth(null, lColumn, f, 16), Width - (Skin.PaddingSmal * 2));
         lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, prefSize.Width);
         lsbFilterItems.Height = Math.Max(lsbFilterItems.Height, prefSize.Height);

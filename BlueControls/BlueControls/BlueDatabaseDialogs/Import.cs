@@ -17,10 +17,10 @@
 
 #nullable enable
 
+using System.ComponentModel;
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
-using System.ComponentModel;
 using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;

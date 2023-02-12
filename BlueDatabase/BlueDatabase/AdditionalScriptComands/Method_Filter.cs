@@ -17,10 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -86,10 +87,10 @@ public class Method_Filter : MethodDatabase {
 
         #region Typ ermitteln
 
-        Enums.FilterType filtertype;
+        FilterType filtertype;
         switch (((VariableString)attvar.Attributes[2]).ValueString.ToLower()) {
             case "is":
-                filtertype = Enums.FilterType.Istgleich_GroßKleinEgal;
+                filtertype = FilterType.Istgleich_GroßKleinEgal;
                 break;
 
             default:

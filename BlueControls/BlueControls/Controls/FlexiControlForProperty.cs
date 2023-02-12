@@ -15,6 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq.Expressions;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -22,14 +29,7 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq.Expressions;
-using System.Windows.Forms;
 using static BlueBasics.Converter;
-
-#nullable enable
 
 namespace BlueControls.Controls;
 

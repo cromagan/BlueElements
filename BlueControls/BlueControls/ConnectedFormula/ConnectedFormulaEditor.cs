@@ -17,10 +17,12 @@
 
 #nullable enable
 
-using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using System.Collections.Generic;
 using System.ComponentModel;
+using BlueBasics.MultiUserFile;
+using BlueControls.EventArgs;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollection;
 using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
@@ -92,15 +94,15 @@ public partial class ConnectedFormulaEditor : PadEditor {
         Pad.AddCentered(x);
     }
 
-    private void btnLetzteDateien_ItemClicked(object sender, EventArgs.BasicListItemEventArgs? e) {
-        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+    private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs? e) {
+        MultiUserFile.ForceLoadSaveAll();
 
         if (e?.Item == null) { return; }
         FormulaSet(e.Item.KeyName, null);
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
+        MultiUserFile.SaveAll(true);
 
         if (sender == btnSaveAs) {
             if (_cf == null) { return; }
@@ -125,7 +127,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+        MultiUserFile.ForceLoadSaveAll();
         _ = LoadTab.ShowDialog();
     }
 
@@ -141,7 +143,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         it.Page = n;
     }
 
-    private void btnSpeichern_Click(object sender, System.EventArgs e) => BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
+    private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.ForceLoadSaveAll();
 
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
         if (_cf == null) { return; }
@@ -171,7 +173,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
 
     private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
-        BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+        MultiUserFile.SaveAll(false);
         EditBoxRow_NEW.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", _cf, true);
     }
 

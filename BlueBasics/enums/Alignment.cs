@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Windows.Forms;
 
 namespace BlueBasics.Enums;
 
@@ -23,13 +24,13 @@ namespace BlueBasics.Enums;
 public enum Alignment {
 
     // Undefiniert = CByte(TextFormatFlags.none)
-    Left = System.Windows.Forms.TextFormatFlags.Left,
+    Left = TextFormatFlags.Left,
 
-    Right = System.Windows.Forms.TextFormatFlags.Right,
-    HorizontalCenter = System.Windows.Forms.TextFormatFlags.HorizontalCenter,
-    Top = System.Windows.Forms.TextFormatFlags.Top,
-    Bottom = System.Windows.Forms.TextFormatFlags.Bottom,
-    VerticalCenter = System.Windows.Forms.TextFormatFlags.VerticalCenter,
+    Right = TextFormatFlags.Right,
+    HorizontalCenter = TextFormatFlags.HorizontalCenter,
+    Top = TextFormatFlags.Top,
+    Bottom = TextFormatFlags.Bottom,
+    VerticalCenter = TextFormatFlags.VerticalCenter,
 
     // DehnenLR = 64
     // DehnenOU = 128

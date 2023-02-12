@@ -15,9 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.Collections.Generic;
+using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -46,7 +47,7 @@ internal class Method_DirectoryExists : Method {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
 
-        return new DoItFeedback(BlueBasics.IO.DirectoryExists(((VariableString)attvar.Attributes[0]).ValueString), line);
+        return new DoItFeedback(IO.DirectoryExists(((VariableString)attvar.Attributes[0]).ValueString), line);
     }
 
     #endregion

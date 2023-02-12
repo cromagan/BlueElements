@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueControls.Enums;
 using System.Drawing;
+using BlueControls.Enums;
 
 namespace BlueControls.Extended_Text;
 

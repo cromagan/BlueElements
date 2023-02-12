@@ -17,15 +17,16 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueDatabase.Enums;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -86,7 +87,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
 
     #region Methods
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControl {
             Caption = Überschrift + ":",
             EditType = _bearbeitung,
@@ -113,7 +114,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Variable));
 
-        var u = new ItemCollection.ItemCollectionList.ItemCollectionList(false);
+        var u = new ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
         //var b = new ItemCollection.ItemCollectionList.ItemCollectionList();

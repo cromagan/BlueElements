@@ -15,12 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueBasics.Enums;
 using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
 using static BlueBasics.Converter;
 
 namespace BlueControls.Designer_Support;
@@ -183,10 +184,10 @@ internal sealed class QuickPic : Panel {
         GroupBox1.SuspendLayout();
         GroupBox2.SuspendLayout();
         GroupBox4.SuspendLayout();
-        ((System.ComponentModel.ISupportInitialize)Preview).BeginInit();
-        ((System.ComponentModel.ISupportInitialize)SAT).BeginInit();
-        ((System.ComponentModel.ISupportInitialize)Hell).BeginInit();
-        ((System.ComponentModel.ISupportInitialize)Transp).BeginInit();
+        ((ISupportInitialize)Preview).BeginInit();
+        ((ISupportInitialize)SAT).BeginInit();
+        ((ISupportInitialize)Hell).BeginInit();
+        ((ISupportInitialize)Transp).BeginInit();
         GroupBox3.SuspendLayout();
         ZweitSymbol.SuspendLayout();
         SuspendLayout();
@@ -521,10 +522,10 @@ internal sealed class QuickPic : Panel {
         GroupBox2.ResumeLayout(false);
         GroupBox2.PerformLayout();
         GroupBox4.ResumeLayout(false);
-        ((System.ComponentModel.ISupportInitialize)Preview).EndInit();
-        ((System.ComponentModel.ISupportInitialize)SAT).EndInit();
-        ((System.ComponentModel.ISupportInitialize)Hell).EndInit();
-        ((System.ComponentModel.ISupportInitialize)Transp).EndInit();
+        ((ISupportInitialize)Preview).EndInit();
+        ((ISupportInitialize)SAT).EndInit();
+        ((ISupportInitialize)Hell).EndInit();
+        ((ISupportInitialize)Transp).EndInit();
         GroupBox3.ResumeLayout(false);
         GroupBox3.PerformLayout();
         ZweitSymbol.ResumeLayout(false);

@@ -17,12 +17,12 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Linq;
 using BlueDatabase.Interfaces;
 using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptComands;
