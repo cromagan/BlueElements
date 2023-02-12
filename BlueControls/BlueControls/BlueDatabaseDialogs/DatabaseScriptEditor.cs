@@ -17,31 +17,27 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueBasics.Converter;
-using MessageBox = BlueControls.Forms.MessageBox;
+using static BlueBasics.IO;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
 public sealed partial class DatabaseScriptEditor {
-
     #region Fields
 
-    private EventScript? _item;
     private DatabaseAbstract? _database;
+    private EventScript? _item;
 
     #endregion
 
@@ -50,15 +46,16 @@ public sealed partial class DatabaseScriptEditor {
     public DatabaseScriptEditor(DatabaseAbstract database) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
+        grpEigenschaften.Enabled = false;
+        eventScriptEditor.Enabled = false;
         _database = database;
         _database.Disposing += Database_Disposing;
-
-        eventScriptEditor.Database = _database;
     }
 
     #endregion
 
     #region Properties
+
     public EventScript? Item {
         get {
             if (_database == null || _database.IsDisposed) { return null; }
@@ -68,34 +65,30 @@ public sealed partial class DatabaseScriptEditor {
         set {
             if (_item == value) { return; }
 
-            if (_item != null) {
-                _item.EventTypes = eventScriptEditor.EventTypes;
-                _item.NeedRow = eventScriptEditor.IsRowScript;
-                _item.Script = eventScriptEditor.ScriptText;
-            }
+            WriteInfosBack();
 
-            _item = value;
+            _item = null; // Um keine werte zurück zu Schreiben werden des anzeigen
 
-            if (_item != null) {
-                Enabled = true;
-                txbName.Text = _item.Name;
+            if (value != null) {
+                grpEigenschaften.Enabled = true;
+                eventScriptEditor.Enabled = true;
+                txbName.Text = value.Name;
 
-                chkZeile.Checked = _item.NeedRow;
-                chkAuslöser_newrow.Checked = _item.EventTypes.HasFlag(EventTypes.new_row);
-                chkAuslöser_valuechanged.Checked = _item.EventTypes.HasFlag(EventTypes.value_changed);
-                chkAuslöser_errorcheck.Checked = _item.EventTypes.HasFlag(EventTypes.error_check);
-                chkExternVerfügbar.Checked = _item.ManualExecutable;
-                chkAendertWerte.Checked = _item.ChangeValues;
+                chkZeile.Checked = value.NeedRow;
+                chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(EventTypes.new_row);
+                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(EventTypes.value_changed);
+                chkAuslöser_errorcheck.Checked = value.EventTypes.HasFlag(EventTypes.error_check);
+                chkExternVerfügbar.Checked = value.ManualExecutable;
+                chkAendertWerte.Checked = value.ChangeValues;
+                eventScriptEditor.ScriptText = value.Script;
 
-                eventScriptEditor.EventTypes = _item.EventTypes;
-                eventScriptEditor.IsRowScript = _item.NeedRow;
-                eventScriptEditor.ScriptText = _item.Script;
+                _item = value;
             } else {
-                Enabled = false;
+                grpEigenschaften.Enabled = false;
+                eventScriptEditor.Enabled = false;
 
                 txbName.Text = string.Empty;
                 eventScriptEditor.ScriptText = string.Empty;
-                eventScriptEditor.IsRowScript = false;
                 chkAuslöser_newrow.Checked = false;
                 chkAuslöser_valuechanged.Checked = false;
                 chkAuslöser_errorcheck.Checked = false;
@@ -130,6 +123,14 @@ public sealed partial class DatabaseScriptEditor {
 
     protected override void OnShown(System.EventArgs e) => variableEditor.WriteVariablesToTable(_database?.Variables);
 
+    protected void OpenAdditionalFileFolder() {
+        //Todo: Implementieren
+        if (_database == null || _database.IsDisposed) {
+            return;
+        }
+        if (DirectoryExists(_database.AdditionalFilesPfadWhole())) { _ = ExecuteFile(_database.AdditionalFilesPfadWhole()); }
+    }
+
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSave.Enabled = false;
 
@@ -140,7 +141,12 @@ public sealed partial class DatabaseScriptEditor {
         btnSave.Enabled = true;
     }
 
-    private void CheckEvents() {
+    private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
+        if (Item == null) { return; }
+        Item.ChangeValues = chkAendertWerte.Checked;
+    }
+
+    private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
 
         EventTypes tmp = 0;
@@ -149,13 +155,6 @@ public sealed partial class DatabaseScriptEditor {
         if (chkAuslöser_errorcheck.Checked) { tmp |= EventTypes.error_check; }
         Item.EventTypes = tmp;
     }
-
-    private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
-        if (Item == null) { return; }
-        Item.ChangeValues = chkAendertWerte.Checked;
-    }
-
-    private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) => CheckEvents();
 
     private void chkExternVerfügbar_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
@@ -172,10 +171,53 @@ public sealed partial class DatabaseScriptEditor {
         Close();
     }
 
+    private void eventScriptEditor_ExecuteScript(object sender, BlueScript.EventArgs.ScriptEventArgs e) {
+        if (_database == null || _database.IsDisposed) {
+            e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.");
+            return;
+        }
+
+        if (_item == null) {
+            e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.");
+            return;
+        }
+
+        if (!_item.IsOk()) {
+            e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason());
+            return;
+        }
+
+        WriteInfosBack();
+
+        RowItem? r = null;
+
+        if (_item.NeedRow) {
+            if (_database.Row.Count == 0) {
+                e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.");
+                return;
+            }
+            if (string.IsNullOrEmpty(txbTestZeile.Text)) {
+                txbTestZeile.Text = _database?.Row?.First()?.CellFirstString() ?? string.Empty;
+            }
+
+            r = _database?.Row?[txbTestZeile.Text];
+            if (r == null) {
+                e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.");
+                return;
+            }
+        }
+        e.Feedback = _database?.ExecuteScript(_item, false, r);
+    }
+
+    private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
+
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (_database == null || _database.IsDisposed) { return; }
 
         var newScriptItem = lstEventScripts.Item.Add(new EventScript(_database));
+
+        WriteInfosBack();
+
         newScriptItem.Checked = true;
     }
 
@@ -192,10 +234,9 @@ public sealed partial class DatabaseScriptEditor {
         Item = selectedlstEventScripts;
     }
 
-    private void OkBut_Click(object sender, System.EventArgs e) => Close();
-
     private void RemoveDatabase() {
         if (_database == null || _database.IsDisposed) { return; }
+        Item = null;
         _database.Disposing -= Database_Disposing;
         _database = null;
     }
@@ -203,6 +244,31 @@ public sealed partial class DatabaseScriptEditor {
     private void ScriptEditor_Changed(object sender, System.EventArgs e) {
         if (Item == null) { return; }
         Item.Script = eventScriptEditor.ScriptText;
+    }
+
+    private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+        //Todo: Implementieren
+        if (e.HotItem is string txt) {
+            var c = _database.Column.Exists(txt);
+            if (c is null) { return; }
+            _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
+        }
+    }
+
+    private void scriptEditor_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        //Todo: Implementieren
+        ColumnItem? c = null;
+
+        if (e.HotItem is string txt) { c = _database.Column.Exists(txt); }
+
+        switch (e.ClickedComand.ToLower()) {
+            case "spalteneigenschaftenbearbeiten":
+                if (c != null) {
+                    TableView.OpenColumnEditor(c, null, null);
+                }
+
+                break;
+        }
     }
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
@@ -213,9 +279,19 @@ public sealed partial class DatabaseScriptEditor {
     private void WriteInfosBack() {
         if (_database == null || _database.IsDisposed || _database.ReadOnly) { return; } // Disposed
 
+        if (_item != null) {
+            _item.Script = eventScriptEditor.ScriptText;
+        }
+
+        #region Items sicherheitshalber in die DAtenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
+
         var t2 = new List<EventScript?>();
         t2.AddRange(lstEventScripts.Item.Select(thisItem => (EventScript)((ReadableListItem)thisItem).Item));
         _database.EventScript = new(t2);
+
+        #endregion
+
+        #region
 
         var l = variableEditor.GetVariables();
         var l2 = new List<VariableString>();
@@ -224,6 +300,8 @@ public sealed partial class DatabaseScriptEditor {
                 l2.Add(vs);
             }
         }
+
+        #endregion
 
         _database.Variables = new ReadOnlyCollection<VariableString>(l2);
     }

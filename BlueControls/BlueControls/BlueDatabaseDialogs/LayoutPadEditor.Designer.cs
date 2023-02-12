@@ -10,7 +10,6 @@ using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
 using TabControl = BlueControls.Controls.TabControl;
-using TabPage = System.Windows.Forms.TabPage;
 
 namespace BlueControls.BlueDatabaseDialogs 
     {
@@ -49,8 +48,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnTextEditor = new Button();
             this.btnLayoutVerzeichnis = new Button();
             this.btnLayoutOeffnen = new Button();
-            this.tabSkript = new TabPage();
-            this.scriptEditor = new ScriptEditorDatabase();
             this.tabDatei.SuspendLayout();
             this.grpDateiSystem.SuspendLayout();
             this.grpDesign.SuspendLayout();
@@ -61,7 +58,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpAssistent.SuspendLayout();
             this.grpLayoutSelection.SuspendLayout();
             this.grpExterneLayouts.SuspendLayout();
-            this.tabSkript.SuspendLayout();
             this.SuspendLayout();
             // 
             // tabDatei
@@ -90,10 +86,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabRightSide
             // 
-            this.tabRightSide.Controls.Add(this.tabSkript);
             this.tabRightSide.Location = new Point(968, 136);
             this.tabRightSide.Size = new Size(372, 476);
-            this.tabRightSide.Controls.SetChildIndex(this.tabSkript, 0);
             // 
             // Pad
             // 
@@ -258,27 +252,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnLayoutOeffnen.Text = "Layout mit Std.-Anwendung öffnen";
             this.btnLayoutOeffnen.Click += new EventHandler(this.btnLayoutOeffnen_Click);
             // 
-            // tabSkript
-            // 
-            this.tabSkript.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabSkript.Controls.Add(this.scriptEditor);
-            this.tabSkript.Location = new Point(4, 25);
-            this.tabSkript.Name = "tabSkript";
-            this.tabSkript.Size = new Size(364, 196);
-            this.tabSkript.TabIndex = 1;
-            this.tabSkript.Text = "Skript";
-            // 
-            // scriptEditor
-            // 
-            this.scriptEditor.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.scriptEditor.Database = null;
-            this.scriptEditor.Dock = DockStyle.Fill;
-            this.scriptEditor.Location = new Point(0, 0);
-            this.scriptEditor.Name = "scriptEditor";
-            this.scriptEditor.Size = new Size(364, 196);
-            this.scriptEditor.TabIndex = 1;
-            this.scriptEditor.TabStop = false;
-            // 
             // LayoutPadEditor
             // 
             this.AutoScaleMode = AutoScaleMode.None;
@@ -296,7 +269,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpAssistent.ResumeLayout(false);
             this.grpLayoutSelection.ResumeLayout(false);
             this.grpExterneLayouts.ResumeLayout(false);
-            this.tabSkript.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -311,8 +283,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnTextEditor;
         private Button btnLayoutVerzeichnis;
         private Button btnLayoutOeffnen;
-        private TabPage tabSkript;
-        private ScriptEditorDatabase scriptEditor;
         internal Button btnCopyID;
     }
 }

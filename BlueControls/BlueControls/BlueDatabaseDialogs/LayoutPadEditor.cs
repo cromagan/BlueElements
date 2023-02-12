@@ -51,7 +51,6 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         Database = database;
-        scriptEditor.Database = database;
 
         BefülleLayoutDropdown();
         CheckButtons();
@@ -117,7 +116,6 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
             Database.Disposing -= Database_Disposing;
         }
         SaveCurrentLayout();
-        scriptEditor.Database = null;
         Database = null;
         base.OnFormClosing(e);
     }

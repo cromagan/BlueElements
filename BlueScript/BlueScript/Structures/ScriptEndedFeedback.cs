@@ -22,7 +22,7 @@ using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 
-public readonly struct ScriptEndedFeedback {
+public class ScriptEndedFeedback {
 
     #region Fields
 

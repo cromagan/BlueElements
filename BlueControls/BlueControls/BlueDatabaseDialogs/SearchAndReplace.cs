@@ -26,6 +26,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using Form = BlueControls.Forms.Form;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -164,7 +165,7 @@ internal sealed partial class SearchAndReplace : Form {
                     }
                 }
             }
-            if (rowChanged) { _ = thisRow.ExecuteScript(BlueDatabase.Enums.EventTypes.value_changed, string.Empty, true, false, true, 10); }
+            if (rowChanged) { _ = thisRow.ExecuteScript(EventTypes.value_changed, string.Empty, true, false, true, 10); }
         }
         p?.Close();
         MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");

@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enums\ScriptIssueType.cs" />
+    <Compile Include="EventArgs\ScriptEventArgs.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Methods\Method.cs" />
     <Compile Include="Methods\Method_AddPrefix.cs" />
@@ -151,5 +152,6 @@
       <Name>BlueBasics</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

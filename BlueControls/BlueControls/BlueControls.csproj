@@ -359,12 +359,6 @@
     <Compile Include="ScriptEditor.Designer.cs">
       <DependentUpon>ScriptEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="ScriptEditorDatabase.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="ScriptEditorDatabase.Designer.cs">
-      <DependentUpon>ScriptEditorDatabase.cs</DependentUpon>
-    </Compile>
     <Compile Include="SystemInputHook.cs" />
     <Compile Include="Controls\Button.cs">
       <SubType>Component</SubType>
@@ -605,10 +599,6 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="BlueDatabaseDialogs\DatabaseScriptEditor.resx">
-      <DependentUpon>DatabaseScriptEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\FlexiControlForFilter.resx">
       <DependentUpon>FlexiControlForFilter.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -644,20 +634,8 @@
       <DependentUpon>ComboBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Controls\CreativePad.resx">
-      <DependentUpon>CreativePad.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\AutoFilter.resx">
-      <DependentUpon>AutoFilter.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\ColumnEditor.resx">
       <DependentUpon>ColumnEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="BlueDatabaseDialogs\DatabaseHeadEditor.resx">
-      <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\Import.resx">
@@ -727,10 +705,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\InputBoxComboStyle.resx">
       <DependentUpon>InputBoxComboStyle.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Forms\Progressbar.resx">
-      <DependentUpon>Progressbar.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\InputBox.resx">
@@ -825,9 +799,6 @@
       <DependentUpon>ScriptEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="ScriptEditorDatabase.resx">
-      <DependentUpon>ScriptEditorDatabase.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="VariableEditor.resx">
       <DependentUpon>VariableEditor.cs</DependentUpon>
     </EmbeddedResource>
@@ -847,10 +818,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Forms\Notification.resx">
-      <DependentUpon>Notification.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Ressourcen\Dictionary\Deutsch.MDB" />
   </ItemGroup>
   <ItemGroup>

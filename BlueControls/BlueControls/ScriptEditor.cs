@@ -28,13 +28,12 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript;
-using BlueScript.Structures;
+using BlueScript.EventArgs;
 using FastColoredTextBoxNS;
-using GroupBox = BlueControls.Controls.GroupBox;
 
 namespace BlueControls;
 
-public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IChangedFeedback //System.Windows.Forms.UserControl, IContextMenu//
+public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IChangedFeedback //UserControl, IContextMenu//
 {
     #region Fields
 
@@ -59,6 +58,8 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
+
+    public event EventHandler<ScriptEventArgs>? ExecuteScript;
 
     #endregion
 
@@ -116,11 +117,6 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         base.Dispose(disposing);
     }
 
-    protected virtual ScriptEndedFeedback GenerateAndExecuteScript() {
-        var s = new Script(null, string.Empty, true);
-        return s.Parse();
-    }
-
     protected virtual void OpenAdditionalFileFolder() { }
 
     protected void WriteComandsToList() {
@@ -163,19 +159,43 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
 
         grpVariablen.Clear();
 
-        var s = GenerateAndExecuteScript();
+        var ex = new ScriptEventArgs();
 
-        grpVariablen.WriteVariablesToTable(s.Variables);
+        OnExecuteScript(ex);
+
+        if (ex.Feedback == null) {
+            var s = new Script(null, string.Empty, true);
+            ex.Feedback = s.Parse();
+        }
+
+        grpVariablen.WriteVariablesToTable(ex.Feedback.Variables);
         WriteComandsToList();
 
-        if (string.IsNullOrEmpty(s.ErrorMessage)) {
+        if (string.IsNullOrEmpty(ex.Feedback.ErrorMessage)) {
             Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
         } else {
-            Message("Fehler in Zeile: " + s.LastlineNo + "\r\n" + s.ErrorMessage + "\r\n >>> " + s.ErrorCode.RestoreEscape());
+
+            if (ex.Feedback.LastlineNo > 0) {
+
+                var codetxt = ex.Feedback.ErrorCode.RestoreEscape();
+                codetxt = codetxt.Replace("¶", "\r\n");
+
+
+                Message("Fehler in Zeile: " + ex.Feedback.LastlineNo + "\r\n" + ex.Feedback.ErrorMessage + "\r\n\r\nCode:\r\n~~~~~~\r\n" + codetxt);
+            }
+            else {
+                Message("Fehler: " +  ex.Feedback.ErrorMessage );
+
+            }
+
+
+
         }
     }
 
     private void btnZusatzDateien_Click(object sender, System.EventArgs e) => OpenAdditionalFileFolder();
+
+    private void OnExecuteScript(ScriptEventArgs scriptEventArgs) => ExecuteScript?.Invoke(this, scriptEventArgs);
 
     private void TxtSkript_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button == MouseButtons.Right) {

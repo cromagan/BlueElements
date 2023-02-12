@@ -141,7 +141,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.AutoScaleDimensions = new SizeF(6F, 13F);
             this.AutoScaleMode = AutoScaleMode.Font;
-            this.BackgroundImage = ((Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new Size(165, 159);
             this.Controls.Add(this.capInfo);
             this.Controls.Add(this.butFertig);

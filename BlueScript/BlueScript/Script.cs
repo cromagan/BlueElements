@@ -147,7 +147,7 @@ public class Script {
 
         #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos), line);
+        return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos).TrimEnd("¶") , line);
     }
 
     public static string ReduceText(string txt) {

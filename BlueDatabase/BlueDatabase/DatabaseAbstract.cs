@@ -824,7 +824,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             : string.Empty;
     }
 
-    public ScriptEndedFeedback ExecuteScript(string scripttext, bool changevalues, RowItem? row, bool feedbackScript) {
+    public ScriptEndedFeedback ExecuteScript(EventScript s, bool changevalues, RowItem? row) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen"); }
 
         try {
@@ -852,7 +852,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             vars.Add(new VariableString("Usergroup", UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
             vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             vars.Add(new VariableDatabase("Database", this, true, true, "Die Datebank, die zu dem Skript gehört"));
-            vars.Add(new VariableBool("SetErrorEnabled", feedbackScript, true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
+            vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(EventTypes.error_check), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
             if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
                 vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
             }
@@ -862,7 +862,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             #region Script ausführen
 
             Script sc = new(vars, AdditionalFilesPfadWhole(), changevalues) {
-                ScriptText = scripttext
+                ScriptText = s.Script
             };
             var scf = sc.Parse();
 
@@ -870,7 +870,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             #region Variablen zurückschreiben und Special Rules ausführen
 
-            if (changevalues && !string.IsNullOrEmpty(scf.ErrorMessage)) {
+            if (sc.ChangeValues && changevalues && !string.IsNullOrEmpty(scf.ErrorMessage)) {
                 if (row != null) {
                     foreach (var thisCol in Column) {
                         row.VariableToCell(thisCol, vars);
@@ -891,7 +891,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             return scf;
         } catch {
             Develop.CheckStackForOverflow();
-            return ExecuteScript(scripttext, changevalues, row, feedbackScript);
+            return ExecuteScript(s, changevalues, row);
         }
     }
 
@@ -908,7 +908,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen"); }
 
-            if (string.IsNullOrEmpty(scriptname)) {
+            if (string.IsNullOrEmpty(scriptname) && eventname != null) {
                 foreach (var thisEvent in EventScript) {
                     if (thisEvent != null && thisEvent.EventTypes.HasFlag(eventname)) {
                         scriptname = thisEvent.Name;
@@ -931,7 +931,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             if (!script.ChangeValues) { changevalues = false; }
 
-            return ExecuteScript(script.Script, changevalues, row, eventname == EventTypes.error_check);
+            return ExecuteScript(script, changevalues, row);
         } catch {
             Develop.CheckStackForOverflow();
             return ExecuteScript(eventname, scriptname, changevalues, row);

@@ -50,6 +50,7 @@ public class ReadableListItem : TextListItem {
         Text = Item.ReadableText();
         Symbol = Item.SymbolForReadableText();
         Internal = Item.KeyName;
+        OnChanged(); // Um den Refresh zu bewirken
     }
 
     #endregion

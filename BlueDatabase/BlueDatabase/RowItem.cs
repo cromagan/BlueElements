@@ -543,7 +543,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
         DoingScript = false;
 
-        if (!changevalues) { return new ScriptEndedFeedback(); }
+        if (!changevalues) { return new ScriptEndedFeedback(string.Empty); }
 
         // checkPerformed geht von Dateisystemfehlern aus
 

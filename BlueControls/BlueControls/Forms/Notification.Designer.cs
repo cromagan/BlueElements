@@ -48,7 +48,6 @@ namespace BlueControls.Forms {
             // 
             // Notification
             // 
-            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(86, 65);
             this.Controls.Add(this.capTXT);
             this.Name = "Notification";

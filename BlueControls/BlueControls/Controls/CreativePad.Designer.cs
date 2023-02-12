@@ -28,7 +28,6 @@ namespace BlueControls.Controls
             this.PrintPreviewDialog1.ClientSize = new Size(400, 300);
             this.PrintPreviewDialog1.Document = this.DruckerDokument;
             this.PrintPreviewDialog1.Enabled = true;
-            this.PrintPreviewDialog1.Icon = ((Icon)(resources.GetObject("PrintPreviewDialog1.Icon")));
             this.PrintPreviewDialog1.Name = "PrintPreviewDialog1";
             this.PrintPreviewDialog1.Visible = false;
             // 

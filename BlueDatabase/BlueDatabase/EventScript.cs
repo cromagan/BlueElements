@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -170,7 +169,10 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
 
         if (!_name.IsFormat(FormatHolder.SystemName)) { return "Ungültiger Name"; }
 
-        if (_eventTypes.HasFlag(EventTypes.error_check) && _changeValues) { return "Routinen, die Fehler prüfen, können keine Werte ändern."; }
+        if (_eventTypes.HasFlag(EventTypes.error_check)) {
+            if (_changeValues) { return "Routinen, die Fehler prüfen, können keine Werte ändern."; }
+            if (!_needRow) { return "Routinen, die Fehler prüfen, müssen sich auf Zeilen beziehen."; }
+        }
 
         return string.Empty;
     }

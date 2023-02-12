@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
@@ -30,7 +29,6 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueScript.Variables;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
 

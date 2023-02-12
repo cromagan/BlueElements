@@ -15,15 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 

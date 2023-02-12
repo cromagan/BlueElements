@@ -21,8 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Interfaces;
 
 namespace BlueControls.Forms;
 

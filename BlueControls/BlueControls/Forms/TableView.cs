@@ -32,7 +32,6 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -993,7 +992,7 @@ public partial class TableView : FormWithStatusBar {
             m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
         } else {
             //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-            var s = Table.Database.ExecuteScript(sc.Script, sc.ChangeValues, null, sc.EventTypes.HasFlag(EventTypes.error_check));
+            var s = Table.Database.ExecuteScript(sc, sc.ChangeValues, null);
             m = s.ErrorMessage;
         }
 
@@ -1114,7 +1113,7 @@ public partial class TableView : FormWithStatusBar {
         }
     }
 
-    private void LoadTab_FileOk(object sender, CancelEventArgs e) =>
+    private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) =>
         SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName, PreveredDatabaseID));
 
     private string NameRepair(string istName, RowItem? vRow) {

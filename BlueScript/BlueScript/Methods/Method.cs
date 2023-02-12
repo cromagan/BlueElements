@@ -307,7 +307,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return co;
     }
 
-    public void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public string ReadableText() => Syntax;
 
