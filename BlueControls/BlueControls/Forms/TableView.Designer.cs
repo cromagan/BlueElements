@@ -72,15 +72,16 @@ namespace BlueControls.Forms {
             this.cbxDoSript = new BlueControls.Controls.ComboBox();
             this.btnSuchenUndErsetzen = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
-            this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
-            this.btnFormular = new BlueControls.Controls.Button();
-            this.btnPowerBearbeitung = new BlueControls.Controls.Button();
-            this.btnSpaltenanordnung = new BlueControls.Controls.Button();
-            this.btnLayouts = new BlueControls.Controls.Button();
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
             this.btnSaveLoad = new BlueControls.Controls.Button();
-            this.btnDatenbankKopf = new BlueControls.Controls.Button();
+            this.btnPowerBearbeitung = new BlueControls.Controls.Button();
             this.btnSpaltenUebersicht = new BlueControls.Controls.Button();
+            this.grpAdminBearbeiten = new BlueControls.Controls.GroupBox();
+            this.btnSkripteBearbeiten = new BlueControls.Controls.Button();
+            this.btnFormular = new BlueControls.Controls.Button();
+            this.btnSpaltenanordnung = new BlueControls.Controls.Button();
+            this.btnDatenbankKopf = new BlueControls.Controls.Button();
+            this.btnLayouts = new BlueControls.Controls.Button();
             this.tabExport = new System.Windows.Forms.TabPage();
             this.grpExport = new BlueControls.Controls.GroupBox();
             this.btnDrucken = new BlueControls.Controls.ComboBox();
@@ -100,7 +101,7 @@ namespace BlueControls.Forms {
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
-            this.btnSkripteBearbeiten = new BlueControls.Controls.Button();
+            this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpOrdner.SuspendLayout();
@@ -112,8 +113,8 @@ namespace BlueControls.Forms {
             this.grpFormularSteuerung.SuspendLayout();
             this.tabAdmin.SuspendLayout();
             this.grpAdminZeilen.SuspendLayout();
-            this.grpAdminBearbeiten.SuspendLayout();
             this.grpAdminAllgemein.SuspendLayout();
+            this.grpAdminBearbeiten.SuspendLayout();
             this.tabExport.SuspendLayout();
             this.grpExport.SuspendLayout();
             this.grpImport.SuspendLayout();
@@ -125,8 +126,20 @@ namespace BlueControls.Forms {
             this.SplitContainer1.SuspendLayout();
             this.tbcSidebar.SuspendLayout();
             this.tabFormula.SuspendLayout();
-            this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // capStatusBar
+            // 
+            this.capStatusBar.Location = new System.Drawing.Point(304, 0);
+            this.capStatusBar.Size = new System.Drawing.Size(1025, 24);
+            // 
+            // pnlStatusBar
+            // 
+            this.pnlStatusBar.Controls.Add(this.capZeilen2);
+            this.pnlStatusBar.Location = new System.Drawing.Point(0, 705);
+            this.pnlStatusBar.Size = new System.Drawing.Size(1329, 24);
+            this.pnlStatusBar.Controls.SetChildIndex(this.capZeilen2, 0);
+            this.pnlStatusBar.Controls.SetChildIndex(this.capStatusBar, 0);
             // 
             // ribMain
             // 
@@ -606,69 +619,6 @@ namespace BlueControls.Forms {
             this.btnZeileLöschen.Text = "Zeilen löschen";
             this.btnZeileLöschen.Click += new System.EventHandler(this.btnZeileLöschen_Click);
             // 
-            // grpAdminBearbeiten
-            // 
-            this.grpAdminBearbeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpAdminBearbeiten.CausesValidation = false;
-            this.grpAdminBearbeiten.Controls.Add(this.btnSkripteBearbeiten);
-            this.grpAdminBearbeiten.Controls.Add(this.btnFormular);
-            this.grpAdminBearbeiten.Controls.Add(this.btnSpaltenanordnung);
-            this.grpAdminBearbeiten.Controls.Add(this.btnDatenbankKopf);
-            this.grpAdminBearbeiten.Controls.Add(this.btnLayouts);
-            this.grpAdminBearbeiten.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAdminBearbeiten.Location = new System.Drawing.Point(0, 0);
-            this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
-            this.grpAdminBearbeiten.Size = new System.Drawing.Size(312, 81);
-            this.grpAdminBearbeiten.TabIndex = 9;
-            this.grpAdminBearbeiten.TabStop = false;
-            this.grpAdminBearbeiten.Text = "Bearbeiten";
-            // 
-            // btnFormular
-            // 
-            this.btnFormular.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnFormular.ImageCode = "Textfeld|16|||||||||Stift";
-            this.btnFormular.Location = new System.Drawing.Point(64, 2);
-            this.btnFormular.Name = "btnFormular";
-            this.btnFormular.Size = new System.Drawing.Size(56, 66);
-            this.btnFormular.TabIndex = 44;
-            this.btnFormular.Text = "Formular-Editor";
-            this.btnFormular.Click += new System.EventHandler(this.btnFormular_Click);
-            // 
-            // btnPowerBearbeitung
-            // 
-            this.btnPowerBearbeitung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnPowerBearbeitung.ImageCode = "Stift||||FF0000||||||Uhr";
-            this.btnPowerBearbeitung.Location = new System.Drawing.Point(128, 2);
-            this.btnPowerBearbeitung.Name = "btnPowerBearbeitung";
-            this.btnPowerBearbeitung.QuickInfo = "Aktuell angezeigte Zeilen<br>automatisch überprüfen.";
-            this.btnPowerBearbeitung.Size = new System.Drawing.Size(72, 66);
-            this.btnPowerBearbeitung.TabIndex = 43;
-            this.btnPowerBearbeitung.Text = "Power-Bearbeitung";
-            this.btnPowerBearbeitung.Click += new System.EventHandler(this.btnPowerBearbeitung_Click);
-            // 
-            // btnSpaltenanordnung
-            // 
-            this.btnSpaltenanordnung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnSpaltenanordnung.ImageCode = "Spalte||||||||||Stift";
-            this.btnSpaltenanordnung.Location = new System.Drawing.Point(176, 2);
-            this.btnSpaltenanordnung.Name = "btnSpaltenanordnung";
-            this.btnSpaltenanordnung.Size = new System.Drawing.Size(64, 66);
-            this.btnSpaltenanordnung.TabIndex = 43;
-            this.btnSpaltenanordnung.Text = "Spalten-anordung";
-            this.btnSpaltenanordnung.Click += new System.EventHandler(this.btnSpaltenanordnung_Click);
-            // 
-            // btnLayouts
-            // 
-            this.btnLayouts.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnLayouts.ImageCode = "Layout||||||||||Stift";
-            this.btnLayouts.Location = new System.Drawing.Point(120, 2);
-            this.btnLayouts.Name = "btnLayouts";
-            this.btnLayouts.Size = new System.Drawing.Size(56, 66);
-            this.btnLayouts.TabIndex = 41;
-            this.btnLayouts.Text = "Layout-Editor";
-            this.btnLayouts.Click += new System.EventHandler(this.btnLayouts_Click);
-            // 
             // grpAdminAllgemein
             // 
             this.grpAdminAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -697,16 +647,17 @@ namespace BlueControls.Forms {
             this.btnSaveLoad.Text = "Daten aktual.";
             this.btnSaveLoad.Click += new System.EventHandler(this.btnSaveLoad_Click);
             // 
-            // btnDatenbankKopf
+            // btnPowerBearbeitung
             // 
-            this.btnDatenbankKopf.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnDatenbankKopf.ImageCode = "Datenbank||||||||||Stift";
-            this.btnDatenbankKopf.Location = new System.Drawing.Point(0, 2);
-            this.btnDatenbankKopf.Name = "btnDatenbankKopf";
-            this.btnDatenbankKopf.Size = new System.Drawing.Size(64, 66);
-            this.btnDatenbankKopf.TabIndex = 37;
-            this.btnDatenbankKopf.Text = "Datenbank-Kopf";
-            this.btnDatenbankKopf.Click += new System.EventHandler(this.btnDatenbankKopf_Click);
+            this.btnPowerBearbeitung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnPowerBearbeitung.ImageCode = "Stift||||FF0000||||||Uhr";
+            this.btnPowerBearbeitung.Location = new System.Drawing.Point(128, 2);
+            this.btnPowerBearbeitung.Name = "btnPowerBearbeitung";
+            this.btnPowerBearbeitung.QuickInfo = "Aktuell angezeigte Zeilen<br>automatisch überprüfen.";
+            this.btnPowerBearbeitung.Size = new System.Drawing.Size(72, 66);
+            this.btnPowerBearbeitung.TabIndex = 43;
+            this.btnPowerBearbeitung.Text = "Power-Bearbeitung";
+            this.btnPowerBearbeitung.Click += new System.EventHandler(this.btnPowerBearbeitung_Click);
             // 
             // btnSpaltenUebersicht
             // 
@@ -718,6 +669,79 @@ namespace BlueControls.Forms {
             this.btnSpaltenUebersicht.TabIndex = 36;
             this.btnSpaltenUebersicht.Text = "Spalten-Übersicht";
             this.btnSpaltenUebersicht.Click += new System.EventHandler(this.btnSpaltenUebersicht_Click);
+            // 
+            // grpAdminBearbeiten
+            // 
+            this.grpAdminBearbeiten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpAdminBearbeiten.CausesValidation = false;
+            this.grpAdminBearbeiten.Controls.Add(this.btnSkripteBearbeiten);
+            this.grpAdminBearbeiten.Controls.Add(this.btnFormular);
+            this.grpAdminBearbeiten.Controls.Add(this.btnSpaltenanordnung);
+            this.grpAdminBearbeiten.Controls.Add(this.btnDatenbankKopf);
+            this.grpAdminBearbeiten.Controls.Add(this.btnLayouts);
+            this.grpAdminBearbeiten.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAdminBearbeiten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpAdminBearbeiten.Location = new System.Drawing.Point(0, 0);
+            this.grpAdminBearbeiten.Name = "grpAdminBearbeiten";
+            this.grpAdminBearbeiten.Size = new System.Drawing.Size(312, 81);
+            this.grpAdminBearbeiten.TabIndex = 9;
+            this.grpAdminBearbeiten.TabStop = false;
+            this.grpAdminBearbeiten.Text = "Bearbeiten";
+            // 
+            // btnSkripteBearbeiten
+            // 
+            this.btnSkripteBearbeiten.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
+            this.btnSkripteBearbeiten.Location = new System.Drawing.Point(240, 2);
+            this.btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
+            this.btnSkripteBearbeiten.Size = new System.Drawing.Size(56, 66);
+            this.btnSkripteBearbeiten.TabIndex = 45;
+            this.btnSkripteBearbeiten.Text = "Skripte";
+            this.btnSkripteBearbeiten.Click += new System.EventHandler(this.btnSkripteBearbeiten_Click);
+            // 
+            // btnFormular
+            // 
+            this.btnFormular.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnFormular.ImageCode = "Textfeld|16|||||||||Stift";
+            this.btnFormular.Location = new System.Drawing.Point(64, 2);
+            this.btnFormular.Name = "btnFormular";
+            this.btnFormular.Size = new System.Drawing.Size(56, 66);
+            this.btnFormular.TabIndex = 44;
+            this.btnFormular.Text = "Formular-Editor";
+            this.btnFormular.Click += new System.EventHandler(this.btnFormular_Click);
+            // 
+            // btnSpaltenanordnung
+            // 
+            this.btnSpaltenanordnung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSpaltenanordnung.ImageCode = "Spalte||||||||||Stift";
+            this.btnSpaltenanordnung.Location = new System.Drawing.Point(176, 2);
+            this.btnSpaltenanordnung.Name = "btnSpaltenanordnung";
+            this.btnSpaltenanordnung.Size = new System.Drawing.Size(64, 66);
+            this.btnSpaltenanordnung.TabIndex = 43;
+            this.btnSpaltenanordnung.Text = "Spalten-anordung";
+            this.btnSpaltenanordnung.Click += new System.EventHandler(this.btnSpaltenanordnung_Click);
+            // 
+            // btnDatenbankKopf
+            // 
+            this.btnDatenbankKopf.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnDatenbankKopf.ImageCode = "Datenbank||||||||||Stift";
+            this.btnDatenbankKopf.Location = new System.Drawing.Point(0, 2);
+            this.btnDatenbankKopf.Name = "btnDatenbankKopf";
+            this.btnDatenbankKopf.Size = new System.Drawing.Size(64, 66);
+            this.btnDatenbankKopf.TabIndex = 37;
+            this.btnDatenbankKopf.Text = "Datenbank-Kopf";
+            this.btnDatenbankKopf.Click += new System.EventHandler(this.btnDatenbankKopf_Click);
+            // 
+            // btnLayouts
+            // 
+            this.btnLayouts.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnLayouts.ImageCode = "Layout||||||||||Stift";
+            this.btnLayouts.Location = new System.Drawing.Point(120, 2);
+            this.btnLayouts.Name = "btnLayouts";
+            this.btnLayouts.Size = new System.Drawing.Size(56, 66);
+            this.btnLayouts.TabIndex = 41;
+            this.btnLayouts.Text = "Layout-Editor";
+            this.btnLayouts.Click += new System.EventHandler(this.btnLayouts_Click);
             // 
             // tabExport
             // 
@@ -933,10 +957,6 @@ namespace BlueControls.Forms {
             this.Formula.Size = new System.Drawing.Size(338, 566);
             this.Formula.TabIndex = 0;
             // 
-            // pnlStatusBar
-            // 
-            this.pnlStatusBar.Controls.Add(this.capZeilen2);
-            // 
             // capZeilen2
             // 
             this.capZeilen2.CausesValidation = false;
@@ -958,17 +978,6 @@ namespace BlueControls.Forms {
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
-            // btnSkripteBearbeiten
-            // 
-            this.btnSkripteBearbeiten.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
-            this.btnSkripteBearbeiten.Location = new System.Drawing.Point(240, 2);
-            this.btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
-            this.btnSkripteBearbeiten.Size = new System.Drawing.Size(64, 66);
-            this.btnSkripteBearbeiten.TabIndex = 45;
-            this.btnSkripteBearbeiten.Text = "Spalten-anordung";
-            this.btnSkripteBearbeiten.Click += new System.EventHandler(this.btnSkripteBearbeiten_Click);
-            // 
             // TableView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -976,11 +985,14 @@ namespace BlueControls.Forms {
             this.ClientSize = new System.Drawing.Size(1329, 729);
             this.Controls.Add(this.SplitContainer1);
             this.Controls.Add(this.ribMain);
-            this.Controls.Add(this.pnlStatusBar);
             this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "TableView";
             this.Text = "TableView";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
+            this.Controls.SetChildIndex(this.pnlStatusBar, 0);
+            this.Controls.SetChildIndex(this.ribMain, 0);
+            this.Controls.SetChildIndex(this.SplitContainer1, 0);
+            this.pnlStatusBar.ResumeLayout(false);
             this.ribMain.ResumeLayout(false);
             this.tabFile.ResumeLayout(false);
             this.grpOrdner.ResumeLayout(false);
@@ -992,8 +1004,8 @@ namespace BlueControls.Forms {
             this.grpFormularSteuerung.ResumeLayout(false);
             this.tabAdmin.ResumeLayout(false);
             this.grpAdminZeilen.ResumeLayout(false);
-            this.grpAdminBearbeiten.ResumeLayout(false);
             this.grpAdminAllgemein.ResumeLayout(false);
+            this.grpAdminBearbeiten.ResumeLayout(false);
             this.tabExport.ResumeLayout(false);
             this.grpExport.ResumeLayout(false);
             this.grpImport.ResumeLayout(false);
@@ -1005,7 +1017,6 @@ namespace BlueControls.Forms {
             this.SplitContainer1.ResumeLayout(false);
             this.tbcSidebar.ResumeLayout(false);
             this.tabFormula.ResumeLayout(false);
-            this.pnlStatusBar.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

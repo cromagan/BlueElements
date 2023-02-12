@@ -847,6 +847,10 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
+        if (Table?.Database == null || Table.Database.IsDisposed) { return; }
+
+        var se = new DatabaseScriptEditor(Table.Database);
+        se.ShowDialog();
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
