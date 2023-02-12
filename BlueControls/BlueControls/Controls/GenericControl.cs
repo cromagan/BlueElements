@@ -243,7 +243,7 @@ public class GenericControl : System.Windows.Forms.Control {
         if (InvokeRequired) {
             return (Point)Invoke(new Func<Point>(MousePos));
         }
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return default; }
         return PointToClient(System.Windows.Forms.Cursor.Position);
     }
 
@@ -266,7 +266,7 @@ public class GenericControl : System.Windows.Forms.Control {
     }
 
     internal static bool AllEnabled(System.Windows.Forms.Control control) {
-        Develop.DebugPrint_Disposed(control.IsDisposed);
+        if (control.IsDisposed) { return false; }
         do {
             if (control == null) { return true; }
             if (control.IsDisposed) { return false; }
@@ -422,7 +422,7 @@ public class GenericControl : System.Windows.Forms.Control {
     //MyBase.GetScaledBounds(bounds, factor, specified)
 
     protected void SetNotFocusable() {
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return; }
         TabStop = false;
         TabIndex = 0;
         CausesValidation = false;

@@ -20,7 +20,6 @@
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueDatabase;
-using BlueScript;
 using BlueScript.Structures;
 using static BlueBasics.IO;
 

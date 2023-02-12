@@ -124,7 +124,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         new(items, xpos, ypos, steuerWi, tag, connectedControl, translate);
 
     public void Generate_ListBox1(ItemCollectionList items, int minWidth, AddType addNewAllowed, bool translate) {
-
         var (biggestItemX, _, heightAdded, _) = items.ItemData();
         if (addNewAllowed != AddType.None) { heightAdded += 24; }
         lstbx.Appearance = (BlueListBoxAppearance)items.ControlDesign;

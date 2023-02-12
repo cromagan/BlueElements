@@ -487,7 +487,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndK
         var did = false;
         if (!IsOk()) { return false; }
 
-        if (Database == null) { return false; } // Obsolet, aber um die Null-Prüfung zu bestehen ohne ! benutzen zu müssen
+        if (Database == null || Database.IsDisposed) { return false; } // Obsolet, aber um die Null-Prüfung zu bestehen ohne ! benutzen zu müssen
 
         if (_typ is ExportTyp.DatenbankCSVFormat or ExportTyp.DatenbankHTMLFormat or ExportTyp.DatenbankOriginalFormat) {
             for (var n = 0; n < BereitsExportiert.Count; n++) {
@@ -552,7 +552,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndK
 
     internal bool DoBackUp(BackgroundWorker worker) {
         if (!IsOk()) { return false; }
-        if (Database == null) { return false; } // Obsolet, aber um die Null-Prüfung zu bestehen ohne ! benutzen zu müssen
+        if (Database == null || Database.IsDisposed) { return false; } // Obsolet, aber um die Null-Prüfung zu bestehen ohne ! benutzen zu müssen
 
         string savePath;
 

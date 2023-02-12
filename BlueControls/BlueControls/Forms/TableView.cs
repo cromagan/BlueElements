@@ -242,12 +242,12 @@ public partial class TableView : Form, IHasStatusbar {
             return;
         }
 
-        var NTabPage = new System.Windows.Forms.TabPage {
+        var nTabPage = new System.Windows.Forms.TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
             Text = ci.TableName.ToTitleCase(),
             Tag = new List<object>() { ci, string.Empty }
         };
-        tbcDatabaseSelector.Controls.Add(NTabPage);
+        tbcDatabaseSelector.Controls.Add(nTabPage);
     }
 
     protected virtual void btnCSVClipboard_Click(object sender, System.EventArgs e) {
@@ -293,7 +293,7 @@ public partial class TableView : Form, IHasStatusbar {
 
     protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => Table.Export_HTML();
 
-    protected void ChangeDatabaseInTab(ConnectionInfo connectionID, System.Windows.Forms.TabPage? xtab) {
+    protected void ChangeDatabaseInTab(ConnectionInfo connectionId, System.Windows.Forms.TabPage? xtab) {
         if (xtab == null) {
             return;
         }
@@ -304,7 +304,7 @@ public partial class TableView : Form, IHasStatusbar {
         Table.Refresh();
 
         var s = (List<object>)xtab.Tag;
-        s[0] = connectionID;
+        s[0] = connectionId;
         s[1] = string.Empty;
         xtab.Tag = s;
         tbcDatabaseSelector_Selected(null,
@@ -323,10 +323,10 @@ public partial class TableView : Form, IHasStatusbar {
         chkAnsichtFormular.Enabled = datenbankDa;
         chkAnsichtTableFormular.Enabled = datenbankDa;
 
-        if (Table.Database is DatabaseMultiUser BDB) {
-            btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(BDB.Filename);
-        } else if (Table.Database is Database BD) {
-            btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(BD.Filename);
+        if (Table.Database is DatabaseMultiUser bdb) {
+            btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(bdb.Filename);
+        } else if (Table.Database is Database bd) {
+            btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(bd.Filename);
         } else {
             btnDatenbankenSpeicherort.Enabled = false;
         }
@@ -407,21 +407,13 @@ public partial class TableView : Form, IHasStatusbar {
 
     protected virtual void FillFormula(RowItem? r) {
         if (tbcSidebar.SelectedTab == tabFormula) {
-            if (Formula is null || Formula.IsDisposed) {
-                return;
-            }
+            if (Formula is null || Formula.IsDisposed) { return; }
 
-            if (!Formula.Visible) {
-                return;
-            }
+            if (!Formula.Visible) { return; }
 
-            if (Formula.Width < 30 || Formula.Height < 10) {
-                return;
-            }
+            if (Formula.Width < 30 || Formula.Height < 10) { return; }
 
-            if (r?.Database != null) {
-                SetFormula(r?.Database);
-            }
+            if (r?.Database != null) { SetFormula(r?.Database); }
 
             Formula.Database = r?.Database;
             if (r != null) {
@@ -450,10 +442,8 @@ public partial class TableView : Form, IHasStatusbar {
         InitView();
     }
 
-    protected bool SwitchTabToDatabase(ConnectionInfo connectionInfo) {
-        if (connectionInfo is null) {
-            return false;
-        }
+    protected bool SwitchTabToDatabase(ConnectionInfo? connectionInfo) {
+        if (connectionInfo is null) { return false; }
 
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
             if (thisT is System.Windows.Forms.TabPage tp && tp.Tag is List<object> s && s[0] is ConnectionInfo ci) {
@@ -480,10 +470,9 @@ public partial class TableView : Form, IHasStatusbar {
     /// Sucht den Tab mit der angegebenen Datenbank.
     /// Ist kein Reiter vorhanden, wird ein neuer erzeugt.
     /// </summary>
-    /// <param name="connectionInfo"></param>
     /// <returns></returns>
     protected bool SwitchTabToDatabase(DatabaseAbstract? database) {
-        if (database == null) {
+        if (database == null || database.IsDisposed) {
             return false;
         }
 
@@ -555,9 +544,9 @@ public partial class TableView : Form, IHasStatusbar {
 
         tbl.Database.Cell.DataOfCellKey(cellKey, out var column, out var row);
 
-        var ValueCol0 = string.Empty;
+        var valueCol0 = string.Empty;
         if (row != null) {
-            ValueCol0 = row.CellFirstString();
+            valueCol0 = row.CellFirstString();
         }
 
         var editable = string.IsNullOrEmpty(CellCollection.ErrorReason(column, row, ErrorReason.EditAcut));
@@ -601,7 +590,7 @@ public partial class TableView : Form, IHasStatusbar {
                     return;
                 }
 
-                if (MessageBox.Show("Zeile wirklich löschen? (<b>" + ValueCol0 + "</b>)", ImageCode.Frage, "Ja",
+                if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja",
                         "Nein") == 0) {
                     _ = tbl.Database.Row.Remove(row, "Benutzer: löschen Befehl");
                 }
@@ -682,7 +671,7 @@ public partial class TableView : Form, IHasStatusbar {
     protected virtual string ViewToString() {
         //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
         var s = "{" +
-                "Ansicht=" + ((int)_ansicht) + ", " +
+                "Ansicht=" + (int)_ansicht + ", " +
                 "MainTab=" + ribMain.SelectedIndex + ", " +
                 "TableView=" + Table.ViewToString().ToNonCritical() +
                 "}";
@@ -728,12 +717,12 @@ public partial class TableView : Form, IHasStatusbar {
         DatabaseAbstract.ForceSaveAll();
         BlueBasics.MultiUserFile.MultiUserFile.ForceLoadSaveAll();
 
-        if (Table.Database is DatabaseMultiUser BDBM) {
-            _ = ExecuteFile(BDBM.Filename.FilePath());
+        if (Table.Database is DatabaseMultiUser bdbm) {
+            _ = ExecuteFile(bdbm.Filename.FilePath());
         }
 
-        if (Table.Database is Database BDB) {
-            _ = ExecuteFile(BDB.Filename.FilePath());
+        if (Table.Database is Database bdb) {
+            _ = ExecuteFile(bdb.Filename.FilePath());
         }
     }
 
@@ -1255,22 +1244,22 @@ public partial class TableView : Form, IHasStatusbar {
 
         var s = (List<object>)e.TabPage.Tag;
 
-        var DB = DatabaseAbstract.GetById((ConnectionInfo)s[0], Table.Database_NeedPassword);
+        var db = DatabaseAbstract.GetById((ConnectionInfo)s[0], Table.Database_NeedPassword);
 
-        if (DB is Database BDB) {
-            if (!string.IsNullOrEmpty(BDB.Filename)) {
-                btnLetzteDateien.AddFileName(BDB.Filename, DB.TableName);
-                LoadTab.FileName = BDB.Filename;
+        if (db is Database bdb) {
+            if (!string.IsNullOrEmpty(bdb.Filename)) {
+                btnLetzteDateien.AddFileName(bdb.Filename, db.TableName);
+                LoadTab.FileName = bdb.Filename;
             } else {
-                btnLetzteDateien.AddFileName(DB.ConnectionData.UniqueID, DB.TableName);
+                btnLetzteDateien.AddFileName(db.ConnectionData.UniqueID, db.TableName);
             }
         }
 
-        e.TabPage.Text = DB?.TableName.ToTitleCase() ?? "FEHLER";
+        e.TabPage.Text = db?.TableName.ToTitleCase() ?? "FEHLER";
 
-        UpdateScripts(DB);
+        UpdateScripts(db);
 
-        DatabaseSet(DB, (string)s[1]);
+        DatabaseSet(db, (string)s[1]);
     }
 
     private void tbcSidebar_SelectedIndexChanged(object sender, System.EventArgs e) =>

@@ -86,12 +86,12 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
 
     public new T this[int index] {
         get {
-            Develop.DebugPrint_Disposed(IsDisposed);
+            if (IsDisposed) { return default; }
             if (index >= Count || index < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Index falsch: " + index + ", Maximum: " + (Count - 1)); }
             return base[index];
         }
         set {
-            Develop.DebugPrint_Disposed(IsDisposed);
+            if (IsDisposed) { return; }
 
             if (base[index] is string s1 && value is string s2 && s1 == s2) { return; }
 
@@ -115,7 +115,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
     #region Methods
 
     public new void Add(T item) {
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return; }
         base.Add(item);
         OnItemAdded(item);
     }
@@ -137,7 +137,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
     }
 
     public new void AddRange(IEnumerable<T>? collection) {
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return; }
         if (collection is null) { return; }
         // base.AddRange(collection);
         foreach (var item in collection) {
@@ -248,7 +248,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
     }
 
     public void Swap(int index1, int index2) {
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return; }
         if (index1 == index2) { return; }
         // Der Swap geht so, und nicht anders! Es müssen die Items im Original-Array geswapt werden!
         // Wichtig auch der Zugriff auf die base (nicht auf this). Dadurch werden keine Add/Remove Event ausgelöst.
@@ -257,7 +257,7 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
     }
 
     public override string ToString() {
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return string.Empty; }
         try {
             if (typeof(IStringable).IsAssignableFrom(typeof(T))) {
                 System.Text.StringBuilder a = new();

@@ -472,7 +472,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
             LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
-        _ = (_item?.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, _currentPage, _showInPrintMode));
+        _ = _item?.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, _currentPage, _showInPrintMode);
 
         #region Dann die selektierten Punkte
 

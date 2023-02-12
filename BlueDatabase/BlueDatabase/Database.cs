@@ -37,7 +37,7 @@ public sealed class Database : DatabaseAbstract {
 
     #region Fields
 
-    public ListExt<WorkItem>? Works;
+    public List<WorkItem>? Works;
 
     #endregion
 
@@ -228,7 +228,7 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public static void Parse(byte[] data, DatabaseAbstract db, ListExt<WorkItem>? works, NeedPassword? needPassword) {
+    public static void Parse(byte[] data, DatabaseAbstract db, List<WorkItem>? works, NeedPassword? needPassword) {
         db.Column.ThrowEvents = false;
         db.Row.ThrowEvents = false;
         var pointer = 0;
@@ -426,7 +426,7 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public static List<byte> ToListOfByte(DatabaseAbstract db, ListExt<WorkItem>? works) {
+    public static List<byte> ToListOfByte(DatabaseAbstract db, List<WorkItem>? works) {
         try {
             List<byte> l = new();
             // Wichtig, Reihenfolge und Länge NIE verändern!
@@ -505,7 +505,7 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public static string UndoText(ColumnItem? column, RowItem? row, ListExt<WorkItem>? works) {
+    public static string UndoText(ColumnItem? column, RowItem? row, List<WorkItem>? works) {
         if (works == null || works.Count == 0) { return string.Empty; }
         var cellKey = CellCollection.KeyOfCell(column, row);
         var t = string.Empty;
@@ -632,7 +632,7 @@ public sealed class Database : DatabaseAbstract {
         CreateWatcher();
     }
 
-    public override void RefreshColumnsData(List<ColumnItem?>? columns) {
+    public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns == null || columns.Count == 0) { return; }
 
         foreach (var thiscol in columns) {
@@ -694,7 +694,7 @@ public sealed class Database : DatabaseAbstract {
     internal static void SaveToByteList(List<byte> list, ColumnItem c, RowItem r) {
         if (!c.SaveContent) { return; }
 
-        var cv = c?.Database?.Cell.GetStringBehindLinkedValue(c, r);
+        var cv = c.Database?.Cell.GetStringBehindLinkedValue(c, r);
 
         if (cv == null || string.IsNullOrEmpty(cv)) { return; }
         var b = cv.UTF8_ToByte();
@@ -759,11 +759,11 @@ public sealed class Database : DatabaseAbstract {
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) => Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
 
-    protected override void Dispose(bool disposing) {
-        //_muf?.Dispose();
-        Works?.Dispose();
-        base.Dispose(disposing);
-    }
+    //protected override void Dispose(bool disposing) {
+    //    //_muf?.Dispose();
+    //    //Works?.Dispose();
+    //    base.Dispose(disposing);
+    //}
 
     protected override void Initialize() {
         base.Initialize();

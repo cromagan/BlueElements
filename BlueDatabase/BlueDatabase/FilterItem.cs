@@ -336,7 +336,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public QuickImage? SymbolForReadableText() => null;
 
     public override string ToString() {
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return string.Empty; }
+
         try {
             if (!IsOk()) { return string.Empty; }
 

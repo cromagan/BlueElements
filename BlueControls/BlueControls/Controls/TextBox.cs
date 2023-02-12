@@ -524,7 +524,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _eTxt.State = state;
 
         var effectWidth = Width;
-        var sliderVisible = _multiline ? _eTxt.Height() > (Height - 16) : _eTxt.Height() > Height;
+        var sliderVisible = _multiline ? _eTxt.Height() > Height - 16 : _eTxt.Height() > Height;
         if (sliderVisible) { effectWidth = Width - 18; }
 
         switch (_verhalten) {

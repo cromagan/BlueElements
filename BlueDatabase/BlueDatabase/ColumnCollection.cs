@@ -248,7 +248,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
         //    return null;
         //}
-        _ = (Database?.ChangeData(DatabaseDataType.Comand_AddColumnByName, internalName, null, string.Empty, internalName, string.Empty));
+        _ = Database?.ChangeData(DatabaseDataType.Comand_AddColumnByName, internalName, null, string.Empty, internalName, string.Empty);
         var item = Exists(internalName);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");

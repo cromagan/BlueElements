@@ -43,7 +43,7 @@ public sealed partial class Import {
         var ein = _originalImportText.SplitAndCutByCrToList();
         Eintr.Text = ein.Count + " zum Importieren bereit.";
         Database = database;
-        if (Database == null) {
+        if (Database == null || Database.IsDisposed) {
             return;
         }
 

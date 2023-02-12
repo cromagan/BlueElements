@@ -130,8 +130,14 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return connectionData;
     }
 
-    public override void RefreshColumnsData(List<ColumnItem?>? columns) {
+    public override void RefreshColumnsData(List<ColumnItem>? columns) {
         if (columns == null || columns.Count == 0) { return; }
+
+        if (_sql == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "SQL Verbindung verworfen");
+            return;
+        }
+
         var need = false;
         foreach (var thisColumn in columns) {
             if (thisColumn != null && thisColumn.IsInCache == null) {
@@ -208,7 +214,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         if (!isLoading && !ReadOnly) {
             var c = Column.Exists(columnName);
 
-            _ = (_sql?.SetValueInternal(TableName, type, value, c?.Name, rowkey, isLoading));
+            _ = _sql?.SetValueInternal(TableName, type, value, c?.Name, rowkey, isLoading);
         }
 
         return base.SetValueInternal(type, value, columnName, rowkey, isLoading);

@@ -21,6 +21,7 @@ using BlueBasics.Enums;
 using BlueControls;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Forms;
+using BlueDatabase;
 using static BlueBasics.Develop;
 
 namespace BeCreative;
@@ -38,17 +39,19 @@ public partial class Start : Form {
     public static void Ende() {
         DebugPrint(FehlerArt.Info, "Schließe Programm...");
 
-        var P = Progressbar.Show("Programm wird beendet<br><i>Speichern aller Datenbanken");
+        var p = Progressbar.Show("Programm wird beendet<br><i>Speichern aller Datenbanken");
+        DatabaseAbstract.ForceSaveAll();
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
 
-        P?.Update("Programm wird beendet<br><i>Speichern aller Datenbanken");
+        p?.Update("Programm wird beendet<br><i>Speichern aller Datenbanken");
+        DatabaseAbstract.ForceSaveAll();
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false); // Fonts und Dictionarys werden noch benötigt
 
         DebugPrint(FehlerArt.Info, "Schließe Programm, noch ein SaveAll.");
-        P?.Update("Programm wird beendet<br><i>Fast geschafft!");
+        p?.Update("Programm wird beendet<br><i>Fast geschafft!");
         BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true); // Nun aber
 
-        P?.Close();
+        p?.Close();
         TraceLogging_End();
     }
 

@@ -57,7 +57,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
     public string Datenbankkopf {
         get => string.Empty;
         set {
-            if (Database == null) { return; }
+            if (Database == null || Database.IsDisposed) { return; }
             Forms.TableView.OpenDatabaseHeadEditor(Database);
         }
     }
@@ -84,7 +84,7 @@ public class DatabaseSourcePadItem : RectanglePadItemWithVersion, IReadableText,
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
-        if (Database == null) { return l; }
+        if (Database == null || Database.IsDisposed) { return l; }
 
         l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
         return l;

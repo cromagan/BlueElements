@@ -115,7 +115,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     public string Datenbankkopf {
         get => string.Empty;
         set {
-            if (Database == null) { return; }
+            if (Database == null || Database.IsDisposed) { return; }
             Forms.TableView.OpenDatabaseHeadEditor(Database);
         }
     }
@@ -123,7 +123,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     public string Filter_hinzufügen {
         get => string.Empty;
         set {
-            if (Database == null) { return; }
+            if (Database == null || Database.IsDisposed) { return; }
 
             var c = new ItemCollectionList.ItemCollectionList(true);
             foreach (var thiscol in Database.Column) {
@@ -192,7 +192,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
             new FlexiControl()
         };
-        if (Database == null) { return l; }
+        if (Database == null || Database.IsDisposed) { return l; }
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));
 
@@ -440,7 +440,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         switch (e.ClickedComand.ToLower()) {
             case "löschen":
-                _ = (row.Database?.Row.Remove(row, "Benutzer: Filter (und somit Zeile) gelöscht"));
+                _ = row.Database?.Row.Remove(row, "Benutzer: Filter (und somit Zeile) gelöscht");
                 break;
 
             default:

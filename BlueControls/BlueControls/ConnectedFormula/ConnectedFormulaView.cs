@@ -90,7 +90,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowItem? ShowingRow {
         get {
-            Develop.DebugPrint_Disposed(IsDisposed);
+            if (IsDisposed) { return null; }
             return _tmpShowingRow;
         }
     }

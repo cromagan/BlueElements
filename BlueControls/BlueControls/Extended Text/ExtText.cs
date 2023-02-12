@@ -27,6 +27,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
 
 // VTextTyp-Hirachie
@@ -54,7 +55,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.Extended_Text;
 
-public sealed class ExtText : ListExt<ExtChar> {
+public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtended {
 
     #region Fields
 
@@ -74,15 +75,25 @@ public sealed class ExtText : ListExt<ExtChar> {
     public Point DrawingPos;
 
     public int MaxTextLenght;
+
     public bool Multiline;
+
     private readonly RowItem? _row;
+
     private Design _design;
+
     private int? _height;
+
     private States _state;
+
     private Size _textDimensions;
+
     private string? _tmpHtmlText;
+
     private string? _tmpPlainText;
+
     private int? _width;
+
     private float _zeilenabstand;
 
     #endregion
@@ -120,6 +131,12 @@ public sealed class ExtText : ListExt<ExtChar> {
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? Changed;
+
+    #endregion
+
     #region Properties
 
     public Design Design {
@@ -144,6 +161,8 @@ public sealed class ExtText : ListExt<ExtChar> {
             OnChanged();
         }
     }
+
+    public bool IsDisposed { get; private set; }
 
     public string PlainText {
         get {
@@ -298,6 +317,11 @@ public sealed class ExtText : ListExt<ExtChar> {
         ResetPosition(true);
     }
 
+    public void Dispose() {
+        IsDisposed = true;
+        _row?.Dispose();
+    }
+
     public void Draw(Graphics gr, float zoom) {
         while (_width == null) { ReBreak(); }
         DrawStates(gr, zoom);
@@ -342,6 +366,10 @@ public sealed class ExtText : ListExt<ExtChar> {
     public Size LastSize() {
         while (_width == null) { ReBreak(); }
         return _width < 5 || _height < 5 || _height == null ? new Size(32, 16) : new Size((int)_width, (int)_height);
+    }
+
+    public void OnChanged() {
+        Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void StufeÄndern(int first, int last, int stufe) {

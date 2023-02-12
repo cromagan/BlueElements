@@ -1008,7 +1008,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var lastCap = string.Empty;
 
             List<RowData?> sortedRowDataNew;
-            if (Database == null) {
+            if (Database == null || Database.IsDisposed) {
                 sortedRowDataNew = new List<RowData?>();
             } else {
                 sortedRowDataNew =
@@ -2715,7 +2715,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_Border(gr, Enums.Design.ListBox, state, displayRectangleWoSlider);
     }
 
-    private void Draw_Table_Std(Graphics gr, List<RowData>? sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca) {
+    private void Draw_Table_Std(Graphics gr, List<RowData> sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca) {
         try {
             if (Database == null || Database.IsDisposed || ca == null) { return; }   // Kommt vor, dass spontan doch geparsed wird...
             Skin.Draw_Back(gr, Enums.Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
@@ -2760,6 +2760,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Draw_Table_What(Graphics gr, List<RowData?>? sr, TableDrawColumn col, TableDrawType type, int permaX, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, ColumnViewCollection ca) {
+        if (sr == null) { return; }
+
         var lfdno = 0;
 
         var firstOnScreen = true;
@@ -2797,7 +2799,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_Back(gr, Enums.Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle, this, true);
 
         var i = QuickImage.Get(ImageCode.Uhr, 64);
-        gr.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
+        if (i != null) { gr.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2); }
         Skin.Draw_Border(gr, Enums.Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
     }
 

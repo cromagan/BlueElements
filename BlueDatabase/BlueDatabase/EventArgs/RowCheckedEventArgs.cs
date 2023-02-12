@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using BlueDatabase.Enums;
 using System.Collections.Generic;
 
 namespace BlueDatabase.EventArgs;

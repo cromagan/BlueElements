@@ -209,7 +209,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
-            _ = (thisFile?.Save(mustSave));
+            _ = thisFile?.Save(mustSave);
             if (x != AllFiles.Count) {
                 // Die Auflistung wurde verändert! Selten, aber kann passieren!
                 SaveAll(mustSave);

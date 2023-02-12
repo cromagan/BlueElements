@@ -699,7 +699,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     }
 
     private void SetValueFromCell() {
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return; }
 
         if (_tmpColumn == null || _tmpRow == null) {
             ValueSet(string.Empty, true, true);

@@ -127,7 +127,7 @@ public abstract class SQLBackAbstract {
         if (!OpenConnection()) { return "Verbindung fehlgeschlagen"; }
 
         //var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
-        var rk = rowKey is not null and > (-1) ? rowKey.ToString() : string.Empty;
+        var rk = rowKey is not null and > -1 ? rowKey.ToString() : string.Empty;
 
         var cmdString = "INSERT INTO " + SYS_UNDO +
             " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, TIMECODEUTC, CMT) VALUES (" +
@@ -812,7 +812,7 @@ public abstract class SQLBackAbstract {
         return null;
     }
 
-    internal void LoadColumns(string tablename, List<ColumnItem?>? columns) {
+    internal void LoadColumns(string tablename, List<ColumnItem>? columns) {
         try {
             if (columns == null || columns.Count == 0) { return; }
 

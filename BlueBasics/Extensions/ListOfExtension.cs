@@ -340,8 +340,8 @@ public static partial class Extensions {
         }
     }
 
-    public static void SplitAndCutByCr(this List<string?> list, string textToSplit) {
-        List<string?> l = new();
+    public static void SplitAndCutByCr(this List<string> list, string textToSplit) {
+        List<string> l = new();
         l.AddRange(textToSplit.SplitAndCutByCr());
         if (!list.IsDifferentTo(l)) { return; }
         if (list.Count > 0) { list.Clear(); }

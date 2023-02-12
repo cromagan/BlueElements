@@ -1011,7 +1011,7 @@ public class BitmapExt : IDisposableExtended {
         _bitmap = new Bitmap(Width, Height, Width * 4, Pixelformat, BitsHandle.AddrOfPinnedObject());
     }
 
-    private static Bitmap ConvolutionFilter(Bitmap sourceBitmap, double[,] filterMatrix, double factor = 1, int bias = 0) {
+    private static Bitmap ConvolutionFilter(Bitmap sourceBitmap, double[,] filterMatrix, double factor, int bias) {
         var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
         var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
         var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
@@ -1037,9 +1037,9 @@ public class BitmapExt : IDisposableExtended {
                 blue = (factor * blue) + bias;
                 green = (factor * green) + bias;
                 red = (factor * red) + bias;
-                blue = blue > 255 ? 255 : (blue < 0 ? 0 : blue);
-                green = green > 255 ? 255 : (green < 0 ? 0 : green);
-                red = red > 255 ? 255 : (red < 0 ? 0 : red);
+                blue = blue > 255 ? 255 : blue < 0 ? 0 : blue;
+                green = green > 255 ? 255 : green < 0 ? 0 : green;
+                red = red > 255 ? 255 : red < 0 ? 0 : red;
                 resultBuffer[byteOffset] = (byte)blue;
                 resultBuffer[byteOffset + 1] = (byte)green;
                 resultBuffer[byteOffset + 2] = (byte)red;

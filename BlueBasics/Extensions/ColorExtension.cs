@@ -29,7 +29,14 @@ public static partial class Extensions {
 
     public static Color Brighten(this Color color, double value) => FromHsb(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 + value)), color.A);
 
-    // weighed distance using hue, saturation and brightness
+    /// <summary>
+    ///  weighed distance using hue, saturation and brightness
+    /// </summary>
+    /// <param name="target"></param>
+    /// <param name="colors"></param>
+    /// <param name="factorSat"></param>
+    /// <param name="factorBri"></param>
+    /// <returns></returns>
     public static Color ClosestHsvColor(this Color target, List<Color> colors, float factorSat, float factorBri) {
         // https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
         var hue1 = target.GetHue();
@@ -53,12 +60,23 @@ public static partial class Extensions {
         return colors[colors.FindIndex(n => ColorDiff(n, target) == colorDiffs)];
     }
 
-    // distance in RGB space
+    /// <summary>
+    /// distance in RGB space
+    /// </summary>
+    /// <param name="c1"></param>
+    /// <param name="c2"></param>
+    /// <returns></returns>
     public static int ColorDiff(this Color c1, Color c2) => (int)Math.Sqrt(((c1.R - c2.R) * (c1.R - c2.R))
                                                                            + ((c1.G - c2.G) * (c1.G - c2.G))
                                                                            + ((c1.B - c2.B) * (c1.B - c2.B)));
 
-    // weighed only by saturation and brightness (from my trackbars)
+    /// <summary>
+    /// weighed only by saturation and brightness (from my trackbars)
+    /// </summary>
+    /// <param name="c"></param>
+    /// <param name="factorSat"></param>
+    /// <param name="factorBri"></param>
+    /// <returns></returns>
     public static float ColorNum(this Color c, float factorSat, float factorBri) => (c.GetSaturation() * factorSat) + (GetBrightness(c) * factorBri);
 
     public static Color Darken(this Color color, double value) => FromHsb(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 - value)), color.A);
@@ -114,18 +132,24 @@ public static partial class Extensions {
         return Color.FromArgb(a, r, g, b);
     }
 
-    // color brightness as perceived:
+    /// <summary>
+    ///  color brightness as perceived:
+    /// </summary>
+    /// <param name="c"></param>
+    /// <returns></returns>
     public static float GetBrightness(this Color c) => ((c.R * 0.299f) + (c.G * 0.587f) + (c.B * 0.114f)) / 256f;
 
-    // distance between two hues:
+    /// <summary>
+    /// distance between two hues:
+    /// </summary>
+    /// <param name="hue1"></param>
+    /// <param name="hue2"></param>
+    /// <returns></returns>
     public static float GetHueDistance(this float hue1, float hue2) {
         var d = Math.Abs(hue1 - hue2);
         return d > 180 ? 360 - d : d;
     }
 
-    //public static bool IsMagenta(this Color col) {
-    //    return (col.ToArgb() == -65281);
-    //}
     public static bool IsMagentaOrTransparent(this Color col) => col.ToArgb() == -65281 || col.A == 0;
 
     public static bool IsNearBlack(this Color color, double maxBrightness) => color.A != 0 && (color.ToArgb() == 0 || color.GetBrightness() <= maxBrightness);
@@ -151,147 +175,6 @@ public static partial class Extensions {
         (int)OverlayMath(baseColor.G, blendColor.G),
         (int)OverlayMath(baseColor.B, blendColor.B)), baseColor, opacity);
 
-    //public static bool IsTransparent(this Color col) {
-    //    return (col.A == 0);
-    //}
-    //public static string ColorName(this Color col) {
-    //    var c = col.ToHTMLCode().ToLower();
-    //    switch (c) {
-    //        case "0000ff":
-    //            return "Blue";
-    //        case "ff00ff":
-    //            return "Magenta";
-    //        case "ffffff":
-    //            return "White";
-    //        case "000000":
-    //            return "Black";
-    //        case "d394b4":
-    //            return "Pale Pink";
-    //        case "ffaed7":
-    //            return "Light Pink";
-    //        case "ff69b4":
-    //            return "Hot Pink";
-    //        case "f5f4ea":
-    //            return "Disabled XP-Button";
-    //        case "0095dd":
-    //            return "Glossy Cyan Button Color";
-    //        case "919b9c":
-    //            return "XP Frame Border Grey";
-    //        case "f8dfb1":
-    //            return "Glossy Orange Disabled";
-    //        case "87b7cd":
-    //            return "Glossy Cyan Disabled Button Color";
-    //        case "2fbbff":
-    //            return "Glossy Cyan Highlight Button Color";
-    //        case "d7e7ee":
-    //            return "Glossy Cyan Form Color";
-    //        case "003c74":
-    //            return "XP Button Border Dark Blue";
-    //        case "7f9db9":
-    //            return "XP Text Border Light Blue";
-    //        case "c9c7ba":
-    //            return "XP Disabled Border Grey";
-    //        case "f7fafb":
-    //            return "Glossy Cyan Light Form Color";
-    //        // break; case Is = "96ff96" : Return "Unipaint Calender Green"
-    //        // break; case Is = "c8ffc8" : Return "Unipaint Saturday Green"
-    //        // break; case Is = "ff8080" : Return "Unipaint Today Red"
-    //        case "d1ccc1":
-    //            return "XP Pressed Button Dark Grey";
-    //        case "e3e2da":
-    //            return "XP Pressed Button Middle Grey";
-    //        case "efeeea":
-    //            return "XP Pressed Button Light Grey";
-    //        case "ffb834":
-    //            return "XP Mouseover Button Dark Orange";
-    //        case "ffda8c":
-    //            return "XP Mouseover Button Middle Orange";
-    //        case "ffe696":
-    //            return "XP Mouseover Button Light Orange";
-    //        case "ffffee":
-    //            return "XP Quickinfo Pale Yellow";
-    //        case "ffffe1":
-    //            return "XP Ballon ToolTip Pale Yellow";
-    //        case "fdffff":
-    //            return "XP Cyan Button Light";
-    //        case "d2eafe":
-    //            return "XP Cyan Button Middle";
-    //        case "b9ddfb":
-    //            return "XP Cyan Button Dark";
-    //        case "97aee2":
-    //            return "XP Cyan Button Border Light Blue";
-    //        case "f7f7f4":
-    //            return "XP Blue Button Disabled Light Grey";
-    //        case "edede6":
-    //            return "XP Blue Button Disabled Middle Grey";
-    //        case "e6e6dd":
-    //            return "XP Blue Button Disabled Dark Grey";
-    //        case "f4f3ee":
-    //            return "XP Blue Tabstrip Grey";
-    //        case "f3f3ec":
-    //            return "XP Slider Body Grey Darker";
-    //        case "fefefb":
-    //            return "XP Slider Body Grey Lighter";
-    //        case "ece9d8":
-    //            return "XP Form Grey";
-    //        case "e6eefc":
-    //            return "XP Blue Button Light";
-    //        case "c1d3fb":
-    //            return "XP Blue Button Middle";
-    //        case "aec8f7":
-    //            return "XP Blue Button Dark";
-    //        case "bdbaa2":
-    //            return "XP Disabled Toolbar Dark Button Grey";
-    //        case "316ac5":
-    //            return "XP Text Marker Dark Blue";
-    //        case "f4f2e8":
-    //            return "XP Button Middle Grey";
-    //        case "dcd7cb":
-    //            return "XP Button Dark Grey";
-    //        case "eeede5":
-    //            return "XP Slider Border Grey";
-    //        case "e8e8df":
-    //            return "XP Disabled Button Border Grey";
-    //        case "a6a6a6":
-    //            return "XP Disabled Text Grey";
-    //        case "777777":
-    //            return "XP Text Marker Disabled Grey";
-    //        case "c2dbff":
-    //            return "XP Focus Blue 1";
-    //        case "8cb4f2":
-    //            return "XP Focus Blue 2";
-    //        case "404040":
-    //            return "XP Focus Dot Line Grey";
-    //        case "dbdbdb":
-    //            return "Glossy Cyan Disabled Text";
-    //        case "0046d5":
-    //            return "Glossy Cyan Text";
-    //        case "498dab":
-    //            return "Glossy Cyan Form Border Color";
-    //        case "00000000":
-    //            return "Transparent";
-    //        case "eaeaea":
-    //            return "Win 10 Button Grey";
-    //        case "b6b6b6":
-    //            return "Win 10 Button Border Grey";
-    //        case "efefef":
-    //            return "Win 10 Disabled Button Grey";
-    //        case "d8d8d8":
-    //            return "Win 10 Disabled Button Border Grey";
-    //        case "9d9d9d":
-    //            return "Win 10 Disabled Text Grey";
-    //        case "f0f0f0":
-    //            return "Win 10 Form Grey";
-    //        case "acacac":
-    //            return "Win 10 Border Frame Grey";
-    //        case "bababa":
-    //            return "Win 10 Border Slider Grey";
-    //        case "dddddd":
-    //            return "Win 10 Background Slider Grey";
-    //        default:
-    //            return c;
-    //    }
-    //}
     public static Color SetAlpha(this Color color, byte newAlpha) => Color.FromArgb(newAlpha, color.R, color.G, color.B);
 
     public static Color SoftLightMix(this Color baseColor, Color blendColor, double opacity) => MixColor(Color.FromArgb((int)SoftLightMath(baseColor.R, blendColor.R),
@@ -303,12 +186,6 @@ public static partial class Extensions {
         return Color.FromArgb(color.A, w, w, w);
     }
 
-    //public static Color ToSepia(this Color color) {
-    //    var r = (int)Math.Min(255, color.R * 0.393 + color.G * 0.769 + color.B * 0.189);
-    //    var g = (int)Math.Min(255, color.R * 0.349 + color.G * 0.686 + color.B * 0.168);
-    //    var b = (int)Math.Min(255, color.R * 0.272 + color.G * 0.534 + color.B * 0.131);
-    //    return Color.FromArgb(255, r, g, b);
-    //}
     public static string ToHtmlCode(this Color color) {
         var r = Convert.ToString(color.R, 16);
         if (r.Length < 2) { r = "0" + r; }

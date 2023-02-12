@@ -165,7 +165,7 @@ public abstract class RectanglePadItem : BasicPadItem {
         if (!overrideFixedSize) {
             var vr = r.PointOf(Alignment.Horizontal_Vertical_Center);
             var ur = UsedArea;
-            _pLo.SetTo(vr.X - ur.Width / 2, vr.Y - ur.Height / 2);
+            _pLo.SetTo(vr.X - (ur.Width / 2), vr.Y - (ur.Height / 2));
             _pRu.SetTo(_pLo.X + ur.Width, _pLo.Y + ur.Height);
         } else {
             _pLo.SetTo(r.PointOf(Alignment.Top_Left));
@@ -175,10 +175,10 @@ public abstract class RectanglePadItem : BasicPadItem {
 
     public virtual void SizeChanged() {
         // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-        _pl.SetTo(_pLo.X, _pLo.Y + (_pLu.Y - _pLo.Y) / 2);
-        _pr.SetTo(_pRo.X, _pLo.Y + (_pLu.Y - _pLo.Y) / 2);
-        _pu.SetTo(_pLo.X + (_pRo.X - _pLo.X) / 2, _pRu.Y);
-        _po.SetTo(_pLo.X + (_pRo.X - _pLo.X) / 2, _pRo.Y);
+        _pl.SetTo(_pLo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
+        _pr.SetTo(_pRo.X, _pLo.Y + ((_pLu.Y - _pLo.Y) / 2));
+        _pu.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRu.Y);
+        _po.SetTo(_pLo.X + ((_pRo.X - _pLo.X) / 2), _pRo.Y);
     }
 
     public override string ToString() {

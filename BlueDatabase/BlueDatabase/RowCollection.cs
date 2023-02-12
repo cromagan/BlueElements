@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
-using BlueScript;
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -105,7 +104,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     #region Indexers
 
-    public RowItem? this[string primärSchlüssel] => this[new FilterItem(Database.Column.First, FilterType.Istgleich_GroßKleinEgal | FilterType.MultiRowIgnorieren, primärSchlüssel)];
+    public RowItem? this[string primärSchlüssel] {
+        get {
+            if (Database?.Column.First != null) {
+                return this[new FilterItem(Database.Column.First,
+                    FilterType.Istgleich_GroßKleinEgal | FilterType.MultiRowIgnorieren,
+                    primärSchlüssel)];
+            }
+            return null;
+        }
+    }
 
     public RowItem? this[params FilterItem[]? filter] {
         get {
@@ -166,7 +174,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     public List<RowItem> CalculateFilteredRows(List<FilterItem>? filter) {
         List<RowItem> tmpVisibleRows = new();
-        if (Database == null) { return tmpVisibleRows; }
+        if (Database == null || Database.IsDisposed) { return tmpVisibleRows; }
 
         Database.RefreshColumnsData(filter);
 
@@ -189,7 +197,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     public List<RowData> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem?>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 
     public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem?>? pinnedRows, List<RowData>? reUseMe) {
-        if (Database == null) { return new List<RowData>(); }
+        if (Database == null || Database.IsDisposed) { return new List<RowData>(); }
 
         VisibleRowCount = 0;
 
@@ -232,7 +240,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
         #region Gefiltere Zeilen erstellen (_rowData)
 
-        List<RowData?> rowData = new();
+        List<RowData> rowData = new();
         _ = Parallel.ForEach(filteredRows, thisRow => {
             var adk = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
 
@@ -284,7 +292,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
     public List<RowItem> CalculateVisibleRows(List<FilterItem>? filter, List<RowItem?>? pinnedRows) {
         List<RowItem> tmpVisibleRows = new();
-        if (Database == null) { return tmpVisibleRows; }
+        if (Database == null || Database.IsDisposed) { return tmpVisibleRows; }
 
         pinnedRows ??= new List<RowItem?>();
 
@@ -354,16 +362,22 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     /// <param name="valueOfCellInFirstColumn"></param>
     /// <param name="runScriptOfNewRow"></param>
     /// <param name="fullprocessing">Sollen der Zeilenersteller, das Datum und die Initalwerte geschrieben werden?</param>
+    /// <param name="comment"></param>
     /// <returns></returns>
-
     public RowItem? GenerateAndAdd(long key, string valueOfCellInFirstColumn, bool runScriptOfNewRow, bool fullprocessing, string comment) {
-        Develop.DebugPrint_Disposed(Database);
+        if (Database == null || Database.IsDisposed) { return null; }
 
         var item = SearchByKey(key);
-        if (item != null) { Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!"); }
-        _ = (Database?.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString(), comment));
+        if (item != null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
+            return null;
+        }
+        _ = Database?.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString(), comment);
         item = SearchByKey(key);
-        if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen."); }
+        if (item == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
+            return null;
+        }
 
         if (fullprocessing) {
             Database.Cell.SystemSet(Database.Column.SysRowCreator, item, Database.UserName);

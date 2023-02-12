@@ -780,7 +780,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
         if (value == oldValue) { return; }
 
-        _ = (_database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Name, row.Key, oldValue, value, string.Empty));
+        _ = _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Name, row.Key, oldValue, value, string.Empty);
         column.UcaseNamesSortedByLenght = null;
 
         var checkValue = string.Empty;
@@ -820,7 +820,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
         if (value == oldval) { return; }
-        _ = (_database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Name, row.Key, oldval, value, "SystemSet"));
+        _ = _database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Name, row.Key, oldval, value, "SystemSet");
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {

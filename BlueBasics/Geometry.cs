@@ -115,7 +115,7 @@ public static class Geometry {
         var b2 = line2Start.X - line2End.X;
         var c2 = (line2End.X * line2Start.Y) - (line2Start.X * line2End.Y);
         var denom = (a1 * b2) - (a2 * b1);
-        if (denom is < 0.0000001f and > (-0.0000001f)) {
+        if (denom is < 0.0000001f and > -0.0000001f) {
             // Ergibt ansonsten zu große ergebnisse
             return PointF.Empty;
         }

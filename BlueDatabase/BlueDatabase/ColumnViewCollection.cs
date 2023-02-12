@@ -241,7 +241,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
     }
 
     public override string ToString() {
-        Develop.DebugPrint_Disposed(IsDisposed);
+        if (IsDisposed) { return string.Empty; }
         var result = "{Name=" + _name.ToNonCritical();
         foreach (var thisViewItem in this) {
             if (thisViewItem != null) {

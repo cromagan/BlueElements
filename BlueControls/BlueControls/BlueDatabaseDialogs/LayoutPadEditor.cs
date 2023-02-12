@@ -186,7 +186,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
     }
 
     private void btnLayoutVerzeichnis_Click(object sender, System.EventArgs e) {
-        if (Database == null) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         if (!string.IsNullOrEmpty(Database.AdditionalFilesPfadWhole())) {
             _ = ExecuteFile(Database.AdditionalFilesPfadWhole());
         }
@@ -198,7 +198,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
     private void cbxLayout_ItemClicked(object sender, BasicListItemEventArgs e) => LoadLayout(e.Item.KeyName);
 
     private void CheckButtons() {
-        if (Database == null) {
+        if (Database == null || Database.IsDisposed) {
             DisablePad();
             cbxLayout.Enabled = false;
             btnLayoutHinzu.Enabled = false;
@@ -240,7 +240,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     private void SaveCurrentLayout() {
         //scriptEditor.WriteScriptBack();
-        if (Database == null) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         var newl = Pad.Item.ToString();
         var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);
         if (ind > -1) {

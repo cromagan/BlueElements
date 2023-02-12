@@ -247,9 +247,9 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
         for (var pgon = 0; pgon < 2; pgon++) {
             for (var index = 0; index < polygons[pgon].Count; index++) {
                 var testPoint = polygons[pgon][index];
-                if ((testPoint.X < curPoint.X) ||
-                    ((testPoint.X == curPoint.X) &&
-                     (testPoint.Y > curPoint.Y))) {
+                if (testPoint.X < curPoint.X ||
+                    (testPoint.X == curPoint.X &&
+                     testPoint.Y > curPoint.Y)) {
                     curPgon = pgon;
                     curIndex = index;
                     curPoint = polygons[curPgon][curIndex];
@@ -291,8 +291,8 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
                     out _, out var segmentsIntersect,
                     out var intersection, out _, out _, out var t1, out _);
                 if (segmentsIntersect && // The segments intersect
-                    (t1 > 0.001) &&         // Not at the previous intersection
-                    (t1 < bestT))          // Better than the last intersection found
+                    t1 > 0.001 &&         // Not at the previous intersection
+                    t1 < bestT)          // Better than the last intersection found
                 {
                     // See if this is an improvement.
                     if (t1 < bestT) {
@@ -463,7 +463,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
         // Find the point of intersection.
         intersection = new PointF(p1.X + (dx12 * t1), p1.Y + (dy12 * t1));
         // The segments intersect if t1 and t2 are between 0 and 1.
-        segmentsIntersect = (t1 >= 0) && (t1 <= 1) && (t2 >= 0) && (t2 <= 1);
+        segmentsIntersect = t1 >= 0 && t1 <= 1 && t2 >= 0 && t2 <= 1;
         // Find the closest points on the segments.
         if (t1 < 0) {
             t1 = 0;

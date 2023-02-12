@@ -375,7 +375,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
             foreach (var thisR in _rows) {
                 if (cb?.Item?[thisR.Key.ToString()] == null) {
                     var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
-                    _ = (cb?.Item?.Add(tmpQuickInfo, thisR.Key.ToString()));
+                    _ = cb?.Item?.Add(tmpQuickInfo, thisR.Key.ToString());
                     //cb.Item.Add(thisR, string.Empty);
                 } else {
                     foreach (var thisIt in ex) {

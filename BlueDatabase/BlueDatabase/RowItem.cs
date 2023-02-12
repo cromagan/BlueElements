@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
-using BlueScript;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System;
@@ -199,80 +198,80 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         return vars;
     }
 
-    public string CellFirstString() => Database.Cell.GetString(Database.Column.First, this);
+    public string CellFirstString() => Database?.Cell.GetString(Database.Column.First, this) ?? string.Empty;
 
-    public bool CellGetBoolean(string columnName) => Database.Cell.GetBoolean(Database.Column[columnName], this);
+    public bool CellGetBoolean(string columnName) => Database?.Cell.GetBoolean(Database.Column[columnName], this) ?? default;
 
-    public bool CellGetBoolean(ColumnItem? column) => Database.Cell.GetBoolean(column, this);
+    public bool CellGetBoolean(ColumnItem? column) => Database?.Cell.GetBoolean(column, this) ?? default;
 
-    public Color CellGetColor(string columnName) => Database.Cell.GetColor(Database.Column[columnName], this);
+    public Color CellGetColor(string columnName) => Database?.Cell.GetColor(Database.Column[columnName], this) ?? default;
 
-    public Color CellGetColor(ColumnItem? column) => Database.Cell.GetColor(column, this);
+    public Color CellGetColor(ColumnItem? column) => Database?.Cell.GetColor(column, this) ?? default;
 
-    public int CellGetColorBgr(ColumnItem? column) => Database.Cell.GetColorBgr(column, this);
+    public int CellGetColorBgr(ColumnItem? column) => Database?.Cell.GetColorBgr(column, this) ?? 0;
 
-    public string CellGetCompareKey(ColumnItem column) => Database.Cell.CompareKey(column, this);
+    public string CellGetCompareKey(ColumnItem column) => Database?.Cell.CompareKey(column, this) ?? string.Empty;
 
-    public DateTime CellGetDateTime(string columnName) => Database.Cell.GetDateTime(Database.Column[columnName], this);
+    public DateTime CellGetDateTime(string columnName) => Database?.Cell.GetDateTime(Database.Column[columnName], this) ?? default;
 
-    public DateTime CellGetDateTime(ColumnItem? column) => Database.Cell.GetDateTime(column, this);
+    public DateTime CellGetDateTime(ColumnItem? column) => Database?.Cell.GetDateTime(column, this) ?? default;
 
-    public double CellGetDouble(string columnName) => Database.Cell.GetDouble(Database.Column[columnName], this);
+    public double CellGetDouble(string columnName) => Database?.Cell.GetDouble(Database.Column[columnName], this) ?? default;
 
-    public double CellGetDouble(ColumnItem? column) => Database.Cell.GetDouble(column, this);
+    public double CellGetDouble(ColumnItem? column) => Database?.Cell.GetDouble(column, this) ?? default;
 
-    public int CellGetInteger(string columnName) => Database.Cell.GetInteger(Database.Column[columnName], this);
+    public int CellGetInteger(string columnName) => Database?.Cell.GetInteger(Database.Column[columnName], this) ?? default;
 
-    public int CellGetInteger(ColumnItem? column) => Database.Cell.GetInteger(column, this);
+    public int CellGetInteger(ColumnItem? column) => Database?.Cell.GetInteger(column, this) ?? default;
 
-    public List<string> CellGetList(string columnName) => Database.Cell.GetList(Database.Column[columnName], this);
+    public List<string> CellGetList(string columnName) => Database?.Cell.GetList(Database.Column[columnName], this) ?? new List<string>();
 
-    public List<string> CellGetList(ColumnItem? column) => Database.Cell.GetList(column, this);
+    public List<string> CellGetList(ColumnItem? column) => Database?.Cell.GetList(column, this) ?? new List<string>();
 
-    public Point CellGetPoint(string columnName) => Database.Cell.GetPoint(Database.Column[columnName], this);
+    public Point CellGetPoint(string columnName) => Database?.Cell.GetPoint(Database.Column[columnName], this) ?? Point.Empty;
 
-    public Point CellGetPoint(ColumnItem? column) => Database.Cell.GetPoint(column, this);
+    public Point CellGetPoint(ColumnItem? column) => Database?.Cell.GetPoint(column, this) ?? Point.Empty;
 
-    public string CellGetString(string columnName) => Database.Cell.GetString(Database.Column[columnName], this);
+    public string CellGetString(string columnName) => Database?.Cell.GetString(Database.Column[columnName], this) ?? default;
 
     public string CellGetString(ColumnItem? column) {
-        if (Database == null) { return string.Empty; }
+        if (Database == null || Database.IsDisposed || column == null) { return string.Empty; }
         return Database.Cell.GetString(column, this);
     }
 
-    public List<string> CellGetValuesReadable(ColumnItem? column, ShortenStyle style) => Database.Cell.ValuesReadable(column, this, style);
+    public List<string> CellGetValuesReadable(ColumnItem? column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? new List<string>();
 
-    public bool CellIsNullOrEmpty(string columnName) => Database.Cell.IsNullOrEmpty(Database.Column[columnName], this);
+    public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database.Column[columnName], this) ?? default;
 
-    public bool CellIsNullOrEmpty(ColumnItem? column) => Database.Cell.IsNullOrEmpty(column, this);
+    public bool CellIsNullOrEmpty(ColumnItem? column) => Database?.Cell.IsNullOrEmpty(column, this) ?? default;
 
-    public void CellSet(string columnName, bool value) => Database.Cell.Set(Database.Column[columnName], this, value);
+    public void CellSet(string columnName, bool value) => Database?.Cell.Set(Database.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, bool value) => Database.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem? column, bool value) => Database?.Cell.Set(column, this, value);
 
-    public void CellSet(string columnName, string value) => Database.Cell.Set(Database.Column[columnName], this, value);
+    public void CellSet(string columnName, string value) => Database?.Cell.Set(Database.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, string value) => Database.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem? column, string value) => Database?.Cell.Set(column, this, value);
 
-    public void CellSet(string columnName, double value) => Database.Cell.Set(Database.Column[columnName], this, value);
+    public void CellSet(string columnName, double value) => Database?.Cell.Set(Database.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, double value) => Database.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem? column, double value) => Database?.Cell.Set(column, this, value);
 
-    public void CellSet(string columnName, int value) => Database.Cell.Set(Database.Column[columnName], this, value);
+    public void CellSet(string columnName, int value) => Database?.Cell.Set(Database.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, int value) => Database.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem? column, int value) => Database?.Cell.Set(column, this, value);
 
-    public void CellSet(string columnName, Point value) => Database.Cell.Set(Database.Column[columnName], this, value);
+    public void CellSet(string columnName, Point value) => Database?.Cell.Set(Database.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, Point value) => Database.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem? column, Point value) => Database?.Cell.Set(column, this, value);
 
-    public void CellSet(string columnName, List<string>? value) => Database.Cell.Set(Database.Column[columnName], this, value);
+    public void CellSet(string columnName, List<string>? value) => Database?.Cell.Set(Database.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, List<string>? value) => Database.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem? column, List<string>? value) => Database?.Cell.Set(column, this, value);
 
-    public void CellSet(string columnName, DateTime value) => Database.Cell.Set(Database.Column[columnName], this, value);
+    public void CellSet(string columnName, DateTime value) => Database?.Cell.Set(Database.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, DateTime value) => Database.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem? column, DateTime value) => Database?.Cell.Set(column, this, value);
 
     /// <summary>
     /// Überschreibt alle Zellen-Werte mit der der Vorlage.
@@ -374,20 +373,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         } while (true);
     }
 
-    /// <summary>
-    /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initalwerte der Zellen.
-    /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
-    /// </summary>
-    /// <param name="doFemdZelleInvalidate">bei verlinkten Zellen wird der verlinkung geprüft und erneuert.</param>
-    /// <param name="fullCheck">Runden, Großschreibung, etc. wird ebenfalls durchgeführt</param>
-    /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-
     public bool IsNullOrEmpty() => Database.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
 
     public bool IsNullOrEmpty(ColumnItem? column) => Database.Cell.IsNullOrEmpty(column, this);
 
     public bool MatchesTo(FilterItem filter) {
-        if (Database == null) { return false; }
+        if (Database == null || Database.IsDisposed) { return false; }
 
         filter.Column?.RefreshColumnsData();
 
@@ -407,7 +398,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     }
 
     public bool MatchesTo(List<FilterItem>? filter) {
-        if (Database == null) { return false; }
+        if (Database == null || Database.IsDisposed) { return false; }
         if (filter == null || filter.Count == 0) { return true; }
 
         Database.RefreshColumnsData(filter);
@@ -421,7 +412,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     }
 
     public string ReplaceVariables(string formel, bool fulltext, bool removeLineBreaks) {
-        if (Database == null) { return formel; }
+        if (Database == null || Database.IsDisposed) { return formel; }
 
         var erg = formel;
         // Variablen ersetzen

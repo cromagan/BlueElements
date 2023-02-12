@@ -80,7 +80,11 @@ public partial class ColumnArrangementPadEditor : PadEditor {
 
     private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
         if (Database == null || _arrangement < 2 || _arrangement >= Database.ColumnArrangements.Count) { return; }
-        if (MessageBox.Show("Anordung <b>'" + CurrentArrangement.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+
+        var ca = CurrentArrangement;
+        if (ca == null) { return; }
+
+        if (MessageBox.Show("Anordung <b>'" + ca.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         var car = Database.ColumnArrangements.CloneWithClones();
         car.RemoveAt(_arrangement);
         Database.ColumnArrangements = new System.Collections.ObjectModel.ReadOnlyCollection<ColumnViewCollection>(car);
@@ -90,28 +94,37 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     }
 
     private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
+        var ca = CurrentArrangement;
+        if (ca == null) { return; }
+
         if (MessageBox.Show("Alle Spalten anzeigen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-        CurrentArrangement.ShowAllColumns();
+        ca.ShowAllColumns();
         ShowOrder();
     }
 
     private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-        var n = InputBox.Show("Umbenennen:", CurrentArrangement.Name, FormatHolder.Text);
+        var ca = CurrentArrangement;
+        if (ca == null) { return; }
+
+        var n = InputBox.Show("Umbenennen:", ca.Name, FormatHolder.Text);
         if (!string.IsNullOrEmpty(n)) { CurrentArrangement.Name = n; }
         UpdateCombobox();
     }
 
     private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
+        var ca = CurrentArrangement;
+        if (ca == null) { return; }
+
         ItemCollectionList aa = new(true);
         aa.AddRange(Database.Permission_AllUsed(false));
         //aa.Sort();
         aa.CheckBehavior = CheckBehavior.MultiSelection;
-        aa.Check(CurrentArrangement.PermissionGroups_Show, true);
+        aa.Check(ca.PermissionGroups_Show, true);
         var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, AddType.Text, true);
         if (b == null) { return; }
-        CurrentArrangement.PermissionGroups_Show.Clear();
-        CurrentArrangement.PermissionGroups_Show.AddRange(b.ToArray());
-        if (_arrangement == 1) { CurrentArrangement.PermissionGroups_Show.Add("#Everybody"); }
+        ca.PermissionGroups_Show.Clear();
+        ca.PermissionGroups_Show.AddRange(b.ToArray());
+        if (_arrangement == 1) { ca.PermissionGroups_Show.Add("#Everybody"); }
     }
 
     private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {
@@ -126,11 +139,14 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         if (car.Count < 1) {
             car.Add(new ColumnViewCollection(Database, string.Empty, string.Empty));
         }
+
+        var ca = CurrentArrangement;
+
         string newname;
-        if (mitVorlage) {
+        if (mitVorlage && ca != null) {
             newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            car.Add(new ColumnViewCollection(Database, CurrentArrangement.ToString(), newname));
+            car.Add(new ColumnViewCollection(Database, ca.ToString(), newname));
         } else {
             newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
@@ -194,9 +210,12 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     }
 
     private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
+        var ca = CurrentArrangement;
+        if (ca == null) { return; }
+
         ItemCollectionList ic = new(true);
         foreach (var thisColumnItem in Database.Column) {
-            if (thisColumnItem != null && CurrentArrangement[thisColumnItem] == null) { _ = ic.Add(thisColumnItem); }
+            if (thisColumnItem != null && ca[thisColumnItem] == null) { _ = ic.Add(thisColumnItem); }
         }
         if (ic.Count == 0) {
             MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", ImageCode.Information, "Ok");
@@ -205,12 +224,12 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         //ic.Sort();
         var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, AddType.None, true);
         if (r == null || r.Count == 0) { return; }
-        CurrentArrangement.Add(Database.Column.Exists(r[0]), false);
+        ca.Add(Database.Column.Exists(r[0]), false);
         ShowOrder();
     }
 
     private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) {
-        CurrentArrangement.HideSystemColumns();
+        CurrentArrangement?.HideSystemColumns();
         ShowOrder();
     }
 
@@ -435,7 +454,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                             foreach (var thisc2 in thisc?.Column?.Database?.Column) {
                                 if (tmp[2].Contains("~" + thisc2.Name + "~")) {
                                     var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Name];
-                                    _ = (rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false)));
+                                    _ = rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                 }
                             }
                         }
@@ -449,7 +468,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
                             kx = it2.UsedArea.Right;
 
                             // und noch die Datenbank auf die Spalte zeigen lassem
-                            _ = (databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false)));
+                            _ = databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
                         }
                     }
                 }

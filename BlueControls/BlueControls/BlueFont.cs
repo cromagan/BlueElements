@@ -188,7 +188,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName {
             DrawString(gr, "Z", tmpfont, Brushes.Black, 0, 0);
             var miny = (int)(f.Height / 2.0);
 
-            for (var x = 1; x <= (f.Width - 1); x++) {
+            for (var x = 1; x <= f.Width - 1; x++) {
                 for (var y = (int)(f.Height - 1); y >= miny; y--) {
                     if (y > miny && bmp.GetPixel(x, y).R == 0) { miny = y; }
                 }

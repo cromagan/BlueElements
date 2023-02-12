@@ -312,7 +312,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    public string LoadedVersion { get; private set; }
+    public string LoadedVersion { get; private set; } = "0.00";
 
     public bool LogUndo { get; set; } = true;
 
@@ -451,7 +451,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public static void ForceSaveAll() {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
-            _ = (thisFile?.Save());
+            _ = thisFile?.Save();
             if (x != AllFiles.Count) {
                 // Die Auflistung wurde verändert! Selten, aber kann passieren!
                 ForceSaveAll();
@@ -948,7 +948,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>
         //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-        Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
+        Export_CSV(firstRow, new List<ColumnItem?> { column }, sortedRows);
 
     /// <summary>
     /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
@@ -958,7 +958,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
     /// <returns></returns>
 
-    public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, List<RowData>? sortedRows) {
+    public string Export_CSV(FirstRow firstRow, List<ColumnItem> columnList, List<RowData>? sortedRows) {
         columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
         sortedRows ??= Row.AllRows();
 
@@ -1043,7 +1043,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     /// </summary>
     /// <returns></returns>
 
-    public void Export_HTML(string filename, List<ColumnItem?>? columnList, List<RowData?>? sortedRows, bool execute) {
+    public void Export_HTML(string filename, List<ColumnItem?>? columnList, List<RowData> sortedRows, bool execute) {
         if (columnList == null || columnList.Count == 0) {
             columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
         }
@@ -1385,7 +1385,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         RefreshColumnsData(new List<ColumnItem?>() { column });
     }
 
-    public abstract void RefreshColumnsData(List<ColumnItem?>? columns);
+    public abstract void RefreshColumnsData(List<ColumnItem> columns);
 
     public void RefreshColumnsData(List<FilterItem>? filter) {
         if (filter != null) {

@@ -445,7 +445,7 @@ public sealed partial class DatabaseHeadEditor {
 
         #region  Export
 
-        var t = new ListExt<ExportDefinition?>();
+        var t = new List<ExportDefinition?>();
         t.AddRange(lbxExportSets.Item.Select(thisItem => (ExportDefinition)((ReadableListItem)thisItem).Item));
         _database.Export = new(t);
 
@@ -453,7 +453,7 @@ public sealed partial class DatabaseHeadEditor {
 
         #region  Import
 
-        var t2 = new ListExt<EventScript?>();
+        var t2 = new List<EventScript?>();
         t2.AddRange(lstEventScripts.Item.Select(thisItem => (EventScript)((ReadableListItem)thisItem).Item));
         _database.EventScript = new(t2);
 
