@@ -43,11 +43,11 @@ internal class Method_Min : Method {
 
     public override List<string> Comand(Script? s) => new() { "min" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
         var val = attvar.Attributes.Select(thisval => ((VariableFloat)thisval).ValueNum).Prepend(float.MaxValue).Min();
-        return new DoItFeedback(val, line);
+        return new DoItFeedback(infos, s, val);
     }
 
     #endregion

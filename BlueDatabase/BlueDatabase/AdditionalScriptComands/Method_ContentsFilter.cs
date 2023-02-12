@@ -49,18 +49,18 @@ public class Method_ContentsFilter : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "contentsfilter" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
-        if (allFi is null) { return new DoItFeedback("Fehler im Filter", line); }
+        if (allFi is null) { return new DoItFeedback(infos, s, "Fehler im Filter"); }
 
         var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ReadableText);
-        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[0].ReadableText, line); }
+        if (returncolumn == null) { return new DoItFeedback(infos, s, "Spalte nicht gefunden: " + attvar.Attributes[0].ReadableText); }
         var x = returncolumn.Contents(allFi, null);
-        return new DoItFeedback(x, line);
+        return new DoItFeedback(infos, s, x);
     }
 
     #endregion

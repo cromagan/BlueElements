@@ -43,11 +43,11 @@ internal class Method_CountString : Method {
 
     public override List<string> Comand(Script? s) => new() { "countstring" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(this, attvar, line)
-            : new DoItFeedback(attvar.Attributes[0].ReadableText.CountString(attvar.Attributes[1].ReadableText), line);
+            ? DoItFeedback.AttributFehler(infos, s, this, attvar)
+            : new DoItFeedback(infos, s, attvar.Attributes[0].ReadableText.CountString(attvar.Attributes[1].ReadableText));
     }
 
     #endregion

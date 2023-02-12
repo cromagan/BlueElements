@@ -47,17 +47,17 @@ internal class Method_ExtractText : Method {
 
     public override List<string> Comand(Script? s) => new() { "extracttext" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var tags = ((VariableString)attvar.Attributes[0]).ValueString.ReduceToMulti(((VariableString)attvar.Attributes[1]).ValueString, StringComparison.OrdinalIgnoreCase);
 
         if (tags == null) {
-            return new DoItFeedback("Searchpattern fehlerhaft.", line);
+            return new DoItFeedback(infos, s, "Searchpattern fehlerhaft.");
         }
 
-        return new DoItFeedback(tags, line);
+        return new DoItFeedback(infos, s, tags);
     }
 
     #endregion

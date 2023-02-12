@@ -29,6 +29,7 @@ public class Method_Row : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableFilterItem.ShortName_Variable } };
+
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                           "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt. Es wird keine neue Zeile erstellt.\r\n" +
                                           "Mit RowIsNull kann abgefragt werden, ob die Zeile gefunden wurde.\r\n" +
@@ -65,26 +66,26 @@ public class Method_Row : Method_Database {
         return vro.RowItem;
     }
 
-    public static DoItFeedback RowToObjectFeedback(RowItem? row, int line) => new(new VariableRowItem(row), line);
+    public static DoItFeedback RowToObjectFeedback(CanDoFeedback? infos, Script s, RowItem? row) => new(infos, s, new VariableRowItem(row));
 
     public override List<string> Comand(Script? s) => new() { "row" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-        if (allFi is null) { return new DoItFeedback("Fehler im Filter", line); }
+        if (allFi is null) { return new DoItFeedback(infos, s, "Fehler im Filter"); }
 
         var r = RowCollection.MatchesTo(allFi);
 
-        if (r.Count > 1) { return new DoItFeedback("Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount.", line); }
+        if (r.Count > 1) { return new DoItFeedback(infos, s, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 
         if (r == null || r.Count is 0 or > 1) {
-            return RowToObjectFeedback(null, line);
+            return RowToObjectFeedback(infos, s, null);
         }
 
-        return RowToObjectFeedback(r[0], line);
+        return RowToObjectFeedback(infos, s, r[0]);
     }
 
     #endregion

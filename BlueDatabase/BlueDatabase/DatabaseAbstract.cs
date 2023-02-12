@@ -864,7 +864,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             Script sc = new(vars, AdditionalFilesPfadWhole(), changevalues) {
                 ScriptText = s.Script
             };
-            var scf = sc.Parse();
+            var scf = sc.Parse(0);
 
             #endregion
 

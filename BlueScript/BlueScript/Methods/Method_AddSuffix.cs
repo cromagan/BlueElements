@@ -43,11 +43,11 @@ internal class Method_AddSuffix : Method {
 
     public override List<string> Comand(Script? s) => new() { "addsuffix" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos, s); }
 
         var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
 
@@ -57,7 +57,7 @@ internal class Method_AddSuffix : Method {
 
         ((VariableListString)attvar.Attributes[0]).ValueList = tmp;
 
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s );
     }
 
     #endregion

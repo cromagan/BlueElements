@@ -44,12 +44,12 @@ internal class Method_StringShortenWord : Method {
 
     public override List<string> Comand(Script? s) => new() { "stringshortenword" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
         var txt = ((VariableString)attvar.Attributes[0]).ValueString;
         if (string.IsNullOrEmpty(txt)) {
-            return new DoItFeedback(txt, string.Empty, line);
+            return new DoItFeedback(infos, s, txt, string.Empty);
         }
         //TXT = TXT.HTMLSpecialToNormalChar();
         txt = txt.Replace("Sekunden", "Sek.");
@@ -109,7 +109,7 @@ internal class Method_StringShortenWord : Method {
         }
         txt = txt.Replace("Tiefkühl", "TK-");
         //TXT = TXT.CreateHtmlCodes(true);
-        return new DoItFeedback(txt, string.Empty, line);
+        return new DoItFeedback(infos, s, txt, string.Empty);
     }
 
     #endregion

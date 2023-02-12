@@ -82,15 +82,20 @@ internal class Method_if : Method {
 
     public override List<string> Comand(Script? s) => new() { "if" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
         if (((VariableBool)attvar.Attributes[0]).ValueBool) {
-            var scx = s.Parse(infos.CodeBlockAfterText, line);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(scx.ErrorMessage, scx.LastlineNo); }
+            var scx = s.Parse(infos.CodeBlockAfterText, infos.Line-1);
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) {
+                //var ind =
+                //var line =    scx.LastlineNo + Script.Line(s.ReducedScriptText, infos.ContinueOrErrorPosition) - Script.Line(infos.CodeBlockAfterText, infos.CodeBlockAfterText.Length);
+
+                return new DoItFeedback(scx.ErrorMessage, scx.LastlineNo);
+            }
         }
 
-        return DoItFeedback.Null(line + infos.CodeBlockLines());
+        return DoItFeedback.Null(infos, s);
     }
 
     #endregion

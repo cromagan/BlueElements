@@ -42,11 +42,11 @@ internal class Method_Add : Method {
 
     public override List<string> Comand(Script? s) => new() { "add" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos, s); }
 
         var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
         for (var z = 1; z < attvar.Attributes.Count; z++) {
@@ -58,7 +58,7 @@ internal class Method_Add : Method {
             }
         }
         ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s );
     }
 
     #endregion

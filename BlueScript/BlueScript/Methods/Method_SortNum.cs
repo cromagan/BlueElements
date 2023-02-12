@@ -50,11 +50,11 @@ internal class Method_SortNum : Method {
 
     public override List<string> Comand(Script? s) => new() { "sortnum" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos, s); }
 
         var nums = new List<double>();
         foreach (var txt in ((VariableListString)attvar.Attributes[0]).ValueList) {
@@ -64,7 +64,7 @@ internal class Method_SortNum : Method {
         nums.Sort();
 
         ((VariableListString)attvar.Attributes[0]).ValueList = nums.ConvertAll<string>(i => i.ToString(Constants.Format_Float1));
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s );
     }
 
     #endregion

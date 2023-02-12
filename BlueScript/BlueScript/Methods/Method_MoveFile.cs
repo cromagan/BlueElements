@@ -44,30 +44,30 @@ internal class Method_MoveFile : Method {
 
     public override List<string> Comand(Script? s) => new() { "movefile" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var sop = ((VariableString)attvar.Attributes[0]).ValueString;
 
         var dep = ((VariableString)attvar.Attributes[1]).ValueString;
 
-        //if (!DirectoryExists(sop.FilePath())) { return new DoItFeedback("Verzeichnis existiert nicht"); }
-        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback("Ziel-Verzeichnis existiert nicht", line); }
-        if (!FileExists(sop)) { return new DoItFeedback("Quelldatei existiert nicht.", line); }
+        //if (!DirectoryExists(sop.FilePath())) { return new DoItFeedback(infos, s, "Verzeichnis existiert nicht"); }
+        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback(infos, s, "Ziel-Verzeichnis existiert nicht"); }
+        if (!FileExists(sop)) { return new DoItFeedback(infos, s, "Quelldatei existiert nicht."); }
 
         if (FileExists(dep)) {
-            return new DoItFeedback("Zieldatei existiert bereits.", line);
+            return new DoItFeedback(infos, s, "Zieldatei existiert bereits.");
         }
 
-        if (!s.ChangeValues) { return new DoItFeedback("Verschieben im Testmodus deaktiviert.", line); }
+        if (!s.ChangeValues) { return new DoItFeedback(infos, s, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveFile(sop, dep, false)) {
-            return new DoItFeedback("Verschieben fehlgeschlagen.", line);
+            return new DoItFeedback(infos, s, "Verschieben fehlgeschlagen.");
         }
 
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s );
     }
 
     #endregion

@@ -46,12 +46,12 @@ internal class Method_MatchColumnFormat : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "matchcolumnformat" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var column = Column(s, attvar.Attributes[1].Name);
-        if (column == null) { return new DoItFeedback("Spalte in Datenbank nicht gefunden", line); }
+        if (column == null) { return new DoItFeedback(infos, s, "Spalte in Datenbank nicht gefunden"); }
 
         var tocheck = new List<string>();
         if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
@@ -60,10 +60,10 @@ internal class Method_MatchColumnFormat : Method_Database {
         tocheck = tocheck.SortedDistinctList();
 
         if (tocheck.Any(thisstring => !thisstring.IsFormat(column))) {
-            return DoItFeedback.Falsch(line);
+            return DoItFeedback.Falsch(infos, s);
         }
 
-        return DoItFeedback.Wahr(line);
+        return DoItFeedback.Wahr(infos, s);
     }
 
     #endregion

@@ -40,7 +40,7 @@ public readonly struct DoItWithEndedPosFeedback {
         ErrorMessage = errormessage;
         Variable = variable;
         Position = endpos;
-        Line = line;
+        Line  = line;
     }
 
     public DoItWithEndedPosFeedback(string errormessage, int line) {

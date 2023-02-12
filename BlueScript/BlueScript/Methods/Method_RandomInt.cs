@@ -43,12 +43,12 @@ internal class Method_RandomInt : Method {
 
     public override List<string> Comand(Script? s) => new() { "randomint" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(this, attvar, line)
-            : new DoItFeedback(Constants.GlobalRND.Next(((VariableFloat)attvar.Attributes[0]).ValueInt));
+            ? DoItFeedback.AttributFehler(infos, s, this, attvar)
+            : new DoItFeedback(infos, s);
     }
 
     #endregion

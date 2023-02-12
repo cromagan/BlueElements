@@ -42,13 +42,13 @@ internal class Method_Element : Method {
 
     public override List<string> Comand(Script? s) => new() { "element" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
         var i = ((VariableFloat)attvar.Attributes[1]).ValueInt;
         var list = ((VariableListString)attvar.Attributes[0]).ValueList;
-        return i < 0 || i >= list.Count ? new DoItFeedback("Element nicht in Liste", line)
-            : new DoItFeedback(list[i], string.Empty, line);
+        return i < 0 || i >= list.Count ? new DoItFeedback(infos, s, "Element nicht in Liste")
+            : new DoItFeedback(infos, s, list[i], string.Empty);
     }
 
     #endregion

@@ -79,11 +79,11 @@ public class VariableBool : Variable {
         return v;
     }
 
-    public override DoItFeedback GetValueFrom(Variable variable, int line) {
-        if (variable is not VariableBool v) { return DoItFeedback.VerschiedeneTypen(this, variable, line); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
+    public override DoItFeedback GetValueFrom(Variable variable) {
+        if (variable is not VariableBool v) { return DoItFeedback.VerschiedeneTypen(null, null, this, variable); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null, null); }
         ValueBool = v.ValueBool;
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(null, null);
     }
 
     protected override Variable NewWithThisValue(object x, Script s) {
@@ -109,11 +109,11 @@ public class VariableBool : Variable {
         var (i, check) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
         if (i > -1) {
             if (i < 1 && check != "!") {
-                return false;//new DoItFeedback("Operator (" + check + ") am String-Start nicht erlaubt: " + txt);
+                return false;//new DoItFeedback(infos, s, "Operator (" + check + ") am String-Start nicht erlaubt: " + txt);
             } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
 
             if (i >= txt.Length - 1) {
-                return false;//new DoItFeedback("Operator (" + check + ") am String-Ende nicht erlaubt: " + txt);
+                return false;//new DoItFeedback(infos, s, "Operator (" + check + ") am String-Ende nicht erlaubt: " + txt);
             } // siehe oben
 
             #region Die Werte vor und nach dem Trennzeichen in den Variablen v1 und v2 ablegen
@@ -123,12 +123,12 @@ public class VariableBool : Variable {
             var s1 = txt.Substring(0, i);
             Variable? v1 = null;
             if (!string.IsNullOrEmpty(s1)) {
-                var tmp1 = GetVariableByParsing(s1, s, -1);
-                if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return false; }//new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
+                var tmp1 = GetVariableByParsing(s1, s);
+                if (!string.IsNullOrEmpty(tmp1.ErrorMessage)) { return false; }//new DoItFeedback(infos, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
 
                 v1 = tmp1.Variable;
             } else {
-                if (check != "!") { return false; }//new DoItFeedback("Wert vor Operator (" + check + ") nicht gefunden: " + txt);
+                if (check != "!") { return false; }//new DoItFeedback(infos, s, "Wert vor Operator (" + check + ") nicht gefunden: " + txt);
             }
 
             #endregion
@@ -136,11 +136,11 @@ public class VariableBool : Variable {
             #region Zweiten Wert als s2 ermitteln
 
             var s2 = txt.Substring(i + check.Length);
-            if (string.IsNullOrEmpty(s2)) { return false; }//new DoItFeedback("Wert nach Operator (" + check + ") nicht gefunden: " + txt);
+            if (string.IsNullOrEmpty(s2)) { return false; }//new DoItFeedback(infos, s, "Wert nach Operator (" + check + ") nicht gefunden: " + txt);
 
-            var tmp2 = GetVariableByParsing(s2, s, -1);
+            var tmp2 = GetVariableByParsing(s2, s);
             if (!string.IsNullOrEmpty(tmp2.ErrorMessage)) {
-                return false;//new DoItFeedback("Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
+                return false;//new DoItFeedback(infos, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
             }
 
             var v2 = tmp2.Variable;
@@ -149,11 +149,11 @@ public class VariableBool : Variable {
 
             // V2 braucht nicht peprüft werden, muss ja eh der gleiche TYpe wie V1 sein
             if (v1 != null) {
-                if (v1.MyClassId != v2.MyClassId) { return false; }// return new DoItFeedback("Typen unterschiedlich: " + txt);
+                if (v1.MyClassId != v2.MyClassId) { return false; }// return new DoItFeedback(infos, s, "Typen unterschiedlich: " + txt);
 
-                if (!v1.ToStringPossible) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                if (!v1.ToStringPossible) { return false; }// return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
             } else {
-                if (v2 is not VariableBool) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                if (v2 is not VariableBool) { return false; }// return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
             }
 
             #endregion
@@ -171,43 +171,43 @@ public class VariableBool : Variable {
                     }
 
                 case ">=": {
-                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
                         if (v1Fl.ValueNum >= v2Fl.ValueNum) { replacer = "true"; }
                         break;
                     }
 
                 case "<=": {
-                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
                         if (v1Fl.ValueNum <= v2Fl.ValueNum) { replacer = "true"; }
                         break;
                     }
 
                 case "<": {
-                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
                         if (v1Fl.ValueNum < v2Fl.ValueNum) { replacer = "true"; }
                         break;
                     }
 
                 case ">": {
-                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1 is not VariableFloat v1Fl) { return false; } //  return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableFloat v2Fl) { return false; }  //  return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
                         if (v1Fl.ValueNum > v2Fl.ValueNum) { replacer = "true"; }
                         break;
                     }
 
                 case "||": {
-                        if (v1 is not VariableBool v1Bo) { return false; }                            // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableBool v2Bo) { return false; }// return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1 is not VariableBool v1Bo) { return false; }                            // return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableBool v2Bo) { return false; }// return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
                         if (v1Bo.ValueBool || v2Bo.ValueBool) { replacer = "true"; }
                         break;
                     }
 
                 case "&&": {
-                        if (v1 is not VariableBool v1Bo) { return false; }  // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
-                        if (v2 is not VariableBool v2Bo) { return false; }                                // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v1 is not VariableBool v1Bo) { return false; }  // return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableBool v2Bo) { return false; }                                // return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
                         if (v1Bo.ValueBool && v2Bo.ValueBool) { replacer = "true"; }
                         break;
                     }
@@ -215,13 +215,13 @@ public class VariableBool : Variable {
                 case "!": {
                         // S1 dürfte eigentlich nie was sein: !False||!false
                         // entweder ist es ganz am anfang, oder direkt nach einem Trenneichen
-                        if (v2 is not VariableBool v2Bo) { return false; }   // return new DoItFeedback("Datentyp nicht zum Vergleichen geeignet: " + txt);
+                        if (v2 is not VariableBool v2Bo) { return false; }   // return new DoItFeedback(infos, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
                         if (!v2Bo.ValueBool) { replacer = "true"; }
                         break;
                     }
 
                 default:
-                    return false; //  return new DoItFeedback("Operator (" + check + ") unbekannt: " + txt);
+                    return false; //  return new DoItFeedback(infos, s, "Operator (" + check + ") unbekannt: " + txt);
             }
 
             if (!string.IsNullOrEmpty(replacer)) {

@@ -31,24 +31,22 @@ public readonly struct SplittedAttributesFeedback {
 
     public readonly ScriptIssueType FehlerTyp;
 
-    public readonly int NextLine;
-
     #endregion
+
+    //public readonly int NextLine;
 
     #region Constructors
 
-    public SplittedAttributesFeedback(List<Variable> atts, int line) {
+    public SplittedAttributesFeedback(List<Variable> atts) {
         Attributes = atts;
         ErrorMessage = string.Empty;
         FehlerTyp = ScriptIssueType.ohne;
-        NextLine = line;
     }
 
-    public SplittedAttributesFeedback(ScriptIssueType type, string error, int line) {
+    public SplittedAttributesFeedback(ScriptIssueType type, string error) {
         Attributes = new List<Variable>();
         ErrorMessage = error;
         FehlerTyp = type;
-        NextLine = line;
     }
 
     #endregion

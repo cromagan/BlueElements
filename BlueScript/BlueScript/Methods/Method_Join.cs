@@ -44,16 +44,16 @@ internal class Method_Join : Method {
 
     public override List<string> Comand(Script? s) => new() { "join" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
-        //if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)) { return DoItFeedback.Null(line); }
+        //if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)) { return DoItFeedback.Null(infos, s, line); }
 
         var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
         //tmp = tmp.Substring(0, tmp.Length - 1); // Listen mit Einträgen haben zur Erkennung immer noch einen zusätzlichen Zeilenumbruch
 
-        return new DoItFeedback(tmp.JoinWith(((VariableString)attvar.Attributes[1]).ValueString), string.Empty, line);
+        return new DoItFeedback(infos, s, tmp.JoinWith(((VariableString)attvar.Attributes[1]).ValueString), string.Empty);
     }
 
     #endregion

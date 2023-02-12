@@ -42,12 +42,12 @@ internal class Method_ToUpper : Method {
 
     public override List<string> Comand(Script? s) => new() { "toupper" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
-        return new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.ToUpper(), string.Empty, line);
+        return new DoItFeedback(infos, s, ((VariableString)attvar.Attributes[0]).ValueString.ToUpper(), string.Empty);
     }
 
     #endregion

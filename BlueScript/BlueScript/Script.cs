@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using BlueBasics;
@@ -118,36 +119,41 @@ public class Script {
 
     #region Methods
 
-    public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback, int line) {
+    public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
         if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", -1); }
 
         foreach (var thisC in Comands) {
-            var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s, line);
-            if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, line); }
+            var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s, Line(txt, pos));
+            if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, Line(txt, pos)); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                var fn = thisC.DoIt(f, s, f.Line);
+                var fn = thisC.DoIt(f, s);
                 return new DoItWithEndedPosFeedback(fn.ErrorMessage, fn.Variable, f.ContinueOrErrorPosition, fn.Line);
             }
         }
 
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, s, line))) {
+        foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, s, Line(txt, pos)))) {
             if (f.MustAbort) {
-                return new DoItWithEndedPosFeedback(f.ErrorMessage, line);
+                return new DoItWithEndedPosFeedback(f.ErrorMessage, Line(txt, pos));
             }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
                 return expectedvariablefeedback
-                    ? new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos), line)
-                    : new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos), line);
+                    ? new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos), Line(txt, pos))
+                    : new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos), Line(txt, pos));
             }
         }
 
         #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos).TrimEnd("¶") , line);
+        return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos).TrimEnd("¶"), Line(txt, pos));
+    }
+
+    public static int Line(string? txt, int? pos) {
+        if (pos == null || txt == null) { return 0; }
+        return txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
     }
 
     public static string ReduceText(string txt) {
@@ -193,13 +199,13 @@ public class Script {
         return s.ToString();
     }
 
-    public ScriptEndedFeedback Parse() {
+    public ScriptEndedFeedback Parse(int lineadd) {
         ReducedScriptText = ReduceText(ScriptText);
         BreakFired = false;
         Schleife = 0;
         Sub = 0;
 
-        return Parse(ReducedScriptText, 1);
+        return Parse(ReducedScriptText, lineadd);
     }
 
     //internal int AddBitmapToCache(Bitmap? bmp) {
@@ -207,27 +213,25 @@ public class Script {
     //    return BitmapCache.IndexOf(bmp);
     //}
 
-    public ScriptEndedFeedback Parse(string redScriptText, int line) {
+    public ScriptEndedFeedback Parse(string redScriptText, int lineadd) {
         var pos = 0;
         EndScript = false;
 
         do {
             if (pos >= redScriptText.Length || EndScript) {
-                return new ScriptEndedFeedback(Variables, line);
+                return new ScriptEndedFeedback(Variables, Line(redScriptText, pos) + lineadd);
             }
 
-            if (BreakFired) { return new ScriptEndedFeedback(Variables, line); }
+            if (BreakFired) { return new ScriptEndedFeedback(Variables, Line(redScriptText, pos) + lineadd); }
 
             if (redScriptText.Substring(pos, 1) == "¶") {
-                line++;
                 pos++;
             } else {
-                var f = ComandOnPosition(redScriptText, pos, this, false, line);
+                var f = ComandOnPosition(redScriptText, pos, this, false);
                 if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                    return new ScriptEndedFeedback(f.Line, f.ErrorMessage, redScriptText.Substring(pos, Math.Min(30, redScriptText.Length - pos)), null);
+                    return new ScriptEndedFeedback(f.Line + lineadd, f.ErrorMessage, redScriptText.Substring(pos, Math.Min(30, redScriptText.Length - pos)), Variables);
                 }
                 pos = f.Position;
-                line = f.Line;
             }
         } while (true);
     }

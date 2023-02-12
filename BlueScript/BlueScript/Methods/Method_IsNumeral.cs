@@ -43,14 +43,14 @@ internal class Method_IsNumeral : Method {
 
     public override List<string> Comand(Script? s) => new() { "isnumeral" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(line); }
-        if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(infos, s); }
+        if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(infos, s); }
         if (attvar.Attributes[0] is VariableString vs) {
-            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(line); }
+            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(infos, s); }
         }
-        return DoItFeedback.Falsch(line);
+        return DoItFeedback.Falsch(infos, s);
     }
 
     #endregion

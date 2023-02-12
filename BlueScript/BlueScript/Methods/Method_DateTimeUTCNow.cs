@@ -43,11 +43,11 @@ internal class Method_DateTimeNowUTC : Method {
 
     public override List<string> Comand(Script? s) => new() { "datetimeutcnow" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(this, attvar, line)
-            : new DoItFeedback(DateTime.UtcNow, line);
+            ? DoItFeedback.AttributFehler(infos, s, this, attvar)
+            : new DoItFeedback(infos, s, DateTime.UtcNow);
     }
 
     #endregion

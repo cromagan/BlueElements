@@ -49,9 +49,9 @@ internal class Method_Contains : Method {
 
     public override List<string> Comand(Script? s) => new() { "contains" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         #region Wortliste erzeugen
 
@@ -68,27 +68,27 @@ internal class Method_Contains : Method {
         if (attvar.Attributes[0] is VariableListString vl) {
             var x = vl.ValueList;
             if (wordlist.Any(thisW => x.Contains(thisW, ((VariableBool)attvar.Attributes[1]).ValueBool))) {
-                return DoItFeedback.Wahr(line);
+                return DoItFeedback.Wahr(infos, s);
             }
-            return DoItFeedback.Falsch(line);
+            return DoItFeedback.Falsch(infos, s);
         }
 
         if (attvar.Attributes[0] is VariableString vs) {
             foreach (var thisW in wordlist) {
                 if (((VariableBool)attvar.Attributes[1]).ValueBool) {
                     if (vs.ValueString.Contains(thisW)) {
-                        return DoItFeedback.Wahr(line);
+                        return DoItFeedback.Wahr(infos, s);
                     }
                 } else {
                     if (vs.ValueString.ToLower().Contains(thisW.ToLower())) {
-                        return DoItFeedback.Wahr(line);
+                        return DoItFeedback.Wahr(infos, s);
                     }
                 }
             }
-            return DoItFeedback.Falsch(line);
+            return DoItFeedback.Falsch(infos, s);
         }
 
-        return DoItFeedback.FalscherDatentyp(line);
+        return DoItFeedback.FalscherDatentyp(infos, s);
     }
 
     #endregion

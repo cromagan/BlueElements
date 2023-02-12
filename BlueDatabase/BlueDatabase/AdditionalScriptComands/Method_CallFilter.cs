@@ -52,19 +52,19 @@ public class Method_CallFilter : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "callfilter" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
-        if (allFi is null || allFi.Count == 0) { return new DoItFeedback("Fehler im Filter", line); }
+        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos, s, "Fehler im Filter"); }
 
         //var db = MyDatabase(s);
-        if (allFi[0].Database == null) { return new DoItFeedback("Datenbankfehler!", line); }
+        if (allFi[0].Database == null) { return new DoItFeedback(infos, s, "Datenbankfehler!"); }
 
         var r = allFi[0].Database.Row.CalculateFilteredRows(allFi);
-        if (r == null || r.Count == 0) { return new DoItFeedback(); }
+        if (r == null || r.Count == 0) { return new DoItFeedback(infos, s); }
 
         var vs = (VariableString)attvar.Attributes[0];
 
@@ -72,16 +72,16 @@ public class Method_CallFilter : Method_Database {
             if (r != null) {
                 s.Sub++;
                 var s2 = thisR.ExecuteScript(null, vs.ValueString, false, true, s.ChangeValues, 0);
-                if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "' bei Zeile '" + thisR.CellFirstString() + "': " + s2.ErrorMessage, line); }
+                if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback(infos, s, "Subroutine '" + vs.ValueString + "' bei Zeile '" + thisR.CellFirstString() + "': " + s2.ErrorMessage); }
                 s.Sub--;
             }
         }
 
-        if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler", line); }
+        if (s.Sub < 0) { return new DoItFeedback(infos, s, "Subroutinen-Fehler"); }
 
         s.BreakFired = false;
 
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s);
     }
 
     #endregion

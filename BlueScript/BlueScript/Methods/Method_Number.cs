@@ -43,20 +43,20 @@ internal class Method_Number : Method {
 
     public override List<string> Comand(Script? s) => new() { "number" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
-        if (attvar.Attributes[0] is VariableFloat vf) { return new DoItFeedback(vf.ValueNum, line); }
+        if (attvar.Attributes[0] is VariableFloat vf) { return new DoItFeedback(infos, s, vf.ValueNum); }
 
         if (attvar.Attributes[0] is VariableString vs) {
             if (Converter.DoubleTryParse(vs.ValueString, out var dbl)) {
-                return new DoItFeedback(dbl, line);
+                return new DoItFeedback(infos, s, dbl);
             }
-            //return new DoItFeedback("'" + vs.ValueString + "' kann nicht als Zahl interpretiert werden.");
+            //return new DoItFeedback(infos, s, "'" + vs.ValueString + "' kann nicht als Zahl interpretiert werden.");
         }
 
-        return new DoItFeedback(attvar.Attributes[1], line);
+        return new DoItFeedback(infos, s, attvar.Attributes[1]);
     }
 
     #endregion

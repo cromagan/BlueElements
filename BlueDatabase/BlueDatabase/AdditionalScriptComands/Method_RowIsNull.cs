@@ -48,15 +48,15 @@ public class Method_RowIsNull : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "rowisnull" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
-        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback("Kein Zeilenobjekt übergeben.", line); }
+        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback(infos, s, "Kein Zeilenobjekt übergeben."); }
 
         //var r = Method_Row.ObjectToRow(attvar.Attributes[0]);
 
-        return vr.RowItem == null ? DoItFeedback.Wahr(line) : DoItFeedback.Falsch(line);
+        return vr.RowItem == null ? DoItFeedback.Wahr(infos, s) : DoItFeedback.Falsch(infos, s);
     }
 
     #endregion

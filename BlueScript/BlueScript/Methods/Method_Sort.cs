@@ -48,11 +48,11 @@ internal class Method_Sort : Method {
 
     public override List<string> Comand(Script? s) => new() { "sort" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos, s); }
 
         var x = ((VariableListString)attvar.Attributes[0]).ValueList;
         if (((VariableBool)attvar.Attributes[1]).ValueBool) {
@@ -61,7 +61,7 @@ internal class Method_Sort : Method {
             x.Sort();
         }
         ((VariableListString)attvar.Attributes[0]).ValueList = x;
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s );
     }
 
     #endregion

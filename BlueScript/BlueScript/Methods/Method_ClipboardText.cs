@@ -43,16 +43,16 @@ internal class Method_ClipboardText : Method {
 
     public override List<string> Comand(Script? s) => new() { "clipboardtext" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(this, attvar, line);
+            return DoItFeedback.AttributFehler(infos, s, this, attvar);
         }
 
         if (Clipboard.ContainsText()) {
-            return new DoItFeedback(Clipboard.GetText(), string.Empty, line);
+            return new DoItFeedback(infos, s, Clipboard.GetText(), string.Empty);
         }
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s );
     }
 
     #endregion

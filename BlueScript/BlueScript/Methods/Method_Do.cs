@@ -42,21 +42,21 @@ internal class Method_Do : Method {
 
     public override List<string> Comand(Script? s) => new() { "do" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var du = 0;
         s.Schleife++;
         do {
             du++;
-            if (du > 100000) { return new DoItFeedback("Do-Schleife nach 100.000 Durchläufen abgebrochen.", line); }
+            if (du > 100000) { return new DoItFeedback(infos, s, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
             var tmpv = new List<Variable>();
             tmpv.AddRange(s.Variables);
 
-            var scx = s.Parse(infos.CodeBlockAfterText, line);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(scx.ErrorMessage, scx.LastlineNo); }
+            var scx = s.Parse(infos.CodeBlockAfterText, infos.Line-1);
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback( scx.ErrorMessage, scx.LastlineNo); }
 
             s.Variables.Clear();
             s.Variables.AddRange(tmpv);
@@ -66,12 +66,12 @@ internal class Method_Do : Method {
 
         s.Schleife--;
 
-        if (s.Schleife < 0) { return new DoItFeedback("Schleifenfehler", line); }
+        if (s.Schleife < 0) { return new DoItFeedback(infos, s, "Schleifenfehler"); }
 
         s.BreakFired = false;
 
         //linex = tmpline + infos.LineBreakInCodeBlock;
-        return DoItFeedback.Null(line + infos.CodeBlockLines());
+        return DoItFeedback.Null(infos, s);
     }
 
     #endregion

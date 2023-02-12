@@ -45,18 +45,18 @@ internal class Method_GetFiles : Method {
 
     public override List<string> Comand(Script? s) => new() { "getfiles" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var pf = ((VariableString)attvar.Attributes[0]).ValueString;
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback("Verzeichnis existiert nicht", line);
+            return new DoItFeedback(infos, s, "Verzeichnis existiert nicht");
         }
 
-        return new DoItFeedback(Directory.GetFiles(pf, ((VariableString)attvar.Attributes[1]).ValueString), line);
+        return new DoItFeedback(infos, s, Directory.GetFiles(pf, ((VariableString)attvar.Attributes[1]).ValueString));
     }
 
     #endregion

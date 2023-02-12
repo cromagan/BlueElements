@@ -42,21 +42,21 @@ internal class Method_EndsWith : Method {
 
     public override List<string> Comand(Script? s) => new() { "endswith" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (((VariableBool)attvar.Attributes[1]).ValueBool) {
                 if (((VariableString)attvar.Attributes[0]).ValueString.EndsWith(((VariableString)attvar.Attributes[z]).ValueString)) {
-                    return DoItFeedback.Wahr(line);
+                    return DoItFeedback.Wahr(infos, s);
                 }
             } else {
                 if (((VariableString)attvar.Attributes[0]).ValueString.ToLower().EndsWith(((VariableString)attvar.Attributes[z]).ValueString.ToLower())) {
-                    return DoItFeedback.Wahr(line);
+                    return DoItFeedback.Wahr(infos, s);
                 }
             }
         }
-        return DoItFeedback.Falsch(line);
+        return DoItFeedback.Falsch(infos, s);
     }
 
     #endregion

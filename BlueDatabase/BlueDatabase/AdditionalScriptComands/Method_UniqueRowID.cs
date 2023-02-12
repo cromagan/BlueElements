@@ -49,11 +49,11 @@ public class Method_UniqueRowID : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "uniquerowid" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(this, attvar, line)
-            : new DoItFeedback(RowCollection.UniqueKeyValue(), string.Empty, line);
+            ? DoItFeedback.AttributFehler(infos, s, this, attvar)
+            : new DoItFeedback(infos, s, RowCollection.UniqueKeyValue(), string.Empty);
     }
 
     #endregion

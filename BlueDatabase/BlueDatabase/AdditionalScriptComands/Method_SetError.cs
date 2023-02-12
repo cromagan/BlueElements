@@ -48,18 +48,18 @@ public class Method_SetError : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "seterror" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var see = s.Variables.GetSystem("SetErrorEnabled");
 
-        if (see is not VariableBool seet) { return new DoItFeedback("SetErrorEnabled Variable nicht gefunden", line); }
-        if (!seet.ValueBool) { return new DoItFeedback("'SetError' nur bei FehlerCheck Routinen erlaubt.", line); }
+        if (see is not VariableBool seet) { return new DoItFeedback(infos, s, "SetErrorEnabled Variable nicht gefunden"); }
+        if (!seet.ValueBool) { return new DoItFeedback(infos, s, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(s, attvar.Attributes[z].Name);
-            if (column == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Attributes[z].Name, line); }
+            if (column == null) { return new DoItFeedback(infos, s, "Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
 
             MyDatabase(s)?.Row.LastCheckedRowFeedback.Add(attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString);
 
@@ -76,7 +76,7 @@ public class Method_SetError : Method_Database {
             //ve.Readonly = true;
         }
 
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s );
     }
 
     #endregion

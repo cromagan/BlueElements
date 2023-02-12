@@ -51,22 +51,22 @@ public class Method_CallRow : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "callrow" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
 
         if (row == null) {
-            return new DoItFeedback("Zeile nicht gefunden", line);
+            return new DoItFeedback(infos, s, "Zeile nicht gefunden");
         }
 
         var vs = (VariableString)attvar.Attributes[0];
         s.Sub++;
         var s2 = row.ExecuteScript(null, vs.ValueString, false, false, s.ChangeValues, 0);
-        if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback("Subroutine '" + vs.ValueString + "': " + s2.ErrorMessage, line); }
+        if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback(infos, s, "Subroutine '" + vs.ValueString + "': " + s2.ErrorMessage); }
         s.Sub--;
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s );
     }
 
     #endregion

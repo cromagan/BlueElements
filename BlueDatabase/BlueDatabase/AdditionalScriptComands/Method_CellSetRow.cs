@@ -49,22 +49,22 @@ public class Method_CellSetRow : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "cellsetrow" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
-        if (row?.Database is null || row.Database.IsDisposed) { return new DoItFeedback("Fehler in der Zeile", line); }
+        if (row?.Database is null || row.Database.IsDisposed) { return new DoItFeedback(infos, s, "Fehler in der Zeile"); }
 
         var columnToSet = row.Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString, line); }
+        if (columnToSet == null) { return new DoItFeedback(infos, s, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString); }
 
-        if (row?.Database?.ReadOnly ?? true) { return new DoItFeedback("Datenbank schreibgeschützt.", line); }
-        if (!s.ChangeValues) { return new DoItFeedback("Zellen setzen Testmodus deaktiviert.", line); }
+        if (row?.Database?.ReadOnly ?? true) { return new DoItFeedback(infos, s, "Datenbank schreibgeschützt."); }
+        if (!s.ChangeValues) { return new DoItFeedback(infos, s, "Zellen setzen Testmodus deaktiviert."); }
 
         row.CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-        return row.CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr(line) : DoItFeedback.Falsch(line);
+        return row.CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr(infos, s) : DoItFeedback.Falsch(infos, s);
     }
 
     #endregion

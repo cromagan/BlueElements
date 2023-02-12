@@ -43,46 +43,46 @@ internal class Method_SetIfHasValue : Method {
 
     public override List<string> Comand(Script? s) => new() { "SetIfHasValue" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos, s); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableUnknown) { continue; }
-            if (attvar.Attributes[z].MyClassId != attvar.Attributes[0].MyClassId) { return new DoItFeedback("Variablentyp zur Ausgangsvariable unterschiedlich.", line); }
+            if (attvar.Attributes[z].MyClassId != attvar.Attributes[0].MyClassId) { return new DoItFeedback(infos, s, "Variablentyp zur Ausgangsvariable unterschiedlich."); }
 
             switch (attvar.Attributes[z]) {
                 case VariableFloat vf:
                     if (vf.ValueNum != 0) {
                         ((VariableFloat)attvar.Attributes[0]).ValueNum = vf.ValueNum;
-                        return DoItFeedback.Null(line);
+                        return DoItFeedback.Null(infos, s );
                     }
                     break;
 
                 case VariableString vs:
                     if (!string.IsNullOrEmpty(vs.ValueString)) {
                         ((VariableString)attvar.Attributes[0]).ValueString = vs.ValueString;
-                        return DoItFeedback.Null(line);
+                        return DoItFeedback.Null(infos, s );
                     }
                     break;
 
                 case VariableBool vs:
 
                     ((VariableBool)attvar.Attributes[0]).ValueBool = vs.ValueBool;
-                    return DoItFeedback.Null(line);
+                    return DoItFeedback.Null(infos, s );
 
                 case VariableListString vl:
                     if (vl.ValueList != null) {
                         ((VariableListString)attvar.Attributes[0]).ValueList = vl.ValueList;
-                        return DoItFeedback.Null(line);
+                        return DoItFeedback.Null(infos, s );
                     }
                     break;
             }
         }
 
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s );
     }
 
     #endregion

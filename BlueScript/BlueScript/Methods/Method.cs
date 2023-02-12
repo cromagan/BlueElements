@@ -93,7 +93,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return (s, string.Empty);
     }
 
-    public static GetEndFeedback ReplaceComands(string txt, Script s, int line) {
+    public static GetEndFeedback ReplaceComands(string txt, Script s) {
         if (Script.Comands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert"); }
 
         List<string> c = new();
@@ -106,7 +106,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         do {
             var (pos, _) = NextText(txt, posc, c, true, false, KlammernStd);
             if (pos < 0) { return new GetEndFeedback(0, txt); }
-            var f = Script.ComandOnPosition(txt, pos, s, true, line);
+            var f = Script.ComandOnPosition(txt, pos, s, true);
             if (!string.IsNullOrEmpty(f.ErrorMessage)) { return new GetEndFeedback(f.ErrorMessage); }
 
             if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
@@ -185,22 +185,22 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return attributes;
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<List<string>> types, bool endlessArgs, int line) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<List<string>> types, bool endlessArgs) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributtext)
-                ? new SplittedAttributesFeedback(new List<Variable>(), line)
-                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.", line);
+                ? new SplittedAttributesFeedback(new List<Variable>())
+                : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
         }
 
         var attributes = SplitAttributeToString(attributtext);
-        if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler.", line); }
-        if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten.", line); }
-        if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten.", line); }
+        if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler."); }
+        if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
+        if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
         //  Variablen und Routinen ersetzen
         List<Variable> feedbackVariables = new();
         for (var n = 0; n < attributes.Count; n++) {
-            var lb = attributes[n].Count(c => c == '¶'); // Zeilenzähler weitersetzen
+            //var lb = attributes[n].Count(c => c == '¶'); // Zeilenzähler weitersetzen
             attributes[n] = attributes[n].RemoveChars("¶"); // Zeilenzähler entfernen
 
             var exceptetType = n < types.Count ? types[n] : types[types.Count - 1]; // Bei Endlessargs den letzten nehmen
@@ -218,13 +218,13 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
                 //    varn = x.ValueString;
                 //}
 
-                if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1), line); }
+                if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
 
                 if (s != null) { v = s.Variables.Get(varn); }
-                if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), line); }
+                if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
             } else {
-                var tmp2 = Variable.GetVariableByParsing(attributes[n], s, line);
-                if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1) + "\r\n" + " - " + tmp2.ErrorMessage, line); }
+                var tmp2 = Variable.GetVariableByParsing(attributes[n], s);
+                if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1) + "\r\n" + " - " + tmp2.ErrorMessage); }
                 v = tmp2.Variable;
             }
 
@@ -236,13 +236,13 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
                 if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
             }
 
-            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId, line); }
+            if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId); }
 
             feedbackVariables.Add(v);
 
-            if (s != null) { line += lb; }
+            //if (s != null) { line += lb; }
         }
-        return new SplittedAttributesFeedback(feedbackVariables, line);
+        return new SplittedAttributesFeedback(feedbackVariables);
     }
 
     public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s, int line) {
@@ -280,7 +280,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     public abstract List<string> Comand(Script? s);
 
-    public abstract DoItFeedback DoIt(CanDoFeedback infos, Script s, int line);
+    public abstract DoItFeedback DoIt(CanDoFeedback infos, Script s);
 
     public string HintText() {
         var co = "Syntax:\r\n";

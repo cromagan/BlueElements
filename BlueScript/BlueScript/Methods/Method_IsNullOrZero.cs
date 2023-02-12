@@ -43,29 +43,29 @@ internal class Method_IsNullOrZero : Method {
 
     public override List<string> Comand(Script? s) => new() { "isnullorzero" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-                return DoItFeedback.AttributFehler(this, attvar, line);
+                return DoItFeedback.AttributFehler(infos, s, this, attvar);
             }
 
-            return DoItFeedback.Wahr(line);
+            return DoItFeedback.Wahr(infos, s);
         }
 
-        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(line); }
-        if (attvar.Attributes[0] is VariableUnknown) { return DoItFeedback.Wahr(line); }
+        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(infos, s); }
+        if (attvar.Attributes[0] is VariableUnknown) { return DoItFeedback.Wahr(infos, s); }
 
         if (attvar.Attributes[0] is VariableFloat f) {
-            if (f.ValueNum == 0) { return DoItFeedback.Wahr(line); }
+            if (f.ValueNum == 0) { return DoItFeedback.Wahr(infos, s); }
 
-            return DoItFeedback.Falsch(line);
+            return DoItFeedback.Falsch(infos, s);
         }
-        return new DoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.", line);
+        return new DoItFeedback(infos, s, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
         //if (attvar.Attributes == null) {
         //    if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-        //        return DoItFeedback.AttributFehler(this, attvar, line);
+        //        return DoItFeedback.AttributFehler(infos, s, this, attvar, line);
         //    } else {
         //        return DoItFeedback.Wahr(line);
         //    }
@@ -78,7 +78,7 @@ internal class Method_IsNullOrZero : Method {
         //            return DoItFeedback.Wahr(line);
         //        } else {
         //            if (attvar.Attributes[0] is not VariableFloat) {
-        //                return new DoItFeedback("Variable existiert, ist aber nicht vom Datentyp Numeral.");
+        //                return new DoItFeedback(infos, s, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
         //            } else {
         //                if (((VariableFloat)attvar.Attributes[0]).ValueNum == 0) {
         //                    return DoItFeedback.Wahr(line);

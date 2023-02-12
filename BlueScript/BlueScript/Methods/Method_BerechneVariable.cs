@@ -55,38 +55,38 @@ internal class Method_BerechneVariable : Method {
     /// <param name="s"></param>
     /// <param name="generateVariable"></param>
     /// <returns></returns>
-    public static DoItFeedback VariablenBerechnung(string newcommand, Script s, bool generateVariable, int line) {
-        //if (s.BerechneVariable == null) { return new DoItFeedback("Interner Fehler"); }
+    public static DoItFeedback VariablenBerechnung(CanDoFeedback infos, string newcommand, Script s, bool generateVariable) {
+        //if (s.BerechneVariable == null) { return new DoItFeedback(infos, s, "Interner Fehler"); }
 
         var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
 
-        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback("Fehler mit = - Zeichen", line); }
+        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback(infos, s, "Fehler mit = - Zeichen"); }
 
         var varnam = newcommand.Substring(0, pos);
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", line); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos, s, varnam + " ist kein gültiger Variablen-Name"); }
 
         var v = s.Variables.Get(varnam);
         if (generateVariable && v != null) {
-            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", line);
+            return new DoItFeedback(infos, s, "Variable " + varnam + " ist bereits vorhanden.");
         }
         if (!generateVariable && v == null) {
-            return new DoItFeedback("Variable " + varnam + " nicht vorhanden.", line);
+            return new DoItFeedback(infos, s, "Variable " + varnam + " nicht vorhanden.");
         }
 
         var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
 
-        var attvar = SplitAttributeToVars(value, s, _args, SEndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(new Method_BerechneVariable(), attvar, line); }
+        var attvar = SplitAttributeToVars(value, s, _args, SEndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(null, s, new Method_BerechneVariable(), attvar); }
 
         if (generateVariable) {
             attvar.Attributes[0].KeyName = varnam.ToLower();
             attvar.Attributes[0].ReadOnly = false;
             s.Variables.Add(attvar.Attributes[0]);
-            return new DoItFeedback(attvar.Attributes[0], line);
+            return new DoItFeedback(infos, s, attvar.Attributes[0]);
         }
 
-        return v.GetValueFrom(attvar.Attributes[0], line);
+        return v.GetValueFrom(attvar.Attributes[0]);
     }
 
     public override List<string> Comand(Script? s) => s == null ? new List<string>() : s.Variables.AllNames();
@@ -98,7 +98,7 @@ internal class Method_BerechneVariable : Method {
     /// <param name="infos"></param>
     /// <param name="s"></param>
     /// <returns></returns>
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) => VariablenBerechnung(infos.ComandText + infos.AttributText + ";", s, false, line);
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) => VariablenBerechnung(infos, infos.ComandText + infos.AttributText + ";", s, false);
 
     #endregion
 }

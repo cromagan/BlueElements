@@ -70,11 +70,11 @@ public class VariableRowItem : Variable {
         return v;
     }
 
-    public override DoItFeedback GetValueFrom(Variable variable, int line) {
-        if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(this, variable, line); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(line); }
+    public override DoItFeedback GetValueFrom(Variable variable) {
+        if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(null, null, this, variable); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null, null); }
         RowItem = v.RowItem;
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(null, null);
     }
 
     protected override Variable? NewWithThisValue(object x, Script s) => null;

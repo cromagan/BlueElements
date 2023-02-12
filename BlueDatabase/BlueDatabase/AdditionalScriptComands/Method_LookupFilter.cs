@@ -51,43 +51,43 @@ public class Method_LookupFilter : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "lookupfilter" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3);
 
-        if (allFi is null) { return new DoItFeedback("Fehler im Filter", line); }
+        if (allFi is null) { return new DoItFeedback(infos, s, "Fehler im Filter"); }
 
         var returncolumn = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[0]).ValueString);
-        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString, line); }
+        if (returncolumn == null) { return new DoItFeedback(infos, s, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString); }
 
         var l = new List<string>();
 
         var r = RowCollection.MatchesTo(allFi);
         if (r.Count == 0) {
             l.Add(((VariableString)attvar.Attributes[1]).ValueString);
-            return new DoItFeedback(l, line);
+            return new DoItFeedback(infos, s, l);
         }
         if (r.Count > 1) {
             l.Add(((VariableString)attvar.Attributes[2]).ValueString);
-            return new DoItFeedback(l, line);
+            return new DoItFeedback(infos, s, l);
         }
 
         var v = RowItem.CellToVariable(returncolumn, r[0]);
-        if (v == null || v.Count != 1) { return new DoItFeedback("Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[4]).ValueString, line); }
+        if (v == null || v.Count != 1) { return new DoItFeedback(infos, s, "Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
 
         if (v[0] is VariableListString vl) {
             l.AddRange(vl.ValueList);
         } else if (v[0] is VariableString vs) {
             l.Add(vs.ValueString);
         } else {
-            return new DoItFeedback("Spaltentyp nicht unterstützt.", line);
+            return new DoItFeedback(infos, s, "Spaltentyp nicht unterstützt.");
         }
 
         //  l.GenerateAndAdd(((VariableString)attvar.Attributes[2]).ValueString);
 
-        return new DoItFeedback(l, line);
+        return new DoItFeedback(infos, s, l);
     }
 
     #endregion

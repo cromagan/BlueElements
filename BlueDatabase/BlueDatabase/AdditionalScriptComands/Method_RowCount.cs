@@ -46,20 +46,18 @@ public class Method_RowCount : Method_Database {
 
     #region Methods
 
-    public static DoItFeedback RowToObjectFeedback(RowItem? row, int line) => new(new VariableRowItem(row), line);
-
     public override List<string> Comand(Script? s) => new() { "rowcount" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-        if (allFi is null) { return new DoItFeedback("Fehler im Filter", line); }
+        if (allFi is null) { return new DoItFeedback(infos, s, "Fehler im Filter"); }
 
         var r = RowCollection.MatchesTo(allFi);
 
-        return new DoItFeedback(r.Count);
+        return new DoItFeedback(infos, s);
     }
 
     #endregion

@@ -49,9 +49,9 @@ internal class Method_CallByFilename : Method {
 
     public override List<string> Comand(Script? s) => new() { "callbyfilename" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
 
         var vs = (VariableString)attvar.Attributes[0];
         string f;
@@ -62,10 +62,10 @@ internal class Method_CallByFilename : Method {
             } else if (FileExists(s.AdditionalFilesPath + vs.ValueString)) {
                 f = File.ReadAllText(s.AdditionalFilesPath + vs.ValueString, Encoding.UTF8);
             } else {
-                return new DoItFeedback("Datei nicht gefunden: " + vs.ValueString, line);
+                return new DoItFeedback(infos, s, "Datei nicht gefunden: " + vs.ValueString);
             }
         } catch {
-            return new DoItFeedback("Fehler beim Lesen der Datei: " + vs.ValueString, line);
+            return new DoItFeedback(infos, s, "Fehler beim Lesen der Datei: " + vs.ValueString);
         }
 
         f = Script.ReduceText(f);
@@ -77,26 +77,26 @@ internal class Method_CallByFilename : Method {
         s.Sub++;
 
         if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-            var scx = s.Parse(f, 1);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + scx.ErrorMessage, line); }
+            var scx = s.Parse(f, 0);
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(infos, s, "Subroutine " + vs.ValueString + ": " + scx.ErrorMessage); }
         } else {
             var tmpv = new List<Variable>();
             tmpv.AddRange(s.Variables);
 
-            var scx = s.Parse(f, 1);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback("Subroutine " + vs.ValueString + ": " + scx.ErrorMessage, line); }
+            var scx = s.Parse(f, 0);
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(infos, s, "Subroutine " + vs.ValueString + ": " + scx.ErrorMessage); }
 
             s.Variables.Clear();
             s.Variables.AddRange(tmpv);
         }
         s.Sub--;
 
-        if (s.Sub < 0) { return new DoItFeedback("Subroutinen-Fehler", line); }
+        if (s.Sub < 0) { return new DoItFeedback(infos, s, "Subroutinen-Fehler"); }
 
         //s.Line = weiterLine;
         s.BreakFired = false;
 
-        return DoItFeedback.Null(line);
+        return DoItFeedback.Null(infos, s);
     }
 
     #endregion
