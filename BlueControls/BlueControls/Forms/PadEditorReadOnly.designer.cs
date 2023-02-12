@@ -40,7 +40,6 @@ namespace BlueControls.Forms {
             this.btnAlsBildSpeichern = new Button();
             this.btnDruckerDialog = new Button();
             this.tabSeiten = new TabControl();
-            this.capStatusBar = new Caption();
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
@@ -275,21 +274,12 @@ namespace BlueControls.Forms {
             this.tabSeiten.TabIndex = 3;
             this.tabSeiten.Selected += new TabControlEventHandler(this.tabSeiten_Selected);
             // 
-            // capStatusBar
-            // 
-            this.capStatusBar.CausesValidation = false;
-            this.capStatusBar.Dock = DockStyle.Bottom;
-            this.capStatusBar.Location = new Point(0, 336);
-            this.capStatusBar.Name = "capStatusBar";
-            this.capStatusBar.Size = new Size(884, 25);
-            // 
             // PadEditorReadOnly
             // 
             this.ClientSize = new Size(884, 361);
             this.Controls.Add(this.Pad);
             this.Controls.Add(this.tabSeiten);
             this.Controls.Add(this.Ribbon);
-            this.Controls.Add(this.capStatusBar);
             this.Name = "PadEditorReadOnly";
             this.StartPosition = FormStartPosition.Manual;
             this.Text = "(c) Christian Peter";
@@ -320,6 +310,5 @@ namespace BlueControls.Forms {
         private Button btnPageSetup;
         protected Button btnVorschauModus;
         protected TabControl tabSeiten;
-        private Caption capStatusBar;
     }
 }

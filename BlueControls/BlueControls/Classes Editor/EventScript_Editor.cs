@@ -89,10 +89,10 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
         scriptEditor.IsRowScript = data.NeedRow;
         chkZeile.Checked = data.NeedRow;
         scriptEditor.ScriptText = data.Script;
-        chkAuslöser_newrow.Checked = data.Events.HasFlag(BlueDatabase.Enums.Events.new_row);
-        chkAuslöser_valuechanged.Checked = data.Events.HasFlag(BlueDatabase.Enums.Events.value_changed);
-        chkAuslöser_errorcheck.Checked = data.Events.HasFlag(BlueDatabase.Enums.Events.error_check);
-
+        chkAuslöser_newrow.Checked = data.EventTypes.HasFlag(EventTypes.new_row);
+        chkAuslöser_valuechanged.Checked = data.EventTypes.HasFlag(EventTypes.value_changed);
+        chkAuslöser_errorcheck.Checked = data.EventTypes.HasFlag(EventTypes.error_check);
+        scriptEditor.EventTypes = data.EventTypes;
         chkExternVerfügbar.Checked = data.ManualExecutable;
         chkAendertWerte.Checked = data.ChangeValues;
     }
@@ -102,11 +102,11 @@ internal sealed partial class EventScript_Editor : AbstractClassEditor<EventScri
     private void CheckEvents() {
         if (Item == null) { return; }
 
-        Events tmp = 0;
-        if (chkAuslöser_newrow.Checked) { tmp |= BlueDatabase.Enums.Events.new_row; }
-        if (chkAuslöser_valuechanged.Checked) { tmp |= BlueDatabase.Enums.Events.value_changed; }
-        if (chkAuslöser_errorcheck.Checked) { tmp |= BlueDatabase.Enums.Events.error_check; }
-        Item.Events = tmp;
+        EventTypes tmp = 0;
+        if (chkAuslöser_newrow.Checked) { tmp |= EventTypes.new_row; }
+        if (chkAuslöser_valuechanged.Checked) { tmp |= EventTypes.value_changed; }
+        if (chkAuslöser_errorcheck.Checked) { tmp |= EventTypes.error_check; }
+        Item.EventTypes = tmp;
     }
 
     private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {

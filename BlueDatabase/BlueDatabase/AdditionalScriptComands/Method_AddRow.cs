@@ -25,7 +25,7 @@ using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_AddRow : MethodDatabase {
+public class Method_AddRow : Method_Database {
 
     #region Properties
 

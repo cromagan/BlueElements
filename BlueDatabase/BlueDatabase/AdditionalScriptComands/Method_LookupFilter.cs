@@ -24,7 +24,7 @@ using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_LookupFilter : MethodDatabase {
+public class Method_LookupFilter : Method_Database {
 
     #region Properties
 

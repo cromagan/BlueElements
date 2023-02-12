@@ -106,15 +106,6 @@ public sealed partial class DatabaseHeadEditor {
 
         #endregion
 
-        #region Event Scripte
-
-        lstEventScripts.Item.Clear();
-        foreach (var thisSet in _database.EventScript.Where(thisSet => thisSet != null)) {
-            _ = lstEventScripts.Item.Add((EventScript)thisSet.Clone());
-        }
-
-        #endregion
-
         txbCaption.Text = _database.Caption;
         txbGlobalScale.Text = _database.GlobalScale.ToString(Constants.Format_Float1);
         txbAdditionalFiles.Text = _database.AdditionalFilesPfad;
@@ -132,10 +123,6 @@ public sealed partial class DatabaseHeadEditor {
         lbxSortierSpalten.Suggestions.AddRange(_database.Column, false);
 
         GenerateInfoText();
-    }
-
-    protected override void OnShown(System.EventArgs e) {
-        variableEditor.WriteVariablesToTable(_database?.Variables);
     }
 
     private void AddUndoToTable(WorkItem work, int index, string db, bool checkNeeded) {
@@ -323,9 +310,6 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void GlobalTab_Selecting(object sender, TabControlCancelEventArgs e) {
-        if (e.TabPage == tabScripts) {
-            eventScriptEditor.Database = _database;
-        }
         if (e.TabPage == tabUndo) {
             if (tblUndo.Database == null) { GenerateUndoTabelle(); }
         }
@@ -347,37 +331,6 @@ public sealed partial class DatabaseHeadEditor {
         }
         var selectedExport = (ExportDefinition)((ReadableListItem)lbxExportSets.Item.Checked()[0]).Item;
         ExportEditor.Item = selectedExport;
-    }
-
-    //private void lbxExportSets_RemoveClicked(object sender, ListOfBasicListItemEventArgs e) {
-    //    foreach (var thisitem in e.Items) {
-    //        if (thisitem is BasicListItem thisItemBasic) {
-    //            var tempVar = (ExportDefinition)((TextListItem)thisItemBasic).Tag;
-    //            tempVar.DeleteAllBackups();
-    //        }
-    //    }
-    //}
-
-    private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
-        if (_database == null || _database.IsDisposed) { return; }
-
-        var newScriptItem = lstEventScripts.Item.Add(new EventScript(_database));
-        newScriptItem.Checked = true;
-    }
-
-    private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (lstEventScripts.Item.Checked().Count != 1) {
-            eventScriptEditor.Item = null;
-            return;
-        }
-        if (_database == null || _database.IsDisposed || _database.ReadOnly) {
-            eventScriptEditor.Item = null;
-            return;
-        }
-        var selectedlstEventScripts = (EventScript)((ReadableListItem)lstEventScripts.Item.Checked()[0]).Item;
-        eventScriptEditor.Item = selectedlstEventScripts;
-
-        WriteInfosBack();
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
@@ -451,24 +404,6 @@ public sealed partial class DatabaseHeadEditor {
         _database.Export = new(t);
 
         #endregion
-
-        #region  Import
-
-        var t2 = new List<EventScript?>();
-        t2.AddRange(lstEventScripts.Item.Select(thisItem => (EventScript)((ReadableListItem)thisItem).Item));
-        _database.EventScript = new(t2);
-
-        #endregion
-
-        var l = variableEditor.GetVariables();
-        var l2 = new List<VariableString>();
-        foreach (var thisv in l) {
-            if (thisv is VariableString vs) {
-                l2.Add(vs);
-            }
-        }
-
-        _database.Variables = new ReadOnlyCollection<VariableString>(l2);
     }
 
     #endregion

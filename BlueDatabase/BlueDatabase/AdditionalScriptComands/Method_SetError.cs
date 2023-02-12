@@ -24,7 +24,7 @@ using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_SetError : MethodDatabase {
+public class Method_SetError : Method_Database {
 
     #region Properties
 
@@ -51,6 +51,11 @@ public class Method_SetError : MethodDatabase {
     public override DoItFeedback DoIt(CanDoFeedback infos, Script s, int line) {
         var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs, line);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(this, attvar, line); }
+
+        var see = s.Variables.GetSystem("SetErrorEnabled");
+
+        if (see is not VariableBool seet) { return new DoItFeedback("SetErrorEnabled Variable nicht gefunden", line); }
+        if (!seet.ValueBool) { return new DoItFeedback("'SetError' nur bei FehlerCheck Routinen erlaubt.", line); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(s, attvar.Attributes[z].Name);

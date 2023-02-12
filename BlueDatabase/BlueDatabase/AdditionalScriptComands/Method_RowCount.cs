@@ -24,7 +24,7 @@ using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_RowCount : MethodDatabase {
+public class Method_RowCount : Method_Database {
 
     #region Properties
 

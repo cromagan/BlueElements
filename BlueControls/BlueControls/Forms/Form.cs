@@ -119,51 +119,6 @@ public partial class Form : System.Windows.Forms.Form {
         // NIX TUN!!!!
     }
 
-    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox, Caption capStatusbar, bool dropMessages) {
-        if (IsDisposed) { return false; }
-        if (capStatusbar == null || capStatusbar.IsDisposed) { return false; }
-
-        try {
-            if (InvokeRequired) {
-                return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, message, didAlreadyMessagebox, capStatusbar, dropMessages)));
-            }
-
-            var imagecode = ImageCode.Information;
-
-            if (string.IsNullOrEmpty(message)) {
-                capStatusbar.Text = string.Empty;
-                capStatusbar.Refresh();
-                return false;
-            }
-
-            message = message.Replace("\r\n", "; ");
-            message = message.Replace("\r", "; ");
-            message = message.Replace("\n", "; ");
-            message = message.Replace("<BR>", "; ", RegexOptions.IgnoreCase);
-            message = message.Replace("; ; ", "; ");
-            message = message.TrimEnd("; ");
-
-            if (type == FehlerArt.Warnung) { imagecode = ImageCode.Warnung; }
-            if (type == FehlerArt.Fehler) { imagecode = ImageCode.Kritisch; }
-
-            if (type == FehlerArt.Info || type == FehlerArt.DevelopInfo || !dropMessages || didAlreadyMessagebox) {
-                capStatusbar.Text = "<imagecode=" + QuickImage.Get(imagecode, 16) + "> " + message;
-                capStatusbar.Refresh();
-                return false;
-            }
-
-            if (dropMessages) {
-                Develop.DebugPrint(FehlerArt.Warnung, message);
-                MessageBox.Show(message, imagecode, "Ok");
-                return true;
-            }
-
-            return false;
-        } catch {
-            return false;
-        }
-    }
-
     //MyBase.ScaleChildren
     protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
 

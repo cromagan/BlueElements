@@ -77,7 +77,7 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdditionalScriptComands\MethodDatabase.cs" />
+    <Compile Include="AdditionalScriptComands\Method_Database.cs" />
     <Compile Include="AdditionalScriptComands\Method_AddRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_SoftMessage.cs" />
     <Compile Include="AdditionalScriptComands\Method_Call.cs" />
@@ -104,7 +104,7 @@
     <Compile Include="DatabaseAbstract.cs" />
     <Compile Include="DatabaseMultiUser.cs" />
     <Compile Include="DatabaseSQLLite.cs" />
-    <Compile Include="Enums\Events.cs" />
+    <Compile Include="Enums\EventTypes.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="ColumnFormatHolder.cs" />
     <Compile Include="EventScript.cs" />

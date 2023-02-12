@@ -93,35 +93,11 @@ public static class Allgemein {
         //Database.DropConstructorMessage += Database_DropConstructorMessage;
     }
 
-    public static void UpdateStatusBar(string jobname, string text) {
-        if (string.IsNullOrEmpty(jobname) && string.IsNullOrEmpty(text)) {
-            UpdateStatusBar(FehlerArt.Info, string.Empty, false);
-        } else {
-            UpdateStatusBar(FehlerArt.Info, "[" + jobname + " " + DateTime.Now.ToString("HH:mm:ss") + "] " + text, false);
-        }
-    }
-
-    public static void UpdateStatusBar(FehlerArt type, string text, bool addtime) {
-        if (addtime && !string.IsNullOrEmpty(text)) {
-            text = DateTime.Now.ToString("HH:mm:ss") + " " + text;
-        }
-
-        var did = false;
-        try {
-            foreach (var thisf in FormManager.Forms) {
-                if (thisf is IHasStatusbar fd) {
-                    var x = fd.UpdateStatus(type, text, did);
-                    if (x) { did = true; }
-                }
-            }
-        } catch { }
-    }
-
     private static void AllFiles_ItemAdded(object sender, ListEventArgs e) {
         if (e.Item is DatabaseAbstract db) {
             db.GenerateLayoutInternal += DB_GenerateLayoutInternal;
             db.Loaded += TableView.CheckDatabase;
-            db.DropMessage += Db_DropMessage;
+            db.DropMessage += FormWithStatusBar.Db_DropMessage;
         }
     }
 
@@ -129,11 +105,9 @@ public static class Allgemein {
         if (e.Item is DatabaseAbstract db) {
             db.GenerateLayoutInternal -= DB_GenerateLayoutInternal;
             db.Loaded -= TableView.CheckDatabase;
-            db.DropMessage -= Db_DropMessage;
+            db.DropMessage -= FormWithStatusBar.Db_DropMessage;
         }
     }
-
-    private static void Db_DropMessage(object sender, MessageEventArgs e) => UpdateStatusBar(e.Type, e.Message, true);
 
     private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
         if (e.Handled) { return; }

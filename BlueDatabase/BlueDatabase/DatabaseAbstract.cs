@@ -824,7 +824,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             : string.Empty;
     }
 
-    public ScriptEndedFeedback ExecuteScript(string scripttext, bool changevalues, RowItem? row) {
+    public ScriptEndedFeedback ExecuteScript(string scripttext, bool changevalues, RowItem? row, bool feedbackScript) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen"); }
 
         try {
@@ -851,8 +851,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             vars.Add(new VariableString("User", UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
             vars.Add(new VariableString("Usergroup", UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
             vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-            vars.Add(new VariableDatabase("Database", this, true, true, string.Empty));
-
+            vars.Add(new VariableDatabase("Database", this, true, true, "Die Datebank, die zu dem Skript gehört"));
+            vars.Add(new VariableBool("SetErrorEnabled", feedbackScript, true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
             if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
                 vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
             }
@@ -891,11 +891,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             return scf;
         } catch {
             Develop.CheckStackForOverflow();
-            return ExecuteScript(scripttext, changevalues, row);
+            return ExecuteScript(scripttext, changevalues, row, feedbackScript);
         }
     }
 
-    public ScriptEndedFeedback ExecuteScript(Events? eventname, string? scriptname, bool changevalues, RowItem? row) {
+    public ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen"); }
 
@@ -910,7 +910,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             if (string.IsNullOrEmpty(scriptname)) {
                 foreach (var thisEvent in EventScript) {
-                    if (thisEvent != null && thisEvent.Events.HasFlag(eventname)) {
+                    if (thisEvent != null && thisEvent.EventTypes.HasFlag(eventname)) {
                         scriptname = thisEvent.Name;
                         break;
                     }
@@ -931,7 +931,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             if (!script.ChangeValues) { changevalues = false; }
 
-            return ExecuteScript(script.Script, changevalues, row);
+            return ExecuteScript(script.Script, changevalues, row, eventname == EventTypes.error_check);
         } catch {
             Develop.CheckStackForOverflow();
             return ExecuteScript(eventname, scriptname, changevalues, row);
@@ -1916,14 +1916,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         };
         _EventScript.Add(l2);
 
-        var t = typeof(Events);
+        var t = typeof(EventTypes);
 
         foreach (int z1 in Enum.GetValues(t)) {
             var ln = new EventScript(this) {
                 NeedRow = true,
                 ManualExecutable = false,
                 Name = Enum.GetName(t, z1),
-                Events = (Events)z1,
+                EventTypes = (EventTypes)z1,
                 Script = "//ACHTUNG: Keinesfalls dürfen startroutinenabhängig Werte verändert werden.\r\n" +
                          "var Startroutine = \"" + Enum.GetName(t, z1).Replace("_", " ") + "\";\r\n" +
                          "Call(\"DatenueberpruefungIntern\", false);"

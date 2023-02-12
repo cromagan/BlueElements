@@ -26,27 +26,15 @@ using BlueControls.Interfaces;
 
 namespace BlueControls.Forms;
 
-public partial class PadEditorReadOnly : Form, IHasStatusbar {
+public partial class PadEditorReadOnly : FormWithStatusBar {
 
     #region Constructors
 
-    public PadEditorReadOnly() : base() =>
-        // Dieser Aufruf ist für den Designer erforderlich.
-        InitializeComponent();
-
-    #endregion
-
-    // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-
-    #region Properties
-
-    public bool DropMessages { get; set; }
+    public PadEditorReadOnly() : base() => InitializeComponent();
 
     #endregion
 
     #region Methods
-
-    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) => base.UpdateStatus(type, message, didAlreadyMessagebox, capStatusBar, DropMessages);
 
     private void btnAlsBildSpeichern_Click(object sender, System.EventArgs e) => Pad.OpenSaveDialog(string.Empty);
 
@@ -91,7 +79,7 @@ public partial class PadEditorReadOnly : Form, IHasStatusbar {
                 }
 
                 _ = x.Remove(tb.Text);
-                if (tb.Text == Pad.CurrentPage) { later = tb; }
+                if (Pad != null && tb.Text == Pad.CurrentPage) { later = tb; }
             }
 
             foreach (var thisn in x) {
@@ -100,7 +88,7 @@ public partial class PadEditorReadOnly : Form, IHasStatusbar {
                 };
                 tabSeiten.TabPages.Add(t);
 
-                if (t.Text == Pad.CurrentPage) { later = t; }
+                if (Pad != null && t.Text == Pad.CurrentPage) { later = t; }
             }
         } else {
             tabSeiten.Visible = false;

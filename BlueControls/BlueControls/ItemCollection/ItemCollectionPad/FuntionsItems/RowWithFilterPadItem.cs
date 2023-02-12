@@ -407,7 +407,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             ManualExecutable = false,
             Script = sc,
             Name = "Main",
-            Events = Events.value_changed | Events.new_row
+            EventTypes = EventTypes.value_changed | EventTypes.new_row
         };
         eves.Add(l);
         FilterDefiniton.EventScript = new ReadOnlyCollection<EventScript>(eves);
@@ -417,7 +417,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         #region Zeilen Prüfen
 
         foreach (var thisrow in FilterDefiniton.Row) {
-            _ = thisrow.ExecuteScript(Events.new_row, string.Empty, false, false, true, 0);
+            _ = thisrow.ExecuteScript(EventTypes.new_row, string.Empty, false, false, true, 0);
         }
 
         #endregion

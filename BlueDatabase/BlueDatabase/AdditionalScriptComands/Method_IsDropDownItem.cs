@@ -26,7 +26,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-internal class Method_IsDropDownItem : MethodDatabase {
+internal class Method_IsDropDownItem : Method_Database {
 
     #region Properties
 

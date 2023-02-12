@@ -279,7 +279,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
         if (Database.Row.LastCheckedRow != Key) {
             Database.Row.LastCheckedRowFeedback.Clear();
-            ExecuteScript(Events.error_check, string.Empty, false, false, true, 0);
+            ExecuteScript(EventTypes.error_check, string.Empty, false, false, true, 0);
         }
 
         var infoTxt = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
@@ -360,7 +360,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
     /// <param name="tryforsceonds"></param>
     /// <param name="eventname"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-    public ScriptEndedFeedback ExecuteScript(Events? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
+    public ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
         var t = DateTime.Now;
         do {
@@ -525,7 +525,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         }
     }
 
-    private ScriptEndedFeedback ExecuteScript(bool doFemdZelleInvalidate, bool fullCheck, Events? eventname, bool changevalues, string scriptname) {
+    private ScriptEndedFeedback ExecuteScript(bool doFemdZelleInvalidate, bool fullCheck, EventTypes? eventname, bool changevalues, string scriptname) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist"); }
 
         var feh = Database.ErrorReason(ErrorReason.EditAcut);

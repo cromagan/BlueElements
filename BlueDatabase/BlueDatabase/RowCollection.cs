@@ -324,7 +324,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         GC.SuppressFinalize(this);
     }
 
-    public string ExecuteScript(Events? eventname, string scriptname, FilterCollection? filter, List<RowItem?>? pinned, bool fullCheck, bool changevalues) {
+    public string ExecuteScript(EventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem?>? pinned, bool fullCheck, bool changevalues) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
 
         var rows = CalculateVisibleRows(filter, pinned);
@@ -394,7 +394,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         }
 
         if (runScriptOfNewRow) {
-            _ = item.ExecuteScript(Events.new_row, string.Empty, false, false, true, 1);
+            _ = item.ExecuteScript(EventTypes.new_row, string.Empty, false, false, true, 1);
         }
 
         return item;
@@ -434,7 +434,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
             row.CellSet(thisfi.Column, thisfi.SearchValue);
         }
 
-        _ = row.ExecuteScript(Events.new_row, string.Empty, false, false, true, 1);
+        _ = row.ExecuteScript(EventTypes.new_row, string.Empty, false, false, true, 1);
 
         return row;
     }

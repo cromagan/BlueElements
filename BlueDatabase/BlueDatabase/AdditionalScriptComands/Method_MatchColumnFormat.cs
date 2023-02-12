@@ -27,7 +27,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-internal class Method_MatchColumnFormat : MethodDatabase {
+internal class Method_MatchColumnFormat : Method_Database {
 
     #region Properties
 

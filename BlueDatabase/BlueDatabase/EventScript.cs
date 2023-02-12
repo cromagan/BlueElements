@@ -19,10 +19,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -32,7 +34,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
     #region Fields
 
     private bool _changeValues;
-    private Events _events = 0;
+    private EventTypes _eventTypes = 0;
     private bool _executable;
 
     //private string _lastUsed;
@@ -96,11 +98,11 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
 
     public DatabaseAbstract? Database { get; private set; }
 
-    public Events Events {
-        get => _events;
+    public EventTypes EventTypes {
+        get => _eventTypes;
         set {
-            if (_events == value) { return; }
-            _events = value;
+            if (_eventTypes == value) { return; }
+            _eventTypes = value;
             OnChanged();
         }
     }
@@ -162,13 +164,13 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
     public string ErrorReason() {
         if (Database?.IsDisposed ?? true) { return "Datenbank verworfen"; }
 
-        if (string.IsNullOrEmpty(_script)) {
-            return "Kein Skript angegeben.";
-        }
+        if (string.IsNullOrEmpty(_script)) { return "Kein Skript angegeben."; }
 
-        if (string.IsNullOrEmpty(_name)) {
-            return "Kein Name angegeben.";
-        }
+        if (string.IsNullOrEmpty(_name)) { return "Kein Name angegeben."; }
+
+        if (!_name.IsFormat(FormatHolder.SystemName)) { return "Ungültiger Name"; }
+
+        if (_eventTypes.HasFlag(EventTypes.error_check) && _changeValues) { return "Routinen, die Fehler prüfen, können keine Werte ändern."; }
 
         return string.Empty;
     }
@@ -206,7 +208,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
                     break;
 
                 case "events":
-                    _events = (Events)IntParse(pair.Value);
+                    _eventTypes = (EventTypes)IntParse(pair.Value);
                     break;
 
                 //case "lastdone":
@@ -252,7 +254,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
             result.ParseableAdd("ManualExecutable", ManualExecutable);
             result.ParseableAdd("NeedRow", NeedRow);
             result.ParseableAdd("ChangeValues", ChangeValues);
-            result.ParseableAdd("Events", Events);
+            result.ParseableAdd("Events", EventTypes);
 
             return result.Parseable();
         } catch {

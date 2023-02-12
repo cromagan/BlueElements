@@ -25,7 +25,7 @@ public class DoRowAutomaticEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public DoRowAutomaticEventArgs(RowItem row, Events? eventn) : base(row) => Event = eventn;
+    public DoRowAutomaticEventArgs(RowItem row, EventTypes? eventn) : base(row) => Event = eventn;
 
     #endregion
 
@@ -33,7 +33,7 @@ public class DoRowAutomaticEventArgs : RowEventArgs {
 
     public bool Done { get; set; }
 
-    public Events? Event { get; set; }
+    public EventTypes? Event { get; set; }
 
     #endregion
 }

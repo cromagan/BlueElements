@@ -24,7 +24,7 @@ using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_CellSetFilter : MethodDatabase {
+public class Method_CellSetFilter : Method_Database {
 
     #region Properties
 

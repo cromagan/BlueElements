@@ -44,7 +44,7 @@ using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
-public partial class TableView : Form, IHasStatusbar {
+public partial class TableView : FormWithStatusBar {
 
     #region Fields
 
@@ -90,8 +90,6 @@ public partial class TableView : Form, IHasStatusbar {
     #endregion
 
     #region Properties
-
-    public bool DropMessages { get; set; }
 
     public string PreveredDatabaseID { get; set; } = Database.DatabaseId;
 
@@ -231,9 +229,6 @@ public partial class TableView : Form, IHasStatusbar {
             }
         }
     }
-
-    public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) =>
-        base.UpdateStatus(type, message, didAlreadyMessagebox, capStatusbar, DropMessages);
 
     /// <summary>
     /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.
@@ -851,6 +846,9 @@ public partial class TableView : Form, IHasStatusbar {
         DatabaseAbstract.ForceSaveAll();
     }
 
+    private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
+    }
+
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
         var x = new ColumnArrangementPadEditor(Table.Database);
         _ = x.ShowDialog();
@@ -985,13 +983,13 @@ public partial class TableView : Form, IHasStatusbar {
         if (e.Item is not ReadableListItem bli) { return; }
         if (bli.Item is not EventScript sc) { return; }
 
-        var m = string.Empty;
+        string m;
 
         if (sc.NeedRow) {
             m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
         } else {
             //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-            var s = Table.Database.ExecuteScript(sc.Script, sc.ChangeValues, null);
+            var s = Table.Database.ExecuteScript(sc.Script, sc.ChangeValues, null, sc.EventTypes.HasFlag(EventTypes.error_check));
             m = s.ErrorMessage;
         }
 

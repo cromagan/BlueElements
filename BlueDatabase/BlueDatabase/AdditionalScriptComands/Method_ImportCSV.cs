@@ -24,7 +24,7 @@ using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-internal class Method_ImportCSV : MethodDatabase {
+internal class Method_ImportCSV : Method_Database {
 
     #region Properties
 

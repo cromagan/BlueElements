@@ -21,6 +21,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using BlueScript.Structures;
 using static BlueBasics.IO;
 
@@ -32,6 +33,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
 
     private DatabaseAbstract? _database;
 
+    private EventTypes _eventTypes = 0;
     private bool _isRowSkript;
 
     #endregion
@@ -56,6 +58,15 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
             if (_database != null && !_database.IsDisposed) {
                 _database.Disposing += _Database_Disposing;
             }
+        }
+    }
+
+    public EventTypes EventTypes {
+        get => _eventTypes;
+        set {
+            if (_eventTypes == value) { return; }
+            _eventTypes = value;
+            OnChanged();
         }
     }
 
@@ -93,16 +104,7 @@ public partial class ScriptEditorDatabase : ScriptEditor//System.Windows.Forms.U
                 return new ScriptEndedFeedback("Zeile nicht gefunden.");
             }
         }
-        var s = _database.ExecuteScript(ScriptText, false, r);
-        //var (_, m, s) = r.ExecuteScript(null, true, _skriptname);
-        //message = m;
-        //sc = s;
-
-        //if (!string.IsNullOrEmpty(message)) {
-        //    Message("Allgemeiner Fehler: " + message);
-        //    return null;
-        //}
-
+        var s = _database.ExecuteScript(ScriptText, false, r, _eventTypes.HasFlag(EventTypes.error_check));
         return s;
     }
 
