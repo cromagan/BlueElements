@@ -57,7 +57,7 @@ public class Method_RowCount : Method_Database {
 
         var r = RowCollection.MatchesTo(allFi);
 
-        return new DoItFeedback(infos);
+        return new DoItFeedback(infos, r.Count);
     }
 
     #endregion

@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -351,7 +352,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             table.OnNeedButtonArgs(e);
             contentSize = Button.StandardSize(e.Text, e.Image);
         } else if (column.MultiLine) {
-            var tmp = column.Database.Cell.GetList(column, row);
+            var tmp = SplitMultiLine(column.Database.Cell.GetString(column, row));
             if (column.ShowMultiLineInOneLine) {
                 contentSize = FormatedText_NeededSize(column, tmp.JoinWith("; "), cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText);
             } else {
@@ -1659,10 +1660,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         toDraw ??= string.Empty;
 
-        if (!contentHolderCellColumn.MultiLine || !toDraw.Contains("\r")) {
+     
+        if (!ShowMultiLine(toDraw, contentHolderCellColumn.MultiLine)) {
             Draw_CellTransparentDirect_OneLine(gr, toDraw, contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state);
         } else {
-            var mei = toDraw.SplitAndCutByCr();
+            var mei = SplitMultiLine(toDraw);
             if (contentHolderCellColumn.ShowMultiLineInOneLine) {
                 Draw_CellTransparentDirect_OneLine(gr, mei.JoinWith("; "), contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state);
             } else {
@@ -1674,8 +1676,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
         }
     }
-
-    //    if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }
 
     private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont? font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
@@ -1692,6 +1692,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_FormatedText(gr, text, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
     }
 
+    //    if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }
     private static int GetPix(int pix, BlueFont? f, double scale) => Skin.FormatedText_NeededSize("@|", null, f, (int)((pix * scale) + 0.5)).Height;
 
     private static bool Mouse_IsInAutofilter(ColumnViewItem? viewItem, MouseEventArgs e) => viewItem?.Column != null && viewItem.TmpAutoFilterLocation.Width != 0 && viewItem.Column.AutoFilterSymbolPossible() && viewItem.TmpAutoFilterLocation.Contains(e.X, e.Y);
@@ -1699,6 +1700,21 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private static bool Mouse_IsInRedcueButton(ColumnViewItem? viewItem, MouseEventArgs e) => viewItem != null && viewItem.TmpReduceLocation.Width != 0 && viewItem.TmpReduceLocation.Contains(e.X, e.Y);
 
     private static void NotEditableInfo(string reason) => Notification.Show(reason, ImageCode.Kreuz);
+
+    private static bool ShowMultiLine(string txt, bool ml) {
+        if (!ml) { return false; }
+
+        if (txt.Contains("\r")) { return true; }
+        if (txt.Contains("<br>")) { return true; }
+
+        return false;
+    }
+
+    private static string[] SplitMultiLine(string txt) {
+        txt = txt.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+
+        return txt.SplitAndCutByCr();
+    }
 
     private static void UserEdited(Table table, string newValue, ColumnItem? column, RowItem? row, string chapter, bool formatWarnung) {
         if (column == null || column.Database == null || column.Database.Column.Count == 0) {

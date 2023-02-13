@@ -150,6 +150,7 @@ public partial class VariableEditor : UserControl {
 
     private void GenerateVariableTable() {
         Database x = new(false, "Script_Variablen");
+        x.DropMessages = false;
         var na = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         _ = x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
         _ = x.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");

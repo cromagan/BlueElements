@@ -643,6 +643,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public string ChangeData(DatabaseDataType comand, string? columnname, long? rowkey, string previousValue, string changedTo, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
+
         var f = SetValueInternal(comand, changedTo, columnname, rowkey, false);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
