@@ -52,7 +52,7 @@ internal class Method_ImportCSV : Method_Database {
         var txt = ((VariableString)attvar.Attributes[0]).ValueString;
         var sep = ((VariableString)attvar.Attributes[1]).ValueString;
 
-        var db = MyDatabase(s);
+        var db = MyDatabase(s.Variables);
         if (db == null) { return new DoItFeedback(infos, "Datenbankfehler!"); }
         if (db?.ReadOnly ?? true) { return new DoItFeedback(infos, "Datenbank schreibgeschützt."); }
         if (!s.ChangeValues) { return new DoItFeedback(infos, "Import im Testmodus deaktiviert."); }

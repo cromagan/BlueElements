@@ -56,7 +56,7 @@ public class Method_WriteBackDBVariables : Method_Database {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
-        var db = MyDatabase(s);
+        var db = MyDatabase(s.Variables);
         if (db == null) { return new DoItFeedback(infos, "Datenbankfehler!"); }
         if (db?.ReadOnly ?? true) { return new DoItFeedback(infos, "Datenbank schreibgeschützt."); }
         if (!s.ChangeValues) { return new DoItFeedback(infos, "Variabeln zurückschreiben im Testmodus deaktiviert."); }

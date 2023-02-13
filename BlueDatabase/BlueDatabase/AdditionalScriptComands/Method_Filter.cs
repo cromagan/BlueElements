@@ -75,7 +75,7 @@ public class Method_Filter : Method_Database {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
-        var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
+        var db = DatabaseOf(s.Variables, ((VariableString)attvar.Attributes[0]).ValueString);
         if (db == null) { return new DoItFeedback(infos, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
 
         #region Spalte ermitteln

@@ -54,7 +54,7 @@ internal class Method_Call : Method_Database {
 
         var vs = (VariableString)attvar.Attributes[0];
 
-        var db = MyDatabase(s);
+        var db = MyDatabase(s.Variables);
         if (db == null) { return new DoItFeedback(infos, "Datenbankfehler!"); }
 
         var sc = db.EventScript.Get(vs.ValueString);

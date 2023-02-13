@@ -20,6 +20,7 @@
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -27,20 +28,20 @@ public abstract class Method_Database : Method {
 
     #region Methods
 
-    protected ColumnItem? Column(Script s, string name) => MyDatabase(s)?.Column.Exists(name);
+    protected ColumnItem? Column(List<Variable>? variables, string name) => MyDatabase(variables)?.Column.Exists(name);
 
-    protected DatabaseAbstract? DatabaseOf(Script s, string tableName) {
-        if (s.Variables != null) {
-            var db = MyDatabase(s)?.ConnectionDataOfOtherTable(tableName, false);
+    protected DatabaseAbstract? DatabaseOf(List<Variable>? variables, string tableName) {
+        if (variables != null) {
+            var db = MyDatabase(variables)?.ConnectionDataOfOtherTable(tableName, false);
             return DatabaseAbstract.GetById(db, null);
         }
 
         return null;
     }
 
-    protected DatabaseAbstract? MyDatabase(Script s) {
-        if (s.Variables != null) {
-            var f = s.Variables.GetSystem("Database");
+    protected DatabaseAbstract? MyDatabase(List<Variable>? variables) {
+        if (variables != null) {
+            var f = variables.GetSystem("Database");
             if (f is VariableDatabase db) { return db.Database; }
         }
         return null;

@@ -46,7 +46,7 @@ public class Method_SetError : Method_Database {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "seterror" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "seterror" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
@@ -58,10 +58,10 @@ public class Method_SetError : Method_Database {
         if (!seet.ValueBool) { return new DoItFeedback(infos, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
-            var column = Column(s, attvar.Attributes[z].Name);
+            var column = Column(s.Variables, attvar.Attributes[z].Name);
             if (column == null) { return new DoItFeedback(infos, "Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
 
-            MyDatabase(s)?.Row.LastCheckedRowFeedback.Add(attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString);
+            MyDatabase(s.Variables)?.Row.LastCheckedRowFeedback.Add(attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString);
 
             //var n = attvar.Attributes[z].Name.ToLower() + "_error";
             //var ve = s.Variablen.GetSystem(n);

@@ -54,7 +54,7 @@ public class Method_SoftMessage : Method_Database {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
-        var db = MyDatabase(s);
+        var db = MyDatabase(s.Variables);
         if (db == null) { return new DoItFeedback(infos, "Datenbankfehler!"); }
 
         var txt = "<b>Skript:</b> " + ((VariableString)attvar.Attributes[0]).ValueString;
