@@ -43,9 +43,9 @@ internal class Method_TrimSuffix : Method {
 
     public override List<string> Comand(Script? s) => new() { "trimsuffix" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
         var val = ((VariableString)attvar.Attributes[0]).ValueString;
 
         const string tmp = Constants.Char_Numerals + " ";
@@ -59,12 +59,12 @@ internal class Method_TrimSuffix : Method {
             if (val.ToLower().EndsWith(suf)) {
                 var c = val.Substring(val.Length - suf.Length - 1, 1);
                 if (tmp.Contains(c)) {
-                    return new DoItFeedback(infos, s, val.Substring(0, val.Length - suf.Length).TrimEnd(" "), string.Empty);
+                    return new DoItFeedback(s, infos, val.Substring(0, val.Length - suf.Length).TrimEnd(" "), string.Empty);
                 }
             }
         }
 
-        return new DoItFeedback(infos, s, val, string.Empty);
+        return new DoItFeedback(s, infos, val, string.Empty);
     }
 
     #endregion

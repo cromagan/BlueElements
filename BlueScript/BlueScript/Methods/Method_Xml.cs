@@ -52,15 +52,15 @@ public class Method_Xml : Method {
 
     public override List<string> Comand(Script? s) => new() { "xml" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         try {
             var x = XDocument.Parse(((VariableString)attvar.Attributes[0]).ValueString);
-            return new DoItFeedback(infos, s, new VariableXml(x));
+            return new DoItFeedback(s, infos, new VariableXml(x));
         } catch (Exception e) {
-            return new DoItFeedback(infos, s, string.Empty, "XML-Parsen fehlgeschlagen: " + e.Message);
+            return new DoItFeedback(s, infos, string.Empty, "XML-Parsen fehlgeschlagen: " + e.Message);
         }
     }
 

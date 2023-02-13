@@ -127,7 +127,7 @@ public class Script {
             if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, Line(txt, pos)); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                var fn = thisC.DoIt(f, s);
+                var fn = thisC.DoIt(s, f);
                 return new DoItWithEndedPosFeedback(fn.ErrorMessage, fn.Variable, f.ContinueOrErrorPosition, fn.Line);
             }
         }

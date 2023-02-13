@@ -66,26 +66,26 @@ public class Method_Row : Method_Database {
         return vro.RowItem;
     }
 
-    public static DoItFeedback RowToObjectFeedback(CanDoFeedback? infos, Script s, RowItem? row) => new(infos, s, new VariableRowItem(row));
+    public static DoItFeedback RowToObjectFeedback(Script s, CanDoFeedback? infos, RowItem? row) => new(s, infos, new VariableRowItem(row));
 
     public override List<string> Comand(Script? s) => new() { "row" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-        if (allFi is null) { return new DoItFeedback(infos, s, "Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback(s, infos, "Fehler im Filter"); }
 
         var r = RowCollection.MatchesTo(allFi);
 
-        if (r.Count > 1) { return new DoItFeedback(infos, s, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
+        if (r.Count > 1) { return new DoItFeedback(s, infos, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 
         if (r == null || r.Count is 0 or > 1) {
-            return RowToObjectFeedback(infos, s, null);
+            return RowToObjectFeedback(s, infos, null);
         }
 
-        return RowToObjectFeedback(infos, s, r[0]);
+        return RowToObjectFeedback(s, infos, r[0]);
     }
 
     #endregion

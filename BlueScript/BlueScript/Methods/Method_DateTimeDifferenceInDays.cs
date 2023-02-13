@@ -42,13 +42,13 @@ internal class Method_DateTimeDifferenceInDays : Method {
 
     public override List<string> Comand(Script? s) => new() { "datetimedifferenceindays" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var d1 = ((VariableDateTime)attvar.Attributes[0]).ValueDate;
         var d2 = ((VariableDateTime)attvar.Attributes[1]).ValueDate;
-        return new DoItFeedback(infos, s, d1.Subtract(d2).TotalDays);
+        return new DoItFeedback(s, infos, d1.Subtract(d2).TotalDays);
     }
 
     #endregion

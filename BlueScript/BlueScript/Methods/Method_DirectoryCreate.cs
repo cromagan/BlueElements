@@ -45,19 +45,19 @@ internal class Method_DirectoryCreate : Method {
 
     public override List<string> Comand(Script? s) => new() { "directorycreate" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var p = ((VariableString)attvar.Attributes[0]).ValueString.TrimEnd("\\");
 
-        if (DirectoryExists(p)) { return DoItFeedback.Wahr(infos, s); }
+        if (DirectoryExists(p)) { return DoItFeedback.Wahr(s, infos); }
 
         try {
             _ = Directory.CreateDirectory(p);
         } catch { }
 
-        return !DirectoryExists(p) ? DoItFeedback.Falsch(infos, s) : DoItFeedback.Wahr(infos, s);
+        return !DirectoryExists(p) ? DoItFeedback.Falsch(s, infos) : DoItFeedback.Wahr(s, infos);
     }
 
     #endregion

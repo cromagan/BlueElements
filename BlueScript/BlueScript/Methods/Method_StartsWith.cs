@@ -43,21 +43,21 @@ internal class Method_StartsWith : Method {
 
     public override List<string> Comand(Script? s) => new() { "startswith" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (((VariableBool)attvar.Attributes[1]).ValueBool) {
                 if (((VariableString)attvar.Attributes[0]).ValueString.StartsWith(((VariableString)attvar.Attributes[z]).ValueString)) {
-                    return DoItFeedback.Wahr(infos, s);
+                    return DoItFeedback.Wahr(s, infos);
                 }
             } else {
                 if (((VariableString)attvar.Attributes[0]).ValueString.ToLower().StartsWith(((VariableString)attvar.Attributes[z]).ValueString.ToLower())) {
-                    return DoItFeedback.Wahr(infos, s);
+                    return DoItFeedback.Wahr(s, infos);
                 }
             }
         }
-        return DoItFeedback.Falsch(infos, s);
+        return DoItFeedback.Falsch(s, infos);
     }
 
     #endregion

@@ -51,48 +51,48 @@ public class Method_Lookup : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "lookup" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(infos, s, this, attvar);
+            return DoItFeedback.AttributFehler(s, infos, this, attvar);
         }
 
         var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
         if (db == null) {
-            return new DoItFeedback(infos, s, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden");
+            return new DoItFeedback(s, infos, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden");
         }
 
         var c = db.Column.Exists(((VariableString)attvar.Attributes[2]).ValueString);
         if (c == null) {
-            return new DoItFeedback(infos, s, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[2]).ValueString);
+            return new DoItFeedback(s, infos, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[2]).ValueString);
         }
 
         var r = RowCollection.MatchesTo(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, ((VariableString)attvar.Attributes[1]).ValueString));
 
         if (r == null || r.Count == 0) {
             if (attvar.Attributes.Count > 3) {
-                return new DoItFeedback(infos, s, new List<string> { ((VariableString)attvar.Attributes[3]).ValueString });
+                return new DoItFeedback(s, infos, new List<string> { ((VariableString)attvar.Attributes[3]).ValueString });
             }
 
-            return DoItFeedback.Null(infos, s );
+            return DoItFeedback.Null(s, infos);
         }
 
         if (r.Count > 1) {
             if (attvar.Attributes.Count > 4) {
-                return new DoItFeedback(infos, s, new List<string> { ((VariableString)attvar.Attributes[4]).ValueString });
+                return new DoItFeedback(s, infos, new List<string> { ((VariableString)attvar.Attributes[4]).ValueString });
             }
 
-            return DoItFeedback.Null(infos, s );
+            return DoItFeedback.Null(s, infos);
         }
 
         var v = RowItem.CellToVariable(c, r[0]);
         if (v == null || v.Count != 1) {
-            return new DoItFeedback(infos, s, "Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[2]).ValueString);
+            return new DoItFeedback(s, infos, "Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[2]).ValueString);
         }
 
-        if (v[0] is VariableListString vl) { return new DoItFeedback(infos, s, vl.ValueList); }
+        if (v[0] is VariableListString vl) { return new DoItFeedback(s, infos, vl.ValueList); }
 
-        return new DoItFeedback(infos, s, new List<string> { v[0].ReadableText });
+        return new DoItFeedback(s, infos, new List<string> { v[0].ReadableText });
         //return new DoItFeedback(infos, s, new List<string>{kv[0].ReadableText
 
         //return new DoItFeedback(infos, s, v[0]);

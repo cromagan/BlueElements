@@ -42,11 +42,11 @@ internal class Method_Exception : Method {
 
     public override List<string> Comand(Script? s) => new() { "Exception" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos, s, "Die Ausführung wurde absichtlich abgebrochen."); }
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(infos, s, "Die Ausführung wurde absichtlich abgebrochen.")
-            : new DoItFeedback(infos, s, "Exception: " + ((VariableString)attvar.Attributes[0]).ValueString);
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(s, infos, "Die Ausführung wurde absichtlich abgebrochen."); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(s, infos, "Die Ausführung wurde absichtlich abgebrochen.")
+            : new DoItFeedback(s, infos, "Exception: " + ((VariableString)attvar.Attributes[0]).ValueString);
     }
 
     #endregion

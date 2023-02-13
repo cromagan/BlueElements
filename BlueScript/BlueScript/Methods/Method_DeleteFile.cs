@@ -44,20 +44,20 @@ internal class Method_DeleteFile : Method {
 
     public override List<string> Comand(Script? s) => new() { "deletefile" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
-            return DoItFeedback.Wahr(infos, s);
+            return DoItFeedback.Wahr(s, infos);
         }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos, s, "Löschen im Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback(s, infos, "Löschen im Testmodus deaktiviert."); }
 
         try {
-            return new DoItFeedback(infos, s, IO.DeleteFile(((VariableString)attvar.Attributes[0]).ValueString, false));
+            return new DoItFeedback(s, infos, IO.DeleteFile(((VariableString)attvar.Attributes[0]).ValueString, false));
         } catch {
-            return new DoItFeedback(infos, s, "Fehler beim Löschen: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(s, infos, "Fehler beim Löschen: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
     }
 

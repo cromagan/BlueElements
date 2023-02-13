@@ -42,8 +42,8 @@ internal class Method_Var : Method {
 
     public override List<string> Comand(Script? s) => new() { "var" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos, s, "Kein Text angekommen."); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(s, infos, "Kein Text angekommen."); }
 
         return Method_BerechneVariable.VariablenBerechnung(infos, infos.AttributText + ";", s, true);
 

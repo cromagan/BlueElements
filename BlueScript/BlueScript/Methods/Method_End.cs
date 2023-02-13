@@ -49,9 +49,9 @@ internal class Method_End : Method {
 
     public override List<string> Comand(Script? s) => new() { "end" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         s.EndScript = true;
-        return DoItFeedback.Null(infos, s );
+        return DoItFeedback.Null(s, infos);
     }
 
     #endregion

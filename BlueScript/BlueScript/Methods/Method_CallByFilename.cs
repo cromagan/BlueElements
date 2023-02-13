@@ -49,9 +49,9 @@ internal class Method_CallByFilename : Method {
 
     public override List<string> Comand(Script? s) => new() { "callbyfilename" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var vs = (VariableString)attvar.Attributes[0];
         string f;
@@ -62,10 +62,10 @@ internal class Method_CallByFilename : Method {
             } else if (FileExists(s.AdditionalFilesPath + vs.ValueString)) {
                 f = File.ReadAllText(s.AdditionalFilesPath + vs.ValueString, Encoding.UTF8);
             } else {
-                return new DoItFeedback(infos, s, "Datei nicht gefunden: " + vs.ValueString);
+                return new DoItFeedback(s, infos, "Datei nicht gefunden: " + vs.ValueString);
             }
         } catch {
-            return new DoItFeedback(infos, s, "Fehler beim Lesen der Datei: " + vs.ValueString);
+            return new DoItFeedback(s, infos, "Fehler beim Lesen der Datei: " + vs.ValueString);
         }
 
         f = Script.ReduceText(f);
@@ -78,25 +78,25 @@ internal class Method_CallByFilename : Method {
 
         if (((VariableBool)attvar.Attributes[1]).ValueBool) {
             var scx = s.Parse(f, 0);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(infos, s, "Subroutine " + vs.ValueString + ": " + scx.ErrorMessage); }
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(s, infos, "Subroutine " + vs.ValueString + ": " + scx.ErrorMessage); }
         } else {
             var tmpv = new List<Variable>();
             tmpv.AddRange(s.Variables);
 
             var scx = s.Parse(f, 0);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(infos, s, "Subroutine " + vs.ValueString + ": " + scx.ErrorMessage); }
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(s, infos, "Subroutine " + vs.ValueString + ": " + scx.ErrorMessage); }
 
             s.Variables.Clear();
             s.Variables.AddRange(tmpv);
         }
         s.Sub--;
 
-        if (s.Sub < 0) { return new DoItFeedback(infos, s, "Subroutinen-Fehler"); }
+        if (s.Sub < 0) { return new DoItFeedback(s, infos, "Subroutinen-Fehler"); }
 
         //s.Line = weiterLine;
         s.BreakFired = false;
 
-        return DoItFeedback.Null(infos, s);
+        return DoItFeedback.Null(s, infos);
     }
 
     #endregion

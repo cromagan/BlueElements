@@ -43,16 +43,16 @@ internal class Method_AddDays : Method {
 
     public override List<string> Comand(Script? s) => new() { "adddays" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
         // var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
         //if (!ok) {
         //    return new DoItFeedback(infos, s, "Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
         //}
         var d = ((VariableDateTime)attvar.Attributes[0]).ValueDate;
         d = d.AddDays(((VariableFloat)attvar.Attributes[1]).ValueNum);
-        return new DoItFeedback(infos, s, d);
+        return new DoItFeedback(s, infos, d);
     }
 
     #endregion

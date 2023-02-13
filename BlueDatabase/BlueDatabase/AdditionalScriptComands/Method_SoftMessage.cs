@@ -50,17 +50,17 @@ public class Method_SoftMessage : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "softmessage" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var db = MyDatabase(s);
-        if (db == null) { return new DoItFeedback(infos, s, "Datenbankfehler!"); }
+        if (db == null) { return new DoItFeedback(s, infos, "Datenbankfehler!"); }
 
         var txt = "<b>Skript:</b> " + ((VariableString)attvar.Attributes[0]).ValueString;
         db.OnDropMessage(FehlerArt.Info, txt);
 
-        return DoItFeedback.Null(infos, s);
+        return DoItFeedback.Null(s, infos);
     }
 
     #endregion

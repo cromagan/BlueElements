@@ -45,15 +45,15 @@ internal class Method_FreeFileName : Method {
 
     public override List<string> Comand(Script? s) => new() { "freefilename" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var pf = ((VariableString)attvar.Attributes[0]).ValueString;
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback(infos, s, "Verzeichnis existiert nicht");
+            return new DoItFeedback(s, infos, "Verzeichnis existiert nicht");
         }
 
         var zeichen = Constants.Char_AZ.ToLower() + Constants.Char_Numerals + Constants.Char_AZ.ToUpper();
@@ -67,7 +67,7 @@ internal class Method_FreeFileName : Method {
             }
 
             if (!FileExists(pf + p + ((VariableString)attvar.Attributes[1]).ValueString)) {
-                return new DoItFeedback(infos, s, p, string.Empty);
+                return new DoItFeedback(s, infos, p, string.Empty);
             }
         } while (true);
     }

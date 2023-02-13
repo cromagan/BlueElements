@@ -43,14 +43,14 @@ internal class Method_SetClipboard : Method {
 
     public override List<string> Comand(Script? s) => new() { "setclipboard" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var vs = (VariableString)attvar.Attributes[0];
         CopytoClipboard(vs.ValueString);
 
-        return DoItFeedback.Null(infos, s );
+        return DoItFeedback.Null(s, infos);
     }
 
     #endregion

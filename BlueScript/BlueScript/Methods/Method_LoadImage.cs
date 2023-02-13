@@ -46,24 +46,24 @@ internal class Method_LoadImage : Method {
 
     public override List<string> Comand(Script? s) => new() { "loadimage" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != FileFormat.Image) {
-            return new DoItFeedback(infos, s, "Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(s, infos, "Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 
         if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
-            return new DoItFeedback(infos, s, "Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(s, infos, "Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 
         try {
             Generic.CollectGarbage();
             var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
-            return new DoItFeedback(infos, s, bmp);
+            return new DoItFeedback(s, infos, bmp);
         } catch {
-            return new DoItFeedback(infos, s, "Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(s, infos, "Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
     }
 

@@ -44,10 +44,10 @@ internal class Method_StringHTMLToAscii : Method {
 
     public override List<string> Comand(Script? s) => new() { "stringhtmltoascii" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        return string.IsNullOrEmpty(attvar.ErrorMessage) ? new DoItFeedback(infos, s, ((VariableString)attvar.Attributes[0]).ValueString.HtmlSpecialToNormalChar(((VariableBool)attvar.Attributes[1]).ValueBool))
-            : DoItFeedback.AttributFehler(infos, s, this, attvar);
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        return string.IsNullOrEmpty(attvar.ErrorMessage) ? new DoItFeedback(s, infos, ((VariableString)attvar.Attributes[0]).ValueString.HtmlSpecialToNormalChar(((VariableBool)attvar.Attributes[1]).ValueBool))
+            : DoItFeedback.AttributFehler(s, infos, this, attvar);
     }
 
     #endregion

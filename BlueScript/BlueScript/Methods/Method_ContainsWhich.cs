@@ -51,9 +51,9 @@ internal class Method_ContainsWhitch : Method {
 
     public override List<string> Comand(Script? s) => new() { "containswhich" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var found = new List<string>();
 
@@ -86,7 +86,7 @@ internal class Method_ContainsWhitch : Method {
             }
         }
 
-        return new DoItFeedback(infos, s, found);
+        return new DoItFeedback(s, infos, found);
     }
 
     #endregion

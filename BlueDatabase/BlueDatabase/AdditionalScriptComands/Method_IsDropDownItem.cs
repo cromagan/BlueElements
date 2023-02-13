@@ -47,12 +47,12 @@ internal class Method_IsDropDownItem : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "isdropdownitem" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var column = Column(s, attvar.Attributes[1].Name);
-        if (column == null) { return new DoItFeedback(infos, s, "Spalte in Datenbank nicht gefunden"); }
+        if (column == null) { return new DoItFeedback(s, infos, "Spalte in Datenbank nicht gefunden"); }
 
         var tocheck = new List<string>();
         if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
@@ -61,10 +61,10 @@ internal class Method_IsDropDownItem : Method_Database {
         tocheck = tocheck.SortedDistinctList();
 
         if (tocheck.Any(thisstring => !column.DropDownItems.Contains(thisstring))) {
-            return DoItFeedback.Falsch(infos, s);
+            return DoItFeedback.Falsch(s, infos);
         }
 
-        return DoItFeedback.Wahr(infos, s);
+        return DoItFeedback.Wahr(s, infos);
     }
 
     #endregion

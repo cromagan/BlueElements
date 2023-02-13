@@ -43,9 +43,9 @@ internal class Method_Exists : Method {
 
     public override List<string> Comand(Script? s) => new() { "exists" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.Falsch(infos, s) : DoItFeedback.Wahr(infos, s);
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.Falsch(s, infos) : DoItFeedback.Wahr(s, infos);
     }
 
     #endregion

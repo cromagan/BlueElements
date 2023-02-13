@@ -43,14 +43,14 @@ internal class Method_Round : Method {
 
     public override List<string> Comand(Script? s) => new() { "round" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
         var n = (int)((VariableFloat)attvar.Attributes[1]).ValueNum;
         if (n < 0) { n = 0; }
         if (n > 10) { n = 10; }
         var val = Math.Round(((VariableFloat)attvar.Attributes[0]).ValueNum, n);
-        return new DoItFeedback(infos, s, val);
+        return new DoItFeedback(s, infos, val);
     }
 
     #endregion

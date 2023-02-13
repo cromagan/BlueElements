@@ -185,7 +185,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return attributes;
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(string attributtext, Script s, List<List<string>> types, bool endlessArgs) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(Script s, string attributtext, List<List<string>> types, bool endlessArgs) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributtext)
                 ? new SplittedAttributesFeedback(new List<Variable>())
@@ -280,7 +280,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     public abstract List<string> Comand(Script? s);
 
-    public abstract DoItFeedback DoIt(CanDoFeedback infos, Script s);
+    public abstract DoItFeedback DoIt(Script s, CanDoFeedback infos);
 
     public string HintText() {
         var co = "Syntax:\r\n";

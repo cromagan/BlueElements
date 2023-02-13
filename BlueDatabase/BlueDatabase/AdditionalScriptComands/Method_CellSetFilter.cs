@@ -49,24 +49,24 @@ public class Method_CellSetFilter : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "cellsetfilter" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
-        if (allFi is null) { return new DoItFeedback(infos, s, "Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback(s, infos, "Fehler im Filter"); }
 
         var columnToSet = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (columnToSet == null) { return new DoItFeedback(infos, s, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
+        if (columnToSet == null) { return new DoItFeedback(s, infos, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
 
         var r = RowCollection.MatchesTo(allFi);
         if (r == null || r.Count is 0 or > 1) {
-            return DoItFeedback.Falsch(infos, s);
+            return DoItFeedback.Falsch(s, infos);
         }
 
         r[0].CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-        return r[0].CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr(infos, s) : DoItFeedback.Falsch(infos, s);
+        return r[0].CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr(s, infos) : DoItFeedback.Falsch(s, infos);
     }
 
     #endregion

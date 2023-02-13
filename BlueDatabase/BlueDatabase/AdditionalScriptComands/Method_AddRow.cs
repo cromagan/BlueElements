@@ -51,16 +51,16 @@ public class Method_AddRow : Method_Database {
 
     public override List<string> Comand(Script? s) => new() { "addrow" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
-        if (db == null) { return new DoItFeedback(infos, s, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback(s, infos, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
 
-        if (db?.ReadOnly ?? true) { return new DoItFeedback(infos, s, "Datenbank schreibgeschützt."); }
+        if (db?.ReadOnly ?? true) { return new DoItFeedback(s, infos, "Datenbank schreibgeschützt."); }
 
-        if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback(infos, s, "KeyValue muss einen Wert enthalten."); }
+        if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback(s, infos, "KeyValue muss einen Wert enthalten."); }
         //var r = db.Row[((VariableString)attvar.Attributes[1]).ValueString];
 
         //if (r != null && !((VariableBool)attvar.Attributes[2]).ValueBool) { return Method_Row?.RowToObject(r); }
@@ -69,15 +69,15 @@ public class Method_AddRow : Method_Database {
             StackTrace stackTrace = new();
 
             if (stackTrace.FrameCount > 400) {
-                return new DoItFeedback(infos, s, "Stapelspeicherüberlauf");
+                return new DoItFeedback(s, infos, "Stapelspeicherüberlauf");
             }
         }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos, s, "Zeile anlegen im Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback(s, infos, "Zeile anlegen im Testmodus deaktiviert."); }
 
         var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), ((VariableString)attvar.Attributes[1]).ValueString, ((VariableBool)attvar.Attributes[2]).ValueBool, true, "Script Command: Add Row");
 
-        return Method_Row.RowToObjectFeedback(infos, s, r);
+        return Method_Row.RowToObjectFeedback(s, infos, r);
     }
 
     #endregion

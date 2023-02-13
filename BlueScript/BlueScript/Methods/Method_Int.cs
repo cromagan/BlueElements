@@ -42,11 +42,11 @@ internal class Method_Int : Method {
 
     public override List<string> Comand(Script? s) => new() { "int" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(infos, s, this, attvar)
-            : new DoItFeedback(infos, s, ((VariableFloat)attvar.Attributes[0]).ValueInt);
+            ? DoItFeedback.AttributFehler(s, infos, this, attvar)
+            : new DoItFeedback(s, infos, ((VariableFloat)attvar.Attributes[0]).ValueInt);
     }
 
     #endregion

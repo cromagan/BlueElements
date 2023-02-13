@@ -44,9 +44,9 @@ internal class Method_BitmapToBase64 : Method {
 
     public override List<string> Comand(Script? s) => new() { "bitmaptobase64" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         string x;
 
@@ -60,10 +60,10 @@ internal class Method_BitmapToBase64 : Method {
                 break;
 
             default:
-                return new DoItFeedback(infos, s, "Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.");
+                return new DoItFeedback(s, infos, "Es wir als zweites Attribut ein String mit dem Inhalt jpg oder png erwartet.");
         }
 
-        return new DoItFeedback(infos, s, x, string.Empty);
+        return new DoItFeedback(s, infos, x, string.Empty);
     }
 
     #endregion

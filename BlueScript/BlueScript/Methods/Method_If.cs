@@ -82,9 +82,9 @@ internal class Method_if : Method {
 
     public override List<string> Comand(Script? s) => new() { "if" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
         if (((VariableBool)attvar.Attributes[0]).ValueBool) {
             var scx = s.Parse(infos.CodeBlockAfterText, infos.Line-1);
             if (!string.IsNullOrEmpty(scx.ErrorMessage)) {
@@ -95,7 +95,7 @@ internal class Method_if : Method {
             }
         }
 
-        return DoItFeedback.Null(infos, s);
+        return DoItFeedback.Null(s, infos);
     }
 
     #endregion

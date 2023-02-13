@@ -44,30 +44,30 @@ internal class Method_MoveFile : Method {
 
     public override List<string> Comand(Script? s) => new() { "movefile" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         var sop = ((VariableString)attvar.Attributes[0]).ValueString;
 
         var dep = ((VariableString)attvar.Attributes[1]).ValueString;
 
         //if (!DirectoryExists(sop.FilePath())) { return new DoItFeedback(infos, s, "Verzeichnis existiert nicht"); }
-        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback(infos, s, "Ziel-Verzeichnis existiert nicht"); }
-        if (!FileExists(sop)) { return new DoItFeedback(infos, s, "Quelldatei existiert nicht."); }
+        if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback(s, infos, "Ziel-Verzeichnis existiert nicht"); }
+        if (!FileExists(sop)) { return new DoItFeedback(s, infos, "Quelldatei existiert nicht."); }
 
         if (FileExists(dep)) {
-            return new DoItFeedback(infos, s, "Zieldatei existiert bereits.");
+            return new DoItFeedback(s, infos, "Zieldatei existiert bereits.");
         }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos, s, "Verschieben im Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback(s, infos, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveFile(sop, dep, false)) {
-            return new DoItFeedback(infos, s, "Verschieben fehlgeschlagen.");
+            return new DoItFeedback(s, infos, "Verschieben fehlgeschlagen.");
         }
 
-        return DoItFeedback.Null(infos, s );
+        return DoItFeedback.Null(s, infos);
     }
 
     #endregion
