@@ -62,30 +62,30 @@ internal class Method_BerechneVariable : Method {
 
         var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
 
-        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback(s, infos, "Fehler mit = - Zeichen"); }
+        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback(infos, "Fehler mit = - Zeichen"); }
 
         var varnam = newcommand.Substring(0, pos);
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(s, infos, varnam + " ist kein gültiger Variablen-Name"); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos, varnam + " ist kein gültiger Variablen-Name"); }
 
         var v = s.Variables.Get(varnam);
         if (generateVariable && v != null) {
-            return new DoItFeedback(s, infos, "Variable " + varnam + " ist bereits vorhanden.");
+            return new DoItFeedback(infos, "Variable " + varnam + " ist bereits vorhanden.");
         }
         if (!generateVariable && v == null) {
-            return new DoItFeedback(s, infos, "Variable " + varnam + " nicht vorhanden.");
+            return new DoItFeedback(infos, "Variable " + varnam + " nicht vorhanden.");
         }
 
         var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
 
         var attvar = SplitAttributeToVars(s, value, _args, SEndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, null, new Method_BerechneVariable(), attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(null, new Method_BerechneVariable(), attvar); }
 
         if (generateVariable) {
             attvar.Attributes[0].KeyName = varnam.ToLower();
             attvar.Attributes[0].ReadOnly = false;
             s.Variables.Add(attvar.Attributes[0]);
-            return new DoItFeedback(s, infos, attvar.Attributes[0]);
+            return new DoItFeedback(infos, attvar.Attributes[0]);
         }
 
         return v.GetValueFrom(attvar.Attributes[0]);

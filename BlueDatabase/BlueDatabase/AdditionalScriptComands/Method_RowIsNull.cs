@@ -50,13 +50,13 @@ public class Method_RowIsNull : Method_Database {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
-        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback(s, infos, "Kein Zeilenobjekt übergeben."); }
+        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback(infos, "Kein Zeilenobjekt übergeben."); }
 
         //var r = Method_Row.ObjectToRow(attvar.Attributes[0]);
 
-        return vr.RowItem == null ? DoItFeedback.Wahr(s, infos) : DoItFeedback.Falsch(s, infos);
+        return vr.RowItem == null ? DoItFeedback.Wahr(infos) : DoItFeedback.Falsch(infos);
     }
 
     #endregion

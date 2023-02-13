@@ -47,8 +47,8 @@ internal class Method_RandomInt : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
 
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(s, infos, this, attvar)
-            : new DoItFeedback(s, infos);
+            ? DoItFeedback.AttributFehler(infos, this, attvar)
+            : new DoItFeedback(infos);
     }
 
     #endregion

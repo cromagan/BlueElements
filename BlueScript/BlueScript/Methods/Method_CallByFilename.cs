@@ -52,29 +52,29 @@ public class Method_CallByFilename : Method {
 
         if (keepVariables) {
             var scx = s.Parse(reducedscripttext, lineadd);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback( "Fehler innerhalb " + name + ": " + scx.ErrorMessage, scx.LastlineNo); }
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback("Fehler innerhalb " + name + ": " + scx.ErrorMessage, scx.LastlineNo); }
         } else {
             var tmpv = new List<Variable>();
             tmpv.AddRange(s.Variables);
 
             var scx = s.Parse(reducedscripttext, lineadd);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback( "Fehler innerhalb " + name + ": " + scx.ErrorMessage, scx.LastlineNo); }
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback("Fehler innerhalb " + name + ": " + scx.ErrorMessage, scx.LastlineNo); }
 
             s.Variables.Clear();
             s.Variables.AddRange(tmpv);
         }
         s.Sub--;
 
-        if (s.Sub < 0) { return new DoItFeedback(s, infos, "Subroutinen-Fehler"); }
+        if (s.Sub < 0) { return new DoItFeedback(infos, "Subroutinen-Fehler"); }
 
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     public override List<string> Comand(List<Variable> currentvariables) => new() { "callbyfilename" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var vs = (VariableString)attvar.Attributes[0];
         string f;
@@ -85,10 +85,10 @@ public class Method_CallByFilename : Method {
             } else if (FileExists(s.AdditionalFilesPath + vs.ValueString)) {
                 f = File.ReadAllText(s.AdditionalFilesPath + vs.ValueString, Encoding.UTF8);
             } else {
-                return new DoItFeedback(s, infos, "Datei nicht gefunden: " + vs.ValueString);
+                return new DoItFeedback(infos, "Datei nicht gefunden: " + vs.ValueString);
             }
         } catch {
-            return new DoItFeedback(s, infos, "Fehler beim Lesen der Datei: " + vs.ValueString);
+            return new DoItFeedback(infos, "Fehler beim Lesen der Datei: " + vs.ValueString);
         }
 
         f = Script.ReduceText(f);

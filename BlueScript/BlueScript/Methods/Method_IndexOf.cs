@@ -45,7 +45,7 @@ internal class Method_IndexOf : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var val = ((VariableString)attvar.Attributes[0]).ValueString;
 
@@ -53,7 +53,7 @@ internal class Method_IndexOf : Method {
 
         var f = val.IndexOf(search, StringComparison.OrdinalIgnoreCase);
 
-        return new DoItFeedback(s, infos);
+        return new DoItFeedback(infos);
     }
 
     #endregion

@@ -47,17 +47,17 @@ internal class Method_DirectoryCreate : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var p = ((VariableString)attvar.Attributes[0]).ValueString.TrimEnd("\\");
 
-        if (DirectoryExists(p)) { return DoItFeedback.Wahr(s, infos); }
+        if (DirectoryExists(p)) { return DoItFeedback.Wahr(infos); }
 
         try {
             _ = Directory.CreateDirectory(p);
         } catch { }
 
-        return !DirectoryExists(p) ? DoItFeedback.Falsch(s, infos) : DoItFeedback.Wahr(s, infos);
+        return !DirectoryExists(p) ? DoItFeedback.Falsch(infos) : DoItFeedback.Wahr(infos);
     }
 
     #endregion

@@ -45,8 +45,8 @@ internal class Method_ReduceToChars : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(s, infos, this, attvar)
-            : new DoItFeedback(s, infos, ((VariableString)attvar.Attributes[0]).ValueString.ReduceToChars(((VariableString)attvar.Attributes[1]).ValueString), string.Empty);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(infos, this, attvar)
+            : new DoItFeedback(infos, ((VariableString)attvar.Attributes[0]).ValueString.ReduceToChars(((VariableString)attvar.Attributes[1]).ValueString), string.Empty);
     }
 
     #endregion

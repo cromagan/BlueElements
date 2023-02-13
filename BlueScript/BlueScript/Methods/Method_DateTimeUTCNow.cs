@@ -46,8 +46,8 @@ internal class Method_DateTimeNowUTC : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(s, infos, this, attvar)
-            : new DoItFeedback(s, infos, DateTime.UtcNow);
+            ? DoItFeedback.AttributFehler(infos, this, attvar)
+            : new DoItFeedback(infos, DateTime.UtcNow);
     }
 
     #endregion

@@ -45,35 +45,35 @@ internal class Method_SetIfExists : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(s, infos); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableUnknown) { continue; }
 
-            if (attvar.Attributes[z].MyClassId != attvar.Attributes[0].MyClassId) { return new DoItFeedback(s, infos, "Variablentyp zur Ausgangsvariable unterschiedlich."); }
+            if (attvar.Attributes[z].MyClassId != attvar.Attributes[0].MyClassId) { return new DoItFeedback(infos, "Variablentyp zur Ausgangsvariable unterschiedlich."); }
 
             switch (attvar.Attributes[z]) {
                 case VariableString vs:
                     ((VariableString)attvar.Attributes[0]).ValueString = vs.ValueString;
-                    return DoItFeedback.Null(s, infos);
+                    return DoItFeedback.Null(infos);
 
                 case VariableBool vb:
                     ((VariableBool)attvar.Attributes[0]).ValueBool = vb.ValueBool;
-                    return DoItFeedback.Null(s, infos);
+                    return DoItFeedback.Null(infos);
 
                 case VariableFloat vf:
                     ((VariableFloat)attvar.Attributes[0]).ValueNum = vf.ValueNum;
-                    return DoItFeedback.Null(s, infos);
+                    return DoItFeedback.Null(infos);
 
                 case VariableListString vl:
                     ((VariableListString)attvar.Attributes[0]).ValueList = vl.ValueList;
-                    return DoItFeedback.Null(s, infos);
+                    return DoItFeedback.Null(infos);
             }
         }
 
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     #endregion

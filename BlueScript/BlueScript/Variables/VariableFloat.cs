@@ -82,10 +82,10 @@ public class VariableFloat : Variable {
     }
 
     public override DoItFeedback GetValueFrom(Variable variable) {
-        if (variable is not VariableFloat v) { return DoItFeedback.VerschiedeneTypen(null, null, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null, null); }
+        if (variable is not VariableFloat v) { return DoItFeedback.VerschiedeneTypen(null, this, variable); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null); }
         ValueNum = v.ValueNum;
-        return DoItFeedback.Null(null, null);
+        return DoItFeedback.Null(null);
     }
 
     protected override Variable NewWithThisValue(object x, Script s) {

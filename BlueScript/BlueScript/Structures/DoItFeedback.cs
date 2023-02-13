@@ -38,19 +38,19 @@ public struct DoItFeedback {
 
     #region Constructors
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos) {
+    public DoItFeedback(CanDoFeedback? infos) {
         ErrorMessage = string.Empty;
         Variable = null;
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos, string errormessage) {
+    public DoItFeedback(CanDoFeedback? infos, string errormessage) {
         ErrorMessage = errormessage;
         Variable = null;
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos, Variable variable) {
+    public DoItFeedback(CanDoFeedback? infos, Variable variable) {
         ErrorMessage = string.Empty;
         Variable = variable;
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
@@ -62,49 +62,49 @@ public struct DoItFeedback {
         Line = line;
     }
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos, string valueString, string errormessage) {
+    public DoItFeedback(CanDoFeedback? infos, string valueString, string errormessage) {
         ErrorMessage = errormessage;
         Variable = new VariableString(Variable.DummyName(), valueString);
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos, List<string>? list) {
+    public DoItFeedback(CanDoFeedback? infos, List<string>? list) {
         ErrorMessage = string.Empty;
         Variable = new VariableListString(list);
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos, Bitmap bmp) {
+    public DoItFeedback(CanDoFeedback? infos, Bitmap bmp) {
         ErrorMessage = string.Empty;
         Variable = new VariableBitmap(bmp);
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos, bool value) {
+    public DoItFeedback(CanDoFeedback? infos, bool value) {
         ErrorMessage = string.Empty;
         Variable = new VariableBool(value);
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos, double value) {
+    public DoItFeedback(CanDoFeedback? infos, double value) {
         ErrorMessage = string.Empty;
         Variable = new VariableFloat((float)value);
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos, float value) {
+    public DoItFeedback(CanDoFeedback? infos, float value) {
         ErrorMessage = string.Empty;
         Variable = new VariableFloat(value);
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos, DateTime value) {
+    public DoItFeedback(CanDoFeedback? infos, DateTime value) {
         ErrorMessage = string.Empty;
         Variable = new VariableDateTime(value);
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
-    public DoItFeedback(Script? s, CanDoFeedback? infos, string[] list) {
+    public DoItFeedback(CanDoFeedback? infos, string[] list) {
         ErrorMessage = string.Empty;
         Variable = new VariableListString(list);
         Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
@@ -114,24 +114,24 @@ public struct DoItFeedback {
 
     #region Methods
 
-    public static DoItFeedback AttributFehler(Script? s, CanDoFeedback? infos, Method method, SplittedAttributesFeedback f) =>
-        new(s, infos, f.ErrorMessage + " > " + method.Syntax);
+    public static DoItFeedback AttributFehler(CanDoFeedback? infos, Method method, SplittedAttributesFeedback f) =>
+        new(infos, f.ErrorMessage + " > " + method.Syntax);
 
-    public static DoItFeedback Falsch(Script s, CanDoFeedback? infos) => new(s, infos, false);
+    public static DoItFeedback Falsch(CanDoFeedback? infos) => new(infos, false);
 
-    public static DoItFeedback FalscherDatentyp(Script s, CanDoFeedback? infos) => new(s, infos, "Falscher Datentyp.");
+    public static DoItFeedback FalscherDatentyp(CanDoFeedback? infos) => new(infos, "Falscher Datentyp.");
 
-    public static DoItFeedback Klammerfehler(Script s, CanDoFeedback? infos) => new(s, infos, "Fehler bei der Klammersetzung.");
+    public static DoItFeedback Klammerfehler(CanDoFeedback? infos) => new(infos, "Fehler bei der Klammersetzung.");
 
-    public static DoItFeedback Null(Script s, CanDoFeedback? infos) => new(s, infos);
+    public static DoItFeedback Null(CanDoFeedback? infos) => new(infos);
 
-    public static DoItFeedback Schreibgschützt(Script s, CanDoFeedback? infos) => new(s, infos, "Variable ist schreibgeschützt.");
+    public static DoItFeedback Schreibgschützt(CanDoFeedback? infos) => new(infos, "Variable ist schreibgeschützt.");
 
-    public static DoItFeedback VerschiedeneTypen(CanDoFeedback? infos, Script? s, Variable var1, Variable var2) =>
-        new(s, infos, "Variable '" + var1.KeyName + "' ist nicht der erwartete Typ {" + var2.MyClassId +
+    public static DoItFeedback VerschiedeneTypen(CanDoFeedback? infos, Variable var1, Variable var2) =>
+        new(infos, "Variable '" + var1.KeyName + "' ist nicht der erwartete Typ {" + var2.MyClassId +
                       "}, sondern {" + var1.MyClassId + "}");
 
-    public static DoItFeedback Wahr(Script s, CanDoFeedback? infos) => new(s, infos, true);
+    public static DoItFeedback Wahr(CanDoFeedback? infos) => new(infos, true);
 
     #endregion
 }

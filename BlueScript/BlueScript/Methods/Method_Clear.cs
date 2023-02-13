@@ -44,10 +44,10 @@ internal class Method_Clear : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(s, infos); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos); }
         ((VariableListString)attvar.Attributes[0]).ValueList = new List<string>();
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     #endregion

@@ -50,14 +50,14 @@ public class Method_RowCount : Method_Database {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-        if (allFi is null) { return new DoItFeedback(s, infos, "Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback(infos, "Fehler im Filter"); }
 
         var r = RowCollection.MatchesTo(allFi);
 
-        return new DoItFeedback(s, infos);
+        return new DoItFeedback(infos);
     }
 
     #endregion

@@ -48,10 +48,10 @@ internal class Method_MatchColumnFormat : Method_Database {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var column = Column(s, attvar.Attributes[1].Name);
-        if (column == null) { return new DoItFeedback(s, infos, "Spalte in Datenbank nicht gefunden"); }
+        if (column == null) { return new DoItFeedback(infos, "Spalte in Datenbank nicht gefunden"); }
 
         var tocheck = new List<string>();
         if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
@@ -60,10 +60,10 @@ internal class Method_MatchColumnFormat : Method_Database {
         tocheck = tocheck.SortedDistinctList();
 
         if (tocheck.Any(thisstring => !thisstring.IsFormat(column))) {
-            return DoItFeedback.Falsch(s, infos);
+            return DoItFeedback.Falsch(infos);
         }
 
-        return DoItFeedback.Wahr(s, infos);
+        return DoItFeedback.Wahr(infos);
     }
 
     #endregion

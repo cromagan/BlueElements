@@ -52,7 +52,7 @@ internal class Method_End : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         s.EndScript = true;
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     #endregion

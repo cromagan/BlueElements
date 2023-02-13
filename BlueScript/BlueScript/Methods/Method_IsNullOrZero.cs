@@ -48,21 +48,21 @@ internal class Method_IsNullOrZero : Method {
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-                return DoItFeedback.AttributFehler(s, infos, this, attvar);
+                return DoItFeedback.AttributFehler(infos, this, attvar);
             }
 
-            return DoItFeedback.Wahr(s, infos);
+            return DoItFeedback.Wahr(infos);
         }
 
-        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(s, infos); }
-        if (attvar.Attributes[0] is VariableUnknown) { return DoItFeedback.Wahr(s, infos); }
+        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(infos); }
+        if (attvar.Attributes[0] is VariableUnknown) { return DoItFeedback.Wahr(infos); }
 
         if (attvar.Attributes[0] is VariableFloat f) {
-            if (f.ValueNum == 0) { return DoItFeedback.Wahr(s, infos); }
+            if (f.ValueNum == 0) { return DoItFeedback.Wahr(infos); }
 
-            return DoItFeedback.Falsch(s, infos);
+            return DoItFeedback.Falsch(infos);
         }
-        return new DoItFeedback(s, infos, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
+        return new DoItFeedback(infos, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
         //if (attvar.Attributes == null) {
         //    if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
         //        return DoItFeedback.AttributFehler(infos, s, this, attvar, line);

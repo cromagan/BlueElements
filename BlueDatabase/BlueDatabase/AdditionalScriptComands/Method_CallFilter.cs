@@ -56,17 +56,17 @@ public class Method_CallFilter : Method_Database {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
-        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(s, infos, "Fehler im Filter"); }
+        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos, "Fehler im Filter"); }
 
         //var db = MyDatabase(s);
-        if (allFi[0].Database == null) { return new DoItFeedback(s, infos, "Datenbankfehler!"); }
+        if (allFi[0].Database == null) { return new DoItFeedback(infos, "Datenbankfehler!"); }
 
         var r = allFi[0].Database.Row.CalculateFilteredRows(allFi);
-        if (r == null || r.Count == 0) { return new DoItFeedback(s, infos); }
+        if (r == null || r.Count == 0) { return new DoItFeedback(infos); }
 
         var vs = (VariableString)attvar.Attributes[0];
 
@@ -74,16 +74,16 @@ public class Method_CallFilter : Method_Database {
             if (r != null) {
                 s.Sub++;
                 var s2 = thisR.ExecuteScript(null, vs.ValueString, false, true, s.ChangeValues, 0);
-                if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback(s, infos, "Subroutine '" + vs.ValueString + "' bei Zeile '" + thisR.CellFirstString() + "': " + s2.ErrorMessage); }
+                if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback(infos, "Subroutine '" + vs.ValueString + "' bei Zeile '" + thisR.CellFirstString() + "': " + s2.ErrorMessage); }
                 s.Sub--;
             }
         }
 
-        if (s.Sub < 0) { return new DoItFeedback(s, infos, "Subroutinen-Fehler"); }
+        if (s.Sub < 0) { return new DoItFeedback(infos, "Subroutinen-Fehler"); }
 
         s.BreakFired = false;
 
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     #endregion

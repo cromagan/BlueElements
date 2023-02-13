@@ -73,15 +73,15 @@ public class Method_Filter : Method_Database {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var db = DatabaseOf(s, ((VariableString)attvar.Attributes[0]).ValueString);
-        if (db == null) { return new DoItFeedback(s, infos, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback(infos, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
 
         #region Spalte ermitteln
 
         var filterColumn = db.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (filterColumn == null) { return new DoItFeedback(s, infos, "Spalte '" + ((VariableString)attvar.Attributes[1]).ValueString + "' in Ziel-Datenbank nicht gefunden"); }
+        if (filterColumn == null) { return new DoItFeedback(infos, "Spalte '" + ((VariableString)attvar.Attributes[1]).ValueString + "' in Ziel-Datenbank nicht gefunden"); }
 
         #endregion
 
@@ -94,13 +94,13 @@ public class Method_Filter : Method_Database {
                 break;
 
             default:
-                return new DoItFeedback(s, infos, "Filtertype unbekannt: " + ((VariableString)attvar.Attributes[2]).ValueString);
+                return new DoItFeedback(infos, "Filtertype unbekannt: " + ((VariableString)attvar.Attributes[2]).ValueString);
         }
 
         #endregion
 
         var fii = new FilterItem(filterColumn, filtertype, ((VariableString)attvar.Attributes[3]).ValueString);
-        return new DoItFeedback(s, infos, new VariableFilterItem(fii));
+        return new DoItFeedback(infos, new VariableFilterItem(fii));
     }
 
     #endregion

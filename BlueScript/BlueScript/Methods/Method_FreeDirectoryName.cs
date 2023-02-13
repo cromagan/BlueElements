@@ -48,12 +48,12 @@ internal class Method_FreeDirectoryName : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var pf = ((VariableString)attvar.Attributes[0]).ValueString;
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback(s, infos, "Verzeichnis existiert nicht");
+            return new DoItFeedback(infos, "Verzeichnis existiert nicht");
         }
 
         var zeichen = Constants.Char_AZ.ToLower() + Constants.Char_Numerals + Constants.Char_AZ.ToUpper();
@@ -67,7 +67,7 @@ internal class Method_FreeDirectoryName : Method {
             }
 
             if (!DirectoryExists(pf + p)) {
-                return new DoItFeedback(s, infos, p, string.Empty);
+                return new DoItFeedback(infos, p, string.Empty);
             }
         } while (true);
     }

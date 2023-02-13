@@ -45,9 +45,9 @@ internal class Method_IsDateTime : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(s, infos); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(infos); }
         var ok = DateTimeTryParse(((VariableString)attvar.Attributes[0]).ValueString, out _);
-        return ok ? DoItFeedback.Wahr(s, infos) : DoItFeedback.Falsch(s, infos);
+        return ok ? DoItFeedback.Wahr(infos) : DoItFeedback.Falsch(infos);
     }
 
     #endregion

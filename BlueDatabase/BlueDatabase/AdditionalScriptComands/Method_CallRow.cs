@@ -55,20 +55,20 @@ public class Method_CallRow : Method_Database {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
 
         if (row == null) {
-            return new DoItFeedback(s, infos, "Zeile nicht gefunden");
+            return new DoItFeedback(infos, "Zeile nicht gefunden");
         }
 
         var vs = (VariableString)attvar.Attributes[0];
         s.Sub++;
         var s2 = row.ExecuteScript(null, vs.ValueString, false, false, s.ChangeValues, 0);
-        if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback(s, infos, "Subroutine '" + vs.ValueString + "': " + s2.ErrorMessage); }
+        if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback(infos, "Subroutine '" + vs.ValueString + "': " + s2.ErrorMessage); }
         s.Sub--;
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     #endregion

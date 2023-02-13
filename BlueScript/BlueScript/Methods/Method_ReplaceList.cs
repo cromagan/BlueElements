@@ -47,20 +47,20 @@ internal class Method_ReplaceList : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(s, infos); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos); }
 
         var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
 
-        if (((VariableString)attvar.Attributes[3]).ValueString == ((VariableString)attvar.Attributes[4]).ValueString) { return new DoItFeedback(s, infos, "Suchtext und Ersetzungstext sind identisch."); }
-        if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback(s, infos, "Suchtext und Ersetzungstext sind identisch."); }
+        if (((VariableString)attvar.Attributes[3]).ValueString == ((VariableString)attvar.Attributes[4]).ValueString) { return new DoItFeedback(infos, "Suchtext und Ersetzungstext sind identisch."); }
+        if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback(infos, "Suchtext und Ersetzungstext sind identisch."); }
 
         var ct = 0;
         bool again;
         do {
             ct++;
-            if (ct > 10000) { return new DoItFeedback(s, infos, "Überlauf bei ReplaceList."); }
+            if (ct > 10000) { return new DoItFeedback(infos, "Überlauf bei ReplaceList."); }
             again = false;
             for (var z = 0; z < tmpList.Count; z++) {
                 if (((VariableBool)attvar.Attributes[2]).ValueBool) {
@@ -95,7 +95,7 @@ internal class Method_ReplaceList : Method {
         } while (again);
 
         ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     #endregion

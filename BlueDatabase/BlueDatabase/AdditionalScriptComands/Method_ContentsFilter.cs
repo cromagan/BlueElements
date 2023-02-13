@@ -51,16 +51,16 @@ public class Method_ContentsFilter : Method_Database {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
-        if (allFi is null) { return new DoItFeedback(s, infos, "Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback(infos, "Fehler im Filter"); }
 
         var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ReadableText);
-        if (returncolumn == null) { return new DoItFeedback(s, infos, "Spalte nicht gefunden: " + attvar.Attributes[0].ReadableText); }
+        if (returncolumn == null) { return new DoItFeedback(infos, "Spalte nicht gefunden: " + attvar.Attributes[0].ReadableText); }
         var x = returncolumn.Contents(allFi, null);
-        return new DoItFeedback(s, infos, x);
+        return new DoItFeedback(infos, x);
     }
 
     #endregion

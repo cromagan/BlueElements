@@ -50,16 +50,16 @@ internal class Method_Call : Method_Database {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var vs = (VariableString)attvar.Attributes[0];
 
         var db = MyDatabase(s);
-        if (db == null) { return new DoItFeedback(s, infos, "Datenbankfehler!"); }
+        if (db == null) { return new DoItFeedback(infos, "Datenbankfehler!"); }
 
         var sc = db.EventScript.Get(vs.ValueString);
 
-        if (sc == null) { return new DoItFeedback(s, infos, "Skript nicht vorhanden: " + vs.ValueString); }
+        if (sc == null) { return new DoItFeedback(infos, "Skript nicht vorhanden: " + vs.ValueString); }
         var f = Script.ReduceText(sc.Script);
 
         var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, f, false, 0, "Subroutine " + vs.ValueString);

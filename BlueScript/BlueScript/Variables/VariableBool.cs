@@ -80,10 +80,10 @@ public class VariableBool : Variable {
     }
 
     public override DoItFeedback GetValueFrom(Variable variable) {
-        if (variable is not VariableBool v) { return DoItFeedback.VerschiedeneTypen(null, null, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null, null); }
+        if (variable is not VariableBool v) { return DoItFeedback.VerschiedeneTypen(null, this, variable); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null); }
         ValueBool = v.ValueBool;
-        return DoItFeedback.Null(null, null);
+        return DoItFeedback.Null(null);
     }
 
     protected override Variable NewWithThisValue(object x, Script s) {

@@ -53,41 +53,41 @@ public class Method_LookupFilter : Method_Database {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3);
 
-        if (allFi is null) { return new DoItFeedback(s, infos, "Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback(infos, "Fehler im Filter"); }
 
         var returncolumn = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[0]).ValueString);
-        if (returncolumn == null) { return new DoItFeedback(s, infos, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString); }
+        if (returncolumn == null) { return new DoItFeedback(infos, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString); }
 
         var l = new List<string>();
 
         var r = RowCollection.MatchesTo(allFi);
         if (r.Count == 0) {
             l.Add(((VariableString)attvar.Attributes[1]).ValueString);
-            return new DoItFeedback(s, infos, l);
+            return new DoItFeedback(infos, l);
         }
         if (r.Count > 1) {
             l.Add(((VariableString)attvar.Attributes[2]).ValueString);
-            return new DoItFeedback(s, infos, l);
+            return new DoItFeedback(infos, l);
         }
 
         var v = RowItem.CellToVariable(returncolumn, r[0]);
-        if (v == null || v.Count != 1) { return new DoItFeedback(s, infos, "Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
+        if (v == null || v.Count != 1) { return new DoItFeedback(infos, "Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
 
         if (v[0] is VariableListString vl) {
             l.AddRange(vl.ValueList);
         } else if (v[0] is VariableString vs) {
             l.Add(vs.ValueString);
         } else {
-            return new DoItFeedback(s, infos, "Spaltentyp nicht unterstützt.");
+            return new DoItFeedback(infos, "Spaltentyp nicht unterstützt.");
         }
 
         //  l.GenerateAndAdd(((VariableString)attvar.Attributes[2]).ValueString);
 
-        return new DoItFeedback(s, infos, l);
+        return new DoItFeedback(infos, l);
     }
 
     #endregion

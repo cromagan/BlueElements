@@ -44,13 +44,13 @@ internal class Method_Do : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var du = 0;
 
         do {
             du++;
-            if (du > 100000) { return new DoItFeedback(s, infos, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
+            if (du > 100000) { return new DoItFeedback(infos, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
             var scx = Method_CallByFilename.CallSub(s, infos, infos.CodeBlockAfterText, false, infos.Line - 1, "Do-Schleife");
             if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return scx; }
@@ -60,7 +60,7 @@ internal class Method_Do : Method {
 
         s.BreakFired = false;
 
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     #endregion

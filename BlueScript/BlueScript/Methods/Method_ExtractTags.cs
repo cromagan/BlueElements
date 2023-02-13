@@ -49,7 +49,7 @@ internal class Method_ExtractTags : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         const string Comment = "Mit dem Befehl 'ExtractTags' erstellt";
         s.Variables.RemoveWithComment(Comment);
@@ -70,7 +70,7 @@ internal class Method_ExtractTags : Method {
             }
         }
 
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     #endregion

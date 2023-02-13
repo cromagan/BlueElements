@@ -54,16 +54,16 @@ public class Method_WriteBackDBVariables : Method_Database {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var db = MyDatabase(s);
-        if (db == null) { return new DoItFeedback(s, infos, "Datenbankfehler!"); }
-        if (db?.ReadOnly ?? true) { return new DoItFeedback(s, infos, "Datenbank schreibgeschützt."); }
-        if (!s.ChangeValues) { return new DoItFeedback(s, infos, "Variabeln zurückschreiben im Testmodus deaktiviert."); }
+        if (db == null) { return new DoItFeedback(infos, "Datenbankfehler!"); }
+        if (db?.ReadOnly ?? true) { return new DoItFeedback(infos, "Datenbank schreibgeschützt."); }
+        if (!s.ChangeValues) { return new DoItFeedback(infos, "Variabeln zurückschreiben im Testmodus deaktiviert."); }
 
         db.WriteBackDBVariables(s.Variables);
 
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     #endregion

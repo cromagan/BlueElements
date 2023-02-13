@@ -43,10 +43,10 @@ internal class Method_Exception : Method {
     public override List<string>Comand(List<Variable>? currentvariables) => new() { "Exception" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(s, infos, "Die Ausführung wurde absichtlich abgebrochen."); }
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos, "Die Ausführung wurde absichtlich abgebrochen."); }
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(s, infos, "Die Ausführung wurde absichtlich abgebrochen.")
-            : new DoItFeedback(s, infos, "Exception: " + ((VariableString)attvar.Attributes[0]).ValueString);
+        return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(infos, "Die Ausführung wurde absichtlich abgebrochen.")
+            : new DoItFeedback(infos, "Exception: " + ((VariableString)attvar.Attributes[0]).ValueString);
     }
 
     #endregion

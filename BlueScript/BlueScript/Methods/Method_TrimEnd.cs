@@ -45,7 +45,7 @@ internal class Method_TrimEnd : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
         var val = ((VariableString)attvar.Attributes[0]).ValueString;
 
         string txt;
@@ -57,7 +57,7 @@ internal class Method_TrimEnd : Method {
             }
         } while (txt != val);
 
-        return new DoItFeedback(s, infos, val, string.Empty);
+        return new DoItFeedback(infos, val, string.Empty);
     }
 
     #endregion

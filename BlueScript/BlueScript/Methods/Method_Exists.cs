@@ -45,7 +45,7 @@ internal class Method_Exists : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.Falsch(s, infos) : DoItFeedback.Wahr(s, infos);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.Falsch(infos) : DoItFeedback.Wahr(infos);
     }
 
     #endregion

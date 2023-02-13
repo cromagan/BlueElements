@@ -40,18 +40,18 @@ internal class Method_Element : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "element" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "element" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
         var i = ((VariableFloat)attvar.Attributes[1]).ValueInt;
         var list = ((VariableListString)attvar.Attributes[0]).ValueList;
-        if( i < 0 || i >= list.Count ) {
-           return new DoItFeedback(s, infos, "Element nicht in Liste");
+        if (i < 0 || i >= list.Count) {
+            return new DoItFeedback(infos, "Element nicht in Liste");
         }
 
-          return  new DoItFeedback(s, infos, list[i], string.Empty);
+        return new DoItFeedback(infos, list[i], string.Empty);
     }
 
     #endregion

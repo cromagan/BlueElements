@@ -48,15 +48,15 @@ internal class Method_GetFiles : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var pf = ((VariableString)attvar.Attributes[0]).ValueString;
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback(s, infos, "Verzeichnis existiert nicht");
+            return new DoItFeedback(infos, "Verzeichnis existiert nicht");
         }
 
-        return new DoItFeedback(s, infos, Directory.GetFiles(pf, ((VariableString)attvar.Attributes[1]).ValueString));
+        return new DoItFeedback(infos, Directory.GetFiles(pf, ((VariableString)attvar.Attributes[1]).ValueString));
     }
 
     #endregion

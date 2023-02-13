@@ -71,10 +71,10 @@ public class VariableFilterItem : Variable {
     }
 
     public override DoItFeedback GetValueFrom(Variable variable) {
-        if (variable is not VariableFilterItem v) { return DoItFeedback.VerschiedeneTypen(null, null, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null, null); }
+        if (variable is not VariableFilterItem v) { return DoItFeedback.VerschiedeneTypen(null, this, variable); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null); }
         FilterItem = v.FilterItem;
-        return DoItFeedback.Null(null, null);
+        return DoItFeedback.Null(null);
     }
 
     protected override Variable? NewWithThisValue(object x, Script s) => null;

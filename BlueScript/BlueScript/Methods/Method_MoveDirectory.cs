@@ -47,21 +47,21 @@ internal class Method_MoveDirectory : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var sop = ((VariableString)attvar.Attributes[0]).ValueString;
-        if (!DirectoryExists(sop)) { return new DoItFeedback(s, infos, "Quell-Verzeichnis existiert nicht."); }
+        if (!DirectoryExists(sop)) { return new DoItFeedback(infos, "Quell-Verzeichnis existiert nicht."); }
         var dep = ((VariableString)attvar.Attributes[1]).ValueString;
 
-        if (DirectoryExists(dep)) { return new DoItFeedback(s, infos, "Ziel-Verzeichnis existiert bereits."); }
+        if (DirectoryExists(dep)) { return new DoItFeedback(infos, "Ziel-Verzeichnis existiert bereits."); }
 
-        if (!s.ChangeValues) { return new DoItFeedback(s, infos, "Verschieben im Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback(infos, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveDirectory(sop, dep, false)) {
-            return new DoItFeedback(s, infos, "Verschieben fehlgeschlagen.");
+            return new DoItFeedback(infos, "Verschieben fehlgeschlagen.");
         }
 
-        return DoItFeedback.Null(s, infos);
+        return DoItFeedback.Null(infos);
     }
 
     #endregion

@@ -44,11 +44,11 @@ internal class Method_DateTimeDifferenceInDays : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var d1 = ((VariableDateTime)attvar.Attributes[0]).ValueDate;
         var d2 = ((VariableDateTime)attvar.Attributes[1]).ValueDate;
-        return new DoItFeedback(s, infos, d1.Subtract(d2).TotalDays);
+        return new DoItFeedback(infos, d1.Subtract(d2).TotalDays);
     }
 
     #endregion
