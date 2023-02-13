@@ -44,14 +44,14 @@ internal class Method_IsType : Method {
 
     public override List<string> Comand(Script? s) => new() { "istype" };
 
-    public override DoItFeedback DoIt(CanDoFeedback infos, Script s) {
-        var attvar = SplitAttributeToVars(infos.AttributText, s, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, s, this, attvar); }
+    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
 
         if (string.Equals(attvar.Attributes[1].ReadableText, attvar.Attributes[0].MyClassId, StringComparison.OrdinalIgnoreCase)) {
-            return DoItFeedback.Wahr(infos, s);
+            return DoItFeedback.Wahr(s, infos);
         }
-        return DoItFeedback.Falsch(infos, s);
+        return DoItFeedback.Falsch(s, infos);
     }
 
     #endregion
