@@ -98,11 +98,13 @@
   <ItemGroup>
     <Compile Include="Accessor.cs" />
     <Compile Include="BitmapExt.cs" />
+    <Compile Include="Enums\AdditionalCheck.cs" />
     <Compile Include="Enums\SortierTyp.cs" />
     <Compile Include="EventArgs\MultiUserFileBackGroundWorker.cs" />
     <Compile Include="EventArgs\MultiUserToListEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserParseEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserHasPendingChangesEventArgs.cs" />
+    <Compile Include="FormatHolder.cs" />
     <Compile Include="ImageMatrix.cs" />
     <Compile Include="Enums\BlurType.cs" />
     <Compile Include="Enums\ErrorReason.cs" />
@@ -113,6 +115,7 @@
     <Compile Include="Interfaces\IHasKeyName.cs" />
     <Compile Include="Interfaces\IErrorCheckable.cs" />
     <Compile Include="Interfaces\IDisposableExtended.cs" />
+    <Compile Include="Interfaces\IInputFormat.cs" />
     <Compile Include="Interfaces\IReadableTextWithChangingAndKey.cs" />
     <Compile Include="Interfaces\IStringable.cs" />
     <Compile Include="Interfaces\IReadableText.cs" />

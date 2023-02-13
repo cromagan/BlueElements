@@ -74,7 +74,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLastFiles
             // 
-            this.btnLastFiles.AdditionalFormatCheck = AdditionalCheck.None;
+            this.btnLastFiles.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.None;
             this.btnLastFiles.Location = new Point(200, 2);
             this.btnLastFiles.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             this.btnLastFiles.Visible = false;

@@ -53,7 +53,6 @@ public class Method_SetError : Method_Database {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
         var see = s.Variables.GetSystem("SetErrorEnabled");
-
         if (see is not VariableBool seet) { return new DoItFeedback(infos, "SetErrorEnabled Variable nicht gefunden"); }
         if (!seet.ValueBool) { return new DoItFeedback(infos, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
 

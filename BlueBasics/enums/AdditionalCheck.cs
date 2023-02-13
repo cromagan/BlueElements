@@ -15,28 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
+namespace BlueBasics.Enums;
 
-using System.Collections.Generic;
-using BlueScript.Variables;
-
-namespace BlueDatabase.EventArgs;
-
-public class RowCheckedEventArgs : RowEventArgs {
-
-    #region Constructors
-
-    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors, List<Variable>? variables) : base(row) {
-        ColumnsWithErrors = columnsWithErrors;
-        Variables = variables;
-    }
-
-    #endregion
-
-    #region Properties
-
-    public List<string>? ColumnsWithErrors { get; }
-    public List<Variable>? Variables { get; }
-
-    #endregion
+public enum AdditionalCheck {
+    None = 0,
+    Integer = 1,
+    Float = 2,
+    DateTime = 3,
+    Path = 4
 }

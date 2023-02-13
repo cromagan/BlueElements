@@ -25,6 +25,7 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -40,7 +41,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("ValueChanged")]
-public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable, IAcceptVariableList {
+public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable, IAcceptVariableList, IDisposableExtended {
 
     #region Fields
 

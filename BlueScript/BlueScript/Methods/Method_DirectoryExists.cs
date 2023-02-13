@@ -19,6 +19,19 @@ using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+
+using System.Collections.Generic;
+
+using System.Drawing;
+using System.Threading;
+
+using BlueBasics;
+
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using static BlueBasics.Converter;
+using BlueDatabase;
 
 namespace BlueScript.Methods;
 
@@ -47,7 +60,14 @@ internal class Method_DirectoryExists : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
 
-        return new DoItFeedback(infos, IO.DirectoryExists(((VariableString)attvar.Attributes[0]).ValueString));
+        var pf = ((VariableString)attvar.Attributes[0]).ValueString;
+
+        if (!pf.IsFormat(FormatHolder.Filepath)) {
+            return new DoItFeedback(infos, "Dateipfad ungültig: " + pf);
+        }
+        //if(pf.IsFormat(FormatHolder.FilepathAndName))
+
+        return new DoItFeedback(infos, IO.DirectoryExists(pf));
     }
 
     #endregion

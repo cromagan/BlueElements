@@ -109,7 +109,6 @@
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="ColumnFormatHolder.cs" />
     <Compile Include="EventScript.cs" />
-    <Compile Include="FormatHolder.cs" />
     <Compile Include="Interfaces\IColumnInputFormat.cs" />
     <Compile Include="Interfaces\IHasChangeabelDatabase.cs" />
     <Compile Include="Interfaces\IHasDatabase.cs" />
@@ -119,14 +118,12 @@
     <Compile Include="Enums\Ansicht.cs" />
     <Compile Include="SQLBackAbstract.cs" />
     <Compile Include="Enums\AlignmentHorizontal.cs" />
-    <Compile Include="Enums\AdditionalCheck.cs" />
     <Compile Include="Enums\EditTypeFormula.cs" />
     <Compile Include="Enums\ScriptType.cs" />
     <Compile Include="Enums\TranslationType.cs" />
     <Compile Include="Enums\ÜberschriftAnordnung.cs" />
     <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
     <Compile Include="Interfaces\ITranslateAble.cs" />
-    <Compile Include="Interfaces\IInputFormat.cs" />
     <Compile Include="RowData.cs" />
     <Compile Include="ColumnCollection.cs" />
     <Compile Include="ColumnItem.cs" />

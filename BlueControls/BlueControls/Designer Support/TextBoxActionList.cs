@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.Design;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueDatabase;
 using BlueDatabase.Interfaces;

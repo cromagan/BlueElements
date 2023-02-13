@@ -19,6 +19,7 @@
 
 using System.Collections.ObjectModel;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 
 namespace BlueDatabase.Interfaces;

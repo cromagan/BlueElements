@@ -28,6 +28,7 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueScript;
+using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using ComboBox = BlueControls.Controls.ComboBox;
@@ -88,21 +89,23 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
             if (IsDisposed) { return; }
             if (value == _row) { return; }
 
+            if (_row != null) { _row.RowChecked -= _row_RowChecked; }
+
             _row = value;
-            Script = null;
-            DoChilds(this, _row);
+
+            if (_row != null) { _row.RowChecked += _row_RowChecked; }
+
+            DoChilds(this, _row, Variables);
         }
     }
 
-    public Script? Script { get; set; }
+    public List<Variable>? Variables { get; set; }
 
     #endregion
 
     #region Methods
 
-    public static void DoChilds(ICalculateRowsControlLevel con, RowItem? row) {
-        //if (_disposing || IsDisposed) { return; }
-
+    public static void DoChilds(ICalculateRowsControlLevel con, RowItem? row, List<Variable>? variables) {
         foreach (var thischild in con.Childs) {
             var did = false;
 
@@ -112,11 +115,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
             }
 
             if (!did && thischild is IAcceptVariableList rv) {
-                //if (row != null && rv.OriginalText.Contains("~") && con.Script == null) {
-                //    (_, _, con.Script) = row.ExecuteScript("to be sure", false);
-                //}
-
-                DoChilds_VariableList(rv, con.Script);
+                DoChilds_VariableList(rv, variables);
                 did = true;
             }
 
@@ -134,6 +133,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
         if (disposing) {
             _disposing = true;
+            Row = null;
 
             Tag = null;
 
@@ -179,9 +179,15 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
     }
 
-    private static void DoChilds_VariableList(IAcceptVariableList fcfc, Script? script) =>
-        // Normales Zellenfeld
-        fcfc.ParseVariables(script?.Variables);
+    private static void DoChilds_VariableList(IAcceptVariableList fcfc, List<Variable>? variables) => fcfc.ParseVariables(variables);
+
+    private void _row_RowChecked(object sender, BlueDatabase.EventArgs.RowCheckedEventArgs e) {
+        if (IsDisposed) { return; }
+        if (_row == e.Row) {
+            Variables = e.Variables;
+            DoChilds(this, _row, Variables);
+        }
+    }
 
     private void CalculateRows() {
         if (_disposing || IsDisposed) { return; }
@@ -309,7 +315,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
             _rows = Database?.Row.CalculateFilteredRows(f);
 
-            Script = null;
+            Variables = null;
 
             #endregion
         }
@@ -319,7 +325,10 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         UpdateMyCollection();
     }
 
-    private void Childs_ItemAdded(object sender, ListEventArgs e) => DoChilds(this, _row);
+    private void Childs_ItemAdded(object sender, ListEventArgs e) {
+        if (IsDisposed) { return; }
+        DoChilds(this, _row, Variables);
+    }
 
     private void GetParentsList() {
         if (_disposing || IsDisposed || Parent == null) { return; }

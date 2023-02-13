@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using BlueBasics.Interfaces;
 using BlueDatabase.Interfaces;
 using BlueScript;
 using BlueScript.Structures;

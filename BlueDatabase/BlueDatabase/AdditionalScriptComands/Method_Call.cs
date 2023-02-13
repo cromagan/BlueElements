@@ -62,7 +62,7 @@ internal class Method_Call : Method_Database {
         if (sc == null) { return new DoItFeedback(infos, "Skript nicht vorhanden: " + vs.ValueString); }
         var f = Script.ReduceText(sc.Script);
 
-        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, f, false, 0, "Subroutine " + vs.ValueString);
+        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, f, ((VariableBool)attvar.Attributes[1]).ValueBool, 0, "Subroutine " + vs.ValueString);
         s.BreakFired = false;
 
         return scx;

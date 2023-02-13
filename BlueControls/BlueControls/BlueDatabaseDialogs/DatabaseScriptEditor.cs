@@ -170,6 +170,7 @@ public sealed partial class DatabaseScriptEditor {
     private void chkZeile_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
         Item.NeedRow = chkZeile.Checked;
+        txbTestZeile.Enabled = chkZeile.Checked;
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) {

@@ -17,9 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueScript;
+using BlueScript.Variables;
 
 namespace BlueControls.Interfaces;
 
@@ -34,7 +36,7 @@ public interface ICalculateRowsControlLevel : IHasDatabase {
 
     public ListExt<Control> Childs { get; }
 
-    public Script? Script { get; set; }
+    public List<Variable>? Variables { get; set; }
 
     #endregion
 }

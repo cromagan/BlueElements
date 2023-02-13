@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -234,6 +235,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr(), string.Empty);
         }
     }
+
+    [DefaultValue(true)]
+    public bool DropMessages { get; set; } = true;
 
     public ReadOnlyCollection<EventScript?> EventScript {
         get => new(_EventScript);
@@ -870,6 +874,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 WriteBackDBVariables(vars);
             }
 
+            if (!string.IsNullOrEmpty(scf.ErrorMessage)) {
+                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.Name + "' hat einen Fehler verursacht.");
+            }
+
             #endregion
 
             return scf;
@@ -1435,6 +1443,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     //public abstract void WaitEditable();
     internal void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }
+        if (!DropMessages) { return; }
         DropMessage?.Invoke(this, new MessageEventArgs(type, message));
     }
 

@@ -463,6 +463,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     private DatabaseAbstract GenerateFilterDatabase() {
         Database x = new(false, "Filterdatabase_" + KeyName);
+        x.DropMessages = false;
 
         var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.TextOptions);
         sp.Align = AlignmentHorizontal.Rechts;

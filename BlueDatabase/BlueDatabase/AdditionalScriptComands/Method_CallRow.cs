@@ -34,7 +34,7 @@ public class Method_CallRow : Method_Database {
         "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
         "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
-        "die vorher veränderr wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
+        "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
     public override bool EndlessArgs => false;
 
@@ -56,6 +56,10 @@ public class Method_CallRow : Method_Database {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+
+        var see = s.Variables.GetSystem("SetErrorEnabled");
+        if (see is not VariableBool seet) { return new DoItFeedback(infos, "SetErrorEnabled Variable nicht gefunden"); }
+        if (seet.ValueBool) { return new DoItFeedback(infos, "'CallRow' bei FehlerCheck Routinen nicht erlaubt."); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
 

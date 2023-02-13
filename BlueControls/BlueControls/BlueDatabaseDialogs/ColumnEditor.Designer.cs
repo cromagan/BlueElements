@@ -1279,7 +1279,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tbxMaxTextLenght
             // 
-            this.tbxMaxTextLenght.AdditionalFormatCheck = AdditionalCheck.Integer;
+            this.tbxMaxTextLenght.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.Integer;
             this.tbxMaxTextLenght.AllowedChars = "0123456789";
             this.tbxMaxTextLenght.Cursor = Cursors.IBeam;
             this.tbxMaxTextLenght.Location = new Point(680, 232);

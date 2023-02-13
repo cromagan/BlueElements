@@ -34,6 +34,23 @@ using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
+using System;
+using System.Collections.Generic;
+
+using System.ComponentModel;
+
+using System.Drawing;
+
+using System.Windows.Forms;
+
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
+using static BlueBasics.Converter;
+
 namespace BlueDatabase;
 
 public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExtended, IColumnInputFormat, IErrorCheckable, IHasDatabase, IHasKeyName {

@@ -34,7 +34,7 @@ public class Method_CallFilter : Method_Database {
                                             "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
                                             "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
                                             "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
-                                            "die vorher veränderr wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
+                                            "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
     public override bool EndlessArgs => true;
 
@@ -57,6 +57,10 @@ public class Method_CallFilter : Method_Database {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+
+        var see = s.Variables.GetSystem("SetErrorEnabled");
+        if (see is not VariableBool seet) { return new DoItFeedback(infos, "SetErrorEnabled Variable nicht gefunden"); }
+        if (seet.ValueBool) { return new DoItFeedback(infos, "'CallFilter' bei FehlerCheck Routinen nicht erlaubt."); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 

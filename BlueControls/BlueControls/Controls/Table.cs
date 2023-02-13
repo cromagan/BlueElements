@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;

@@ -275,12 +275,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
     public string CheckRowData() {
         if (Database is null || Database.IsDisposed) { return "Datenbank verworfen"; }
-        //if (r?.Database != Database) { return "Datenbank Konflikt"; }
 
-        if (Database.Row.LastCheckedRow != Key) {
+        ScriptEndedFeedback? sef = null;
+
+        Database.Row.LastCheckedRow = null;
+
+        while (Database.Row.LastCheckedRow != this) {
             Database.Row.LastCheckedRowFeedback.Clear();
-            ExecuteScript(EventTypes.error_check, string.Empty, false, false, true, 0);
+            sef = ExecuteScript(EventTypes.error_check, string.Empty, false, false, true, 0);
         }
+
+        if (sef is null) { return string.Empty; }
 
         var infoTxt = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
 
@@ -304,7 +309,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
                 CellSet(Database.Column.SysCorrect, cols.Count == 0);
             }
         }
-        OnRowChecked(new RowCheckedEventArgs(this, cols));
+        OnRowChecked(new RowCheckedEventArgs(this, cols, sef.Variables));
 
         return infoTxt;
     }
@@ -534,6 +539,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
         DoingScript = true;
         var script = Database.ExecuteScript(eventname, scriptname, changevalues, this);
+
+        Database.Row.LastCheckedRow = this;
 
         if (changevalues) {
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe

@@ -36,7 +36,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     #region Fields
 
     public readonly List<string> LastCheckedRowFeedback = new();
-    public long LastCheckedRow = -1;
+    public RowItem? LastCheckedRow = null;
     private readonly ConcurrentDictionary<long, RowItem?> _internal = new();
     private bool _throwEvents = true;
 
