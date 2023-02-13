@@ -68,7 +68,7 @@ public class Method_Row : Method_Database {
 
     public static DoItFeedback RowToObjectFeedback(Script s, CanDoFeedback? infos, RowItem? row) => new(s, infos, new VariableRowItem(row));
 
-    public override List<string> Comand(Script? s) => new() { "row" };
+    public override List<string> Comand(List<Variable> currentvariables) => new() { "row" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);

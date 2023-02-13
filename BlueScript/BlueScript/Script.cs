@@ -109,8 +109,6 @@ public class Script {
     public bool BreakFired { get; set; }
 
     public string ReducedScriptText { get; private set; }
-    public int Schleife { get; internal set; }
-
     public string ScriptText { get; set; } = string.Empty;
 
     public int Sub { get; set; }
@@ -202,7 +200,6 @@ public class Script {
     public ScriptEndedFeedback Parse(int lineadd) {
         ReducedScriptText = ReduceText(ScriptText);
         BreakFired = false;
-        Schleife = 0;
         Sub = 0;
 
         return Parse(ReducedScriptText, lineadd);

@@ -40,7 +40,7 @@ internal class Method_String : Method {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "string" };
+    public override List<string>Comand(List<Variable>? currentvariables) => new() { "string" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);

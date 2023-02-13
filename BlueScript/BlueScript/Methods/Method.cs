@@ -99,7 +99,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         List<string> c = new();
         foreach (var thisc in Script.Comands) {
             if (!string.IsNullOrEmpty(thisc.Returns)) {
-                c.AddRange(thisc.Comand(s).Select(thiscs => thiscs + thisc.StartSequence));
+                c.AddRange(thisc.Comand(s.Variables).Select(thiscs => thiscs + thisc.StartSequence));
             }
         }
         var posc = 0;
@@ -247,38 +247,38 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s, int line) {
         if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns)) {
-            return new CanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false, line);
+            return new CanDoFeedback(scriptText, pos, "Befehl an dieser Stelle nicht möglich", false, line);
         }
         if (expectedvariablefeedback && string.IsNullOrEmpty(Returns)) {
-            return new CanDoFeedback(pos, "Befehl an dieser Stelle nicht möglich", false, line);
+            return new CanDoFeedback(scriptText, pos, "Befehl an dieser Stelle nicht möglich", false, line);
         }
         var maxl = scriptText.Length;
 
-        foreach (var thiscomand in Comand(s)) {
+        foreach (var thiscomand in Comand(s.Variables)) {
             var comandtext = thiscomand + StartSequence;
             var l = comandtext.Length;
             if (pos + l < maxl) {
                 if (string.Equals(scriptText.Substring(pos, l), comandtext, StringComparison.OrdinalIgnoreCase)) {
                     var f = GetEnd(scriptText, pos + thiscomand.Length, StartSequence.Length);
                     if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                        return new CanDoFeedback(f.ContinuePosition, "Fehler bei " + comandtext + ": " + f.ErrorMessage, true, line);
+                        return new CanDoFeedback(scriptText, f.ContinuePosition, "Fehler bei " + comandtext + ": " + f.ErrorMessage, true, line);
                     }
                     var cont = f.ContinuePosition;
                     var codebltxt = string.Empty;
                     if (GetCodeBlockAfter) {
                         var (item1, item2) = GetCodeBlockText(scriptText, cont);
-                        if (!string.IsNullOrEmpty(item2)) { return new CanDoFeedback(f.ContinuePosition, item2, true, line); }
+                        if (!string.IsNullOrEmpty(item2)) { return new CanDoFeedback(scriptText, f.ContinuePosition, item2, true, line); }
                         codebltxt = item1;
                         cont = cont + codebltxt.Length + 2;
                     }
-                    return new CanDoFeedback(cont, comandtext, f.AttributeText, codebltxt, line);
+                    return new CanDoFeedback(scriptText, cont, comandtext, f.AttributeText, codebltxt, line);
                 }
             }
         }
-        return new CanDoFeedback(pos, "Kann nicht geparst werden", false, line);
+        return new CanDoFeedback(scriptText, pos, "Kann nicht geparst werden", false, line);
     }
 
-    public abstract List<string> Comand(Script? s);
+    public abstract List<string> Comand(List<Variable> currentvariables);
 
     public abstract DoItFeedback DoIt(Script s, CanDoFeedback infos);
 

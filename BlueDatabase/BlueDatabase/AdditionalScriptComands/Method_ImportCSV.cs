@@ -43,7 +43,7 @@ internal class Method_ImportCSV : Method_Database {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "importcsv" };
+    public override List<string> Comand(List<Variable> currentvariables) => new() { "importcsv" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
@@ -53,7 +53,7 @@ internal class Method_ImportCSV : Method_Database {
         var sep = ((VariableString)attvar.Attributes[1]).ValueString;
 
         var db = MyDatabase(s);
-
+        if (db == null) { return new DoItFeedback(s, infos, "Datenbankfehler!"); }
         if (db?.ReadOnly ?? true) { return new DoItFeedback(s, infos, "Datenbank schreibgeschützt."); }
         if (!s.ChangeValues) { return new DoItFeedback(s, infos, "Import im Testmodus deaktiviert."); }
 

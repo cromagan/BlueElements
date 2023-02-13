@@ -41,7 +41,7 @@ internal class Method_ClipboardText : Method {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "clipboardtext" };
+    public override List<string>Comand(List<Variable>? currentvariables) => new() { "clipboardtext" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);

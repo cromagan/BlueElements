@@ -41,7 +41,7 @@ internal class Method_IndexOf : Method {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "indexof" };
+    public override List<string>Comand(List<Variable>? currentvariables) => new() { "indexof" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);

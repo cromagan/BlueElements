@@ -19,6 +19,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Threading;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -163,7 +165,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
     public string ErrorReason() {
         if (Database?.IsDisposed ?? true) { return "Datenbank verworfen"; }
 
-        if (string.IsNullOrEmpty(_script)) { return "Kein Skript angegeben."; }
+        //if (string.IsNullOrEmpty(_script)) { return "Kein Skript angegeben."; }
 
         if (string.IsNullOrEmpty(_name)) { return "Kein Name angegeben."; }
 
@@ -243,7 +245,25 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
     public QuickImage? SymbolForReadableText() {
         if (!IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
 
-        return null;
+        var symb = ImageCode.Formel;
+        var c = Color.Transparent;
+
+        if (_executable) {
+            c = Color.Yellow;
+            symb = ImageCode.Person;
+        }
+
+        if (_eventTypes.HasFlag(EventTypes.new_row)) { symb = ImageCode.Zeile; }
+        if (_eventTypes.HasFlag(EventTypes.value_changed)) { symb = ImageCode.Stift; }
+        if (_eventTypes.HasFlag(EventTypes.error_check)) { symb = ImageCode.HäkchenDoppelt; }
+
+
+
+
+
+        if (!_changeValues) { }
+
+        return QuickImage.Get(symb, 16, c, Color.Transparent);
     }
 
     public override string ToString() {

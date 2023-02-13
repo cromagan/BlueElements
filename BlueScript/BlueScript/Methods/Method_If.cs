@@ -80,19 +80,16 @@ internal class Method_if : Method {
         return null;
     }
 
-    public override List<string> Comand(Script? s) => new() { "if" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "if" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(s, infos, this, attvar); }
-        if (((VariableBool)attvar.Attributes[0]).ValueBool) {
-            var scx = s.Parse(infos.CodeBlockAfterText, infos.Line-1);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) {
-                //var ind =
-                //var line =    scx.LastlineNo + Script.Line(s.ReducedScriptText, infos.ContinueOrErrorPosition) - Script.Line(infos.CodeBlockAfterText, infos.CodeBlockAfterText.Length);
 
-                return new DoItFeedback(scx.ErrorMessage, scx.LastlineNo);
-            }
+        if (((VariableBool)attvar.Attributes[0]).ValueBool) {
+            var scx = Method_CallByFilename.CallSub(s, infos, infos.CodeBlockAfterText, true, infos.Line - 1, "If-Befehl");
+            //s.BreakFired = false;
+            return scx;
         }
 
         return DoItFeedback.Null(s, infos);

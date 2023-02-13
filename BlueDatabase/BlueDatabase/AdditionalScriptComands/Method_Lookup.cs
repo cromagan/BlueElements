@@ -49,7 +49,7 @@ public class Method_Lookup : Method_Database {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "lookup" };
+    public override List<string> Comand(List<Variable> currentvariables) => new() { "lookup" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);

@@ -47,7 +47,7 @@ public class Method_ContentsFilter : Method_Database {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "contentsfilter" };
+    public override List<string> Comand(List<Variable> currentvariables) => new() { "contentsfilter" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);

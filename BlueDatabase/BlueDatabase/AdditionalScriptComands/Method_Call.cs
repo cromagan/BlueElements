@@ -46,7 +46,7 @@ internal class Method_Call : Method_Database {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "call" };
+    public override List<string> Comand(List<Variable> currentvariables) => new() { "call" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
@@ -62,31 +62,10 @@ internal class Method_Call : Method_Database {
         if (sc == null) { return new DoItFeedback(s, infos, "Skript nicht vorhanden: " + vs.ValueString); }
         var f = Script.ReduceText(sc.Script);
 
-        //var weiterLine = s.Line;
-        //s.Line = 1;
-        s.Sub++;
-
-        if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-            var scx = s.Parse(f, 0);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(s, infos, "Subroutine '" + vs.ValueString + "' Zeile " + scx.LastlineNo + ": " + scx.ErrorMessage); }
-        } else {
-            var tmpv = new List<Variable>();
-            tmpv.AddRange(s.Variables);
-
-            var scx = s.Parse(f, 0);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(s, infos, "Subroutine '" + vs.ValueString + "' Zeile " + scx.LastlineNo + ": " + scx.ErrorMessage); }
-
-            s.Variables.Clear();
-            s.Variables.AddRange(tmpv);
-        }
-        s.Sub--;
-
-        if (s.Sub < 0) { return new DoItFeedback(s, infos, "Subroutinen-Fehler"); }
-
-        //s.Line = weiterLine;
+        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, f, false, 0, "Subroutine " + vs.ValueString);
         s.BreakFired = false;
 
-        return DoItFeedback.Null(s, infos);
+        return scx;
     }
 
     #endregion

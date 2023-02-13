@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
@@ -44,10 +45,10 @@ internal class Method_Break : Method {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "break" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "break" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        if (s.Schleife < 1 && s.Sub < 1) { return new DoItFeedback(s, infos, "Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
+        if (s.Sub < 1) { return new DoItFeedback(s, infos, "Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
 
         if (s.BreakFired) { return new DoItFeedback(s, infos, "Break doppelt ausgelöst."); }
         s.BreakFired = true;

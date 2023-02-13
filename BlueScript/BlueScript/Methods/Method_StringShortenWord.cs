@@ -42,7 +42,7 @@ internal class Method_StringShortenWord : Method {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "stringshortenword" };
+    public override List<string>Comand(List<Variable>? currentvariables) => new() { "stringshortenword" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);

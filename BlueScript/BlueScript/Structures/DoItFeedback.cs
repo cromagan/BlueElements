@@ -41,19 +41,19 @@ public struct DoItFeedback {
     public DoItFeedback(Script? s, CanDoFeedback? infos) {
         ErrorMessage = string.Empty;
         Variable = null;
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     public DoItFeedback(Script? s, CanDoFeedback? infos, string errormessage) {
         ErrorMessage = errormessage;
         Variable = null;
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     public DoItFeedback(Script? s, CanDoFeedback? infos, Variable variable) {
         ErrorMessage = string.Empty;
         Variable = variable;
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     public DoItFeedback(string errormessage, int line) {
@@ -65,49 +65,49 @@ public struct DoItFeedback {
     public DoItFeedback(Script? s, CanDoFeedback? infos, string valueString, string errormessage) {
         ErrorMessage = errormessage;
         Variable = new VariableString(Variable.DummyName(), valueString);
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     public DoItFeedback(Script? s, CanDoFeedback? infos, List<string>? list) {
         ErrorMessage = string.Empty;
         Variable = new VariableListString(list);
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     public DoItFeedback(Script? s, CanDoFeedback? infos, Bitmap bmp) {
         ErrorMessage = string.Empty;
         Variable = new VariableBitmap(bmp);
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     public DoItFeedback(Script? s, CanDoFeedback? infos, bool value) {
         ErrorMessage = string.Empty;
         Variable = new VariableBool(value);
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     public DoItFeedback(Script? s, CanDoFeedback? infos, double value) {
         ErrorMessage = string.Empty;
         Variable = new VariableFloat((float)value);
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     public DoItFeedback(Script? s, CanDoFeedback? infos, float value) {
         ErrorMessage = string.Empty;
         Variable = new VariableFloat(value);
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     public DoItFeedback(Script? s, CanDoFeedback? infos, DateTime value) {
         ErrorMessage = string.Empty;
         Variable = new VariableDateTime(value);
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     public DoItFeedback(Script? s, CanDoFeedback? infos, string[] list) {
         ErrorMessage = string.Empty;
         Variable = new VariableListString(list);
-        Line = Script.Line(s?.ScriptText, infos?.ContinueOrErrorPosition);
+        Line = Script.Line(infos?.CurrentReducedScriptText, infos?.ContinueOrErrorPosition);
     }
 
     #endregion

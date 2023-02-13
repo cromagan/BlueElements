@@ -40,7 +40,7 @@ internal class Method_Exception : Method {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "Exception" };
+    public override List<string>Comand(List<Variable>? currentvariables) => new() { "Exception" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(s, infos, "Die Ausführung wurde absichtlich abgebrochen."); }

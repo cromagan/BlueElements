@@ -133,7 +133,7 @@ public sealed class ColumnViewItem {
         get => _viewType == ViewType.PermanentColumn;
         set {
             if (!PermanentPossible() && Permanent) { return; }
-            if (!NonPermanentPossible() && !Permanent) { return; }
+            if (!NonPermanentPossible() && !value) { return; }
 
             if (value == Permanent) { return; }
 

@@ -32,7 +32,9 @@ public class Method_CallFilter : Method_Database {
 
     public override string Description => "Sucht Zeilen und ruft in dessen Datenbank ein Skript für jede Zeile aus.\r\n" +
                                             "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
-                                            "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.";
+                                            "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
+                                            "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
+                                            "die vorher veränderr wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
     public override bool EndlessArgs => true;
 
@@ -50,7 +52,7 @@ public class Method_CallFilter : Method_Database {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "callfilter" };
+    public override List<string> Comand(List<Variable> currentvariables) => new() { "callfilter" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);

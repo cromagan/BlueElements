@@ -46,7 +46,7 @@ public class Method_RowCount : Method_Database {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "rowcount" };
+    public override List<string>Comand(List<Variable>? currentvariables) => new() { "rowcount" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);

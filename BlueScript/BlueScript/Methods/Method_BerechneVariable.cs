@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Generic;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -89,7 +91,7 @@ internal class Method_BerechneVariable : Method {
         return v.GetValueFrom(attvar.Attributes[0]);
     }
 
-    public override List<string> Comand(Script? s) => s == null ? new List<string>() : s.Variables.AllNames();
+    public override List<string> Comand(List<Variable> currentvariables) => currentvariables?.AllNames() ?? new List<string>();
 
     /// <summary>
     /// Berechnet z.B.   X = 5;

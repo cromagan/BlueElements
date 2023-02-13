@@ -26,7 +26,7 @@ using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
-internal class Method_CallByFilename : Method {
+public class Method_CallByFilename : Method {
 
     #region Properties
 
@@ -47,7 +47,30 @@ internal class Method_CallByFilename : Method {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "callbyfilename" };
+    public static DoItFeedback CallSub(Script s, CanDoFeedback infos, string reducedscripttext, bool keepVariables, int lineadd, string name) {
+        s.Sub++;
+
+        if (keepVariables) {
+            var scx = s.Parse(reducedscripttext, lineadd);
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback( "Fehler innerhalb " + name + ": " + scx.ErrorMessage, scx.LastlineNo); }
+        } else {
+            var tmpv = new List<Variable>();
+            tmpv.AddRange(s.Variables);
+
+            var scx = s.Parse(reducedscripttext, lineadd);
+            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback( "Fehler innerhalb " + name + ": " + scx.ErrorMessage, scx.LastlineNo); }
+
+            s.Variables.Clear();
+            s.Variables.AddRange(tmpv);
+        }
+        s.Sub--;
+
+        if (s.Sub < 0) { return new DoItFeedback(s, infos, "Subroutinen-Fehler"); }
+
+        return DoItFeedback.Null(s, infos);
+    }
+
+    public override List<string> Comand(List<Variable> currentvariables) => new() { "callbyfilename" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
@@ -70,33 +93,7 @@ internal class Method_CallByFilename : Method {
 
         f = Script.ReduceText(f);
 
-        //var weiterLine = s.Line;
-
-        //s.Line = 1;
-
-        s.Sub++;
-
-        if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-            var scx = s.Parse(f, 0);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(s, infos, "Subroutine " + vs.ValueString + ": " + scx.ErrorMessage); }
-        } else {
-            var tmpv = new List<Variable>();
-            tmpv.AddRange(s.Variables);
-
-            var scx = s.Parse(f, 0);
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return new DoItFeedback(s, infos, "Subroutine " + vs.ValueString + ": " + scx.ErrorMessage); }
-
-            s.Variables.Clear();
-            s.Variables.AddRange(tmpv);
-        }
-        s.Sub--;
-
-        if (s.Sub < 0) { return new DoItFeedback(s, infos, "Subroutinen-Fehler"); }
-
-        //s.Line = weiterLine;
-        s.BreakFired = false;
-
-        return DoItFeedback.Null(s, infos);
+        return CallSub(s, infos, f, ((VariableBool)attvar.Attributes[1]).ValueBool, 0, vs.ValueString);
     }
 
     #endregion

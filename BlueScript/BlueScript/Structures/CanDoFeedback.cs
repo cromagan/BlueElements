@@ -43,9 +43,13 @@ public readonly struct CanDoFeedback {
     /// </summary>
     public readonly int ContinueOrErrorPosition;
 
-    public readonly string ErrorMessage;
+    /// <summary>
+    /// Der komplette Scripttext, der aktuell ausgeführt werden soll.
+    /// Kann von Script abweichen, wenn z.B. eine Subroutine ausgeführt wird.
+    /// </summary>
+    public readonly string CurrentReducedScriptText;
 
-    //public readonly int LineBreakInCodeBlock;
+    public readonly string ErrorMessage;
 
     public readonly int Line;
 
@@ -58,7 +62,7 @@ public readonly struct CanDoFeedback {
 
     #region Constructors
 
-    public CanDoFeedback(int errorposition, string errormessage, bool mustabort, int line) {
+    public CanDoFeedback(string reducedscript, int errorposition, string errormessage, bool mustabort, int line) {
         ContinueOrErrorPosition = errorposition;
         ErrorMessage = errormessage;
         MustAbort = mustabort;
@@ -66,9 +70,10 @@ public readonly struct CanDoFeedback {
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
         Line = line;
+        CurrentReducedScriptText = reducedscript;
     }
 
-    public CanDoFeedback(int continuePosition, string comandText, string attributtext, string codeblockaftertext, int line) {
+    public CanDoFeedback(string reducedscript, int continuePosition, string comandText, string attributtext, string codeblockaftertext, int line) {
         ContinueOrErrorPosition = continuePosition;
         ErrorMessage = string.Empty;
         MustAbort = false;
@@ -76,13 +81,8 @@ public readonly struct CanDoFeedback {
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
         Line = line;
+        CurrentReducedScriptText = reducedscript;
     }
-
-    #endregion
-
-    #region Methods
-
-    public int CodeBlockLines() => CodeBlockAfterText.Count(c => c == '¶');
 
     #endregion
 }

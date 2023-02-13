@@ -41,7 +41,7 @@ internal class Method_StringToUTF8 : Method {
 
     #region Methods
 
-    public override List<string> Comand(Script? s) => new() { "stringtoutf8" };
+    public override List<string>Comand(List<Variable>? currentvariables) => new() { "stringtoutf8" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);

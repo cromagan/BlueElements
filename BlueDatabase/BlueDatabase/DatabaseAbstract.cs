@@ -31,6 +31,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
+using BlueDatabase.AdditionalScriptComands;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
@@ -74,30 +75,19 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private readonly List<ExportDefinition?> _export = new();
 
     private readonly LayoutCollection _layouts = new();
-
     private readonly List<string> _permissionGroupsNewRow = new();
-
     private readonly long _startTick = DateTime.UtcNow.Ticks;
-
     private readonly List<string> _tags = new();
-
     private readonly List<VariableString> _variables = new();
-
     private string _additionalFilesPfad = string.Empty;
-
     private BackgroundWorker? _backgroundWorker;
-
     private string _cachePfad = string.Empty;
-
     private string _caption = string.Empty;
-
     private Timer _checker;
-
     private int _checkerTickCount = -5;
-
     private string _createDate = string.Empty;
-
     private string _creator = string.Empty;
+    private string _EventScriptTmp = string.Empty;
 
     //private string _firstColumn;
     private double _globalScale;
@@ -248,8 +238,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public ReadOnlyCollection<EventScript?> EventScript {
         get => new(_EventScript);
         set {
-            if (_EventScript.ToString(false) == value.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.EventScript, null, null, _EventScript.ToString(true), value.ToString(true), string.Empty);
+            if (_EventScriptTmp == value.ToString(false)) { return; }
+            _ = ChangeData(DatabaseDataType.EventScript, null, null, _EventScriptTmp, value.ToString(true), string.Empty);
         }
     }
 
@@ -870,20 +860,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             #region Variablen zurückschreiben und Special Rules ausführen
 
-            if (sc.ChangeValues && changevalues && !string.IsNullOrEmpty(scf.ErrorMessage)) {
+            if (sc.ChangeValues && changevalues && string.IsNullOrEmpty(scf.ErrorMessage)) {
                 if (row != null) {
                     foreach (var thisCol in Column) {
                         row.VariableToCell(thisCol, vars);
                     }
                 }
 
-                foreach (var thisvar in Variables) {
-                    var v = vars.Get("DB_" + thisvar.Name);
-
-                    if (v is VariableString vs) {
-                        thisvar.ValueString = vs.ValueString;
-                    }
-                }
+                WriteBackDBVariables(vars);
             }
 
             #endregion
@@ -938,25 +922,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <param name="firstRow">Ob in der ersten Zeile der Spaltenname ist, oder ob sofort Daten kommen.</param>
-    /// <param name="column">Die Spalte, die zurückgegeben wird.</param>
-    /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle Zeilen zurück.</param>
-    /// <returns></returns>
-
     public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>
         //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
         Export_CSV(firstRow, new List<ColumnItem?> { column }, sortedRows);
-
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <param name="firstRow">Ob in der ersten Zeile der Spaltenname ist, oder ob sofort Daten kommen.</param>
-    /// <param name="columnList">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
-    /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
-    /// <returns></returns>
 
     public string Export_CSV(FirstRow firstRow, List<ColumnItem> columnList, List<RowData>? sortedRows) {
         columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
@@ -1014,34 +982,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return sb.ToString().TrimEnd("\r\n");
     }
 
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <param name="firstRow">Ob in der ersten Zeile der Spaltenname ist, oder ob sofort Daten kommen.</param>
-    /// <param name="arrangement">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
-    /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
-    /// <returns></returns>
-
     public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, List<RowData>? sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
-
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <returns></returns>
 
     public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter, List<RowItem?>? pinned) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
 
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <returns></returns>
-
     public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem?>? pinned) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
-
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <returns></returns>
 
     public void Export_HTML(string filename, List<ColumnItem?>? columnList, List<RowData> sortedRows, bool execute) {
         if (columnList == null || columnList.Count == 0) {
@@ -1106,13 +1051,45 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         da.Save(filename, execute);
     }
 
+    public void Export_HTML(string filename, ColumnViewCollection? arrangement, List<RowData?> sortedRows, bool execute) => Export_HTML(filename, arrangement.ListOfUsedColumn(), sortedRows, execute);
+
+    /// <summary>
+    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
+    /// </summary>
+    /// <param name="firstRow">Ob in der ersten Zeile der Spaltenname ist, oder ob sofort Daten kommen.</param>
+    /// <param name="column">Die Spalte, die zurückgegeben wird.</param>
+    /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle Zeilen zurück.</param>
+    /// <returns></returns>
+    /// <summary>
+    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
+    /// </summary>
+    /// <param name="firstRow">Ob in der ersten Zeile der Spaltenname ist, oder ob sofort Daten kommen.</param>
+    /// <param name="columnList">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
+    /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
+    /// <returns></returns>
+    /// <summary>
+    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
+    /// </summary>
+    /// <param name="firstRow">Ob in der ersten Zeile der Spaltenname ist, oder ob sofort Daten kommen.</param>
+    /// <param name="arrangement">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
+    /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
+    /// <returns></returns>
     /// <summary>
     /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
     /// </summary>
     /// <returns></returns>
-
-    public void Export_HTML(string filename, ColumnViewCollection? arrangement, List<RowData?> sortedRows, bool execute) => Export_HTML(filename, arrangement.ListOfUsedColumn(), sortedRows, execute);
-
+    /// <summary>
+    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
+    /// </summary>
+    /// <returns></returns>
+    /// <summary>
+    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
+    /// </summary>
+    /// <returns></returns>
+    /// <summary>
+    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
+    /// </summary>
+    /// <returns></returns>
     /// <summary>
     /// Testet die Standard-Verzeichnisse und gibt das Formular zurück, falls es existiert
     /// </summary>
@@ -1435,6 +1412,16 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public abstract string UndoText(ColumnItem? column, RowItem? row);
 
+    public void WriteBackDBVariables(List<Variable> vars) {
+        foreach (var thisvar in Variables) {
+            var v = vars.Get("DB_" + thisvar.Name);
+
+            if (v is VariableString vs) {
+                thisvar.ValueString = vs.ValueString;
+            }
+        }
+    }
+
     internal void DevelopWarnung(string t) {
         try {
             t += "\r\nColumn-Count: " + Column.Count;
@@ -1641,6 +1628,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 break;
 
             case DatabaseDataType.EventScript:
+                _EventScriptTmp = value;
                 _EventScript.Clear();
                 List<string> ai = new(value.SplitAndCutByCr());
                 foreach (var t in ai) {
