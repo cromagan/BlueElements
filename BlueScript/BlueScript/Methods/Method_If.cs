@@ -19,22 +19,24 @@
 
 using System.Collections.Generic;
 using BlueBasics;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_if : Method {
 
     #region Fields
 
     public static readonly List<string> OderOder = new() { "||" };
-
     public static readonly List<string> UndUnd = new() { "&&" };
 
     /// <summary>
     /// Vergleichsopeatoren in der richtigen Rang-Reihenfolge
-    // https://de.wikipedia.org/wiki/Operatorrangfolge
+    /// https://de.wikipedia.org/wiki/Operatorrangfolge
     /// </summary>
     public static readonly List<string> VergleichsOperatoren = new() { "==", "!=", ">=", "<=", "<", ">", "!", "&&", "||" };
 
@@ -47,6 +49,7 @@ internal class Method_if : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => true;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "if (true) { Code zum Ausführen }";
@@ -83,16 +86,15 @@ internal class Method_if : Method {
     public override List<string> Comand(List<Variable>? currentvariables) => new() { "if" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(infos.Data, "Fehler innerhalb der runden Klammern des If-Befehls"); }
 
         if (((VariableBool)attvar.Attributes[0]).ValueBool) {
-            var scx = Method_CallByFilename.CallSub(s, infos, infos.CodeBlockAfterText, true, infos.Line - 1, "If-Befehl");
-            //s.BreakFired = false;
+            var scx = Method_CallByFilename.CallSub(s, infos, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname);
             return scx;
         }
 
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion
