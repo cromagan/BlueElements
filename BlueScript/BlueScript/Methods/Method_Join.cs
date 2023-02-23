@@ -18,22 +18,25 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Join : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableListString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
-
     public override string Description => "Wandelt eine Liste in einen Text um.\r\nEs verbindet den Text dabei mitteles dem angegebenen Verbindungszeichen.\r\nSind leere Einträge am Ende der Liste, werden die Trennzeichen am Ende nicht abgeschnitten.\r\nDas letzte Trennzeichen wird allerdings immer abgeschnitten!\r\n\r\nBeispiel: Eine Liste mit den Werten 'a' und 'b' wird beim Join mit Semikolon das zurück geben: 'a;b'\r\nAber: Wird eine Liste mit ChangeType in String umgewandelt, wäre ein zusätzliches Trennzeichen am Ende.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Join(VariableListe, Verbindungszeichen)";
@@ -45,15 +48,15 @@ internal class Method_Join : Method {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "join" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         //if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)) { return DoItFeedback.Null(infos, s, line); }
 
         var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
         //tmp = tmp.Substring(0, tmp.Length - 1); // Listen mit Einträgen haben zur Erkennung immer noch einen zusätzlichen Zeilenumbruch
 
-        return new DoItFeedback(infos, tmp.JoinWith(((VariableString)attvar.Attributes[1]).ValueString), string.Empty);
+        return new DoItFeedback(tmp.JoinWith(((VariableString)attvar.Attributes[1]).ValueString));
     }
 
     #endregion

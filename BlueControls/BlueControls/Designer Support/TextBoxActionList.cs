@@ -3,7 +3,6 @@ using System.ComponentModel.Design;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueDatabase;
-using BlueDatabase.Interfaces;
 
 namespace BlueControls.Designer_Support;
 

@@ -40,14 +40,14 @@ public static partial class Extensions {
     /// <param name="collection"></param>
     /// <param name="joinChar"></param>
     /// <returns></returns>
-    public static string JoinWith(this ICollection<string> collection, string joinChar) => string.Join(joinChar, collection.ToArray());
+    public static string JoinWith(this IEnumerable<string>? collection, string joinChar) => collection != null && collection.Any() ? string.Join(joinChar, collection.ToArray()) : string.Empty;
 
     /// <summary>
     /// Verbindet die Collection mit \r und doppelte \r am Ende werden nicht abgeschnitten.
     /// </summary>
     /// <param name="collection"></param>
     /// <returns></returns>
-    public static string JoinWithCr(this ICollection<string>? collection) => collection == null || collection.Count == 0 ? string.Empty : collection.JoinWith("\r");
+    public static string JoinWithCr(this IEnumerable<string>? collection) => collection != null && collection.Any() ? collection.JoinWith("\r") : string.Empty;
 
     /// <summary>
     /// Gibt einen String zurück, der alle Elemet der Collection mittels einem Zeilenumbruch zusammenfügt.

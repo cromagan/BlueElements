@@ -18,12 +18,15 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_CountString : Method {
 
     #region Properties
@@ -33,6 +36,7 @@ internal class Method_CountString : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "CountString(Text, Suchstring)";
@@ -41,13 +45,13 @@ internal class Method_CountString : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "countstring" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "countstring" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(infos, this, attvar)
-            : new DoItFeedback(infos, attvar.Attributes[0].ReadableText.CountString(attvar.Attributes[1].ReadableText));
+            ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
+            : new DoItFeedback(attvar.Attributes[0].ReadableText.CountString(attvar.Attributes[1].ReadableText));
     }
 
     #endregion

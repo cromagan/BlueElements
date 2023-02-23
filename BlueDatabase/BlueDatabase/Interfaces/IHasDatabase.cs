@@ -20,13 +20,10 @@
 namespace BlueDatabase.Interfaces;
 
 public interface IHasDatabase {
-    //protected DatabaseAbstract? _database;
 
     #region Properties
 
     public DatabaseAbstract? Database { get; }
 
     #endregion
-
-    //protected void Database_Disposing(object sender, System.EventArgs e);
 }

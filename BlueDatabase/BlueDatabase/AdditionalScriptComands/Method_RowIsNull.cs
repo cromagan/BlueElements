@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -30,12 +31,10 @@ public class Method_RowIsNull : Method_Database {
 
     public override List<List<string>> Args => new() { new List<string> { VariableRowItem.ShortName_Variable } };
     public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
-
     public override bool EndlessArgs => false;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.AnyDatabaseRow;
     public override string Returns => VariableBool.ShortName_Plain;
 
     public override string StartSequence => "(";
@@ -46,17 +45,17 @@ public class Method_RowIsNull : Method_Database {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "rowisnull" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "rowisnull" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback(infos, "Kein Zeilenobjekt übergeben."); }
+        if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback(infos.Data, "Kein Zeilenobjekt übergeben."); }
 
         //var r = Method_Row.ObjectToRow(attvar.Attributes[0]);
 
-        return vr.RowItem == null ? DoItFeedback.Wahr(infos) : DoItFeedback.Falsch(infos);
+        return vr.RowItem == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 
     #endregion

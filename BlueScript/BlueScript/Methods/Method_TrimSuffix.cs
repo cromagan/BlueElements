@@ -19,11 +19,14 @@
 
 using System.Collections.Generic;
 using BlueBasics;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_TrimSuffix : Method {
 
     #region Properties
@@ -33,6 +36,7 @@ internal class Method_TrimSuffix : Method {
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "TrimSuffix(string, suffix, ...)";
@@ -41,11 +45,11 @@ internal class Method_TrimSuffix : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "trimsuffix" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "trimsuffix" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         var val = ((VariableString)attvar.Attributes[0]).ValueString;
 
         const string tmp = Constants.Char_Numerals + " ";
@@ -59,12 +63,12 @@ internal class Method_TrimSuffix : Method {
             if (val.ToLower().EndsWith(suf)) {
                 var c = val.Substring(val.Length - suf.Length - 1, 1);
                 if (tmp.Contains(c)) {
-                    return new DoItFeedback(infos, val.Substring(0, val.Length - suf.Length).TrimEnd(" "), string.Empty);
+                    return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "));
                 }
             }
         }
 
-        return new DoItFeedback(infos, val, string.Empty);
+        return new DoItFeedback(val);
     }
 
     #endregion

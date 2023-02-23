@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -30,13 +31,10 @@ public class Method_CellSetFilter : Method_Database {
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableFilterItem.ShortName_Variable } };
     public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und setzt den Wert. Ein Filter kann mit dem Befehl 'Filter' erstellt werden. Gibt TRUE zurück, wenn der Wert erfolgreich gesetzt wurde.";
-
     public override bool EndlessArgs => true;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => VariableBool.ShortName_Plain;
 
     public override string StartSequence => "(";
@@ -50,23 +48,23 @@ public class Method_CellSetFilter : Method_Database {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "cellsetfilter" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
-        if (allFi is null) { return new DoItFeedback(infos, "Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
         var columnToSet = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (columnToSet == null) { return new DoItFeedback(infos, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
+        if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
 
         var r = RowCollection.MatchesTo(allFi);
         if (r == null || r.Count is 0 or > 1) {
-            return DoItFeedback.Falsch(infos);
+            return DoItFeedback.Falsch();
         }
 
         r[0].CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-        return r[0].CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr(infos) : DoItFeedback.Falsch(infos);
+        return r[0].CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 
     #endregion

@@ -24,6 +24,8 @@ using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_IsNullOrZero : Method {
 
     #region Properties
@@ -33,6 +35,7 @@ internal class Method_IsNullOrZero : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "isNullOrZero(Variable)";
@@ -41,31 +44,31 @@ internal class Method_IsNullOrZero : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "isnullorzero" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "isnullorzero" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-                return DoItFeedback.AttributFehler(infos, this, attvar);
+                return DoItFeedback.AttributFehler(infos.Data, this, attvar);
             }
 
-            return DoItFeedback.Wahr(infos);
+            return DoItFeedback.Wahr();
         }
 
-        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(infos); }
-        if (attvar.Attributes[0] is VariableUnknown) { return DoItFeedback.Wahr(infos); }
+        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(); }
+        if (attvar.Attributes[0] is VariableUnknown) { return DoItFeedback.Wahr(); }
 
         if (attvar.Attributes[0] is VariableFloat f) {
-            if (f.ValueNum == 0) { return DoItFeedback.Wahr(infos); }
+            if (f.ValueNum == 0) { return DoItFeedback.Wahr(); }
 
-            return DoItFeedback.Falsch(infos);
+            return DoItFeedback.Falsch();
         }
-        return new DoItFeedback(infos, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
+        return new DoItFeedback(infos.Data, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
         //if (attvar.Attributes == null) {
         //    if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-        //        return DoItFeedback.AttributFehler(infos, s, this, attvar, line);
+        //        return DoItFeedback.AttributFehler(infos.LogData,  s, this, attvar, line);
         //    } else {
         //        return DoItFeedback.Wahr(line);
         //    }
@@ -78,7 +81,7 @@ internal class Method_IsNullOrZero : Method {
         //            return DoItFeedback.Wahr(line);
         //        } else {
         //            if (attvar.Attributes[0] is not VariableFloat) {
-        //                return new DoItFeedback(infos, s, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
+        //                return new DoItFeedback(infos.LogData, s, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
         //            } else {
         //                if (((VariableFloat)attvar.Attributes[0]).ValueNum == 0) {
         //                    return DoItFeedback.Wahr(line);

@@ -71,9 +71,7 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
 
         if (Item == null || e.Filter == null) { return; }
 
-        Item.FilterType = e.Filter.FilterType;
-        Item.SearchValue.Clear();
-        Item.SearchValue.AddRange(e.Filter.SearchValue);
+        Item.Changeto(e.Filter.FilterType, e.Filter.SearchValue);
     }
 
     private void btnFilterWahl_Click(object sender, System.EventArgs e) {
@@ -95,8 +93,7 @@ internal sealed partial class FilterItem_Editor : AbstractClassEditor<FilterItem
         var c = Item.Database.Column[cbxColumns.Text];
         btnFilterWahl.Enabled = c == null || c.AutoFilterSymbolPossible() || true;
         Item.Column = c;
-        Item.FilterType = FilterType.KeinFilter;
-        Item.SearchValue.Clear();
+        Item.Changeto(FilterType.KeinFilter, string.Empty);
     }
 
     #endregion

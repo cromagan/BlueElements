@@ -18,12 +18,15 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Constants;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_AddDays : Method {
 
     #region Properties
@@ -33,6 +36,7 @@ internal class Method_AddDays : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableDateTime.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "AddDays(DateTimeString, Days)";
@@ -41,18 +45,18 @@ internal class Method_AddDays : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "adddays" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "adddays" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         // var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
         //if (!ok) {
-        //    return new DoItFeedback(infos, s, "Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
+        //    return new DoItFeedback(infos.LogData, s, "Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
         //}
         var d = ((VariableDateTime)attvar.Attributes[0]).ValueDate;
         d = d.AddDays(((VariableFloat)attvar.Attributes[1]).ValueNum);
-        return new DoItFeedback(infos, d);
+        return new DoItFeedback(d);
     }
 
     #endregion

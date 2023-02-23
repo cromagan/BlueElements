@@ -18,21 +18,24 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Substring : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableFloat.ShortName_Plain }, new List<string> { VariableFloat.ShortName_Plain } };
-
     public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Substring(String, Start, Anzahl)";
@@ -44,8 +47,8 @@ internal class Method_Substring : Method {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "substring" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         var st = ((VariableFloat)attvar.Attributes[1]).ValueInt;
         var en = ((VariableFloat)attvar.Attributes[2]).ValueInt;
         if (st < 0) {
@@ -56,13 +59,13 @@ internal class Method_Substring : Method {
         var t = ((VariableString)attvar.Attributes[0]).ValueString;
 
         if (st > t.Length) {
-            return DoItFeedback.Null(infos);
+            return DoItFeedback.Null();
         }
 
         if (st + en > t.Length) {
             en = t.Length - st;
         }
-        return new DoItFeedback(infos, t.Substring(st, en), string.Empty);
+        return new DoItFeedback(t.Substring(st, en));
     }
 
     #endregion

@@ -17,17 +17,17 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
 using BlueBasics;
-using BlueBasics.EventArgs;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueScript;
+using BlueDatabase.Interfaces;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
@@ -35,15 +35,13 @@ using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLevel {
+internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLevel, IHasDatabase {
 
     #region Fields
 
     public readonly DatabaseAbstract? FilterDefiniton;
 
-    public ItemCollectionPad? ParentCol;
-
-    private readonly ListExt<Control> _parents = new();
+    private readonly List<Control> _childs = new();
 
     private readonly string _showformat;
 
@@ -57,7 +55,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     #region Constructors
 
-    public FlexiControlRowSelector(DatabaseAbstract? database, ItemCollectionPad parent, DatabaseAbstract? filterdef, string caption, string showFormat) : base() {
+    public FlexiControlRowSelector(DatabaseAbstract? database, DatabaseAbstract? filterdef, string caption, string showFormat) : base() {
         CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
@@ -68,54 +66,46 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
             _showformat = "~" + fc.Name + "~";
         }
 
-        ParentCol = parent;
         Database = database;
         FilterDefiniton = filterdef;
 
-        // den Rest initialisieren, bei OnParentChanged
-        // weil der Parent gebraucht wird um Filter zu erstellen
+        SetData(database, null);
     }
 
     #endregion
 
     #region Properties
 
-    public ListExt<Control> Childs { get; } = new();
-    public DatabaseAbstract? Database { get; set; }
+    public DatabaseAbstract? Database { get; }
 
     public RowItem? Row {
         get => IsDisposed ? null : _row;
         private set {
             if (IsDisposed) { return; }
             if (value == _row) { return; }
-
-            if (_row != null) { _row.RowChecked -= _row_RowChecked; }
-
             _row = value;
-
-            if (_row != null) { _row.RowChecked += _row_RowChecked; }
-
-            DoChilds(this, _row, Variables);
+            DoChilds(_childs, Database, _row?.Key);
         }
     }
-
-    public List<Variable>? Variables { get; set; }
 
     #endregion
 
     #region Methods
 
-    public static void DoChilds(ICalculateRowsControlLevel con, RowItem? row, List<Variable>? variables) {
-        foreach (var thischild in con.Childs) {
+    public static void DoChilds(List<Control> childs, DatabaseAbstract? db, long? rowkey) {
+        var r = db?.Row.SearchByKey(rowkey);
+        r?.CheckRowDataIfNeeded();
+
+        foreach (var thischild in childs) {
             var did = false;
 
             if (!did && thischild is IAcceptRowKey fcfc) {
-                DoChilds_OneRowKey(fcfc, row, con.Database);
+                fcfc.SetData(db, rowkey);
                 did = true;
             }
 
             if (!did && thischild is IAcceptVariableList rv) {
-                DoChilds_VariableList(rv, variables);
+                _ = rv.ParseVariables(r?.LastCheckedEventArgs?.Variables);
                 did = true;
             }
 
@@ -128,68 +118,13 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
     }
 
-    protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-
-        if (disposing) {
-            _disposing = true;
-            Row = null;
-
-            Tag = null;
-
-            _disposing = true;
-            Childs.Clear();
-            _parents.Clear();
-            _rows = null;
-            ParentCol = null;
-
-            Childs.ItemAdded -= Childs_ItemAdded;
-            _parents.ItemAdded -= Parents_ItemAdded;
-            _parents.ItemRemoving -= Parents_ItemRemoving;
-        }
-    }
-
-    protected override void OnParentChanged(System.EventArgs e) {
-        base.OnParentChanged(e);
-
-        Childs.ItemAdded += Childs_ItemAdded;
-        _parents.ItemAdded += Parents_ItemAdded;
-        _parents.ItemRemoving += Parents_ItemRemoving;
-
-        GetParentsList();
-        CalculateRows();
-    }
-
-    protected override void OnValueChanged() {
-        base.OnValueChanged();
-
-        Row = string.IsNullOrEmpty(Value) ? null : Database?.Row.SearchByKey(LongParse(Value));
-    }
-
-    private static void DoChilds_OneRowKey(IAcceptRowKey fcfc, RowItem? row, DatabaseAbstract? database) {
-        // Normales Zellenfeld
-        if (fcfc.IsDisposed) { return; }
-
-        fcfc.Database = database;
-
-        if (row != null) {
-            fcfc.RowKey = row.Key;
-        } else {
-            fcfc.RowKey = -1;
-        }
-    }
-
-    private static void DoChilds_VariableList(IAcceptVariableList fcfc, List<Variable>? variables) => fcfc.ParseVariables(variables);
-
-    private void _row_RowChecked(object sender, BlueDatabase.EventArgs.RowCheckedEventArgs e) {
+    public void ChildAdd(Control c) {
         if (IsDisposed) { return; }
-        if (_row == e.Row) {
-            Variables = e.Variables;
-            DoChilds(this, _row, Variables);
-        }
+        _childs.Add(c);
+        DoChilds(_childs, Database, _row?.Key);
     }
 
-    private void CalculateRows() {
+    public void SetData(DatabaseAbstract? otherdatabase, long? rowkey) {
         if (_disposing || IsDisposed) { return; }
 
         if (FilterDefiniton == null || FilterDefiniton.IsDisposed) { return; }
@@ -224,11 +159,6 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
                         onlyifhasvalue = true;
                         break;
 
-                    //case "x":
-                    //    // Filter löschen
-                    //    ft = FilterType.KeinFilter;
-                    //    break;
-
                     default:
                         ft = FilterType.Istgleich_GroßKleinEgal;
                         DebugPrint("Filter " + thisR.CellGetInteger("Filterart") + " nicht definiert.");
@@ -240,63 +170,16 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
                 #region Value ermitteln
 
                 var value = string.Empty;
-                if (ft != FilterType.KeinFilter) {
-                    var connected = ParentCol[thisR.CellGetString("suchtxt")];
 
-                    switch (connected) {
-                        case ConstantTextPadItem ctpi:
+                if (otherdatabase?.Row.SearchByKey(rowkey) is RowItem r) {
+                    r.CheckRowDataIfNeeded();
 
-                            if (Parent is ConnectedFormulaView cfvx) {
-                                var se2 = cfvx.SearchOrGenerate(ctpi);
+                    value = thisR.CellGetString("suchtxt");
 
-                                if (se2 is FlexiControl fcx) {
-                                    value = fcx.Value;
-                                } else {
-                                    DebugPrint("Unbekannt");
-                                }
-                            } else {
-                                value = "@@@";
-                                //DebugPrint("Parent unbekannt!");
-                            }
-                            break;
-
-                        case EditFieldPadItem efpi:
-                            if (Parent is ConnectedFormulaView cfv) {
-                                var se = cfv.SearchOrGenerate(efpi);
-
-                                if (se is FlexiControlForCell fcfc) {
-                                    value = fcfc.Value;
-                                } else if (se is FlexiControl fc) {
-                                    value = fc.Value;
-                                } else {
-                                    DebugPrint("Unbekannt");
-                                }
-                            } else {
-                                value = "@@@";
-                                //DebugPrint("Parent unbekannt!");
-                            }
-                            break;
-
-                        case RowInputPadItem ripi:
-                            if (Parent is ConnectedFormulaView cfvy) {
-                                var se = cfvy.SearchOrGenerate(ripi);
-
-                                if (se is FlexiControlForCell fcfc) {
-                                    value = fcfc.Value;
-                                } else {
-                                    DebugPrint("Unbekannt");
-                                }
-                            } else {
-                                value = "@@@";
-                                //DebugPrint("Parent unbekannt!");
-                            }
-                            break;
-
-                        default:
-                            value = "@@@";
-                            ft = FilterType.KeinFilter; // Wurde dsa Parent eben gelöscht...
-                            //DebugPrint("Parent " + thisR.CellGetString("suchtxt") + " nicht gefunden.");
-                            break;
+                    if (value.Equals("#first", StringComparison.OrdinalIgnoreCase)) {
+                        value = r.CellFirstString();
+                    } else {
+                        value = r.ReplaceVariables(value, false, false);
                     }
                 }
 
@@ -315,8 +198,6 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
             _rows = Database?.Row.CalculateFilteredRows(f);
 
-            Variables = null;
-
             #endregion
         }
 
@@ -325,42 +206,25 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         UpdateMyCollection();
     }
 
-    private void Childs_ItemAdded(object sender, ListEventArgs e) {
-        if (IsDisposed) { return; }
-        DoChilds(this, _row, Variables);
-    }
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
 
-    private void GetParentsList() {
-        if (_disposing || IsDisposed || Parent == null) { return; }
+        if (disposing) {
+            _disposing = true;
+            Row = null;
 
-        foreach (var thisR in FilterDefiniton.Row) {
-            var item = ParentCol?[thisR.CellGetString("suchtxt")];
-            if (item is IItemToControl itco) {
-                var c = ((ConnectedFormulaView)Parent).SearchOrGenerate(itco);
-                if (c != null) { _parents.Add(c); }
-            }
+            Tag = null;
+
+            _disposing = true;
+            _childs.Clear();
+
+            _rows = null;
         }
     }
 
-    private void Parent_ValueChanged(object sender, System.EventArgs e) => CalculateRows();
-
-    private void Parents_ItemAdded(object sender, ListEventArgs e) {
-        if (e.Item is FlexiControlForCell fcfc) {
-            fcfc.ValueChanged += Parent_ValueChanged;
-        } else if (e.Item is FlexiControl fc) {
-            fc.ValueChanged += Parent_ValueChanged;
-        } else {
-            DebugPrint("unbekannt");
-        }
-        CalculateRows();
-    }
-
-    private void Parents_ItemRemoving(object sender, ListEventArgs e) {
-        if (e.Item is FlexiControlForCell fcfc) {
-            fcfc.ValueChanged -= Parent_ValueChanged;
-        }
-
-        CalculateRows();
+    protected override void OnValueChanged() {
+        base.OnValueChanged();
+        Row = string.IsNullOrEmpty(Value) ? null : Database?.Row.SearchByKey(LongParse(Value));
     }
 
     private void UpdateMyCollection() {
@@ -413,8 +277,14 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         #region Nur eine Zeile? auswählen!
 
         // nicht vorher auf null setzen, um Blinki zu vermeiden
-        if (cb.Item.Count == 1) {
+        if (cb?.Item != null && cb.Item.Count == 1) {
             ValueSet(cb.Item[0].KeyName, true, true);
+        }
+
+        if (cb?.Item == null || cb.Item.Count < 2) {
+            DisabledReason = "Keine Auswahl möglich.";
+        } else {
+            DisabledReason = string.Empty;
         }
 
         #endregion

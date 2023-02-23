@@ -22,9 +22,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-
 namespace BlueDatabase;
 
 public class FormatHolder : IInputFormat, IReadableText {

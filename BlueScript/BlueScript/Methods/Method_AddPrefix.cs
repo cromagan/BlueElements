@@ -18,11 +18,14 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_AddPrefix : Method {
 
     #region Properties
@@ -32,6 +35,7 @@ internal class Method_AddPrefix : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "AddPrefix(VariableListe, PrefixText)";
@@ -40,13 +44,13 @@ internal class Method_AddPrefix : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "addprefix" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "addprefix" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
         var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
 
@@ -56,7 +60,7 @@ internal class Method_AddPrefix : Method {
 
         ((VariableListString)attvar.Attributes[0]).ValueList = tmp;
 
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

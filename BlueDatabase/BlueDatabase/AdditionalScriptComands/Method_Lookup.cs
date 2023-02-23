@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using BlueDatabase.Enums;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -31,13 +32,10 @@ public class Method_Lookup : Method_Database {
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
     public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.";
-
     public override bool EndlessArgs => false;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.MyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => VariableListString.ShortName_Plain;
 
     public override string StartSequence => "(";
@@ -52,53 +50,53 @@ public class Method_Lookup : Method_Database {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "lookup" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(infos, this, attvar);
+            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
         }
 
         var db = DatabaseOf(s.Variables, ((VariableString)attvar.Attributes[0]).ValueString);
         if (db == null) {
-            return new DoItFeedback(infos, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden");
+            return new DoItFeedback(infos.Data, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden");
         }
 
         var c = db.Column.Exists(((VariableString)attvar.Attributes[2]).ValueString);
         if (c == null) {
-            return new DoItFeedback(infos, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[2]).ValueString);
+            return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[2]).ValueString);
         }
 
         var r = RowCollection.MatchesTo(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, ((VariableString)attvar.Attributes[1]).ValueString));
 
         if (r == null || r.Count == 0) {
             if (attvar.Attributes.Count > 3) {
-                return new DoItFeedback(infos, new List<string> { ((VariableString)attvar.Attributes[3]).ValueString });
+                return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[3]).ValueString });
             }
 
-            return DoItFeedback.Null(infos);
+            return DoItFeedback.Null();
         }
 
         if (r.Count > 1) {
             if (attvar.Attributes.Count > 4) {
-                return new DoItFeedback(infos, new List<string> { ((VariableString)attvar.Attributes[4]).ValueString });
+                return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[4]).ValueString });
             }
 
-            return DoItFeedback.Null(infos);
+            return DoItFeedback.Null();
         }
 
         var v = RowItem.CellToVariable(c, r[0]);
         if (v == null || v.Count != 1) {
-            return new DoItFeedback(infos, "Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[2]).ValueString);
+            return new DoItFeedback(infos.Data, "Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[2]).ValueString);
         }
 
-        if (v[0] is VariableListString vl) { return new DoItFeedback(infos, vl.ValueList); }
+        if (v[0] is VariableListString vl) { return new DoItFeedback(vl.ValueList); }
 
-        return new DoItFeedback(infos, new List<string> { v[0].ReadableText });
-        //return new DoItFeedback(infos, s, new List<string>{kv[0].ReadableText
+        return new DoItFeedback(new List<string> { v[0].ReadableText });
+        //return new DoItFeedback(infos.LogData, s, new List<string>{kv[0].ReadableText
 
-        //return new DoItFeedback(infos, s, v[0]);
+        //return new DoItFeedback(infos.LogData, s, v[0]);
         //return v[0].Type != VariableDataType.List
-        //    ? new DoItFeedback(infos, s, v[0].ValueString + "\r", VariableDataType.List)
-        //    : new DoItFeedback(infos, s, v[0].ValueString, VariableDataType.List);
+        //    ? new DoItFeedback(infos.LogData, s, v[0].ValueString + "\r", VariableDataType.List)
+        //    : new DoItFeedback(infos.LogData, s, v[0].ValueString, VariableDataType.List);
     }
 
     #endregion

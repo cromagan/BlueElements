@@ -15,74 +15,73 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System.Linq;
+#nullable enable
 
 namespace BlueScript.Structures;
 
 public readonly struct CanDoFeedback {
 
-    #region Fields
-
-    /// <summary>
-    /// Der Text zwischen dem StartString und dem EndString
-    /// </summary>
-    public readonly string AttributText;
-
-    /// <summary>
-    /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
-    /// </summary>
-    public readonly string CodeBlockAfterText;
-
-    /// <summary>
-    /// Der Text, mit dem eingestiegen wird. Also der Befehl mit dem StartString.
-    /// </summary>
-    public readonly string ComandText;
-
-    /// <summary>
-    /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
-    /// </summary>
-    public readonly int ContinueOrErrorPosition;
-
-    /// <summary>
-    /// Der komplette Scripttext, der aktuell ausgeführt werden soll.
-    /// Kann von Script abweichen, wenn z.B. eine Subroutine ausgeführt wird.
-    /// </summary>
-    public readonly string CurrentReducedScriptText;
-
-    public readonly string ErrorMessage;
-
-    public readonly int Line;
-
-    /// <summary>
-    /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
-    /// </summary>
-    public readonly bool MustAbort;
-
-    #endregion
-
     #region Constructors
 
-    public CanDoFeedback(string reducedscript, int errorposition, string errormessage, bool mustabort, int line) {
+    public CanDoFeedback(string reducedscript, int errorposition, string errormessage, bool mustabort, LogData ld) {
         ContinueOrErrorPosition = errorposition;
         ErrorMessage = errormessage;
         MustAbort = mustabort;
         ComandText = string.Empty;
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
-        Line = line;
         CurrentReducedScriptText = reducedscript;
+        Data = ld;
     }
 
-    public CanDoFeedback(string reducedscript, int continuePosition, string comandText, string attributtext, string codeblockaftertext, int line) {
+    public CanDoFeedback(string reducedscript, int continuePosition, string comandText, string attributtext, string codeblockaftertext, LogData ld) {
         ContinueOrErrorPosition = continuePosition;
         ErrorMessage = string.Empty;
         MustAbort = false;
         ComandText = comandText;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
-        Line = line;
         CurrentReducedScriptText = reducedscript;
+        Data = ld;
     }
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Der Text zwischen dem StartString und dem EndString
+    /// </summary>
+    public string AttributText { get; }
+
+    /// <summary>
+    /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
+    /// </summary>
+    public string CodeBlockAfterText { get; }
+
+    /// <summary>
+    /// Der Text, mit dem eingestiegen wird. Also der Befehl mit dem StartString.
+    /// </summary>
+    public string ComandText { get; }
+
+    /// <summary>
+    /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss
+    /// </summary>
+    public int ContinueOrErrorPosition { get; }
+
+    /// <summary>
+    /// Der komplette Scripttext, der aktuell ausgeführt werden soll.
+    /// Kann von Script abweichen, wenn z.B. eine Subroutine ausgeführt wird.
+    /// </summary>
+    public string CurrentReducedScriptText { get; }
+
+    public LogData Data { get; }
+    public string ErrorMessage { get; }
+
+    /// <summary>
+    /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
+    /// </summary>
+    public bool MustAbort { get; }
 
     #endregion
 }

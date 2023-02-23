@@ -19,19 +19,23 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable, ICloneable {
+public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, ICloneable, IDisposableExtended, IHasDatabase {
     //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
     #region Fields
 
+    private readonly List<string> _permissionGroups_Show = new();
     private string _name;
 
     #endregion
@@ -45,12 +49,13 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
         Parse(toParse);
     }
 
-    public ColumnViewCollection(DatabaseAbstract database, string toParse, string newname) {
-        Database = database;
-        Database.Disposing += Database_Disposing;
-        Parse(toParse);
-        _name = newname;
-    }
+    public ColumnViewCollection(DatabaseAbstract database, string toParse, string newname) : this(database, toParse) => _name = newname;
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? Changed;
 
     #endregion
 
@@ -58,6 +63,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
 
     public DatabaseAbstract? Database { get; private set; }
 
+    public bool IsDisposed { get; private set; }
     public bool IsParsing { get; private set; }
 
     public string Name {
@@ -69,7 +75,18 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
         }
     }
 
-    public ListExt<string> PermissionGroups_Show { get; } = new();
+    public ReadOnlyCollection<string> PermissionGroups_Show {
+        get => new(_permissionGroups_Show);
+        set {
+            var l = value.SortedDistinctList();
+
+            if (l.IsDifferentTo(_permissionGroups_Show)) {
+                _permissionGroups_Show.Clear();
+                _permissionGroups_Show.AddRange(l);
+                OnChanged();
+            }
+        }
+    }
 
     #endregion
 
@@ -95,28 +112,36 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
             : new ColumnViewItem(column, ViewType.Column, this));
     }
 
+    public new void Add(ColumnViewItem item) {
+        base.Add(item);
+        OnChanged();
+    }
+
     public object Clone() => new ColumnViewCollection(Database, ToString());
 
+    public void Dispose() {
+        Dispose(true);
+    }
+
     public void Hide(string columnName) {
-        foreach (var thisViewItem in this.Where(thisViewItem => thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.OrdinalIgnoreCase)))) {
-            Remove(thisViewItem);
-            Hide(columnName);
-            return;
+        foreach (var thisViewItem in this) {
+            if (thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.OrdinalIgnoreCase))) {
+                Remove(thisViewItem);
+                Hide(columnName);
+                return;
+            }
         }
     }
 
     public void HideSystemColumns() {
-        foreach (var thisViewItem in this.Where(thisViewItem => thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.IsSystemColumn()))) {
-            Remove(thisViewItem);
-            HideSystemColumns();
-            return;
+        foreach (var thisViewItem in this) {
+            if (thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.IsSystemColumn())) {
+                Remove(thisViewItem);
+                HideSystemColumns();
+                return;
+            }
         }
     }
-
-    //public void Insert(int index, ColumnItem? column) {
-    //    if (column == null) { return; }
-    //    Insert(index, new ColumnViewItem(column, ViewType.Column, this));
-    //}
 
     public void Invalidate_DrawWithOfAllItems() {
         foreach (var thisViewItem in this) {
@@ -124,10 +149,10 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
         }
     }
 
-    public List<ColumnItem?> ListOfUsedColumn() {
-        List<ColumnItem?> colList = new();
+    public List<ColumnItem> ListOfUsedColumn() {
+        List<ColumnItem> colList = new();
         foreach (var t in this) {
-            if (t != null) { colList.Add(t.Column); }
+            if (t?.Column != null) { colList.Add(t.Column); }
         }
         return colList;
     }
@@ -155,17 +180,14 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
         } while (true);
     }
 
-    public override void OnChanged() {
+    public void OnChanged() {
         if (IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
-        base.OnChanged();
-        //Changed?.Invoke(this, System.EventArgs.Empty);
+        Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void Parse(string toParse) {
         IsParsing = true;
-        ThrowEvents = false;
-        PermissionGroups_Show.ThrowEvents = false;
-        Initialize();
+
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "name":
@@ -173,11 +195,11 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
                     break;
 
                 case "columndata":
-                    Add(new ColumnViewItem(Database, pair.Value, this));
+                    base.Add(new ColumnViewItem(Database, pair.Value, this)); // BAse, um Events zu vermeiden
                     break;
 
                 case "permissiongroup":
-                    PermissionGroups_Show.Add(pair.Value);
+                    _permissionGroups_Show.Add(pair.Value);
                     break;
 
                 default:
@@ -185,8 +207,7 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
                     break;
             }
         }
-        PermissionGroups_Show.ThrowEvents = true;
-        ThrowEvents = true;
+
         IsParsing = false;
     }
 
@@ -212,6 +233,11 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
         } while (true);
     }
 
+    public new void Remove(ColumnViewItem item) {
+        _ = base.Remove(item);
+        OnChanged();
+    }
+
     public void ShowAllColumns() {
         if (Database == null || Database.IsDisposed) { return; }
 
@@ -234,11 +260,23 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
         }
     }
 
-    public new void Swap(ColumnViewItem? viewItem1, ColumnViewItem? viewItem2) {
-        if (viewItem1 == null || viewItem2 == null) { return; }
-        base.Swap(viewItem1, viewItem2);
-        if (viewItem2.ViewType != ViewType.PermanentColumn) { viewItem1.ViewType = ViewType.Column; }
+    public void Swap(int index1, int index2) {
+        if (index1 == index2) { return; }
+
+        (base[index1], base[index2]) = (base[index2], base[index1]);
+
+        if (base[index2].ViewType != ViewType.PermanentColumn) { base[index1].ViewType = ViewType.Column; }
+        OnChanged();
     }
+
+    //public void Swap(ColumnViewItem? viewItem1, ColumnViewItem? viewItem2) {
+    //    if (viewItem1 == null || viewItem2 == null) { return; }
+
+    //    var index1 = IndexOf(viewItem1);
+    //    var index2 = IndexOf(viewItem2);
+
+    //    Swap(index1, index2);
+    //}
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
@@ -288,33 +326,21 @@ public sealed class ColumnViewCollection : ListExt<ColumnViewItem?>, IParseable,
                 break;
         }
 
-        tmp = tmp.SortedDistinctList();
-
-        if (PermissionGroups_Show.IsDifferentTo(tmp)) {
-            PermissionGroups_Show.Clear();
-            PermissionGroups_Show.AddRange(tmp);
-        }
+        PermissionGroups_Show = new ReadOnlyCollection<string>(tmp);
 
         if (string.IsNullOrEmpty(Name)) { Name = "Ansicht " + number; }
     }
 
-    protected override void Dispose(bool disposing) {
-        PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
-        PermissionGroups_Show.Clear();
-        Database.Disposing += Database_Disposing;
+    protected void Dispose(bool disposing) {
+        IsDisposed = true;
+        //PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
+        //PermissionGroups_Show.Clear();
+        if (Database != null) { Database.Disposing += Database_Disposing; }
         Database = null;
-        base.Dispose(disposing);
+        //base.Dispose(disposing);
     }
-
-    private void _PermissionGroups_Show_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-
-    private void Initialize() {
-        _name = string.Empty;
-        PermissionGroups_Show.Clear();
-        PermissionGroups_Show.Changed += _PermissionGroups_Show_ListOrItemChanged;
-    }
 
     #endregion
 }

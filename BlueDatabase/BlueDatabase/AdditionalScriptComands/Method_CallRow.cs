@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -37,11 +38,9 @@ public class Method_CallRow : Method_Database {
         "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
     public override bool EndlessArgs => false;
-
     public override string EndSequence => ");";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
 
@@ -54,25 +53,28 @@ public class Method_CallRow : Method_Database {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "callrow" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var see = s.Variables.GetSystem("SetErrorEnabled");
-        if (see is not VariableBool seet) { return new DoItFeedback(infos, "SetErrorEnabled Variable nicht gefunden"); }
-        if (seet.ValueBool) { return new DoItFeedback(infos, "'CallRow' bei FehlerCheck Routinen nicht erlaubt."); }
+        if (see is not VariableBool seet) { return new DoItFeedback(infos.Data, "SetErrorEnabled Variable nicht gefunden"); }
+        if (seet.ValueBool) { return new DoItFeedback(infos.Data, "'CallRow' bei FehlerCheck Routinen nicht erlaubt."); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
 
         if (row == null) {
-            return new DoItFeedback(infos, "Zeile nicht gefunden");
+            return new DoItFeedback(infos.Data, "Zeile nicht gefunden");
         }
 
         var vs = (VariableString)attvar.Attributes[0];
         s.Sub++;
         var s2 = row.ExecuteScript(null, vs.ValueString, false, false, s.ChangeValues, 0);
-        if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback(infos, "Subroutine '" + vs.ValueString + "': " + s2.ErrorMessage); }
+        if (!s2.AllOk) {
+            infos.Data.Protocol.AddRange(s2.Protocol);
+            return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs.ValueString + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");
+        }
         s.Sub--;
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

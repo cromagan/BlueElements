@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Threading;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -30,17 +29,13 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName {
+public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase {
 
     #region Fields
 
     private bool _changeValues;
     private EventTypes _eventTypes = 0;
     private bool _executable;
-
-    //private string _lastUsed;
-    private string _name;
-
     private bool _needRow;
     private string _script;
 
@@ -49,7 +44,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
     #region Constructors
 
     public EventScript(DatabaseAbstract database, string name, string script) : this(database) {
-        _name = name;
+        KeyName = name;
         _script = script;
     }
 
@@ -62,7 +57,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
             Database.Disposing += Database_Disposing;
         }
 
-        _name = string.Empty;
+        KeyName = string.Empty;
         _script = string.Empty;
         _executable = false;
         _needRow = false;
@@ -112,7 +107,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
 
     public bool IsParsing { get; private set; }
 
-    public string KeyName => _name;
+    public string KeyName { get; private set; }
 
     public bool ManualExecutable {
         get => _executable;
@@ -124,10 +119,10 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
     }
 
     public string Name {
-        get => _name;
+        get => KeyName;
         set {
-            if (_name == value) { return; }
-            _name = value;
+            if (KeyName == value) { return; }
+            KeyName = value;
             OnChanged();
         }
     }
@@ -167,9 +162,9 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
 
         //if (string.IsNullOrEmpty(_script)) { return "Kein Skript angegeben."; }
 
-        if (string.IsNullOrEmpty(_name)) { return "Kein Name angegeben."; }
+        if (string.IsNullOrEmpty(KeyName)) { return "Kein Name angegeben."; }
 
-        if (!_name.IsFormat(FormatHolder.SystemName)) { return "Ungültiger Name"; }
+        if (!KeyName.IsFormat(FormatHolder.SystemName)) { return "Ungültiger Name"; }
 
         if (_eventTypes.HasFlag(EventTypes.error_check)) {
             if (_changeValues) { return "Routinen, die Fehler prüfen, können keine Werte ändern."; }
@@ -189,7 +184,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "name":
-                    _name = pair.Value.FromNonCritical();
+                    KeyName = pair.Value.FromNonCritical();
                     break;
 
                 case "script":
@@ -256,10 +251,6 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
         if (_eventTypes.HasFlag(EventTypes.new_row)) { symb = ImageCode.Zeile; }
         if (_eventTypes.HasFlag(EventTypes.value_changed)) { symb = ImageCode.Stift; }
         if (_eventTypes.HasFlag(EventTypes.error_check)) { symb = ImageCode.HäkchenDoppelt; }
-
-
-
-
 
         if (!_changeValues) { }
 

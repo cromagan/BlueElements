@@ -19,11 +19,14 @@
 
 using System.Collections.Generic;
 using BlueBasics;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_IsNumeral : Method {
 
     #region Properties
@@ -33,6 +36,7 @@ internal class Method_IsNumeral : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "isNumeral(Value)";
@@ -41,16 +45,16 @@ internal class Method_IsNumeral : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "isnumeral" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "isnumeral" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(infos); }
-        if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(infos); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
+        if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(); }
         if (attvar.Attributes[0] is VariableString vs) {
-            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(infos); }
+            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }
         }
-        return DoItFeedback.Falsch(infos);
+        return DoItFeedback.Falsch();
     }
 
     #endregion

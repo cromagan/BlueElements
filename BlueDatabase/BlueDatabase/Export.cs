@@ -528,12 +528,12 @@ public static class Export {
 
                     var script = thisRow.ExecuteScript(null, scriptname, false, false, true, 0);
 
-                    if (!string.IsNullOrEmpty(script.ErrorMessage)) {
+                    if (!script.AllOk) {
                         f = f + thisRow.CellFirstString() + "\r\n";
                     }
 
-                    if (script.Variables != null) {
-                        foreach (var thisV in script.Variables) {
+                    if (script.Variables1 != null) {
+                        foreach (var thisV in script.Variables1) {
                             tmpBody = thisV.ReplaceInText(tmpBody);
                         }
                     }

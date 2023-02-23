@@ -38,10 +38,10 @@ public sealed class LastFilesCombo : ComboBox {
 
     #region Fields
 
-    private string _filename = string.Empty;
-    private List<string> _lastD = new();
     private int _maxCount = 20;
     private bool _mustExists = true;
+    private List<string> _settings = new();
+    private string _settingsfilename = string.Empty;
 
     #endregion
 
@@ -59,11 +59,11 @@ public sealed class LastFilesCombo : ComboBox {
     ///
     [DefaultValue("")]
     public string Filename {
-        get => _filename;
+        get => _settingsfilename;
         set {
-            if (_filename == value) { return; }
-            _filename = value;
-            LoadFromDisk();
+            if (_settingsfilename == value) { return; }
+            _settingsfilename = value;
+            LoadSettingsFromDisk();
             GenerateMenu();
         }
     }
@@ -99,13 +99,11 @@ public sealed class LastFilesCombo : ComboBox {
             s = s.Replace("\r", ";");
             s = s.Replace("\n", ";");
             if (!_mustExists || FileExists(fileName)) {
-                if (_lastD.Count > 0) { _lastD.RemoveString(fileName, false); }
-                if (_lastD.Count > 0) { _lastD.RemoveString(s, false); }
-                _lastD.Add(s);
+                if (_settings.Count > 0) { _settings.RemoveString(fileName, false); }
+                if (_settings.Count > 0) { _settings.RemoveString(s, false); }
+                _settings.Add(s);
 
-                if (CanWriteInDirectory(SaveFileName().FilePath())) {
-                    _lastD.Save(SaveFileName(), Encoding.UTF8, false);
-                }
+                SaveSettingsToDisk();
             }
         }
         GenerateMenu();
@@ -118,7 +116,7 @@ public sealed class LastFilesCombo : ComboBox {
 
     protected override void OnHandleCreated(System.EventArgs e) {
         base.OnHandleCreated(e);
-        LoadFromDisk();
+        LoadSettingsFromDisk();
         GenerateMenu();
     }
 
@@ -132,8 +130,8 @@ public sealed class LastFilesCombo : ComboBox {
         var nr = -1;
         var vis = false;
         Item.Clear();
-        for (var z = _lastD.Count - 1; z >= 0; z--) {
-            var x = _lastD[z].SplitAndCutBy("|");
+        for (var z = _settings.Count - 1; z >= 0; z--) {
+            var x = _settings[z].SplitAndCutBy("|");
             if (x != null && x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && Item[x[0]] is null) {
                 if (!_mustExists || FileExists(x[0])) {
                     nr++;
@@ -165,16 +163,21 @@ public sealed class LastFilesCombo : ComboBox {
         Enabled = vis;
     }
 
-    private void LoadFromDisk() {
-        _lastD = new List<string?>();
-        if (FileExists(SaveFileName())) {
-            var t = File.ReadAllText(SaveFileName(), Encoding.UTF8);
+    private void LoadSettingsFromDisk() {
+        _settings = new List<string>();
+
+        if (FileExists(SettingsFileName())) {
+            var t = File.ReadAllText(SettingsFileName(), Encoding.UTF8);
             t = t.RemoveChars("\n");
-            _lastD.AddRange(t.SplitAndCutByCr());
+            _settings.AddRange(t.SplitAndCutByCr());
         }
     }
 
-    private string SaveFileName() => !string.IsNullOrEmpty(_filename) ? _filename.CheckFile() : Application.StartupPath + "\\" + Name + "-Files.laf";
+    private void SaveSettingsToDisk() {
+        if (CanWriteInDirectory(SettingsFileName().FilePath())) {
+            _settings.Save(SettingsFileName(), Encoding.UTF8, false);
+        }
+    }
 
     private void SetLastFilesStyle() {
         if (DrawStyle == ComboboxStyle.TextBox) {
@@ -183,6 +186,8 @@ public sealed class LastFilesCombo : ComboBox {
         if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
         if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }
     }
+
+    private string SettingsFileName() => !string.IsNullOrEmpty(_settingsfilename) ? _settingsfilename.CheckFile() : Application.StartupPath + "\\" + Name + "-Files.laf";
 
     #endregion
 }

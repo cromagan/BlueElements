@@ -18,46 +18,59 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueBasics;
 using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 
 public class ScriptEndedFeedback {
 
-    #region Fields
+    #region Constructors
 
-    public readonly string ErrorCode;
-    public readonly string ErrorMessage;
-    public readonly bool GiveItAnotherTry;
-    public readonly int LastlineNo;
-    public readonly List<Variable>? Variables;
+    public ScriptEndedFeedback(List<Variable> variables, List<string> protocol, bool allOk) {
+        Variables1 = variables;
+        GiveItAnotherTry = false;
+        Protocol = protocol;
+        AllOk = allOk;
+        ProtocolText = GenNiceProtokoll(protocol);
+    }
+
+    /// <summary>
+    /// Wird ausschließlich verwendet, wenn eine Vorabprüfung scheitert,
+    /// und das Skript erst gar nicht gestartet wird.
+    /// </summary>
+    /// <param name="errormessage"></param>
+    /// <param name="giveitanothertry"></param>
+    public ScriptEndedFeedback(string errormessage, bool giveitanothertry) {
+        Variables1 = null;
+        GiveItAnotherTry = giveitanothertry;
+        Protocol = new List<string> {
+            errormessage
+        };
+
+        ProtocolText = GenNiceProtokoll(Protocol);
+        AllOk = false;
+    }
 
     #endregion
 
-    #region Constructors
+    #region Properties
 
-    public ScriptEndedFeedback(int lastlineNo, string errormessage, string errorcode, List<Variable> variables) {
-        ErrorMessage = errormessage;
-        ErrorCode = errorcode;
-        LastlineNo = lastlineNo;
-        Variables = variables;
-        GiveItAnotherTry = false;
-    }
+    public bool AllOk { get; }
 
-    public ScriptEndedFeedback(string errormessage, bool giveitanothertry) {
-        ErrorMessage = errormessage;
-        ErrorCode = string.Empty;
-        LastlineNo = -1;
-        Variables = null;
-        GiveItAnotherTry = giveitanothertry;
-    }
+    public bool GiveItAnotherTry { get; }
 
-    public ScriptEndedFeedback(List<Variable> variables, int lastlineNo) {
-        ErrorMessage = string.Empty;
-        ErrorCode = string.Empty;
-        LastlineNo = lastlineNo;
-        Variables = variables;
-    }
+    public List<string> Protocol { get; }
+
+    public string ProtocolText { get; }
+
+    public List<Variable>? Variables1 { get; }
+
+    #endregion
+
+    #region Methods
+
+    private string GenNiceProtokoll(List<string> protokoll) => "Skript-Protokoll:\r\n\r\n" + protokoll.JoinWith("\r\n\r\n").Replace("]@", "]\r\n");
 
     #endregion
 }

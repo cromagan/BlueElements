@@ -28,17 +28,21 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase {
 
     #region Fields
 
     public DateTime? IsInCache = null;
+    public RowCheckedEventArgs? LastCheckedEventArgs;
+    public string? LastCheckedMessage;
+    public List<string>? LastCheckedRowFeedback;
     private string? _tmpQuickInfo;
 
     #endregion
@@ -273,35 +277,34 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
     public void CellSet(ColumnItem? column, DateTime value) => Database?.Cell.Set(column, this, value);
 
-    public string CheckRowData() {
-        if (Database is null || Database.IsDisposed) { return "Datenbank verworfen"; }
-
-        ScriptEndedFeedback? sef = null;
-
-        Database.Row.LastCheckedRow = null;
-
-        while (Database.Row.LastCheckedRow != this) {
-            Database.Row.LastCheckedRowFeedback.Clear();
-            sef = ExecuteScript(EventTypes.error_check, string.Empty, false, false, true, 0);
+    public void CheckRowDataIfNeeded() {
+        if (Database is null || Database.IsDisposed) {
+            LastCheckedMessage = "Datenbank verworfen";
+            return;
         }
 
-        if (sef is null) { return string.Empty; }
+        if (LastCheckedEventArgs != null) { return; }
 
-        var infoTxt = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
+        var sef = ExecuteScript(EventTypes.error_check, string.Empty, false, false, true, 0);
+
+        LastCheckedMessage = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
 
         List<string> cols = new();
-        //var fs = script.Feedback.SplitAndCutByCrToList().SortedDistinctList();
-        foreach (var thiss in Database.Row.LastCheckedRowFeedback) {
-            cols.AddIfNotExists(thiss);
-            var t = thiss.SplitBy("|");
-            var thisc = Database.Column[t[0]];
-            if (thisc != null) {
-                infoTxt = infoTxt + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
+
+        var tmp = LastCheckedRowFeedback;
+        if (tmp != null && tmp.Count > 0) {
+            foreach (var thiss in tmp) {
+                cols.AddIfNotExists(thiss);
+                var t = thiss.SplitBy("|");
+                var thisc = Database.Column[t[0]];
+                if (thisc != null) {
+                    LastCheckedMessage = LastCheckedMessage + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
+                }
             }
         }
 
         if (cols.Count == 0) {
-            infoTxt += "Diese Zeile ist fehlerfrei.";
+            LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
         }
 
         if (Database.Column.SysCorrect.SaveContent) {
@@ -309,9 +312,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
                 CellSet(Database.Column.SysCorrect, cols.Count == 0);
             }
         }
-        OnRowChecked(new RowCheckedEventArgs(this, cols, sef.Variables));
 
-        return infoTxt;
+        LastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef.Variables1);
+
+        OnRowChecked(LastCheckedEventArgs);
     }
 
     public void CloneFrom(RowItem source, bool nameAndKeyToo) {
@@ -324,12 +328,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         }
     }
 
-    /// <summary>
-    /// Erstellt einen Sortierfähigen String eine Zeile
-    /// </summary>
-    /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
-    /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
-
     public string CompareKey(List<ColumnItem>? columns) {
         StringBuilder r = new();
         if (columns != null) {
@@ -341,13 +339,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         return r.ToString();
     }
 
+    public string CompareKey() => CompareKey(Database?.SortDefinition?.Columns);
+
+    /// <summary>
+    /// Erstellt einen Sortierfähigen String eine Zeile
+    /// </summary>
+    /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
+    /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
     /// <summary>
     /// Erstellt einen sortierfähigen String eine Zeile mit der Standard sortierung
     /// </summary>
     /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
-
-    public string CompareKey() => CompareKey(Database?.SortDefinition?.Columns);
-
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
@@ -370,7 +372,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         var t = DateTime.Now;
         do {
             var erg = ExecuteScript(doFemdZelleInvalidate, fullCheck, eventname, changevalues, scriptname);
-            if (string.IsNullOrWhiteSpace(erg.ErrorMessage)) { return erg; }
+            if (erg.AllOk) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
     }
@@ -419,37 +421,44 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         return true;
     }
 
-    public string ReplaceVariables(string formel, bool fulltext, bool removeLineBreaks) {
-        if (Database == null || Database.IsDisposed) { return formel; }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="txt"></param>
+    /// <param name="replacedvalue">Wenn true, wird der Wert durch den leserlichen Zelleninhalt ersetzt. Bei False durch den Origial Zelleninhalt</param>
+    /// <param name="removeLineBreaks"></param>
+    /// <returns></returns>
+    public string ReplaceVariables(string txt, bool replacedvalue, bool removeLineBreaks) {
+        if (Database == null || Database.IsDisposed) { return txt; }
 
-        var erg = formel;
+        var erg = txt;
         // Variablen ersetzen
         foreach (var thisColumnItem in Database.Column) {
             if (!erg.Contains("~")) { return erg; }
 
             if (thisColumnItem != null) {
                 if (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper())) {
-                    var txt = CellGetString(thisColumnItem);
-                    if (fulltext) { txt = CellItem.ValueReadable(thisColumnItem, txt, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks); }
-                    if (removeLineBreaks && !fulltext) {
-                        txt = txt.Replace("\r\n", " ");
-                        txt = txt.Replace("\r", " ");
+                    var replacewith = CellGetString(thisColumnItem);
+                    if (replacedvalue) { replacewith = CellItem.ValueReadable(thisColumnItem, replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks); }
+                    if (removeLineBreaks && !replacedvalue) {
+                        replacewith = replacewith.Replace("\r\n", " ");
+                        replacewith = replacewith.Replace("\r", " ");
                     }
 
-                    erg = erg.Replace("~" + thisColumnItem.Name.ToUpper() + "~", txt, RegexOptions.IgnoreCase);
-                    while (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper() + "(")) {
-                        var x = erg.IndexOf("~" + thisColumnItem.Name.ToUpper() + "(", StringComparison.OrdinalIgnoreCase);
-                        var x2 = erg.IndexOf(")", x, StringComparison.Ordinal);
-                        if (x2 < x) { return erg; }
-                        var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
-                        ww = ww.Replace(" ", string.Empty).ToUpper();
-                        var vals = ww.SplitAndCutBy(",");
-                        if (vals.Length != 2) { return formel; }
-                        if (vals[0] != "L") { return formel; }
-                        if (!IntTryParse(vals[1], out var stellen)) { return formel; }
-                        var newW = txt.Substring(0, Math.Min(stellen, txt.Length));
-                        erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
-                    }
+                    erg = erg.Replace("~" + thisColumnItem.Name.ToUpper() + "~", replacewith, RegexOptions.IgnoreCase);
+                    //while (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper() + "(")) {
+                    //    var x = erg.IndexOf("~" + thisColumnItem.Name.ToUpper() + "(", StringComparison.OrdinalIgnoreCase);
+                    //    var x2 = erg.IndexOf(")", x, StringComparison.Ordinal);
+                    //    if (x2 < x) { return erg; }
+                    //    var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
+                    //    ww = ww.Replace(" ", string.Empty).ToUpper();
+                    //    var vals = ww.SplitAndCutBy(",");
+                    //    if (vals.Length != 2) { return txt; }
+                    //    if (vals[0] != "L") { return txt; }
+                    //    if (!IntTryParse(vals[1], out var stellen)) { return txt; }
+                    //    var newW = replacewith.Substring(0, Math.Min(stellen, replacewith.Length));
+                    //    erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
+                    //}
                 }
             }
         }
@@ -501,6 +510,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
     }
 
+    internal void InvalidateCheckData() {
+        LastCheckedRowFeedback = null;
+        LastCheckedEventArgs = null;
+        LastCheckedMessage = null;
+    }
+
     internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
     internal void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
@@ -540,8 +555,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
         DoingScript = true;
         var script = Database.ExecuteScript(eventname, scriptname, changevalues, this);
 
-        Database.Row.LastCheckedRow = this;
-
         if (changevalues) {
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
             DoRowAutomaticEventArgs e = new(this, eventname);
@@ -554,30 +567,30 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName {
 
         // checkPerformed geht von Dateisystemfehlern aus
 
-        if (!string.IsNullOrEmpty(script.ErrorMessage)) {
-            Database.OnScriptError(new RowCancelEventArgs(this, "Zeile: " + script.LastlineNo + "\r\n" + script.ErrorMessage + "\r\n" + script.ErrorCode));
+        if (!script.AllOk) {
+            Database.OnScriptError(new RowCancelEventArgs(this, script.ProtocolText));
             return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
         }
 
         // Dann die Abschließenden Korrekturen vornehmen
-        foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null)) {
-            if (fullCheck) {
-                var x = CellGetString(thisColum);
-                var x2 = thisColum.AutoCorrect(x, true);
-                if (thisColum.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
-                    Database.Cell.Set(thisColum, this, x2);
-                } else {
-                    if (!thisColum.IsFirst()) {
-                        Database.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
+        foreach (var thisColum in Database.Column) {
+            if (thisColum != null) {
+                if (fullCheck) {
+                    var x = CellGetString(thisColum);
+                    var x2 = thisColum.AutoCorrect(x, true);
+                    if (thisColum.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
+                        Database.Cell.Set(thisColum, this, x2);
+                    } else {
+                        if (!thisColum.IsFirst()) {
+                            Database.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
+                        }
                     }
+                    doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
                 }
-                //CellCollection.Invalidate_CellContentSize(thisColum, this);
-                //thisColum.Invalidate_ContentWidth();
-                doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
-            }
-            if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {
-                //CellCollection.Invalidate_CellContentSize(thisColum, this);
-                thisColum.Invalidate_ContentWidth();
+
+                if (doFemdZelleInvalidate && thisColum.LinkedDatabase != null) {
+                    thisColum.Invalidate_ContentWidth();
+                }
             }
         }
 

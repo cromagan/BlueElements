@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
@@ -42,6 +43,7 @@ internal class Method_BerechneVariable : Method {
     public override bool EndlessArgs => SEndlessArgs;
     public override string EndSequence => ";";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
     public override string StartSequence => "=";
     public override string Syntax => "VariablenName = Berechung;";
@@ -53,42 +55,43 @@ internal class Method_BerechneVariable : Method {
     /// <summary>
     ///
     /// </summary>
+    /// <param name="infos"></param>
     /// <param name="newcommand">Erwartet wird: X=5;</param>
     /// <param name="s"></param>
     /// <param name="generateVariable"></param>
     /// <returns></returns>
     public static DoItFeedback VariablenBerechnung(CanDoFeedback infos, string newcommand, Script s, bool generateVariable) {
-        //if (s.BerechneVariable == null) { return new DoItFeedback(infos, s, "Interner Fehler"); }
+        //if (s.BerechneVariable == null) { return new DoItFeedback(infos.LogData, s, "Interner Fehler"); }
 
         var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
 
-        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback(infos, "Fehler mit = - Zeichen"); }
+        if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback(infos.Data, "Fehler mit = - Zeichen"); }
 
         var varnam = newcommand.Substring(0, pos);
 
-        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos, varnam + " ist kein gültiger Variablen-Name"); }
+        if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos.Data, varnam + " ist kein gültiger Variablen-Name"); }
 
         var v = s.Variables.Get(varnam);
         if (generateVariable && v != null) {
-            return new DoItFeedback(infos, "Variable " + varnam + " ist bereits vorhanden.");
+            return new DoItFeedback(infos.Data, "Variable " + varnam + " ist bereits vorhanden.");
         }
         if (!generateVariable && v == null) {
-            return new DoItFeedback(infos, "Variable " + varnam + " nicht vorhanden.");
+            return new DoItFeedback(infos.Data, "Variable " + varnam + " nicht vorhanden.");
         }
 
         var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
 
-        var attvar = SplitAttributeToVars(s, value, _args, SEndlessArgs);
+        var attvar = SplitAttributeToVars(s, value, _args, SEndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(null, new Method_BerechneVariable(), attvar); }
 
         if (generateVariable) {
             attvar.Attributes[0].KeyName = varnam.ToLower();
             attvar.Attributes[0].ReadOnly = false;
             s.Variables.Add(attvar.Attributes[0]);
-            return new DoItFeedback(infos, attvar.Attributes[0]);
+            return new DoItFeedback(attvar.Attributes[0]);
         }
 
-        return v.GetValueFrom(attvar.Attributes[0]);
+        return v.GetValueFrom(attvar.Attributes[0], infos.Data);
     }
 
     public override List<string> Comand(List<Variable> currentvariables) => currentvariables?.AllNames() ?? new List<string>();

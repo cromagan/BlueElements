@@ -72,11 +72,11 @@ public class VariableBitmap : Variable {
         return v;
     }
 
-    public override DoItFeedback GetValueFrom(Variable variable) {
-        if (variable is not VariableBitmap v) { return DoItFeedback.VerschiedeneTypen(null, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null); }
+    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
+        if (variable is not VariableBitmap v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         ValueBitmap = v.ValueBitmap;
-        return DoItFeedback.Null(null);
+        return DoItFeedback.Null();
     }
 
     protected override Variable? NewWithThisValue(object x, Script s) => null;

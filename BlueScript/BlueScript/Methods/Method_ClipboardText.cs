@@ -19,11 +19,14 @@
 
 using System.Collections.Generic;
 using System.Windows;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_ClipboardText : Method {
 
     #region Properties
@@ -33,6 +36,7 @@ internal class Method_ClipboardText : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "ClipboardText()";
@@ -41,18 +45,18 @@ internal class Method_ClipboardText : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "clipboardtext" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "clipboardtext" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(infos, this, attvar);
+            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
         }
 
         if (Clipboard.ContainsText()) {
-            return new DoItFeedback(infos, Clipboard.GetText(), string.Empty);
+            return new DoItFeedback(Clipboard.GetText());
         }
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

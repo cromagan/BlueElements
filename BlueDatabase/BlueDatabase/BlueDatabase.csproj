@@ -112,6 +112,12 @@
     <Compile Include="Interfaces\IColumnInputFormat.cs" />
     <Compile Include="Interfaces\IHasChangeabelDatabase.cs" />
     <Compile Include="Interfaces\IHasDatabase.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="SQLBackMicrosoftCE.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
@@ -181,7 +187,13 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\BlueBasics\BlueBasics.csproj">
       <Project>{e7e05bac-07cb-478d-861a-db24a27bbf75}</Project>

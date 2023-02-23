@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -356,8 +355,10 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     public void Parse(List<KeyValuePair<string, string>> toParse) {
         IsParsing = true;
-        foreach (var pair in toParse.Where(pair => !ParseThis(pair.Key, pair.Value))) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
+        foreach (var pair in toParse) {
+            if (!ParseThis(pair.Key, pair.Value)) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
+            }
         }
 
         ParseFinished();
@@ -385,9 +386,12 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
             case "point":
                 if (value.StartsWith("[I]")) { value = value.FromNonCritical(); }
 
-                foreach (var thisPoint in MovablePoint.Where(thisPoint => value.Contains("Name=" + thisPoint.KeyName + ","))) {
-                    thisPoint.Parse(value);
+                foreach (var thisPoint in MovablePoint) {
+                    if (value.Contains("Name=" + thisPoint.KeyName + ",")) {
+                        thisPoint.Parse(value);
+                    }
                 }
+
                 return true;
 
             case "format": // = Textformat!!!

@@ -37,7 +37,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection;
 
-public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptAndSends, IContentHolder, IItemToControl {
+public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToControl {
 
     #region Fields
 
@@ -187,14 +187,13 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
 
-            var con = new FlexiControlForCell {
-                Database = Column?.Database,
-                ColumnName = Column?.Name ?? string.Empty,
-                EditType = EditType,
-                CaptionPosition = CaptionPosition,
-                Name = DefaultItemToControlName()
-            };
-            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
+            var con = new FlexiControlForCell();
+            con.SetData(Column?.Database, -1);
+            con.ColumnName = Column?.Name ?? string.Empty;
+            con.EditType = EditType;
+            con.CaptionPosition = CaptionPosition;
+            con.Name = DefaultItemToControlName();
+            if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
             return con;
         }
 
@@ -233,13 +232,6 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptA
         l.Add(new FlexiControl());
 
         return l;
-    }
-
-    public bool IsRecursiveWith(IAcceptAndSends obj) {
-        if (obj == this) { return true; }
-
-        if (GetRowFrom is IAcceptAndSends i) { return i.IsRecursiveWith(obj); }
-        return false;
     }
 
     public override bool ParseThis(string tag, string value) {

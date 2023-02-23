@@ -21,11 +21,14 @@ using System.Collections.Generic;
 using System.IO;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_LoadTextFile : Method {
 
     #region Properties
@@ -35,7 +38,7 @@ internal class Method_LoadTextFile : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableString.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "LoadTextFile(Filename)";
@@ -44,28 +47,28 @@ internal class Method_LoadTextFile : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "loadtextfile" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "loadtextfile" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var ft = ((VariableString)attvar.Attributes[0]).ValueString.FileType();
 
         if (ft is not FileFormat.Textdocument and not FileFormat.CSV) {
-            return new DoItFeedback(infos, "Datei ist kein Textformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(infos.Data, "Datei ist kein Textformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 
         if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
-            return new DoItFeedback(infos, "Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 
         try {
             var importText = File.ReadAllText(((VariableString)attvar.Attributes[0]).ValueString, Constants.Win1252);
             //var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
-            return new DoItFeedback(infos, importText, string.Empty);
+            return new DoItFeedback(importText);
         } catch {
-            return new DoItFeedback(infos, "Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
     }
 

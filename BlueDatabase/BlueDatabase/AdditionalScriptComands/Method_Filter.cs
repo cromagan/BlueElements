@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using BlueDatabase.Enums;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -31,13 +32,10 @@ public class Method_Filter : Method_Database {
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann. Aktuell wird nur der FilterTyp 'is' unterstützt. Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.";
-
     public override bool EndlessArgs => true;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => VariableFilterItem.ShortName_Variable;
 
     public override string StartSequence => "(";
@@ -54,14 +52,14 @@ public class Method_Filter : Method_Database {
         var allFi = new List<FilterItem>();
 
         for (var z = ab; z < attributes.Count; z++) {
-            if (attributes[z] is not VariableFilterItem fi) { return null; } // new DoItFeedback(infos, s, "Kein Filter übergeben.");
+            if (attributes[z] is not VariableFilterItem fi) { return null; } // new DoItFeedback(infos.LogData, s, "Kein Filter übergeben.");
 
             //var fi = new FilterItem(attributes[z].ObjectData());
 
-            if (!fi.FilterItem.IsOk()) { return null; }// new DoItFeedback(infos, s, "Filter fehlerhaft"); }
+            if (!fi.FilterItem.IsOk()) { return null; }// new DoItFeedback(infos.LogData, s, "Filter fehlerhaft"); }
 
             if (z > ab) {
-                if (fi.FilterItem.Database != allFi[0].Database) { return null; }// new DoItFeedback(infos, s, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }
+                if (fi.FilterItem.Database != allFi[0].Database) { return null; }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }
             }
             allFi.Add(fi.FilterItem);
         }
@@ -72,16 +70,16 @@ public class Method_Filter : Method_Database {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "filter" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var db = DatabaseOf(s.Variables, ((VariableString)attvar.Attributes[0]).ValueString);
-        if (db == null) { return new DoItFeedback(infos, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
 
         #region Spalte ermitteln
 
         var filterColumn = db.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (filterColumn == null) { return new DoItFeedback(infos, "Spalte '" + ((VariableString)attvar.Attributes[1]).ValueString + "' in Ziel-Datenbank nicht gefunden"); }
+        if (filterColumn == null) { return new DoItFeedback(infos.Data, "Spalte '" + ((VariableString)attvar.Attributes[1]).ValueString + "' in Ziel-Datenbank nicht gefunden"); }
 
         #endregion
 
@@ -94,13 +92,13 @@ public class Method_Filter : Method_Database {
                 break;
 
             default:
-                return new DoItFeedback(infos, "Filtertype unbekannt: " + ((VariableString)attvar.Attributes[2]).ValueString);
+                return new DoItFeedback(infos.Data, "Filtertype unbekannt: " + ((VariableString)attvar.Attributes[2]).ValueString);
         }
 
         #endregion
 
         var fii = new FilterItem(filterColumn, filtertype, ((VariableString)attvar.Attributes[3]).ValueString);
-        return new DoItFeedback(infos, new VariableFilterItem(fii));
+        return new DoItFeedback(new VariableFilterItem(fii));
     }
 
     #endregion

@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -31,7 +32,7 @@ public class Method_AddRow : Method_Database {
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableBool.ShortName_Plain } };
 
-    public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile. KeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
+    public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile.\r\nKeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
 
     public override bool EndlessArgs => false;
 
@@ -39,10 +40,10 @@ public class Method_AddRow : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
 
+    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => VariableRowItem.ShortName_Variable;
 
     public override string StartSequence => "(";
-
     public override string Syntax => "AddRow(database, keyvalue, startScriptOfNewRow);";
 
     #endregion
@@ -52,15 +53,15 @@ public class Method_AddRow : Method_Database {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "addrow" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var db = DatabaseOf(s.Variables, ((VariableString)attvar.Attributes[0]).ValueString);
-        if (db == null) { return new DoItFeedback(infos, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
+        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
 
-        if (db?.ReadOnly ?? true) { return new DoItFeedback(infos, "Datenbank schreibgeschützt."); }
+        if (db?.ReadOnly ?? true) { return new DoItFeedback(infos.Data, "Datenbank schreibgeschützt."); }
 
-        if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback(infos, "KeyValue muss einen Wert enthalten."); }
+        if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback(infos.Data, "KeyValue muss einen Wert enthalten."); }
         //var r = db.Row[((VariableString)attvar.Attributes[1]).ValueString];
 
         //if (r != null && !((VariableBool)attvar.Attributes[2]).ValueBool) { return Method_Row?.RowToObject(r); }
@@ -69,11 +70,11 @@ public class Method_AddRow : Method_Database {
             StackTrace stackTrace = new();
 
             if (stackTrace.FrameCount > 400) {
-                return new DoItFeedback(infos, "Stapelspeicherüberlauf");
+                return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf");
             }
         }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos, "Zeile anlegen im Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
 
         var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), ((VariableString)attvar.Attributes[1]).ValueString, ((VariableBool)attvar.Attributes[2]).ValueBool, true, "Script Command: Add Row");
 

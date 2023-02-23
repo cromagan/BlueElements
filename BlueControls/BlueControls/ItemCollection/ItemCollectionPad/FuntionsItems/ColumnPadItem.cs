@@ -30,6 +30,9 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
+/// <summary>
+/// Zum Darstellen einer Spalte. Im ViewEditpt benutzt
+/// </summary>
 public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     #region Fields

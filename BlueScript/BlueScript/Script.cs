@@ -19,10 +19,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using BlueBasics;
+using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -43,50 +43,16 @@ public class Script {
     /// </summary>
     public readonly string AdditionalFilesPath;
 
+    public readonly MethodType AllowedMethods = MethodType.Standard;
     public readonly bool ChangeValues;
     public readonly List<Variable> Variables;
     public bool EndScript;
 
     #endregion
 
-    ///// <summary>
-    ///// Dieses Feld enthält informationen, die nach dem Skript-Lauf abgegriffen werden können.
-    ///// </summary>
-    //public string Feedback = string.Empty;
-
     #region Constructors
 
-    //public static IEnumerable<T> GetEnumerableOfType<T>(params object[] constructorArgs) where T : class {
-    //    var objects = new List<T>();
-    //    IEnumerable<Type> types = null;
-    //    try {
-    //        types =
-    //           from a in AppDomain.CurrentDomain.GetAssemblies()
-    //           from t in a.GetTypes()
-    //           select t;
-    //    }
-    //    catch (Exception ex) {
-    //        Develop.DebugPrint(ex);
-    //        if (ex is System.Reflection.ReflectionTypeLoadException typeLoadException) {
-    //            Develop.DebugPrint(typeLoadException.LoaderExceptions.ToString(false));
-    //            //var loaderExceptions = typeLoadException.LoaderExceptions;
-    //        }
-    //        return objects;
-    //    }
-    //    foreach (var type in types.Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
-    //        objects.Add((T)Activator.CreateInstance(type, constructorArgs));
-    //    }
-    //    //foreach( var thisa in  AppDomain.CurrentDomain.GetAssemblies())
-    //    //       {
-    //    //   foreach (var type in
-    //    //       Assembly.GetAssembly(typeof(T)).GetTypes()
-    //    //       .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(typeof(T)))) {
-    //    //       objects.Add((T)Activator.CreateInstance(type, constructorArgs));
-    //    //   }
-    //    //   //objects.Sort();
-    //    return objects;
-    //}
-    public Script(List<Variable>? variablen, string additionalFilesPath, bool changevalues) {
+    public Script(List<Variable>? variablen, string additionalFilesPath, bool changevalues, MethodType allowedMethods) {
         Comands ??= GetInstaceOfType<Method>();
         if (VarTypes == null) {
             VarTypes = GetInstaceOfType<Variable>("NAME");
@@ -96,10 +62,9 @@ public class Script {
         ReducedScriptText = string.Empty;
         ChangeValues = changevalues;
         Variables = variablen ?? new();
+        AllowedMethods = allowedMethods;
 
         AdditionalFilesPath = (additionalFilesPath.Trim("\\") + "\\").CheckPath();
-
-        //BitmapCache = new List<Bitmap>();
     }
 
     #endregion
@@ -117,36 +82,38 @@ public class Script {
 
     #region Methods
 
-    public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback) {
-        if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", -1); }
+    public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback, LogData ld) {
+        if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
         foreach (var thisC in Comands) {
-            var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s, Line(txt, pos));
-            if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, Line(txt, pos)); }
+            var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s, ld);
+            if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
                 var fn = thisC.DoIt(s, f);
-                return new DoItWithEndedPosFeedback(fn.ErrorMessage, fn.Variable, f.ContinueOrErrorPosition, fn.Line);
+                return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinueOrErrorPosition);
             }
         }
 
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, s, Line(txt, pos)))) {
+        foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, s, ld))) {
             if (f.MustAbort) {
-                return new DoItWithEndedPosFeedback(f.ErrorMessage, Line(txt, pos));
+                return new DoItWithEndedPosFeedback(f.ErrorMessage, ld);
             }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
                 return expectedvariablefeedback
-                    ? new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos), Line(txt, pos))
-                    : new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos), Line(txt, pos));
+                    ? new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos), ld)
+                    : new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos), ld);
             }
         }
 
         #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + txt.Substring(pos).TrimEnd("¶"), Line(txt, pos));
+        var bef = (txt.Substring(pos) + "¶").SplitBy("¶");
+
+        return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + bef[0], ld);
     }
 
     public static int Line(string? txt, int? pos) {
@@ -197,12 +164,12 @@ public class Script {
         return s.ToString();
     }
 
-    public ScriptEndedFeedback Parse(int lineadd) {
+    public ScriptEndedFeedback Parse(int lineadd, string subname) {
         ReducedScriptText = ReduceText(ScriptText);
         BreakFired = false;
         Sub = 0;
 
-        return Parse(ReducedScriptText, lineadd);
+        return Parse(ReducedScriptText, lineadd, subname);
     }
 
     //internal int AddBitmapToCache(Bitmap? bmp) {
@@ -210,25 +177,30 @@ public class Script {
     //    return BitmapCache.IndexOf(bmp);
     //}
 
-    public ScriptEndedFeedback Parse(string redScriptText, int lineadd) {
+    public ScriptEndedFeedback Parse(string redScriptText, int lineadd, string subname) {
         var pos = 0;
         EndScript = false;
 
+        var ld = new LogData(subname, lineadd + 1);
+
         do {
             if (pos >= redScriptText.Length || EndScript) {
-                return new ScriptEndedFeedback(Variables, Line(redScriptText, pos) + lineadd);
+                return new ScriptEndedFeedback(Variables, ld.Protocol, true);
             }
 
-            if (BreakFired) { return new ScriptEndedFeedback(Variables, Line(redScriptText, pos) + lineadd); }
+            if (BreakFired) { return new ScriptEndedFeedback(Variables, ld.Protocol, true); }
 
             if (redScriptText.Substring(pos, 1) == "¶") {
                 pos++;
+                ld.LineAdd(1);
             } else {
-                var f = ComandOnPosition(redScriptText, pos, this, false);
-                if (!string.IsNullOrEmpty(f.ErrorMessage)) {
-                    return new ScriptEndedFeedback(f.Line + lineadd, f.ErrorMessage, redScriptText.Substring(pos, Math.Min(30, redScriptText.Length - pos)), Variables);
+                var f = ComandOnPosition(redScriptText, pos, this, false, ld);
+                if (!f.AllOk) {
+                    return new ScriptEndedFeedback(Variables, ld.Protocol, false);
                 }
+
                 pos = f.Position;
+                ld.LineAdd(Script.Line(redScriptText, pos) - ld.Line + lineadd);
             }
         } while (true);
     }

@@ -19,6 +19,7 @@
 
 using System;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.EventArgs;
@@ -26,6 +27,12 @@ using BlueDatabase.EventArgs;
 namespace BlueControls.Forms;
 
 public partial class FormWithStatusBar : Form {
+
+    #region Fields
+
+    private DateTime LastMessage = DateTime.UtcNow;
+
+    #endregion
 
     #region Constructors
 
@@ -35,7 +42,8 @@ public partial class FormWithStatusBar : Form {
 
     #region Properties
 
-    public bool DropMessages { get; set; }
+    public bool DropMessages { get; set; } = true;
+    public int MessageSeconds { get; set; } = 10;
 
     #endregion
 
@@ -72,6 +80,9 @@ public partial class FormWithStatusBar : Form {
             if (InvokeRequired) {
                 return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, message, didAlreadyMessagebox)));
             }
+
+            LastMessage = DateTime.UtcNow;
+            timMessageClearer.Enabled = true;
 
             var imagecode = ImageCode.Information;
 
@@ -110,6 +121,19 @@ public partial class FormWithStatusBar : Form {
     }
 
     internal static void Db_DropMessage(object sender, MessageEventArgs e) => UpdateStatusBar(e.Type, e.Message, true);
+
+    private void timMessageClearer_Tick(object sender, System.EventArgs e) {
+        if (IsDisposed) {
+            timMessageClearer.Enabled = false;
+            return;
+        }
+
+        if (DateTime.UtcNow.Subtract(LastMessage).TotalSeconds >= MessageSeconds) {
+            timMessageClearer.Enabled = false;
+            capStatusBar.Text = "<imagecode=" + QuickImage.Get(ImageCode.Häkchen, 16) + "> Nix besonderes zu berichten...";
+            capStatusBar.Refresh();
+        }
+    }
 
     #endregion
 }

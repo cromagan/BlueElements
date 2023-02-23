@@ -18,11 +18,14 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_EndsWith : Method {
 
     #region Properties
@@ -32,6 +35,7 @@ internal class Method_EndsWith : Method {
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "EndsWith(String, CaseSensitive, Value1, Value2, ...)";
@@ -40,23 +44,23 @@ internal class Method_EndsWith : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "endswith" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "endswith" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (((VariableBool)attvar.Attributes[1]).ValueBool) {
                 if (((VariableString)attvar.Attributes[0]).ValueString.EndsWith(((VariableString)attvar.Attributes[z]).ValueString)) {
-                    return DoItFeedback.Wahr(infos);
+                    return DoItFeedback.Wahr();
                 }
             } else {
                 if (((VariableString)attvar.Attributes[0]).ValueString.ToLower().EndsWith(((VariableString)attvar.Attributes[z]).ValueString.ToLower())) {
-                    return DoItFeedback.Wahr(infos);
+                    return DoItFeedback.Wahr();
                 }
             }
         }
-        return DoItFeedback.Falsch(infos);
+        return DoItFeedback.Falsch();
     }
 
     #endregion

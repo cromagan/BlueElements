@@ -88,11 +88,11 @@ public class VariableString : Variable {
         return v;
     }
 
-    public override DoItFeedback GetValueFrom(Variable variable) {
-        if (variable is not VariableString v) { return DoItFeedback.VerschiedeneTypen(null, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null); }
+    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
+        if (variable is not VariableString v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         ValueString = v.ValueString;
-        return DoItFeedback.Null(null);
+        return DoItFeedback.Null();
     }
 
     protected override Variable NewWithThisValue(object x, Script s) {

@@ -81,11 +81,11 @@ public class VariableFloat : Variable {
         return v;
     }
 
-    public override DoItFeedback GetValueFrom(Variable variable) {
-        if (variable is not VariableFloat v) { return DoItFeedback.VerschiedeneTypen(null, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null); }
+    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
+        if (variable is not VariableFloat v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
         ValueNum = v.ValueNum;
-        return DoItFeedback.Null(null);
+        return DoItFeedback.Null();
     }
 
     protected override Variable NewWithThisValue(object x, Script s) {
@@ -105,9 +105,9 @@ public class VariableFloat : Variable {
     }
 
     protected override object? TryParse(string txt, Script? s) {
-        var (pos2, _) = NextText(txt, 0, Berechnung.RechenOperatoren, false, false, KlammernStd);
+        var (pos2, _) = NextText(txt, 0, MathFormulaParser.RechenOperatoren, false, false, KlammernStd);
         if (pos2 >= 0) {
-            var erg = Berechnung.Ergebnis(txt);
+            var erg = MathFormulaParser.Ergebnis(txt);
             if (erg == null) { return null; }
             txt = erg.ToString();
         }

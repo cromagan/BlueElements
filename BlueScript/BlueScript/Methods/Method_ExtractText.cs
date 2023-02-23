@@ -20,11 +20,14 @@
 using System;
 using System.Collections.Generic;
 using BlueBasics;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_ExtractText : Method {
 
     #region Properties
@@ -37,6 +40,7 @@ internal class Method_ExtractText : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "ExtractText(String, SearchPattern);";
@@ -45,19 +49,19 @@ internal class Method_ExtractText : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "extracttext" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "extracttext" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var tags = ((VariableString)attvar.Attributes[0]).ValueString.ReduceToMulti(((VariableString)attvar.Attributes[1]).ValueString, StringComparison.OrdinalIgnoreCase);
 
         if (tags == null) {
-            return new DoItFeedback(infos, "Searchpattern fehlerhaft.");
+            return new DoItFeedback(infos.Data, "Searchpattern fehlerhaft.");
         }
 
-        return new DoItFeedback(infos, tags);
+        return new DoItFeedback(tags);
     }
 
     #endregion

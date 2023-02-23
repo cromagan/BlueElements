@@ -14,10 +14,7 @@ namespace BlueControls.Controls {
         protected override void Dispose(bool disposing) {
 
 
-            if(disposing) {
-                RowKey = -1;
-                Database = null; // Evente registration aufheben.
-            }
+            if(disposing) { SetData(null,-1); }
 
 
             if (disposing && (components != null)) {

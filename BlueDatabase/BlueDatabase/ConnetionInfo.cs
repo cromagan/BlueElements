@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
@@ -33,7 +32,6 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
 
     #region Fields
 
-    private readonly string _databaseId = string.Empty;
     private string _additionalData = string.Empty;
     private DatabaseAbstract? _provider;
     private string _tablename = string.Empty;
@@ -61,7 +59,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
                 if (d.UniqueID.ToUpper().EndsWith(uniqueId.ToUpper())) {
                     TableName = d.TableName;
                     Provider = d.Provider;
-                    _databaseId = d.DatabaseID;
+                    DatabaseID = d.DatabaseID;
                     AdditionalData = d.AdditionalData;
                     return;
                 }
@@ -69,7 +67,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
 
             TableName = SQLBackAbstract.MakeValidTableName(uniqueId.FileNameWithoutSuffix());
             Provider = null;
-            _databaseId = preveredFileFormatId ?? Database.DatabaseId;
+            DatabaseID = preveredFileFormatId ?? Database.DatabaseId;
             AdditionalData = uniqueId;
 
             return;
@@ -84,7 +82,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
         if (SQLBackAbstract.IsValidTableName(x[0]) && !string.IsNullOrEmpty(x[1])) {
             TableName = x[0];
             Provider = null;
-            _databaseId = x[1];
+            DatabaseID = x[1];
             AdditionalData = x[2];
             return;
         }
@@ -99,7 +97,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
             if (thisDb.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
                 TableName = nci.TableName;
                 Provider = nci.Provider;
-                _databaseId = nci.DatabaseID;
+                DatabaseID = nci.DatabaseID;
                 AdditionalData = nci.AdditionalData;
                 return;
             }
@@ -147,7 +145,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
     public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string? additionalInfo) {
         TableName = tablename.ToUpper();
         Provider = provider;
-        _databaseId = connectionString;
+        DatabaseID = connectionString;
         AdditionalData = additionalInfo ?? string.Empty;
     }
 
@@ -179,7 +177,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
     /// Enthänt nur eine Wert wie z.B. DatabaseSQL.
     /// Um eine Datenbank wieder zu finden, muss uniqueID verwendet werden.
     /// </summary>
-    public string DatabaseID => _databaseId;
+    public string DatabaseID { get; } = string.Empty;
 
     public string KeyName => UniqueID;
 

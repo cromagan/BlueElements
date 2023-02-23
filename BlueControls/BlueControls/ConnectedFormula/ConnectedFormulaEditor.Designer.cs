@@ -40,12 +40,10 @@ namespace BlueControls.Forms {
             this.btnVariable = new BlueControls.Controls.Button();
             this.btnTabControlAdd = new BlueControls.Controls.Button();
             this.btnFileExplorer = new BlueControls.Controls.Button();
-            this.btnKonstante = new BlueControls.Controls.Button();
             this.btnFeldHinzu = new BlueControls.Controls.Button();
             this.grpOptik = new BlueControls.Controls.GroupBox();
             this.btnRegisterKarte = new BlueControls.Controls.Button();
             this.groupBox1 = new BlueControls.Controls.GroupBox();
-            this.btnEingangsZeile = new BlueControls.Controls.Button();
             this.btnZeileHinzu = new BlueControls.Controls.Button();
             this.tabFile = new System.Windows.Forms.TabPage();
             this.grpDatei = new BlueControls.Controls.GroupBox();
@@ -181,7 +179,6 @@ namespace BlueControls.Forms {
             this.grpFelder.Controls.Add(this.btnBild);
             this.grpFelder.Controls.Add(this.btnVariable);
             this.grpFelder.Controls.Add(this.btnFileExplorer);
-            this.grpFelder.Controls.Add(this.btnKonstante);
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
             this.grpFelder.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
@@ -243,18 +240,6 @@ namespace BlueControls.Forms {
             this.btnFileExplorer.Text = "Verzeichniss";
             this.btnFileExplorer.Click += new System.EventHandler(this.grpFileExplorer_Click);
             // 
-            // btnKonstante
-            // 
-            this.btnKonstante.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnKonstante.ImageCode = "Textfeld|16|||||||||PlusZeichen";
-            this.btnKonstante.Location = new System.Drawing.Point(8, 24);
-            this.btnKonstante.Name = "btnKonstante";
-            this.btnKonstante.QuickInfo = "Fügt einen konstanten Wert hinzu,\r\nder für Filterungen benutzt werden\r\nkann.";
-            this.btnKonstante.Size = new System.Drawing.Size(136, 22);
-            this.btnKonstante.TabIndex = 2;
-            this.btnKonstante.Text = "Konstanter Wert";
-            this.btnKonstante.Click += new System.EventHandler(this.btnKonstante_Click);
-            // 
             // btnFeldHinzu
             // 
             this.btnFeldHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
@@ -298,7 +283,6 @@ namespace BlueControls.Forms {
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.groupBox1.Controls.Add(this.btnEingangsZeile);
             this.groupBox1.Controls.Add(this.btnZeileHinzu);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
@@ -308,18 +292,6 @@ namespace BlueControls.Forms {
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Zeilen-Berechnung";
-            // 
-            // btnEingangsZeile
-            // 
-            this.btnEingangsZeile.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnEingangsZeile.ImageCode = "Zeile|16|||||||||Pfeil_Unten";
-            this.btnEingangsZeile.Location = new System.Drawing.Point(8, 2);
-            this.btnEingangsZeile.Name = "btnEingangsZeile";
-            this.btnEingangsZeile.QuickInfo = resources.GetString("btnEingangsZeile.QuickInfo");
-            this.btnEingangsZeile.Size = new System.Drawing.Size(72, 66);
-            this.btnEingangsZeile.TabIndex = 5;
-            this.btnEingangsZeile.Text = "Eingangs-Wert";
-            this.btnEingangsZeile.Click += new System.EventHandler(this.btnEingangsZeile_Click);
             // 
             // btnZeileHinzu
             // 
@@ -481,7 +453,6 @@ namespace BlueControls.Forms {
         private GroupBox grpFelder;
         private Button btnZeileHinzu;
         private Button btnFeldHinzu;
-        private Button btnKonstante;
         private GroupBox grpVorschau;
         private Button btnPfeileAusblenden;
         private Button btnVorschauÖffnen;
@@ -498,7 +469,6 @@ namespace BlueControls.Forms {
         private GroupBox groupBox1;
         private GroupBox grpOptik;
         private Button btnVariable;
-        private Button btnEingangsZeile;
         private TabPage tabPage1;
         private Button btnRegisterKarte;
         private Button btnBild;

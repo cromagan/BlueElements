@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -74,9 +73,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         if (filter == null || filter.Count < 0) { return column.Contents(); }
         FilterCollection tfilter = new(column.Database);
-        foreach (var thisFilter in filter.Where(thisFilter => thisFilter != null && column != thisFilter.Column)) {
-            tfilter.Add(thisFilter);
+        foreach (var thisFilter in filter) {
+            if (thisFilter != null && column != thisFilter.Column) {
+                tfilter.Add(thisFilter);
+            }
         }
+
         return column.Contents(tfilter, pinned);
     }
 
@@ -159,20 +161,24 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         #region Wenn ein Filter übergeben wurde, die Einträge markieren
 
         if (filter != null) {
-            foreach (var thisfilter in filter.Where(thisfilter => thisfilter != null && thisfilter.FilterType != FilterType.KeinFilter).Where(thisfilter => thisfilter.Column == _column)) {
-                if (thisfilter.FilterType.HasFlag(FilterType.Istgleich)) {
-                    foreach (var thisValue in thisfilter.SearchValue) {
-                        if (lsbFilterItems.Item[thisValue] is BasicListItem bli) {
-                            bli.Checked = true;
-                        } else if (string.IsNullOrEmpty(thisValue) && leere != null) {
-                            leere.Checked = true;
+            foreach (var thisfilter in filter) {
+                if (thisfilter != null && thisfilter.FilterType != FilterType.KeinFilter) {
+                    if (thisfilter.Column == _column) {
+                        if (thisfilter.FilterType.HasFlag(FilterType.Istgleich)) {
+                            foreach (var thisValue in thisfilter.SearchValue) {
+                                if (lsbFilterItems.Item[thisValue] is BasicListItem bli) {
+                                    bli.Checked = true;
+                                } else if (string.IsNullOrEmpty(thisValue) && leere != null) {
+                                    leere.Checked = true;
+                                }
+                            }
+                        } else if (thisfilter.FilterType.HasFlag(FilterType.Instr)) {
+                            txbEingabe.Text = thisfilter.SearchValue[0];
+                        } else if (Convert.ToBoolean((int)thisfilter.FilterType & 2)) {
+                            if (thisfilter.SearchValue.Count == 1 && string.IsNullOrEmpty(thisfilter.SearchValue[0]) && nichtleere != null) {
+                                nichtleere.Checked = true;
+                            }
                         }
-                    }
-                } else if (thisfilter.FilterType.HasFlag(FilterType.Instr)) {
-                    txbEingabe.Text = thisfilter.SearchValue[0];
-                } else if (Convert.ToBoolean((int)thisfilter.FilterType & 2)) {
-                    if (thisfilter.SearchValue.Count == 1 && string.IsNullOrEmpty(thisfilter.SearchValue[0]) && nichtleere != null) {
-                        nichtleere.Checked = true;
                     }
                 }
             }
@@ -357,7 +363,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         if (_column.SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
             if (txbEingabe.Text.Contains("-")) {
                 var tmp = txbEingabe.Text.Replace(" ", string.Empty);
-                var l = Berechnung.LastMinusIndex(tmp);
+                var l = MathFormulaParser.LastMinusIndex(tmp);
                 if (l > 0 && l < tmp.Length - 1) {
                     var z1 = tmp.Substring(0, l);
                     var z2 = tmp.Substring(l + 1);

@@ -18,12 +18,15 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_MoveDirectory : Method {
 
     #region Properties
@@ -33,7 +36,7 @@ internal class Method_MoveDirectory : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "MoveDirectory(SourceCompleteName, DestinatonCompleteName)";
@@ -45,23 +48,23 @@ internal class Method_MoveDirectory : Method {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "movedirectory" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var sop = ((VariableString)attvar.Attributes[0]).ValueString;
-        if (!DirectoryExists(sop)) { return new DoItFeedback(infos, "Quell-Verzeichnis existiert nicht."); }
+        if (!DirectoryExists(sop)) { return new DoItFeedback(infos.Data, "Quell-Verzeichnis existiert nicht."); }
         var dep = ((VariableString)attvar.Attributes[1]).ValueString;
 
-        if (DirectoryExists(dep)) { return new DoItFeedback(infos, "Ziel-Verzeichnis existiert bereits."); }
+        if (DirectoryExists(dep)) { return new DoItFeedback(infos.Data, "Ziel-Verzeichnis existiert bereits."); }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos, "Verschieben im Testmodus deaktiviert."); }
+        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveDirectory(sop, dep, false)) {
-            return new DoItFeedback(infos, "Verschieben fehlgeschlagen.");
+            return new DoItFeedback(infos.Data, "Verschieben fehlgeschlagen.");
         }
 
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

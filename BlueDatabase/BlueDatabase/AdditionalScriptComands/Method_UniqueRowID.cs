@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -30,13 +31,10 @@ public class Method_UniqueRowID : Method_Database {
 
     public override List<List<string>> Args => new();
     public override string Description => "Gibt eine systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
-
     public override bool EndlessArgs => false;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => VariableString.ShortName_Plain;
 
     public override string StartSequence => "(";
@@ -47,13 +45,13 @@ public class Method_UniqueRowID : Method_Database {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "uniquerowid" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "uniquerowid" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(infos, this, attvar)
-            : new DoItFeedback(infos, RowCollection.UniqueKeyValue(), string.Empty);
+            ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
+            : new DoItFeedback(RowCollection.UniqueKeyValue());
     }
 
     #endregion

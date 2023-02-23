@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -32,10 +31,10 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
-using BlueDatabase.AdditionalScriptComands;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
@@ -58,7 +57,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public readonly CellCollection Cell;
     public readonly ColumnCollection Column;
     public readonly RowCollection Row;
-    public readonly string TableName = string.Empty;
+    public readonly string TableName;
     public readonly string UserName = Generic.UserName().ToUpper();
     public string UserGroup;
     protected string? AdditionalFilesPfadtmp;
@@ -67,7 +66,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private readonly List<ColumnViewCollection> _columnArrangements = new();
     private readonly List<string> _datenbankAdmin = new();
 
-    private readonly List<EventScript?> _EventScript = new();
+    private readonly List<EventScript?> _eventScript = new();
 
     /// <summary>
     /// Exporte werden nur internal verwaltet. Wegen zu vieler erzeigter Pendings, z.B. bei LayoutExport.
@@ -88,18 +87,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private int _checkerTickCount = -5;
     private string _createDate = string.Empty;
     private string _creator = string.Empty;
-    private string _EventScriptTmp = string.Empty;
-
-    //private string _firstColumn;
+    private string _eventScriptTmp = string.Empty;
     private double _globalScale;
-
     private string _globalShowPass = string.Empty;
-
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
 
     private RowSortDefinition? _sortDefinition;
 
-    //private string _rulesScript = string.Empty;
     /// <summary>
     /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
     /// </summary>
@@ -138,7 +132,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     #region Delegates
 
-    //public DatabaseAbstract(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.TableName, readOnly) { }
     public delegate string NeedPassword();
 
     #endregion
@@ -240,10 +233,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public bool DropMessages { get; set; } = true;
 
     public ReadOnlyCollection<EventScript?> EventScript {
-        get => new(_EventScript);
+        get => new(_eventScript);
         set {
-            if (_EventScriptTmp == value.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.EventScript, null, null, _EventScriptTmp, value.ToString(true), string.Empty);
+            if (_eventScriptTmp == value.ToString(false)) { return; }
+            _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, value.ToString(true), string.Empty);
         }
     }
 
@@ -643,7 +636,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public string ChangeData(DatabaseDataType comand, string? columnname, long? rowkey, string previousValue, string changedTo, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-
         var f = SetValueInternal(comand, changedTo, columnname, rowkey, false);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -703,7 +695,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         DatenbankAdmin = new(sourceDatabase.DatenbankAdmin.Clone());
         PermissionGroupsNewRow = new(sourceDatabase.PermissionGroupsNewRow.Clone());
 
-        var tcvc = new ListExt<ColumnViewCollection>();
+        var tcvc = new List<ColumnViewCollection>();
         foreach (var t in sourceDatabase.ColumnArrangements) {
             tcvc.Add(new ColumnViewCollection(this, t.ToString()));
         }
@@ -835,6 +827,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                         vars.AddRange(v);
                     }
                 }
+                vars.Add(new VariableRowItem("RowKey", row, true, true, "Die aktuelle Zeile, die ausgeführt wird."));
             }
 
             foreach (var thisvar in Variables) {
@@ -846,7 +839,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             vars.Add(new VariableString("User", UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
             vars.Add(new VariableString("Usergroup", UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
             vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-            vars.Add(new VariableDatabase("Database", this, true, true, "Die Datebank, die zu dem Skript gehört"));
+            vars.Add(new VariableDatabase("Database", this, true, true, "Die Datenbank, die zu dem Skript gehört"));
             vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(EventTypes.error_check), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
             if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
                 vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
@@ -854,28 +847,41 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             #endregion
 
+            #region  Erlaubte Methoden ermitteln
+
+            var allowedMethods = MethodType.Standard;
+
+            if (row != null) { allowedMethods |= MethodType.MyDatabaseRow; }
+            if (!s.EventTypes.HasFlag(EventTypes.error_check)) {
+                allowedMethods |= MethodType.IO;
+                allowedMethods |= MethodType.NeedLongTime;
+            }
+            if (changevalues) { allowedMethods |= MethodType.AnyDatabaseRow; }
+
+            #endregion
+
             #region Script ausführen
 
-            Script sc = new(vars, AdditionalFilesPfadWhole(), changevalues) {
+            Script sc = new(vars, AdditionalFilesPfadWhole(), changevalues, allowedMethods) {
                 ScriptText = s.Script
             };
-            var scf = sc.Parse(0);
+            var scf = sc.Parse(0, s.Name);
 
             #endregion
 
             #region Variablen zurückschreiben und Special Rules ausführen
 
-            if (sc.ChangeValues && changevalues && string.IsNullOrEmpty(scf.ErrorMessage)) {
+            if (sc.ChangeValues && changevalues && scf.AllOk) {
                 if (row != null) {
                     foreach (var thisCol in Column) {
                         row.VariableToCell(thisCol, vars);
                     }
                 }
 
-                WriteBackDBVariables(vars);
+                WriteBackDbVariables(vars);
             }
 
-            if (!string.IsNullOrEmpty(scf.ErrorMessage)) {
+            if (!scf.AllOk) {
                 OnDropMessage(FehlerArt.Info, "Das Skript '" + s.Name + "' hat einen Fehler verursacht.");
             }
 
@@ -997,7 +1003,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem?>? pinned) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
 
-    public void Export_HTML(string filename, List<ColumnItem?>? columnList, List<RowData> sortedRows, bool execute) {
+    public void Export_HTML(string filename, List<ColumnItem?>? columnList, List<RowData>? sortedRows, bool execute) {
         if (columnList == null || columnList.Count == 0) {
             columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
         }
@@ -1015,9 +1021,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         foreach (var thisColumn in columnList) {
             if (thisColumn != null) {
                 da.CellAdd(thisColumn.ReadableText().Replace(";", "<br>"), thisColumn.BackColor);
-                //da.GenerateAndAdd("        <th bgcolor=\"#" + ThisColumn.BackColor.ToHTMLCode() + "\"><b>" + ThisColumn.ReadableText().Replace(";", "<br>") + "</b></th>");
             }
         }
+
         da.RowEnd();
         foreach (var thisRow in sortedRows) {
             if (thisRow != null) {
@@ -1029,6 +1035,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                         if (thisColumn.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                             (lcColumn, lCrow, _) = CellCollection.LinkedCellData(thisColumn, thisRow?.Row, false, false);
                         }
+
                         if (lCrow != null && lcColumn != null) {
                             da.CellAdd(lCrow.CellGetValuesReadable(lcColumn, ShortenStyle.HTML).JoinWith("<br>"), thisColumn.BackColor);
                         } else {
@@ -1036,9 +1043,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                         }
                     }
                 }
+
                 da.RowEnd();
             }
         }
+
         // Summe----
         da.RowBeginn();
         foreach (var thisColumn in columnList) {
@@ -1375,7 +1384,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public void RefreshColumnsData(List<FilterItem>? filter) {
         if (filter != null) {
-            var c = new ListExt<ColumnItem>();
+            var c = new List<ColumnItem>();
 
             foreach (var thisF in filter) {
                 if (thisF.Column != null && thisF.Column.IsInCache == null) {
@@ -1421,7 +1430,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public abstract string UndoText(ColumnItem? column, RowItem? row);
 
-    public void WriteBackDBVariables(List<Variable> vars) {
+    public void WriteBackDbVariables(List<Variable> vars) {
         foreach (var thisvar in Variables) {
             var v = vars.Get("DB_" + thisvar.Name);
 
@@ -1638,11 +1647,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 break;
 
             case DatabaseDataType.EventScript:
-                _EventScriptTmp = value;
-                _EventScript.Clear();
+                _eventScriptTmp = value;
+                _eventScript.Clear();
                 List<string> ai = new(value.SplitAndCutByCr());
                 foreach (var t in ai) {
-                    _EventScript.Add(new EventScript(this, t));
+                    _eventScript.Add(new EventScript(this, t));
                 }
                 break;
 
@@ -1703,8 +1712,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     protected abstract void AddUndo(string tableName, DatabaseDataType comand, string? columnname, long? rowKey, string previousValue, string changedTo, string userName, string comment);
-
-    protected void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) => AddUndo(tableName, comand, column?.Name ?? string.Empty, row?.Key ?? -1, previousValue, changedTo, userName, comment);
 
     protected void CreateWatcher() {
         if (!ReadOnly) {
@@ -1787,7 +1794,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         _additionalFilesPfad = "AdditionalFiles";
         _zeilenQuickInfo = string.Empty;
         _sortDefinition = null;
-        _EventScript.Clear();
+        _eventScript.Clear();
         _variables.Clear();
     }
 
@@ -1847,7 +1854,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         var mustBackup = IsThereBackgroundWorkToDo();
 
-        if (!mustBackup) {
+        if (!mustBackup && !HasPendingChanges) {
             _checkerTickCount = 0;
             return;
         }
@@ -1902,7 +1909,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             Script = scriptText,
             Name = "DatenueberpruefungIntern"
         };
-        _EventScript.Add(l1);
+        _eventScript.Add(l1);
 
         var l2 = new EventScript(this) {
             NeedRow = true,
@@ -1912,7 +1919,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                      "Call(\"DatenueberpruefungIntern\", false);",
             Name = "Datenüberprüfung"
         };
-        _EventScript.Add(l2);
+        _eventScript.Add(l2);
 
         var t = typeof(EventTypes);
 
@@ -1926,7 +1933,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                          "var Startroutine = \"" + Enum.GetName(t, z1).Replace("_", " ") + "\";\r\n" +
                          "Call(\"DatenueberpruefungIntern\", false);"
             };
-            _EventScript.Add(ln);
+            _eventScript.Add(ln);
         }
     }
 

@@ -52,20 +52,15 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
     public string RowFilterText {
         get {
             var f = this[null];
-            return f != null ? f?.SearchValue[0] : string.Empty;
+            return f?.SearchValue[0] ?? string.Empty;
         }
         set {
-            if (Database == null || Database.IsDisposed) {
-                return;
-            }
+            if (Database == null || Database.IsDisposed) { return; }
 
             var f = this[null];
             if (f != null) {
-                if (string.Equals(f.SearchValue[0], value, StringComparison.OrdinalIgnoreCase)) {
-                    return;
-                }
-
-                f.SearchValue[0] = value;
+                if (string.Equals(f.SearchValue[0], value, StringComparison.OrdinalIgnoreCase)) { return; }
+                f.Changeto(f.FilterType, value);
                 return;
             }
 

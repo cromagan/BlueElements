@@ -32,7 +32,7 @@ using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
-public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExtended {
+public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExtended, IHasDatabase {
 
     #region Fields
 
@@ -282,20 +282,23 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         da.CellAdd("Änderungs-Rechte");
         da.RowEnd();
         var lfdn = 0;
-        foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
-            lfdn++;
-            da.RowBeginn();
-            da.CellAdd(lfdn.ToString());
-            da.CellAdd(thisColumnItem.Name);
-            da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
-            da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd("/"));
-            da.CellAdd(thisColumnItem.Format.ToString());
-            da.CellAdd(thisColumnItem.Quickinfo.Replace("\r", "<br>"));
-            da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
-            da.CellAdd(thisColumnItem.Tags.JoinWith("<br>"));
-            da.CellAdd(thisColumnItem.PermissionGroupsChangeCell.JoinWith("<br>"));
-            da.RowEnd();
+        foreach (var thisColumnItem in Database.Column) {
+            if (thisColumnItem != null) {
+                lfdn++;
+                da.RowBeginn();
+                da.CellAdd(lfdn.ToString());
+                da.CellAdd(thisColumnItem.Name);
+                da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
+                da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd("/"));
+                da.CellAdd(thisColumnItem.Format.ToString());
+                da.CellAdd(thisColumnItem.Quickinfo.Replace("\r", "<br>"));
+                da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
+                da.CellAdd(thisColumnItem.Tags.JoinWith("<br>"));
+                da.CellAdd(thisColumnItem.PermissionGroupsChangeCell.JoinWith("<br>"));
+                da.RowEnd();
+            }
         }
+
         da.TableEnd();
         da.AddFoot();
         da.Save(TempFile("", "Spaltenliste.html"), true);
@@ -319,40 +322,42 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         SysRowChangeDate = null;
         SysChapter = null;
 
-        foreach (var thisColumnItem in this.Where(thisColumnItem => thisColumnItem != null && thisColumnItem.IsSystemColumn())) {
-            switch (thisColumnItem.Name.ToUpper()) {
-                case "SYS_LOCKED":
-                    SysLocked = thisColumnItem;
-                    break;
+        foreach (var thisColumnItem in this) {
+            if (thisColumnItem != null && thisColumnItem.IsSystemColumn()) {
+                switch (thisColumnItem.Name.ToUpper()) {
+                    case "SYS_LOCKED":
+                        SysLocked = thisColumnItem;
+                        break;
 
-                case "SYS_CREATOR":
-                    SysRowCreator = thisColumnItem;
-                    break;
+                    case "SYS_CREATOR":
+                        SysRowCreator = thisColumnItem;
+                        break;
 
-                case "SYS_CHANGER":
-                    SysRowChanger = thisColumnItem;
-                    break;
+                    case "SYS_CHANGER":
+                        SysRowChanger = thisColumnItem;
+                        break;
 
-                case "SYS_DATECREATED":
-                    SysRowCreateDate = thisColumnItem;
-                    break;
+                    case "SYS_DATECREATED":
+                        SysRowCreateDate = thisColumnItem;
+                        break;
 
-                case "SYS_CORRECT":
-                    SysCorrect = thisColumnItem;
-                    break;
+                    case "SYS_CORRECT":
+                        SysCorrect = thisColumnItem;
+                        break;
 
-                case "SYS_DATECHANGED":
-                    SysRowChangeDate = thisColumnItem;
-                    break;
+                    case "SYS_DATECHANGED":
+                        SysRowChangeDate = thisColumnItem;
+                        break;
 
-                case "SYS_CHAPTER":
-                    SysChapter = thisColumnItem;
-                    break;
+                    case "SYS_CHAPTER":
+                        SysChapter = thisColumnItem;
+                        break;
 
-                default:
+                    default:
 
-                    Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.Name);
-                    break;
+                        Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.Name);
+                        break;
+                }
             }
         }
     }
@@ -455,19 +460,21 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     //internal static string ParsableColumnName(ColumnItem? column) => column == null ? "ColumnName=?" : "ColumnName=" + column.Name;
 
-    internal void ChangeName(string oldName, string newName) {
-        if (oldName == newName) { return; }
+    internal bool ChangeName(string oldName, string newName) {
+        if (oldName == newName) { return true; }
+        if (Database == null || Database.IsDisposed) { return false; }
 
-        var x = _internal.TryRemove(oldName.ToUpper(), out var vcol);
-        if (!x) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Schlüsselfehler 1");
-            return;
-        }
+        var ok = _internal.TryRemove(oldName.ToUpper(), out var vcol);
+        if (!ok) { return false; }
 
-        x = _internal.TryAdd(newName.ToUpper(), vcol);
-        if (!x) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Schlüsselfehler 2");
-        }
+        ok = _internal.TryAdd(newName.ToUpper(), vcol);
+        if (!ok) { return false; }
+
+        ok = Database.Cell.ChangeColumnName(oldName, newName);
+        if (!ok) { return false; }
+        Database?.RepairColumnArrangements();
+        Database?.RepairViews();
+        return true;
     }
 
     internal void CloneFrom(DatabaseAbstract sourceDatabase) {

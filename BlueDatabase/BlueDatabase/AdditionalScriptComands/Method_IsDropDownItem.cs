@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
@@ -35,7 +36,7 @@ internal class Method_IsDropDownItem : Method_Database {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.NeedLongTime;
     public override string Returns => VariableBool.ShortName_Plain;
 
     public override string StartSequence => "(";
@@ -48,11 +49,11 @@ internal class Method_IsDropDownItem : Method_Database {
     public override List<string> Comand(List<Variable>? currentvariables) => new() { "isdropdownitem" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var column = Column(s.Variables, attvar.Attributes[1].Name);
-        if (column == null) { return new DoItFeedback(infos, "Spalte in Datenbank nicht gefunden"); }
+        if (column == null) { return new DoItFeedback(infos.Data, "Spalte in Datenbank nicht gefunden"); }
 
         var tocheck = new List<string>();
         if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
@@ -61,10 +62,10 @@ internal class Method_IsDropDownItem : Method_Database {
         tocheck = tocheck.SortedDistinctList();
 
         if (tocheck.Any(thisstring => !column.DropDownItems.Contains(thisstring))) {
-            return DoItFeedback.Falsch(infos);
+            return DoItFeedback.Falsch();
         }
 
-        return DoItFeedback.Wahr(infos);
+        return DoItFeedback.Wahr();
     }
 
     #endregion

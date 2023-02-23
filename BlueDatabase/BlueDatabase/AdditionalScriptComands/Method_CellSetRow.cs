@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -29,15 +30,11 @@ public class Method_CellSetRow : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableRowItem.ShortName_Variable } };
-
     public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn der Wert erfolgreich gesetzt wurde.";
-
     public override bool EndlessArgs => false;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
 
@@ -50,21 +47,21 @@ public class Method_CellSetRow : Method_Database {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "cellsetrow" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
-        if (row?.Database is null || row.Database.IsDisposed) { return new DoItFeedback(infos, "Fehler in der Zeile"); }
+        if (row?.Database is null || row.Database.IsDisposed) { return new DoItFeedback(infos.Data, "Fehler in der Zeile"); }
 
         var columnToSet = row.Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (columnToSet == null) { return new DoItFeedback(infos, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString); }
+        if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString); }
 
-        if (row?.Database?.ReadOnly ?? true) { return new DoItFeedback(infos, "Datenbank schreibgeschützt."); }
-        if (!s.ChangeValues) { return new DoItFeedback(infos, "Zellen setzen Testmodus deaktiviert."); }
+        if (row?.Database?.ReadOnly ?? true) { return new DoItFeedback(infos.Data, "Datenbank schreibgeschützt."); }
+        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
 
         row.CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-        return row.CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr(infos) : DoItFeedback.Falsch(infos);
+        return row.CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 
     #endregion

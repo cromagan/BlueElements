@@ -50,7 +50,6 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndK
     private string _exportFormularId;
     private int _exportSpaltenAnsicht;
     private FilterCollection? _filter;
-    private string _id;
     private DateTime _lastExportTimeUtc;
     private string _scriptname;
     private ExportTyp _typ;
@@ -90,7 +89,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndK
         BereitsExportiert = new ListExt<string>();
         BereitsExportiert.Changed += _BereitsExportiert_ListOrItemChanged;
         _lastExportTimeUtc = new DateTime(1900, 1, 1);
-        _id = Generic.UniqueInternal();
+        KeyName = Generic.UniqueInternal();
     }
 
     #endregion
@@ -177,7 +176,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndK
 
     public bool IsParsing { get; private set; }
 
-    public string KeyName => _id;
+    public string KeyName { get; private set; }
 
     public DateTime LastExportTimeUtc {
         get => _lastExportTimeUtc;
@@ -365,7 +364,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndK
                     break;
 
                 case "id":
-                    _id = pair.Value.FromNonCritical();
+                    KeyName = pair.Value.FromNonCritical();
                     break;
 
                 default:
@@ -455,7 +454,7 @@ public sealed class ExportDefinition : IParseable, IReadableTextWithChangingAndK
             var shortener = GetShortener();
 
             var result = new List<string>();
-            result.ParseableAdd("id", _id);
+            result.ParseableAdd("id", KeyName);
             result.ParseableAdd("sho", shortener);
             result.ParseableAdd("dest", _verzeichnis);
             result.ParseableAdd("typ", _typ);

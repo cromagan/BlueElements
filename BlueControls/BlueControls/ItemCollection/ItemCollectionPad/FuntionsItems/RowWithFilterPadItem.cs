@@ -40,7 +40,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl {
+public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl, IHasDatabase {
 
     #region Fields
 
@@ -166,7 +166,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControlRowSelector(Database, Parent, FilterDefiniton, _überschrift, _anzeige) {
+        var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition,
             Name = DefaultItemToControlName()
@@ -214,19 +214,6 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         return l;
     }
 
-    public bool IsRecursiveWith(IAcceptAndSends obj) {
-        if (obj == this) { return true; }
-
-        foreach (var thisR in FilterDefiniton.Row) {
-            var it = Parent[thisR.CellGetString("suchtxt")];
-            if (it is IAcceptAndSends i) {
-                if (i.IsRecursiveWith(obj)) { return true; }
-            }
-        }
-
-        return false;
-    }
-
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
@@ -249,7 +236,10 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 _ = FilterDefiniton.Row.Clear("Neue Filter-Datenbank per Parse");
                 FilterDatabaseUpdate();
                 _ = FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false);
-
+                var exi = FilterDefiniton.Column.Exists("SuchSym");
+                if (exi != null) {
+                    FilterDefiniton.Column.Remove("SuchSym", "Veraltete Spalte");
+                }
                 //foreach (var thisRow in FilterDefiniton.Row) {
                 //    var n = thisRow.CellGetString("Spalte");
                 //    if (n.IsLong()) {
@@ -347,7 +337,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     private void FilterDatabaseUpdate() {
         if (FilterDefiniton == null) { return; }
 
-        var sc = "if (!IsDropDownItem(suchtxt, suchtxt)) {suchtxt=\"\";}";
+        //var sc = "if (!IsDropDownItem(suchtxt, suchtxt)) {suchtxt=\"\";}";
 
         #region Hauptspalte
 
@@ -373,24 +363,15 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         var b = FilterDefiniton.Column["suchtxt"];
 
-        var dd = new List<string>();
-        var or = new List<string>();
+        var dd = new List<string> { "#first" };
 
-        if (Parent != null) {
-            foreach (var thisPadItem in Parent) {
-                if (thisPadItem.IsVisibleOnPage(Page) && thisPadItem is IContentHolder efpi) {
-                    var rek = false;
-                    if (efpi is IAcceptAndSends aas) { rek = aas.IsRecursiveWith(this); }
+        var or = new List<string> { "#first|Erste Spalte der Eingangsdatenbank" };
 
-                    if (!rek) {
-                        dd.Add(efpi.KeyName);
-                        or.Add(efpi.KeyName + "|" + efpi.ReadableText());
-                        var s = string.Empty;
-                        var tmp = efpi.SymbolForReadableText();
-                        if (tmp != null) { s = tmp.ToString(); }
-
-                        sc = sc + "if (" + b.Name + "==\"" + efpi.KeyName + "\") {suchsym=\"" + s + "\";}";
-                    }
+        if (Database != null) {
+            foreach (var thisColumn in Database.Column) {
+                if (thisColumn != null) {
+                    dd.Add("~" + thisColumn.Name + "~");
+                    or.Add("~" + thisColumn.Name + "~|Spalte: " + thisColumn.ReadableText());
                 }
             }
         }
@@ -399,20 +380,20 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         #endregion
 
-        #region Events Mappen
+        //#region Events Mappen
 
-        var eves = FilterDefiniton.EventScript.CloneWithClones();
-        var l = new EventScript(FilterDefiniton) {
-            NeedRow = true,
-            ManualExecutable = false,
-            Script = sc,
-            Name = "Main",
-            EventTypes = EventTypes.value_changed | EventTypes.new_row
-        };
-        eves.Add(l);
-        FilterDefiniton.EventScript = new ReadOnlyCollection<EventScript>(eves);
+        //var eves = FilterDefiniton.EventScript.CloneWithClones();
+        //var l = new EventScript(FilterDefiniton) {
+        //    NeedRow = true,
+        //    ManualExecutable = false,
+        //    Script = string.Empty ,
+        //    Name = "Main",
+        //    EventTypes = EventTypes.value_changed | EventTypes.new_row
+        //};
+        //eves.Add(l);
+        //FilterDefiniton.EventScript = new ReadOnlyCollection<EventScript>(eves);
 
-        #endregion
+        //#endregion
 
         #region Zeilen Prüfen
 
@@ -481,9 +462,9 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         fa.DropDownItems = new(new List<string> { "=", "=!empty" });
         fa.OpticalReplace = new(new List<string> { "=|ist (GK egal)", "=!empty|wenn nicht leer, ist" });
 
-        var b1 = x.Column.GenerateAndAdd("suchsym", " ", ColumnFormatHolder.Text);
-        b1.BehaviorOfImageAndText = BildTextVerhalten.Nur_Bild;
-        b1.ScriptType = ScriptType.String;
+        //var b1 = x.Column.GenerateAndAdd("suchsym", " ", ColumnFormatHolder.Text);
+        //b1.BehaviorOfImageAndText = BildTextVerhalten.Nur_Bild;
+        //b1.ScriptType = ScriptType.String;
 
         var b = x.Column.GenerateAndAdd("suchtxt", "Suchtext", ColumnFormatHolder.Text);
         b.MultiLine = false;
@@ -491,13 +472,25 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         b.DropdownAllesAbwählenErlaubt = true;
         b.DropdownBearbeitungErlaubt = true;
         b.ScriptType = ScriptType.String;
+        b.Quickinfo = "<b><u>Folgende drei Möglichkeiten:</b></u><br>" +
+                      "<i>Da das Formular von einer beliebigen Datenbank aufgerufen werden kann,<br>" +
+                      "kann der Filter hier nur über Texteingaben bzw. Variablen gesteuert werden.<br>" +
+                      "Deswegen sind manuelle Eingaben nötig.<br>" +
+                      "<b>Fester Wert:</b><br>" +
+                      "Eine Eingabe, die immer fix ist. Ganz normale Eingabe des Wertes.<br>" +
+                      "<b>Erste Spalte:</b><br>" +
+                      "Wenn #first eingegeben wird, wird aus der eingebenden Datenbank der<br>" +
+                      "Wert der ersten Spalte gewählt.<br>" +
+                      "<b>Variablenname:</b><br>" +
+                      "Wird ein Wert im Format ~Variable~ eingegeben wird der Wert der Variable<br>" +
+                      "der eingebenenden Datenbank gewählt.";
 
         FilterDatabaseUpdate();
 
         x.RepairAfterParse();
 
         var car = x.ColumnArrangements.CloneWithClones();
-        car[1].ShowColumns("Spalte", "FilterArt", "suchsym", "suchtxt");
+        car[1].ShowColumns("Spalte", "FilterArt", "suchtxt");
         x.ColumnArrangements = new(car);
 
         x.SortDefinition = new RowSortDefinition(x, "Spalte", false);

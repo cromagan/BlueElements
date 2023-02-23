@@ -363,12 +363,10 @@ namespace BlueControls.Forms {
             // tabRightSide
             // 
             this.tabRightSide.Controls.Add(this.tabElementEigenschaften);
-            this.tabRightSide.Database = null;
             this.tabRightSide.Dock = DockStyle.Right;
             this.tabRightSide.HotTrack = true;
             this.tabRightSide.Location = new Point(512, 136);
             this.tabRightSide.Name = "tabRightSide";
-            this.tabRightSide.RowKey = ((long)(-1));
             this.tabRightSide.SelectedIndex = 0;
             this.tabRightSide.Size = new Size(372, 225);
             this.tabRightSide.TabDefault = null;

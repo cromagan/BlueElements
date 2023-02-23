@@ -954,7 +954,7 @@ public abstract class SQLBackAbstract {
             return string.Empty;
         } catch (Exception ex) {
             Develop.DebugPrint(ex);
-            return "Allgemeiner Fehler beim Ausführen, siehe Protokoll";
+            return "Allgemeiner Fehler beim Ausführen, siehe Protocol";
         } finally {
             _ = CloseConnection();
         }

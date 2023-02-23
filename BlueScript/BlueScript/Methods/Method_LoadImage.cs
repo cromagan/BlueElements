@@ -21,11 +21,14 @@ using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_LoadImage : Method {
 
     #region Properties
@@ -35,7 +38,7 @@ internal class Method_LoadImage : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableBitmap.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "LoadImage(Filename)";
@@ -44,26 +47,26 @@ internal class Method_LoadImage : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "loadimage" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "loadimage" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != FileFormat.Image) {
-            return new DoItFeedback(infos, "Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(infos.Data, "Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 
         if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
-            return new DoItFeedback(infos, "Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 
         try {
             Generic.CollectGarbage();
             var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
-            return new DoItFeedback(infos, bmp);
+            return new DoItFeedback(bmp);
         } catch {
-            return new DoItFeedback(infos, "Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
     }
 

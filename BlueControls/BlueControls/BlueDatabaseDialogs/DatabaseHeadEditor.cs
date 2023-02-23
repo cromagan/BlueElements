@@ -29,45 +29,16 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using static BlueBasics.Converter;
-
-using System;
-using System.Collections.Generic;
-
-using System.ComponentModel;
-using System.Drawing;
-
-using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-
-using BlueBasics.Interfaces;
-using BlueControls.Designer_Support;
-
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-
-using BlueControls.Extended_Text;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-
-using BlueControls.ItemCollection.ItemCollectionList;
-using BlueDatabase.Enums;
-
-using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-
 using static BlueBasics.Converter;
-
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class DatabaseHeadEditor {
+public sealed partial class DatabaseHeadEditor : IHasDatabase {
 
     #region Fields
 
-    private DatabaseAbstract? _database;
     private bool _frmHeadEditorFormClosingIsin;
 
     #endregion
@@ -77,9 +48,15 @@ public sealed partial class DatabaseHeadEditor {
     public DatabaseHeadEditor(DatabaseAbstract database) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        _database = database;
-        _database.Disposing += Database_Disposing;
+        Database = database;
+        Database.Disposing += Database_Disposing;
     }
+
+    #endregion
+
+    #region Properties
+
+    public DatabaseAbstract? Database { get; private set; }
 
     #endregion
 
@@ -98,7 +75,7 @@ public sealed partial class DatabaseHeadEditor {
         if (_frmHeadEditorFormClosingIsin) { return; }
         _frmHeadEditorFormClosingIsin = true;
         base.OnFormClosing(e);
-        if (_database == null || _database.IsDisposed) {
+        if (Database == null || Database.IsDisposed) {
             return;
         }
 
@@ -109,45 +86,49 @@ public sealed partial class DatabaseHeadEditor {
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
         PermissionGroups_NewRow.Item.Clear();
-        PermissionGroups_NewRow.Item.AddRange(_database.PermissionGroupsNewRow);
+        PermissionGroups_NewRow.Item.AddRange(Database.PermissionGroupsNewRow);
         DatenbankAdmin.Item.Clear();
-        DatenbankAdmin.Item.AddRange(_database.DatenbankAdmin);
-        txbKennwort.Text = _database.GlobalShowPass;
+        DatenbankAdmin.Item.AddRange(Database.DatenbankAdmin);
+        txbKennwort.Text = Database.GlobalShowPass;
         lbxSortierSpalten.Item.Clear();
-        if (_database.SortDefinition != null) {
-            btnSortRichtung.Checked = _database.SortDefinition.Reverse;
-            if (_database.SortDefinition.Columns != null) {
-                foreach (var thisColumn in _database.SortDefinition.Columns.Where(thisColumn => thisColumn != null && !thisColumn.IsDisposed)) {
-                    _ = lbxSortierSpalten.Item.Add(thisColumn);
+        if (Database.SortDefinition != null) {
+            btnSortRichtung.Checked = Database.SortDefinition.Reverse;
+            if (Database.SortDefinition?.Columns != null) {
+                foreach (var thisColumn in Database.SortDefinition.Columns) {
+                    if (thisColumn != null && !thisColumn.IsDisposed) {
+                        _ = lbxSortierSpalten.Item.Add(thisColumn);
+                    }
                 }
             }
         }
-        txbTags.Text = _database.Tags.JoinWithCr();
+        txbTags.Text = Database.Tags.JoinWithCr();
 
         #region Exports
 
         lbxExportSets.Item.Clear();
-        foreach (var thisSet in _database.Export.Where(thisSet => thisSet != null)) {
-            _ = lbxExportSets.Item.Add((ExportDefinition)thisSet.Clone());
+        foreach (var thisSet in Database.Export) {
+            if (thisSet != null) {
+                _ = lbxExportSets.Item.Add((ExportDefinition)thisSet.Clone());
+            }
         }
 
         #endregion
 
-        txbCaption.Text = _database.Caption;
-        txbGlobalScale.Text = _database.GlobalScale.ToString(Constants.Format_Float1);
-        txbAdditionalFiles.Text = _database.AdditionalFilesPfad;
-        txbStandardFormulaFile.Text = _database.StandardFormulaFile;
-        txbZeilenQuickInfo.Text = _database.ZeilenQuickInfo.Replace("<br>", "\r");
-        tbxUndoAnzahl.Text = _database.UndoCount.ToString();
+        txbCaption.Text = Database.Caption;
+        txbGlobalScale.Text = Database.GlobalScale.ToString(Constants.Format_Float1);
+        txbAdditionalFiles.Text = Database.AdditionalFilesPfad;
+        txbStandardFormulaFile.Text = Database.StandardFormulaFile;
+        txbZeilenQuickInfo.Text = Database.ZeilenQuickInfo.Replace("<br>", "\r");
+        tbxUndoAnzahl.Text = Database.UndoCount.ToString();
 
         PermissionGroups_NewRow.Suggestions.Clear();
-        PermissionGroups_NewRow.Suggestions.AddRange(_database.Permission_AllUsed(false));
+        PermissionGroups_NewRow.Suggestions.AddRange(Database.Permission_AllUsed(false));
 
         DatenbankAdmin.Suggestions.Clear();
-        DatenbankAdmin.Suggestions.AddRange(_database.Permission_AllUsed(false));
+        DatenbankAdmin.Suggestions.AddRange(Database.Permission_AllUsed(false));
 
         lbxSortierSpalten.Suggestions.Clear();
-        lbxSortierSpalten.Suggestions.AddRange(_database.Column, false);
+        lbxSortierSpalten.Suggestions.AddRange(Database.Column, false);
 
         GenerateInfoText();
     }
@@ -156,7 +137,7 @@ public sealed partial class DatabaseHeadEditor {
         if (checkNeeded && tblUndo.Database.Row[work.ToString()] != null) { return; }
 
         var cd = work.CellKey.SplitAndCutBy("|");
-        _database.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
+        Database.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
         var r = tblUndo.Database.Row.GenerateAndAdd(work.ToString(), "New Undo Item");
         r.CellSet("ColumnName", cd[0]);
         r.CellSet("RowKey", cd[1]);
@@ -244,9 +225,9 @@ public sealed partial class DatabaseHeadEditor {
         //scriptEditor.Message("Speichervorgang...");
 
         var ok = false;
-        if (_database != null) {
+        if (Database != null) {
             WriteInfosBack();
-            ok = _database.Save();
+            ok = Database.Save();
         }
         if (ok) {
             MessageBox.Show("Speichern erfolgreich.", ImageCode.Häkchen, "Ok");
@@ -257,7 +238,7 @@ public sealed partial class DatabaseHeadEditor {
         btnSave.Enabled = true;
     }
 
-    private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => _database.Column.GenerateOverView();
+    private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database.Column.GenerateOverView();
 
     private void Database_Disposing(object sender, System.EventArgs e) {
         RemoveDatabase();
@@ -287,14 +268,14 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void GenerateInfoText() {
-        var t = "<b>Tabelle:</b> <tab>" + _database.ConnectionData.TableName + "<br>";
-        t += "<b>ID:</b> <tab>" + _database.ConnectionData.UniqueID + "<br>";
-        t += "<b>Zeilen:</b> <tab>" + (_database.Row.Count() - 1);
+        var t = "<b>Tabelle:</b> <tab>" + Database.ConnectionData.TableName + "<br>";
+        t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueID + "<br>";
+        t += "<b>Zeilen:</b> <tab>" + (Database.Row.Count() - 1);
         capInfo.Text = t.TrimEnd("<br>");
     }
 
     private void GenerateUndoTabelle() {
-        Database x = new(false, "Undo " + _database.ConnectionData.TableName);
+        Database x = new(false, "Undo " + Database.ConnectionData.TableName);
         _ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
         _ = x.Column.GenerateAndAdd("db", "Herkunft", ColumnFormatHolder.Text);
@@ -309,11 +290,13 @@ public sealed partial class DatabaseHeadEditor {
         _ = x.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
-        foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
-            thisColumn.MultiLine = true;
-            thisColumn.TextBearbeitungErlaubt = false;
-            thisColumn.DropdownBearbeitungErlaubt = false;
-            thisColumn.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text;
+        foreach (var thisColumn in x.Column) {
+            if (!thisColumn.IsSystemColumn()) {
+                thisColumn.MultiLine = true;
+                thisColumn.TextBearbeitungErlaubt = false;
+                thisColumn.DropdownBearbeitungErlaubt = false;
+                thisColumn.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text;
+            }
         }
 
         x.RepairAfterParse();
@@ -329,7 +312,7 @@ public sealed partial class DatabaseHeadEditor {
         tblUndo.DatabaseSet(x, string.Empty);
         tblUndo.Arrangement = 1;
 
-        if (_database is Database db) {
+        if (Database is Database db) {
             for (var n = 0; n < db.Works.Count; n++) {
                 AddUndoToTable(db.Works[n], n, string.Empty, false);
             }
@@ -343,7 +326,7 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void lbxExportSets_AddClicked(object sender, System.EventArgs e) {
-        var newExportItem = lbxExportSets.Item.Add(new ExportDefinition(_database));
+        var newExportItem = lbxExportSets.Item.Add(new ExportDefinition(Database));
         newExportItem.Checked = true;
     }
 
@@ -352,7 +335,7 @@ public sealed partial class DatabaseHeadEditor {
             ExportEditor.Item = null;
             return;
         }
-        if (_database == null || _database.IsDisposed || _database.ReadOnly) {
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) {
             ExportEditor.Item = null;
             return;
         }
@@ -363,9 +346,9 @@ public sealed partial class DatabaseHeadEditor {
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
     private void RemoveDatabase() {
-        if (_database == null || _database.IsDisposed) { return; }
-        _database.Disposing -= Database_Disposing;
-        _database = null;
+        if (Database == null || Database.IsDisposed) { return; }
+        Database.Disposing -= Database_Disposing;
+        Database = null;
     }
 
     private void tblUndo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -395,32 +378,32 @@ public sealed partial class DatabaseHeadEditor {
     }
 
     private void WriteInfosBack() {
-        if (_database == null || _database.IsDisposed || _database.ReadOnly) { return; } // Disposed
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; } // Disposed
 
         //eventScriptEditor.WriteScriptBack();
-        _database.GlobalShowPass = txbKennwort.Text;
-        _database.Caption = txbCaption.Text;
-        _database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(tbxUndoAnzahl.Text), 5) : 5;
+        Database.GlobalShowPass = txbKennwort.Text;
+        Database.Caption = txbCaption.Text;
+        Database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(tbxUndoAnzahl.Text), 5) : 5;
         if (txbGlobalScale.Text.IsDouble()) {
-            _database.GlobalScale = Math.Min(DoubleParse(txbGlobalScale.Text), 5);
-            _database.GlobalScale = Math.Max(0.5, _database.GlobalScale);
+            Database.GlobalScale = Math.Min(DoubleParse(txbGlobalScale.Text), 5);
+            Database.GlobalScale = Math.Max(0.5, Database.GlobalScale);
         }
-        _database.AdditionalFilesPfad = txbAdditionalFiles.Text;
-        _database.StandardFormulaFile = txbStandardFormulaFile.Text;
-        _database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
+        Database.AdditionalFilesPfad = txbAdditionalFiles.Text;
+        Database.StandardFormulaFile = txbStandardFormulaFile.Text;
+        Database.ZeilenQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
 
-        _database.Tags = new(txbTags.Text.SplitAndCutByCrToList());
+        Database.Tags = new(txbTags.Text.SplitAndCutByCrToList());
 
-        _database.DatenbankAdmin = new(DatenbankAdmin.Item.ToListOfString());
+        Database.DatenbankAdmin = new(DatenbankAdmin.Item.ToListOfString());
 
         var tmp = PermissionGroups_NewRow.Item.ToListOfString();
         _ = tmp.Remove("#Administrator");
-        _database.PermissionGroupsNewRow = new(tmp);
+        Database.PermissionGroupsNewRow = new(tmp);
 
         #region Sortierung
 
         var colnam = lbxSortierSpalten.Item.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item).Name).ToList();
-        _database.SortDefinition = new RowSortDefinition(_database, colnam, btnSortRichtung.Checked);
+        Database.SortDefinition = new RowSortDefinition(Database, colnam, btnSortRichtung.Checked);
 
         #endregion
 
@@ -428,7 +411,7 @@ public sealed partial class DatabaseHeadEditor {
 
         var t = new List<ExportDefinition?>();
         t.AddRange(lbxExportSets.Item.Select(thisItem => (ExportDefinition)((ReadableListItem)thisItem).Item));
-        _database.Export = new(t);
+        Database.Export = new(t);
 
         #endregion
     }

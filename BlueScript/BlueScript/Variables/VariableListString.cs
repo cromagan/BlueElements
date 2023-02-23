@@ -107,17 +107,17 @@ public class VariableListString : Variable {
         return v;
     }
 
-    public override DoItFeedback GetValueFrom(Variable variable) {
+    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableListString v) {
-            return DoItFeedback.VerschiedeneTypen(null, this, variable);
+            return DoItFeedback.VerschiedeneTypen(ld, this, variable);
         }
 
         if (ReadOnly) {
-            return DoItFeedback.Schreibgschützt(null);
+            return DoItFeedback.Schreibgschützt(ld);
         }
 
         ValueList = v.ValueList;
-        return DoItFeedback.Null(null);
+        return DoItFeedback.Null();
     }
 
     protected override Variable NewWithThisValue(object x, Script s) {
@@ -142,7 +142,7 @@ public class VariableListString : Variable {
                 return new List<string>();
             } // Leere Liste
 
-            var l = Method.SplitAttributeToVars(s, t, new List<List<string>> { new() { VariableString.ShortName_Plain } }, true);
+            var l = Method.SplitAttributeToVars(s, t, new List<List<string>> { new() { VariableString.ShortName_Plain } }, true, null);
             if (!string.IsNullOrEmpty(l.ErrorMessage)) {
                 return null;
             }

@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -30,13 +31,10 @@ public class Method_ContentsFilter : Method_Database {
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableFilterItem.ShortName_Variable } };
     public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
-
     public override bool EndlessArgs => true;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.MyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => VariableListString.ShortName_Plain;
 
     public override string StartSequence => "(";
@@ -50,17 +48,17 @@ public class Method_ContentsFilter : Method_Database {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "contentsfilter" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
-        if (allFi is null) { return new DoItFeedback(infos, "Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
         var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ReadableText);
-        if (returncolumn == null) { return new DoItFeedback(infos, "Spalte nicht gefunden: " + attvar.Attributes[0].ReadableText); }
+        if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.Attributes[0].ReadableText); }
         var x = returncolumn.Contents(allFi, null);
-        return new DoItFeedback(infos, x);
+        return new DoItFeedback(x);
     }
 
     #endregion

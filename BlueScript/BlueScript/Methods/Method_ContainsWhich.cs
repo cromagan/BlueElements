@@ -18,27 +18,26 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using BlueBasics;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_ContainsWhitch : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new List<string> { VariableBool.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
     public override string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann als Liste alle gefundenen Strings zurück.";
-
     public override bool EndlessArgs => true;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableListString.ShortName_Plain;
 
     public override string StartSequence => "(";
@@ -49,11 +48,11 @@ internal class Method_ContainsWhitch : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "containswhich" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "containswhich" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var found = new List<string>();
 
@@ -73,20 +72,24 @@ internal class Method_ContainsWhitch : Method {
         if (((VariableBool)attvar.Attributes[1]).ValueBool) { rx = RegexOptions.None; }
 
         if (attvar.Attributes[0] is VariableString vs2) {
-            foreach (var thisW in wordlist.Where(thisW => vs2.ValueString.ContainsWord(thisW, rx))) {
-                _ = found.AddIfNotExists(thisW);
-            }
-        }
-
-        if (attvar.Attributes[0] is VariableListString vl2) {
-            foreach (var thiss in vl2.ValueList) {
-                foreach (var thisW in wordlist.Where(thisW => thiss.ContainsWord(thisW, rx))) {
+            foreach (var thisW in wordlist) {
+                if (vs2.ValueString.ContainsWord(thisW, rx)) {
                     _ = found.AddIfNotExists(thisW);
                 }
             }
         }
 
-        return new DoItFeedback(infos, found);
+        if (attvar.Attributes[0] is VariableListString vl2) {
+            foreach (var thiss in vl2.ValueList) {
+                foreach (var thisW in wordlist) {
+                    if (thiss.ContainsWord(thisW, rx)) {
+                        _ = found.AddIfNotExists(thisW);
+                    }
+                }
+            }
+        }
+
+        return new DoItFeedback(found);
     }
 
     #endregion

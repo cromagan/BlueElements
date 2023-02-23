@@ -18,7 +18,9 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using BlueBasics;
 using BlueBasics.MultiUserFile;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
@@ -29,21 +31,21 @@ namespace BlueControls.Forms;
 
 public partial class ConnectedFormulaEditor : PadEditor {
 
-    #region Fields
-
-    private ConnectedFormula.ConnectedFormula? _cf;
-
-    #endregion
-
     #region Constructors
 
-    public ConnectedFormulaEditor(string? filename, List<string>? notAllowedchilds) {
+    public ConnectedFormulaEditor(string? filename, ReadOnlyCollection<string>? notAllowedchilds) {
         InitializeComponent();
 
         FormulaSet(filename, notAllowedchilds);
     }
 
     public ConnectedFormulaEditor() : this(string.Empty, null) { }
+
+    #endregion
+
+    #region Properties
+
+    public ConnectedFormula.ConnectedFormula? CFormula { get; private set; }
 
     #endregion
 
@@ -64,12 +66,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
         Pad.AddCentered(x);
     }
 
-    private void btnEingangsZeile_Click(object sender, System.EventArgs e) {
-        var it = new RowInputPadItem(string.Empty);
-        //it.Bei_Export_sichtbar = false;
-        Pad.AddCentered(it);
-    }
-
     private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
         var l = Pad.LastClickedItem;
 
@@ -88,12 +84,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
         }
     }
 
-    private void btnKonstante_Click(object sender, System.EventArgs e) {
-        var x = new ConstantTextPadItem();
-        //x.Bei_Export_Sichtbar = false;
-        Pad.AddCentered(x);
-    }
-
     private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs? e) {
         MultiUserFile.ForceLoadSaveAll();
 
@@ -105,11 +95,11 @@ public partial class ConnectedFormulaEditor : PadEditor {
         MultiUserFile.SaveAll(true);
 
         if (sender == btnSaveAs) {
-            if (_cf == null) { return; }
+            if (CFormula == null) { return; }
         }
 
         if (sender == btnNeuDB) {
-            if (_cf != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
+            if (CFormula != null) { FormulaSet(null as ConnectedFormula.ConnectedFormula, null); }
         }
 
         _ = SaveTab.ShowDialog();
@@ -121,7 +111,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         }
         if (FileExists(SaveTab.FileName)) { _ = DeleteFile(SaveTab.FileName, true); }
 
-        _cf?.SaveAsAndChangeTo(SaveTab.FileName);
+        CFormula?.SaveAsAndChangeTo(SaveTab.FileName);
 
         FormulaSet(SaveTab.FileName, null);
     }
@@ -137,18 +127,19 @@ public partial class ConnectedFormulaEditor : PadEditor {
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
 
-        var it = new RowInputPadItem(string.Empty);
+        Develop.DebugPrint_NichtImplementiert(); //Todo: Ein element hinzufügen!
+        //var it = new RowInputPadItem(string.Empty);
         //it.Bei_Export_sichtbar = false;
-        Pad.AddCentered(it);
-        it.Page = n;
+        //Pad.AddCentered(it);
+        //it.Page = n;
     }
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.ForceLoadSaveAll();
 
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
-        if (_cf == null) { return; }
+        if (CFormula == null) { return; }
 
-        var x = new TabFormulaPadItem(string.Empty, _cf) {
+        var x = new TabFormulaPadItem(string.Empty, CFormula) {
             Bei_Export_sichtbar = true
         };
         Pad.AddCentered(x);
@@ -174,7 +165,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        EditBoxRow_NEW.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", _cf, true);
+        EditBoxRow_NEW.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", CFormula, true);
     }
 
     private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
@@ -186,17 +177,17 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void CheckButtons() { }
 
     private void ChooseDatabaseAndId(ICalculateRowsItemLevel? it) {
-        if (_cf == null || it == null) { return; }
+        if (CFormula == null || it == null) { return; }
 
         var db = CommonDialogs.ChooseKnownDatabase();
 
         if (db == null) { return; }
 
         it.Database = db;
-        it.Id = _cf.NextId();
+        it.Id = CFormula.NextId();
     }
 
-    private void FormulaSet(string? filename, List<string>? notAllowedchilds) {
+    private void FormulaSet(string? filename, ReadOnlyCollection<string>? notAllowedchilds) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
 
         if (filename == null || !FileExists(filename)) {
@@ -206,19 +197,23 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpDatabase = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+        var tmpDatabase = BlueControls.ConnectedFormula.ConnectedFormula.GetByFilename(filename);
         if (tmpDatabase == null) { return; }
         FormulaSet(tmpDatabase, notAllowedchilds);
     }
 
     private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
-        _cf = formular;
+        CFormula = formular;
 
-        if (notAllowedchilds != null && _cf != null) {
-            _cf.NotAllowedChilds.AddRange(notAllowedchilds);
+        if (notAllowedchilds != null && CFormula != null) {
+            var l = new List<string>();
+            l.AddRange(CFormula.NotAllowedChilds);
+            l.AddRange(notAllowedchilds);
+
+            CFormula.NotAllowedChilds = new ReadOnlyCollection<string>(l);
         }
 
-        Pad.Item = _cf?.PadData;
+        Pad.Item = CFormula?.PadData;
     }
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {

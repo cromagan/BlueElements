@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BlueBasics;
@@ -326,8 +325,10 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         while (_width == null) { ReBreak(); }
         DrawStates(gr, zoom);
 
-        foreach (var t in this.Where(t => t.IsVisible(zoom, DrawingPos, DrawingArea))) {
-            t.Draw(gr, DrawingPos, zoom);
+        foreach (var t in this) {
+            if (t.IsVisible(zoom, DrawingPos, DrawingArea)) {
+                t.Draw(gr, DrawingPos, zoom);
+            }
         }
 
         //var lockMe = new object();
@@ -421,8 +422,10 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     }
 
     internal void Unmark(MarkState markstate) {
-        foreach (var t in this.Where(t => t.Marking.HasFlag(markstate))) {
-            t.Marking ^= markstate;
+        foreach (var t in this) {
+            if (t.Marking.HasFlag(markstate)) {
+                t.Marking ^= markstate;
+            }
         }
     }
 

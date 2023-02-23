@@ -19,11 +19,14 @@
 
 using System;
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_IsType : Method {
 
     #region Properties
@@ -33,6 +36,7 @@ internal class Method_IsType : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
 
     public override string StartSequence => "(";
@@ -42,16 +46,16 @@ internal class Method_IsType : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "istype" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "istype" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         if (string.Equals(attvar.Attributes[1].ReadableText, attvar.Attributes[0].MyClassId, StringComparison.OrdinalIgnoreCase)) {
-            return DoItFeedback.Wahr(infos);
+            return DoItFeedback.Wahr();
         }
-        return DoItFeedback.Falsch(infos);
+        return DoItFeedback.Falsch();
     }
 
     #endregion

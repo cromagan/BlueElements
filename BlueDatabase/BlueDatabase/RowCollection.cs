@@ -28,15 +28,14 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
+using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
-public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
+public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, IHasDatabase {
 
     #region Fields
 
-    public readonly List<string> LastCheckedRowFeedback = new();
-    public RowItem? LastCheckedRow = null;
     private readonly ConcurrentDictionary<long, RowItem?> _internal = new();
     private bool _throwEvents = true;
 
@@ -340,14 +339,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
 
             var scx = rows[0].ExecuteScript(eventname, scriptname, true, fullCheck, changevalues, 0);
 
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) {
+            if (!scx.AllOk) {
                 var w = rows[0].CellFirstString();
                 rows.Clear();
                 Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
-                Database.OnDropMessage(FehlerArt.Warnung, "Skript fehlerhaft bei " + w + "\r\n" + scx.ErrorMessage);
-                return "Skript fehlerhaft bei " + w + "\r\n" + scx.ErrorMessage;
+                Database.OnDropMessage(FehlerArt.Warnung, "Skript fehlerhaft bei " + w);
+                return "Skript fehlerhaft bei " + w;
             }
-            if (string.IsNullOrEmpty(scx.ErrorMessage)) { rows.RemoveAt(0); }
+            if (scx.AllOk) { rows.RemoveAt(0); }
         }
         Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
         return string.Empty;
@@ -384,8 +383,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
             Database.Cell.SystemSet(Database.Column.SysRowCreateDate, item, DateTime.UtcNow.ToString(Constants.Format_Date5));
 
             // Dann die Inital-Werte reinschreiben
-            foreach (var thisColum in Database.Column.Where(thisColum => thisColum != null && !string.IsNullOrEmpty(thisColum.CellInitValue))) {
-                item.CellSet(thisColum, thisColum.CellInitValue);
+            foreach (var thisColum in Database.Column) {
+                if (thisColum != null && !string.IsNullOrEmpty(thisColum.CellInitValue)) {
+                    item.CellSet(thisColum, thisColum.CellInitValue);
+                }
             }
         }
 
@@ -412,7 +413,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
     public RowItem? GenerateAndAdd(List<FilterItem> fi, string comment) {
         if (Database == null || Database.IsDisposed) { return null; }
 
-        List<string>? first = null;
+        IReadOnlyCollection<string>? first = null;
 
         foreach (var thisfi in fi) {
             if (Database.Column.First() == thisfi.Column) {
@@ -431,7 +432,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
         if (row == null) { return null; }
 
         foreach (var thisfi in fi) {
-            row.CellSet(thisfi.Column, thisfi.SearchValue);
+            row.CellSet(thisfi.Column, thisfi.SearchValue.ToList());
         }
 
         _ = row.ExecuteScript(EventTypes.new_row, string.Empty, false, false, true, 1);
@@ -584,9 +585,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended {
             if (row == null) { return "Zeile nicht vorhanden"; }
 
             OnRowRemoving(new RowEventArgs(row));
-            foreach (var thisColumnItem in Database.Column.Where(thisColumnItem => thisColumnItem != null)) {
-                Database.Cell.Delete(thisColumnItem, (long)key);
+            foreach (var thisColumnItem in Database.Column) {
+                if (thisColumnItem != null) {
+                    Database.Cell.Delete(thisColumnItem, (long)key);
+                }
             }
+
             if (!_internal.TryRemove((long)key, out _)) { return "Löschen nicht erfolgreich"; }
             OnRowRemoved();
             return string.Empty;

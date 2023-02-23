@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
@@ -26,6 +27,7 @@ using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using static BlueBasics.Converter;
@@ -39,19 +41,26 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     #region Fields
 
     public const string Version = "0.10";
-    public static readonly ListExt<ConnectedFormula> AllFiles = new();
+    public static readonly List<ConnectedFormula> AllFiles = new();
     public static readonly float StandardHöhe = 1.75f;
     public static readonly float Umrechnungsfaktor2 = MmToPixel(StandardHöhe, 300) / 22;
-    public readonly ListExt<string> DatabaseFiles = new();
-    public readonly ListExt<string> NotAllowedChilds = new();
+    private readonly List<string> _databaseFiles = new();
+    private readonly List<string> _notAllowedChilds = new();
+
     private string _createDate;
+
     private string _creator;
+
     private int _id = -1;
+
     private string _loadedVersion = "0.00";
+
     private MultiUserFile? _muf;
+
     private ItemCollectionPad? _padData;
 
     private bool _saved;
+
     private bool _saving;
 
     #endregion
@@ -73,7 +82,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         _muf.ParseExternal += ParseExternal;
         _muf.ToListOfByte += ToListOfByte;
         _muf.Saving += _muf_Saving;
-
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
         _creator = Generic.UserName();
         PadData = new ItemCollectionPad();
@@ -81,17 +89,12 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         if (FileExists(filename)) {
             _muf.Load(filename, true);
         }
-        //if (notallowedchilds != null) {
-        //    NotAllowedChilds.AddIfNotExists(notallowedchilds);
-        //}
+
         _saved = true;
 
         _padData.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
         _padData.GridShow = 0.5f;
         _padData.GridSnap = 0.5f;
-
-        DatabaseFiles.Changed += DatabaseFiles_Changed;
-        NotAllowedChilds.Changed += NotAllowedChilds_Changed;
     }
 
     #endregion
@@ -103,6 +106,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     public event EventHandler? Loaded;
 
     public event EventHandler? Loading;
+
+    public event EventHandler? NotAllowedChildsChanged;
 
     public event EventHandler? SavedToDisk;
 
@@ -121,6 +126,18 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     public bool IsDisposed { get; private set; }
 
     public string KeyName => Filename;
+
+    public ReadOnlyCollection<string> NotAllowedChilds {
+        get => new(_notAllowedChilds);
+        set {
+            var l = new List<string>(value).SortedDistinctList();
+            if (_notAllowedChilds.JoinWithCr() == l.JoinWithCr()) { return; }
+            _notAllowedChilds.Clear();
+            _notAllowedChilds.AddRange(l);
+            _saved = false;
+            OnNotAllowedChildsChanged();
+        }
+    }
 
     public ItemCollectionPad? PadData {
         get => _padData;
@@ -187,6 +204,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
+    public void OnNotAllowedChildsChanged() => NotAllowedChildsChanged?.Invoke(this, System.EventArgs.Empty);
+
     public void Save() => _muf?.Save(true);
 
     /// <summary>
@@ -250,13 +269,15 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                 //    break;
 
                 case "databasefiles":
-                    DatabaseFiles.Clear();
-                    DatabaseFiles.AddRange(pair.Value.FromNonCritical().SplitByCrToList());
+                    _databaseFiles.Clear();
+                    _databaseFiles.AddRange(pair.Value.FromNonCritical().SplitByCrToList());
+                    DatabaseFiles_Changed();
                     break;
 
                 case "notallowedchilds":
-                    NotAllowedChilds.Clear();
-                    NotAllowedChilds.AddRange(pair.Value.FromNonCritical().SplitByCrToList());
+                    _notAllowedChilds.Clear();
+                    _notAllowedChilds.AddRange(pair.Value.FromNonCritical().SplitByCrToList());
+                    OnNotAllowedChildsChanged();
                     break;
 
                 case "createdate":
@@ -292,22 +313,24 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         //    : string.Empty;
     }
 
-    private void DatabaseFiles_Changed(object sender, System.EventArgs e) {
+    private void DatabaseFiles_Changed() {
         if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
-        foreach (var thisfile in DatabaseFiles) {
+        foreach (var thisfile in _databaseFiles) {
             _ = DatabaseAbstract.GetById(new ConnectionInfo(thisfile, null), null);
         }
 
         _saved = false;
     }
 
-    private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
-        if (_saving || (_muf?.IsLoading ?? true)) { return; }
-        _saved = false;
-    }
+    //private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
+    //    if (_saving || (_muf?.IsLoading ?? true)) { return; }
+    //    _saved = false;
+    //}
 
     private void OnLoaded(object sender, System.EventArgs e) {
+        // Reparatur-Routine
+
         foreach (var thisIt in PadData) {
             if (string.IsNullOrEmpty(thisIt.Page)) {
                 thisIt.Page = "Head";
@@ -315,6 +338,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
             foreach (var thisCon in thisIt.ConnectsTo) {
                 thisCon.Bei_Export_sichtbar = false;
+            }
+
+            if (thisIt is IHasConnectedFormula itcf) {
+                itcf.CFormula = this;
             }
         }
 
@@ -344,12 +371,12 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         _id = -1;
 
-        DatabaseFiles.Clear();
+        _databaseFiles.Clear();
 
         foreach (var thisit in PadData) {
             if (thisit is RowWithFilterPadItem rwf) {
                 if (rwf.Database != null) {
-                    _ = DatabaseFiles.AddIfNotExists(rwf.Database.ConnectionData.UniqueID);
+                    _ = _databaseFiles.AddIfNotExists(rwf.Database.ConnectionData.UniqueID);
                     _id = Math.Max(_id, rwf.Id);
                 }
             }
@@ -366,8 +393,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         t.Add("CreateName=" + _creator.ToNonCritical());
         //t.GenerateAndAdd("FilePath=" + FilePath.ToNonCritical());
         t.Add("LastUsedID=" + _id);
-        t.Add("DatabaseFiles=" + DatabaseFiles.JoinWithCr().ToNonCritical());
-        t.Add("NotAllowedChilds=" + NotAllowedChilds.JoinWithCr().ToNonCritical());
+        t.Add("DatabaseFiles=" + _databaseFiles.JoinWithCr().ToNonCritical());
+        t.Add("NotAllowedChilds=" + _notAllowedChilds.JoinWithCr().ToNonCritical());
         t.Add("PadItemData=" + PadData.ToString().ToNonCritical());
 
         e.Data = ("{" + t.JoinWith(", ").TrimEnd(", ") + "}").WIN1252_toByte();

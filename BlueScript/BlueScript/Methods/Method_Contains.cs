@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -31,13 +32,10 @@ internal class Method_Contains : Method {
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Variable, VariableListString.ShortName_Variable }, new List<string> { VariableBool.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
     public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
-
     public override bool EndlessArgs => true;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
 
@@ -50,8 +48,8 @@ internal class Method_Contains : Method {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "contains" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         #region Wortliste erzeugen
 
@@ -68,27 +66,27 @@ internal class Method_Contains : Method {
         if (attvar.Attributes[0] is VariableListString vl) {
             var x = vl.ValueList;
             if (wordlist.Any(thisW => x.Contains(thisW, ((VariableBool)attvar.Attributes[1]).ValueBool))) {
-                return DoItFeedback.Wahr(infos);
+                return DoItFeedback.Wahr();
             }
-            return DoItFeedback.Falsch(infos);
+            return DoItFeedback.Falsch();
         }
 
         if (attvar.Attributes[0] is VariableString vs) {
             foreach (var thisW in wordlist) {
                 if (((VariableBool)attvar.Attributes[1]).ValueBool) {
                     if (vs.ValueString.Contains(thisW)) {
-                        return DoItFeedback.Wahr(infos);
+                        return DoItFeedback.Wahr();
                     }
                 } else {
                     if (vs.ValueString.ToLower().Contains(thisW.ToLower())) {
-                        return DoItFeedback.Wahr(infos);
+                        return DoItFeedback.Wahr();
                     }
                 }
             }
-            return DoItFeedback.Falsch(infos);
+            return DoItFeedback.Falsch();
         }
 
-        return DoItFeedback.FalscherDatentyp(infos);
+        return DoItFeedback.FalscherDatentyp(infos.Data);
     }
 
     #endregion

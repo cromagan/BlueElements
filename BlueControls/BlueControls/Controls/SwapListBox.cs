@@ -20,7 +20,6 @@
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using BlueBasics.EventArgs;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -71,9 +70,12 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     internal void SuggestionsAdd(ItemCollectionList? item) {
         if (item == null) { return; }
-        foreach (var thisi in item.Where(thisi => Main.Item[thisi.KeyName] == null && Suggest.Item[thisi.KeyName] == null)) {
-            thisi.Checked = false;
-            Suggest.Item.Add(thisi.Clone() as BasicListItem);
+
+        foreach (var thisi in item) {
+            if (Main.Item[thisi.KeyName] == null && Suggest.Item[thisi.KeyName] == null) {
+                thisi.Checked = false;
+                Suggest.Item.Add(thisi.Clone() as BasicListItem);
+            }
         }
     }
 

@@ -65,12 +65,10 @@ public class VariableUnknown : Variable {
         return v;
     }
 
-    //public override string ValueForReplace { get => "\"" + _valueString.RemoveCriticalVariableChars() + "\""; }
-
-    public override DoItFeedback GetValueFrom(Variable variable) {
-        if (variable is not VariableUnknown) { return DoItFeedback.VerschiedeneTypen(null, this, variable); }
-        if (ReadOnly) { return DoItFeedback.Schreibgschützt(null); }
-        return DoItFeedback.Null(null);
+    public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
+        if (variable is not VariableUnknown) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }
+        if (ReadOnly) { return DoItFeedback.Schreibgschützt(ld); }
+        return DoItFeedback.Null();
     }
 
     protected override Variable NewWithThisValue(object x, Script s) {

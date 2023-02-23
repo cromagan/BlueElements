@@ -28,36 +28,8 @@ using BlueControls.Enums;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
-
-using System;
-using System.Collections.Generic;
-
-using System.ComponentModel;
-
-using System.Drawing;
-using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-
 using BlueBasics.Interfaces;
-using BlueControls.Designer_Support;
-
-using BlueControls.Enums;
-
-using BlueControls.EventArgs;
-using BlueControls.Extended_Text;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-
-using BlueControls.ItemCollection.ItemCollectionList;
-using BlueDatabase.Enums;
-
-using BlueDatabase.EventArgs;
-
-using BlueDatabase.Interfaces;
-using static BlueBasics.Converter;
 
 namespace BlueControls.Controls;
 

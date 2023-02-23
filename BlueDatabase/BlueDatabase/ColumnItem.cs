@@ -34,23 +34,6 @@ using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
-using System;
-using System.Collections.Generic;
-
-using System.ComponentModel;
-
-using System.Drawing;
-
-using System.Windows.Forms;
-
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
-using static BlueBasics.Converter;
-
 namespace BlueDatabase;
 
 public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExtended, IColumnInputFormat, IErrorCheckable, IHasDatabase, IHasKeyName {
@@ -921,8 +904,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             //}
 
             _ = Database?.ChangeData(DatabaseDataType.ColumnName, Name, null, KeyName, value, string.Empty);
-            Database?.RepairColumnArrangements();
-            Database?.RepairViews();
             OnChanged();
         }
     }
@@ -1725,7 +1706,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (Database == null || Database.IsDisposed) { return; }
         if (Name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
 
-        var x = new ListExt<ColumnItem> { this };
+        var x = new List<ColumnItem> { this };
         Database?.RefreshColumnsData(x);
     }
 
@@ -2131,9 +2112,11 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             var maxCount = 0;
             var keyValue = string.Empty;
 
-            foreach (var thisKey in d.Where(thisKey => thisKey.Value > maxCount)) {
-                keyValue = thisKey.Key;
-                maxCount = thisKey.Value;
+            foreach (var thisKey in d) {
+                if (thisKey.Value > maxCount) {
+                    keyValue = thisKey.Key;
+                    maxCount = thisKey.Value;
+                }
             }
 
             _ = d.Remove(keyValue);
@@ -2388,7 +2371,12 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             case DatabaseDataType.ColumnName:
                 var nname = newvalue.ToUpper();
 
-                Database.Column.ChangeName(KeyName, nname);
+                var ok = Database.Column.ChangeName(KeyName, nname);
+
+                if (!ok) {
+                    Database.SetReadOnly();
+                    return "Schwerer Spalten Umbenennungsfehler!";
+                }
 
                 KeyName = nname;
                 //Invalidate_TmpVariablesx();

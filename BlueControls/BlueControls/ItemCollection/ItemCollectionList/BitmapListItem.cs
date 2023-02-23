@@ -32,9 +32,6 @@ public class BitmapListItem : BasicListItem {
     #region Fields
 
     private const int ConstMy = 15;
-
-    private readonly ListExt<QuickImage> _overlays = new();
-
     private Bitmap? _bitmap;
 
     private string _caption;
@@ -54,7 +51,7 @@ public class BitmapListItem : BasicListItem {
         _captiontmp.Clear();
         _bitmap = bmp;
         Padding = 0;
-        _overlays.Clear();
+        Overlays.Clear();
     }
 
     public BitmapListItem(string filename, string internalname, string caption) : base(internalname, true) {
@@ -63,7 +60,7 @@ public class BitmapListItem : BasicListItem {
         //_Bitmap = bmp;
         _imageFilename = filename;
         Padding = 0;
-        _overlays.Clear();
+        Overlays.Clear();
         //_overlays.ListOrItemChanged += _overlays_ListOrItemChanged;
     }
 
@@ -104,7 +101,7 @@ public class BitmapListItem : BasicListItem {
         }
     }
 
-    public List<QuickImage> Overlays => _overlays;
+    public List<QuickImage> Overlays { get; } = new();
 
     public int Padding { get; set; }
 

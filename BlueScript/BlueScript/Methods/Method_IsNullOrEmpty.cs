@@ -24,19 +24,18 @@ using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_IsNullOrEmpty : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { Variable.Any_Variable } };
     public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
-
     public override bool EndlessArgs => false;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
 
@@ -46,26 +45,26 @@ internal class Method_IsNullOrEmpty : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "isnullorempty" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "isnullorempty" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-                return DoItFeedback.AttributFehler(infos, this, attvar);
+                return DoItFeedback.AttributFehler(infos.Data, this, attvar);
             }
 
-            return DoItFeedback.Wahr(infos);
+            return DoItFeedback.Wahr();
         }
 
-        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(infos); }
+        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(); }
 
         if (attvar.Attributes[0] is VariableUnknown) {
-            return DoItFeedback.Wahr(infos);
+            return DoItFeedback.Wahr();
         }
 
-        return DoItFeedback.Falsch(infos);
+        return DoItFeedback.Falsch();
     }
 
     #endregion

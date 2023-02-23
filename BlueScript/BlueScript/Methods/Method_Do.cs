@@ -18,11 +18,14 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Do : Method {
 
     #region Properties
@@ -32,6 +35,7 @@ internal class Method_Do : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => string.Empty;
     public override bool GetCodeBlockAfter => true;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
     public override string StartSequence => string.Empty;
     public override string Syntax => "Do { Break; }";
@@ -43,24 +47,24 @@ internal class Method_Do : Method {
     public override List<string> Comand(List<Variable>? currentvariables) => new() { "do" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var du = 0;
 
         do {
             du++;
-            if (du > 100000) { return new DoItFeedback(infos, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
+            if (du > 100000) { return new DoItFeedback(infos.Data, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
-            var scx = Method_CallByFilename.CallSub(s, infos, infos.CodeBlockAfterText, false, infos.Line - 1, "Do-Schleife");
-            if (!string.IsNullOrEmpty(scx.ErrorMessage)) { return scx; }
+            var scx = Method_CallByFilename.CallSub(s, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname);
+            if (!scx.AllOk) { return scx; }
 
             if (s.BreakFired) { break; }
         } while (true);
 
         s.BreakFired = false;
 
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

@@ -31,7 +31,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcceptAndSends, IContentHolder, IItemToControl {
+public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText {
 
     #region Fields
 
@@ -98,7 +98,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
 
-            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
+            if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
             con.DisabledReason = "Dieser Wert ist nur eine Anzeige.";
         } else {
             con.DisabledReason = "Keine gültige Verknüpfung";
@@ -123,13 +123,6 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IAcc
         l.Add(new FlexiControl());
 
         return l;
-    }
-
-    public bool IsRecursiveWith(IAcceptAndSends obj) {
-        if (obj == this) { return true; }
-
-        if (GetRowFrom is IAcceptAndSends i) { return i.IsRecursiveWith(obj); }
-        return false;
     }
 
     public override bool ParseThis(string tag, string value) {

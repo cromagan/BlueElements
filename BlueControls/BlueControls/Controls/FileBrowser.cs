@@ -24,6 +24,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -51,6 +52,8 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     private string _originalText = string.Empty;
 
     private string _sort = "Name";
+
+    private FileSystemWatcher? _watcher;
 
     #endregion
 
@@ -134,13 +137,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         return exekey.GetValue("").ToString();
     }
 
-    //public string GetDescription(string extension) {
-    //    if (SubKeyExist(extension)) {
-    //        var mainkey = Registry.ClassesRoot.OpenSubKey(extension);
-    //        var type = mainkey.GetValue(""); // GetValue("") read the standard value of a key
-    //        if (type == null) {
-    //            return extension.Replace(".", string.Empty).ToUpper() + "-Datei";
-    //        }
+    public void ParentPath() => btnZurück_Click(null, System.EventArgs.Empty);
 
     //        mainkey = Registry.ClassesRoot.OpenSubKey(type.ToString());
     //        return mainkey.GetValue("").ToString();
@@ -148,9 +145,6 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
     //        return "Unknown Extension";
     //    }
     //}
-
-    public void ParentPath() => btnZurück_Click(null, System.EventArgs.Empty);
-
     public bool ParseVariables(List<Variable>? list) {
         if (IsDisposed) { return false; }
 
@@ -164,6 +158,13 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         return ct == OriginalText;
     }
 
+    //public string GetDescription(string extension) {
+    //    if (SubKeyExist(extension)) {
+    //        var mainkey = Registry.ClassesRoot.OpenSubKey(extension);
+    //        var type = mainkey.GetValue(""); // GetValue("") read the standard value of a key
+    //        if (type == null) {
+    //            return extension.Replace(".", string.Empty).ToUpper() + "-Datei";
+    //        }
     public void Reload() => ÖffnePfad(txbPfad.Text);
 
     protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
@@ -218,6 +219,38 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         btnAddScreenShot.Enabled = DirectoryExists(txbPfad.Text);
         btnExplorerÖffnen.Enabled = DirectoryExists(txbPfad.Text);
         btnZurück.Enabled = DirectoryExists(txbPfad.Text);
+    }
+
+    private void CreateWatcher() {
+        if (!string.IsNullOrEmpty(txbPfad.Text) && DirectoryExists(txbPfad.Text)) {
+            _watcher = new FileSystemWatcher(txbPfad.Text);
+            _watcher.Changed += Watcher_Changed;
+            _watcher.Created += Watcher_Created;
+            _watcher.Deleted += Watcher_Deleted;
+            _watcher.Renamed += Watcher_Renamed;
+            _watcher.Error += Watcher_Error;
+            _watcher.EnableRaisingEvents = true;
+        }
+    }
+
+    private DragDropEffects CurrentState(DragEventArgs e) {
+        if (!DirectoryExists(txbPfad.Text)) {
+            return DragDropEffects.None;
+        }
+
+        if (!CanWriteInDirectory(txbPfad.Text)) {
+            return DragDropEffects.None;
+        }
+
+        if ((Control.ModifierKeys & Keys.Shift) == Keys.Shift && e.AllowedEffect.HasFlag(DragDropEffects.Move)) {
+            return DragDropEffects.Move;
+        }
+
+        if (e.AllowedEffect.HasFlag(DragDropEffects.Copy)) {
+            return DragDropEffects.Copy;
+        }
+
+        return DragDropEffects.None;
     }
 
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -314,6 +347,57 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         }
     }
 
+    private void lsbFiles_DragDrop(object sender, DragEventArgs e) {
+        var tmp = CurrentState(e);
+
+        if (tmp == DragDropEffects.None) { return; }
+
+        List<string> files;
+
+        try {
+            var dropped = ((string[])e.Data.GetData(DataFormats.FileDrop));
+            files = dropped.ToList();
+        } catch {
+            MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
+            return;
+        }
+
+
+
+        foreach (var thisfile in files) {
+            if (!FileExists(thisfile)) {
+                MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
+                return;
+            }
+
+
+        }
+
+
+        foreach (var thisfile in files) {
+            var f = TempFile(txbPfad.Text, thisfile.FileNameWithoutSuffix(), thisfile.FileSuffix());
+
+            if (tmp == DragDropEffects.Copy) {
+                CopyFile(thisfile, f, true);
+            }
+
+            if (tmp == DragDropEffects.Move) {
+                MoveFile(thisfile, f, true);
+            }
+        }
+    }
+
+    private void lsbFiles_DragEnter(object sender, DragEventArgs e) {
+        var tmp = CurrentState(e);
+
+        if (e.AllowedEffect.HasFlag(tmp)) {
+            e.Effect = tmp;
+            return;
+        }
+
+        e.Effect = DragDropEffects.None;
+    }
+
     private void lsbFiles_ItemClicked(object sender, BasicListItemEventArgs e) {
         if (File.Exists(e.Item.KeyName)) {
             var tags = (List<string>)e.Item.Tag ?? new List<string>();
@@ -388,6 +472,8 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         if (_isLoading) { return; }
         _isLoading = true;
 
+        RemoveWatcher();
+
         var dropChanged = newPath.ToLower() != txbPfad.Text.ToLower();
 
         AbortThumbs();
@@ -458,10 +544,29 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         //lsbFiles.Item.Sort();
 
         StartThumbs();
+        CreateWatcher();
         _isLoading = false;
     }
 
     private void OnFolderChanged() => FolderChanged?.Invoke(this, System.EventArgs.Empty);
+
+    //private void ReCreateWatcher() {
+    //    RemoveWatcher();
+    //    CreateWatcher();
+    //}
+
+    private void RemoveWatcher() {
+        if (_watcher != null) {
+            _watcher.EnableRaisingEvents = false;
+            _watcher.Changed -= Watcher_Changed;
+            _watcher.Created -= Watcher_Created;
+            _watcher.Deleted -= Watcher_Deleted;
+            _watcher.Renamed -= Watcher_Renamed;
+            _watcher.Error -= Watcher_Error;
+            _watcher?.Dispose();
+            _watcher = null;
+        }
+    }
 
     private void StartThumbs() {
         AbortThumbs();
@@ -557,6 +662,21 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         if (IsDisposed) { return; }
         ÖffnePfad(txbPfad.Text);
     }
+
+    private void Watcher_Changed(object sender, FileSystemEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
+
+    private void Watcher_Created(object sender, FileSystemEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
+
+    private void Watcher_Deleted(object sender, FileSystemEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
+
+    /// <summary>
+    /// Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    private void Watcher_Error(object sender, ErrorEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
+
+    private void Watcher_Renamed(object sender, RenamedEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
 
     #endregion
 }

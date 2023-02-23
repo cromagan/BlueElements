@@ -27,20 +27,17 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
+using BlueDatabase.Interfaces;
 
 namespace BlueControls.Forms;
 
-public partial class RelationDiagram : PadEditor {
+public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     #region Fields
 
     private readonly ColumnItem? _column;
-    private DatabaseAbstract? _database;
 
     #endregion
-
-    //private bool RelationsValid;
-    //   Dim ItS As New Size(60, 80)
 
     #region Constructors
 
@@ -48,28 +45,38 @@ public partial class RelationDiagram : PadEditor {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        _database = database;
-        _database.Disposing += Database_Disposing;
-        foreach (var thisColumnItem in _database.Column.Where(thisColumnItem => thisColumnItem != null && thisColumnItem.Format == DataFormat.RelationText)) {
-            _column = thisColumnItem;
-            break;
+        Database = database;
+        Database.Disposing += Database_Disposing;
+        foreach (var thisColumnItem in Database.Column) {
+            if (thisColumnItem != null && thisColumnItem.Format == DataFormat.RelationText) {
+                _column = thisColumnItem;
+                break;
+            }
         }
     }
 
     #endregion
 
+    #region Properties
+
+    public DatabaseAbstract? Database { get; private set; }
+
+    #endregion
+
     #region Methods
 
+    //private bool RelationsValid;
+    //   Dim ItS As New Size(60, 80)
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad.Item[what] != null) { return null; }
-        var r = _database.Row[what];
+        var r = Database.Row[what];
         if (r == null) {
             MessageBox.Show("<b>" + what + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
             return null;
         }
         if (ItemOfRow(r) != null) { return null; }
-        RowFormulaPadItem i2 = new(_database, r.Key, layoutId);
+        RowFormulaPadItem i2 = new(Database, r.Key, layoutId);
         Pad.AddCentered(i2);
         //  Pad.Invalidate()
         i2.SetLeftTopPoint(xPos, ypos);
@@ -87,11 +94,11 @@ public partial class RelationDiagram : PadEditor {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
-        if (_database != null) {
-            _database.Disposing -= Database_Disposing;
+        if (Database != null) {
+            Database.Disposing -= Database_Disposing;
         }
 
-        _database = null;
+        Database = null;
     }
 
     private void BezPlus(RowFormulaPadItem? initialItem) {
@@ -100,7 +107,7 @@ public partial class RelationDiagram : PadEditor {
         if (string.IsNullOrEmpty(t)) { return; }
         // Alle möglichen Namen holen
         List<string> names = new();
-        names.AddRange(_database.Column.First.GetUcaseNamesSortedByLenght());
+        names.AddRange(Database.Column.First.GetUcaseNamesSortedByLenght());
         // Namen ermitteln, die relevant sind
         List<string> bez = new();
         foreach (var thisN in names.Where(t.Contains)) {
@@ -111,7 +118,7 @@ public partial class RelationDiagram : PadEditor {
         // Namen in der Übersicht hinzufügen
         var lastit = initialItem;
         foreach (var thisn in bez) {
-            var ro = _database.Row[thisn];
+            var ro = Database.Row[thisn];
             var it = ItemOfRow(ro);
             if (it == null) {
                 //lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
@@ -308,7 +315,7 @@ public partial class RelationDiagram : PadEditor {
 
     private void Hinzu_Click(object sender, System.EventArgs e) {
         ItemCollectionList il = new(true);
-        il.AddRange(_database.Column.First.Contents());
+        il.AddRange(Database.Column.First.Contents());
         //il.Sort();
         il.CheckBehavior = CheckBehavior.SingleSelection;
         var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, AddType.None, true);

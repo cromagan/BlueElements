@@ -27,21 +27,25 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueDatabase.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class DatabaseScriptEditor {
+public sealed partial class DatabaseScriptEditor : IHasDatabase {
     #region Fields
 
     #region Fields
 
-    private DatabaseAbstract? _database;
     private EventScript? _item;
 
     #endregion
+
+    #endregion
+
+    #region Constructors
 
     #region Constructors
 
@@ -50,8 +54,8 @@ public sealed partial class DatabaseScriptEditor {
         InitializeComponent();
         grpEigenschaften.Enabled = false;
         eventScriptEditor.Enabled = false;
-        _database = database;
-        _database.Disposing += Database_Disposing;
+        Database = database;
+        Database.Disposing += Database_Disposing;
 
         FormManager.Current.RegisterForm(this);
     }
@@ -62,9 +66,13 @@ public sealed partial class DatabaseScriptEditor {
 
     #region Properties
 
+    #region Properties
+
+    public DatabaseAbstract? Database { get; private set; }
+
     public EventScript? Item {
         get {
-            if (_database == null || _database.IsDisposed) { return null; }
+            if (Database == null || Database.IsDisposed) { return null; }
 
             return _item;
         }
@@ -106,13 +114,15 @@ public sealed partial class DatabaseScriptEditor {
 
     #endregion
 
+    #endregion
+
+    #region Methods
+
     #region Methods
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
-        if (_database == null || _database.IsDisposed) {
-            return;
-        }
+        if (Database == null || Database.IsDisposed) { return; }
 
         WriteInfosBack();
         RemoveDatabase();
@@ -122,27 +132,31 @@ public sealed partial class DatabaseScriptEditor {
         base.OnLoad(e);
 
         lstEventScripts.Item.Clear();
-        foreach (var thisSet in _database.EventScript.Where(thisSet => thisSet != null)) {
-            _ = lstEventScripts.Item.Add(thisSet);
+        if (Database == null || Database.IsDisposed) { return; }
+
+        foreach (var thisSet in Database.EventScript) {
+            if (thisSet != null) {
+                _ = lstEventScripts.Item.Add(thisSet);
+            }
         }
     }
 
-    protected override void OnShown(System.EventArgs e) => variableEditor.WriteVariablesToTable(_database?.Variables);
+    protected override void OnShown(System.EventArgs e) => variableEditor.WriteVariablesToTable(Database?.Variables);
 
     protected void OpenAdditionalFileFolder() {
         //Todo: Implementieren
-        if (_database == null || _database.IsDisposed) {
+        if (Database == null || Database.IsDisposed) {
             return;
         }
-        if (DirectoryExists(_database.AdditionalFilesPfadWhole())) { _ = ExecuteFile(_database.AdditionalFilesPfadWhole()); }
+        if (DirectoryExists(Database.AdditionalFilesPfadWhole())) { _ = ExecuteFile(Database.AdditionalFilesPfadWhole()); }
     }
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSave.Enabled = false;
 
-        if (_database != null) {
+        if (Database != null) {
             WriteInfosBack();
-            _ = _database.Save();
+            _ = Database.Save();
         }
         btnSave.Enabled = true;
     }
@@ -179,7 +193,7 @@ public sealed partial class DatabaseScriptEditor {
     }
 
     private void eventScriptEditor_ExecuteScript(object sender, BlueScript.EventArgs.ScriptEventArgs e) {
-        if (_database == null || _database.IsDisposed) {
+        if (Database == null || Database.IsDisposed) {
             e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false);
             return;
         }
@@ -199,29 +213,29 @@ public sealed partial class DatabaseScriptEditor {
         RowItem? r = null;
 
         if (_item.NeedRow) {
-            if (_database.Row.Count == 0) {
+            if (Database.Row.Count == 0) {
                 e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false);
                 return;
             }
             if (string.IsNullOrEmpty(txbTestZeile.Text)) {
-                txbTestZeile.Text = _database?.Row?.First()?.CellFirstString() ?? string.Empty;
+                txbTestZeile.Text = Database?.Row.First()?.CellFirstString() ?? string.Empty;
             }
 
-            r = _database?.Row?[txbTestZeile.Text];
+            r = Database?.Row[txbTestZeile.Text];
             if (r == null) {
                 e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false);
                 return;
             }
         }
-        e.Feedback = _database?.ExecuteScript(_item, false, r);
+        e.Feedback = Database?.ExecuteScript(_item, false, r);
     }
 
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
 
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
 
-        var newScriptItem = lstEventScripts.Item.Add(new EventScript(_database));
+        var newScriptItem = lstEventScripts.Item.Add(new EventScript(Database));
 
         WriteInfosBack();
 
@@ -233,7 +247,7 @@ public sealed partial class DatabaseScriptEditor {
             Item = null;
             return;
         }
-        if (_database == null || _database.IsDisposed || _database.ReadOnly) {
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) {
             Item = null;
             return;
         }
@@ -242,10 +256,10 @@ public sealed partial class DatabaseScriptEditor {
     }
 
     private void RemoveDatabase() {
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         Item = null;
-        _database.Disposing -= Database_Disposing;
-        _database = null;
+        Database.Disposing -= Database_Disposing;
+        Database = null;
     }
 
     private void ScriptEditor_Changed(object sender, System.EventArgs e) {
@@ -256,7 +270,7 @@ public sealed partial class DatabaseScriptEditor {
     private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         //Todo: Implementieren
         if (e.HotItem is string txt) {
-            var c = _database.Column.Exists(txt);
+            var c = Database?.Column.Exists(txt);
             if (c is null) { return; }
             _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
         }
@@ -266,7 +280,7 @@ public sealed partial class DatabaseScriptEditor {
         //Todo: Implementieren
         ColumnItem? c = null;
 
-        if (e.HotItem is string txt) { c = _database.Column.Exists(txt); }
+        if (e.HotItem is string txt) { c = Database?.Column.Exists(txt); }
 
         switch (e.ClickedComand.ToLower()) {
             case "spalteneigenschaftenbearbeiten":
@@ -284,7 +298,7 @@ public sealed partial class DatabaseScriptEditor {
     }
 
     private void WriteInfosBack() {
-        if (_database == null || _database.IsDisposed || _database.ReadOnly) { return; } // Disposed
+        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; } // Disposed
 
         if (_item != null) {
             _item.Script = eventScriptEditor.ScriptText;
@@ -294,7 +308,7 @@ public sealed partial class DatabaseScriptEditor {
 
         var t2 = new List<EventScript?>();
         t2.AddRange(lstEventScripts.Item.Select(thisItem => (EventScript)((ReadableListItem)thisItem).Item));
-        _database.EventScript = new(t2);
+        Database.EventScript = new(t2);
 
         #endregion
 
@@ -310,8 +324,10 @@ public sealed partial class DatabaseScriptEditor {
 
         #endregion
 
-        _database.Variables = new ReadOnlyCollection<VariableString>(l2);
+        Database.Variables = new ReadOnlyCollection<VariableString>(l2);
     }
+
+    #endregion
 
     #endregion
 }

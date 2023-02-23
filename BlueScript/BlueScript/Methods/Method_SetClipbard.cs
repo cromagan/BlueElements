@@ -18,12 +18,15 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Generic;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_SetClipboard : Method {
 
     #region Properties
@@ -33,6 +36,7 @@ internal class Method_SetClipboard : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.IO;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "SetClipboard(Text);";
@@ -41,16 +45,16 @@ internal class Method_SetClipboard : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "setclipboard" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "setclipboard" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var vs = (VariableString)attvar.Attributes[0];
         CopytoClipboard(vs.ValueString);
 
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

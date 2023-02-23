@@ -18,34 +18,10 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueDatabase;
 using BlueScript.Variables;
-using System;
-
-using System.Collections.Generic;
-
-using System.ComponentModel;
-using System.Drawing;
-
-using System.Windows.Forms;
-using BlueBasics;
-
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Extended_Text;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
-using static BlueBasics.Converter;
 
 namespace BlueControls;
 
@@ -158,10 +134,12 @@ public partial class VariableEditor : UserControl {
         var inh = x.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt");
         var kom = x.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
 
-        foreach (var thisColumn in x.Column.Where(thisColumn => !thisColumn.IsSystemColumn())) {
-            thisColumn.MultiLine = true;
-            thisColumn.TextBearbeitungErlaubt = false;
-            thisColumn.DropdownBearbeitungErlaubt = false;
+        foreach (var thisColumn in x.Column) {
+            if (!thisColumn.IsSystemColumn()) {
+                thisColumn.MultiLine = true;
+                thisColumn.TextBearbeitungErlaubt = false;
+                thisColumn.DropdownBearbeitungErlaubt = false;
+            }
         }
 
         if (Editabe) {

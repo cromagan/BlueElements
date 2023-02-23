@@ -34,8 +34,8 @@ public partial class Tool_DummyGenerator {
     #region Methods
 
     private void CreateDummy() {
-        var w = Berechnung.Ergebnis(X.Text);
-        var h = Berechnung.Ergebnis(Y.Text);
+        var w = MathFormulaParser.Ergebnis(X.Text);
+        var h = MathFormulaParser.Ergebnis(Y.Text);
         if (w == null || (int)w < 2) {
             Notification.Show("Bitte Breite eingeben.", ImageCode.Information);
             return;

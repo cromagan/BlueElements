@@ -19,8 +19,7 @@
 
 using System.Collections.Generic;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueScript;
+using BlueDatabase.Interfaces;
 using BlueScript.Variables;
 
 namespace BlueControls.Interfaces;
@@ -30,13 +29,11 @@ namespace BlueControls.Interfaces;
 /// Hier sind die Wert zu finden, wenn das Control Zeilen berechnen kann und
 /// diese an Childs weiter geben kann.
 /// </summary>
-public interface ICalculateRowsControlLevel : IHasDatabase {
+public interface ICalculateRowsControlLevel : IHasDatabase, IAcceptRowKey {
 
-    #region Properties
+    #region Methods
 
-    public ListExt<Control> Childs { get; }
-
-    public List<Variable>? Variables { get; set; }
+    public void ChildAdd(Control c);
 
     #endregion
 }

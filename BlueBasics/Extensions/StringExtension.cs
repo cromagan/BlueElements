@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -449,11 +450,16 @@ public static partial class Extensions {
                 if (ch == "\"") { gans = false; machtezu = true; }
             } else {
                 if (klammern != null) {
-                    foreach (var thisc in klammern.Where(thisc => ch == thisc[1])) {
-                        if (!historie.EndsWith(thisc[0])) { return (-1, string.Empty); }
-                        historie = historie.Substring(0, historie.Length - 1);
-                        machtezu = true;
-                        break;
+                    foreach (var thisc in klammern) {
+                        if (ch == thisc[1]) {
+                            if (!historie.EndsWith(thisc[0])) {
+                                return (-1, string.Empty);
+                            }
+
+                            historie = historie.Substring(0, historie.Length - 1);
+                            machtezu = true;
+                            break;
+                        }
                     }
                 }
             }
@@ -795,7 +801,7 @@ public static partial class Extensions {
 
     public static List<string> ToListOfString(this IEnumerable<IHasKeyName?>? items) {
         List<string> w = new();
-        if (items == null) { return w; }
+        if (items == null || !items.Any()) { return w; }
 
         w.AddRange(from thisItem in items where thisItem != null where !string.IsNullOrEmpty(thisItem.KeyName) select thisItem.KeyName);
         return w;

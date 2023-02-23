@@ -17,8 +17,10 @@ namespace BlueControls.Forms {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
+            this.components = new System.ComponentModel.Container();
             this.capStatusBar = new BlueControls.Controls.Caption();
             this.pnlStatusBar = new System.Windows.Forms.Panel();
+            this.timMessageClearer = new System.Windows.Forms.Timer(this.components);
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -39,6 +41,11 @@ namespace BlueControls.Forms {
             this.pnlStatusBar.Size = new System.Drawing.Size(287, 24);
             this.pnlStatusBar.TabIndex = 96;
             // 
+            // timMessageClearer
+            // 
+            this.timMessageClearer.Interval = 1000;
+            this.timMessageClearer.Tick += new System.EventHandler(this.timMessageClearer_Tick);
+            // 
             // FormWithStatusBar
             // 
             this.ClientSize = new System.Drawing.Size(287, 172);
@@ -52,5 +59,7 @@ namespace BlueControls.Forms {
         }
         protected Caption capStatusBar;
         protected Panel pnlStatusBar;
+        private Timer timMessageClearer;
+        private System.ComponentModel.IContainer components;
     }
 }

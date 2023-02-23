@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -37,7 +36,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     #region Fields
 
-    public ListExt<WorkItem>? Works;
+    public List<WorkItem>? Works;
     private readonly MultiUserFile? _muf;
 
     #endregion
@@ -61,7 +60,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         _muf.ReloadDelaySecond = 180;
         _muf.Saving += _muf_Saving;
 
-        Works = new ListExt<WorkItem>();
+        Works = new List<WorkItem>();
 
         Initialize();
 
@@ -228,14 +227,14 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     protected override void Dispose(bool disposing) {
         _muf?.Dispose();
-        Works?.Dispose();
+        Works?.Clear();
         base.Dispose(disposing);
     }
 
     protected override void Initialize() {
         base.Initialize();
         _muf.ReloadDelaySecond = 600;
-        Works.Clear();
+        Works?.Clear();
     }
 
     protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
@@ -317,11 +316,14 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         //    }
         //}
         // Und nun alles ausführen!
-        foreach (var thisPending in Works.Where(thisPending => thisPending.IsPending)) {
-            if (thisPending.Comand == DatabaseDataType.ColumnName) {
-                thisPending.ChangedTo = Column.Freename(thisPending.ChangedTo);
+        foreach (var thisPending in Works) {
+            if (thisPending.IsPending) {
+                if (thisPending.Comand == DatabaseDataType.ColumnName) {
+                    thisPending.ChangedTo = Column.Freename(thisPending.ChangedTo);
+                }
+
+                ExecutePending(thisPending);
             }
-            ExecutePending(thisPending);
         }
     }
 
@@ -351,7 +353,9 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         }
     }
 
-    private void ToListOfByte(object sender, MultiUserToListEventArgs e) => e.Data = Database.ToListOfByte(this, Works).ToArray();
+    private void ToListOfByte(object sender, MultiUserToListEventArgs e) {
+        e.Data = Database.ToListOfByte(this, Works)?.ToArray();
+    }
 
     #endregion
 }

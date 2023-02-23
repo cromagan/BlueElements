@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -27,6 +28,8 @@ using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -38,7 +41,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection;
 
-public class ItemCollectionPad : ListExt<BasicPadItem> {
+public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposableExtended {
 
     #region Fields
 
@@ -200,6 +203,26 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
     #endregion
 
+    #region Destructors
+
+    ~ItemCollectionPad() {
+        Dispose(false);
+    }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? Changed;
+
+    public event EventHandler<ListEventArgs>? ItemAdded;
+
+    public event EventHandler? ItemRemoved;
+
+    public event EventHandler<ListEventArgs>? ItemRemoving;
+
+    #endregion
+
     #region Properties
 
     public Color BackColor { get; set; } = Color.White;
@@ -223,6 +246,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
             OnChanged();
         }
     }
+
+    public bool IsDisposed { get; private set; }
 
     [DefaultValue(true)]
     public bool IsSaved { get; set; }
@@ -338,9 +363,21 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
             sizeOfPaintArea.Height / maxBounds.Height);
     }
 
-    public new void Add(BasicPadItem item) {
+    public new void Add(BasicPadItem? item) {
+        if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Item ist null"); return; }
+        if (Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
+        if (this[item.KeyName] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.KeyName); return; }
+
+        if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
+
         item.Parent = this;
         base.Add(item);
+        IsSaved = false;
+        OnItemAdded(item);
+        item.Changed += Item_Changed;
+        //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
+        //item.CheckedChanged += Item_CheckedChanged;
+        //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
     public List<string> AllPages() {
@@ -353,6 +390,21 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         }
 
         return p;
+    }
+
+    public new void Clear() {
+        var l = new List<BasicPadItem>(this);
+
+        foreach (var thisit in l) {
+            Remove(thisit);
+        }
+
+        base.Clear();
+    }
+
+    public void Dispose() {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     public bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, States state, float zoom, float shiftX, float shiftY, string seite, bool showinprintmode) {
@@ -445,7 +497,7 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         var i2 = Previous(bpi);
         if (i2 != null) {
             var tempVar = bpi;
-            Swap(tempVar, i2);
+            Swap(this.IndexOf(tempVar), this.IndexOf(i2));
         }
     }
 
@@ -453,13 +505,13 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         var i2 = Next(bpi);
         if (i2 != null) {
             var tempVar = bpi;
-            Swap(tempVar, i2);
+            Swap(this.IndexOf(tempVar), this.IndexOf(i2));
         }
     }
 
-    public override void OnChanged() {
-        base.OnChanged();
+    public void OnChanged() {
         IsSaved = false;
+        Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
     public bool ParseVariable(string name, string wert) => ParseVariable(new VariableString(name, wert));
@@ -478,8 +530,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         if (row == null) { return; }
 
         var script = row.ExecuteScript(null, _scriptName, false, false, true, 0);
-        if (script.Variables == null) { return; }
-        foreach (var thisV in script.Variables) {
+        if (script.Variables1 == null) { return; }
+        foreach (var thisV in script.Variables1) {
             _ = ParseVariable(thisV);
         }
     }
@@ -488,13 +540,23 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
     public new void Remove(BasicPadItem? item) {
         if (item == null || !Contains(item)) { return; }
+        item.Changed -= Item_Changed;
+        //item.CheckedChanged -= Item_CheckedChanged;
+        //item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
+        OnItemRemoving(item);
+        _ = base.Remove(item);
+        OnItemRemoved();
 
-        base.Remove(item);
-        if (string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) { return; }
-        foreach (var thisToo in this.Where(thisToo => item.Gruppenzugehörigkeit.ToLower() == thisToo.Gruppenzugehörigkeit?.ToLower())) {
-            Remove(thisToo);
-            return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
+        if (!string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) {
+            foreach (var thisToo in this) {
+                if (item.Gruppenzugehörigkeit.ToLower() == thisToo.Gruppenzugehörigkeit?.ToLower()) {
+                    Remove(thisToo);
+                    return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
+                }
+            }
         }
+
+        OnChanged();
     }
 
     //private void ParseVariable(string VariableName, ColumnItem Column, RowItem Row) {
@@ -563,17 +625,13 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         }
     }
 
-    public new void Swap(BasicPadItem item1, BasicPadItem item2) {
-        var g1 = item1.Gruppenzugehörigkeit;
-        item1.Gruppenzugehörigkeit = string.Empty;
-        var g2 = item2.Gruppenzugehörigkeit;
-        item2.Gruppenzugehörigkeit = string.Empty;
-
-        base.Swap(item1, item2);
-
-        item1.Gruppenzugehörigkeit = g1;
-        item2.Gruppenzugehörigkeit = g2;
-        OnChanged();
+    public void Swap(int index1, int index2) {
+        if (index1 == index2) { return; }
+        //var l = ItemOrder.ToList();
+        (this[index1], this[index2]) = (this[index2], this[index1]);
+        //_maxNeededItemSize = Size.Empty;
+        //_itemOrder = null;
+        //OnChanged();
     }
 
     public Bitmap? ToBitmap(float scale) {
@@ -605,6 +663,10 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         return I;
     }
 
+    //    item1.Gruppenzugehörigkeit = g1;
+    //    item2.Gruppenzugehörigkeit = g2;
+    //    OnChanged();
+    //}
     public new string ToString() {
         List<string> result = new();
         result.ParseableAdd("ID", Id);
@@ -644,8 +706,14 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         return result.Parseable(tmp);
     }
 
+    //    base.Swap(item1, item2);
     internal Rectangle DruckbereichRect() => _prLo == null ? new Rectangle(0, 0, 0, 0) : new Rectangle((int)_prLo.X, (int)_prLo.Y, (int)(_prRu.X - _prLo.X), (int)(_prRu.Y - _prLo.Y));
 
+    //public void Swap(BasicPadItem item1, BasicPadItem item2) {
+    //    var g1 = item1.Gruppenzugehörigkeit;
+    //    item1.Gruppenzugehörigkeit = string.Empty;
+    //    var g2 = item2.Gruppenzugehörigkeit;
+    //    item2.Gruppenzugehörigkeit = string.Empty;
     internal void InDenHintergrund(BasicPadItem thisItem) {
         if (IndexOf(thisItem) == 0) { return; }
         var g1 = thisItem.Gruppenzugehörigkeit;
@@ -698,18 +766,18 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
 
     protected RectangleF MaxBounds() => MaxBounds(null);
 
-    protected override void OnItemAdded(BasicPadItem item) {
-        //if (item == null) {
-        //    Develop.DebugPrint(FehlerArt.Fehler, "Null Item soll hinzugefügt werden!");
-        //}
-        if (string.IsNullOrEmpty(item.KeyName)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.KeyName);
-        }
+    protected virtual void OnItemAdded(BasicPadItem item) {
+        ItemAdded?.Invoke(this, new ListEventArgs(item));
+        OnChanged();
+    }
 
-        item.Parent = this;
-        base.OnItemAdded(item);
+    protected virtual void OnItemRemoved() {
+        ItemRemoved?.Invoke(this, System.EventArgs.Empty);
+        OnChanged();
+    }
 
-        IsSaved = false;
+    protected virtual void OnItemRemoving(BasicPadItem item) {
+        ItemRemoving?.Invoke(this, new ListEventArgs(item));
     }
 
     private void ApplyDesignToItems() {
@@ -719,6 +787,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         OnChanged();
     }
 
+    //    IsSaved = false;
+    //}
     private void CreateConnection(string toParse) {
         if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
 
@@ -767,6 +837,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         item1.ConnectsTo.Add(new ItemConnection(con1, arrow1, item2, con2, arrow2, pm));
     }
 
+    //    item.Parent = this;
+    //    base.OnItemAdded(item);
     private void CreateItems(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key.ToLower()) {
@@ -787,15 +859,38 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         }
     }
 
+    private void Dispose(bool disposing) {
+        IsDisposed = true;
+        foreach (var thisIt in this) {
+            thisIt.Changed -= Item_Changed;
+            thisIt.Dispose();
+        }
+
+        if (disposing) {
+            _sheetStyle = null;
+        }
+    }
+
+    //protected override void OnItemAdded(BasicPadItem item) {
+    //    //if (item == null) {
+    //    //    Develop.DebugPrint(FehlerArt.Fehler, "Null Item soll hinzugefügt werden!");
+    //    //}
+    //    if (string.IsNullOrEmpty(item.KeyName)) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.KeyName);
+    //    }
     private bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, string seite) {
         try {
             if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
-            foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
-                gr.PixelOffsetMode = PixelOffsetMode.None;
-                if (string.IsNullOrEmpty(seite) || thisItem.Page.Equals(seite, StringComparison.OrdinalIgnoreCase)) {
-                    thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
+
+            foreach (var thisItem in this) {
+                if (thisItem != null) {
+                    gr.PixelOffsetMode = PixelOffsetMode.None;
+                    if (string.IsNullOrEmpty(seite) || thisItem.Page.Equals(seite, StringComparison.OrdinalIgnoreCase)) {
+                        thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
+                    }
                 }
             }
+
             return true;
         } catch {
             CollectGarbage();
@@ -834,6 +929,8 @@ public class ItemCollectionPad : ListExt<BasicPadItem> {
         _prRu.SetTo(ssw - rr, ssh - ru);
         _prLu.SetTo(rl, ssh - ru);
     }
+
+    private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 
     private RectangleF MaximumBounds(ICollection<BasicPadItem>? zoomItems) {
         var x1 = float.MaxValue;

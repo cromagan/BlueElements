@@ -378,18 +378,18 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return "dummy" + _dummyCount;
     }
 
-    public static DoItFeedback GetVariableByParsing(string txt, Script? s) {
-        if (string.IsNullOrEmpty(txt)) { return new DoItFeedback(null, "Kein Wert zum Parsen angekommen."); }
+    public static DoItFeedback GetVariableByParsing(string txt, Script? s, LogData ld) {
+        if (string.IsNullOrEmpty(txt)) { return new DoItFeedback(ld, "Kein Wert zum Parsen angekommen."); }
 
         if (txt.StartsWith("(")) {
             var (pose, _) = NextText(txt, 0, KlammerZu, false, false, KlammernStd);
             if (pose < txt.Length - 1) {
                 // Wir haben so einen Fall: (true) || (true)
-                var tmp = GetVariableByParsing(txt.Substring(1, pose - 1), s);
-                if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return new DoItFeedback(null, "Befehls-Berechnungsfehler in ():" + tmp.ErrorMessage); }
-                if (tmp.Variable == null) { return new DoItFeedback(null, "Allgemeiner Befehls-Berechnungsfehler"); }
-                if (!tmp.Variable.ToStringPossible) { return new DoItFeedback(null, "Falscher Variablentyp: " + tmp.Variable.MyClassId); }
-                return GetVariableByParsing(tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s);
+                var tmp = GetVariableByParsing(txt.Substring(1, pose - 1), s, ld);
+                if (!tmp.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler in ()"); }
+                if (tmp.Variable == null) { return new DoItFeedback(ld, "Allgemeiner Befehls-Berechnungsfehler"); }
+                if (!tmp.Variable.ToStringPossible) { return new DoItFeedback(ld, "Falscher Variablentyp: " + tmp.Variable.MyClassId); }
+                return GetVariableByParsing(tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s, ld);
             }
         }
 
@@ -397,36 +397,42 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
         var (uu, _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
         if (uu > 0) {
-            var txt1 = GetVariableByParsing(txt.Substring(0, uu), s);
-            return !string.IsNullOrEmpty(txt1.ErrorMessage)
-                ? new DoItFeedback(null, "Befehls-Berechnungsfehler vor &&: " + txt1.ErrorMessage)
-                : txt1.Variable.ValueForReplace == "false"
-                    ? txt1
-                    : GetVariableByParsing(txt.Substring(uu + 2), s);
+            var txt1 = GetVariableByParsing(txt.Substring(0, uu), s, ld);
+            if (!txt1.AllOk) {
+                return new DoItFeedback(ld, "Befehls-Berechnungsfehler vor &&");
+            }
+
+            if (txt1.Variable.ValueForReplace == "false") {
+                return txt1;
+            }
+            return GetVariableByParsing(txt.Substring(uu + 2), s, ld);
         }
 
         var (oo, _) = NextText(txt, 0, Method_if.OderOder, false, false, KlammernStd);
         if (oo > 0) {
-            var txt1 = GetVariableByParsing(txt.Substring(0, oo), s);
-            return !string.IsNullOrEmpty(txt1.ErrorMessage)
-                ? new DoItFeedback(null, "Befehls-Berechnungsfehler vor ||: " + txt1.ErrorMessage)
-                : txt1.Variable.ValueForReplace == "true"
-                    ? txt1
-                    : GetVariableByParsing(txt.Substring(oo + 2), s);
+            var txt1 = GetVariableByParsing(txt.Substring(0, oo), s, ld);
+            if (!txt1.AllOk) {
+                return new DoItFeedback(ld, "Befehls-Berechnungsfehler vor ||");
+            }
+
+            if (txt1.Variable.ValueForReplace == "true") {
+                return txt1;
+            }
+            return GetVariableByParsing(txt.Substring(oo + 2), s, ld);
         }
 
         if (s != null) {
-            var t = Method.ReplaceVariable(txt, s);
-            if (!string.IsNullOrEmpty(t.ErrorMessage)) { return new DoItFeedback(null, "Variablen-Berechnungsfehler: " + t.ErrorMessage); }
-            if (t.Variable != null) { return new DoItFeedback(null, t.Variable); }
-            if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, s); }
+            var t = Method.ReplaceVariable(txt, s, ld);
+            if (!t.AllOk) { return new DoItFeedback(ld, "Variablen-Berechnungsfehler"); }
+            if (t.Variable != null) { return new DoItFeedback(t.Variable); }
+            if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, s, ld); }
         }
 
         if (s != null) {
-            var t = Method.ReplaceComands(txt, s);
-            if (!string.IsNullOrEmpty(t.ErrorMessage)) { return new DoItFeedback(null, "Befehls-Berechnungsfehler: " + t.ErrorMessage); }
-            if (t.Variable != null) { return new DoItFeedback(null, t.Variable); }
-            if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, s); }
+            var t = Method.ReplaceComands(txt, s, ld);
+            if (!t.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler"); }
+            if (t.Variable != null) { return new DoItFeedback(t.Variable); }
+            if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, s, ld); }
         }
 
         var (posa, _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
@@ -436,27 +442,27 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
             var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
             if (!string.IsNullOrEmpty(tmptxt)) {
-                var tmp = GetVariableByParsing(tmptxt, s);
-                if (!string.IsNullOrEmpty(tmp.ErrorMessage)) { return new DoItFeedback(null, "Befehls-Berechnungsfehler in ():" + tmp.ErrorMessage); }
-                if (tmp.Variable == null) { return new DoItFeedback(null, "Allgemeiner Berechnungsfehler in ()"); }
-                if (!tmp.Variable.ToStringPossible) { return new DoItFeedback(null, "Falscher Variablentyp: " + tmp.Variable.MyClassId); }
-                return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s);
+                var tmp = GetVariableByParsing(tmptxt, s, ld);
+                if (!tmp.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler in ()"); }
+                if (tmp.Variable == null) { return new DoItFeedback(ld, "Allgemeiner Berechnungsfehler in ()"); }
+                if (!tmp.Variable.ToStringPossible) { return new DoItFeedback(ld, "Falscher Variablentyp: " + tmp.Variable.MyClassId); }
+                return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), s, ld);
             }
         }
 
         if (Script.VarTypes == null) {
-            return new DoItFeedback(null, "Variablentypen nicht initialisiert");
+            return new DoItFeedback(ld, "Variablentypen nicht initialisiert");
         }
 
         foreach (var thisVT in Script.VarTypes) {
             if (thisVT.GetFromStringPossible) {
                 if (thisVT.TryParse(txt, out var v, s)) {
-                    return new DoItFeedback(null, v);
+                    return new DoItFeedback(v);
                 }
             }
         }
 
-        return new DoItFeedback(null, "Wert kann nicht geparsed werden: " + txt);
+        return new DoItFeedback(ld, "Wert kann nicht geparsed werden: " + txt);
     }
 
     public static bool IsValidName(string v) {
@@ -477,7 +483,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return 0;
     }
 
-    public abstract DoItFeedback GetValueFrom(Variable attvarAttribute);
+    public abstract DoItFeedback GetValueFrom(Variable variable, LogData ld);
 
     public override void Parse(string toParse) {
         //IsParsing = true;

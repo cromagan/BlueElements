@@ -156,7 +156,7 @@
     <Compile Include="Extensions\SizeFExtension.cs" />
     <Compile Include="Extensions\SortExtensions.cs" />
     <Compile Include="Extensions\StringExtension.cs" />
-    <Compile Include="modErgebnis.cs" />
+    <Compile Include="MathFormulaParser.cs" />
     <Compile Include="Extensions\BooleanExtensions.cs" />
     <Compile Include="Interfaces\ICanBeEmpty.cs" />
     <Compile Include="Generic.cs" />
@@ -170,26 +170,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Application.myapp</DependentUpon>
     </Compile>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="Properties\Settings.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Settings.settings</DependentUpon>
-      <DesignTimeSharedInput>True</DesignTimeSharedInput>
-    </Compile>
     <Compile Include="WindowsThumbnailProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MultiUserFile\MultiUserFile.resx">
       <DependentUpon>MultiUserFile.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
@@ -198,10 +183,6 @@
     <None Include="Properties\Application.myapp">
       <Generator>MyApplicationCodeGenerator</Generator>
       <LastGenOutput>Application.Designer.cs</LastGenOutput>
-    </None>
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -416,9 +397,7 @@
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Balken.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="DatabaseInterfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <EmbeddedResource Include="Ressourcen\Image\Icons\Register.png" />
     <EmbeddedResource Include="Ressourcen\Image\Icons\Registersammlung.png" />

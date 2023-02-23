@@ -18,25 +18,24 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_End : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new();
-
     public override string Description => "Beendet das Skript ohne Fehler.";
-
     public override bool EndlessArgs => false;
-
     public override string EndSequence => ";";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
 
     public override string StartSequence => "";
@@ -52,7 +51,7 @@ internal class Method_End : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         s.EndScript = true;
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -37,11 +38,9 @@ public class Method_CallFilter : Method_Database {
                                             "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
     public override bool EndlessArgs => true;
-
     public override string EndSequence => ");";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
 
     public override string StartSequence => "(";
@@ -55,22 +54,22 @@ public class Method_CallFilter : Method_Database {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "callfilter" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var see = s.Variables.GetSystem("SetErrorEnabled");
-        if (see is not VariableBool seet) { return new DoItFeedback(infos, "SetErrorEnabled Variable nicht gefunden"); }
-        if (seet.ValueBool) { return new DoItFeedback(infos, "'CallFilter' bei FehlerCheck Routinen nicht erlaubt."); }
+        if (see is not VariableBool seet) { return new DoItFeedback(infos.Data, "SetErrorEnabled Variable nicht gefunden"); }
+        if (seet.ValueBool) { return new DoItFeedback(infos.Data, "'CallFilter' bei FehlerCheck Routinen nicht erlaubt."); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
-        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos, "Fehler im Filter"); }
+        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
         //var db = MyDatabase(s);
-        if (allFi[0].Database == null) { return new DoItFeedback(infos, "Datenbankfehler!"); }
+        if (allFi[0].Database == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var r = allFi[0].Database.Row.CalculateFilteredRows(allFi);
-        if (r == null || r.Count == 0) { return new DoItFeedback(infos); }
+        if (r == null || r.Count == 0) { return DoItFeedback.Null(); }
 
         var vs = (VariableString)attvar.Attributes[0];
 
@@ -78,16 +77,19 @@ public class Method_CallFilter : Method_Database {
             if (r != null) {
                 s.Sub++;
                 var s2 = thisR.ExecuteScript(null, vs.ValueString, false, true, s.ChangeValues, 0);
-                if (!string.IsNullOrEmpty(s2.ErrorMessage)) { return new DoItFeedback(infos, "Subroutine '" + vs.ValueString + "' bei Zeile '" + thisR.CellFirstString() + "': " + s2.ErrorMessage); }
+                if (!s2.AllOk) {
+                    infos.Data.Protocol.AddRange(s2.Protocol);
+                    return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs.ValueString + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen");
+                }
                 s.Sub--;
             }
         }
 
-        if (s.Sub < 0) { return new DoItFeedback(infos, "Subroutinen-Fehler"); }
+        if (s.Sub < 0) { return new DoItFeedback(infos.Data, "Subroutinen-Fehler"); }
 
         s.BreakFired = false;
 
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

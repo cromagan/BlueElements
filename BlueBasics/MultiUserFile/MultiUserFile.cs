@@ -38,7 +38,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     #region Fields
 
     public int ReloadDelaySecond = 10;
-    private static readonly ListExt<MultiUserFile> AllFiles = new();
+    private static readonly List<MultiUserFile> AllFiles = new();
 
     private readonly Timer _checker;
 

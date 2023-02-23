@@ -19,24 +19,16 @@ using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System;
-
-using System.Collections.Generic;
-
-using System.Drawing;
-using System.Threading;
-
-using BlueBasics;
-
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using static BlueBasics.Converter;
 using BlueDatabase;
+using BlueScript.Enums;
 
 namespace BlueScript.Methods;
 
 #nullable enable
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_DirectoryExists : Method {
 
     #region Properties
@@ -46,6 +38,7 @@ internal class Method_DirectoryExists : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "DirectoryExists(FilePath)";
@@ -57,17 +50,17 @@ internal class Method_DirectoryExists : Method {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "directoryexists" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var pf = ((VariableString)attvar.Attributes[0]).ValueString;
 
         if (!pf.IsFormat(FormatHolder.Filepath)) {
-            return new DoItFeedback(infos, "Dateipfad ungültig: " + pf);
+            return new DoItFeedback(infos.Data, "Dateipfad ungültig: " + pf);
         }
         //if(pf.IsFormat(FormatHolder.FilepathAndName))
 
-        return new DoItFeedback(infos, IO.DirectoryExists(pf));
+        return new DoItFeedback(IO.DirectoryExists(pf));
     }
 
     #endregion

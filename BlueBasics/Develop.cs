@@ -196,7 +196,7 @@ public static class Develop {
                         endl.Add("<br>");
                         endl.Add("<a href=\"file://" + tmp + "\">Tracelog öffnen</a>");
                     } else {
-                        endl.AddRange(l);
+                        if (l != null) { endl.AddRange(l); }
                     }
                     HTML_AddFoot(endl);
                     endl.Save(TempFile(string.Empty, "Endmeldung", "html"), Encoding.UTF8, true);
@@ -263,11 +263,14 @@ public static class Develop {
 
         OrigingNumberDecimalSeparator = info.NumberDecimalSeparator;
 
-        CultureInfo ci = new("de-DE");
-        ci.NumberFormat.CurrencyGroupSeparator = string.Empty;
-        ci.NumberFormat.NumberGroupSeparator = string.Empty;
-        ci.NumberFormat.PercentGroupSeparator = string.Empty;
-        ci.NumberFormat.NumberDecimalSeparator = ",";
+        CultureInfo ci = new("de-DE") {
+            NumberFormat = {
+                CurrencyGroupSeparator = string.Empty,
+                NumberGroupSeparator = string.Empty,
+                PercentGroupSeparator = string.Empty,
+                NumberDecimalSeparator = ","
+            }
+        };
         Application.CurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentUICulture = ci;
@@ -305,11 +308,15 @@ public static class Develop {
                 Trace.WriteLine("    </table>");
                 Trace.WriteLine("  </body>");
                 Trace.WriteLine(" </html>");
-                Trace.Listeners.Remove(_traceListener);
-                _traceListener.Flush();
-                _traceListener.Close();
-                _traceListener?.Dispose();
-                _traceListener = null;
+
+                if (_traceListener != null) {
+                    Trace.Listeners.Remove(_traceListener);
+                    _traceListener.Flush();
+                    _traceListener.Close();
+                    _traceListener.Dispose();
+                    _traceListener = null;
+                }
+
                 if (_deleteTraceLog && FileExists(_currentTraceLogFile)) { _ = DeleteFile(_currentTraceLogFile, false); }
             }
         } catch {

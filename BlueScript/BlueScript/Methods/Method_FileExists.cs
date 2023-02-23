@@ -17,6 +17,7 @@
 
 using System.Collections.Generic;
 using BlueBasics;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -24,6 +25,8 @@ namespace BlueScript.Methods;
 
 #nullable enable
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_FileExists : Method {
 
     #region Properties
@@ -33,6 +36,7 @@ internal class Method_FileExists : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "FileExists(FilePath)";
@@ -41,13 +45,13 @@ internal class Method_FileExists : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "fileexists" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "fileexists" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        return new DoItFeedback(infos, IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString));
+        return new DoItFeedback(IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString));
     }
 
     #endregion

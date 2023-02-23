@@ -28,6 +28,7 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.EventArgs;
 using FastColoredTextBoxNS;
 
@@ -164,24 +165,26 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         OnExecuteScript(ex);
 
         if (ex.Feedback == null) {
-            var s = new Script(null, string.Empty, true);
-            ex.Feedback = s.Parse(0);
+            var s = new Script(null, string.Empty, true, MethodType.Standard);
+            ex.Feedback = s.Parse(0, "Main");
         }
 
-        grpVariablen.WriteVariablesToTable(ex.Feedback.Variables);
+        grpVariablen.WriteVariablesToTable(ex.Feedback.Variables1);
         WriteComandsToList();
 
-        if (string.IsNullOrEmpty(ex.Feedback.ErrorMessage)) {
+        if (ex.Feedback.AllOk) {
             Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
         } else {
-            if (ex.Feedback.LastlineNo > 0) {
-                var codetxt = ex.Feedback.ErrorCode.RestoreEscape();
-                codetxt = codetxt.Replace("¶", "\r\n");
+            Message(ex.Feedback.ProtocolText);
 
-                Message("Fehler in Zeile: " + ex.Feedback.LastlineNo + "\r\n" + ex.Feedback.ErrorMessage + "\r\n\r\nCode:\r\n~~~~~~\r\n" + codetxt);
-            } else {
-                Message("Fehler: " + ex.Feedback.ErrorMessage);
-            }
+            //if (ex.Feedback.LastlineNo > 0) {
+            //    var codetxt = ex.Feedback.ErrorCode.RestoreEscape();
+            //    codetxt = codetxt.Replace("¶", "\r\n");
+
+            //    Message("Fehler in Zeile: " + ex.Feedback.LastlineNo + "\r\n" + ex.Feedback.ErrorMessage + "\r\n\r\nCode:\r\n~~~~~~\r\n" + codetxt);
+            //} else {
+            //    Message("Fehler: " + ex.Feedback.ErrorMessage);
+            //}
         }
     }
 
@@ -203,11 +206,14 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         try {
             _lastWord = string.Empty;
             _lastVariableContent = string.Empty;
-            foreach (var thisc in Script.Comands.Where(thisc => thisc.Comand(null).Contains(e.HoveredWord, false))) {
-                e.ToolTipTitle = thisc.Syntax;
-                e.ToolTipText = thisc.HintText();
-                return;
+            foreach (var thisc in Script.Comands) {
+                if (thisc.Comand(null).Contains(e.HoveredWord, false)) {
+                    e.ToolTipTitle = thisc.Syntax;
+                    e.ToolTipText = thisc.HintText();
+                    return;
+                }
             }
+
             var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
             _lastWord = hoveredWordnew;
 

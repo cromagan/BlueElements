@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -28,7 +29,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IReadableTextWithChanging, ICanBeEmpty, IDisposableExtended, IErrorCheckable, IHasDatabase {
+public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IReadableTextWithChanging, ICanBeEmpty, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtended {
 
     #region Fields
 
@@ -37,7 +38,6 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     private ColumnItem? _column;
 
     private FilterType _filterType = FilterType.KeinFilter;
-    private string _id;
 
     #endregion
 
@@ -45,22 +45,21 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public FilterItem(DatabaseAbstract database, FilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
 
-    public FilterItem(DatabaseAbstract database, FilterType filterType, IReadOnlyCollection<string> searchValue) {
+    public FilterItem(DatabaseAbstract database, FilterType filterType, IList<string>? searchValue) {
         Database = database;
-        _id = Generic.UniqueInternal();
+        KeyName = Generic.UniqueInternal();
         if (Database != null && !Database.IsDisposed) {
             Database.Disposing += Database_Disposing;
         }
 
         _filterType = filterType;
-        if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
+        if (searchValue != null && searchValue.Count > 0) {
+            SearchValue = new ReadOnlyCollection<string>(searchValue);
+        } else {
+            SearchValue = new ReadOnlyCollection<string>(new List<string>());
+        }
 
-        //if (!IsOk()) {
-        //    Develop.DebugPrint(FehlerArt.Fehler, "Filter fehlerhaft: " + ErrorReason());
-        //    return;
-        //}
         _column?.RefreshColumnsData();
-        SearchValue.Changed += SearchValue_ListOrItemChanged;
     }
 
     public FilterItem(DatabaseAbstract database, string filterCode) {
@@ -68,16 +67,13 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         if (Database != null && !Database.IsDisposed) {
             Database.Disposing += Database_Disposing;
         }
-        _id = Generic.UniqueInternal();
+        KeyName = Generic.UniqueInternal();
+
+        SearchValue = new ReadOnlyCollection<string>(new List<string>());
 
         Parse(filterCode);
 
-        //if (!IsOk()) {
-        //    Develop.DebugPrint(FehlerArt.Fehler, "Filter fehlerhaft: " + ErrorReason());
-        //    return;
-        //}
         _column?.RefreshColumnsData();
-        SearchValue.Changed += SearchValue_ListOrItemChanged;
     }
 
     /// <summary>
@@ -86,15 +82,10 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     /// <param name="filterCode"></param>
 
     public FilterItem(string filterCode) {
-        _id = Generic.UniqueInternal();
+        KeyName = Generic.UniqueInternal();
+        SearchValue = new ReadOnlyCollection<string>(new List<string>());
         Parse(filterCode);
-
-        //if (!IsOk()) {
-        //    Develop.DebugPrint(FehlerArt.Fehler, "Filter fehlerhaft: " + ErrorReason());
-        //    return;
-        //}
         _column?.RefreshColumnsData();
-        SearchValue.Changed += SearchValue_ListOrItemChanged;
     }
 
     public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) { }
@@ -103,12 +94,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public FilterItem(ColumnItem column, FilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, IReadOnlyCollection<string> searchValue, string herkunft) {
-        if (column == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht vorhanden.");
-            return;
-        }
-        _id = Generic.UniqueInternal();
+    public FilterItem(ColumnItem column, FilterType filterType, IList<string>? searchValue, string herkunft) {
+        KeyName = Generic.UniqueInternal();
         Database = column.Database;
         _column = column;
         _filterType = filterType;
@@ -116,14 +103,11 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
         _column?.RefreshColumnsData();
 
-        if (searchValue != null && searchValue.Count > 0) { SearchValue.AddRange(searchValue); }
-
-        //if (!IsOk()) {
-        //    Develop.DebugPrint(FehlerArt.Fehler, "Filter fehlerhaft: " + ErrorReason());
-        //    return;
-        //}
-
-        SearchValue.Changed += SearchValue_ListOrItemChanged;
+        if (searchValue != null && searchValue.Count > 0) {
+            SearchValue = new ReadOnlyCollection<string>(searchValue);
+        } else {
+            SearchValue = new ReadOnlyCollection<string>(new List<string>());
+        }
     }
 
     public FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
@@ -163,36 +147,38 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public bool IsDisposed { get; private set; }
     public bool IsParsing { get; private set; }
-    public string KeyName => _id;
-    public ListExt<string> SearchValue { get; } = new();
+    public string KeyName { get; private set; }
+    public ReadOnlyCollection<string> SearchValue { get; private set; }
 
     #endregion
 
     #region Methods
 
-    public void Changeto(FilterType type, string searchvalue) {
-        SearchValue.ThrowEvents = false;
-        SearchValue.Clear();
-        SearchValue.Add(searchvalue);
+    public void Changeto(FilterType type, IEnumerable<string> searchvalue) {
+        var l = new List<string>();
+        l.AddRange(searchvalue);
+
+        SearchValue = new ReadOnlyCollection<string>(l.SortedDistinctList());
+
         _filterType = type;
-        SearchValue.ThrowEvents = true;
         OnChanged();
     }
 
-    //public object Clone() => new FilterItem(Database, ToString());
+    public void Changeto(FilterType type, string searchvalue) {
+        SearchValue = new ReadOnlyCollection<string>(new List<string> { searchvalue });
 
-    //public string CompareKey() => ((int)_filterType).ToString(Constants.Format_Integer10);
+        _filterType = type;
+        OnChanged();
+    }
 
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~FilterItem()
-    // {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //     Dispose(disposing: false);
-    // }
     public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(true);
-        GC.SuppressFinalize(this);
+        IsDisposed = true;
+
+        Column = null;
+        if (Database != null && !Database.IsDisposed) {
+            if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+            Database = null;
+        }
     }
 
     public string ErrorReason() {
@@ -247,7 +233,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
                 case "columnname":
                 case "column":
-                    _column = Database.Column[pair.Value];
+                    _column = Database?.Column[pair.Value];
                     break;
 
                 case "columnkey":
@@ -255,7 +241,13 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                     break;
 
                 case "value":
-                    _ = SearchValue.AddIfNotExists(pair.Value.FromNonCritical());
+                    var l = new List<string>();
+                    if (SearchValue != null) {
+                        l.AddRange(SearchValue);
+                    }
+
+                    l.Add(pair.Value.FromNonCritical());
+                    SearchValue = new ReadOnlyCollection<string>(l);
                     break;
 
                 case "herkunft":
@@ -263,7 +255,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                     break;
 
                 case "id":
-                    _id = pair.Value.FromNonCritical();
+                    KeyName = pair.Value.FromNonCritical();
                     break;
 
                 default:
@@ -288,7 +280,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                 _ => nam + ": Spezial-Filter"
             };
         }
-        if (_column == Database.Column.SysCorrect && _filterType.HasFlag(FilterType.Istgleich)) {
+        if (_column == Database?.Column.SysCorrect && _filterType.HasFlag(FilterType.Istgleich)) {
             if (SearchValue[0].FromPlusMinus()) { return "Fehlerfreie Zeilen"; }
             if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhafte Zeilen"; }
         }
@@ -342,7 +334,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             if (!IsOk()) { return string.Empty; }
 
             var result = new List<string>();
-            result.ParseableAdd("ID", _id);
+            result.ParseableAdd("ID", KeyName);
             result.ParseableAdd("Type", _filterType);
 
             result.ParseableAdd("Database", Database);
@@ -358,24 +350,6 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-
-    private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-            }
-            Column = null;
-            if (Database != null && !Database.IsDisposed) {
-                if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
-                Database = null;
-            }
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-            IsDisposed = true;
-        }
-    }
-
-    private void SearchValue_ListOrItemChanged(object sender, System.EventArgs e) => OnChanged();
 
     #endregion
 }

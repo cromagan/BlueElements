@@ -26,15 +26,15 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
+using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
+public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     #region Fields
 
-    private DatabaseAbstract? _database;
     private string _lastQuickInfo;
     private string _layoutId;
     private long _rowKey;
@@ -53,11 +53,11 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
     public RowFormulaPadItem(DatabaseAbstract database, long rowkey, string layoutId) : this(string.Empty, database, rowkey, layoutId) { }
 
     public RowFormulaPadItem(string internalname, DatabaseAbstract? database, long rowkey, string layoutId) : base(internalname) {
-        _database = database;
-        if (_database != null) { _database.Disposing += _Database_Disposing; }
+        Database = database;
+        if (Database != null) { Database.Disposing += _Database_Disposing; }
         _rowKey = rowkey;
-        if (_database != null && string.IsNullOrEmpty(layoutId)) {
-            ItemCollectionPad p = new(_database.Layouts[0], string.Empty);
+        if (Database != null && string.IsNullOrEmpty(layoutId)) {
+            ItemCollectionPad p = new(Database.Layouts[0], string.Empty);
             layoutId = p.Id;
         }
         _layoutId = layoutId;
@@ -65,14 +65,14 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
 
     #endregion
 
-    /// <summary>
-    /// Wird von Flexoptions aufgerufen
-    /// </summary>
-
     #region Properties
 
     public static string ClassId => "ROW";
+    public DatabaseAbstract? Database { get; private set; }
 
+    /// <summary>
+    /// Wird von Flexoptions aufgerufen
+    /// </summary>
     public string Datensatz_bearbeiten {
         get => string.Empty;
         set {
@@ -109,7 +109,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
         }
     }
 
-    public RowItem? Row => _database?.Row.SearchByKey(_rowKey);
+    public RowItem? Row => Database?.Row.SearchByKey(_rowKey);
     protected override int SaveOrder => 999;
 
     #endregion
@@ -140,8 +140,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
                 return true;
 
             case "database":
-                _database = DatabaseAbstract.GetById(new ConnectionInfo(value.FromNonCritical(), null), null);
-                _database.Disposing += _Database_Disposing;
+                Database = DatabaseAbstract.GetById(new ConnectionInfo(value.FromNonCritical(), null), null);
+                Database.Disposing += _Database_Disposing;
                 return true;
 
             case "rowid": // TODO: alt
@@ -157,7 +157,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
                     }
                     return true; // Alles beim Alten
                 }
-                var rowtmp = _database.Row[n];
+                var rowtmp = Database.Row[n];
                 if (rowtmp == null) {
                     MessageBox.Show("<b><u>Eintrag nicht hinzugefügt</b></u><br>" + n, ImageCode.Warnung, "OK");
                 } else {
@@ -174,7 +174,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
     public override string ToString() {
         var result = new List<string>();
         result.ParseableAdd("LayoutID", _layoutId);
-        result.ParseableAdd("Database", _database);
+        result.ParseableAdd("Database", Database);
         if (_rowKey != 0) { result.ParseableAdd("RowKey", _rowKey); }
         if (Row is RowItem r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
         return result.Parseable(base.ToString());
@@ -186,7 +186,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
             return;
         }
 
-        CreativePad pad = new(new ItemCollectionPad(_layoutId, _database, _rowKey));
+        CreativePad pad = new(new ItemCollectionPad(_layoutId, Database, _rowKey));
         var re = pad.Item.MaxBounds(null);
 
         var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);
@@ -212,8 +212,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem {
     //}
 
     private void _Database_Disposing(object sender, System.EventArgs e) {
-        _database.Disposing -= _Database_Disposing;
-        _database = null;
+        Database.Disposing -= _Database_Disposing;
+        Database = null;
         RemovePic();
     }
 

@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,8 +27,8 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static List<string> SortedDistinctList(this List<string>? arr) {
-        if (arr == null || arr.Count == 0) { return new List<string>(); }
+    public static List<string> SortedDistinctList(this IEnumerable<string>? arr) {
+        if (arr == null || !arr.Any()) { return new List<string>(); }
 
         var arr2 = arr.Distinct().ToList();
         if (arr2.Contains(string.Empty)) { _ = arr2.Remove(string.Empty); }

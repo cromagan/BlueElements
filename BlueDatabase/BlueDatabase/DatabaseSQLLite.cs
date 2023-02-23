@@ -165,7 +165,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways) {
         if (rows == null || rows.Count == 0) { return false; }
 
-        var l = new ListExt<RowItem>();
+        var l = new List<RowItem>();
 
         foreach (var thisr in rows) {
             if (refreshAlways || thisr.IsInCache == null) {

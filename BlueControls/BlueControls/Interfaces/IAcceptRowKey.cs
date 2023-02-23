@@ -19,6 +19,7 @@
 
 using BlueBasics.Interfaces;
 using BlueDatabase;
+using BlueDatabase.Interfaces;
 
 namespace BlueControls.Interfaces;
 
@@ -26,13 +27,11 @@ namespace BlueControls.Interfaces;
 /// Wird verwendet, wenn ein Steuerelement einen Zeilenschlüssel empfangen
 /// und damit umgehen kann.
 /// </summary>
-public interface IAcceptRowKey : IDisposableExtended {
+public interface IAcceptRowKey : IDisposableExtended, IHasDatabase {
 
-    #region Properties
+    #region Methods
 
-    public DatabaseAbstract? Database { get; set; }
-
-    public long RowKey { get; set; }
+    public void SetData(DatabaseAbstract? database, long? rowkey);
 
     #endregion
 }

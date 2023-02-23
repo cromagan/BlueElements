@@ -21,11 +21,14 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using BlueBasics;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_ReplaceList : Method {
 
     #region Properties
@@ -35,6 +38,7 @@ internal class Method_ReplaceList : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "ReplaceList(ListVariable, CaseSensitive, Partial, SearchValue, ReplaceValue);";
@@ -43,24 +47,24 @@ internal class Method_ReplaceList : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "replacelist" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "replacelist" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
         var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
 
-        if (((VariableString)attvar.Attributes[3]).ValueString == ((VariableString)attvar.Attributes[4]).ValueString) { return new DoItFeedback(infos, "Suchtext und Ersetzungstext sind identisch."); }
-        if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback(infos, "Suchtext und Ersetzungstext sind identisch."); }
+        if (((VariableString)attvar.Attributes[3]).ValueString == ((VariableString)attvar.Attributes[4]).ValueString) { return new DoItFeedback(infos.Data, "Suchtext und Ersetzungstext sind identisch."); }
+        if (!((VariableBool)attvar.Attributes[1]).ValueBool && string.Equals(((VariableString)attvar.Attributes[3]).ValueString, ((VariableString)attvar.Attributes[4]).ValueString, StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback(infos.Data, "Suchtext und Ersetzungstext sind identisch."); }
 
         var ct = 0;
         bool again;
         do {
             ct++;
-            if (ct > 10000) { return new DoItFeedback(infos, "Überlauf bei ReplaceList."); }
+            if (ct > 10000) { return new DoItFeedback(infos.Data, "Überlauf bei ReplaceList."); }
             again = false;
             for (var z = 0; z < tmpList.Count; z++) {
                 if (((VariableBool)attvar.Attributes[2]).ValueBool) {
@@ -95,7 +99,7 @@ internal class Method_ReplaceList : Method {
         } while (again);
 
         ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

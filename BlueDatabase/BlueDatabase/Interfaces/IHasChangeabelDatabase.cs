@@ -19,14 +19,11 @@
 
 namespace BlueDatabase.Interfaces;
 
-public interface IHasChangeabelDatabase {
-    //protected DatabaseAbstract? _database;
+public interface IHasChangeabelDatabase : IHasDatabase {
 
     #region Properties
 
-    public DatabaseAbstract? Database { get; set; }
+    public new DatabaseAbstract? Database { get; set; }
 
     #endregion
-
-    //protected void Database_Disposing(object sender, System.EventArgs e);
 }

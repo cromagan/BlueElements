@@ -18,18 +18,13 @@
 namespace BlueControls.Interfaces;
 
 /// <summary>
-/// Wird verwendet, wenn das Control Werte abgeben und empfagen kann
+/// Wird verwendet, wenn das Control Zeilen abgeben kann, und eine Eingangszeile Empfangen kann.
 /// </summary>
-public interface IAcceptAndSends : IContentHolder, IItemToControl {
+public interface IAcceptAndSends : IItemToControl {
 
     #region Methods
 
-    /// <summary>
-    /// Übrprüft ob eine Rekursivität besteht.
-    /// </summary>
-    /// <param name="obj"></param>
-    /// <returns></returns>
-    public bool IsRecursiveWith(IAcceptAndSends obj);
+    public bool IsVisibleOnPage(string page);
 
     #endregion
 }

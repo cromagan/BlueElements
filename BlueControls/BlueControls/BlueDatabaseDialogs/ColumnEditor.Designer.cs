@@ -1232,7 +1232,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.HotTrack = true;
             this.tabControl.Location = new Point(0, 136);
             this.tabControl.Name = "tabControl";
-            this.tabControl.RowKey = ((long)(-1));
             this.tabControl.SelectedIndex = 0;
             this.tabControl.Size = new Size(1001, 512);
             this.tabControl.TabDefault = this.tabDatenFormat;

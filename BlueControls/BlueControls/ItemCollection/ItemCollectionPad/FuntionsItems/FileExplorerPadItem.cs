@@ -28,7 +28,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
-public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
+public class FileExplorerPadItem : CustomizableShowPadItem {
 
     #region Fields
 
@@ -72,7 +72,7 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemToControl {
 
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
-            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
+            if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
         }
         return con;
     }

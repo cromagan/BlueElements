@@ -18,12 +18,15 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_IsDateTime : Method {
 
     #region Properties
@@ -33,6 +36,7 @@ internal class Method_IsDateTime : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "IsDateTime(Value)";
@@ -44,10 +48,10 @@ internal class Method_IsDateTime : Method {
     public override List<string> Comand(List<Variable>? currentvariables) => new() { "isdatetime" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(infos); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
         var ok = DateTimeTryParse(((VariableString)attvar.Attributes[0]).ValueString, out _);
-        return ok ? DoItFeedback.Wahr(infos) : DoItFeedback.Falsch(infos);
+        return ok ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 
     #endregion

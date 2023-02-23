@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using BlueBasics;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -38,6 +39,7 @@ internal class Method_Call : Method_Database {
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "Call(SubName, KeepVariables);";
@@ -49,20 +51,20 @@ internal class Method_Call : Method_Database {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "call" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var vs = (VariableString)attvar.Attributes[0];
 
         var db = MyDatabase(s.Variables);
-        if (db == null) { return new DoItFeedback(infos, "Datenbankfehler!"); }
+        if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var sc = db.EventScript.Get(vs.ValueString);
 
-        if (sc == null) { return new DoItFeedback(infos, "Skript nicht vorhanden: " + vs.ValueString); }
+        if (sc == null) { return new DoItFeedback(infos.Data, "Skript nicht vorhanden: " + vs.ValueString); }
         var f = Script.ReduceText(sc.Script);
 
-        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, f, ((VariableBool)attvar.Attributes[1]).ValueBool, 0, "Subroutine " + vs.ValueString);
+        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, "Subroutinen-Aufruf [" + vs.ValueString + "]", f, ((VariableBool)attvar.Attributes[1]).ValueBool, 0, vs.ValueString);
         s.BreakFired = false;
 
         return scx;

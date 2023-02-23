@@ -96,8 +96,8 @@ public class ListExt<T> : List<T>, IChangedFeedback, IDisposableExtended {
 
             if (base[index] is string s1 && value is string s2 && s1 == s2) { return; }
 
-            if (base[index] != null) {
-                OnItemRemoving(base[index]);
+            if (base[index] is T bi) {
+                OnItemRemoving(bi);
                 base[index] = value;
                 OnItemRemoved();
             } else {

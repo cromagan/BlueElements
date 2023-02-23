@@ -63,7 +63,7 @@ public static partial class Extensions {
     /// <typeparam name="T"></typeparam>
     /// <param name="list1"></param>
     /// <param name="list2"></param>
-    public static void CloneFrom<T>(this IList<T?> list1, IList<T?> list2) where T : IComparable {
+    public static void CloneFrom<T>(this IList<T> list1, IList<T> list2) where T : IComparable {
         if (!list1.IsDifferentTo(list2)) { return; }
 
         //if (list2 == null) { list1 = null; return; }
@@ -76,9 +76,9 @@ public static partial class Extensions {
         for (var z = 0; z < list2.Count; z++) {
             if (z >= list1.Count) { list1.Add(list2[z]); }
 
-            if (list2[z] != null && !list1[z].Equals(list2[z])) { list1[z] = list2[z]; }
+            if (!list1[z].Equals(list2[z])) { list1[z] = list2[z]; }
 
-            if (list1[z] != null && list2[z] == null) { list1[z] = default; }
+            //if (list1[z] != null && list2[z] == null) { list1[z] = default; }
         }
 
         while (list1.Count > list2.Count) {
@@ -101,7 +101,7 @@ public static partial class Extensions {
         return l2;
     }
 
-    public static bool IsDifferentTo<T>(this ICollection<T>? list1, ICollection<T>? list2) =>
+    public static bool IsDifferentTo<T>(this IEnumerable<T>? list1, IEnumerable<T>? list2) =>
             // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
             list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
@@ -275,7 +275,9 @@ public static partial class Extensions {
         }
     }
 
-    public static void RemoveString(this IList<string?> l, string value, bool caseSensitive) {
+    public static void RemoveString(this IList<string>? l, string value, bool caseSensitive) {
+        if (l == null || l.Count == 0) { return; }
+
         var cas = StringComparison.OrdinalIgnoreCase;
         if (!caseSensitive) { cas = StringComparison.Ordinal; }
         var z = 0;
@@ -312,21 +314,6 @@ public static partial class Extensions {
         WriteAllText(dateiName, t, code, executeAfter);
     }
 
-    // public static bool IsDifferentTo<T>(this List<T> List1, List<T> List2) where T : IParseable
-    // {
-    //    if (List1.Count != List2.Count) { return true; }
-    // return List1.Where((t, Count) => t.ToString(false) != List2[Count].ToString(false)).Any();
-    // }
-    // public static bool IsDifferentTo(this List<string> List1, List<string> List2)
-    // {
-    //    if (List1.Count != List2.Count) { return true; }
-    // return List1.Where((t, Count) => t != List2[Count]).Any();
-    // }
-    // public static bool IsDifferentTo(this List<string> List1, BindingList<string> List2)
-    // {
-    //    if (List1.Count != List2.Count) { return true; }
-    // return List1.Where((t, Count) => t != List2[Count]).Any();
-    // }
     public static void Shuffle<T>(this IList<T> list) {
         for (var i1 = 0; i1 < list.Count; i1++) {
             var i2 = Constants.GlobalRND.Next(i1, list.Count);

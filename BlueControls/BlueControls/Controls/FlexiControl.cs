@@ -75,7 +75,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private string _infoText = string.Empty;
     private int _maxTextLenght = 4000;
     private bool _multiLine;
-    private bool _pauseValueChanged;
     private string _regex = string.Empty;
     private bool _showInfoWhenDisabled;
     private bool _spellChecking;
@@ -266,16 +265,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     public string OriginalText { get; set; } = string.Empty;
-
-    [DefaultValue(false)]
-    public bool PauseValueChanged {
-        get => _pauseValueChanged;
-        set {
-            if (_pauseValueChanged == value) { return; }
-            _pauseValueChanged = value;
-            RaiseEventIfChanged();
-        }
-    }
 
     [Browsable(false)]
     [DefaultValue("")]
@@ -731,7 +720,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void _IdleTimer_Tick(object sender, System.EventArgs e) {
         if (LastTextChange == null) { return; }
-        if (_pauseValueChanged) { return; }
         if (DateTime.UtcNow.Subtract((DateTime)LastTextChange).TotalSeconds < 20) { return; }
         _ = Focus(); // weitere Tastatureingabn verhindern. Z.B: wenn was mariert wird und dann entfernen gedrück wird. Wenn die Box neu sortiert wird, ist dsa ergebnis nicht schön
         RaiseEventIfChanged();
@@ -949,7 +937,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void RaiseEventIfChanged() {
         if (LastTextChange == null) { return; }
-        if (_pauseValueChanged) { return; }
         if (IsDisposed) { return; }
         LastTextChange = null;
         OnValueChanged();

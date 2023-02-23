@@ -32,12 +32,13 @@ using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
+using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
 
-public sealed partial class ExportDialog {
+public sealed partial class ExportDialog : IHasDatabase {
 
     #region Fields
 

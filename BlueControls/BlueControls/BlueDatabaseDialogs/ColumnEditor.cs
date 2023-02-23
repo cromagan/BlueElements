@@ -541,9 +541,11 @@ internal sealed partial class ColumnEditor {
             var dd = b.DropDownItems.Clone();
             var or = b.OpticalReplace.Clone();
 
-            foreach (var thisColumn in _column.Database.Column.Where(thisColumn => thisColumn.Format.CanBeCheckedByRules() && !thisColumn.MultiLine)) {
-                dd.Add("~" + thisColumn.Name.ToLower() + "~");
-                or.Add("~" + thisColumn.Name.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
+            foreach (var thisColumn in _column.Database.Column) {
+                if (thisColumn.Format.CanBeCheckedByRules() && !thisColumn.MultiLine) {
+                    dd.Add("~" + thisColumn.Name.ToLower() + "~");
+                    or.Add("~" + thisColumn.Name.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
+                }
             }
 
             b.DropDownItems = new ReadOnlyCollection<string>(dd);

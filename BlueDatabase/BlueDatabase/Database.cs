@@ -54,7 +54,7 @@ public sealed class Database : DatabaseAbstract {
     private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : base(tablename, readOnly) {
         //Develop.StartService();
 
-        Works = new ListExt<WorkItem>();
+        Works = new List<WorkItem>();
 
         Initialize();
 
@@ -426,7 +426,7 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public static List<byte> ToListOfByte(DatabaseAbstract db, List<WorkItem>? works) {
+    public static List<byte>? ToListOfByte(DatabaseAbstract db, List<WorkItem>? works) {
         try {
             List<byte> l = new();
             // Wichtig, Reihenfolge und Länge NIE verändern!
@@ -499,6 +499,12 @@ public sealed class Database : DatabaseAbstract {
             if (works2.Count > db.UndoCount) { works2.RemoveRange(0, works2.Count - db.UndoCount); }
             SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.9)));
             SaveToByteList(l, DatabaseDataType.EOF, "END");
+
+            if (l.Count < 5000) {
+                //Develop.DebugPrint(FehlerArt.Fehler, "ToString Fehler!");
+                return null;
+            }
+
             return l;
         } catch {
             return ToListOfByte(db, works);
@@ -683,6 +689,9 @@ public sealed class Database : DatabaseAbstract {
         Filename = newFileName;
 
         var l = ToListOfByte(this, Works);
+
+        if (l == null) { return; }
+
         using FileStream x = new(newFileName, FileMode.Create, FileAccess.Write, FileShare.None);
         x.Write(l.ToArray(), 0, l.ToArray().Length);
         x.Flush();
@@ -856,7 +865,10 @@ public sealed class Database : DatabaseAbstract {
         var f = ErrorReason(BlueBasics.Enums.ErrorReason.Save);
         if (!string.IsNullOrEmpty(f)) { return string.Empty; }
 
-        var dataUncompressed = ToListOfByte(this, Works).ToArray();
+        var dataUncompressed = ToListOfByte(this, Works)?.ToArray();
+
+        if (dataUncompressed == null) { return string.Empty; }
+
         var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName().ToUpper());
 
         using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);

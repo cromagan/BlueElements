@@ -121,7 +121,7 @@
     <Compile Include="Forms\FormWithStatusBar.designer.cs">
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\IHasDatabase.cs" />
+    <Compile Include="Interfaces\IHasConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormulaView.cs">
       <SubType>Component</SubType>
@@ -309,7 +309,6 @@
     <Compile Include="Interfaces\ICalculateRowsItemLevel.cs" />
     <Compile Include="Interfaces\IDisabledReason.cs" />
     <Compile Include="Interfaces\ICalculateRowsControlLevel.cs" />
-    <Compile Include="Interfaces\IContenHolder.cs" />
     <Compile Include="Interfaces\IAcceptRowKey.cs" />
     <Compile Include="Interfaces\IItemToControl.cs" />
     <Compile Include="Interfaces\IAcceptAndSends.cs" />
@@ -324,15 +323,12 @@
     <Compile Include="ItemCollection\ItemCollectionList\ReadableListItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EasyPicPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\DatabaseSourcePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\TabFormulaPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\CustomizableShowPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowInputPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\VariableFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\FileExplorerPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\EditFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\ConstantTextPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems\RowWithFilterPadItem.cs" />
     <Compile Include="ItemCollection\ItemConnection.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\PhysicPadItem.cs" />
@@ -348,11 +344,6 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="clsDesign.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="ScriptEditor.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -790,10 +781,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmBefehlsreferenz.resx">
       <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="ScriptEditor.resx">
       <DependentUpon>ScriptEditor.cs</DependentUpon>

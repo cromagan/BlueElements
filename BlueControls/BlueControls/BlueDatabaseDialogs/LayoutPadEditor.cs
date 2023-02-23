@@ -28,12 +28,13 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using BlueDatabase.Interfaces;
 using static BlueBasics.IO;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public partial class LayoutPadEditor : PadEditorWithFileAccess {
+public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
 
     #region Fields
 
@@ -101,7 +102,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
             } else {
                 DisablePad();
                 TextPadItem x = new("x", "Nicht editierbares Layout aus dem Dateisystem");
-                Pad.Item.Add(x);
+                Pad?.Item.Add(x);
                 x.Stil = PadStyles.Style_Überschrift_Haupt;
                 x.SetCoordinates(new RectangleF(0, 0, 1000, 400), true);
                 ItemChanged();
@@ -129,8 +130,10 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess {
 
     private void btnCopyID_Click(object sender, System.EventArgs e) {
         SaveCurrentLayout();
-        _ = Generic.CopytoClipboard(Pad.Item.Id);
-        Notification.Show("ID kopiert.", ImageCode.Clipboard);
+        if (Pad.Item?.Id != null) {
+            _ = Generic.CopytoClipboard(Pad.Item.Id);
+            Notification.Show("ID kopiert.", ImageCode.Clipboard);
+        }
     }
 
     private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {

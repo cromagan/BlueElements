@@ -125,9 +125,8 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         aa.Check(ca.PermissionGroups_Show, true);
         var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, AddType.Text, true);
         if (b == null) { return; }
-        ca.PermissionGroups_Show.Clear();
-        ca.PermissionGroups_Show.AddRange(b.ToArray());
-        if (_arrangement == 1) { ca.PermissionGroups_Show.Add("#Everybody"); }
+        if (_arrangement == 1) { b.Add("#Everybody"); }
+        ca.PermissionGroups_Show = new ReadOnlyCollection<string>(b);
     }
 
     private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {

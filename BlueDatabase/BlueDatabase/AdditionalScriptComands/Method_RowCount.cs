@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -30,13 +31,10 @@ public class Method_RowCount : Method_Database {
 
     public override List<List<string>> Args => new() { new List<string> { VariableFilterItem.ShortName_Variable } };
     public override string Description => "Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.";
-
     public override bool EndlessArgs => true;
-
     public override string EndSequence => ")";
-
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
 
@@ -46,18 +44,18 @@ public class Method_RowCount : Method_Database {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "rowcount" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "rowcount" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-        if (allFi is null) { return new DoItFeedback(infos, "Fehler im Filter"); }
+        if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
         var r = RowCollection.MatchesTo(allFi);
 
-        return new DoItFeedback(infos, r.Count);
+        return new DoItFeedback(r.Count);
     }
 
     #endregion

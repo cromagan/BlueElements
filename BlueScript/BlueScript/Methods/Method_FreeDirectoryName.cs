@@ -19,12 +19,15 @@
 
 using System.Collections.Generic;
 using BlueBasics;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_FreeDirectoryName : Method {
 
     #region Properties
@@ -34,7 +37,7 @@ internal class Method_FreeDirectoryName : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "FreeDirectoryName(Path)";
@@ -43,17 +46,17 @@ internal class Method_FreeDirectoryName : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "freedirectoryname" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "freedirectoryname" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
 
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var pf = ((VariableString)attvar.Attributes[0]).ValueString;
 
         if (!DirectoryExists(pf)) {
-            return new DoItFeedback(infos, "Verzeichnis existiert nicht");
+            return new DoItFeedback(infos.Data, "Verzeichnis existiert nicht");
         }
 
         var zeichen = Constants.Char_AZ.ToLower() + Constants.Char_Numerals + Constants.Char_AZ.ToUpper();
@@ -67,7 +70,7 @@ internal class Method_FreeDirectoryName : Method {
             }
 
             if (!DirectoryExists(pf + p)) {
-                return new DoItFeedback(infos, p, string.Empty);
+                return new DoItFeedback(p);
             }
         } while (true);
     }

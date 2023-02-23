@@ -266,7 +266,6 @@ namespace BlueControls.Forms {
             this.tabSeiten.HotTrack = true;
             this.tabSeiten.Location = new Point(0, 110);
             this.tabSeiten.Name = "tabSeiten";
-            this.tabSeiten.RowKey = ((long)(-1));
             this.tabSeiten.SelectedIndex = 0;
             this.tabSeiten.Size = new Size(884, 26);
             this.tabSeiten.TabDefault = null;

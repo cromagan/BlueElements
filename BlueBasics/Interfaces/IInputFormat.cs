@@ -18,22 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Linq;
-using BlueBasics;
 using BlueBasics.Enums;
-using System;
-
-using System.Collections.Generic;
-
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
-
-using BlueBasics;
-using BlueBasics.Enums;
-
-using BlueBasics.Interfaces;
-using static BlueBasics.Converter;
 
 namespace BlueBasics.Interfaces;
 
@@ -99,35 +84,55 @@ public static class IInputFormatExtensions {
 
         if (txt.Length > formatToCheck.MaxTextLenght) { return false; }
 
-        foreach (var thisString in l.Where(thisString => !string.IsNullOrEmpty(thisString))) {
-            if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) { return false; }
-            if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) { return false; }
+        foreach (var thisString in l) {
+            if (!string.IsNullOrEmpty(thisString)) {
+                if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) {
+                    return false;
+                }
 
-            switch (formatToCheck.AdditionalFormatCheck) {
-                case AdditionalCheck.None:
-                    break;
+                if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) {
+                    return false;
+                }
 
-                case AdditionalCheck.Integer:
-                    if (!thisString.IsLong()) { return false; }
-                    break;
+                switch (formatToCheck.AdditionalFormatCheck) {
+                    case AdditionalCheck.None:
+                        break;
 
-                case AdditionalCheck.Float:
-                    if (!thisString.IsDouble()) { return false; }
-                    break;
+                    case AdditionalCheck.Integer:
+                        if (!thisString.IsLong()) {
+                            return false;
+                        }
 
-                case AdditionalCheck.DateTime:
-                    if (!thisString.IsDateTime()) { return false; }
-                    break;
+                        break;
 
-                case AdditionalCheck.Path:
-                    if (thisString.Contains("\\\\")) { return false; }
-                    break;
+                    case AdditionalCheck.Float:
+                        if (!thisString.IsDouble()) {
+                            return false;
+                        }
 
-                default:
-                    Develop.DebugPrint(formatToCheck.AdditionalFormatCheck);
-                    break;
+                        break;
+
+                    case AdditionalCheck.DateTime:
+                        if (!thisString.IsDateTime()) {
+                            return false;
+                        }
+
+                        break;
+
+                    case AdditionalCheck.Path:
+                        if (thisString.Contains("\\\\")) {
+                            return false;
+                        }
+
+                        break;
+
+                    default:
+                        Develop.DebugPrint(formatToCheck.AdditionalFormatCheck);
+                        break;
+                }
             }
         }
+
         return true;
         //return l.All(thisString => string.IsNullOrEmpty(thisString) || thisString.IsFormat(format, additionalRegex));
     }

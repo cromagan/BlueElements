@@ -18,7 +18,9 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Data.Common;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -37,6 +39,8 @@ public class Method_SetError : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
 
+    public override MethodType MethodType => MethodType.MyDatabaseRow;
+
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
 
@@ -49,33 +53,25 @@ public class Method_SetError : Method_Database {
     public override List<string> Comand(List<Variable>? currentvariables) => new() { "seterror" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var see = s.Variables.GetSystem("SetErrorEnabled");
-        if (see is not VariableBool seet) { return new DoItFeedback(infos, "SetErrorEnabled Variable nicht gefunden"); }
-        if (!seet.ValueBool) { return new DoItFeedback(infos, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
+        if (see is not VariableBool seet) { return new DoItFeedback(infos.Data, "SetErrorEnabled Variable nicht gefunden"); }
+        if (!seet.ValueBool) { return new DoItFeedback(infos.Data, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
+
+        var r = MyRow(s.Variables);
+        if (r == null) { return new DoItFeedback(infos.Data, "Interner Fehler, Zeile nicht gefunden"); }
+
+        r.LastCheckedRowFeedback ??= new List<string>();
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(s.Variables, attvar.Attributes[z].Name);
-            if (column == null) { return new DoItFeedback(infos, "Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
-
-            MyDatabase(s.Variables)?.Row.LastCheckedRowFeedback.Add(attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString);
-
-            //var n = attvar.Attributes[z].Name.ToLower() + "_error";
-            //var ve = s.Variablen.GetSystem(n);
-            //if (ve == null) {
-            //    ve = new Variable(n, string.Empty, enVariableDataType.List, false, true, string.Empty);
-            //    s.Variablen.GenerateAndAdd(ve);
-            //}
-            //ve.Readonly = false;
-            //var l = ve.ValueListString;
-            //l.AddIfNotExists(((VariableString)attvar.Attributes[0]).ValueString);
-            //ve.ValueListString = l;
-            //ve.Readonly = true;
+            if (column == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
+            r.LastCheckedRowFeedback.Add(attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString);
         }
 
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

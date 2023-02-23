@@ -23,27 +23,7 @@ using System.Collections.ObjectModel;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using static BlueDatabase.FormatHolder;
-
-using System;
-using System.Collections.Generic;
-
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
-using BlueBasics;
-
-using BlueBasics.Enums;
-
 using BlueBasics.Interfaces;
-
-using BlueDatabase.Enums;
-
-using BlueDatabase.EventArgs;
-
-using BlueDatabase.Interfaces;
-
-using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 

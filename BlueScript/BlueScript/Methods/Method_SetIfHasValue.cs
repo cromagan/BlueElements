@@ -18,21 +18,24 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_SetIfHasValue : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable }, new List<string> { Variable.Any_Plain } };
-
     public override string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht und einen Wert enthält in die erste Variable.\r\nDabei müssen die Datentypen übereinstimmen.\r\nFalls einer der Werte ein Variable ist, die nicht existiert, wird diese einfach übergangen.\r\nAls 'kein Wert' wird bei Zahlen ebenfalls 0 gewertet.\r\nListen, die einen Eintrag haben (auch wenn dessen Wert leer ist), zählt >nicht< als kein Eintrag.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "SetIfHasValue(Variable, Werte, ...);";
@@ -41,48 +44,48 @@ internal class Method_SetIfHasValue : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "SetIfHasValue" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "SetIfHasValue" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos); }
+        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableUnknown) { continue; }
-            if (attvar.Attributes[z].MyClassId != attvar.Attributes[0].MyClassId) { return new DoItFeedback(infos, "Variablentyp zur Ausgangsvariable unterschiedlich."); }
+            if (attvar.Attributes[z].MyClassId != attvar.Attributes[0].MyClassId) { return new DoItFeedback(infos.Data, "Variablentyp zur Ausgangsvariable unterschiedlich."); }
 
             switch (attvar.Attributes[z]) {
                 case VariableFloat vf:
                     if (vf.ValueNum != 0) {
                         ((VariableFloat)attvar.Attributes[0]).ValueNum = vf.ValueNum;
-                        return DoItFeedback.Null(infos);
+                        return DoItFeedback.Null();
                     }
                     break;
 
                 case VariableString vs:
                     if (!string.IsNullOrEmpty(vs.ValueString)) {
                         ((VariableString)attvar.Attributes[0]).ValueString = vs.ValueString;
-                        return DoItFeedback.Null(infos);
+                        return DoItFeedback.Null();
                     }
                     break;
 
                 case VariableBool vs:
 
                     ((VariableBool)attvar.Attributes[0]).ValueBool = vs.ValueBool;
-                    return DoItFeedback.Null(infos);
+                    return DoItFeedback.Null();
 
                 case VariableListString vl:
                     if (vl.ValueList != null) {
                         ((VariableListString)attvar.Attributes[0]).ValueList = vl.ValueList;
-                        return DoItFeedback.Null(infos);
+                        return DoItFeedback.Null();
                     }
                     break;
             }
         }
 
-        return DoItFeedback.Null(infos);
+        return DoItFeedback.Null();
     }
 
     #endregion

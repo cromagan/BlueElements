@@ -18,11 +18,14 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Exists : Method {
 
     #region Properties
@@ -32,6 +35,7 @@ internal class Method_Exists : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;
 
     public override string StartSequence => "(";
@@ -41,11 +45,11 @@ internal class Method_Exists : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "exists" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "exists" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.Falsch(infos) : DoItFeedback.Wahr(infos);
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 
     #endregion

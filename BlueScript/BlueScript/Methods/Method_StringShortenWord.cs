@@ -19,12 +19,15 @@
 
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_StringShortenWord : Method {
 
     #region Properties
@@ -34,6 +37,7 @@ internal class Method_StringShortenWord : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "StringShortenWord(String)";
@@ -42,14 +46,14 @@ internal class Method_StringShortenWord : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "stringshortenword" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "stringshortenword" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         var txt = ((VariableString)attvar.Attributes[0]).ValueString;
         if (string.IsNullOrEmpty(txt)) {
-            return new DoItFeedback(infos, txt, string.Empty);
+            return new DoItFeedback(txt);
         }
         //TXT = TXT.HTMLSpecialToNormalChar();
         txt = txt.Replace("Sekunden", "Sek.");
@@ -109,7 +113,7 @@ internal class Method_StringShortenWord : Method {
         }
         txt = txt.Replace("Tiefkühl", "TK-");
         //TXT = TXT.CreateHtmlCodes(true);
-        return new DoItFeedback(infos, txt, string.Empty);
+        return new DoItFeedback(txt);
     }
 
     #endregion

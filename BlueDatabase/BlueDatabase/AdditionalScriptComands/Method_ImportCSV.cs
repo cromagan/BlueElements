@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueScript;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -33,7 +34,7 @@ internal class Method_ImportCSV : Method_Database {
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
-
+    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
 
     public override string StartSequence => "(";
@@ -46,20 +47,20 @@ internal class Method_ImportCSV : Method_Database {
     public override List<string> Comand(List<Variable> currentvariables) => new() { "importcsv" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos, this, attvar); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var txt = ((VariableString)attvar.Attributes[0]).ValueString;
         var sep = ((VariableString)attvar.Attributes[1]).ValueString;
 
         var db = MyDatabase(s.Variables);
-        if (db == null) { return new DoItFeedback(infos, "Datenbankfehler!"); }
-        if (db?.ReadOnly ?? true) { return new DoItFeedback(infos, "Datenbank schreibgeschützt."); }
-        if (!s.ChangeValues) { return new DoItFeedback(infos, "Import im Testmodus deaktiviert."); }
+        if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
+        if (db?.ReadOnly ?? true) { return new DoItFeedback(infos.Data, "Datenbank schreibgeschützt."); }
+        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Import im Testmodus deaktiviert."); }
 
         var sx = db?.Import(txt, true, true, sep, false, false, true);
 
-        return new DoItFeedback(infos, sx ?? "Datenbank nicht gefunden");
+        return new DoItFeedback(infos.Data, sx ?? "Datenbank nicht gefunden");
     }
 
     #endregion

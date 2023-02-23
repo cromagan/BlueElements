@@ -23,18 +23,6 @@ namespace BlueScript.Structures;
 
 public readonly struct SplittedAttributesFeedback {
 
-    #region Fields
-
-    public readonly List<Variable> Attributes;
-
-    public readonly string ErrorMessage;
-
-    public readonly ScriptIssueType FehlerTyp;
-
-    #endregion
-
-    //public readonly int NextLine;
-
     #region Constructors
 
     public SplittedAttributesFeedback(List<Variable> atts) {
@@ -48,6 +36,16 @@ public readonly struct SplittedAttributesFeedback {
         ErrorMessage = error;
         FehlerTyp = type;
     }
+
+    #endregion
+
+    #region Properties
+
+    public List<Variable> Attributes { get; }
+
+    public string ErrorMessage { get; }
+
+    public ScriptIssueType FehlerTyp { get; }
 
     #endregion
 }

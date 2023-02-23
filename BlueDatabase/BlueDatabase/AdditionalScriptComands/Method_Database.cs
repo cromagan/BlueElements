@@ -47,5 +47,13 @@ public abstract class Method_Database : Method {
         return null;
     }
 
+    protected RowItem? MyRow(List<Variable>? variables) {
+        if (variables != null) {
+            var f = variables.GetSystem("RowKey");
+            if (f is VariableRowItem db) { return db.RowItem; }
+        }
+        return null;
+    }
+
     #endregion
 }

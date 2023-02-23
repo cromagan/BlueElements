@@ -54,7 +54,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
+public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase {
 
     #region Fields
 
@@ -920,7 +920,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         ImportCsv(nt);
     }
 
-    public void ImportCsv(string csvtxt) => ImportCsv(Database, csvtxt);
+    public void ImportCsv(string csvtxt) {
+        if (Database == null || Database.IsDisposed) { return; }
+        ImportCsv(Database, csvtxt);
+    }
 
     public void Invalidate_AllColumnArrangements() {
         if (Database == null || Database.IsDisposed) { return; }
@@ -1660,7 +1663,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         toDraw ??= string.Empty;
 
-     
         if (!ShowMultiLine(toDraw, contentHolderCellColumn.MultiLine)) {
             Draw_CellTransparentDirect_OneLine(gr, toDraw, contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state);
         } else {
@@ -2923,9 +2925,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return 0;
         }
         _headSize = 16;
-        foreach (var thisViewItem in CurrentArrangement.Where(thisViewItem => thisViewItem?.Column != null)) {
-            _headSize = Math.Max((int)_headSize, (int)ColumnHead_Size(thisViewItem.Column).Height);
+        foreach (var thisViewItem in CurrentArrangement) {
+            if (thisViewItem?.Column != null) {
+                _headSize = Math.Max((int)_headSize, (int)ColumnHead_Size(thisViewItem.Column).Height);
+            }
         }
+
         _headSize += 8;
         _headSize += AutoFilterSize;
         return (int)_headSize;
@@ -2943,9 +2948,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void Invalidate_Filterinfo() {
         if (Database == null || Database.IsDisposed) { return; }
 
-        foreach (var thisColumn in Database.Column.Where(thisColumn => thisColumn != null)) {
-            thisColumn.TmpIfFilterRemoved = null;
-            thisColumn.TmpAutoFilterSinnvoll = null;
+        foreach (var thisColumn in Database.Column) {
+            if (thisColumn != null) {
+                thisColumn.TmpIfFilterRemoved = null;
+                thisColumn.TmpAutoFilterSinnvoll = null;
+            }
         }
     }
 

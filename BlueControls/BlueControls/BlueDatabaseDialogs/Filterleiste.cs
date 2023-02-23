@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -170,9 +169,12 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         if (_tableView?.Database != null && _tableView.Filter != null) {
             List<ColumnItem?> columSort = new();
             ColumnViewCollection? orderArrangement = null;
-            foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => string.Equals(thisArr.Name, AnsichtName, StringComparison.OrdinalIgnoreCase))) {
-                orderArrangement = thisArr;
+            foreach (var thisArr in _tableView.Database.ColumnArrangements) {
+                if (string.Equals(thisArr.Name, AnsichtName, StringComparison.OrdinalIgnoreCase)) {
+                    orderArrangement = thisArr;
+                }
             }
+
             orderArrangement ??= _tableView?.CurrentArrangement;
 
             #region Reihenfolge der Spalten bestimmen
@@ -298,21 +300,23 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         }
 
         btnAlleFilterAus_Click(null, null);
-        foreach (var thiscolumnitem in _ähnliche.Where(thiscolumnitem => thiscolumnitem.Column.AutoFilterSymbolPossible())) {
-            if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
-                FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal,
-                    string.Empty);
-                _tableView.Filter.Add(fi);
-            } else if (thiscolumnitem.Column.MultiLine) {
-                var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
-                FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
-                _tableView.Filter.Add(fi);
-            } else {
-                var l = r[0].CellGetString(thiscolumnitem.Column);
-                FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
-                _tableView.Filter.Add(fi);
+        foreach (var thiscolumnitem in _ähnliche) {
+            if (thiscolumnitem.Column.AutoFilterSymbolPossible()) {
+                if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
+                    FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
+                    _tableView.Filter.Add(fi);
+                } else if (thiscolumnitem.Column.MultiLine) {
+                    var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
+                    FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
+                    _tableView.Filter.Add(fi);
+                } else {
+                    var l = r[0].CellGetString(thiscolumnitem.Column);
+                    FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
+                    _tableView.Filter.Add(fi);
+                }
             }
         }
+
         btnÄhnliche.Enabled = false;
     }
 
@@ -416,7 +420,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             var v = flx.Value; //.Trim("|");
             if (_tableView.Filter == null || _tableView.Filter.Count == 0 || !_tableView.Filter.Contains(flx.Filter)) {
                 if (isFilter) { flx.Filter.FilterType = FilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werden
-                flx.Filter.SearchValue[0] = v;
+                flx.Filter.Changeto(flx.Filter.FilterType, v);
                 _tableView.Filter.Add(flx.Filter);
                 return;
             }
@@ -440,8 +444,10 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     private void GetÄhnlich() {
         _ähnliche = null;
         if (_tableView?.Database != null && !string.IsNullOrEmpty(_ähnlicheAnsichtName)) {
-            foreach (var thisArr in _tableView.Database.ColumnArrangements.Where(thisArr => string.Equals(thisArr.Name, _ähnlicheAnsichtName, StringComparison.OrdinalIgnoreCase))) {
-                _ähnliche = thisArr;
+            foreach (var thisArr in _tableView.Database.ColumnArrangements) {
+                if (string.Equals(thisArr.Name, _ähnlicheAnsichtName, StringComparison.OrdinalIgnoreCase)) {
+                    _ähnliche = thisArr;
+                }
             }
         }
         DoÄhnlich();

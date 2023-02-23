@@ -76,23 +76,23 @@ dotnet_style_allow_statement_immediately_after_block_experimental = true
 #### C#-Codierungskonventionen ####
 
 # Var-Einstellungen
-csharp_style_var_elsewhere = true:warning
-csharp_style_var_for_built_in_types = true:warning
-csharp_style_var_when_type_is_apparent = true:warning
+csharp_style_var_elsewhere = false
+csharp_style_var_for_built_in_types = false
+csharp_style_var_when_type_is_apparent = false
 
 # Ausdruckskörpermember
-csharp_style_expression_bodied_accessors = true:warning
-csharp_style_expression_bodied_constructors = when_on_single_line:warning
-csharp_style_expression_bodied_indexers = true:warning
-csharp_style_expression_bodied_lambdas = true:warning
-csharp_style_expression_bodied_local_functions = true:warning
-csharp_style_expression_bodied_methods = when_on_single_line:warning
-csharp_style_expression_bodied_operators = when_on_single_line:warning
-csharp_style_expression_bodied_properties = true:warning
+csharp_style_expression_bodied_accessors = true
+csharp_style_expression_bodied_constructors = false
+csharp_style_expression_bodied_indexers = true
+csharp_style_expression_bodied_lambdas = true:suggestion
+csharp_style_expression_bodied_local_functions = true:suggestion
+csharp_style_expression_bodied_methods = false
+csharp_style_expression_bodied_operators = false
+csharp_style_expression_bodied_properties = true
 
 # Einstellungen für den Musterabgleich
 csharp_style_pattern_matching_over_as_with_null_check = true
-csharp_style_pattern_matching_over_is_with_cast_check = true:warning
+csharp_style_pattern_matching_over_is_with_cast_check = true
 csharp_style_prefer_extended_property_pattern = true
 csharp_style_prefer_not_pattern = true:error
 csharp_style_prefer_pattern_matching = true:warning
@@ -107,7 +107,7 @@ csharp_preferred_modifier_order = public,private,protected,internal,file,static,
 csharp_style_prefer_readonly_struct = true
 
 # Einstellungen für Codeblöcke
-csharp_prefer_braces = true:warning
+csharp_prefer_braces = true
 csharp_prefer_simple_using_statement = true:warning
 csharp_style_namespace_declarations = block_scoped
 csharp_style_prefer_method_group_conversion = true
@@ -117,7 +117,7 @@ csharp_style_prefer_top_level_statements = true
 csharp_prefer_simple_default_expression = true:error
 csharp_style_deconstructed_variable_declaration = true:error
 csharp_style_implicit_object_creation_when_type_is_apparent = true:warning
-csharp_style_inlined_variable_declaration = true:error
+csharp_style_inlined_variable_declaration = true
 csharp_style_prefer_index_operator = true
 csharp_style_prefer_local_over_anonymous_function = true
 csharp_style_prefer_null_check_over_type_check = true
@@ -142,10 +142,10 @@ csharp_style_allow_embedded_statements_on_same_line_experimental = true:suggesti
 csharp_new_line_before_catch = false
 csharp_new_line_before_else = false
 csharp_new_line_before_finally = false
-csharp_new_line_before_members_in_anonymous_types = true
-csharp_new_line_before_members_in_object_initializers = true
+csharp_new_line_before_members_in_anonymous_types = false
+csharp_new_line_before_members_in_object_initializers = false
 csharp_new_line_before_open_brace = none
-csharp_new_line_between_query_expression_clauses = true
+csharp_new_line_between_query_expression_clauses = false
 
 # Einstellungen für Einrückung
 csharp_indent_block_contents = true
@@ -181,7 +181,7 @@ csharp_space_between_square_brackets = false
 
 # Umbrucheinstellungen
 csharp_preserve_single_line_blocks = true
-csharp_preserve_single_line_statements = false
+csharp_preserve_single_line_statements = true
 
 #### Benennungsstile ####
 

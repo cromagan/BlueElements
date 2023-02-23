@@ -133,7 +133,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                 _item.ItemRemoving -= _Item_ItemRemoving;
                 _item.ItemAdded -= _Item_ItemAdded;
                 _item.Changed -= Item_Changed;
-                _item.ItemInternalChanged -= _item_ItemInternalChanged;
             }
             _item = value;
             if (_item != null) {
@@ -141,7 +140,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                 _item.ItemRemoving += _Item_ItemRemoving;
                 _item.ItemAdded += _Item_ItemAdded;
                 _item.Changed += Item_Changed;
-                _item.ItemInternalChanged += _item_ItemInternalChanged;
             }
             Invalidate();
             OnGotNewItemCollection();
@@ -530,8 +528,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
         OnItemAdded(e);
     }
-
-    private void _item_ItemInternalChanged(object sender, ListEventArgs e) => OnChanged();
 
     private void _Item_ItemRemoved(object sender, System.EventArgs e) {
         if (Fitting) { ZoomFit(); }

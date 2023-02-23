@@ -15,8 +15,7 @@ namespace BlueControls.Controls {
         protected override void Dispose(bool disposing) {
 
             if(disposing) {
-                RowKey = -1;
-                Database = null;
+                SetData(null,null);
                 ConnectedFormula = null;
             }
 

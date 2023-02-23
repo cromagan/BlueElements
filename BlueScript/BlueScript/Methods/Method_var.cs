@@ -18,11 +18,14 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Var : Method {
 
     #region Properties
@@ -32,6 +35,7 @@ internal class Method_Var : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ";";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
     public override string StartSequence => "";
     public override string Syntax => "var VariablenName = Wert;";
@@ -40,10 +44,10 @@ internal class Method_Var : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "var" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "var" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos, "Kein Text angekommen."); }
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.Data, "Kein Text angekommen."); }
 
         return Method_BerechneVariable.VariablenBerechnung(infos, infos.AttributText + ";", s, true);
 

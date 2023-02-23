@@ -191,11 +191,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // tabRight
             // 
-            this.tabRight.Database = null;
             this.tabRight.HotTrack = true;
             this.tabRight.Location = new Point(8, 67);
             this.tabRight.Name = "tabRight";
-            this.tabRight.RowKey = ((long)(-1));
             this.tabRight.SelectedIndex = 0;
             this.tabRight.Size = new Size(472, 285);
             this.tabRight.TabDefault = null;

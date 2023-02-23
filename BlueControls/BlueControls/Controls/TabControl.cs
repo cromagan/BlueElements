@@ -28,14 +28,6 @@ namespace BlueControls.Controls;
 
 public class TabControl : AbstractTabControl, IAcceptRowKey {
 
-    #region Fields
-
-    private DatabaseAbstract? _database;
-
-    private long _rowkey = -1;
-
-    #endregion
-
     #region Constructors
 
     public TabControl() : base() => BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
@@ -53,29 +45,21 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DatabaseAbstract? Database {
-        get => _database;
-        set {
-            if (_database != value) {
-                _database = value;
-                DoDatabaseAction();
-            }
-        }
-    }
+    public DatabaseAbstract? Database { get; private set; }
 
     [DefaultValue(-1)]
-    public long RowKey {
-        get => _rowkey; set {
-            if (_rowkey != value) {
-                _rowkey = value;
-                DoDatabaseAction();
-            }
-        }
-    }
+    public long RowKey { get; private set; } = -1;
 
     #endregion
 
     #region Methods
+
+    public void SetData(DatabaseAbstract? database, long? rowkey) {
+        if (database != Database && rowkey == RowKey) { return; }
+        Database = database;
+        RowKey = rowkey ?? -1;
+        DoDatabaseAction();
+    }
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
@@ -94,9 +78,7 @@ public class TabControl : AbstractTabControl, IAcceptRowKey {
             if (thisTab is TabPage tp) {
                 foreach (var thisControl in tp.Controls) {
                     if (thisControl is IAcceptRowKey iar and not TabControl) {
-                        //iar.RowKey = -1;
-                        iar.Database = Database;
-                        iar.RowKey = RowKey;
+                        iar.SetData(Database, RowKey);
                     }
                 }
             }

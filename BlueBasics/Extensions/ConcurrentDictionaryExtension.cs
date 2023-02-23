@@ -36,9 +36,13 @@ public static partial class Extensions {
             if (pair.Value == null || pair.Value.IsNullOrEmpty()) { remo.Add(pair.Key); }
         }
         if (remo.Count == 0) { return false; }
-        foreach (var thisInteger in remo.Where(thisInteger => !l.TryRemove(thisInteger, out _))) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Remove failed: " + thisInteger);
+
+        foreach (var thisInteger in remo) {
+            if (!l.TryRemove(thisInteger, out _)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Remove failed: " + thisInteger);
+            }
         }
+
         return true;
     }
 
@@ -46,9 +50,13 @@ public static partial class Extensions {
         if (l == null || l.Count == 0) { return false; }
         var remo = (from pair in l where pair.Value == null || pair.Value.IsNullOrEmpty() select pair.Key).ToList();
         if (remo.Count == 0) { return false; }
-        foreach (var thisInteger in remo.Where(thisInteger => !l.TryRemove(thisInteger, out _))) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Remove failed: " + thisInteger);
+
+        foreach (var thisInteger in remo) {
+            if (!l.TryRemove(thisInteger, out _)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Remove failed: " + thisInteger);
+            }
         }
+
         return true;
     }
 

@@ -18,11 +18,14 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
+[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_Exception : Method {
 
     #region Properties
@@ -32,6 +35,7 @@ internal class Method_Exception : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "Exception(\"Unbehandelter Programmcode!\");";
@@ -40,13 +44,13 @@ internal class Method_Exception : Method {
 
     #region Methods
 
-    public override List<string>Comand(List<Variable>? currentvariables) => new() { "Exception" };
+    public override List<string> Comand(List<Variable>? currentvariables) => new() { "Exception" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos, "Die Ausführung wurde absichtlich abgebrochen."); }
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs);
-        return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(infos, "Die Ausführung wurde absichtlich abgebrochen.")
-            : new DoItFeedback(infos, "Exception: " + ((VariableString)attvar.Attributes[0]).ValueString);
+        if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen."); }
+        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+        return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen.")
+            : new DoItFeedback(infos.Data, "Abbruch durch Exception-Befehl: " + ((VariableString)attvar.Attributes[0]).ValueString);
     }
 
     #endregion

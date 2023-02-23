@@ -17,7 +17,6 @@
 
 using System;
 using System.Drawing;
-using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
@@ -85,9 +84,12 @@ internal sealed partial class ExportDefinition_Editor : AbstractClassEditor<Expo
         cbxExportFormularID.Text = data.ExportFormularId;
         ExportSpaltenAnsicht.Text = data.ExportSpaltenAnsicht.ToString();
         lbxFilter.Item.Clear();
-        foreach (var thisFilter in data.Filter.Where(thisFilter => thisFilter != null)) {
-            _ = lbxFilter.Item.Add(thisFilter);
+        foreach (var thisFilter in data.Filter) {
+            if (thisFilter != null) {
+                _ = lbxFilter.Item.Add(thisFilter);
+            }
         }
+
         lsbExportDateien.Item.Clear();
         foreach (var t1 in data.BereitsExportiert) {
             if (!string.IsNullOrEmpty(t1)) {

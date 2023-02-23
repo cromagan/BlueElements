@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -143,10 +144,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
 
     public ReadOnlyCollection<BasicListItem> ItemOrder {
         get {
-            if (_itemOrder == null) {
-                CalculateItemOrder();
-            }
-
+            if (_itemOrder == null) { CalculateItemOrder(); }
             return (ReadOnlyCollection<BasicListItem>)_itemOrder;
         }
         private set {
@@ -209,7 +207,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
                 var db2 = column.LinkedDatabase;
                 if (db2 == null) { Notification.Show("Verknüpfte Datenbank nicht vorhanden", ImageCode.Information); return; }
 
-                /// Spalte aus der Ziel-Datenbank ermitteln
+                // Spalte aus der Ziel-Datenbank ermitteln
                 var targetColumn = db2.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase);
                 if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return; }
 
@@ -331,12 +329,12 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt
     /// </summary>
-    public RowFormulaListItem Add(RowItem? row, string layoutId) => Add(row, layoutId, string.Empty);
+    public RowFormulaListItem Add(RowItem row, string layoutId) => Add(row, layoutId, string.Empty);
 
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt
     /// </summary>
-    public RowFormulaListItem Add(RowItem? row, string layoutId, string userDefCompareKey) {
+    public RowFormulaListItem Add(RowItem row, string layoutId, string userDefCompareKey) {
         RowFormulaListItem i = new(row, layoutId, userDefCompareKey);
         Add(i);
         return i;
@@ -491,7 +489,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         if (list == null || list.Count == 0) { return; }
 
         foreach (var thisitem in list) {
-            if (thisitem == null) { Add(thisitem); }
+            if (thisitem != null) { Add(thisitem); }
         }
     }
 
@@ -502,15 +500,22 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
     /// <returns></returns>
     public void AddRange(Type type) {
         foreach (int z1 in Enum.GetValues(type)) {
-            if (this[z1.ToString()] == null) { _ = Add(Enum.GetName(type, z1)?.Replace("_", " "), z1.ToString()); }
+            if (this[z1.ToString()] == null) {
+                var n = Enum.GetName(type, z1);
+                if (n != null) {
+                    _ = Add(n.Replace("_", " "), z1.ToString());
+                }
+            }
         }
     }
 
     public void AddRange(ICollection<string>? list) {
         if (list == null) { return; }
 
-        foreach (var thisstring in list.Where(thisstring => !string.IsNullOrEmpty(thisstring) && this[thisstring] == null)) {
-            _ = Add(thisstring, thisstring);
+        foreach (var thisstring in list) {
+            if (!string.IsNullOrEmpty(thisstring) && this[thisstring] == null) {
+                _ = Add(thisstring, thisstring);
+            }
         }
     }
 
@@ -529,7 +534,9 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         if (list == null || list.Count == 0) { return; }
 
         foreach (var thisRow in list) {
-            _ = Add(thisRow, layoutId);
+            if (thisRow != null) {
+                _ = Add(thisRow, layoutId);
+            }
         }
     }
 
@@ -565,21 +572,16 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, orienation);
     }
 
-    public void Check(IList<string> vItems, bool checkstate) {
-        for (var z = 0; z < vItems.Count; z++) {
-            if (this[vItems[z]] != null) {
-                this[vItems[z]].Checked = checkstate;
+    public void Check(IList<string> itemnames, bool checkstate) {
+        foreach (var thisItem in itemnames) {
+            if (this[thisItem] is BasicListItem bli) {
+                bli.Checked = checkstate;
             }
         }
     }
 
     public List<BasicListItem> Checked() => this.Where(thisItem => thisItem != null && thisItem.Checked).ToList();
 
-    //public void CheckAll() {
-    //    foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
-    //        thisItem.Checked = true;
-    //    }
-    //}
     public object Clone() {
         ItemCollectionList x = new(_appearance, _autoSort) {
             CheckBehavior = _checkBehavior
@@ -590,26 +592,6 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         return x;
     }
 
-    ///// <summary>
-    ///// Füllt die Ersetzungen mittels eines Übergebenen Enums aus.
-    ///// </summary>
-    ///// <param name="t">Beispiel: GetType(enDesign)</param>
-    ///// <param name="zumDropdownHinzuAb">Erster Wert der Enumeration, der Hinzugefügt werden soll. Inklusive deses Wertes</param>
-    ///// <param name="zumDropdownHinzuBis">Letzter Wert der Enumeration, der nicht mehr hinzugefügt wird, also exklusives diese Wertes</param>
-    //public void GetValuesFromEnum(Type t, int zumDropdownHinzuAb, int zumDropdownHinzuBis) {
-    //    var items = Enum.GetValues(t);
-    //    Clear();
-    //    foreach (var thisItem in items) {
-    //        var te = Enum.GetName(t, thisItem);
-    //        var th = (int)thisItem;
-    //        if (!string.IsNullOrEmpty(te)) {
-    //            //NewReplacer.GenerateAndAdd(th + "|" + te);
-    //            if (th >= zumDropdownHinzuAb && th < zumDropdownHinzuBis) {
-    //                _ = Add(te, th.ToString());
-    //            }
-    //        }
-    //    }
-    //}
     public void OnChanged() {
         _maxNeededItemSize = Size.Empty;
         _itemOrder = null;
@@ -617,28 +599,14 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
-    //public ListExt<clsNamedBinary> GetNamedBinaries() {
-    //    var l = new ListExt<clsNamedBinary>();
-    //    foreach (var thisItem in this) {
-    //        switch (thisItem) {
-    //            case BitmapListItem BI:
-    //                l.GenerateAndAdd(new clsNamedBinary(BI.Caption, BI.Bitmap));
-    //                break;
-    //            case TextListItem TI:
-    //                l.GenerateAndAdd(new clsNamedBinary(TI.Text, TI.Internal));
-    //                break;
-    //        }
-    //    }
-    //    return l;
-    //}
     public void Remove(string internalnam) => Remove(this[internalnam]);
 
     public new void Remove(BasicListItem? item) {
-        if (item == null) { return; }
+        if (item == null || !Contains(item)) { return; }
         item.Changed -= Item_Changed;
         item.CheckedChanged -= Item_CheckedChanged;
         item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
-        base.Remove(item);
+        _ = base.Remove(item);
         OnChanged();
     }
 
@@ -652,8 +620,10 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
     }
 
     public void UncheckAll() {
-        foreach (var thisItem in this.Where(thisItem => thisItem != null)) {
-            thisItem.Checked = false;
+        foreach (var thisItem in this) {
+            if (thisItem != null) {
+                thisItem.Checked = false;
+            }
         }
     }
 
@@ -844,9 +814,12 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         var zuviel = ist.Except(values).ToList();
         var zuwenig = values.Except(ist).ToList();
         // Zu viele im Mains aus der Liste löschen
-        foreach (var thisString in zuviel.Where(thisString => !values.Contains(thisString))) {
-            Remove(thisString);
+        foreach (var thisString in zuviel) {
+            if (!values.Contains(thisString)) {
+                Remove(thisString);
+            }
         }
+
         // und die Mains auffüllen
         foreach (var thisString in zuwenig) {
             if (IO.FileExists(thisString)) {

@@ -23,7 +23,7 @@ public class BasicDesigner : ControlDesigner {
         properties.Remove("GenerateMember");
         properties.Remove("ContextMenuStrip");
         properties.Remove("ImeMode");
-        properties.Remove("AllowDrop");
+        //properties.Remove("AllowDrop");
         properties.Remove("(DataBindings)");
         properties.Remove("(AppicationSettings)");
         base.PreFilterProperties(properties);

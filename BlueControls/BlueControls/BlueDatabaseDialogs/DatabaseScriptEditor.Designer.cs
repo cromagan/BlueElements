@@ -77,7 +77,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
-            this.GlobalTab.RowKey = ((long)(-1));
             this.GlobalTab.SelectedIndex = 0;
             this.GlobalTab.Size = new System.Drawing.Size(1297, 653);
             this.GlobalTab.TabDefault = null;

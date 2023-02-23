@@ -32,8 +32,7 @@ public partial class EditBoxRow : DialogWithOkAndCancel {
 
         if (row != null) {
             formToEdit.GetConnectedFormulaFromDatabase(row.Database);
-            formToEdit.Database = row.Database;
-            formToEdit.RowKey = row.Key;
+            formToEdit.SetData(row.Database, row.Key);
         }
 
         Setup(txt, formToEdit, formToEdit.MinimumSize.Width + 50);

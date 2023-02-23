@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using BlueBasics;
@@ -48,10 +49,10 @@ public partial class TableView : FormWithStatusBar {
     #region Fields
 
     private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
-
     private bool _firstOne = true;
-
     private DatabaseAbstract? _originalDb;
+    private List<string> _settings = new();
+    private string _settingsfilename = string.Empty;
 
     #endregion
 
@@ -83,6 +84,8 @@ public partial class TableView : FormWithStatusBar {
 
         Check_OrderButtons();
 
+        LoadSettingsFromDisk();
+
         _ = SwitchTabToDatabase(database);
     }
 
@@ -91,6 +94,20 @@ public partial class TableView : FormWithStatusBar {
     #region Properties
 
     public string PreveredDatabaseID { get; set; } = Database.DatabaseId;
+
+    /// <summary>
+    /// Einstellungsdatei der TableView
+    /// </summary>
+    ///
+    [DefaultValue("")]
+    public string SettingsFilename {
+        get => _settingsfilename;
+        set {
+            if (_settingsfilename == value) { return; }
+            _settingsfilename = value;
+            LoadSettingsFromDisk();
+        }
+    }
 
     #endregion
 
@@ -166,7 +183,9 @@ public partial class TableView : FormWithStatusBar {
     /// Löst das DatabaseLoadedEvengt aus, weil es fast einem Neuladen gleichkommt.
     /// </summary>
     /// <param name="db"></param>
-    public static void OpenDatabaseHeadEditor(DatabaseAbstract db) {
+    public static void OpenDatabaseHeadEditor(DatabaseAbstract? db) {
+        if (db == null || db.IsDisposed) { return; }
+
         using DatabaseHeadEditor w = new(db);
         _ = w.ShowDialog();
     }
@@ -191,7 +210,7 @@ public partial class TableView : FormWithStatusBar {
         List<string> zusatz = new();
         ItemCollectionList l = new(true);
         foreach (var thisExport in db.Export) {
-            if (thisExport.Typ == ExportTyp.DatenbankOriginalFormat) {
+            if (thisExport != null && thisExport.Typ == ExportTyp.DatenbankOriginalFormat) {
                 var lockMe = new object();
                 _ = Parallel.ForEach(thisExport.BereitsExportiert, (thisString, _) => {
                     var t = thisString.SplitAndCutBy("|");
@@ -211,9 +230,10 @@ public partial class TableView : FormWithStatusBar {
             }
         }
 
-        foreach (var thisString in zusatz.Where(thisString => l[thisString] == null)) {
-            _ = l.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(ImageCode.Warnung), true,
-                new FileInfo(thisString).CreationTime.ToString().CompareKey(SortierTyp.Datum_Uhrzeit));
+        foreach (var thisString in zusatz) {
+            if (l[thisString] == null) {
+                _ = l.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(ImageCode.Warnung), true, new FileInfo(thisString).CreationTime.ToString().CompareKey(SortierTyp.Datum_Uhrzeit));
+            }
         }
 
         //l.Sort();
@@ -231,17 +251,26 @@ public partial class TableView : FormWithStatusBar {
 
     /// <summary>
     /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.
+    /// HIer wird auch die Standard-Ansicht als Tag Injiziert
     /// </summary>
-    /// <param name="uniqueID"></param>
-    protected void AddTabPage(ConnectionInfo ci) {
-        if (ci is null) {
-            return;
+    protected void AddTabPage(ConnectionInfo? ci) {
+        if (ci is null) { return; }
+
+        var toParse = string.Empty;
+
+        //LoadSettingsFromDisk();
+        if (string.IsNullOrEmpty(toParse)) {
+            var v = _settings.TagGet("TableDefaultView_" + ci.TableName);
+
+            if (!string.IsNullOrEmpty(v)) {
+                toParse = "{Ansicht=" + v + "}";
+            }
         }
 
         var nTabPage = new TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
             Text = ci.TableName.ToTitleCase(),
-            Tag = new List<object> { ci, string.Empty }
+            Tag = new List<object> { ci, toParse }
         };
         tbcDatabaseSelector.Controls.Add(nTabPage);
     }
@@ -255,10 +284,12 @@ public partial class TableView : FormWithStatusBar {
         MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
 
+        if (Table.Database == null || Table.Database.IsDisposed) { return; }
+
         switch (e.Item.KeyName) {
             case "erweitert":
                 Visible = false;
-                List<RowItem?> selectedRows = new();
+                List<RowItem> selectedRows = new();
                 if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead && Formula.ShowingRow != null) {
                     selectedRows.Add(Formula.ShowingRow);
                 } else {
@@ -309,19 +340,19 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected virtual void CheckButtons() {
-        var datenbankDa = Table.Database != null;
+        var datenbankDa = Table.Database != null && !Table.Database.IsDisposed;
         btnNeuDB.Enabled = true;
         btnOeffnen.Enabled = true;
-        btnNeu.Enabled = datenbankDa && Table.Database.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
+        btnNeu.Enabled = datenbankDa && Table!.Database!.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
         btnLoeschen.Enabled = datenbankDa;
         btnDrucken.Enabled = datenbankDa;
         chkAnsichtNurTabelle.Enabled = datenbankDa;
         chkAnsichtFormular.Enabled = datenbankDa;
         chkAnsichtTableFormular.Enabled = datenbankDa;
 
-        if (Table.Database is DatabaseMultiUser bdb) {
+        if (Table?.Database is DatabaseMultiUser bdb) {
             btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(bdb.Filename);
-        } else if (Table.Database is Database bd) {
+        } else if (Table?.Database is Database bd) {
             btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(bd.Filename);
         } else {
             btnDatenbankenSpeicherort.Enabled = false;
@@ -330,16 +361,16 @@ public partial class TableView : FormWithStatusBar {
         //SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         //Datenüberprüfung.Enabled = datenbankDa;
-        btnZeileLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+        btnZeileLöschen.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         cbxDoSript.Enabled = datenbankDa;
         btnSaveAs.Enabled = datenbankDa;
-        btnDrucken.Item["csv"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-        btnDrucken.Item["html"].Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+        btnDrucken.Item["csv"].Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+        btnDrucken.Item["html"].Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         btnVorwärts.Enabled = datenbankDa;
         btnZurück.Enabled = datenbankDa;
         txbTextSuche.Enabled = datenbankDa;
-        btnSuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-        FilterLeiste.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+        btnSuchenUndErsetzen.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+        FilterLeiste.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
     }
 
     protected virtual void DatabaseSet(DatabaseAbstract? database, string toParse) {
@@ -409,14 +440,8 @@ public partial class TableView : FormWithStatusBar {
 
             if (Formula.Width < 30 || Formula.Height < 10) { return; }
 
-            if (r?.Database != null) { SetFormula(r?.Database); }
-
-            Formula.Database = r?.Database;
-            if (r != null) {
-                Formula.RowKey = r.Key;
-            } else {
-                Formula.RowKey = -1;
-            }
+            Formula.GetConnectedFormulaFromDatabase(r?.Database);
+            Formula.SetData(r?.Database, r?.Key ?? -1);
         }
     }
 
@@ -438,6 +463,11 @@ public partial class TableView : FormWithStatusBar {
         InitView();
     }
 
+    /// <summary>
+    /// Schaltet um auf die gewählte Datenbank. Ist diese nicht vorhanden, wird ein neuer Reiter erstellt.
+    /// </summary>
+    /// <param name="connectionInfo"></param>
+    /// <returns></returns>
     protected bool SwitchTabToDatabase(ConnectionInfo? connectionInfo) {
         if (connectionInfo is null) { return false; }
 
@@ -476,7 +506,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected virtual void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
-        var tbl = (Table)sender;
+        if (sender is not Table tbl || tbl.Database == null || tbl.Database.IsDisposed) { return; }
         var cellKey = e.Tags.TagGet("Cellkey");
         if (string.IsNullOrEmpty(cellKey)) {
             return;
@@ -488,36 +518,26 @@ public partial class TableView : FormWithStatusBar {
 
         if (_ansicht != Ansicht.Überschriften_und_Formular) {
             _ = e.UserMenu.Add("Info", true);
-            if (tbl.PinnedRows.Contains(row)) {
-                _ = e.UserMenu.Add("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16),
-                    row != null);
+            if (tbl.PinnedRows != null && tbl.PinnedRows.Contains(row)) {
+                _ = e.UserMenu.Add("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), row != null);
             } else {
                 _ = e.UserMenu.Add("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), row != null);
             }
 
             _ = e.UserMenu.Add("Sortierung", true);
-            _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ,
-                column != null && column.Format.CanBeCheckedByRules());
-            _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA,
-                column != null && column.Format.CanBeCheckedByRules());
+            _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeCheckedByRules());
+            _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeCheckedByRules());
             _ = e.UserMenu.AddSeparator();
             _ = e.UserMenu.Add("Zelle", true);
-            _ = e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren,
-                column != null && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard,
-                editable && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi,
-                editable && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add(ContextMenuComands.VorherigenInhaltWiederherstellen,
-                editable && column.Format.CanBeChangedByRules() && column.ShowUndo);
+            _ = e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules());
+            _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column != null && column.Format.CanBeChangedByRules());
+            _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column != null && column.Format.CanBeChangedByRules());
+            _ = e.UserMenu.Add(ContextMenuComands.VorherigenInhaltWiederherstellen, editable && column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
             _ = e.UserMenu.Add(ContextMenuComands.SuchenUndErsetzen, column != null && tbl.Database.IsAdministrator());
             _ = e.UserMenu.AddSeparator();
             _ = e.UserMenu.Add("Spalte", true);
-            _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten,
-                column != null && tbl.Database.IsAdministrator());
-            _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16),
-                column != null && tbl.Database.IsAdministrator());
-            //e.UserMenu.GenerateAndAdd("Inhalte aller angezeigten Zellen dieser Spalte löschen", "ColumnContentDelete", ImageCode.Radiergummi, column != null && column.Format.CanBeChangedByRules() && tbl.Database.IsAdministrator());
+            _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null && tbl.Database.IsAdministrator());
+            _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && tbl.Database.IsAdministrator());
             _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && tbl.Database.IsAdministrator());
             _ = e.UserMenu.AddSeparator();
         }
@@ -532,7 +552,8 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected virtual void TableView_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        var tbl = (Table)sender;
+        if (sender is not Table tbl || tbl.Database == null || tbl.Database.IsDisposed) { return; }
+
         var cellKey = e.Tags.TagGet("CellKey");
         if (string.IsNullOrEmpty(cellKey)) {
             return;
@@ -568,7 +589,7 @@ public partial class TableView : FormWithStatusBar {
 
             case "Skript":
                 if (row != null) {
-                    MessageBox.Show(row.ExecuteScript(null, ev[1], true, true, true, 10).ErrorMessage);
+                    MessageBox.Show(row.ExecuteScript(null, ev[1], true, true, true, 10).Protocol.JoinWithCr());
                 }
 
                 break;
@@ -594,9 +615,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "ContentDelete":
-                if (!editable) {
-                    return;
-                }
+                if (!editable) { return; }
 
                 tbl.Database.Cell.Delete(column, row.Key);
                 break;
@@ -693,6 +712,12 @@ public partial class TableView : FormWithStatusBar {
             _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
         }
 
+        if (Table.Database != null) {
+            LoadSettingsFromDisk();
+            _settings.TagSet("TableDefaultView_" + Table.Database.TableName, ((int)_ansicht).ToString());
+            SaveSettingsToDisk();
+        }
+
         InitView();
         CheckButtons();
     }
@@ -722,7 +747,7 @@ public partial class TableView : FormWithStatusBar {
         }
     }
 
-    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(Table.Database);
+    private void btnDatenbankKopf_Click(object sender, System.EventArgs e) => OpenDatabaseHeadEditor(Table?.Database);
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
@@ -993,7 +1018,7 @@ public partial class TableView : FormWithStatusBar {
         } else {
             //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
             var s = Table.Database.ExecuteScript(sc, sc.ChangeValues, null);
-            m = s.ErrorMessage;
+            m = s.Protocol.JoinWithCr();
         }
 
         if (!string.IsNullOrEmpty(m)) {
@@ -1113,6 +1138,16 @@ public partial class TableView : FormWithStatusBar {
         }
     }
 
+    private void LoadSettingsFromDisk() {
+        _settings = new List<string>();
+
+        if (FileExists(SettingsFileName())) {
+            var t = File.ReadAllText(SettingsFileName(), Encoding.UTF8);
+            t = t.RemoveChars("\n");
+            _settings.AddRange(t.SplitAndCutByCr());
+        }
+    }
+
     private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) =>
         SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName, PreveredDatabaseID));
 
@@ -1135,16 +1170,13 @@ public partial class TableView : FormWithStatusBar {
         } while (true);
     }
 
-    private void SetFormula(DatabaseAbstract? database) {
-        if (database != null && !database.IsDisposed) {
-            Formula.GetConnectedFormulaFromDatabase(database);
-            Formula.Database = database;
-            return;
+    private void SaveSettingsToDisk() {
+        if (CanWriteInDirectory(SettingsFileName().FilePath())) {
+            _settings.Save(SettingsFileName(), Encoding.UTF8, false);
         }
-
-        Formula.Database = null;
-        Formula.ConnectedFormula = null;
     }
+
+    private string SettingsFileName() => !string.IsNullOrEmpty(_settingsfilename) ? _settingsfilename.CheckFile() : Application.StartupPath + "\\" + Name + "-Settings.ini";
 
     private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
         column = Table?.View_ColumnFirst();
@@ -1230,7 +1262,6 @@ public partial class TableView : FormWithStatusBar {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-
     private void tbcDatabaseSelector_Selected(object? sender, TabControlEventArgs e) {
         Table.ShowWaitScreen = true;
         tbcDatabaseSelector.Enabled = false;
@@ -1238,12 +1269,9 @@ public partial class TableView : FormWithStatusBar {
         Table.Refresh();
 
         DatabaseAbstract.ForceSaveAll();
-
         MultiUserFile.ForceLoadSaveAll();
 
-        if (e.TabPage == null) {
-            return;
-        }
+        if (e.TabPage == null) { return; }
 
         var s = (List<object>)e.TabPage.Tag;
 
@@ -1285,8 +1313,8 @@ public partial class TableView : FormWithStatusBar {
         }
 
         foreach (var thiss in db.EventScript) {
-            if (thiss.ManualExecutable) {
-                cbxDoSript.Item.Add(thiss);
+            if (thiss != null && thiss.ManualExecutable) {
+                _ = cbxDoSript.Item.Add(thiss);
             }
         }
     }

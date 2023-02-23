@@ -36,13 +36,11 @@ using TabControl = BlueControls.Controls.TabControl;
 
 namespace BlueControls.ItemCollection;
 
-public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
+public class TabFormulaPadItem : CustomizableShowPadItem, IHasConnectedFormula {
 
     #region Fields
 
     private readonly List<string> _childs = new();
-
-    private ConnectedFormula.ConnectedFormula? _cf;
 
     #endregion
 
@@ -51,9 +49,9 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
     public TabFormulaPadItem() : this(Generic.UniqueInternal(), null) { }
 
     public TabFormulaPadItem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
-        _cf = cf;
-        if (_cf != null) {
-            _cf.NotAllowedChilds.Changed += NotAllowedChilds_Changed;
+        CFormula = cf;
+        if (CFormula != null) {
+            CFormula.NotAllowedChildsChanged += NotAllowedChilds_Changed;
         }
     }
 
@@ -64,6 +62,11 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
     #region Properties
 
     public static string ClassId => "FI-ChildFormula";
+
+    /// <summary>
+    /// Wird benötigt bei ToString - um die eigenen Ansichten wieder zu finden.
+    /// </summary>
+    public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
 
     protected override int SaveOrder => 1000;
 
@@ -78,7 +81,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
             var ff = parent.SearchOrGenerate(rfw2);
-            if (ff is ICalculateRowsControlLevel cc) { cc.Childs.Add(con); }
+            if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
         }
 
         return con;
@@ -102,7 +105,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
                 pg = "Head";
                 pgvis = string.Empty;
             } else {
-                cf = _cf;
+                cf = CFormula;
                 pg = thisc;
                 pgvis = thisc;
             }
@@ -136,12 +139,12 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
                     if (existTab != null) {
                         foreach (var thisC in existTab.Controls) {
                             if (thisC is IDisposable c) {
-                                c?.Dispose();
+                                c.Dispose();
                             }
                         }
 
                         c3.TabPages.Remove(existTab);
-                        existTab?.Dispose();
+                        existTab.Dispose();
                     }
                 }
             }
@@ -162,9 +165,9 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
             case "parent":
-                _cf = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
-                if (_cf != null) {
-                    _cf.NotAllowedChilds.Changed += NotAllowedChilds_Changed;
+                CFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
+                if (CFormula != null) {
+                    CFormula.NotAllowedChildsChanged += NotAllowedChilds_Changed;
                 }
                 return true;
 
@@ -187,15 +190,15 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
     public override string ToString() {
         var result = new List<string>();
-        result.ParseableAdd("Parent", _cf);
+        result.ParseableAdd("Parent", CFormula);
         result.ParseableAdd("Childs", _childs);
         return result.Parseable(base.ToString());
     }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            if (_cf != null) {
-                _cf.NotAllowedChilds.Changed -= NotAllowedChilds_Changed;
+            if (CFormula != null) {
+                CFormula.NotAllowedChildsChanged -= NotAllowedChilds_Changed;
             }
         }
     }
@@ -214,7 +217,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
 
             gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
 
-            Skin.Draw_FormatedText(gr, thisC.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont.Scale(zoom), false);
+            Skin.Draw_FormatedText(gr, thisC.FileNameWithoutSuffix(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont?.Scale(zoom), false);
             gr.DrawRectangle(new Pen(Color.Black, zoom), it);
         }
 
@@ -222,7 +225,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         gr.DrawRectangle(new Pen(Color.Black, zoom), body);
 
         //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
-        Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont.Scale(zoom), false);
+        Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
@@ -241,17 +244,17 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         };
         childs.Suggestions.Clear();
 
-        if (_cf != null && File.Exists(_cf.Filename)) {
-            foreach (var thisf in Directory.GetFiles(_cf.Filename.FilePath(), "*.cfo")) {
-                if (!_cf.NotAllowedChilds.Contains(thisf)) {
+        if (CFormula != null && File.Exists(CFormula.Filename)) {
+            foreach (var thisf in Directory.GetFiles(CFormula.Filename.FilePath(), "*.cfo")) {
+                if (!CFormula.NotAllowedChilds.Contains(thisf)) {
                     _ = childs.Suggestions.Add(thisf, ImageCode.Diskette);
                 }
             }
         }
 
-        if (_cf != null && _cf.PadData != null) {
-            foreach (var thisf in _cf.PadData.AllPages()) {
-                if (!_cf.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
+        if (CFormula != null && CFormula.PadData != null) {
+            foreach (var thisf in CFormula.PadData.AllPages()) {
+                if (!CFormula.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
                     _ = childs.Suggestions.Add(thisf, ImageCode.Formel);
                 }
             }
@@ -275,10 +278,10 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
         if (e.ClickedComand.ToLower() == "bearbeiten") {
             MultiUserFile.SaveAll(false);
 
-            var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).KeyName, _cf?.NotAllowedChilds);
+            var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).KeyName, CFormula?.NotAllowedChilds);
             _ = x.ShowDialog();
             MultiUserFile.SaveAll(false);
-            x?.Dispose();
+            x.Dispose();
         }
     }
 
@@ -299,7 +302,9 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IItemToControl {
     }
 
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
-        foreach (var thisl in _cf.NotAllowedChilds) {
+        if (CFormula == null) { return; }
+
+        foreach (var thisl in CFormula.NotAllowedChilds) {
             _ = _childs.Remove(thisl);
         }
 

@@ -41,14 +41,11 @@ using static BlueBasics.IO;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRowKey, IDisabledReason {
+public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRowKey, IDisabledReason, IHasDatabase {
 
     #region Fields
 
     private string _columnName = string.Empty;
-
-    private DatabaseAbstract? _database;
-
     private long _rowKey = -1;
 
     private ColumnItem? _tmpColumn;
@@ -71,8 +68,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         ShowInfoWhenDisabled = true;
         CaptionPosition = captionPosition;
         EditType = editType;
-        Database = database;
         ColumnName = column;
+        SetData(database, -1);
         CheckEnabledState();
     }
 
@@ -105,54 +102,12 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DatabaseAbstract? Database {
-        get => _database;
-        set {
-            if (value == _database) { return; }
-            FillCellNow();
-            if (_database != null) {
-                _database.Cell.CellValueChanged -= Database_CellValueChanged;
-                _database.Row.RowRemoving -= Row_RowRemoving;
-                _database.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
-                _database.Row.RowChecked -= Database_RowChecked;
-                //_Database.RowKeyChanged -= _Database_RowKeyChanged;
-                //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
-                _database.Loaded -= _Database_Loaded;
-                _database.Disposing -= _Database_Disposing;
-            }
-            _database = value;
-            GetTmpVariables();
-            UpdateColumnData();
-            if (_database != null) {
-                _database.Cell.CellValueChanged += Database_CellValueChanged;
-                //_Database.Row.RowRemoved += Database_RowRemoved;
-                _database.Row.RowRemoving += Row_RowRemoving;
-                _database.Column.ColumnInternalChanged += Column_ItemInternalChanged;
-                _database.Row.RowChecked += Database_RowChecked;
-                //_Database.RowKeyChanged += _Database_RowKeyChanged;
-                _database.Loaded += _Database_Loaded;
-                //_Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
-                _database.Disposing += _Database_Disposing;
-            }
-            SetValueFromCell();
-            CheckEnabledState();
-        }
-    }
+    public DatabaseAbstract? Database { get; private set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public long RowKey {
-        get => _rowKey;
-        set {
-            if (value == _rowKey) { return; }
-            FillCellNow();
-            _rowKey = value;
-            GetTmpVariables();
-            SetValueFromCell();
-            CheckEnabledState();
-        }
-    }
+    public long RowKey => _rowKey;
 
     #endregion
 
@@ -205,6 +160,44 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+    public void SetData(DatabaseAbstract? database, long? rowkey) {
+        //var LastCheckData = DatabaseAbstract.GetLastCheckData(database, rowkey ?? -1);
+
+        if (rowkey == _rowKey && database == Database) { return; }
+        FillCellNow();
+
+        if (Database != null) {
+            Database.Cell.CellValueChanged -= Database_CellValueChanged;
+            Database.Row.RowRemoving -= Row_RowRemoving;
+            Database.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
+            Database.Row.RowChecked -= Database_RowChecked;
+            Database.Loaded -= _Database_Loaded;
+            Database.Disposing -= _Database_Disposing;
+        }
+
+        Database = database;
+        _rowKey = rowkey ?? -1;
+        GetTmpVariables();
+        UpdateColumnData();
+
+        if (Database != null) {
+            Database.Cell.CellValueChanged += Database_CellValueChanged;
+            Database.Row.RowRemoving += Row_RowRemoving;
+            Database.Column.ColumnInternalChanged += Column_ItemInternalChanged;
+            Database.Row.RowChecked += Database_RowChecked;
+            Database.Loaded += _Database_Loaded;
+            Database.Disposing += _Database_Disposing;
+        }
+        SetValueFromCell();
+        CheckEnabledState();
+
+        _tmpRow?.CheckRowDataIfNeeded();
+
+        if (_tmpRow?.LastCheckedEventArgs is RowCheckedEventArgs e) {
+            Database_RowChecked(this, e);
+        }
+    }
 
     internal void CheckEnabledState() {
         if (Parent == null || !Parent.Enabled || _tmpColumn == null || _tmpRow == null) {
@@ -357,7 +350,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         }
     }
 
-    private void _Database_Disposing(object sender, System.EventArgs e) => Database = null;
+    private void _Database_Disposing(object sender, System.EventArgs e) => SetData(null, null);
 
     private void _Database_Loaded(object sender, System.EventArgs e) {
         if (Disposing || IsDisposed) { return; }
@@ -510,9 +503,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
     private void GetTmpVariables() {
         try {
-            if (_database != null && !_database.IsDisposed) {
-                _tmpColumn = _database.Column.Exists(_columnName);
-                _tmpRow = _database.Row.SearchByKey(_rowKey);
+            if (Database != null && !Database.IsDisposed) {
+                _tmpColumn = Database.Column.Exists(_columnName);
+                _tmpRow = Database.Row.SearchByKey(_rowKey);
             } else {
                 _tmpColumn = null;
                 _tmpRow = null;
@@ -622,9 +615,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         if (_tmpRow == null) { return; }
         if (Marker.CancellationPending) { return; }
         List<string> names = new();
-        if (_database == null || _database.IsDisposed) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
 
-        var col = _database.Column.First;
+        var col = Database.Column.First;
         if (col == null) { return; }
         names.AddRange(col.GetUcaseNamesSortedByLenght());
         if (Marker.CancellationPending) { return; }
@@ -741,7 +734,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         }
     }
 
-    private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _database;
+    private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = Database;
 
     private void TextBox_TextChanged(object sender, System.EventArgs e) {
         while (Marker.IsBusy) {
