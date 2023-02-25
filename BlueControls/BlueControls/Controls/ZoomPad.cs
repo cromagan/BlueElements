@@ -152,7 +152,7 @@ public partial class ZoomPad : GenericControl {
 
         var maxBounds = MaxBounds();
 
-        if (maxBounds == null || maxBounds.Width == 0) { return; }
+        if (maxBounds.Width == 0) { return; }
         var p = ItemCollectionPad.CenterPos(maxBounds, AvailablePaintArea().Size, Zoom);
         var sliderv = ItemCollectionPad.SliderValues(maxBounds, Zoom, p);
         if (p.X < 0) {

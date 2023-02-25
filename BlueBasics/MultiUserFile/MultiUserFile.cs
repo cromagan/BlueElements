@@ -374,7 +374,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         Filename = fileNameToLoad;
         ReCreateWatcher();
         // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
-        while (!Load_Reload()) { };
+        while (!Load_Reload()) { }
     }
 
     /// <summary>

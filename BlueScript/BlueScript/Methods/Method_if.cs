@@ -27,7 +27,7 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_if : Method {
+internal class Method_If : Method {
 
     #region Fields
 

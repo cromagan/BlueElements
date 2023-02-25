@@ -327,7 +327,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
 
         var rows = CalculateVisibleRows(filter, pinned);
-        if (rows == null || rows.Count == 0) { return "Keine Zeilen angekommen."; }
+        if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
         var txt = "Skript wird ausgeführt: " + scriptname;
 
@@ -344,7 +344,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 rows.Clear();
                 Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
                 Database.OnDropMessage(FehlerArt.Warnung, "Skript fehlerhaft bei " + w);
-                return "Skript fehlerhaft bei " + w;
+                return "Skript fehlerhaft bei " + w + "\r\n" + scx.Protocol[0];
             }
             if (scx.AllOk) { rows.RemoveAt(0); }
         }
@@ -446,6 +446,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
+
+    public void InvalidateAllCheckData() {
+        foreach (var thisRow in this) {
+            thisRow.InvalidateCheckData();
+        }
+    }
 
     public bool Remove(long key, string comment) => string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString(), comment));
 
@@ -661,13 +667,4 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     #endregion
-
-    public void InvalidateAllCheckData() {
-
-        foreach (var thisRow in this) {
-            thisRow.InvalidateCheckData();
-            
-        }
-
-    }
 }

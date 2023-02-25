@@ -100,6 +100,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     [DefaultValue(0)]
     public new int TabIndex {
         get => 0;
+        // ReSharper disable once ValueParameterNotUsed
         set => base.TabIndex = 0;
     }
 
@@ -109,6 +110,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     [DefaultValue(false)]
     public new bool TabStop {
         get => false;
+        // ReSharper disable once ValueParameterNotUsed
         set => base.TabStop = false;
     }
 
@@ -117,7 +119,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         get => _text;
         set {
             Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            value ??= string.Empty;
             if (_text == value) { return; }
             _text = value;
             ResetETextAndInvalidate();

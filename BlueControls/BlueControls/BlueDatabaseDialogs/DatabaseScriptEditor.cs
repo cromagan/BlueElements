@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows.Forms;
 using BlueControls.Enums;
@@ -35,6 +36,7 @@ using static BlueBasics.IO;
 namespace BlueControls.BlueDatabaseDialogs;
 
 public sealed partial class DatabaseScriptEditor : IHasDatabase {
+
     #region Fields
 
     private EventScript? _item;
@@ -83,7 +85,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(EventTypes.new_row);
                 chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(EventTypes.value_changed);
                 chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(EventTypes.value_changed_extra_thread);
-                chkAuslöser_errorcheck.Checked = value.EventTypes.HasFlag(EventTypes.error_check);
+                chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(EventTypes.prepare_formula);
                 chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(EventTypes.database_loaded);
                 chkAuslöser_export.Checked = value.EventTypes.HasFlag(EventTypes.export);
                 chkExternVerfügbar.Checked = value.ManualExecutable;
@@ -100,7 +102,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 eventScriptEditor.ScriptText = string.Empty;
                 chkAuslöser_newrow.Checked = false;
                 chkAuslöser_valuechanged.Checked = false;
-                chkAuslöser_errorcheck.Checked = false;
+                chkAuslöser_prepaireformula.Checked = false;
                 chkExternVerfügbar.Checked = false;
                 chkAendertWerte.Checked = false;
                 chkAuslöser_valuechangedThread.Checked = false;
@@ -155,6 +157,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         btnSave.Enabled = true;
     }
 
+    private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
+
     private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
         Item.ChangeValues = chkAendertWerte.Checked;
@@ -166,7 +170,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         EventTypes tmp = 0;
         if (chkAuslöser_newrow.Checked) { tmp |= EventTypes.new_row; }
         if (chkAuslöser_valuechanged.Checked) { tmp |= EventTypes.value_changed; }
-        if (chkAuslöser_errorcheck.Checked) { tmp |= EventTypes.error_check; }
+        if (chkAuslöser_prepaireformula.Checked) { tmp |= EventTypes.prepare_formula; }
         if (chkAuslöser_valuechangedThread.Checked) { tmp |= EventTypes.value_changed_extra_thread; }
         if (chkAuslöser_databaseloaded.Checked) { tmp |= EventTypes.database_loaded; }
         if (chkAuslöser_export.Checked) { tmp |= EventTypes.export; }
@@ -301,15 +305,13 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             _item.Script = eventScriptEditor.ScriptText;
         }
 
-        #region Items sicherheitshalber in die DAtenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
+        #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
 
-        var t2 = new List<EventScript?>();
+        var t2 = new List<EventScript>();
         t2.AddRange(lstEventScripts.Item.Select(thisItem => (EventScript)((ReadableListItem)thisItem).Item));
         Database.EventScript = new(t2);
 
         #endregion
-
-        #region
 
         var l = variableEditor.GetVariables();
         var l2 = new List<VariableString>();
@@ -318,8 +320,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 l2.Add(vs);
             }
         }
-
-        #endregion
 
         Database.Variables = new ReadOnlyCollection<VariableString>(l2);
     }

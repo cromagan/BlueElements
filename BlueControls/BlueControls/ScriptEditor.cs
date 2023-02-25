@@ -176,15 +176,6 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
             Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
         } else {
             Message(ex.Feedback.ProtocolText);
-
-            //if (ex.Feedback.LastlineNo > 0) {
-            //    var codetxt = ex.Feedback.ErrorCode.RestoreEscape();
-            //    codetxt = codetxt.Replace("¶", "\r\n");
-
-            //    Message("Fehler in Zeile: " + ex.Feedback.LastlineNo + "\r\n" + ex.Feedback.ErrorMessage + "\r\n\r\nCode:\r\n~~~~~~\r\n" + codetxt);
-            //} else {
-            //    Message("Fehler: " + ex.Feedback.ErrorMessage);
-            //}
         }
     }
 

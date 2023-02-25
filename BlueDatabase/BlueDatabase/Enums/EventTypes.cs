@@ -23,7 +23,7 @@ namespace BlueDatabase.Enums;
 public enum EventTypes {
     new_row = 1,
     value_changed = 2,
-    error_check = 4,
+    prepare_formula = 4,
     value_changed_extra_thread = 8,
     database_loaded = 16,
     export = 32

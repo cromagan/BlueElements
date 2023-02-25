@@ -66,10 +66,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         _sql = sql.OtherTable(tablename);
 
         Initialize();
-
-        if (sql != null) {
-            LoadFromSQLBack();
-        }
+        LoadFromSQLBack();
     }
 
     #endregion
@@ -442,17 +439,13 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             foreach (var thisCol in columnsToLoad) {
                 var column = Column.Exists(thisCol);
                 if (column == null) {
-                    //var ck = Column.NextColumnKey();
                     _ = Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, true, thisCol);
-                    var co = Column.Exists(thisCol);
-                    //_ = SetValueInternal(DatabaseDataType.ColumnKey, ck.ToString(), co?.Name, null, true);
                     column = Column.Exists(thisCol);
-                    if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht gefunden"); return; }
-                    //column = Column.SearchByKey(ck);
-
-                    //column = new ColumnItem(this, thisCol, Column.NextColumnKey()); // Column.GenerateAndAdd(Column.NextColumnKey(), thisCol);
+                    if (column == null) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht gefunden");
+                        return;
+                    }
                 }
-                if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht gefunden"); return; }
                 GetColumnAttributesColumn(column, _sql);
             }
 

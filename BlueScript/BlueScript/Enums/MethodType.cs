@@ -50,5 +50,11 @@ public enum MethodType {
     /// <summary>
     /// Methoden, die an sich harmlos sind, aber lang zum Ausführen benötigen. Unpassend für z.B. RowCheck
     /// </summary>
-    NeedLongTime = 16
+    NeedLongTime = 16,
+
+    /// <summary>
+    /// Der Befehl stört den Benutzer aktiv. Z.B. wird das Clipbard verändert der ein Programm gestartet.
+    /// Dateioperationen fallen nicht darunter, dafür ist IO zu verwenden.
+    /// </summary>
+    ManipulatesUser = 32
 }

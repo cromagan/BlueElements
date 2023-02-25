@@ -78,7 +78,7 @@ public class Method_AddRow : Method_Database {
 
         var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), ((VariableString)attvar.Attributes[1]).ValueString, ((VariableBool)attvar.Attributes[2]).ValueBool, true, "Script Command: Add Row");
 
-        return Method_Row.RowToObjectFeedback(s, infos, r);
+        return Method_Row.RowToObjectFeedback(r);
     }
 
     #endregion

@@ -18,8 +18,10 @@
 #nullable enable
 
 using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Controls;
 using BlueBasics.EventArgs;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -40,15 +42,17 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     public event EventHandler? AddClicked;
 
-    public event EventHandler<ListEventArgs>? ItemAdded;
+    public event EventHandler<NotifyCollectionChangedEventArgs>? CollectionChanged;
+
+    #endregion
+
+    //public event EventHandler<ListEventArgs>? ItemAdded;
 
     /// <summary>
     /// Wird nach jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
     /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
     /// </summary>
-    public event EventHandler? ItemRemoved;
-
-    #endregion
+    //public event EventHandler? ItemRemoved;
 
     #region Properties
 
@@ -68,6 +72,8 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     public void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
+    public void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
+
     internal void SuggestionsAdd(ItemCollectionList? item) {
         if (item == null) { return; }
 
@@ -79,8 +85,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
-    }
+    protected override void DrawControl(Graphics gr, States state) { }
 
     protected void MoveItemBetweenList(ListBox source, ListBox target, string @internal, bool doRemove) {
         var sourceItem = source.Item[@internal];
@@ -114,18 +119,38 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         Suggest.Enabled = Enabled;
     }
 
-    protected void OnItemAdded(ListEventArgs e) {
-        if (IsDisposed) { return; }
-        ItemAdded?.Invoke(this, e);
-    }
-
-    protected void OnItemRemoved(System.EventArgs e) {
-        if (IsDisposed) { return; }
-        ItemRemoved?.Invoke(this, e);
-    }
-
     private void Main_AddClicked(object sender, System.EventArgs e) => OnAddClicked();
 
+    private void Main_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        foreach (var thisn in Main.Item) {
+            Suggest.Item.Remove(thisn.KeyName);
+        }
+
+        if (e.OldItems != null) {
+            foreach (var thisit in e.OldItems) {
+
+                if (thisit is BasicListItem bli) {
+                    Suggest.Item.Add(bli.Clone() as BasicListItem);
+                }
+                
+            }
+
+
+        }
+
+
+        OnCollectionChanged(e);
+    }
+
+    //protected void OnItemAdded(ListEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    ItemAdded?.Invoke(this, e);
+    //}
+
+    //protected void OnItemRemoved(System.EventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    ItemRemoved?.Invoke(this, e);
+    //}
     //private void Main_ItemAdded(object sender, ListEventArgs e) {
     //    MoveItemBetweenList(Suggest, Main, ((BasicListItem)e.Item).Internal, true);
     //    OnItemAdded(e);

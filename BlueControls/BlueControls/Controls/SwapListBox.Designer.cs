@@ -68,6 +68,7 @@ namespace BlueControls.Controls {
             this.Main.TabIndex = 0;
             this.Main.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.Main_ItemClicked);
             this.Main.AddClicked += new EventHandler(this.Main_AddClicked);
+            this.Main.CollectionChanged += Main_CollectionChanged; 
             // 
             // Suggest
             // 
@@ -92,6 +93,8 @@ namespace BlueControls.Controls {
             this.splitContainer1.ResumeLayout(false);
             this.ResumeLayout(false);
         }
+
+
         #endregion
 
         private SplitContainer splitContainer1;

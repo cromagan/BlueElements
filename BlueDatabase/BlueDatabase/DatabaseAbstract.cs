@@ -94,11 +94,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private string _eventScriptTmp = string.Empty;
 
     private double _globalScale;
-
     private string _globalShowPass = string.Empty;
-
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
-
+    private string _scripterror = string.Empty;
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -671,6 +669,56 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return string.Empty;
     }
 
+    public void CheckScriptError() {
+        _scripterror = string.Empty;
+
+        List<string> names = new();
+        EventTypes types = 0;
+
+        foreach (var thissc in _eventScript) {
+            if (!thissc.IsOk()) {
+                _scripterror = thissc.Name + ": " + thissc.ErrorReason();
+            }
+
+            if (names.Contains(thissc.Name, false)) {
+                _scripterror = "Skriptname '" + thissc.Name + "' mehrfach vorhanden";
+                return;
+            }
+
+            if (thissc.EventTypes.HasFlag(EventTypes.export) && types.HasFlag(EventTypes.export)) {
+                _scripterror = "Skript 'Export' mehrfach vorhanden";
+                return;
+            }
+
+            if (thissc.EventTypes.HasFlag(EventTypes.database_loaded) && types.HasFlag(EventTypes.database_loaded)) {
+                _scripterror = "Skript 'Datenank geladen' mehrfach vorhanden";
+                return;
+            }
+
+            if (thissc.EventTypes.HasFlag(EventTypes.prepare_formula) && types.HasFlag(EventTypes.prepare_formula)) {
+                _scripterror = "Skript 'Formular Vorbereitung' mehrfach vorhanden";
+                return;
+            }
+
+            if (thissc.EventTypes.HasFlag(EventTypes.value_changed_extra_thread) && types.HasFlag(EventTypes.value_changed_extra_thread)) {
+                _scripterror = "Skript 'Wert geändert Extra Thread' mehrfach vorhanden";
+                return;
+            }
+
+            if (thissc.EventTypes.HasFlag(EventTypes.new_row) && types.HasFlag(EventTypes.new_row)) {
+                _scripterror = "Skript 'Neue Zeile' mehrfach vorhanden";
+                return;
+            }
+
+            if (thissc.EventTypes.HasFlag(EventTypes.value_changed) && types.HasFlag(EventTypes.value_changed)) {
+                _scripterror = "Skript 'Wert geändert' mehrfach vorhanden";
+                return;
+            }
+
+            types |= thissc.EventTypes;
+        }
+    }
+
     public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo, bool tagsToo) {
         _ = sourceDatabase.Save();
         sourceDatabase.SetReadOnly();
@@ -865,6 +913,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public ScriptEndedFeedback ExecuteScript(EventScript s, bool changevalues, RowItem? row) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false); }
 
+        if (!string.IsNullOrEmpty(_scripterror)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + _scripterror, false); }
+
         try {
 
             #region Variablen für Skript erstellen
@@ -891,7 +941,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             vars.Add(new VariableString("Usergroup", UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
             vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             vars.Add(new VariableDatabase("Database", this, true, true, "Die Datenbank, die zu dem Skript gehört"));
-            vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(EventTypes.error_check), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
+            vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(EventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
             if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
                 vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
             }
@@ -903,10 +953,17 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             var allowedMethods = MethodType.Standard | MethodType.Database;
 
             if (row != null) { allowedMethods |= MethodType.MyDatabaseRow; }
-            if (!s.EventTypes.HasFlag(EventTypes.error_check)) {
+            if (!s.EventTypes.HasFlag(EventTypes.prepare_formula)) {
                 allowedMethods |= MethodType.IO;
                 allowedMethods |= MethodType.NeedLongTime;
             }
+
+            if (!s.EventTypes.HasFlag(EventTypes.value_changed_extra_thread) &&
+                !s.EventTypes.HasFlag(EventTypes.prepare_formula) &&
+                !s.EventTypes.HasFlag(EventTypes.database_loaded)) {
+                allowedMethods |= MethodType.ManipulatesUser;
+            }
+
             if (changevalues) { allowedMethods |= MethodType.ChangeAnyDatabaseOrRow; }
 
             #endregion
@@ -933,7 +990,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             }
 
             if (!scf.AllOk) {
-                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.Name + "' hat einen Fehler verursacht.");
+                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.Name + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
             }
 
             #endregion
@@ -1658,6 +1715,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 foreach (var t in ai) {
                     _eventScript.Add(new EventScript(this, t));
                 }
+
+                CheckScriptError();
                 break;
 
             case DatabaseDataType.DatabaseVariables:

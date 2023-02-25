@@ -82,9 +82,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public event EventHandler? AddClicked;
 
+    public event EventHandler<NotifyCollectionChangedEventArgs>? CollectionChanged;
+
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
+
+    public event EventHandler? ItemChanged;
 
     public event EventHandler? ItemCheckedChanged;
 
@@ -92,8 +96,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     public event EventHandler<BasicListItemEventArgs>? ItemClicked;
 
     public event EventHandler<BasicListItemEventArgs>? ItemDoubleClick;
-
-    public event EventHandler? ListOrItemChanged;
 
     #endregion
 
@@ -265,11 +267,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
+    public void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
+
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void OnListOrItemChanged() => ListOrItemChanged?.Invoke(this, System.EventArgs.Empty);
+    public void OnItemChanged() => ItemChanged?.Invoke(this, System.EventArgs.Empty);
 
     protected override void DrawControl(Graphics gr, States state) {
 
@@ -415,7 +419,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void _Item_Changed(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         Invalidate();
-        OnListOrItemChanged();
+        OnItemChanged();
     }
 
     private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
@@ -491,7 +495,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (IsDisposed) { return; }
         //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
         Invalidate();
-        OnListOrItemChanged();
+        OnCollectionChanged(e);
     }
 
     private void Minus_Click(object sender, System.EventArgs e) {

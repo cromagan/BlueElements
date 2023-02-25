@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
 using BlueBasics;
+using BlueBasics.Interfaces;
+using BlueDatabase;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -52,7 +54,6 @@ internal class Method_SaveImage : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-
         #region  Bild ermitteln (img)
 
         var img = ((VariableBitmap)attvar.Attributes[2]).ValueBitmap;
@@ -65,6 +66,8 @@ internal class Method_SaveImage : Method {
         var filn = ((VariableString)attvar.Attributes[0]).ValueString;
         if (string.IsNullOrEmpty(filn)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
 
+        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
+
         var pf = filn.PathParent();
         if (string.IsNullOrEmpty(pf)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
         if (!Directory.Exists(pf)) { return new DoItFeedback(infos.Data, "Verzeichniss existiert nicht"); }
@@ -74,8 +77,7 @@ internal class Method_SaveImage : Method {
 
         #endregion
 
-
-        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Bild Speichern im Testmodus deaktiviert."); }
+        //if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Bild Speichern im Testmodus deaktiviert."); }
 
         switch (((VariableString)attvar.Attributes[1]).ValueString.ToUpper()) {
             case "PNG":

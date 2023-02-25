@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.IO;
 using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Enums;
@@ -90,6 +91,8 @@ internal class Method_Export : Method_Database {
 
         var filn = ((VariableString)attvar.Attributes[0]).ValueString;
         if (string.IsNullOrEmpty(filn)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
+        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
+
 
         var pf = filn.PathParent();
         if (string.IsNullOrEmpty(pf)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }

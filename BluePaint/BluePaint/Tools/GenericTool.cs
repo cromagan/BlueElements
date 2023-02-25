@@ -67,6 +67,7 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
+    /// <param name="originalPic"></param>
     public virtual void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) { }
 
     public virtual void ExcuteCommand(string command) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
@@ -75,6 +76,7 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     ///
     /// </summary>
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
+    /// <param name="originalPic"></param>
     public virtual new void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) { }
 
     /// <summary>

@@ -226,7 +226,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         btnSave.Enabled = true;
     }
 
-    private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database.Column.GenerateOverView();
+    private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
     private void Database_Disposing(object sender, System.EventArgs e) {
         RemoveDatabase();

@@ -101,12 +101,12 @@ public class VariableBool : Variable {
     }
 
     protected override object? TryParse(string txt, Script? s) {
-        if (Method_if.GetBool(txt) is bool b) { return b; }
+        if (Method_If.GetBool(txt) is bool b) { return b; }
 
         #region Auf Restliche Boolsche Operationen testen
 
         //foreach (var check in Method_if.VergleichsOperatoren) {
-        var (i, check) = NextText(txt, 0, Method_if.VergleichsOperatoren, false, false, KlammernStd);
+        var (i, check) = NextText(txt, 0, Method_If.VergleichsOperatoren, false, false, KlammernStd);
         if (i > -1) {
             if (i < 1 && check != "!") {
                 return null;//new DoItFeedback(infos.LogData, s, "Operator (" + check + ") am String-Start nicht erlaubt: " + txt);
@@ -225,7 +225,7 @@ public class VariableBool : Variable {
             }
 
             if (!string.IsNullOrEmpty(replacer)) {
-                return Method_if.GetBool(replacer);
+                return Method_If.GetBool(replacer);
             }
         }
 

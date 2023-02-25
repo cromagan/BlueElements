@@ -216,11 +216,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
                 #region Zeile(n) ermitteln und Script löschen
 
-                if (calcrows) {
-                    _rows = Database?.Row.CalculateFilteredRows(f);
-                } else {
-                    _rows = null;
-                }
+                _rows = calcrows ? Database?.Row.CalculateFilteredRows(f) : null;
 
                 #endregion
             }

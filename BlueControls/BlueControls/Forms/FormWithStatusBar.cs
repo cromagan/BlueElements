@@ -29,7 +29,7 @@ public partial class FormWithStatusBar : Form {
 
     #region Fields
 
-    private DateTime LastMessage = DateTime.UtcNow;
+    private DateTime _lastMessage = DateTime.UtcNow;
 
     #endregion
 
@@ -80,7 +80,7 @@ public partial class FormWithStatusBar : Form {
                 return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, message, didAlreadyMessagebox)));
             }
 
-            LastMessage = DateTime.UtcNow;
+            _lastMessage = DateTime.UtcNow;
             timMessageClearer.Enabled = true;
 
             var imagecode = ImageCode.Information;
@@ -127,7 +127,7 @@ public partial class FormWithStatusBar : Form {
             return;
         }
 
-        if (DateTime.UtcNow.Subtract(LastMessage).TotalSeconds >= MessageSeconds) {
+        if (DateTime.UtcNow.Subtract(_lastMessage).TotalSeconds >= MessageSeconds) {
             timMessageClearer.Enabled = false;
             capStatusBar.Text = "<imagecode=" + QuickImage.Get(ImageCode.Häkchen, 16) + "> Nix besonderes zu berichten...";
             capStatusBar.Refresh();

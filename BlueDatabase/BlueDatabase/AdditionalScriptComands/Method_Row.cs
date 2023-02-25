@@ -67,7 +67,7 @@ public class Method_Row : Method {
         return vro.RowItem;
     }
 
-    public static DoItFeedback RowToObjectFeedback(Script s, CanDoFeedback? infos, RowItem? row) => new(new VariableRowItem(row));
+    public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 
     public override List<string> Comand(List<Variable> currentvariables) => new() { "row" };
 
@@ -82,11 +82,11 @@ public class Method_Row : Method {
 
         if (r.Count > 1) { return new DoItFeedback(infos.Data, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 
-        if (r == null || r.Count is 0 or > 1) {
-            return RowToObjectFeedback(s, infos, null);
+        if (r.Count is 0 or > 1) {
+            return RowToObjectFeedback(null);
         }
 
-        return RowToObjectFeedback(s, infos, r[0]);
+        return RowToObjectFeedback(r[0]);
     }
 
     #endregion

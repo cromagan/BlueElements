@@ -36,7 +36,7 @@ internal class Method_SetClipboard : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO;
+    public override MethodType MethodType => MethodType.IO | MethodType.ManipulatesUser;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "SetClipboard(Text);";

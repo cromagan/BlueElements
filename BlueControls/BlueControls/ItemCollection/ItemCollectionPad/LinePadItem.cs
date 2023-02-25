@@ -378,7 +378,7 @@ public class LinePadItem : BasicPadItem {
                         var tLinks = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, lu, true);
                         var trechts = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], ro, ru, true);
                         //    If DirectCast(Object2, RowFormulaItem).Row.CellFirst().String.Contains("Lilo") AndAlso DirectCast(Object1, RowFormulaItem).Row.CellFirst().String.Contains("Karl") Then Stop
-                        if (tOben != null || tUnten != null || tLinks != null || trechts != null) {
+                        if (!tOben.IsEmpty || !tUnten.IsEmpty || !tLinks.IsEmpty || !trechts.IsEmpty) {
                             a.Inflate(-50, -50);
                             lo = a.PointOf(Alignment.Top_Left);
                             ro = a.PointOf(Alignment.Top_Right);
@@ -388,19 +388,19 @@ public class LinePadItem : BasicPadItem {
                             var unten = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lu, ru, true);
                             var links = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], lo, lu, true);
                             var rechts = LinesIntersect(_tempPoints[p1], _tempPoints[p1 + 1], ro, ru, true);
-                            if (oben == null && tOben != null) {
+                            if (oben.IsEmpty && !tOben.IsEmpty) {
                                 oben = tOben;
                             }
-                            if (unten == null && tUnten != null) {
+                            if (unten.IsEmpty && !tUnten.IsEmpty) {
                                 unten = tUnten;
                             }
-                            if (links == null && tLinks != null) {
+                            if (links.IsEmpty && !tLinks.IsEmpty) {
                                 links = tLinks;
                             }
-                            if (rechts == null && trechts != null) {
+                            if (rechts.IsEmpty && !trechts.IsEmpty) {
                                 rechts = trechts;
                             }
-                            if (oben != null && unten != null) {
+                            if (!oben.IsEmpty && !unten.IsEmpty) {
                                 if (_tempPoints[p1].Y < _tempPoints[p1 + 1].Y) {
                                     // Schneidet durch, von oben nach unten
                                     _tempPoints.Insert(p1 + 1, oben);
@@ -426,7 +426,7 @@ public class LinePadItem : BasicPadItem {
                                 _tempPoints.Insert(p1 + 4, oben);
                                 return true;
                             }
-                            if (links != null && rechts != null) {
+                            if (!links.IsEmpty && !rechts.IsEmpty) {
                                 if (_tempPoints[p1].X < _tempPoints[p1 + 1].X) {
                                     // Schneidet durch, von links nach rechts
                                     _tempPoints.Insert(p1 + 1, links);
@@ -452,7 +452,7 @@ public class LinePadItem : BasicPadItem {
                                 _tempPoints.Insert(p1 + 4, links);
                                 return true;
                             }
-                            if (unten != null && rechts != null) {
+                            if (!unten.IsEmpty && !rechts.IsEmpty) {
                                 if (_tempPoints[p1].X < _tempPoints[p1 + 1].X) {
                                     _tempPoints.Insert(p1 + 1, unten);
                                     _tempPoints.Insert(p1 + 2, ru);
@@ -464,7 +464,7 @@ public class LinePadItem : BasicPadItem {
                                 _tempPoints.Insert(p1 + 3, unten);
                                 return true;
                             }
-                            if (oben != null && rechts != null) {
+                            if (!oben.IsEmpty && !rechts.IsEmpty) {
                                 if (_tempPoints[p1].X < _tempPoints[p1 + 1].X) {
                                     _tempPoints.Insert(p1 + 1, oben);
                                     _tempPoints.Insert(p1 + 2, ro);
@@ -476,7 +476,7 @@ public class LinePadItem : BasicPadItem {
                                 _tempPoints.Insert(p1 + 3, oben);
                                 return true;
                             }
-                            if (unten != null && links != null) {
+                            if (!unten.IsEmpty && !links.IsEmpty) {
                                 if (_tempPoints[p1].X < _tempPoints[p1 + 1].X) {
                                     _tempPoints.Insert(p1 + 1, links);
                                     _tempPoints.Insert(p1 + 2, lu);
@@ -488,7 +488,7 @@ public class LinePadItem : BasicPadItem {
                                 _tempPoints.Insert(p1 + 3, links);
                                 return true;
                             }
-                            if (oben != null && links != null) {
+                            if (!oben.IsEmpty && !links.IsEmpty) {
                                 if (_tempPoints[p1].X < _tempPoints[p1 + 1].X) {
                                     _tempPoints.Insert(p1 + 1, links);
                                     _tempPoints.Insert(p1 + 2, lo);

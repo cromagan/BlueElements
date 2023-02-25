@@ -521,25 +521,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName {
 
     private static void SetTextRenderingHint(Graphics gr, Font font) {
         //http://csharphelper.com/blog/2014/09/understand-font-aliasing-issues-in-c/
-        if (font.Size < 11) {
-            // Standard Font = Calibri 10.15
-            gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-        } else {
-            //if (font.Bold) {
-            //    gr.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
-            //} else {
-            gr.TextRenderingHint = TextRenderingHint.AntiAlias;
-            //}
-        }
-        //} else {
-        //    if(font.Bold) {
-        //        gr.TextRenderingHint = TextRenderingHint.SingleBitPerPixelGridFit;
-        //    }
-        //    else {
-        //        gr.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
-        //    }
-
-        //}
+        gr.TextRenderingHint = font.Size < 11 ? TextRenderingHint.ClearTypeGridFit : TextRenderingHint.AntiAlias;
     }
 
     private static string ToString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool vKapitälchen, bool vonlyuppe, bool vonlylower) {

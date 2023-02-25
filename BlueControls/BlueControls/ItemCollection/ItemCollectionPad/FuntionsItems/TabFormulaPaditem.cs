@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -264,12 +265,19 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IHasConnectedFormula {
             _ = childs.Item.Add(thisf, File.Exists(thisf) ? ImageCode.Diskette : ImageCode.Formel);
         }
 
-        childs.ListOrItemChanged += Childs_ListOrItemChanged;
+        childs.CollectionChanged += Childs_CollectionChanged;
         childs.ContextMenuInit += Childs_ContextMenuInit;
         childs.ContextMenuItemClicked += Childs_ContextMenuItemClicked;
         childs.Disposed += Childs_Disposed;
 
         return childs;
+    }
+
+    private void Childs_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+        _childs.Clear();
+        _childs.AddRange(((ListBox)sender).Item.ToListOfString());
+        OnChanged();
+        RaiseVersion();
     }
 
     private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuComands.Bearbeiten);
@@ -287,18 +295,11 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IHasConnectedFormula {
 
     private void Childs_Disposed(object sender, System.EventArgs e) {
         if (sender is ListBox childs) {
-            childs.ListOrItemChanged -= Childs_ListOrItemChanged;
+            childs.CollectionChanged -= Childs_CollectionChanged;
             childs.ContextMenuInit -= Childs_ContextMenuInit;
             childs.ContextMenuItemClicked -= Childs_ContextMenuItemClicked;
             childs.Disposed -= Childs_Disposed;
         }
-    }
-
-    private void Childs_ListOrItemChanged(object sender, System.EventArgs e) {
-        _childs.Clear();
-        _childs.AddRange(((ListBox)sender).Item.ToListOfString());
-        OnChanged();
-        RaiseVersion();
     }
 
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {

@@ -19,6 +19,8 @@
 
 using System.Collections.Generic;
 using BlueBasics;
+using BlueBasics.Interfaces;
+using BlueDatabase;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -51,16 +53,20 @@ internal class Method_DeleteFile : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
+        var filn = ((VariableString)attvar.Attributes[0]).ValueString;
+
+        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
+
+        if (!IO.FileExists(filn)) {
             return DoItFeedback.Wahr();
         }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert."); }
+        //if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert."); }
 
         try {
-            return new DoItFeedback(IO.DeleteFile(((VariableString)attvar.Attributes[0]).ValueString, false));
+            return new DoItFeedback(IO.DeleteFile(filn, false));
         } catch {
-            return new DoItFeedback(infos.Data, "Fehler beim Löschen: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(infos.Data, "Fehler beim Löschen: " + filn);
         }
     }
 

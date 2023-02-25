@@ -165,7 +165,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         switch (column.ScriptType) {
             case ScriptType.Bool:
                 vars.Add(new VariableBool(column.Name, wert == "+", ro, false, qi));
-
                 break;
 
             case ScriptType.List:
@@ -192,6 +191,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             case ScriptType.String_Readonly:
                 vars.Add(new VariableString(column.Name, wert, true, false, qi));
+                break;
+
+            case ScriptType.Bool_Readonly:
+                vars.Add(new VariableBool(column.Name, wert == "+", true, false, qi));
                 break;
 
             default:
@@ -285,7 +288,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (LastCheckedEventArgs != null) { return; }
 
-        var sef = ExecuteScript(EventTypes.error_check, string.Empty, false, false, true, 0);
+        var sef = ExecuteScript(EventTypes.prepare_formula, string.Empty, false, false, true, 0);
 
         LastCheckedMessage = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
 
@@ -371,7 +374,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", false); }
         var t = DateTime.Now;
         do {
-            var erg = ExecuteScript(doFemdZelleInvalidate, fullCheck, eventname, changevalues, scriptname);
+            var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, changevalues);
             if (erg.AllOk) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
@@ -545,7 +548,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    private ScriptEndedFeedback ExecuteScript(bool doFemdZelleInvalidate, bool fullCheck, EventTypes? eventname, bool changevalues, string scriptname) {
+    private ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", false); }
 
         var feh = Database.ErrorReason(ErrorReason.EditAcut);
@@ -554,6 +557,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
         DoingScript = true;
         var script = Database.ExecuteScript(eventname, scriptname, changevalues, this);
+
+        if (!script.AllOk) {
+            Database.OnScriptError(new RowCancelEventArgs(this, script.ProtocolText));
+            DoingScript = false;
+            return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
+        }
+
 
         if (changevalues) {
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
@@ -567,10 +577,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         // checkPerformed geht von Dateisystemfehlern aus
 
-        if (!script.AllOk) {
-            Database.OnScriptError(new RowCancelEventArgs(this, script.ProtocolText));
-            return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
-        }
+
 
         // Dann die Abschließenden Korrekturen vornehmen
         foreach (var thisColum in Database.Column) {

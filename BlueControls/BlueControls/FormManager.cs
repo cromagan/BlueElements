@@ -101,12 +101,8 @@ public class FormManager : ApplicationContext {
         _ = Forms.Remove((Form)sender);
         if (FirstWindowShown && !Forms.Any()) {
             if (sender != _lastStartForm) {
-                if (NewModeSelectionForm != null) {
-                    // Delegate muss auf null geprüt werden!
-                    _lastStartForm = NewModeSelectionForm();
-                } else {
-                    _lastStartForm = null;
-                }
+                // Delegate muss auf null geprüt werden!
+                _lastStartForm = NewModeSelectionForm?.Invoke();
 
                 if (_lastStartForm != null) {
                     Current.RegisterForm(_lastStartForm);

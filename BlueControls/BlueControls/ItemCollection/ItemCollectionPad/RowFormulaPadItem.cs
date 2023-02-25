@@ -102,6 +102,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             _tmpQuickInfo = _lastQuickInfo.Replace(r.CellFirstString(), "<b>[<imagecode=Stern|16>" + Row.CellFirstString() + "]</b>");
             return _tmpQuickInfo;
         }
+        // ReSharper disable once ValueParameterNotUsed
         set {
             // Werte zurücksetzen
             _lastQuickInfo = string.Empty;

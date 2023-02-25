@@ -29,7 +29,7 @@ internal class Method_BerechneVariable : Method {
 
     #region Fields
 
-    private static readonly List<List<string>> _args = new() { new List<string> { Variable.Any_Plain } };
+    private static readonly List<List<string>> Sargs = new() { new List<string> { Variable.Any_Plain } };
 
     #endregion
 
@@ -37,7 +37,7 @@ internal class Method_BerechneVariable : Method {
 
     public static bool SEndlessArgs => false;
 
-    public override List<List<string>> Args => _args;
+    public override List<List<string>> Args => Sargs;
 
     public override string Description => "Berechnet eine Variable. Der Typ der Variable und des Ergebnisses müssen übereinstimmen.";
     public override bool EndlessArgs => SEndlessArgs;
@@ -71,18 +71,18 @@ internal class Method_BerechneVariable : Method {
 
         if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos.Data, varnam + " ist kein gültiger Variablen-Name"); }
 
-        var v = s.Variables.Get(varnam);
-        if (generateVariable && v != null) {
+        var vari = s.Variables.Get(varnam);
+        if (generateVariable && vari != null) {
             return new DoItFeedback(infos.Data, "Variable " + varnam + " ist bereits vorhanden.");
         }
-        if (!generateVariable && v == null) {
+        if (!generateVariable && vari == null) {
             return new DoItFeedback(infos.Data, "Variable " + varnam + " nicht vorhanden.");
         }
 
         var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
 
-        var attvar = SplitAttributeToVars(s, value, _args, SEndlessArgs, infos.Data);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(null, new Method_BerechneVariable(), attvar); }
+        var attvar = SplitAttributeToVars(s, value, Sargs, SEndlessArgs, infos.Data);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, new Method_BerechneVariable(), attvar); }
 
         if (generateVariable) {
             attvar.Attributes[0].KeyName = varnam.ToLower();
@@ -91,10 +91,15 @@ internal class Method_BerechneVariable : Method {
             return new DoItFeedback(attvar.Attributes[0]);
         }
 
-        return v.GetValueFrom(attvar.Attributes[0], infos.Data);
+        if (vari == null) {
+            // es sollte generateVariable greifen, und hier gar nimmer ankommen. Aber um die IDE zu befriedigen
+            return new DoItFeedback(infos.Data, "Interner Fehler");
+        }
+
+        return vari.GetValueFrom(attvar.Attributes[0], infos.Data);
     }
 
-    public override List<string> Comand(List<Variable> currentvariables) => currentvariables?.AllNames() ?? new List<string>();
+    public override List<string> Comand(List<Variable> currentvariables) => currentvariables.AllNames();
 
     /// <summary>
     /// Berechnet z.B.   X = 5;

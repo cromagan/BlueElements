@@ -81,12 +81,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) {
-        if (sender == btnOeffnen) {
-            LoadFile(LoadTab.FileName, LoadTab.FileName);
-        } else {
-            // Kann nur der Import-Knopf sein
-            LoadFile(LoadTab.FileName, string.Empty);
-        }
+        LoadFile(LoadTab.FileName, string.Empty);
     }
 
     private void SaveTab_FileOk(object sender, CancelEventArgs e) {

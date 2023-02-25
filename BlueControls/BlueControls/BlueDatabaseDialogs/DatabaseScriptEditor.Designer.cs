@@ -50,11 +50,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAuslöser_newrow = new BlueControls.Controls.Button();
             this.chkAuslöser_valuechangedThread = new BlueControls.Controls.Button();
             this.chkAuslöser_valuechanged = new BlueControls.Controls.Button();
-            this.chkAuslöser_errorcheck = new BlueControls.Controls.Button();
+            this.chkAuslöser_prepaireformula = new BlueControls.Controls.Button();
             this.grpVerfügbareSkripte = new BlueControls.Controls.GroupBox();
             this.lstEventScripts = new BlueControls.Controls.ListBox();
             this.tabVariablen = new System.Windows.Forms.TabPage();
             this.variableEditor = new BlueControls.VariableEditor();
+            this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.tabScripts.SuspendLayout();
@@ -169,6 +170,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpEigenschaften
             // 
             this.grpEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpEigenschaften.Controls.Add(this.btnSpaltenuebersicht);
             this.grpEigenschaften.Controls.Add(this.chkAendertWerte);
             this.grpEigenschaften.Controls.Add(this.btnSave);
             this.grpEigenschaften.Controls.Add(this.chkExternVerfügbar);
@@ -258,7 +260,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAuslöser.Controls.Add(this.chkAuslöser_newrow);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_valuechangedThread);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_valuechanged);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_errorcheck);
+            this.grpAuslöser.Controls.Add(this.chkAuslöser_prepaireformula);
             this.grpAuslöser.Dock = System.Windows.Forms.DockStyle.Right;
             this.grpAuslöser.Location = new System.Drawing.Point(848, 0);
             this.grpAuslöser.Name = "grpAuslöser";
@@ -324,18 +326,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAuslöser_valuechanged.Text = "Wert geändert";
             this.chkAuslöser_valuechanged.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
-            // chkAuslöser_errorcheck
+            // chkAuslöser_prepaireformula
             // 
-            this.chkAuslöser_errorcheck.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAuslöser_errorcheck.Location = new System.Drawing.Point(9, 16);
-            this.chkAuslöser_errorcheck.Name = "chkAuslöser_errorcheck";
-            this.chkAuslöser_errorcheck.QuickInfo = "Das Skript wird verwendet zur Datenkonsitenzprüfung\r\noder für Variablen für Formu" +
-    "lare.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen oder\r\nlange dauern" +
-    "de Prozesse anstoßen.";
-            this.chkAuslöser_errorcheck.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_errorcheck.TabIndex = 19;
-            this.chkAuslöser_errorcheck.Text = "Fehlerprüfung";
-            this.chkAuslöser_errorcheck.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            this.chkAuslöser_prepaireformula.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(9, 16);
+            this.chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
+            this.chkAuslöser_prepaireformula.QuickInfo = "Das Skript wird verwendet zur Datenkonsitenzprüfung\r\nund für Variablen für Formul" +
+    "are.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen oder\r\nlange dauernd" +
+    "e Prozesse anstoßen.";
+            this.chkAuslöser_prepaireformula.Size = new System.Drawing.Size(200, 16);
+            this.chkAuslöser_prepaireformula.TabIndex = 19;
+            this.chkAuslöser_prepaireformula.Text = "Formular vorbereiten";
+            this.chkAuslöser_prepaireformula.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // grpVerfügbareSkripte
             // 
@@ -363,7 +365,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts.Size = new System.Drawing.Size(222, 586);
             this.lstEventScripts.TabIndex = 0;
             this.lstEventScripts.AddClicked += new System.EventHandler(this.lstEventScripts_AddClicked);
-            this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);
+            this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);            
             // 
             // tabVariablen
             // 
@@ -384,6 +386,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.variableEditor.Name = "variableEditor";
             this.variableEditor.Size = new System.Drawing.Size(1283, 618);
             this.variableEditor.TabIndex = 0;
+            // 
+            // btnSpaltenuebersicht
+            // 
+            this.btnSpaltenuebersicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSpaltenuebersicht.ImageCode = "Spalte|16";
+            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(568, 48);
+            this.btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
+            this.btnSpaltenuebersicht.Size = new System.Drawing.Size(152, 24);
+            this.btnSpaltenuebersicht.TabIndex = 36;
+            this.btnSpaltenuebersicht.Text = "Spaltenübersicht";
+            this.btnSpaltenuebersicht.Click += new System.EventHandler(this.btnSpaltenuebersicht_Click);
             // 
             // DatabaseScriptEditor
             // 
@@ -418,7 +431,7 @@ namespace BlueControls.BlueDatabaseDialogs {
         private VariableEditor variableEditor;
         private GroupBox grpEigenschaften;
         private ScriptEditor eventScriptEditor;
-        private Button chkAuslöser_errorcheck;
+        private Button chkAuslöser_prepaireformula;
         private Button chkAuslöser_valuechanged;
         private Button chkAuslöser_newrow;
         private Button chkAendertWerte;
@@ -435,5 +448,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private GroupBox grpAuslöser;
         private Button chkAuslöser_databaseloaded;
         private Button chkAuslöser_export;
+        private Button btnSpaltenuebersicht;
     }
 }

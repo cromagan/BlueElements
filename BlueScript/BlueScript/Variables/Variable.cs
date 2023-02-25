@@ -395,7 +395,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
         txt = txt.DeKlammere(true, false, false, true);
 
-        var (uu, _) = NextText(txt, 0, Method_if.UndUnd, false, false, KlammernStd);
+        var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernStd);
         if (uu > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, uu), s, ld);
             if (!txt1.AllOk) {
@@ -408,7 +408,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             return GetVariableByParsing(txt.Substring(uu + 2), s, ld);
         }
 
-        var (oo, _) = NextText(txt, 0, Method_if.OderOder, false, false, KlammernStd);
+        var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernStd);
         if (oo > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, oo), s, ld);
             if (!txt1.AllOk) {

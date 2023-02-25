@@ -309,8 +309,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         _ = Focus();
     }
 
-    private void Item_CollectionChanged(object sender,
-                                                                                                    NotifyCollectionChangedEventArgs e) {
+    private void Item_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (IsDisposed) { return; }
         if (_btnDropDownIsIn) { return; }
         FloatingForm.Close(this);

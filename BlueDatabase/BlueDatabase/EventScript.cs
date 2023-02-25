@@ -162,12 +162,12 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
 
         if (string.IsNullOrEmpty(KeyName)) { return "Kein Name angegeben."; }
 
-        if (!KeyName.IsFormat(FormatHolder.SystemName)) { return "Ungültiger Name"; }
+        if (!KeyName.IsFormat(FormatHolder.Text)) { return "Ungültiger Name"; }
 
-        if (_eventTypes.HasFlag(EventTypes.error_check)) {
-            if (_changeValues) { return "Routinen, die Fehler prüfen, können keine Werte ändern."; }
-            if (!_needRow) { return "Routinen, die Fehler prüfen, müssen sich auf Zeilen beziehen."; }
-            if (_executable) { return "Routinen, die Fehler prüfen, können nicht so von außerhalb benutzt werden."; }
+        if (_eventTypes.HasFlag(EventTypes.prepare_formula)) {
+            if (_changeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
+            if (!_needRow) { return "Routinen,  die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
+            if (_executable) { return "Routinen,  die das Formular vorbereiten, können nicht so von außerhalb benutzt werden."; }
         }
 
         if (_eventTypes.HasFlag(EventTypes.export)) {
@@ -269,12 +269,12 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
             symb = ImageCode.Person;
         }
 
-        if (_eventTypes.HasFlag(EventTypes.export)) { symb = ImageCode.Pfeil_Unten; }
+        if (_eventTypes.HasFlag(EventTypes.export)) { symb = ImageCode.Layout; }
         if (_eventTypes.HasFlag(EventTypes.database_loaded)) { symb = ImageCode.Diskette; }
         if (_eventTypes.HasFlag(EventTypes.new_row)) { symb = ImageCode.Zeile; }
         if (_eventTypes.HasFlag(EventTypes.value_changed)) { symb = ImageCode.Stift; }
         if (_eventTypes.HasFlag(EventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
-        if (_eventTypes.HasFlag(EventTypes.error_check)) { symb = ImageCode.HäkchenDoppelt; }
+        if (_eventTypes.HasFlag(EventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 
         if (!_changeValues) { }
 

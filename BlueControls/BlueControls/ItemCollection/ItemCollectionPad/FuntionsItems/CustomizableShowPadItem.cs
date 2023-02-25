@@ -61,12 +61,12 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public string Breite_berechnen {
         get => string.Empty;
         set {
-            var li = new ItemCollectionList.ItemCollectionList(false);
+            var li = new ItemCollectionList.ItemCollectionList(true);
             for (var br = 1; br <= 20; br++) {
-                _ = li.Add(br + " Spalte(n)", br.ToString(), true, string.Empty);
+                _ = li.Add(br + " Spalte(n)", br.ToString(), true, br.ToString(Constants.Format_Integer3) + Constants.FirstSortChar);
 
                 for (var pos = 1; pos <= br; pos++) {
-                    _ = li.Add(br + " Spalte(n) - Position: " + pos, br + ";" + pos);
+                    _ = li.Add(br + " Spalte(n) - Position: " + pos, br + ";" + pos, false, br.ToString(Constants.Format_Integer3) + Constants.SecondSortChar + pos.ToString(Constants.Format_Integer3));
                 }
             }
 

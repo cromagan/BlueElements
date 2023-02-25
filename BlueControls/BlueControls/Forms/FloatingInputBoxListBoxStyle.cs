@@ -44,7 +44,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
 
-    private FloatingInputBoxListBoxStyle(ItemCollectionList items, int xpos, int ypos, int steuerWi, object tag, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
+    private FloatingInputBoxListBoxStyle(ItemCollectionList items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
         InitializeComponent();
         Tag = tag;
         // Design = Items.ControlDesign;
@@ -116,11 +116,11 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         }
     }
 
-    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? items, object tag, Control? connectedControl, bool translate) =>
+    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList items, object tag, Control? connectedControl, bool translate) =>
         new(items, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag,
             connectedControl, translate);
 
-    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList? items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
+    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
         new(items, xpos, ypos, steuerWi, tag, connectedControl, translate);
 
     public void Generate_ListBox1(ItemCollectionList items, int minWidth, AddType addNewAllowed, bool translate) {
@@ -165,7 +165,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         var infos = (List<object>)e.HotItem;
         var userMmenu = (ItemCollectionList)infos[0];
         var hotItem = infos[1];
-        var tags = (List<string>)infos[2] ?? new List<string>();
+        var tags = (List<string>)infos[2];
         var ob = (IContextMenu)infos[3];
         Close(BlueListBoxAppearance.KontextMenu);
         Close(ob);

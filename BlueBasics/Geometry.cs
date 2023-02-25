@@ -124,11 +124,10 @@ public static class Geometry {
 
     public static PointF LinesIntersect(PointF line1Start, PointF line1End, PointF line2Start, PointF line2End, bool considerEndpoints) {
         var sp = LinesIntersect(line1Start, line1End, line2Start, line2End);
-        if (!considerEndpoints) {
-            //    DebugPrint("considerEndpoints = false")
-            return sp;
-        }
-        if (sp == null) { return PointF.Empty; }
+
+        if (!considerEndpoints) { return sp; }
+        if (sp.IsEmpty) { return PointF.Empty; }
+
         const float tol = 0.0001f;
         if (sp.X < Math.Min(line1Start.X, line1End.X) - tol) {
             return PointF.Empty;
