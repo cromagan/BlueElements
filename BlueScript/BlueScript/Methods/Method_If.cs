@@ -44,7 +44,7 @@ internal class Method_if : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableBool.ShortName_Plain } };
+    public override List<List<string>> Args => new() { BoolVal };
     public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
