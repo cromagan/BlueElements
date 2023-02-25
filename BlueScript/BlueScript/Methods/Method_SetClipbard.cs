@@ -31,7 +31,7 @@ internal class Method_SetClipboard : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal };
     public override string Description => "Speichert den Text im Clipboard.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";

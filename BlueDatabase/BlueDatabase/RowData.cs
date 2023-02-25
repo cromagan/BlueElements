@@ -68,21 +68,6 @@ public static class RowDrawDataExtensions {
 /// </summary>
 public class RowData : IComparable {
 
-    #region Fields
-
-    public readonly string Chapter;
-    public readonly RowItem? Row;
-    public string AdditionalSort;
-    public Rectangle CaptionPos;
-    public int DrawHeight;
-    public bool Expanded;
-    public bool MarkYellow;
-    public string PinStateSortAddition;
-    public bool ShowCap;
-    public int Y;
-
-    #endregion
-
     #region Constructors
 
     public RowData(RowItem row) : this(row, string.Empty) { }
@@ -99,6 +84,21 @@ public class RowData : IComparable {
         ShowCap = false;
         MarkYellow = false;
     }
+
+    #endregion
+
+    #region Properties
+
+    public string AdditionalSort { get; set; }
+    public Rectangle CaptionPos { get; set; }
+    public string Chapter { get; }
+    public int DrawHeight { get; set; }
+    public bool Expanded { get; set; }
+    public bool MarkYellow { get; set; }
+    public string PinStateSortAddition { get; set; }
+    public RowItem? Row { get; }
+    public bool ShowCap { get; set; }
+    public int Y { get; set; }
 
     #endregion
 

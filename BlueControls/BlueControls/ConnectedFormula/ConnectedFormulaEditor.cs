@@ -197,7 +197,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpDatabase = BlueControls.ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+        var tmpDatabase = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
         if (tmpDatabase == null) { return; }
         FormulaSet(tmpDatabase, notAllowedchilds);
     }

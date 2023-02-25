@@ -31,7 +31,7 @@ internal class Method_TrimSuffix : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, StringVal };
     public override string Description => "Entfernt die angegebenen Suffixe und evtl. übrige Leerzeichen. Die Suffixe werden nur entfernt, wenn vor dem Suffix ein Leerzeichen oder eine Zahl ist. Groß- und Kleinschreibung wird ignoriert.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";

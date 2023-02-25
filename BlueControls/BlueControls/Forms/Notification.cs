@@ -90,7 +90,7 @@ public partial class Notification : FloatingForm {
 
     #region Properties
 
-    public Notification NoteBelow { get; }
+    public Notification? NoteBelow { get; }
 
     #endregion
 

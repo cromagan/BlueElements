@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Data.Common;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -30,7 +29,7 @@ public class Method_SetError : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable } };
+    public override List<List<string>> Args => new() { StringVal, new List<string> { VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable } };
     public override string Description => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden.";
 
     public override bool EndlessArgs => true;
@@ -39,7 +38,7 @@ public class Method_SetError : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
 
-    public override MethodType MethodType => MethodType.MyDatabaseRow;
+    public override MethodType MethodType => MethodType.Database | MethodType.MyDatabaseRow;
 
     public override string Returns => string.Empty;
     public override string StartSequence => "(";

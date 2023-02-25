@@ -31,7 +31,7 @@ internal class Method_Split : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, StringVal };
     public override string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.\r\nEs wird dabei immer eine Liste mit mindestens einen Eintrag erzeugt,\r\ndieser kann aber leer sein.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

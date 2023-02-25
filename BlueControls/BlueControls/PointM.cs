@@ -38,7 +38,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable {
     #region Fields
 
     private object? _parent;
-    private string _tag;
+    private string _tag = string.Empty;
     private float _x;
     private float _y;
 

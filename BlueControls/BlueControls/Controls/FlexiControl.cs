@@ -321,7 +321,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public new string Text { get; set; }
+    public new string Text { get; set; } = string.Empty;
 
     [DefaultValue(true)]
     bool ITranslateable.Translate {

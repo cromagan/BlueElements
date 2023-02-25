@@ -717,10 +717,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         foreach (var thisk in keys) {
-            if (!this.TryRemove(thisk, out var ci)) { return false; }
+            if (!TryRemove(thisk, out var ci)) { return false; }
 
             var newk = newName + thisk.TrimStart(oldName);
-            if (!this.TryAdd(newk, ci)) { return false; }
+            if (!TryAdd(newk, ci)) { return false; }
         }
 
         return true;

@@ -31,7 +31,7 @@ internal class Method_Number : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableFloat.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, FloatVal };
     public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

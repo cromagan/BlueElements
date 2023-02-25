@@ -31,7 +31,7 @@ internal class Method_IsDateTime : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal };
     public override string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

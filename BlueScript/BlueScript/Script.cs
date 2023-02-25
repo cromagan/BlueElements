@@ -37,17 +37,6 @@ public class Script {
     public static List<Method>? Comands;
     public static List<Variable>? VarTypes;
 
-    /// <summary>
-    /// Bei diesem Pfad können zusätzliche Dateien - wie z.B. Skript-Subroutinen enthalten sein.
-    /// Der Pfad mit abschließenden \
-    /// </summary>
-    public readonly string AdditionalFilesPath;
-
-    public readonly MethodType AllowedMethods = MethodType.Standard;
-    public readonly bool ChangeValues;
-    public readonly List<Variable> Variables;
-    public bool EndScript;
-
     #endregion
 
     #region Constructors
@@ -71,12 +60,20 @@ public class Script {
 
     #region Properties
 
-    public bool BreakFired { get; set; }
+    /// <summary>
+    /// Bei diesem Pfad können zusätzliche Dateien - wie z.B. Skript-Subroutinen enthalten sein.
+    /// Der Pfad mit abschließenden \
+    /// </summary>
+    public string AdditionalFilesPath { get; }
 
+    public MethodType AllowedMethods { get; } = MethodType.Standard;
+    public bool BreakFired { get; set; }
+    public bool ChangeValues { get; }
+    public bool EndScript { get; set; }
     public string ReducedScriptText { get; private set; }
     public string ScriptText { get; set; } = string.Empty;
-
     public int Sub { get; set; }
+    public List<Variable> Variables { get; }
 
     #endregion
 
@@ -200,7 +197,7 @@ public class Script {
                 }
 
                 pos = f.Position;
-                ld.LineAdd(Script.Line(redScriptText, pos) - ld.Line + lineadd);
+                ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);
             }
         } while (true);
     }

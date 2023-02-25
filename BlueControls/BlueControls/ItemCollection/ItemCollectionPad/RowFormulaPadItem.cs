@@ -35,10 +35,10 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     #region Fields
 
-    private string _lastQuickInfo;
-    private string _layoutId;
+    private string _lastQuickInfo = string.Empty;
+    private string _layoutId = string.Empty;
     private long _rowKey;
-    private string _tmpQuickInfo;
+    private string _tmpQuickInfo = string.Empty;
 
     #endregion
 

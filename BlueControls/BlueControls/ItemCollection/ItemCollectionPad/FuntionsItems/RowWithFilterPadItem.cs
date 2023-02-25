@@ -44,14 +44,9 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     #region Fields
 
-    public readonly DatabaseAbstract FilterDefiniton;
-
     private string _anzeige = string.Empty;
-
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-
     private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
-
     private string _überschrift = string.Empty;
 
     #endregion
@@ -144,6 +139,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             r.CellSet("FilterArt", "=");
         }
     }
+
+    public DatabaseAbstract FilterDefiniton { get; }
 
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
@@ -395,13 +392,13 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         //#endregion
 
-        #region Zeilen Prüfen
+        //#region Zeilen Prüfen
 
-        foreach (var thisrow in FilterDefiniton.Row) {
-            _ = thisrow.ExecuteScript(EventTypes.new_row, string.Empty, false, false, true, 0);
-        }
+        //foreach (var thisrow in FilterDefiniton.Row) {
+        //    _ = thisrow.ExecuteScript(EventTypes.new_row, string.Empty, false, false, true, 0);
+        //}
 
-        #endregion
+        //#endregion
     }
 
     private void FilterTable_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -459,8 +456,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         fa.TextBearbeitungErlaubt = false;
         fa.DropdownAllesAbwählenErlaubt = true;
         fa.DropdownBearbeitungErlaubt = true;
-        fa.DropDownItems = new(new List<string> { "=", "=!empty" });
-        fa.OpticalReplace = new(new List<string> { "=|ist (GK egal)", "=!empty|wenn nicht leer, ist" });
+        fa.DropDownItems = new(new List<string> { "=", "=!empty", "=word" });
+        fa.OpticalReplace = new(new List<string> { "=|ist (GK egal)", "=!empty|wenn nicht leer, ist", "=word|ein Eintrag aus" });
 
         //var b1 = x.Column.GenerateAndAdd("suchsym", " ", ColumnFormatHolder.Text);
         //b1.BehaviorOfImageAndText = BildTextVerhalten.Nur_Bild;
@@ -468,7 +465,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         var b = x.Column.GenerateAndAdd("suchtxt", "Suchtext", ColumnFormatHolder.Text);
         b.MultiLine = false;
-        b.TextBearbeitungErlaubt = false;
+        b.TextBearbeitungErlaubt = true;
         b.DropdownAllesAbwählenErlaubt = true;
         b.DropdownBearbeitungErlaubt = true;
         b.ScriptType = ScriptType.String;

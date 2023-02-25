@@ -32,21 +32,15 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
+using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public partial class ColumnArrangementPadEditor : PadEditor {
+public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     #region Fields
-
-    public readonly DatabaseAbstract? Database;
-
-    public int Fixing;
-    public bool Generating;
-
-    public bool Sorting;
 
     private int _arrangement = -1;
 
@@ -76,6 +70,13 @@ public partial class ColumnArrangementPadEditor : PadEditor {
     public ColumnViewCollection? CurrentArrangement => Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= _arrangement
         ? null
         : Database.ColumnArrangements[_arrangement];
+
+    public DatabaseAbstract? Database { get; }
+
+    public int Fixing { get; private set; }
+    public bool Generating { get; private set; }
+
+    public bool Sorting { get; private set; }
 
     #endregion
 
@@ -110,7 +111,7 @@ public partial class ColumnArrangementPadEditor : PadEditor {
         if (ca == null) { return; }
 
         var n = InputBox.Show("Umbenennen:", ca.Name, FormatHolder.Text);
-        if (!string.IsNullOrEmpty(n)) { CurrentArrangement.Name = n; }
+        if (!string.IsNullOrEmpty(n)) { ca.Name = n; }
         UpdateCombobox();
     }
 

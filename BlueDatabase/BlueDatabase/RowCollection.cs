@@ -661,4 +661,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     #endregion
+
+    public void InvalidateAllCheckData() {
+
+        foreach (var thisRow in this) {
+            thisRow.InvalidateCheckData();
+            
+        }
+
+    }
 }

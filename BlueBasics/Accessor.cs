@@ -31,14 +31,7 @@ public class Accessor<T> {
 
     #region Fields
 
-    public readonly bool CanRead;
-    public readonly bool CanWrite;
-    public readonly string Name = "[unbekannt]";
-    public readonly string QuickInfo = string.Empty;
-
-    //public readonly string TypeFullname = string.Empty;
     private readonly Func<T>? _getter;
-
     private readonly Action<T>? _setter;
 
     #endregion
@@ -85,6 +78,15 @@ public class Accessor<T> {
             }
         }
     }
+
+    #endregion
+
+    #region Properties
+
+    public bool CanRead { get; }
+    public bool CanWrite { get; }
+    public string Name { get; } = "[unbekannt]";
+    public string QuickInfo { get; } = string.Empty;
 
     #endregion
 

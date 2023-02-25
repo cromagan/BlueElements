@@ -34,7 +34,7 @@ public class ReadableListItem : TextListItem {
 
     #region Properties
 
-    public IReadableTextWithChangingAndKey Item { get; private set; }
+    public IReadableTextWithChangingAndKey Item { get; }
 
     #endregion
 

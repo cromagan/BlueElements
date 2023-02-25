@@ -30,7 +30,7 @@ public class Method_AddRow : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableBool.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, StringVal, BoolVal };
 
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile.\r\nKeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
 
@@ -40,7 +40,7 @@ public class Method_AddRow : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
 
-    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override string Returns => VariableRowItem.ShortName_Variable;
 
     public override string StartSequence => "(";

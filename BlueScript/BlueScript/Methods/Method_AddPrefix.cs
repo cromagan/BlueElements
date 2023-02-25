@@ -30,7 +30,7 @@ internal class Method_AddPrefix : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableListString.ShortName_Variable }, new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { ListStringVar, StringVal };
     public override string Description => "Fügt am Anfang jedes Listenobjekts einen Text hinzu.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";

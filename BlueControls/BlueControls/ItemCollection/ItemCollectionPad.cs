@@ -34,6 +34,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
@@ -62,7 +63,6 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     private PointM? _prRo;
     private PointM? _prRu;
     private Padding _randinMm = Padding.Empty;
-    private string _scriptName = string.Empty;
     private SizeF _sheetSizeInMm = SizeF.Empty;
     private RowItem? _sheetStyle;
     private float _sheetStyleScale;
@@ -91,6 +91,12 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
         _ = ResetVariables();
         ParseVariable(database.Row.SearchByKey(rowkey));
+    }
+
+    public ItemCollectionPad(RowItem r, int index) : this(r.Database.Layouts[index], string.Empty) {
+        // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
+        _ = ResetVariables();
+        ParseVariable(r);
     }
 
     /// <summary>
@@ -129,17 +135,17 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
                     BackColor = Color.FromArgb(IntParse(pair.Value));
                     break;
 
-                case "scriptname":
-                    _scriptName = pair.Value;
-                    break;
+                //case "scriptname":
+                //    _scriptName = pair.Value;
+                //    break;
 
                 case "id":
                     if (string.IsNullOrEmpty(Id)) { Id = pair.Value.FromNonCritical(); }
                     break;
 
                 case "style":
-                    _sheetStyle = Skin.StyleDb.Row[pair.Value];
-                    _sheetStyle ??= Skin.StyleDb.Row.First();// Einfach die Erste nehmen
+                    _sheetStyle = Skin.StyleDb?.Row[pair.Value];
+                    _sheetStyle ??= Skin.StyleDb?.Row.First();// Einfach die Erste nehmen
                     break;
 
                 case "fontscale":
@@ -187,7 +193,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
                 case "sheetstyle":
                     if (Skin.StyleDb == null) { Skin.InitStyles(); }
-                    _sheetStyle = Skin.StyleDb.Row[pair.Value];
+                    _sheetStyle = Skin.StyleDb?.Row[pair.Value];
                     break;
 
                 case "sheetstylescale":
@@ -231,7 +237,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     public float GridShow {
         get => _gridShow;
         set {
-            if (_gridShow == value) { return; }
+            if (Math.Abs(_gridShow - value) < 0.00001) { return; }
             _gridShow = value;
             OnChanged();
         }
@@ -260,14 +266,14 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         }
     }
 
-    public string ScriptName {
-        get => _scriptName;
-        set {
-            if (_scriptName == value) { return; }
-            _scriptName = value;
-            OnChanged();
-        }
-    }
+    //public string ScriptName {
+    //    get => _scriptName;
+    //    set {
+    //        if (_scriptName == value) { return; }
+    //        _scriptName = value;
+    //        OnChanged();
+    //    }
+    //}
 
     public SizeF SheetSizeInMm {
         get => _sheetSizeInMm;
@@ -280,7 +286,15 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         }
     }
 
-    public SizeF SheetSizeInPix => new(_prRu.X - _prLo.X, _prRu.Y - _prLo.Y);
+    public SizeF SheetSizeInPix {
+        get {
+            if (_prRu == null || _prLo == null || _prRu == null || _prLo == null) {
+                return SizeF.Empty;
+            }
+
+            return new(_prRu.X - _prLo.X, _prRu.Y - _prLo.Y);
+        }
+    }
 
     public RowItem? SheetStyle {
         get => _sheetStyle;
@@ -288,7 +302,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
             if (_sheetStyle == value) { return; }
             //        if (!_isParsing && value == SheetStyle) { return; }
             //if (Skin.StyleDB == null) { Skin.InitStyles(); }
-            /// /       Item.SheetStyle = Skin.StyleDB.Row[value];
+            // /       Item.SheetStyle = Skin.StyleDB.Row[value];
             //   if (Item.SheetStyle == null) { Item.SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
             _sheetStyle = value;
             ApplyDesignToItems();
@@ -302,7 +316,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         get => _sheetStyleScale;
         set {
             if (value < 0.1d) { value = 0.1f; }
-            if (_sheetStyleScale == value) { return; }
+            if (Math.Abs(_sheetStyleScale - value) < 0.0001) { return; }
             _sheetStyleScale = value;
             ApplyDesignToItems();
             OnChanged();
@@ -344,6 +358,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     /// <summary>
     /// Gibt den Versatz der Linken oben Ecke aller Objekte zurück, um mittig zu sein.
     /// </summary>
+    /// <param name="maxBounds"></param>
     /// <param name="sizeOfPaintArea"></param>
     /// <param name="zoomToUse"></param>
     /// <returns></returns>
@@ -357,7 +372,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         (float)((bounds.Top * zoomToUse) - (topLeftPos.Y / 2d)));
 
     public static float ZoomFitValue(RectangleF maxBounds, Size sizeOfPaintArea) {
-        if (maxBounds == null || maxBounds.IsEmpty) { return 1f; }
+        if (maxBounds.IsEmpty) { return 1f; }
 
         return Math.Min(sizeOfPaintArea.Width / maxBounds.Width,
             sizeOfPaintArea.Height / maxBounds.Height);
@@ -425,7 +440,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
                     gr.FillRectangle(new SolidBrush(BackColor), r);
                 }
 
-                if (!showinprintmode) {
+                if (!showinprintmode && _prLo != null && _prRu != null) {
                     var rLo = new PointM(_prLo.X, _prLo.Y).ZoomAndMove(zoom, shiftX, shiftY);
                     var rRu = new PointM(_prRu.X, _prRu.Y).ZoomAndMove(zoom, shiftX, shiftY);
                     Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X),
@@ -490,14 +505,14 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         if (bmp == null) { return; }
         var gr = Graphics.FromImage(bmp);
         _ = DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, seite, true);
-        gr?.Dispose();
+        gr.Dispose();
     }
 
     public void EineEbeneNachHinten(BasicPadItem bpi) {
         var i2 = Previous(bpi);
         if (i2 != null) {
             var tempVar = bpi;
-            Swap(this.IndexOf(tempVar), this.IndexOf(i2));
+            Swap(IndexOf(tempVar), IndexOf(i2));
         }
     }
 
@@ -505,7 +520,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         var i2 = Next(bpi);
         if (i2 != null) {
             var tempVar = bpi;
-            Swap(this.IndexOf(tempVar), this.IndexOf(i2));
+            Swap(IndexOf(tempVar), IndexOf(i2));
         }
     }
 
@@ -529,9 +544,9 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     public void ParseVariable(RowItem? row) {
         if (row == null) { return; }
 
-        var script = row.ExecuteScript(null, _scriptName, false, false, true, 0);
-        if (script.Variables1 == null) { return; }
-        foreach (var thisV in script.Variables1) {
+        var script = row.ExecuteScript(EventTypes.export, string.Empty, false, false, true, 0);
+        if (script.Variables == null) { return; }
+        foreach (var thisV in script.Variables) {
             _ = ParseVariable(thisV);
         }
     }
@@ -549,7 +564,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
         if (!string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) {
             foreach (var thisToo in this) {
-                if (item.Gruppenzugehörigkeit.ToLower() == thisToo.Gruppenzugehörigkeit?.ToLower()) {
+                if (item.Gruppenzugehörigkeit.ToLower() == thisToo.Gruppenzugehörigkeit.ToLower()) {
                     Remove(thisToo);
                     return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
                 }
@@ -685,7 +700,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
         result.ParseableAdd("Items", "Item", this.ToList());
 
-        result.ParseableAdd("ScriptName", _scriptName);
+        //result.ParseableAdd("ScriptName", _scriptName);
 
         result.ParseableAdd("SnapMode", _snapMode);
         result.ParseableAdd("GridShow", _gridShow);
@@ -707,7 +722,9 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     }
 
     //    base.Swap(item1, item2);
-    internal Rectangle DruckbereichRect() => _prLo == null ? new Rectangle(0, 0, 0, 0) : new Rectangle((int)_prLo.X, (int)_prLo.Y, (int)(_prRu.X - _prLo.X), (int)(_prRu.Y - _prLo.Y));
+    internal Rectangle DruckbereichRect() =>
+                _prLo == null || _prRu == null ? Rectangle.Empty :
+                                                 new Rectangle((int)_prLo.X, (int)_prLo.Y, (int)(_prRu.X - _prLo.X), (int)(_prRu.Y - _prLo.Y));
 
     //public void Swap(BasicPadItem item1, BasicPadItem item2) {
     //    var g1 = item1.Gruppenzugehörigkeit;
@@ -750,7 +767,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         do {
             itemCount++;
             if (IsSaved || itemCount >= Count) { return null; }
-            if (this?[itemCount] != null) { return this?[itemCount]; }
+            if (this[itemCount] != null) { return this[itemCount]; }
         } while (true);
     }
 
@@ -760,7 +777,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         do {
             itemCount--;
             if (IsSaved || itemCount < 0) { return null; }
-            if (this?[itemCount] != null) { return this[itemCount]; }
+            if (this[itemCount] != null) { return this[itemCount]; }
         } while (true);
     }
 
@@ -903,10 +920,16 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
             if (_prLo != null) {
                 _prLo.Parent = null;
                 _prLo = null;
+            }
+            if (_prRo != null) {
                 _prRo.Parent = null;
                 _prRo = null;
+            }
+            if (_prRu != null) {
                 _prRu.Parent = null;
                 _prRu = null;
+            }
+            if (_prLu != null) {
                 _prLu.Parent = null;
                 _prLu = null;
             }

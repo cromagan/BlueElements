@@ -31,7 +31,7 @@ internal class Method_Sort : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableListString.ShortName_Variable }, new List<string> { VariableBool.ShortName_Plain } };
+    public override List<List<string>> Args => new() { ListStringVar, BoolVal };
     public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";

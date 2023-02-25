@@ -34,16 +34,6 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
 
     #region Fields
 
-    public readonly string ChangeGreenTo = string.Empty;
-    public readonly string Code = string.Empty;
-    public readonly int DrehWinkel;
-    public readonly ImageCodeEffect Effekt = ImageCodeEffect.Ohne;
-    public readonly string Färbung = string.Empty;
-    public readonly int Helligkeit;
-    public readonly string Name = string.Empty;
-    public readonly int Sättigung;
-    public readonly int Transparenz;
-    public readonly string Zweitsymbol = string.Empty;
     private static readonly object Locker = new();
     private static readonly ConcurrentDictionary<string, QuickImage> Pics = new();
 
@@ -114,11 +104,19 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
 
     #region Properties
 
+    public string ChangeGreenTo { get; } = string.Empty;
+    public string Code { get; } = string.Empty;
+    public int DrehWinkel { get; }
+    public ImageCodeEffect Effekt { get; } = ImageCodeEffect.Ohne;
+    public string Färbung { get; } = string.Empty;
     public new int Height { get; private set; }
-
+    public int Helligkeit { get; }
     public bool IsError { get; private set; }
-
+    public string Name { get; } = string.Empty;
+    public int Sättigung { get; }
+    public int Transparenz { get; }
     public new int Width { get; private set; }
+    public string Zweitsymbol { get; } = string.Empty;
 
     #endregion
 
@@ -131,6 +129,7 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
             case FileFormat.WordKind:
                 return ImageCode.Word;
 
+            case FileFormat.CSV:
             case FileFormat.ExcelKind:
                 return ImageCode.Excel;
 

@@ -29,12 +29,12 @@ internal class Method_ImportCSV : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, StringVal };
     public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Datenbank.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
 
     public override string StartSequence => "(";

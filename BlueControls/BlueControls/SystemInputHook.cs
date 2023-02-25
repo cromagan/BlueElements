@@ -42,7 +42,7 @@ public sealed class SystemInputHook {
     private int _mouseLastY;
 
     [AccessedThroughProperty(nameof(Tim))]
-    private Timer _tim;
+    private Timer? _tim;
 
     #endregion
 

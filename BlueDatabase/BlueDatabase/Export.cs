@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using BlueBasics;
-using BlueDatabase.EventArgs;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
@@ -495,15 +494,16 @@ public static class Export {
 
     public static (List<string>? files, string error) SaveAsBitmap(List<RowItem?> row, string layoutId, string path) {
         List<string> l = new();
-        foreach (var thisRow in row) {
-            var fn = TempFile(path, thisRow.CellFirstString(), "PNG");
-            thisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(thisRow, layoutId, fn));
-            l.Add(fn);
-        }
+        Develop.DebugPrint_NichtImplementiert();
+        //foreach (var thisRow in row) {
+        //    var fn = TempFile(path, thisRow.CellFirstString(), "PNG");
+        //    thisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(thisRow, layoutId, fn));
+        //    l.Add(fn);
+        //}
         return (l, string.Empty);
     }
 
-    public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(row, layoutId, filename));
+    //public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(row, layoutId, filename));
 
     private static string InternalCreateLayout(List<RowItem?>? rows, string fileLoaded, string saveFileName, string scriptname) {
         var head = string.Empty;
@@ -532,8 +532,8 @@ public static class Export {
                         f = f + thisRow.CellFirstString() + "\r\n";
                     }
 
-                    if (script.Variables1 != null) {
-                        foreach (var thisV in script.Variables1) {
+                    if (script.Variables != null) {
+                        foreach (var thisV in script.Variables) {
                             tmpBody = thisV.ReplaceInText(tmpBody);
                         }
                     }
@@ -543,7 +543,7 @@ public static class Export {
             }
         }
         tmpSave += foot;
-        if (!string.IsNullOrEmpty(saveFileName)) // Dateien ohne SUfiix-Angabe könenn nicht gespeichert werden
+        if (!string.IsNullOrEmpty(saveFileName)) // Dateien ohne Suffix-Angabe können nicht gespeichert werden
         {
             WriteAllText(saveFileName, tmpSave, Constants.Win1252, false);
         }

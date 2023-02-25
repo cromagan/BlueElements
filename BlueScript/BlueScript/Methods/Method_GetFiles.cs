@@ -32,7 +32,7 @@ internal class Method_GetFiles : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, StringVal };
     public override string Description => "Gibt alle Dateien im angegebenen Verzeichnis zurück. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

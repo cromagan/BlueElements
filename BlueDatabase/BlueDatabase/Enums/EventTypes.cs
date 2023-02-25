@@ -21,19 +21,10 @@ namespace BlueDatabase.Enums;
 
 [Flags]
 public enum EventTypes {
-
-    //only_manual = 0,
     new_row = 1,
-
     value_changed = 2,
-
-    error_check = 4
-
-    //manual_check =3,
-    //import
-    //export
-    //after_import = 4,
-
-    //every_5_minutes = 8,
-    //first_load = 16,
+    error_check = 4,
+    value_changed_extra_thread = 8,
+    database_loaded = 16,
+    export = 32
 }

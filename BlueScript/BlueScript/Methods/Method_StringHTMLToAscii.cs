@@ -31,7 +31,7 @@ internal class Method_StringHTMLToAscii : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableBool.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, BoolVal };
     public override string Description => "Ersetzt einen HTML-String zu normalen ASCII-String. Beispiel: Aus &auml; wird ä. Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

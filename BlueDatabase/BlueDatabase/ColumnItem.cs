@@ -41,7 +41,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     #region Fields
 
     public static readonly string TmpNewDummy = "TMPNEWDUMMY";
-    public int _unsavedContentWidth = -1;
     public DateTime? IsInCache = null;
 
     //public string _timecode;
@@ -113,6 +112,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     private string _suffix;
     private bool _textBearbeitungErlaubt;
     private DatabaseAbstract? _tmpLinkedDatabase;
+    private int _unsavedContentWidth = -1;
 
     #endregion
 
@@ -2152,7 +2152,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         return summ;
     }
 
-    public double? Summe(List<RowData?> sort) {
+    public double? Summe(List<RowData>? sort) {
+        if (sort == null) { return null; }
+
         double summ = 0;
         foreach (var thisrow in sort) {
             if (thisrow?.Row != null && !thisrow.Row.CellIsNullOrEmpty(this)) {
@@ -2203,9 +2205,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public override string ToString() {
-        if (this == null) { return "NULL"; }
         if (IsDisposed) { return "Disposed"; }
-
         return Name + " -> " + Caption;
     }
 
@@ -2570,6 +2570,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
             case DatabaseDataType.ScriptType:
                 _scriptType = (ScriptType)IntParse(newvalue);
+                Database?.Row.InvalidateAllCheckData();
                 break;
 
             case DatabaseDataType.BehaviorOfImageAndText:
@@ -2646,13 +2647,14 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 Invalidate_ContentWidth();
                 Database.Cell.OnCellValueChanged(new CellEventArgs(this, thisRow));
                 _ = thisRow.ExecuteScript(EventTypes.value_changed, string.Empty, true, false, true, 5);
+                thisRow.Database?.AddBackgroundWork(thisRow);
             }
         }
     }
 
     private void _TMP_LinkedDatabase_Disposing(object sender, System.EventArgs e) {
         Invalidate_LinkedDatabase();
-        Database.Dispose();
+        Database?.Dispose();
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();

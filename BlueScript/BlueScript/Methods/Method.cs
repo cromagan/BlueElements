@@ -31,6 +31,16 @@ namespace BlueScript.Methods;
 
 public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
+    #region Fields
+
+    public static readonly List<string> BoolVal = new() { VariableBool.ShortName_Plain };
+    public static readonly List<string> DateTimeVar = new() { VariableDateTime.ShortName_Variable };
+    public static readonly List<string> FloatVal = new() { VariableFloat.ShortName_Plain };
+    public static readonly List<string> ListStringVar = new() { VariableListString.ShortName_Variable };
+    public static readonly List<string> StringVal = new() { VariableString.ShortName_Plain };
+
+    #endregion
+
     #region Events
 
     public event EventHandler? Changed;
@@ -125,7 +135,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     /// </summary>
     /// <param name="txt"></param>
     /// <param name="s"></param>
-    /// <param name="protocol"></param>
+    /// <param name="ld"></param>
     /// <returns></returns>
     public static GetEndFeedback ReplaceVariable(string txt, Script s, LogData ld) {
         var posc = 0;
@@ -245,13 +255,11 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     }
 
     public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s, LogData ld) {
-
-
         if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns)) {
-            return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax +"' an dieser Stelle nicht möglich", false, ld);
+            return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
         }
         if (expectedvariablefeedback && string.IsNullOrEmpty(Returns)) {
-            return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax +"' an dieser Stelle nicht möglich", false, ld);
+            return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
         }
         var maxl = scriptText.Length;
 
@@ -276,7 +284,6 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
                     if (!s.AllowedMethods.HasFlag(MethodType)) {
                         return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' kann in diesem Skript nicht benutzt werden.", true, ld);
                     }
-
 
                     return new CanDoFeedback(scriptText, cont, comandtext, f.AttributeText, codebltxt, ld);
                 }

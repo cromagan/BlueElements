@@ -17,10 +17,8 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using System.Windows.Forms;
 using BlueDatabase.Interfaces;
-using BlueScript.Variables;
 
 namespace BlueControls.Interfaces;
 

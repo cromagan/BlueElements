@@ -174,22 +174,22 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             switch (e.ClickedComand.ToLower()) {
                 case "#vordergrund":
                     done = true;
-                    thisItem.Parent.InDenVordergrund(thisItem);
+                    thisItem.Parent?.InDenVordergrund(thisItem);
                     break;
 
                 case "#hintergrund":
                     done = true;
-                    thisItem.Parent.InDenHintergrund(thisItem);
+                    thisItem.Parent?.InDenHintergrund(thisItem);
                     break;
 
                 case "#vorne":
                     done = true;
-                    thisItem.Parent.EineEbeneNachVorne(thisItem);
+                    thisItem.Parent?.EineEbeneNachVorne(thisItem);
                     break;
 
                 case "#hinten":
                     done = true;
-                    thisItem.Parent.EineEbeneNachHinten(thisItem);
+                    thisItem.Parent?.EineEbeneNachHinten(thisItem);
                     break;
 
                 case "#duplicate":
@@ -219,13 +219,13 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
         // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
         if (hasbase) { base.OnKeyUp(e); }
-        if (!EditAllowed) { return; }
+        if (!EditAllowed || _item == null) { return; }
         if (_givesMouseComandsTo != null) {
             if (_givesMouseComandsTo.KeyUp(this, e, Zoom, ShiftX, ShiftY)) { return; }
         }
         var multi = 1f;
-        if (Item.SnapMode == SnapMode.SnapToGrid) {
-            multi = Converter.MmToPixel(Item.GridSnap, ItemCollectionPad.Dpi);
+        if (_item.SnapMode == SnapMode.SnapToGrid) {
+            multi = Converter.MmToPixel(_item.GridSnap, ItemCollectionPad.Dpi);
         }
         if (multi < 1) { multi = 1f; }
         switch (e.KeyCode) {
@@ -331,6 +331,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     }
 
     public void ShowWorkingAreaSetup() {
+        if (_item == null) { return; }
+
         PrintDocument oriD = new();
         oriD.DefaultPageSettings.Landscape = false;
         oriD.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(_item.SheetSizeInMm.Width / 25.4 * 100), (int)(_item.SheetSizeInMm.Height / 25.4 * 100));
@@ -362,7 +364,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
         it.InitialPosition(pos.X - (wid / 2), pos.Y - (he / 2), wid, he);
 
-        Item.Add(it);
+        Item?.Add(it);
     }
 
     internal void DoMouseDown(MouseEventArgs e) {
@@ -461,8 +463,12 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         Invalidate();
     }
 
-    internal Point MiddleOfVisiblesScreen() =>
-        new((int)(((Width / 2) + ShiftX) / Zoom), (int)(((Height / 2) + ShiftY) / Zoom));
+    internal Point MiddleOfVisiblesScreen() {
+        var valx = (((float)Width) / 2) + ShiftX;
+        var valy = (((float)Height) / 2) + ShiftY;
+
+        return new((int)(valx / Zoom), (int)(valy / Zoom));
+    }
 
     protected override void DrawControl(Graphics gr, States state) {
         base.DrawControl(gr, state);
@@ -520,7 +526,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     protected override void OnMouseUp(MouseEventArgs e) => DoMouseUp(e);
 
     private void _Item_ItemAdded(object sender, ListEventArgs e) {
-        if (_item.Count == 1 || Fitting) { ZoomFit(); }
+        if (_item == null || _item.Count == 1 || Fitting) { ZoomFit(); }
         Invalidate();
 
         var it = (BasicPadItem)e.Item;
@@ -621,12 +627,12 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     private void OnPrintPage(PrintPageEventArgs e) => PrintPage?.Invoke(this, e);
 
     private void PicsSave_FileOk(object sender, CancelEventArgs e) {
-        if (e.Cancel) { return; }
+        if (e.Cancel || _item == null) { return; }
         _item.SaveAsBitmap(PicsSave.FileName);
     }
 
     private void RepairPrinterData() {
-        if (_repairPrinterDataPrepaired) { return; }
+        if (_repairPrinterDataPrepaired || _item == null) { return; }
         _repairPrinterDataPrepaired = true;
         DruckerDokument.DocumentName = _item.Caption;
         var done = false;
@@ -646,10 +652,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     }
 
     private float SnapToGrid(bool doX, PointM? movedPoint, float mouseMovedTo) {
-        if (Item.SnapMode != SnapMode.SnapToGrid || Math.Abs(Item.GridSnap) < 0.001) { return mouseMovedTo; }
+        if (_item == null || _item.SnapMode != SnapMode.SnapToGrid || Math.Abs(_item.GridSnap) < 0.001) { return mouseMovedTo; }
         if (movedPoint is null) { return 0f; }
 
-        var multi = Converter.MmToPixel(Item.GridSnap, ItemCollectionPad.Dpi);
+        var multi = Converter.MmToPixel(_item.GridSnap, ItemCollectionPad.Dpi);
         float value;
         if (doX) {
             value = movedPoint.X + mouseMovedTo;

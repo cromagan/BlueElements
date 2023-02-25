@@ -52,44 +52,51 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public const string DatabaseVersion = "4.02";
 
     public static readonly ListExt<DatabaseAbstract> AllFiles = new();
+
     public static List<Type>? DatabaseTypes;
 
-    public readonly CellCollection Cell;
-    public readonly ColumnCollection Column;
-    public readonly RowCollection Row;
-    public readonly string TableName;
-    public readonly string UserName = Generic.UserName().ToUpper();
-    public string UserGroup;
-    protected string? AdditionalFilesPfadtmp;
-    private static readonly List<ConnectionInfo> Allavailabletables = new();
     private static DateTime _lastTableCheck = new(1900, 1, 1);
+
     private readonly List<ColumnViewCollection> _columnArrangements = new();
+
     private readonly List<string> _datenbankAdmin = new();
 
-    private readonly List<EventScript?> _eventScript = new();
-
-    /// <summary>
-    /// Exporte werden nur internal verwaltet. Wegen zu vieler erzeigter Pendings, z.B. bei LayoutExport.
-    /// Der Head-Editor kann und muss (manuelles Löschen) auf die Exporte Zugreifen und kümmert sich auch um die Pendings
-    /// </summary>
-    private readonly List<ExportDefinition?> _export = new();
+    private readonly List<EventScript> _eventScript = new();
 
     private readonly LayoutCollection _layouts = new();
+
+    private readonly List<BackgroundWorker> _pendingworker = new();
+
+    private readonly List<long> _pendingworks = new();
+
     private readonly List<string> _permissionGroupsNewRow = new();
+
     private readonly long _startTick = DateTime.UtcNow.Ticks;
+
     private readonly List<string> _tags = new();
+
     private readonly List<VariableString> _variables = new();
+
     private string _additionalFilesPfad = string.Empty;
-    private BackgroundWorker? _backgroundWorker;
+
     private string _cachePfad = string.Empty;
+
     private string _caption = string.Empty;
-    private Timer _checker;
+
+    private Timer? _checker;
+
     private int _checkerTickCount = -5;
+
     private string _createDate = string.Empty;
+
     private string _creator = string.Empty;
+
     private string _eventScriptTmp = string.Empty;
+
     private double _globalScale;
+
     private string _globalShowPass = string.Empty;
+
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
 
     private RowSortDefinition? _sortDefinition;
@@ -142,8 +149,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public event EventHandler<MessageEventArgs>? DropMessage;
 
-    public event EventHandler<GenerateLayoutInternalEventArgs>? GenerateLayoutInternal;
-
     public event EventHandler? Loaded;
 
     public event EventHandler? Loading;
@@ -159,6 +164,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     #endregion
 
     #region Properties
+
+    public static List<ConnectionInfo> Allavailabletables { get; } = new();
 
     [Browsable(false)]
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
@@ -191,6 +198,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             _ = ChangeData(DatabaseDataType.Caption, null, null, _caption, value, string.Empty);
         }
     }
+
+    public CellCollection Cell { get; }
+
+    public ColumnCollection Column { get; }
 
     public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
         get => new(_columnArrangements);
@@ -232,19 +243,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
 
-    public ReadOnlyCollection<EventScript?> EventScript {
+    public ReadOnlyCollection<EventScript> EventScript {
         get => new(_eventScript);
         set {
             if (_eventScriptTmp == value.ToString(false)) { return; }
             _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, value.ToString(true), string.Empty);
-        }
-    }
-
-    public ReadOnlyCollection<ExportDefinition?> Export {
-        get => new(_export);
-        set {
-            if (_export.ToString(false) == value.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.AutoExport, null, null, _export.ToString(true), value.ToString(true), string.Empty);
         }
     }
 
@@ -315,6 +318,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public bool ReadOnly { get; private set; }
 
+    public RowCollection Row { get; }
+
     [Browsable(false)]
     public RowSortDefinition? SortDefinition {
         get => _sortDefinition;
@@ -343,6 +348,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
+    public string TableName { get; }
+
     public ReadOnlyCollection<string> Tags {
         get => new(_tags);
         set {
@@ -359,6 +366,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             _ = ChangeData(DatabaseDataType.UndoCount, null, null, _undoCount.ToString(), value.ToString(), string.Empty);
         }
     }
+
+    public string UserGroup { get; set; }
+
+    public string UserName { get; } = Generic.UserName().ToUpper();
 
     public ReadOnlyCollection<VariableString> Variables {
         get => new(_variables);
@@ -377,6 +388,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             _ = ChangeData(DatabaseDataType.RowQuickInfo, null, null, _zeilenQuickInfo, value, string.Empty);
         }
     }
+
+    protected string? AdditionalFilesPfadtmp { get; set; }
 
     #endregion
 
@@ -596,6 +609,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return null;
     }
 
+    public void AddBackgroundWork(RowItem row) {
+        _pendingworks.AddIfNotExists(row.Key);
+    }
+
     /// <summary>
     /// Der komplette Pfad mit abschließenden \
     /// </summary>
@@ -616,12 +633,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
-
-    public void CancelBackGroundWorker() {
-        if (_backgroundWorker != null && _backgroundWorker.IsBusy && !_backgroundWorker.CancellationPending) {
-            _backgroundWorker?.CancelAsync();
-        }
-    }
 
     /// <summary>
     /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
@@ -655,7 +666,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             AddUndo(TableName, comand, columnname, rowkey, previousValue, changedTo, UserName, comment);
         }
 
-        if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
+        //if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
 
         return string.Empty;
     }
@@ -701,7 +712,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
         ColumnArrangements = new(tcvc);
 
-        Export = sourceDatabase.Export;
+        //Export = sourceDatabase.Export;
 
         EventScript = sourceDatabase.EventScript;
         Variables = sourceDatabase.Variables;
@@ -713,9 +724,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     /// <summary>
     /// Einstellungen der Quell-Datenbank auf diese hier übertragen
     /// </summary>
-    /// <param name="sourceDatabase"></param>
-    /// <param name="cellDataToo"></param>
-    /// <param name="tagsToo"></param>
     public string Column_UsedIn(ColumnItem? column) {
         if (column == null) { return string.Empty; }
 
@@ -802,13 +810,56 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; }
 
-        if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
-            if (_backgroundWorker?.IsBusy ?? false) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
-        }
+        //if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
+        //    if (_backgroundWorker?.IsBusy ?? false) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
+        //}
 
         return IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))
             ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
             : string.Empty;
+    }
+
+    public void ExecuteExtraThread() {
+        if (_pendingworks.Count == 0) { return; }
+
+        var ok = false;
+
+        foreach (var thiss in EventScript) {
+            if (thiss.EventTypes.HasFlag(EventTypes.value_changed_extra_thread)) {
+                if (thiss.IsOk()) {
+                    ok = true; break;
+                }
+            }
+        }
+
+        if (!ok) {
+            _pendingworks.Clear();
+            return;
+        }
+
+        while (_pendingworker.Count < 5) {
+            if (IsDisposed) { return; }
+            if (ReadOnly) { return; }
+            if (!LogUndo) { return; }
+            if (_pendingworks.Count == 0) { return; }
+
+            var key = _pendingworks.First();
+            _ = _pendingworks.Remove(key);
+
+            var r = Row.SearchByKey(key);
+
+            if (r != null) {
+                var l = new BackgroundWorker();
+                l.WorkerReportsProgress = true;
+                l.RunWorkerCompleted += PendingWorker_RunWorkerCompleted;
+                l.DoWork += PendingWorker_DoWork;
+
+                _pendingworker.Add(l);
+                l.RunWorkerAsync(key);
+
+                OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + r.CellFirstString());
+            }
+        }
     }
 
     public ScriptEndedFeedback ExecuteScript(EventScript s, bool changevalues, RowItem? row) {
@@ -849,14 +900,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             #region  Erlaubte Methoden ermitteln
 
-            var allowedMethods = MethodType.Standard;
+            var allowedMethods = MethodType.Standard | MethodType.Database;
 
             if (row != null) { allowedMethods |= MethodType.MyDatabaseRow; }
             if (!s.EventTypes.HasFlag(EventTypes.error_check)) {
                 allowedMethods |= MethodType.IO;
                 allowedMethods |= MethodType.NeedLongTime;
             }
-            if (changevalues) { allowedMethods |= MethodType.AnyDatabaseRow; }
+            if (changevalues) { allowedMethods |= MethodType.ChangeAnyDatabaseOrRow; }
 
             #endregion
 
@@ -939,9 +990,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>
         //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-        Export_CSV(firstRow, new List<ColumnItem?> { column }, sortedRows);
+        Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
-    public string Export_CSV(FirstRow firstRow, List<ColumnItem> columnList, List<RowData>? sortedRows) {
+    public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, List<RowData>? sortedRows) {
         columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
         sortedRows ??= Row.AllRows();
 
@@ -1003,7 +1054,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem?>? pinned) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
 
-    public void Export_HTML(string filename, List<ColumnItem?>? columnList, List<RowData>? sortedRows, bool execute) {
+    public void Export_HTML(string filename, List<ColumnItem>? columnList, List<RowData>? sortedRows, bool execute) {
         if (columnList == null || columnList.Count == 0) {
             columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
         }
@@ -1069,49 +1120,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         da.Save(filename, execute);
     }
 
-    public void Export_HTML(string filename, ColumnViewCollection? arrangement, List<RowData?> sortedRows, bool execute) => Export_HTML(filename, arrangement.ListOfUsedColumn(), sortedRows, execute);
+    public void Export_HTML(string filename, ColumnViewCollection? arrangement, List<RowData> sortedRows, bool execute) => Export_HTML(filename, arrangement?.ListOfUsedColumn(), sortedRows, execute);
 
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <param name="firstRow">Ob in der ersten Zeile der Spaltenname ist, oder ob sofort Daten kommen.</param>
-    /// <param name="column">Die Spalte, die zurückgegeben wird.</param>
-    /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle Zeilen zurück.</param>
-    /// <returns></returns>
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <param name="firstRow">Ob in der ersten Zeile der Spaltenname ist, oder ob sofort Daten kommen.</param>
-    /// <param name="columnList">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
-    /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
-    /// <returns></returns>
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <param name="firstRow">Ob in der ersten Zeile der Spaltenname ist, oder ob sofort Daten kommen.</param>
-    /// <param name="arrangement">Die Spalten, die zurückgegeben werden. NULL gibt alle Spalten zurück.</param>
-    /// <param name="sortedRows">Die Zeilen, die zurückgegeben werden. NULL gibt alle ZEilen zurück.</param>
-    /// <returns></returns>
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <returns></returns>
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <returns></returns>
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <returns></returns>
-    /// <summary>
-    /// TableViews haben eigene Export-Routinen, die hierauf zugreifen
-    /// </summary>
-    /// <returns></returns>
-    /// <summary>
-    /// Testet die Standard-Verzeichnisse und gibt das Formular zurück, falls es existiert
-    /// </summary>
-    /// <returns></returns>
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
         if (FileExists(AdditionalFilesPfadWhole() + _standardFormulaFile)) { return AdditionalFilesPfadWhole() + _standardFormulaFile; }
@@ -1209,8 +1219,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 var col = Column.Exists(zeil[0][spaltNo]);
                 if (col == null) {
                     col = Column.GenerateAndAdd(zeil[0][spaltNo]);
-                    col.Caption = zeil[0][spaltNo];
-                    col.Format = DataFormat.Text;
+                    if (col != null) {
+                        col.Caption = zeil[0][spaltNo];
+                        col.Format = DataFormat.Text;
+                    }
                 }
                 columns.Add(col);
             }
@@ -1218,9 +1230,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             columns.AddRange(Column.Where(thisColumn => thisColumn != null && !thisColumn.IsSystemColumn()));
             while (columns.Count < zeil[0].GetUpperBound(0) + 1) {
                 var newc = Column.GenerateAndAdd();
-                newc.Caption = newc.Name;
-                newc.Format = DataFormat.Text;
-                newc.MultiLine = true;
+                if (newc != null) {
+                    newc.Caption = newc.Name;
+                    newc.Format = DataFormat.Text;
+                    newc.MultiLine = true;
+                }
+
                 columns.Add(newc);
             }
         }
@@ -1275,23 +1290,23 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return Import(importText, true, true, sep, false, false, true);
     }
 
-    public void InvalidateExports(string layoutId) {
-        if (ReadOnly) { return; }
+    //public void InvalidateExports(string layoutId) {
+    //    if (ReadOnly) { return; }
 
-        var ex = Export.CloneWithClones();
+    //    var ex = Export.CloneWithClones();
 
-        foreach (var thisExport in ex) {
-            if (thisExport != null) {
-                if (thisExport.Typ == ExportTyp.EinzelnMitFormular) {
-                    if (thisExport.ExportFormularId == layoutId) {
-                        thisExport.LastExportTimeUtc = new DateTime(1900, 1, 1);
-                    }
-                }
-            }
-        }
+    //    foreach (var thisExport in ex) {
+    //        if (thisExport != null) {
+    //            if (thisExport.Typ == ExportTyp.EinzelnMitFormular) {
+    //                if (thisExport.ExportFormularId == layoutId) {
+    //                    thisExport.LastExportTimeUtc = new DateTime(1900, 1, 1);
+    //                }
+    //            }
+    //        }
+    //    }
 
-        Export = new(ex);
-    }
+    //    Export = new(ex);
+    //}
 
     public bool IsAdministrator() {
         if (UserGroup.ToUpper() == "#ADMINISTRATOR") { return true; }
@@ -1377,7 +1392,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public void RefreshColumnsData(ColumnItem? column) {
         if (column == null || column.IsInCache != null) { return; }
-        RefreshColumnsData(new List<ColumnItem?> { column });
+        RefreshColumnsData(new List<ColumnItem> { column });
     }
 
     public abstract void RefreshColumnsData(List<ColumnItem> columns);
@@ -1423,7 +1438,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public void SetReadOnly() {
         ReadOnly = true;
-        DisposeBackgroundWorker();
     }
 
     public override string ToString() => base.ToString() + " " + TableName;
@@ -1450,18 +1464,16 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
 
-    //public abstract void WaitEditable();
     internal void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }
         if (!DropMessages) { return; }
         DropMessage?.Invoke(this, new MessageEventArgs(type, message));
     }
 
-    //public abstract void UnlockHard();
-    internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventArgs e) {
-        if (IsDisposed) { return; }
-        GenerateLayoutInternal?.Invoke(this, e);
-    }
+    //internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    GenerateLayoutInternal?.Invoke(this, e);
+    //}
 
     internal void OnProgressbarInfo(ProgressbarEventArgs e) {
         if (IsDisposed) { return; }
@@ -1472,8 +1484,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
 
         var x = _columnArrangements.CloneWithClones();
-
-        if (x == null) { return; }
 
         for (var z = 0; z < Math.Max(2, x.Count); z++) {
             if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
@@ -1495,16 +1505,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     /// Nur von Laderoutinen aufzurufen, oder von ChangeData, wenn der Wert bereits fest in der Datenbank verankert ist.
     /// Vorsicht beim Überschreiben:
     /// Da in Columns und Cells abgesprungen wird, und diese nicht überschrieben werden können,
-    ///
     /// </summary>
     /// <param name="type"></param>
     /// <param name="value"></param>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
+    /// <param name="columnName"></param>
+    /// <param name="rowkey"></param>
+    /// <param name="isLoading"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-
     internal virtual string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
@@ -1520,14 +1527,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         if (type.IsCellValue()) {
-            //        case DatabaseDataType.Value_withSizeData:
-            //case DatabaseDataType.UTF8Value_withSizeData:
-            //case DatabaseDataType.Value_withoutSizeData:
-            //if (type == DatabaseDataType.UTF8Value_withSizeData) {
-            //    //Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-            //    var enc1252 = Encoding.GetEncoding(1252);
-            //    value = Encoding.UTF8.GetString(enc1252.GetBytes(value));
-            //}
+            if (columnName == null || rowkey == null) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Spalte/Zeile ist null! " + type);
+                return "Wert nicht gesetzt!";
+            }
+
             return Cell.SetValueInternal(columnName, (long)rowkey, value, isLoading);
         }
 
@@ -1535,6 +1539,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             switch (type) {
                 case DatabaseDataType.Comand_RemoveColumn:
                     var c = Column.Exists(value);
+                    if (c == null) { return string.Empty; }
                     return Column.SetValueInternal(type, isLoading, c.Name);
 
                 //case DatabaseDataType.Comand_AddColumnByKey:
@@ -1638,13 +1643,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 _layouts.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                 break;
 
-            case DatabaseDataType.AutoExport:
-                _export.Clear();
-                List<string> ae = new(value.SplitAndCutByCr());
-                foreach (var t in ae) {
-                    _export.Add(new ExportDefinition(this, t));
-                }
-                break;
+            //case DatabaseDataType.AutoExport:
+            //    _export.Clear();
+            //    List<string> ae = new(value.SplitAndCutByCr());
+            //    foreach (var t in ae) {
+            //        _export.Add(new ExportDefinition(this, t));
+            //    }
+            //    break;
 
             case DatabaseDataType.EventScript:
                 _eventScriptTmp = value;
@@ -1681,10 +1686,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 _globalShowPass = value;
                 break;
 
-            case (DatabaseDataType)67: //.RulesScript:
-                ConvertRules(value);
-                //_rulesScript = value;
-                break;
+            //case (DatabaseDataType)67: //.RulesScript:
+            //    //ConvertRules(value);
+            //    //_rulesScript = value;
+            //    break;
 
             case DatabaseDataType.UndoCount:
                 _undoCount = IntParse(value);
@@ -1715,13 +1720,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     protected void CreateWatcher() {
         if (!ReadOnly) {
-            if (_backgroundWorker != null) { return; }
+            //if (_backgroundWorker != null) { return; }
 
-            _backgroundWorker = new BackgroundWorker {
-                WorkerReportsProgress = false,
-                WorkerSupportsCancellation = true
-            };
-            _backgroundWorker.DoWork += BackgroundWorker_DoWork;
+            //_backgroundWorker = new BackgroundWorker {
+            //    WorkerReportsProgress = false,
+            //    WorkerSupportsCancellation = true
+            //};
+            //_backgroundWorker.DoWork += BackgroundWorker_DoWork;
             _checker = new Timer(Checker_Tick);
             _ = _checker.Change(2000, 2000);
         }
@@ -1738,7 +1743,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         if (disposing) {
             // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
         }
-        DisposeBackgroundWorker();
 
         _checker?.Dispose();
 
@@ -1759,9 +1763,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         //Column.ItemRemoving -= Column_ItemRemoving;
         //Column.ItemRemoved -= Column_ItemRemoved;
         //Column.ItemAdded -= Column_ItemAdded;
-        Column?.Dispose();
+        Column.Dispose();
         //Cell?.Dispose();
-        Row?.Dispose();
+        Row.Dispose();
 
         //_columnArrangements?.Dispose();
         //_cags?.Dispose();
@@ -1779,7 +1783,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         _layouts.Clear();
         _permissionGroupsNewRow.Clear();
         _tags.Clear();
-        _export.Clear();
         _datenbankAdmin.Clear();
         _globalShowPass = string.Empty;
         _creator = UserName;
@@ -1811,164 +1814,41 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     protected virtual void SetUserDidSomething() => _lastUserActionUtc = DateTime.UtcNow;
 
-    private void BackgroundWorker_DoWork(object sender, DoWorkEventArgs e) {
-        if (IsDisposed) { return; }
-        if (ReadOnly) { return; }
-        if (!LogUndo) { return; }
-
-        var tmpe = _export.CloneWithClones();
-
-        foreach (var thisExport in tmpe) {
-            if (_backgroundWorker.CancellationPending || IsDisposed) { break; }
-
-            if (thisExport.IsOk()) {
-                //var e2 = new MultiUserFileHasPendingChangesEventArgs();
-                //HasPendingChanges(null, e2);
-
-                //if (!e2.HasPendingChanges) {
-                //CancelEventArgs ec = new(false);
-                //OnExporting(ec);
-                //if (ec.Cancel) { break; }
-                //}
-
-                _ = thisExport.DeleteOutdatedBackUps(_backgroundWorker);
-                if (_backgroundWorker.CancellationPending || IsDisposed) { break; }
-                _ = thisExport.DoBackUp(_backgroundWorker);
-                if (_backgroundWorker.CancellationPending || IsDisposed) { break; }
-            }
-        }
-
-        Export = new ReadOnlyCollection<ExportDefinition?>(tmpe);
-    }
-
     //protected abstract string SpecialErrorReason(ErrorReason mode);
     private void Checker_Tick(object state) {
         if (IsDisposed) { return; }
         if (ReadOnly) { return; }
         if (!LogUndo) { return; }
 
+        ExecuteExtraThread();
+
         _checkerTickCount++;
         if (_checkerTickCount < 0) { return; }
 
-        if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < 10) { CancelBackGroundWorker(); return; } // Benutzer arbeiten lassen
-
-        var mustBackup = IsThereBackgroundWorkToDo();
-
-        if (!mustBackup && !HasPendingChanges) {
+        if (!HasPendingChanges) {
             _checkerTickCount = 0;
             return;
         }
-
-        // Zeiten berechnen
-
-        ////if (_checkerTickCount > countSave && mustSave) { CancelBackGroundWorker(); }
-
-        //var mustReload = ReloadNeeded;
-
-        //if (_checkerTickCount > ReloadDelaySecond && mustReload) { CancelBackGroundWorker(); }
-        //if (_backgroundWorker.IsBusy) { return; }
-
-        //if (string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditNormaly))) { return; }
-
-        //if (mustReload && mustSave) {
-        //    if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.Load))) { return; }
-        //    // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
-        //    Load_Reload();
-        //    return;
-        //}
 
         if (HasPendingChanges && _checkerTickCount > 20) {
             if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.Save))) { return; }
 
             _ = Save();
             _checkerTickCount = 0;
-            return;
-        }
-
-        if (mustBackup && _checkerTickCount >= 30 && string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.EditAcut))) {
-            var nowsek = (DateTime.UtcNow.Ticks - _startTick) / 30000000;
-            if (nowsek % 20 != 0) { return; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
-
-            StartBackgroundWorker();
-        }
-
-        //// Überhaupt nix besonderes. Ab und zu mal Reloaden
-        //if (mustReload && _checkerTickCount > ReloadDelaySecond) {
-        //    RepairOldBlockFiles();
-        //    if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.Load))) { return; }
-        //    Load_Reload();
-        //    _checkerTickCount = 0;
-        //}
-    }
-
-    private void ConvertRules(string scriptText) {
-        //var eves = EventScript.CloneWithClones();
-        var l1 = new EventScript(this) {
-            NeedRow = true,
-            ManualExecutable = false,
-            Script = scriptText,
-            Name = "DatenueberpruefungIntern"
-        };
-        _eventScript.Add(l1);
-
-        var l2 = new EventScript(this) {
-            NeedRow = true,
-            ManualExecutable = true,
-            Script = "//ACHTUNG: Keinesfalls dürfen startroutinenabhängig Werte verändert werden.\r\n" +
-                     "var Startroutine = \"manual check\";\r\n" +
-                     "Call(\"DatenueberpruefungIntern\", false);",
-            Name = "Datenüberprüfung"
-        };
-        _eventScript.Add(l2);
-
-        var t = typeof(EventTypes);
-
-        foreach (int z1 in Enum.GetValues(t)) {
-            var ln = new EventScript(this) {
-                NeedRow = true,
-                ManualExecutable = false,
-                Name = Enum.GetName(t, z1),
-                EventTypes = (EventTypes)z1,
-                Script = "//ACHTUNG: Keinesfalls dürfen startroutinenabhängig Werte verändert werden.\r\n" +
-                         "var Startroutine = \"" + Enum.GetName(t, z1).Replace("_", " ") + "\";\r\n" +
-                         "Call(\"DatenueberpruefungIntern\", false);"
-            };
-            _eventScript.Add(ln);
         }
     }
 
-    private void DisposeBackgroundWorker() {
-        CancelBackGroundWorker();
-
-        if (_backgroundWorker != null) {
-            _backgroundWorker?.Dispose();
-            _backgroundWorker.DoWork -= BackgroundWorker_DoWork;
-        }
-    }
-
-    private bool IsThereBackgroundWorkToDo() {
-        if (IsDisposed || ReadOnly || !LogUndo) { return false; }
-
-        //CancelEventArgs ec = new(false);
-        //OnExporting(ec);
-        //if (ec.Cancel) { return false; }
-
-        foreach (var thisExport in _export) {
-            if (thisExport != null) {
-                if (thisExport.Typ == ExportTyp.EinzelnMitFormular) { return true; }
-                if (DateTime.UtcNow.Subtract(thisExport.LastExportTimeUtc).TotalDays > thisExport.BackupInterval * 50) { return true; }
-            }
-        }
-
-        return false;
-    }
-
-    //    var lay = (LayoutCollection)Layouts.Clone();
-    //    lay.Check();
-    //    Layouts = lay;
-    //}
     private void OnDisposing() => Disposing?.Invoke(this, System.EventArgs.Empty);
 
+    //    var l2 = new EventScript(this) {
+    //        NeedRow = true,
+    //        ManualExecutable = true,
+    //        Script = "//ACHTUNG: Keinesfalls dürfen startroutinenabhängig Werte verändert werden.\r\n" +
+    //                 "var Startroutine = \"manual check\";\r\n" +
+    //                 "Call(\"DatenueberpruefungIntern\", false);",
+    //        Name = "Datenüberprüfung"
+    //    };
+    //    _eventScript.Add(l2);
     //private void Column_ItemRemoved(object sender, System.EventArgs e) {
     //    //if (IsLoadingx) { Develop.DebugPrint(FehlerArt.Warnung, "Loading Falsch!"); }
     //    CheckViewsAndArrangements();
@@ -1977,6 +1857,28 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
+    private void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
+        var rk = (long)e.Argument;
+
+        var r = Row.SearchByKey(rk);
+        if (r == null) { return; }
+
+        _ = r.ExecuteScript(EventTypes.value_changed_extra_thread, string.Empty, false, false, false, 5);
+    }
+
+    private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
+        _pendingworker.Remove((BackgroundWorker)sender);
+    }
+
+    //private void ConvertRules(string scriptText) {
+    //    //var eves = EventScript.CloneWithClones();
+    //    var l1 = new EventScript(this) {
+    //        NeedRow = true,
+    //        ManualExecutable = false,
+    //        Script = scriptText,
+    //        Name = "DatenueberpruefungIntern"
+    //    };
+    //    _eventScript.Add(l1);
     //private void Column_ItemAdded(object sender, ListEventArgs e) {
     //    if (IsLoadingx) { return; }
     //    CheckViewsAndArrangements();
@@ -2042,33 +1944,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             var l = new List<string>();
             l.Save(fullhashname, Encoding.UTF8, false);
         } catch { }
-    }
-
-    //private void Row_RowAdded(object sender, RowEventArgs e) {
-    //    //if (IsLoading) {
-    //    ChangeData(DatabaseDataType.Comand_RowAdded, null, e.Row, String.Empty, e.Row.Key.ToString(false));
-    //    //}
-    //}
-
-    //private void Row_RowRemoving(object sender, RowEventArgs e) {
-    //    ChangeData(DatabaseDataType.Comand_RemovingRow, null, e.Row, string.Empty, e.Row.Key.ToString(false));
-    //}
-
-    //private void Row_RowRemoving(object sender, RowEventArgs e) {
-    //    Develop.CheckStackForOverflow();
-    //    ChangeData(DatabaseDataType.dummyComand_RemoveRow, null, e.Row, string.Empty, e.Row.Key.ToString(false));
-
-    //}
-
-    private void StartBackgroundWorker() {
-        if (IsDisposed) { return; }
-
-        try {
-            if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.EditNormaly))) { return; }
-            if (!_backgroundWorker.IsBusy) { _backgroundWorker.RunWorkerAsync(); }
-        } catch {
-            StartBackgroundWorker();
-        }
     }
 
     #endregion

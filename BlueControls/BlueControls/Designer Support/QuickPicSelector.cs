@@ -28,8 +28,8 @@ public sealed class QuickPicSelector : UITypeEditor {
     #region Fields
 
     private readonly QuickPic _fqp = new();
-    private string _c;
-    private IWindowsFormsEditorService _edSvc;
+    private string _c = string.Empty;
+    private IWindowsFormsEditorService? _edSvc;
 
     #endregion
 

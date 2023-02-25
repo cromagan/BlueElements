@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueDatabase;
-
 namespace BlueControls.Interfaces;
 
 public interface IHasConnectedFormula {

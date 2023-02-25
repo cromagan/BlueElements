@@ -313,7 +313,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
 
-        LastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef.Variables1);
+        LastCheckedEventArgs = new RowCheckedEventArgs(this, cols, sef.Variables);
 
         OnRowChecked(LastCheckedEventArgs);
     }
@@ -375,6 +375,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (erg.AllOk) { return erg; }
             if (!erg.GiveItAnotherTry || DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
+    }
+
+    public void InvalidateCheckData() {
+        LastCheckedRowFeedback = null;
+        LastCheckedEventArgs = null;
+        LastCheckedMessage = null;
     }
 
     public bool IsNullOrEmpty() {
@@ -508,12 +514,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
-    }
-
-    internal void InvalidateCheckData() {
-        LastCheckedRowFeedback = null;
-        LastCheckedEventArgs = null;
-        LastCheckedMessage = null;
     }
 
     internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);

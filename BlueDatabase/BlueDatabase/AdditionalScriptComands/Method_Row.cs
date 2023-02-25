@@ -20,16 +20,18 @@
 using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_Row : Method_Database {
+public class Method_Row : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableFilterItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { FilterVar };
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                           "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt. Es wird keine neue Zeile erstellt.\r\n" +
@@ -39,7 +41,7 @@ public class Method_Row : Method_Database {
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableRowItem.ShortName_Variable;
 
     public override string StartSequence => "(";

@@ -46,6 +46,13 @@ public class LayoutCollection : List<string>, ICloneable {
         return l;
     }
 
+    public int LayoutCaptionToIndex(string layoutcaption) {
+        for (var z = 0; z < Count; z++) {
+            if (this[z].Contains("Caption=" + layoutcaption + ",")) { return z; }
+        }
+        return -1;
+    }
+
     // Info:
     // ExportDialog.AddLayoutsOff wandelt Layouts In Items um
     public int LayoutIdToIndex(string exportFormularId) {

@@ -32,6 +32,7 @@ namespace BlueControls.Controls {
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
         private void InitializeComponent() {
+            this.components = new System.ComponentModel.Container();
             this.ThumbGenerator = new System.ComponentModel.BackgroundWorker();
             this.lsbFiles = new BlueControls.Controls.ListBox();
             this.txbPfad = new BlueControls.Controls.TextBox();
@@ -39,6 +40,7 @@ namespace BlueControls.Controls {
             this.btnZurück = new BlueControls.Controls.Button();
             this.btnExplorerÖffnen = new BlueControls.Controls.Button();
             this.btnAddScreenShot = new BlueControls.Controls.Button();
+            this.chkFolder = new System.Windows.Forms.Timer(this.components);
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -48,6 +50,7 @@ namespace BlueControls.Controls {
             this.ThumbGenerator.WorkerSupportsCancellation = true;
             this.ThumbGenerator.DoWork += new System.ComponentModel.DoWorkEventHandler(this.ThumbGenerator_DoWork);
             this.ThumbGenerator.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.ThumbGenerator_ProgressChanged);
+            this.ThumbGenerator.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.ThumbGenerator_RunWorkerCompleted);
             // 
             // lsbFiles
             // 
@@ -120,6 +123,12 @@ namespace BlueControls.Controls {
             this.btnAddScreenShot.TabIndex = 4;
             this.btnAddScreenShot.Click += new System.EventHandler(this.btnAddScreenShot_Click);
             // 
+            // chkFolder
+            // 
+            this.chkFolder.Enabled = true;
+            this.chkFolder.Interval = 1000;
+            this.chkFolder.Tick += new System.EventHandler(this.chkFolder_Tick);
+            // 
             // FileBrowser
             // 
             this.Controls.Add(this.lsbFiles);
@@ -140,5 +149,6 @@ namespace BlueControls.Controls {
         private Button btnAddScreenShot;
         private Button btnExplorerÖffnen;
         private Button btnZurück;
+        private Timer chkFolder;
     }
 }

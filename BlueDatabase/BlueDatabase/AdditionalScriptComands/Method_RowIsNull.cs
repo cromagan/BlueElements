@@ -20,21 +20,23 @@
 using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_RowIsNull : Method_Database {
+public class Method_RowIsNull : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableRowItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { RowVar };
     public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.AnyDatabaseRow;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;
 
     public override string StartSequence => "(";

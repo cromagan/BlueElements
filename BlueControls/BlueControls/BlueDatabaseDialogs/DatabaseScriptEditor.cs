@@ -37,15 +37,9 @@ namespace BlueControls.BlueDatabaseDialogs;
 public sealed partial class DatabaseScriptEditor : IHasDatabase {
     #region Fields
 
-    #region Fields
-
     private EventScript? _item;
 
     #endregion
-
-    #endregion
-
-    #region Constructors
 
     #region Constructors
 
@@ -61,10 +55,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     #endregion
-
-    #endregion
-
-    #region Properties
 
     #region Properties
 
@@ -89,9 +79,13 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 txbName.Text = value.Name;
 
                 chkZeile.Checked = value.NeedRow;
+                txbTestZeile.Enabled = value.NeedRow;
                 chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(EventTypes.new_row);
                 chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(EventTypes.value_changed);
+                chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(EventTypes.value_changed_extra_thread);
                 chkAuslöser_errorcheck.Checked = value.EventTypes.HasFlag(EventTypes.error_check);
+                chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(EventTypes.database_loaded);
+                chkAuslöser_export.Checked = value.EventTypes.HasFlag(EventTypes.export);
                 chkExternVerfügbar.Checked = value.ManualExecutable;
                 chkAendertWerte.Checked = value.ChangeValues;
                 eventScriptEditor.ScriptText = value.Script;
@@ -100,6 +94,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             } else {
                 grpEigenschaften.Enabled = false;
                 eventScriptEditor.Enabled = false;
+                txbTestZeile.Enabled = false;
 
                 txbName.Text = string.Empty;
                 eventScriptEditor.ScriptText = string.Empty;
@@ -108,15 +103,14 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkAuslöser_errorcheck.Checked = false;
                 chkExternVerfügbar.Checked = false;
                 chkAendertWerte.Checked = false;
+                chkAuslöser_valuechangedThread.Checked = false;
+                chkAuslöser_databaseloaded.Checked = false;
+                chkAuslöser_export.Checked = false;
             }
         }
     }
 
     #endregion
-
-    #endregion
-
-    #region Methods
 
     #region Methods
 
@@ -173,6 +167,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         if (chkAuslöser_newrow.Checked) { tmp |= EventTypes.new_row; }
         if (chkAuslöser_valuechanged.Checked) { tmp |= EventTypes.value_changed; }
         if (chkAuslöser_errorcheck.Checked) { tmp |= EventTypes.error_check; }
+        if (chkAuslöser_valuechangedThread.Checked) { tmp |= EventTypes.value_changed_extra_thread; }
+        if (chkAuslöser_databaseloaded.Checked) { tmp |= EventTypes.database_loaded; }
+        if (chkAuslöser_export.Checked) { tmp |= EventTypes.export; }
         Item.EventTypes = tmp;
     }
 
@@ -326,8 +323,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         Database.Variables = new ReadOnlyCollection<VariableString>(l2);
     }
-
-    #endregion
 
     #endregion
 }

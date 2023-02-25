@@ -26,11 +26,10 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, ICloneable, IDisposableExtended, IHasDatabase {
+public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName {
     //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
     #region Fields
@@ -65,6 +64,8 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
 
     public bool IsDisposed { get; private set; }
     public bool IsParsing { get; private set; }
+
+    public string KeyName => _name;
 
     public string Name {
         get => _name;

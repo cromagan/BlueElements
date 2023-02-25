@@ -31,7 +31,7 @@ internal class Method_ExtractTags : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, StringVal };
 
     public override string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
                                           "Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.\r\n" +
@@ -55,8 +55,8 @@ internal class Method_ExtractTags : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        const string Comment = "Mit dem Befehl 'ExtractTags' erstellt";
-        s.Variables.RemoveWithComment(Comment);
+        var comment = "Mit dem Befehl 'ExtractTags' erstellt";
+        s.Variables.RemoveWithComment(comment);
 
         var tags = new List<string>();
         if (attvar.Attributes[0] is VariableString vs) { tags.Add(vs.ValueString); }
@@ -69,7 +69,7 @@ internal class Method_ExtractTags : Method {
                 var vn = x[0].ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
                 var thisv = x[1].Trim();
                 if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
-                    s.Variables.Add(new VariableString("extracted_" + vn, thisv, true, false, Comment));
+                    s.Variables.Add(new VariableString("extracted_" + vn, thisv, true, false, comment));
                 }
             }
         }

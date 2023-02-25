@@ -20,16 +20,18 @@
 using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_CallFilter : Method_Database {
+public class Method_CallFilter : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableFilterItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { StringVal, FilterVar };
 
     public override string Description => "Sucht Zeilen und ruft in dessen Datenbank ein Skript für jede Zeile aus.\r\n" +
                                             "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
@@ -40,7 +42,7 @@ public class Method_CallFilter : Method_Database {
     public override bool EndlessArgs => true;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
 
     public override string StartSequence => "(";

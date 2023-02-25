@@ -33,7 +33,7 @@ internal class Method_DirectoryExists : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal };
     public override string Description => "Prüft, ob ein Verzeichnis existiert";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

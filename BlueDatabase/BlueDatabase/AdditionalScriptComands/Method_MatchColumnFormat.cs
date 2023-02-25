@@ -37,7 +37,7 @@ internal class Method_MatchColumnFormat : Method_Database {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodType => MethodType.Database;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "MatchColumnFormat(Value, Column)";

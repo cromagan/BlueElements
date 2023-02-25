@@ -77,7 +77,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         CollectGarbage();
         var pic = OnNeedCurrentPic();
 
-        if (pic == null) { return; }
+        if (pic == null || e?.MouseDown == null) { return; }
 
         var wink = Winkel(new PointM(e.MouseDown.X, e.MouseDown.Y), new PointM(e.Current.X, e.Current.Y));
         // Make a Matrix to represent rotation by this angle.

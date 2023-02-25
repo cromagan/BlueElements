@@ -79,6 +79,7 @@
   <ItemGroup>
     <Compile Include="AdditionalScriptComands\Method_Database.cs" />
     <Compile Include="AdditionalScriptComands\Method_AddRow.cs" />
+    <Compile Include="AdditionalScriptComands\Method_Export.cs" />
     <Compile Include="AdditionalScriptComands\Method_WriteBackDBVariables.cs" />
     <Compile Include="AdditionalScriptComands\Method_SoftMessage.cs" />
     <Compile Include="AdditionalScriptComands\Method_Call.cs" />
@@ -141,7 +142,6 @@
     <Compile Include="Enums\ShortenStyle.cs" />
     <Compile Include="Enums\ColumnLineStyle.cs" />
     <Compile Include="Enums\EditTypeTable.cs" />
-    <Compile Include="Enums\ExportTyp.cs" />
     <Compile Include="Enums\BildTextVerhalten.cs" />
     <Compile Include="Enums\FirstRow.cs" />
     <Compile Include="Enums\Routinen.cs" />
@@ -150,7 +150,6 @@
     <Compile Include="EventArgs\CellCancelEventArgs.cs" />
     <Compile Include="EventArgs\CellExtEventArgs.cs" />
     <Compile Include="EventArgs\MessageEventArgs.cs" />
-    <Compile Include="EventArgs\GenerateLayoutInternalEventArgs.cs" />
     <Compile Include="EventArgs\CellEventArgs.cs" />
     <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
     <Compile Include="EventArgs\FilterEventArgs.cs" />
@@ -159,7 +158,6 @@
     <Compile Include="EventArgs\ProgressbarEventArgs.cs" />
     <Compile Include="EventArgs\RowEventArgs.cs" />
     <Compile Include="Export.cs" />
-    <Compile Include="ExportDefinition.cs" />
     <Compile Include="FilterCollection.cs" />
     <Compile Include="FilterItem.cs" />
     <Compile Include="LanguageTool.cs" />

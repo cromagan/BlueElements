@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
@@ -57,7 +59,7 @@ public static class clsDesignExtensions {
         if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = boc1.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(boc2)) { des.BorderColor2 = boc2.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(boc3)) { des.BorderColor3 = boc3.FromHtmlCode(); }
-        if (!string.IsNullOrEmpty(f)) { des.bFont = BlueFont.Get(f); }
+        if (!string.IsNullOrEmpty(f)) { des.BFont = BlueFont.Get(f); }
         //if (!string.IsNullOrEmpty(pic)) { des.Image = QuickImage.Get(pic); }
         des.Image = pic;
         des.Status = status;
@@ -75,26 +77,26 @@ public static class clsDesignExtensions {
 
 public class clsDesign {
 
-    #region Fields
+    #region Properties
 
-    public Color BackColor1;
-    public Color BackColor2;
-    public Color BackColor3;
-    public BlueFont bFont;
-    public Color BorderColor1;
-    public Color BorderColor2;
-    public Color BorderColor3;
-    public HintergrundArt HintergrundArt;
-    public string Image;
-    public Kontur Kontur;
-    public bool Need;
-    public RahmenArt RahmenArt;
-    public States Status;
-    public float Verlauf;
-    public int X1;
-    public int X2;
-    public int Y1;
-    public int Y2;
+    public Color BackColor1 { get; set; }
+    public Color BackColor2 { get; set; }
+    public Color BackColor3 { get; set; }
+    public BlueFont? BFont { get; set; }
+    public Color BorderColor1 { get; set; }
+    public Color BorderColor2 { get; set; }
+    public Color BorderColor3 { get; set; }
+    public HintergrundArt HintergrundArt { get; set; }
+    public string Image { get; set; } = string.Empty;
+    public Kontur Kontur { get; set; }
+    public bool Need { get; set; }
+    public RahmenArt RahmenArt { get; set; }
+    public States Status { get; set; }
+    public float Verlauf { get; set; }
+    public int X1 { get; set; }
+    public int X2 { get; set; }
+    public int Y1 { get; set; }
+    public int Y2 { get; set; }
 
     #endregion
 }

@@ -24,10 +24,8 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using BlueDatabase.EventArgs;
 
 namespace BlueControls;
 
@@ -93,7 +91,6 @@ public static class Allgemein {
 
     private static void AllFiles_ItemAdded(object sender, ListEventArgs e) {
         if (e.Item is DatabaseAbstract db) {
-            db.GenerateLayoutInternal += DB_GenerateLayoutInternal;
             db.Loaded += TableView.CheckDatabase;
             db.DropMessage += FormWithStatusBar.Db_DropMessage;
         }
@@ -101,20 +98,19 @@ public static class Allgemein {
 
     private static void AllFiles_ItemRemoving(object sender, ListEventArgs e) {
         if (e.Item is DatabaseAbstract db) {
-            db.GenerateLayoutInternal -= DB_GenerateLayoutInternal;
             db.Loaded -= TableView.CheckDatabase;
             db.DropMessage -= FormWithStatusBar.Db_DropMessage;
         }
     }
 
-    private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
-        if (e.Handled) { return; }
-        e.Handled = true;
-        if (e?.Row?.Database == null) { return; }
-
-        var pad = new ItemCollectionPad(e.LayoutId, e.Row.Database, e.Row.Key);
-        pad.SaveAsBitmap(e.Filename);
-    }
-
     #endregion
+
+    //private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
+    //    if (e.Handled) { return; }
+    //    e.Handled = true;
+    //    if (e?.Row?.Database == null) { return; }
+
+    //    var pad = new ItemCollectionPad(e.LayoutId, e.Row.Database, e.Row.Key);
+    //    pad.SaveAsBitmap(e.Filename);
+    //}
 }

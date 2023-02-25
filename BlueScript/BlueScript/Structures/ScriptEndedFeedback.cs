@@ -28,7 +28,7 @@ public class ScriptEndedFeedback {
     #region Constructors
 
     public ScriptEndedFeedback(List<Variable> variables, List<string> protocol, bool allOk) {
-        Variables1 = variables;
+        Variables = variables;
         GiveItAnotherTry = false;
         Protocol = protocol;
         AllOk = allOk;
@@ -42,7 +42,7 @@ public class ScriptEndedFeedback {
     /// <param name="errormessage"></param>
     /// <param name="giveitanothertry"></param>
     public ScriptEndedFeedback(string errormessage, bool giveitanothertry) {
-        Variables1 = null;
+        Variables = null;
         GiveItAnotherTry = giveitanothertry;
         Protocol = new List<string> {
             errormessage
@@ -64,7 +64,7 @@ public class ScriptEndedFeedback {
 
     public string ProtocolText { get; }
 
-    public List<Variable>? Variables1 { get; }
+    public List<Variable>? Variables { get; }
 
     #endregion
 

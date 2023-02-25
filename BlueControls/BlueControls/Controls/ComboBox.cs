@@ -45,16 +45,16 @@ public partial class ComboBox : TextBox, ITranslateable {
     private bool _btnDropDownIsIn;
     private ComboboxStyle _drawStyle = ComboboxStyle.TextBox;
     private ComboBoxStyle _dropDownStyle = ComboBoxStyle.DropDown;
-    private ExtText _eTxt2;
+    private ExtText? _eTxt;
     private string _imageCode = string.Empty;
 
     /// <summary>
     /// Kümmert sich darum, wenn die ComboBox wie ein Button aussieht, dass immer
     /// der Button-Text stehen bleibt und nicht der Ausgewählte
     /// </summary>
-    private string _initialtext;
+    private string _initialtext = string.Empty;
 
-    private string _lastClickedText;
+    private string _lastClickedText = string.Empty;
 
     #endregion
 
@@ -165,9 +165,9 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (_drawStyle != ComboboxStyle.TextBox) {
             if (string.IsNullOrEmpty(_initialtext) && !string.IsNullOrEmpty(Text)) { _initialtext = Text; }
 
-            _eTxt2 ??= new ExtText((Design)_drawStyle, state);
+            _eTxt ??= new ExtText((Design)_drawStyle, state);
 
-            Button.DrawButton(this, gr, (Design)_drawStyle, state, QuickImage.Get(_imageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt2, _initialtext, DisplayRectangle, Translate);
+            Button.DrawButton(this, gr, (Design)_drawStyle, state, QuickImage.Get(_imageCode), Alignment.Horizontal_Vertical_Center, true, _eTxt, _initialtext, DisplayRectangle, Translate);
             btnDropDown.Invalidate();
             return;
         }

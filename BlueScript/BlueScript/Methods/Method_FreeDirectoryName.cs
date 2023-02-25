@@ -32,7 +32,7 @@ internal class Method_FreeDirectoryName : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal };
     public override string Description => "Gibt einen zufälligen Ordnernamen (ohne Pfad) zurück, der im anggebenen Verzeichnis nicht existiert.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

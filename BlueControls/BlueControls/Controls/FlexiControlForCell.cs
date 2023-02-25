@@ -49,7 +49,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     private long _rowKey = -1;
 
     private ColumnItem? _tmpColumn;
-
     private RowItem? _tmpRow;
 
     #endregion
@@ -92,7 +91,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         set {
             if (_columnName == value) { return; }
             _columnName = value;
-            GetTmpVariables();
+            _tmpColumn = null;
             UpdateColumnData();
             SetValueFromCell();
         }
@@ -104,27 +103,22 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DatabaseAbstract? Database { get; private set; }
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public long RowKey => _rowKey;
-
     #endregion
 
     #region Methods
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-        GetTmpVariables();
+        var (column, row) = GetTmpVariables();
         //var CellKey = e.Tags.TagGet("CellKey");
         //if (string.IsNullOrEmpty(CellKey)) { return; }
         //TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
         switch (e.ClickedComand.ToLower()) {
             case "spalteneigenschaftenbearbeiten":
-                TableView.OpenColumnEditor(_tmpColumn, null);
+                TableView.OpenColumnEditor(column, null);
                 return true;
 
             case "vorherigeninhaltwiederherstellen":
-                Table.DoUndo(_tmpColumn, _tmpRow);
+                Table.DoUndo(column, row);
                 return true;
 
                 //default:
@@ -137,11 +131,11 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     }
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
-        GetTmpVariables();
-        if (_tmpColumn != null && _tmpColumn.Database.IsAdministrator()) {
+        var (column, row) = GetTmpVariables();
+        if (column?.Database != null && column.Database.IsAdministrator()) {
             _ = items.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
         }
-        if (_tmpColumn != null && _tmpRow != null && _tmpColumn.Database.IsAdministrator()) {
+        if (column?.Database != null && row != null && column.Database.IsAdministrator()) {
             _ = items.Add(ContextMenuComands.VorherigenInhaltWiederherstellen);
         }
         //if (Parent is Formula f) {
@@ -154,7 +148,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         //        items.AddClonesFrom(x);
         //    }
         //}
-        hotItem = _tmpColumn;
+        hotItem = column;
     }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
@@ -162,8 +156,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void SetData(DatabaseAbstract? database, long? rowkey) {
-        //var LastCheckData = DatabaseAbstract.GetLastCheckData(database, rowkey ?? -1);
-
         if (rowkey == _rowKey && database == Database) { return; }
         FillCellNow();
 
@@ -178,7 +170,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
 
         Database = database;
         _rowKey = rowkey ?? -1;
-        GetTmpVariables();
+        _tmpRow = null;
+        _tmpColumn = null;
+
         UpdateColumnData();
 
         if (Database != null) {
@@ -192,26 +186,31 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         SetValueFromCell();
         CheckEnabledState();
 
-        _tmpRow?.CheckRowDataIfNeeded();
+        var (_, row) = GetTmpVariables();
+        row?.CheckRowDataIfNeeded();
 
-        if (_tmpRow?.LastCheckedEventArgs is RowCheckedEventArgs e) {
+        if (row?.LastCheckedEventArgs is RowCheckedEventArgs e) {
             Database_RowChecked(this, e);
         }
     }
 
     internal void CheckEnabledState() {
-        if (Parent == null || !Parent.Enabled || _tmpColumn == null || _tmpRow == null) {
+        var (column, row) = GetTmpVariables();
+
+        if (Parent == null || !Parent.Enabled || column == null || row == null) {
             DisabledReason = "Kein Bezug zu einer Zelle.";
             return;
         }
-        DisabledReason = CellCollection.ErrorReason(_tmpColumn, _tmpRow, ErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.
+        DisabledReason = CellCollection.ErrorReason(column, row, ErrorReason.EditNormaly); // Rechteverwaltung einfliesen lassen.
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
         if (e.Control is Caption) { return; } // z.B. Info Caption
 
-        var column1 = GetRealColumn(_tmpColumn, null);
+        var (column, _) = GetTmpVariables();
+
+        var column1 = GetRealColumn(column, null);
 
         if (column1 != null) {
             Suffix = column1.Suffix;
@@ -276,7 +275,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     protected override void OnControlRemoved(ControlEventArgs e) {
         base.OnControlRemoved(e);
         switch (e.Control) {
-            case ComboBox comboBox:
+            case ComboBox:
                 //comboBox.GotFocus -= GotFocus_ComboBox;
                 break;
 
@@ -370,15 +369,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         SetValueFromCell();
     }
 
-    //private void _Database_RowKeyChanged(object sender, KeyChangedEventArgs e) {
-    //    if (e.KeyOld != _RowKey) { return; }
-    //    _RowKey = e.KeyNew;
-    //    GetTmpVariables();
-    //    SetValueFromCell();
-    //}
-
     private void Column_ItemInternalChanged(object sender, ColumnEventArgs e) {
-        if (e.Column == _tmpColumn) {
+        var (column, _) = GetTmpVariables();
+
+        if (e.Column == column) {
             UpdateColumnData();
             CheckEnabledState();
             OnNeedRefresh();
@@ -386,15 +380,19 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     }
 
     private void Database_CellValueChanged(object sender, CellEventArgs e) {
-        if (e.Row != _tmpRow) { return; }
+        var (column, row) = GetTmpVariables();
 
-        if (e.Column == _tmpColumn) { SetValueFromCell(); }
+        if (e.Row != row) { return; }
 
-        if (e.Column == _tmpColumn || e.Column == e.Column.Database.Column.SysLocked) { CheckEnabledState(); }
+        if (e.Column == column) { SetValueFromCell(); }
+
+        if (e.Column == column || e.Column == e.Column?.Database?.Column.SysLocked) { CheckEnabledState(); }
     }
 
     private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
-        if (e.Row != _tmpRow) { return; }
+        var (column, row) = GetTmpVariables();
+
+        if (e.Row != row) { return; }
         if (e.ColumnsWithErrors == null) {
             InfoText = string.Empty;
             return;
@@ -403,7 +401,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         var newT = string.Empty;
         foreach (var thisString in e.ColumnsWithErrors) {
             var x = thisString.SplitAndCutBy("|");
-            if (_tmpColumn != null && string.Equals(x[0], _tmpColumn.Name, StringComparison.OrdinalIgnoreCase)) {
+            if (column != null && string.Equals(x[0], column.Name, StringComparison.OrdinalIgnoreCase)) {
                 if (!string.IsNullOrEmpty(InfoText)) { InfoText += "<br><hr><br>"; }
                 newT += x[1];
             }
@@ -460,20 +458,20 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     private void FillCellNow() {
         if (IsFilling) { return; }
         if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
-        GetTmpVariables(); // Falls der Key inzwischen nicht mehr in der Collection ist, deswegen neu prüfen. RowREmoved greift zwar, kann aber durchaus erst nach RowSortesd/CursorposChanges auftreten.
-        if (_tmpColumn == null || _tmpRow == null) { return; }
-        if (_tmpColumn.IsDisposed || _tmpRow.IsDisposed) { return; }
+        var (column, row) = GetTmpVariables();
+        if (column == null || row == null) { return; }
+        if (column.IsDisposed || row.IsDisposed) { return; }
 
-        var oldVal = _tmpRow.CellGetString(_tmpColumn);
+        var oldVal = row.CellGetString(column);
         var newValue = Value;
 
         if (oldVal == newValue) { return; }
 
-        var tmpR2 = _tmpRow; // Manchmal wird die Sortierung verändert, was zur Folge hat, dass der Cursor verschwindet, wass die _tmpRow verwirft....
-        var tmpC2 = _tmpColumn;
-
-        tmpR2.CellSet(tmpC2, newValue);
-        if (oldVal != tmpR2.CellGetString(tmpC2)) { _ = tmpR2.ExecuteScript(EventTypes.value_changed, string.Empty, false, false, true, 1); }
+        row.CellSet(column, newValue);
+        if (oldVal != row.CellGetString(column)) {
+            _ = row.ExecuteScript(EventTypes.value_changed, string.Empty, false, false, true, 1);
+            row.Database?.AddBackgroundWork(row);
+        }
     }
 
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
@@ -501,8 +499,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         return gbColumn;
     }
 
-    private void GetTmpVariables() {
+    private (ColumnItem? column, RowItem? row) GetTmpVariables() {
         try {
+            if (_tmpColumn != null && _tmpRow != null) { return (_tmpColumn, _tmpRow); }
+
             if (Database != null && !Database.IsDisposed) {
                 _tmpColumn = Database.Column.Exists(_columnName);
                 _tmpRow = Database.Row.SearchByKey(_rowKey);
@@ -510,26 +510,18 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 _tmpColumn = null;
                 _tmpRow = null;
             }
+
+            return (_tmpColumn, _tmpRow);
         } catch {
             // Multitasking sei dank kann _database trotzem null sein...
-            GetTmpVariables();
+            return GetTmpVariables();
         }
     }
 
-    //private void GotFocus_ComboBox(object sender, System.EventArgs e) {
-    //    if (_tmpColumn == null || _tmpRow == null) { return; }
-    //    if (!string.IsNullOrEmpty(((ComboBox)sender).Text)) { return; }
-    //    ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
-    //}
-
-    //private void GotFocus_TextBox(object sender, System.EventArgs e) {
-    //    if (_tmpColumn == null || _tmpRow == null) { return; }
-    //    if (!string.IsNullOrEmpty(((TextBox)sender).Text)) { return; }
-    //    ValueSet(CellCollection.AutomaticInitalValue(_tmpColumn, _tmpRow), true, true);
-    //}
-
     private void ListBox_AddClicked(object sender, System.EventArgs e) {
-        var dia = ColumnItem.UserEditDialogTypeInTable(_tmpColumn, false);
+        var (column, _) = GetTmpVariables();
+
+        var dia = ColumnItem.UserEditDialogTypeInTable(column, false);
 
         ListBox? lbx = null;
 
@@ -604,24 +596,34 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     }
 
     private void Marker_DoWork(object sender, DoWorkEventArgs e) {
-        TextBox? txb = null;
+        if (Database == null || Database.IsDisposed) { return; }
 
+        #region  in Frage kommende Textbox ermitteln txb
+
+        TextBox? txb = null;
         foreach (var control in Controls) {
             if (control is TextBox t) { txb = t; }
         }
 
-        if (Marker.CancellationPending) { return; }
         if (txb == null) { return; }
-        if (_tmpRow == null) { return; }
+
+        #endregion
+
         if (Marker.CancellationPending) { return; }
-        List<string> names = new();
-        if (Database == null || Database.IsDisposed) { return; }
+
+        var (_, row) = GetTmpVariables();
+        if (row == null) { return; }
+        if (Marker.CancellationPending) { return; }
 
         var col = Database.Column.First;
         if (col == null) { return; }
+
+        List<string> names = new();
         names.AddRange(col.GetUcaseNamesSortedByLenght());
+
         if (Marker.CancellationPending) { return; }
-        var myname = _tmpRow.CellFirstString().ToUpper();
+
+        var myname = row.CellFirstString().ToUpper();
         var initT = txb.Text;
         bool ok;
 
@@ -690,20 +692,22 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (e.Row.Key == _rowKey) {
             _rowKey = -1;
-            GetTmpVariables();
+            _tmpRow = null;
         }
     }
 
     private void SetValueFromCell() {
         if (IsDisposed) { return; }
 
-        if (_tmpColumn == null || _tmpRow == null) {
+        var (column, row) = GetTmpVariables();
+
+        if (column == null || row == null) {
             ValueSet(string.Empty, true, true);
             InfoText = string.Empty;
             return;
         }
 
-        switch (_tmpColumn.Format) {
+        switch (column.Format) {
             //case DataFormat.Link_To_Filesystem:
             //    var tmp = _tmpRow.CellGetList(_tmpColumn);
             //    List<string> tmp2 = new();
@@ -724,12 +728,12 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             //    break;
 
             case DataFormat.Verknüpfung_zu_anderer_Datenbank:
-                _ = GetRealColumn(_tmpColumn, _tmpRow);
-                ValueSet(_tmpRow.CellGetString(_tmpColumn), true, true);
+                _ = GetRealColumn(column, row);
+                ValueSet(row.CellGetString(column), true, true);
                 break;
 
             default:
-                ValueSet(_tmpRow.CellGetString(_tmpColumn), true, true);
+                ValueSet(row.CellGetString(column), true, true);
                 break;
         }
     }
@@ -741,13 +745,18 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             if (!Marker.CancellationPending) { Marker.CancelAsync(); }
             Develop.DoEvents();
         }
-        if (_tmpColumn == null) { return; }
-        if (_tmpColumn.Format != DataFormat.RelationText) { return; }
+
+        var (column, _) = GetTmpVariables();
+
+        if (column == null) { return; }
+        if (column.Format != DataFormat.RelationText) { return; }
         Marker.RunWorkerAsync();
     }
 
     private void UpdateColumnData() {
-        if (_tmpColumn == null) {
+        var (column, _) = GetTmpVariables();
+
+        if (column == null) {
             if (string.IsNullOrEmpty(_columnName)) {
                 Caption = "[?]";
                 //EditType = EditTypeFormula.None;
@@ -756,11 +765,11 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 Caption = _columnName + ":";
             }
         } else {
-            Caption = _tmpColumn.ReadableText() + ":";
+            Caption = column.ReadableText() + ":";
 
             if (string.IsNullOrEmpty(_columnName)) {
                 //EditType = _tmpColumn.EditType;
-                QuickInfo = _tmpColumn.QuickInfoText(string.Empty);
+                QuickInfo = column.QuickInfoText(string.Empty);
             }
         }
     }

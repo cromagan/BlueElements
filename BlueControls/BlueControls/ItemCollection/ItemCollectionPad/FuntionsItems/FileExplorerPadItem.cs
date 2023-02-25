@@ -32,6 +32,8 @@ public class FileExplorerPadItem : CustomizableShowPadItem {
 
     #region Fields
 
+    private bool _bei_Bedarf_erzeugen = false;
+    private bool _leere_Ordner_löschen = false;
     private string _pfad = string.Empty;
 
     #endregion
@@ -45,6 +47,30 @@ public class FileExplorerPadItem : CustomizableShowPadItem {
     #region Properties
 
     public static string ClassId => "FI-FileExplorer";
+
+    [Description("Ob das Verzeichniss bei Bedarf erzeugt werden soll.")]
+    public bool Bei_Bedarf_erzeugen {
+        get => _bei_Bedarf_erzeugen;
+
+        set {
+            if (value == _bei_Bedarf_erzeugen) { return; }
+            _bei_Bedarf_erzeugen = value;
+            RaiseVersion();
+            OnChanged();
+        }
+    }
+
+    [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
+    public bool Leere_Ordner_löschen {
+        get => _leere_Ordner_löschen;
+
+        set {
+            if (value == _leere_Ordner_löschen) { return; }
+            _leere_Ordner_löschen = value;
+            RaiseVersion();
+            OnChanged();
+        }
+    }
 
     [Description("Der Dateipfad, dessen Dateien angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Pfad {
@@ -67,7 +93,9 @@ public class FileExplorerPadItem : CustomizableShowPadItem {
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FileBrowser {
             OriginalText = Pfad,
-            Name = DefaultItemToControlName()
+            Name = DefaultItemToControlName(),
+            CreateDir = _bei_Bedarf_erzeugen,
+            DeleteDir = _leere_Ordner_löschen
         };
 
         if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
@@ -81,6 +109,8 @@ public class FileExplorerPadItem : CustomizableShowPadItem {
         List<GenericControl> l = new();
         l.AddRange(base.GetStyleOptions());
         l.Add(new FlexiControlForProperty<string>(() => Pfad));
+        l.Add(new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen));
+        l.Add(new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen));
         return l;
     }
 
@@ -90,6 +120,14 @@ public class FileExplorerPadItem : CustomizableShowPadItem {
             case "pfad":
                 _pfad = value.FromNonCritical();
                 return true;
+
+            case "createdir":
+                _bei_Bedarf_erzeugen = value.FromPlusMinus();
+                return true;
+
+            case "deletedir":
+                _leere_Ordner_löschen = value.FromPlusMinus();
+                return true;
         }
         return false;
     }
@@ -97,6 +135,8 @@ public class FileExplorerPadItem : CustomizableShowPadItem {
     public override string ToString() {
         var result = new List<string>();
         result.ParseableAdd("Pfad", _pfad);
+        result.ParseableAdd("CreateDir", _bei_Bedarf_erzeugen);
+        result.ParseableAdd("DeleteDir", _leere_Ordner_löschen);
         return result.Parseable(base.ToString());
     }
 

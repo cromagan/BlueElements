@@ -30,7 +30,7 @@ internal class Method_StartsWith : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableBool.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, BoolVal, StringVal };
     public override string Description => "Prüft, ob der String mit einem der angegeben Strings startet.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";

@@ -26,6 +26,14 @@ namespace BlueDatabase.AdditionalScriptComands;
 
 public abstract class Method_Database : Method {
 
+    #region Fields
+
+    public static readonly List<string> FilterVar = new() { VariableFilterItem.ShortName_Variable };
+
+    public static readonly List<string> RowVar = new() { VariableRowItem.ShortName_Variable };
+
+    #endregion
+
     #region Methods
 
     protected ColumnItem? Column(List<Variable>? variables, string name) => MyDatabase(variables)?.Column.Exists(name);

@@ -18,7 +18,6 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
@@ -103,17 +102,6 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         }
         txbTags.Text = Database.Tags.JoinWithCr();
 
-        #region Exports
-
-        lbxExportSets.Item.Clear();
-        foreach (var thisSet in Database.Export) {
-            if (thisSet != null) {
-                _ = lbxExportSets.Item.Add((ExportDefinition)thisSet.Clone());
-            }
-        }
-
-        #endregion
-
         txbCaption.Text = Database.Caption;
         txbGlobalScale.Text = Database.GlobalScale.ToString(Constants.Format_Float1);
         txbAdditionalFiles.Text = Database.AdditionalFilesPfad;
@@ -165,12 +153,12 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
             //    aenderung = "Wert geändert";
             //    break;
 
-            case DatabaseDataType.AutoExport:
-                aenderung = "Export ausgeführt oder geändert";
-                alt = string.Empty;
-                neu = string.Empty;
-                symb = ImageCode.Karton;
-                break;
+            //case DatabaseDataType.AutoExport:
+            //    aenderung = "Export ausgeführt oder geändert";
+            //    alt = string.Empty;
+            //    neu = string.Empty;
+            //    symb = ImageCode.Karton;
+            //    break;
 
             case DatabaseDataType.EventScript:
                 aenderung = "Import Script geändert";
@@ -245,28 +233,6 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         Close();
     }
 
-    //private void eventScript_Editor1_Changed(object sender, System.EventArgs e) {
-    //    foreach (var thisitem in lstEventScripts.Item) {
-    //        if (thisitem is TextListItem tli) {
-    //            if (tli.Tag == eventScriptEditor.Item) {
-    //                tli.Text = eventScriptEditor.Item.ReadableText();
-    //                tli.Symbol = eventScriptEditor.Item.SymbolForReadableText();
-    //            }
-    //        }
-    //    }
-    //}
-
-    private void ExportEditor_Changed(object sender, System.EventArgs e) {
-        foreach (var thisitem in lbxExportSets.Item) {
-            if (thisitem is TextListItem tli) {
-                if (tli.Tag == ExportEditor.Item) {
-                    tli.Text = ExportEditor.Item.ReadableText();
-                    tli.Symbol = ExportEditor.Item.SymbolForReadableText();
-                }
-            }
-        }
-    }
-
     private void GenerateInfoText() {
         var t = "<b>Tabelle:</b> <tab>" + Database.ConnectionData.TableName + "<br>";
         t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueID + "<br>";
@@ -323,24 +289,6 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         if (e.TabPage == tabUndo) {
             if (tblUndo.Database == null) { GenerateUndoTabelle(); }
         }
-    }
-
-    private void lbxExportSets_AddClicked(object sender, System.EventArgs e) {
-        var newExportItem = lbxExportSets.Item.Add(new ExportDefinition(Database));
-        newExportItem.Checked = true;
-    }
-
-    private void lbxExportSets_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (lbxExportSets.Item.Checked().Count != 1) {
-            ExportEditor.Item = null;
-            return;
-        }
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) {
-            ExportEditor.Item = null;
-            return;
-        }
-        var selectedExport = (ExportDefinition)((ReadableListItem)lbxExportSets.Item.Checked()[0]).Item;
-        ExportEditor.Item = selectedExport;
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
@@ -404,14 +352,6 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
 
         var colnam = lbxSortierSpalten.Item.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item).Name).ToList();
         Database.SortDefinition = new RowSortDefinition(Database, colnam, btnSortRichtung.Checked);
-
-        #endregion
-
-        #region  Export
-
-        var t = new List<ExportDefinition?>();
-        t.AddRange(lbxExportSets.Item.Select(thisItem => (ExportDefinition)((ReadableListItem)thisItem).Item));
-        Database.Export = new(t);
 
         #endregion
     }

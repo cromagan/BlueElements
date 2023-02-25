@@ -39,18 +39,6 @@ namespace BlueControls.Controls;
 [Designer(typeof(BasicDesigner))]
 public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
-    #region Fields
-
-    /// <summary>
-    /// ACHTUNG: Das Control wird niemals den Filter selbst ändern.
-    /// Der Filter wird nur zur einfacheren Identifizierung der nachfolgenden Steuerelemente behalten.
-    /// </summary>
-    public readonly FilterItem? Filter;
-
-    public readonly Table? TableView;
-
-    #endregion
-
     #region Constructors
 
     public FlexiControlForFilter() : this(null, null, null) {
@@ -76,6 +64,18 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// ACHTUNG: Das Control wird niemals den Filter selbst ändern.
+    /// Der Filter wird nur zur einfacheren Identifizierung der nachfolgenden Steuerelemente behalten.
+    /// </summary>
+    public FilterItem? Filter { get; }
+
+    public Table? TableView { get; }
 
     #endregion
 

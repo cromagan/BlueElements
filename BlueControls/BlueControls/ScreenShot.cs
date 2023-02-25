@@ -123,8 +123,10 @@ public sealed partial class ScreenShot {
     //    return im;
     //}
     protected override void OnMouseMove(MouseEventArgs? e) {
+        if (e == null || _screenShotBmp == null) { return; }
+
         base.OnMouseMove(e);
-        if (e != null && e.Button == MouseButtons.None && !_mousesWasUp) {
+        if (e.Button == MouseButtons.None && !_mousesWasUp) {
             _mousesWasUp = true;
             return;
         }
@@ -138,19 +140,18 @@ public sealed partial class ScreenShot {
 
         gr.DrawImage(_screenShotBmp, 0, 0);
 
-        if (e != null) {
-            PrintText(gr, e);
-            Magnify(_screenShotBmp, new Point(e.X, e.Y), gr, false);
-            if (e.Button != MouseButtons.None) {
-                gr.DrawLine(new Pen(Color.Red), 0, _feedBack.Point1.Y, Width, _feedBack.Point1.Y);
-                gr.DrawLine(new Pen(Color.Red), _feedBack.Point1.X, 0, _feedBack.Point1.X, Height);
-                gr.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
-                gr.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
-            } else {
-                gr.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
-                gr.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
-            }
+        PrintText(gr, e);
+        Magnify(_screenShotBmp, new Point(e.X, e.Y), gr, false);
+        if (e.Button != MouseButtons.None) {
+            gr.DrawLine(new Pen(Color.Red), 0, _feedBack.Point1.Y, Width, _feedBack.Point1.Y);
+            gr.DrawLine(new Pen(Color.Red), _feedBack.Point1.X, 0, _feedBack.Point1.X, Height);
+            gr.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
+            gr.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
+        } else {
+            gr.DrawLine(new Pen(Color.Red), 0, e.Y, Width, e.Y);
+            gr.DrawLine(new Pen(Color.Red), e.X, 0, e.X, Height);
         }
+
         Refresh();
     }
 
@@ -166,10 +167,13 @@ public sealed partial class ScreenShot {
         if (r.Width < 2 || r.Height < 2) { return; }
 
         _clipedArea = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
-        using (var gr = Graphics.FromImage(_clipedArea)) {
+
+        if (_screenShotBmp != null) {
+            using var gr = Graphics.FromImage(_clipedArea);
             gr.Clear(Color.Black);
             gr.DrawImage(_screenShotBmp, 0, 0, r, GraphicsUnit.Pixel);
         }
+
         Close();
     }
 

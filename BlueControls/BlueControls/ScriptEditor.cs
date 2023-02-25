@@ -169,7 +169,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
             ex.Feedback = s.Parse(0, "Main");
         }
 
-        grpVariablen.WriteVariablesToTable(ex.Feedback.Variables1);
+        grpVariablen.WriteVariablesToTable(ex.Feedback.Variables);
         WriteComandsToList();
 
         if (ex.Feedback.AllOk) {

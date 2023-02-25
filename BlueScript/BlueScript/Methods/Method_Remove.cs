@@ -31,7 +31,7 @@ internal class Method_Remove : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableListString.ShortName_Variable }, new List<string> { VariableBool.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { ListStringVar, BoolVal, new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
     public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ");";

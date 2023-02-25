@@ -32,7 +32,7 @@ internal class Method_ExtractText : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, StringVal };
 
     public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt eine List mit allen Funden zurück.\r\n" +
                                           "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";

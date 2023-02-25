@@ -165,7 +165,11 @@ internal sealed partial class SearchAndReplace : Form {
                     }
                 }
             }
-            if (rowChanged) { _ = thisRow.ExecuteScript(EventTypes.value_changed, string.Empty, true, false, true, 10); }
+
+            if (rowChanged) {
+                _ = thisRow.ExecuteScript(EventTypes.value_changed, string.Empty, true, false, true, 10);
+                thisRow.Database?.AddBackgroundWork(thisRow);
+            }
         }
         p?.Close();
         MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");

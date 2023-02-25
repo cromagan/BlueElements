@@ -30,7 +30,7 @@ internal class Method_Substring : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableFloat.ShortName_Plain }, new List<string> { VariableFloat.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, FloatVal, FloatVal };
     public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

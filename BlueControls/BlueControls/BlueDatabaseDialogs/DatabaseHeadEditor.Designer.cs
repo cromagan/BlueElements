@@ -3,7 +3,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Classes_Editor;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -66,11 +65,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnSpaltenuebersicht = new Button();
             this.tabRechte = new TabPage();
             this.tabSortierung = new TabPage();
-            this.tabBackup = new TabPage();
-            this.ExportEditor = new ExportDefinition_Editor();
-            this.grpExport = new GroupBox();
-            this.lbxExportSets = new ListBox();
-            this.tabUndo = new TabPage();
+ this.tabUndo = new TabPage();
             this.btnClipboard = new Button();
             this.tbxUndoAnzahl = new TextBox();
             this.capUndoAnzahl = new Caption();
@@ -83,8 +78,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabAllgemein.SuspendLayout();
             this.tabRechte.SuspendLayout();
             this.tabSortierung.SuspendLayout();
-            this.tabBackup.SuspendLayout();
-            this.grpExport.SuspendLayout();
             this.tabUndo.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -285,7 +278,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.Controls.Add(this.tabAllgemein);
             this.GlobalTab.Controls.Add(this.tabRechte);
             this.GlobalTab.Controls.Add(this.tabSortierung);
-            this.GlobalTab.Controls.Add(this.tabBackup);
             this.GlobalTab.Controls.Add(this.tabUndo);
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new Point(0, 0);
@@ -429,64 +421,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSortierung.TabIndex = 2;
             this.tabSortierung.Text = "Sortierung";
             // 
-            // tabBackup
-            // 
-            this.tabBackup.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabBackup.Controls.Add(this.ExportEditor);
-            this.tabBackup.Controls.Add(this.grpExport);
-            this.tabBackup.Location = new Point(4, 25);
-            this.tabBackup.Name = "tabBackup";
-            this.tabBackup.Padding = new Padding(3);
-            this.tabBackup.Size = new Size(1039, 616);
-            this.tabBackup.TabIndex = 5;
-            this.tabBackup.Text = "Backup & Export";
-            // 
-            // ExportEditor
-            // 
-            this.ExportEditor.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
-                                                         | AnchorStyles.Left) 
-                                                        | AnchorStyles.Right)));
-            this.ExportEditor.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.ExportEditor.CausesValidation = false;
-            this.ExportEditor.Enabled = false;
-            this.ExportEditor.Location = new Point(8, 176);
-            this.ExportEditor.Name = "ExportEditor";
-            this.ExportEditor.Size = new Size(1031, 437);
-            this.ExportEditor.TabIndex = 0;
-            this.ExportEditor.TabStop = false;
-            this.ExportEditor.Text = "Export-Editor:";
-            this.ExportEditor.Changed += new EventHandler(this.ExportEditor_Changed);
-            // 
-            // grpExport
-            // 
-            this.grpExport.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
-                                                     | AnchorStyles.Right)));
-            this.grpExport.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpExport.CausesValidation = false;
-            this.grpExport.Controls.Add(this.lbxExportSets);
-            this.grpExport.Location = new Point(8, 8);
-            this.grpExport.Name = "grpExport";
-            this.grpExport.Size = new Size(1031, 168);
-            this.grpExport.TabIndex = 1;
-            this.grpExport.TabStop = false;
-            this.grpExport.Text = "Alle Export-Aufgaben:";
-            // 
-            // lbxExportSets
-            // 
-            this.lbxExportSets.AddAllowed = AddType.UserDef;
-            this.lbxExportSets.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
-                                                          | AnchorStyles.Left) 
-                                                         | AnchorStyles.Right)));
-            this.lbxExportSets.FilterAllowed = true;
-            this.lbxExportSets.Location = new Point(8, 24);
-            this.lbxExportSets.Name = "lbxExportSets";
-            this.lbxExportSets.RemoveAllowed = true;
-            this.lbxExportSets.Size = new Size(1016, 136);
-            this.lbxExportSets.TabIndex = 0;
-            this.lbxExportSets.Text = "ExportAufgaben";
-            this.lbxExportSets.AddClicked += new EventHandler(this.lbxExportSets_AddClicked);
-            this.lbxExportSets.ItemCheckedChanged += new EventHandler(this.lbxExportSets_ItemCheckedChanged);
-            // 
             // tabUndo
             // 
             this.tabUndo.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -578,8 +512,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabAllgemein.ResumeLayout(false);
             this.tabRechte.ResumeLayout(false);
             this.tabSortierung.ResumeLayout(false);
-            this.tabBackup.ResumeLayout(false);
-            this.grpExport.ResumeLayout(false);
             this.tabUndo.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -601,14 +533,10 @@ namespace BlueControls.BlueDatabaseDialogs
         private  TabPage tabAllgemein;
         private  TabPage tabSortierung;
         private  TabPage tabRechte;
-        private  TabPage tabBackup;
         private GroupBox grpKennwort;
         private GroupBox grpBenutzergruppen;
         private  TabPage tabUndo;
-        private ListBox lbxExportSets;
         private Caption capKennwort;
-        private GroupBox grpExport;
-        private ExportDefinition_Editor ExportEditor;
         private Button btnSpaltenuebersicht;
         private Table tblUndo;
         private Caption capNeueZeilenInfo;

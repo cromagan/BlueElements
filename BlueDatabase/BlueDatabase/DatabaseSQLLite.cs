@@ -34,11 +34,6 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     #region Fields
 
-    /// <summary>
-    /// Nicht static, weil verschiedene Datenbankverbindngen möglich sind.
-    /// </summary>
-    public readonly SQLBackAbstract? _sql;
-
     private static bool _isInTimer;
 
     /// <summary>
@@ -50,6 +45,11 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// Der Zeitstempel der letzten Abfrage des _timer
     /// </summary>
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
+
+    /// <summary>
+    /// Nicht static, weil verschiedene Datenbankverbindngen möglich sind.
+    /// </summary>
+    private readonly SQLBackAbstract? _sql;
 
     #endregion
 
@@ -507,6 +507,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         OnLoaded();
         CreateWatcher();
         GenerateTimer();
+        _ = ExecuteScript(EventTypes.database_loaded, string.Empty, true, null);
     }
 
     #endregion

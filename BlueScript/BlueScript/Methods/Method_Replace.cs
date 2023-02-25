@@ -30,7 +30,7 @@ internal class Method_Replace : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
     public override string Description => "Ersetzt in einem Text einen Text durch einen anderen Text";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

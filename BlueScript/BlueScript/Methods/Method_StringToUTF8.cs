@@ -31,7 +31,7 @@ internal class Method_StringToUTF8 : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal };
     public override string Description => "Ersetzt einen ASCII-String nach UTF8.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

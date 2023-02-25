@@ -36,7 +36,7 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, ICha
     /// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
     /// </summary>
     /// <remarks></remarks>
-    public object Tag;
+    public object? Tag;
 
     /// <summary>
     /// Ist das Item markiert/selektiert?
@@ -50,11 +50,10 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, ICha
     /// <remarks></remarks>
     private bool _enabled;
 
-    private string _internal;
+    private string _internal = string.Empty;
 
     private bool _isCaption;
 
-    //private ItemCollectionList? _parent;
     private Size _sizeUntouchedForListBox = Size.Empty;
 
     private string _userDefCompareKey;
@@ -69,7 +68,7 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, ICha
         _checked = false;
         _enabled = enabled;
         Pos = Rectangle.Empty;
-        UserDefCompareKey = string.Empty;
+        _userDefCompareKey = string.Empty;
     }
 
     #endregion

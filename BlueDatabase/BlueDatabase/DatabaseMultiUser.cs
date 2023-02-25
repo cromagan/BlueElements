@@ -38,6 +38,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     public List<WorkItem>? Works;
     private readonly MultiUserFile? _muf;
+    private bool _loadScriptFired = false;
 
     #endregion
 
@@ -242,11 +243,15 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     private void _muf_HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) => e.HasPendingChanges = HasPendingChanges;
 
     //protected string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
-
     private void _muf_Loaded(object sender, System.EventArgs e) {
         RepairAfterParse();
         OnLoaded();
         CreateWatcher();
+
+        if (!_loadScriptFired) {
+            _loadScriptFired = true;
+            _ = ExecuteScript(EventTypes.database_loaded, string.Empty, true, null);
+        }
     }
 
     private void _muf_Loading(object sender, System.EventArgs e) => OnLoading();

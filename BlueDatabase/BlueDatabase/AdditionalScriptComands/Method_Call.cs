@@ -30,7 +30,7 @@ internal class Method_Call : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableBool.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal, BoolVal };
 
     public override string Description => "Ruft eine Subroutine auf.\r\n" +
         "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
@@ -39,7 +39,7 @@ internal class Method_Call : Method_Database {
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodType => MethodType.Database;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "Call(SubName, KeepVariables);";

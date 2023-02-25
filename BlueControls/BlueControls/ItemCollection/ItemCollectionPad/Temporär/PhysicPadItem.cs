@@ -23,12 +23,6 @@ namespace BlueControls.ItemCollection;
 
 internal class PhysicPadItem : AbstractPhysicPadItem {
 
-    #region Fields
-
-    public readonly List<Kraft> Kraft = new();
-
-    #endregion
-
     #region Constructors
 
     public PhysicPadItem(string internalname) : base(internalname) { }
@@ -40,7 +34,7 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
     #region Properties
 
     public static string ClassId => "Physics-Object";
-
+    public List<Kraft> Kraft { get; } = new();
     protected override int SaveOrder => 999;
 
     #endregion

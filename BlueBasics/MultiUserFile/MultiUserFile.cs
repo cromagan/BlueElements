@@ -125,7 +125,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     public event EventHandler? SavedToDisk;
 
-    public event EventHandler<CancelEventArgs> Saving;
+    public event EventHandler<CancelEventArgs>? Saving;
 
     public event EventHandler<MultiUserToListEventArgs>? ToListOfByte;
 
@@ -458,7 +458,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// </summary>
     /// <param name="mustSave"></param>
     public bool Save(bool mustSave) {
-        return true;
         if (IsInSaveingLoop) { return false; }
         if (string.IsNullOrEmpty(Filename)) { return false; }
 

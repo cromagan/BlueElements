@@ -30,7 +30,7 @@ internal class Method_ToUpper : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal };
     public override string Description => "Gibt den Text in Großbuchstaben zurück";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

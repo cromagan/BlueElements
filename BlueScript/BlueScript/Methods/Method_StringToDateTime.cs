@@ -14,7 +14,7 @@ public class Method_StringToDateTime : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal };
     public override string Description => "Wandelt einen Time-String ein Datum um.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

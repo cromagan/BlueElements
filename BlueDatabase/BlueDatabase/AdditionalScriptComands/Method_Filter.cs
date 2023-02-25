@@ -30,12 +30,12 @@ public class Method_Filter : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain }, new List<string> { VariableString.ShortName_Plain } };
-    public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann. Aktuell wird nur der FilterTyp 'is' unterstützt. Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.";
+    public override List<List<string>> Args => new() { StringVal, StringVal, StringVal, StringVal };
+    public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann. Aktuell werden nur die FilterTypen 'is' und 'isnot' unterstützt. Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableFilterItem.ShortName_Variable;
 
     public override string StartSequence => "(";
@@ -89,6 +89,10 @@ public class Method_Filter : Method_Database {
         switch (((VariableString)attvar.Attributes[2]).ValueString.ToLower()) {
             case "is":
                 filtertype = FilterType.Istgleich_GroßKleinEgal;
+                break;
+
+            case "isnot":
+                filtertype = FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal;
                 break;
 
             default:

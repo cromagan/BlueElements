@@ -36,7 +36,7 @@ internal class Method_IsDropDownItem : Method_Database {
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
     public override string Returns => VariableBool.ShortName_Plain;
 
     public override string StartSequence => "(";

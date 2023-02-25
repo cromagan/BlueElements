@@ -31,7 +31,7 @@ internal class Method_Round : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableFloat.ShortName_Plain }, new List<string> { VariableFloat.ShortName_Plain } };
+    public override List<List<string>> Args => new() { FloatVal, FloatVal };
     public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

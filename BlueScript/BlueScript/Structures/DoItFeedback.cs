@@ -50,7 +50,7 @@ public struct DoItFeedback {
         Variable = new VariableListString(list);
     }
 
-    public DoItFeedback(Bitmap bmp) {
+    public DoItFeedback(Bitmap? bmp) {
         AllOk = true;
         Variable = new VariableBitmap(bmp);
     }

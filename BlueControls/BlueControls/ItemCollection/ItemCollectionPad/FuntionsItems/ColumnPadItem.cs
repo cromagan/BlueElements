@@ -35,12 +35,6 @@ namespace BlueControls.ItemCollection;
 /// </summary>
 public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
-    #region Fields
-
-    public readonly ColumnItem? Column;
-
-    #endregion
-
     #region Constructors
 
     public ColumnPadItem(string internalname) : base(internalname) { }
@@ -58,6 +52,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     #region Properties
 
     public static string ClassId => "FI-Column";
+    public ColumnItem? Column { get; }
 
     public string Datenbank {
         get {

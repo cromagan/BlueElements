@@ -62,9 +62,9 @@ public abstract class SQLBackAbstract {
     #region Properties
 
     public bool ConnectionOk => _connection != null;
-    public string ConnectionString { get; protected set; }
+    public string ConnectionString { get; protected set; } = string.Empty;
 
-    public string Date { get; } = "DATE";
+    public string Date => "DATE";
 
     /// <summary>
     /// Falls die Datenbank von einer lokalen Datei geladen wurde, ist hier der Dateiname enthalten.

@@ -32,7 +32,7 @@ public class Method_Xml : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { StringVal };
     public override string Description => "Erstellt ein XML-Dokument, der für andere Befehle verwendet werden kann.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";

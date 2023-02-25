@@ -81,6 +81,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalScriptComands\Method_GenerateLayoutImage.cs" />
     <Compile Include="Allgemein.cs" />
     <Compile Include="BlueDatabaseDialogs\DatabaseScriptEditor.cs">
       <SubType>Form</SubType>
@@ -360,24 +361,6 @@
     <Compile Include="Controls\Caption.Designer.cs">
       <DependentUpon>Caption.cs</DependentUpon>
     </Compile>
-    <Compile Include="Classes Editor\AbstractClassEditor.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes Editor\AbstractClassEditor.Designer.cs">
-      <DependentUpon>AbstractClassEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes Editor\ExportDefinition_Editor.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes Editor\ExportDefinition_Editor.Designer.cs">
-      <DependentUpon>ExportDefinition_Editor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Classes Editor\FilterItem_Editor.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes Editor\FilterItem_Editor.Designer.cs">
-      <DependentUpon>FilterItem_Editor.cs</DependentUpon>
-    </Compile>
     <Compile Include="Forms\FileDialogs.cs" />
     <Compile Include="Enums\BlueTableAppearance.cs" />
     <Compile Include="Enums\ButtonStyle.cs" />
@@ -548,10 +531,10 @@
     </Compile>
     <Compile Include="PointM.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Forms\ScreenShot.cs">
+    <Compile Include="ScreenShot.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Forms\ScreenShot.designer.cs">
+    <Compile Include="ScreenShot.designer.cs">
       <DependentUpon>ScreenShot.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\Slider.cs">
@@ -590,6 +573,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="BlueDatabaseDialogs\DatabaseScriptEditor.resx">
+      <DependentUpon>DatabaseScriptEditor.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\FlexiControlForFilter.resx">
       <DependentUpon>FlexiControlForFilter.cs</DependentUpon>
       <SubType>Designer</SubType>
@@ -607,18 +594,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\Caption.resx">
       <DependentUpon>Caption.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Classes Editor\AbstractClassEditor.resx">
-      <DependentUpon>AbstractClassEditor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Classes Editor\ExportDefinition_Editor.resx">
-      <DependentUpon>ExportDefinition_Editor.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Classes Editor\FilterItem_Editor.resx">
-      <DependentUpon>FilterItem_Editor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ComboBox.resx">
@@ -760,7 +735,7 @@
       <DependentUpon>ListBox.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\ScreenShot.resx">
+    <EmbeddedResource Include="ScreenShot.resx">
       <DependentUpon>ScreenShot.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>

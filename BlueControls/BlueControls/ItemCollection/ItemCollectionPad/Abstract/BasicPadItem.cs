@@ -37,21 +37,11 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     #region Fields
 
-    public static BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
+    public static readonly BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
 
-    public static BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
+    public static readonly BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
 
-    public static BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
-
-    public readonly ListExt<ItemConnection> ConnectsTo = new();
-
-    public readonly ListExt<PointM> MovablePoint = new();
-
-    public readonly List<PointM> PointsForSuccesfullyMove = new();
-
-    public List<FlexiControl>? AdditionalStyleOptions = null;
-
-    public List<string> Tags = new();
+    public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
     /// <summary>
     /// Soll es gedruckt werden?
@@ -60,13 +50,9 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     private bool _beiExportSichtbar = true;
 
     private string _page = string.Empty;
-
     private ItemCollectionPad? _parent;
-
     private PadStyles _style = PadStyles.Style_Standard;
-
     private RectangleF _usedArea;
-
     private int _zoomPadding;
 
     #endregion
@@ -92,6 +78,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     #region Properties
 
+    public List<FlexiControl>? AdditionalStyleOptions { get; set; } = null;
+
     [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
     public bool Bei_Export_sichtbar {
         get => _beiExportSichtbar;
@@ -102,6 +90,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         }
     }
 
+    public ListExt<ItemConnection> ConnectsTo { get; } = new();
+
     /// <summary>
     /// Wird ein Element gelöscht, das diese Feld befüllt hat, werden automatisch alle andern Elemente mit der selben Gruppe gelöscht.
     /// </summary>
@@ -109,8 +99,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
     public bool IsDisposed { get; private set; }
-
     public bool IsParsing { get; private set; }
+    public ListExt<PointM> MovablePoint { get; } = new();
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
     public string Page {
@@ -141,6 +131,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         }
     }
 
+    public List<PointM> PointsForSuccesfullyMove { get; } = new();
     public virtual string QuickInfo { get; set; } = string.Empty;
 
     public PadStyles Stil {
@@ -153,6 +144,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         }
     }
 
+    public List<string> Tags { get; } = new();
     ///// <summary>
     ///// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
     ///// </summary>

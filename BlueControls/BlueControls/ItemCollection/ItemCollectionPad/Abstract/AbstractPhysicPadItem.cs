@@ -25,12 +25,6 @@ namespace BlueControls.ItemCollection;
 
 public abstract class AbstractPhysicPadItem : BasicPadItem {
 
-    #region Fields
-
-    public readonly List<PointM> Edges = new();
-
-    #endregion
-
     #region Constructors
 
     protected AbstractPhysicPadItem(string internalname) : base(internalname) {
@@ -56,6 +50,8 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
             return new PointM(totalX / MovablePoint.Count, totalY / MovablePoint.Count);
         }
     }
+
+    public List<PointM> Edges { get; } = new();
 
     #endregion
 

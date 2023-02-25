@@ -19,16 +19,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using ComboBox = BlueControls.Controls.ComboBox;
@@ -39,16 +38,10 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     #region Fields
 
-    public readonly DatabaseAbstract? FilterDefiniton;
-
     private readonly List<Control> _childs = new();
-
     private readonly string _showformat;
-
     private bool _disposing;
-
     private RowItem? _row;
-
     private List<RowItem>? _rows;
 
     #endregion
@@ -77,6 +70,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
     #region Properties
 
     public DatabaseAbstract? Database { get; }
+    public DatabaseAbstract? FilterDefiniton { get; }
 
     public RowItem? Row {
         get => IsDisposed ? null : _row;
@@ -140,13 +134,16 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
                 #region Column ermitteln
 
                 var column = Database?.Column.Exists(thisR.CellGetString("Spalte"));
-                if (column == null) { return; }
+                if (column == null) {
+                    return;
+                }
 
                 #endregion
 
                 #region Type ermitteln
 
                 var onlyifhasvalue = false;
+                var word = false;
 
                 FilterType ft;
                 switch (thisR.CellGetString("Filterart").ToLower()) {
@@ -159,6 +156,11 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
                         onlyifhasvalue = true;
                         break;
 
+                    case "=word":
+                        ft = FilterType.Istgleich_ODER_GroßKleinEgal;
+                        word = true;
+                        break;
+
                     default:
                         ft = FilterType.Istgleich_GroßKleinEgal;
                         DebugPrint("Filter " + thisR.CellGetInteger("Filterart") + " nicht definiert.");
@@ -169,39 +171,62 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
                 #region Value ermitteln
 
-                var value = string.Empty;
+                var calcrows = false;
+
+                List<string> value = new();
 
                 if (otherdatabase?.Row.SearchByKey(rowkey) is RowItem r) {
                     r.CheckRowDataIfNeeded();
+                    calcrows = true;
 
-                    value = thisR.CellGetString("suchtxt");
+                    var tmpvalue = thisR.CellGetString("suchtxt");
 
-                    if (value.Equals("#first", StringComparison.OrdinalIgnoreCase)) {
-                        value = r.CellFirstString();
+                    if (tmpvalue.Equals("#first", StringComparison.OrdinalIgnoreCase)) {
+                        tmpvalue = r.CellFirstString();
                     } else {
-                        value = r.ReplaceVariables(value, false, false);
+                        tmpvalue = r.ReplaceVariables(tmpvalue, false, false);
+                    }
+
+                    if (word) {
+                        List<string> names = new();
+                        names.AddRange(column.GetUcaseNamesSortedByLenght());
+
+                        foreach (var thisWord in names) {
+                            var fo = tmpvalue.IndexOfWord(thisWord, 0, RegexOptions.IgnoreCase);
+                            if (fo > -1) {
+                                value.Add(thisWord);
+                            }
+                        }
+
+                        if (value.Count == 0) {
+                            calcrows = false;
+                        }
+                    } else {
+                        value.Add(tmpvalue); // Immer hinzufügen. Es gibt Einträge, wo der erste Befüllt ist, und der Zweite leer sein kann.
                     }
                 }
 
                 #endregion
 
-                if (column != null && ft != FilterType.KeinFilter) {
-                    if (!string.IsNullOrEmpty(value) || !onlyifhasvalue) {
-                        f.Add(new FilterItem(column, ft, value));
-                    }
+                if (value.Count > 0 || !onlyifhasvalue) {
+                    f.Add(new FilterItem(column, ft, value));
                 }
+
+                #endregion
+
+                #region Zeile(n) ermitteln und Script löschen
+
+                if (calcrows) {
+                    _rows = Database?.Row.CalculateFilteredRows(f);
+                } else {
+                    _rows = null;
+                }
+
+                #endregion
             }
 
-            #endregion
-
-            #region Zeile(n) ermitteln und Script löschen
-
-            _rows = Database?.Row.CalculateFilteredRows(f);
-
-            #endregion
+            if (_disposing || IsDisposed) { return; } // Multitasking...
         }
-
-        if (_disposing || IsDisposed) { return; } // Multitasking...
 
         UpdateMyCollection();
     }
@@ -293,7 +318,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
         // am Ende auf null setzen, um Blinki zu vermeiden
 
-        if (cb.Item[Value] == null) {
+        if (cb?.Item?[Value] == null) {
             ValueSet(string.Empty, true, true);
         }
 

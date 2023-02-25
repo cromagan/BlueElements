@@ -32,7 +32,6 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
 
     #region Fields
 
-    //public readonly Size Size;
     private readonly string _text;
 
     #endregion

@@ -160,8 +160,6 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
     public string ErrorReason() {
         if (Database?.IsDisposed ?? true) { return "Datenbank verworfen"; }
 
-        //if (string.IsNullOrEmpty(_script)) { return "Kein Skript angegeben."; }
-
         if (string.IsNullOrEmpty(KeyName)) { return "Kein Name angegeben."; }
 
         if (!KeyName.IsFormat(FormatHolder.SystemName)) { return "Ungültiger Name"; }
@@ -169,6 +167,29 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
         if (_eventTypes.HasFlag(EventTypes.error_check)) {
             if (_changeValues) { return "Routinen, die Fehler prüfen, können keine Werte ändern."; }
             if (!_needRow) { return "Routinen, die Fehler prüfen, müssen sich auf Zeilen beziehen."; }
+            if (_executable) { return "Routinen, die Fehler prüfen, können nicht so von außerhalb benutzt werden."; }
+        }
+
+        if (_eventTypes.HasFlag(EventTypes.export)) {
+            if (_changeValues) { return "Routinen für Export können keine Werte ändern."; }
+            if (!_needRow) { return "Routinen für Export müssen sich auf Zeilen beziehen."; }
+        }
+
+        if (_eventTypes.HasFlag(EventTypes.value_changed_extra_thread)) {
+            if (_changeValues) { return "Routinen aus einem ExtraThread, können keine Werte ändern."; }
+            if (!_needRow) { return "Routinen aus einem ExtraThread, müssen sich auf Zeilen beziehen."; }
+        }
+
+        if (_eventTypes.HasFlag(EventTypes.value_changed)) {
+            if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
+        }
+
+        if (_eventTypes.HasFlag(EventTypes.new_row)) {
+            if (!_needRow) { return "Routinen, die neue Zeilen überwachen, müssen sich auf Zeilen beziehen."; }
+        }
+
+        if (_eventTypes.HasFlag(EventTypes.database_loaded)) {
+            if (_needRow) { return "Routinen nach dem Laden einer Datenbank, dürfen sich nicht auf Zeilen beziehen."; }
         }
 
         return string.Empty;
@@ -248,8 +269,11 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
             symb = ImageCode.Person;
         }
 
+        if (_eventTypes.HasFlag(EventTypes.export)) { symb = ImageCode.Pfeil_Unten; }
+        if (_eventTypes.HasFlag(EventTypes.database_loaded)) { symb = ImageCode.Diskette; }
         if (_eventTypes.HasFlag(EventTypes.new_row)) { symb = ImageCode.Zeile; }
         if (_eventTypes.HasFlag(EventTypes.value_changed)) { symb = ImageCode.Stift; }
+        if (_eventTypes.HasFlag(EventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
         if (_eventTypes.HasFlag(EventTypes.error_check)) { symb = ImageCode.HäkchenDoppelt; }
 
         if (!_changeValues) { }

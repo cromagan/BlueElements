@@ -58,20 +58,20 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     #region Fields
 
-    public static SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
-    public static Pen PenRed1 = new(Color.Red, 1);
-    private const int AutoFilterSize = 22;
-    private const int ColumnCaptionSizeY = 22;
-    private const int RowCaptionSizeY = 50;
+    public static readonly int AutoFilterSize = 22;
+    public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
+    public static readonly int ColumnCaptionSizeY = 22;
+    public static readonly Pen PenRed1 = new(Color.Red, 1);
+    public static readonly int RowCaptionSizeY = 50;
 
     private readonly List<string> _collapsed = new();
     private readonly object _lockUserAction = new();
     private int _arrangementNr = 1;
     private AutoFilter? _autoFilter;
-    private BlueFont _cellFont;
-    private BlueFont _chapterFont;
-    private BlueFont _columnFilterFont;
-    private BlueFont _columnFont;
+    private BlueFont? _cellFont;
+    private BlueFont? _chapterFont;
+    private BlueFont? _columnFilterFont;
+    private BlueFont? _columnFont;
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
     private List<RowItem>? _filteredRows;
     private int? _headSize;
@@ -411,6 +411,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         row.CellSet(column, v[0].Substring(5));
         //Database.Cell.Set(column, row, v[0].Substring(5), false);
         _ = row.ExecuteScript(EventTypes.value_changed, string.Empty, true, true, true, 5);
+        row.Database?.AddBackgroundWork(row);
     }
 
     /// <summary>
@@ -422,7 +423,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (string.IsNullOrEmpty(text)) { return; }
         var d = Skin.DesignOf(design, state);
 
-        Draw_CellTransparentDirect(gr, text, fitInRect, d.bFont, column, 16, style, bildTextverhalten, state);
+        Draw_CellTransparentDirect(gr, text, fitInRect, d.BFont, column, 16, style, bildTextverhalten, state);
     }
 
     public static Size FormatedText_NeededSize(ColumnItem? column, string originalText, BlueFont? font, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten) {
@@ -1782,7 +1783,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
             if (table.Database == column.Database) { table.CursorPos_Set(column, row, false, chapter); }
             _ = row.ExecuteScript(EventTypes.value_changed, string.Empty, true, false, true, 5);
-
+            row.Database?.AddBackgroundWork(row);
             // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
             // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
         } else {

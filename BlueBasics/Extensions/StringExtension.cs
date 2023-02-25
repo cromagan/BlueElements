@@ -18,7 +18,6 @@
 #nullable enable
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -275,15 +274,6 @@ public static partial class Extensions {
     }
 
     public static string GenerateSlash(this string txt) => txt.Replace("[Slash]", "/");
-
-    public static T? Get<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
-        if (items != null) {
-            return items.FirstOrDefault(thisp =>
-                thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase));
-        }
-
-        return default;
-    }
 
     /// <summary>
     /// Teilt einen String, der geparsed werden kann in seine Bestandteile auf.

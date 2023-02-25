@@ -33,8 +33,8 @@ internal class Method_LoadImage : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain } };
-    public override string Description => "Lädt das angegebene Bild aus dem Dateisystem.";
+    public override List<List<string>> Args => new() { StringVal };
+    public override string Description => "Lädt das angegebene Bild aus dem Dateisystem.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
@@ -53,20 +53,26 @@ internal class Method_LoadImage : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != FileFormat.Image) {
-            return new DoItFeedback(infos.Data, "Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
-        }
 
-        if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
-            return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
-        }
+        // Da es keine Möglichit gibt, eine Bild Variable (außerhalb eines If) zu deklarieren,
+        // darf diese Routine nicht fehlschlagen.
+
+
+        //if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != FileFormat.Image) {
+        //    return new DoItFeedback(infos.Data, "Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
+        //}
+
+        //if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
+        //    return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+        //}
 
         try {
             Generic.CollectGarbage();
             var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
             return new DoItFeedback(bmp);
         } catch {
-            return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            return new DoItFeedback(null as Bitmap);
+            //return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
         }
     }
 

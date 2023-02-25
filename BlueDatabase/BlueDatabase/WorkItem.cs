@@ -30,9 +30,9 @@ public class WorkItem : IParseable {
 
     #region Fields
 
-    private string _changedTo;
+    private string _changedTo = string.Empty;
 
-    private string _colName;
+    private string _colName = string.Empty;
 
     private bool _isPending;
     private long _rowKey;
@@ -93,7 +93,7 @@ public class WorkItem : IParseable {
     //public bool HistorischRelevant => State is ItemState.Pending or ItemState.Undo;
     public bool IsParsing { get; private set; }
 
-    public string PreviousValue { get; private set; }
+    public string PreviousValue { get; private set; } = string.Empty;
 
     public long RowKey {
         get => _rowKey;
@@ -104,7 +104,7 @@ public class WorkItem : IParseable {
         }
     }
 
-    public string User { get; private set; }
+    public string User { get; private set; } = string.Empty;
 
     internal bool IsPending {
         get => _isPending;

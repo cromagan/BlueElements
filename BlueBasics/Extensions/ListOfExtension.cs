@@ -101,9 +101,18 @@ public static partial class Extensions {
         return l2;
     }
 
+    public static T? Get<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
+        if (items != null) {
+            return items.FirstOrDefault(thisp =>
+                thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        return default;
+    }
+
     public static bool IsDifferentTo<T>(this IEnumerable<T>? list1, IEnumerable<T>? list2) =>
-            // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
-            list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
+                // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
+                list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));
 
     public static void Load(this List<string> l, string filename, Encoding code) {
         var t = File.ReadAllText(filename, code);

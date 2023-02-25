@@ -834,22 +834,23 @@ public static class Skin {
 
     #region Fields
 
-    public const string DummyStandardFont = "<Name=Arial, Size=10>";
-    public const string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
-    public const int Padding = 9;
-    public const int PaddingSmal = 3;
     public static readonly Dictionary<Design, Dictionary<States, clsDesign>> Design = new();
+    public static readonly string DummyStandardFont = "<Name=Arial, Size=10>";
+    public static readonly string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
+    public static readonly int Padding = 9;
+    public static readonly int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2);
-    public static bool Inited;
     public static DatabaseAbstract? StyleDb;
-    internal static Pen PenLinieDick;
-    internal static Pen PenLinieDünn;
-    internal static Pen PenLinieKräftig;
+    internal static Pen? PenLinieDick;
+    internal static Pen? PenLinieDünn;
+    internal static Pen? PenLinieKräftig;
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
 
     #endregion
 
     #region Properties
+
+    public static bool Inited { get; private set; }
 
     public static Color RandomColor =>
         Color.FromArgb((byte)Constants.GlobalRND.Next(0, 255),
@@ -881,7 +882,7 @@ public static class Skin {
             clsDesign d = new() {
                 BackColor1 = Color.White,
                 BorderColor1 = Color.Red,
-                bFont = BlueFont.Get("Arial", 10f, false, false, false, false, false, Color.Red, Color.Black, false, false, false),
+                BFont = BlueFont.Get("Arial", 10f, false, false, false, false, false, Color.Red, Color.Black, false, false, false),
                 HintergrundArt = HintergrundArt.Solide,
                 RahmenArt = RahmenArt.Solide_1px,
                 Kontur = Enums.Kontur.Rechteck
@@ -1133,7 +1134,7 @@ public static class Skin {
         if (string.IsNullOrEmpty(txt) && qi == null) { return; }
         QuickImage? tmpImage = null;
         if (qi != null) { tmpImage = QuickImage.Get(qi, AdditionalState(design.Status)); }
-        Draw_FormatedText(gr, txt, tmpImage, align, fitInRect, child, deleteBack, design.bFont, translate);
+        Draw_FormatedText(gr, txt, tmpImage, align, fitInRect, child, deleteBack, design.BFont, translate);
     }
 
     /// <summary>
@@ -1216,7 +1217,7 @@ public static class Skin {
         return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, "X" + ((int)format), rowOfStyle);
     }
 
-    public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).bFont;
+    public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).BFont;
 
     /// <summary>
     /// Gibt eine Liste aller Fonts zurück, die mit dem gewählten Sheetstyle möglich sind.

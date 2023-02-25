@@ -30,12 +30,6 @@ public sealed class ColumnViewItem {
 
     #region Fields
 
-    public readonly ColumnViewCollection Parent;
-    public int? OrderTmpSpalteX1;
-    public Rectangle TmpAutoFilterLocation;
-    public int? TmpDrawWidth;
-    public bool TmpReduced;
-    public Rectangle TmpReduceLocation;
     private ViewType _viewType;
 
     #endregion
@@ -125,6 +119,8 @@ public sealed class ColumnViewItem {
     #region Properties
 
     public ColumnItem? Column { get; }
+    public int? OrderTmpSpalteX1 { get; set; }
+    public ColumnViewCollection Parent { get; }
 
     /// <summary>
     /// Für FlexOptions
@@ -142,6 +138,11 @@ public sealed class ColumnViewItem {
             OnChanged();
         }
     }
+
+    public Rectangle TmpAutoFilterLocation { get; set; }
+    public int? TmpDrawWidth { get; set; }
+    public bool TmpReduced { get; set; }
+    public Rectangle TmpReduceLocation { get; set; }
 
     public ViewType ViewType {
         get => _viewType;

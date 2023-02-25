@@ -20,11 +20,9 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -37,7 +35,6 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
-using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
@@ -197,7 +194,6 @@ public partial class TableView : FormWithStatusBar {
             return;
         }
 
-        db.CancelBackGroundWorker();
         LayoutPadEditor w = new(db);
         if (!string.IsNullOrEmpty(layoutToOpen)) {
             w.LoadLayout(layoutToOpen);
@@ -209,32 +205,32 @@ public partial class TableView : FormWithStatusBar {
     public static ItemCollectionList Vorgängerversionen(Database db) {
         List<string> zusatz = new();
         ItemCollectionList l = new(true);
-        foreach (var thisExport in db.Export) {
-            if (thisExport != null && thisExport.Typ == ExportTyp.DatenbankOriginalFormat) {
-                var lockMe = new object();
-                _ = Parallel.ForEach(thisExport.BereitsExportiert, (thisString, _) => {
-                    var t = thisString.SplitAndCutBy("|");
-                    if (FileExists(t[0])) {
-                        var q1 = QuickImage.Get(ImageCode.Kugel, 16,
-                            Color.Red.MixColor(Color.Green,
-                                DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / thisExport.AutoDelete),
-                            Color.Transparent);
-                        lock (lockMe) {
-                            l.Add(t[1], t[0], q1, true, t[1].CompareKey(SortierTyp.Datum_Uhrzeit));
-                        }
-                    }
-                });
+        //foreach (var thisExport in db.Export) {
+        //    if (thisExport != null && thisExport.Typ == ExportTyp.DatenbankOriginalFormat) {
+        //        var lockMe = new object();
+        //        _ = Parallel.ForEach(thisExport.BereitsExportiert, (thisString, _) => {
+        //            var t = thisString.SplitAndCutBy("|");
+        //            if (FileExists(t[0])) {
+        //                var q1 = QuickImage.Get(ImageCode.Kugel, 16,
+        //                    Color.Red.MixColor(Color.Green,
+        //                        DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / thisExport.AutoDelete),
+        //                    Color.Transparent);
+        //                lock (lockMe) {
+        //                    l.Add(t[1], t[0], q1, true, t[1].CompareKey(SortierTyp.Datum_Uhrzeit));
+        //                }
+        //            }
+        //        });
 
-                zusatz.AddRange(Directory.GetFiles(thisExport.Verzeichnis,
-                    db.Filename.FileNameWithoutSuffix() + "_*.MDB"));
-            }
-        }
+        //        zusatz.AddRange(Directory.GetFiles(thisExport.Verzeichnis,
+        //            db.Filename.FileNameWithoutSuffix() + "_*.MDB"));
+        //    }
+        //}
 
-        foreach (var thisString in zusatz) {
-            if (l[thisString] == null) {
-                _ = l.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(ImageCode.Warnung), true, new FileInfo(thisString).CreationTime.ToString().CompareKey(SortierTyp.Datum_Uhrzeit));
-            }
-        }
+        //foreach (var thisString in zusatz) {
+        //    if (l[thisString] == null) {
+        //        _ = l.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(ImageCode.Warnung), true, new FileInfo(thisString).CreationTime.ToString().CompareKey(SortierTyp.Datum_Uhrzeit));
+        //    }
+        //}
 
         //l.Sort();
         return l;
@@ -544,6 +540,8 @@ public partial class TableView : FormWithStatusBar {
 
         _ = e.UserMenu.Add("Zeile", true);
         _ = e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && tbl.Database.IsAdministrator());
+        _ = e.UserMenu.Add("Datenüberprüfung", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null);
+
         foreach (var thiss in tbl.Database.EventScript) {
             if (thiss != null && thiss.ManualExecutable && thiss.NeedRow) {
                 _ = e.UserMenu.Add("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, ImageCode.Skript, row != null);
@@ -589,7 +587,12 @@ public partial class TableView : FormWithStatusBar {
 
             case "Skript":
                 if (row != null) {
-                    MessageBox.Show(row.ExecuteScript(null, ev[1], true, true, true, 10).Protocol.JoinWithCr());
+                    var t = row.ExecuteScript(null, ev[1], true, true, true, 10).Protocol.JoinWithCr();
+                    if (string.IsNullOrEmpty(t)) {
+                        MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
+                    } else {
+                        MessageBox.Show("Wähernd der Skript-Ausführung sind<br>Fehler aufgetreten:<br><br>" + t, ImageCode.Kreuz, "Ok");
+                    }
                 }
 
                 break;
@@ -661,25 +664,19 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "VorherigenInhaltWiederherstellen":
-                if (!editable) {
-                    return;
-                }
+                if (!editable) { return; }
 
                 Table.DoUndo(column, row);
                 break;
 
-                //case "ContentPaste":
-                //    d
-                //    row.CellSet(column, System.Windows.Clipboard.GetText());
-                //    break;
+            case "Datenüberprüfung":
+                if (row != null) {
+                    row.InvalidateCheckData();
+                    row.CheckRowDataIfNeeded();
+                    MessageBox.Show("Datenüberprüfung:\r\n" + row.LastCheckedMessage, ImageCode.HäkchenDoppelt, "Ok");
+                }
 
-                //case "ColumnContentDelete":
-                //    if (column != null) {
-                //        if (MessageBox.Show("Angezeite Inhalte dieser Spalte löschen?", ImageCode.Frage, "Ja", "Nein") == 0) {
-                //            column.DeleteContents(Table.Filter, Table.PinnedRows);
-                //        }
-                //    }
-                //    break;
+                break;
         }
     }
 
@@ -1148,7 +1145,7 @@ public partial class TableView : FormWithStatusBar {
         }
     }
 
-    private void LoadTab_FileOk(object sender, System.ComponentModel.CancelEventArgs e) =>
+    private void LoadTab_FileOk(object sender, CancelEventArgs e) =>
         SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName, PreveredDatabaseID));
 
     private string NameRepair(string istName, RowItem? vRow) {

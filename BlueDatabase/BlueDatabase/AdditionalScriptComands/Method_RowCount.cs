@@ -20,21 +20,23 @@
 using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_RowCount : Method_Database {
+public class Method_RowCount : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableFilterItem.ShortName_Variable } };
+    public override List<List<string>> Args => new() { FilterVar };
     public override string Description => "Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.AnyDatabaseRow | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
 

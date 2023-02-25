@@ -23,7 +23,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
-using BlueControls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -185,38 +184,40 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     }
 
     private void DoFormulaDatabaseAndRow(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database, long rowKey, string page) {
-        if (CFormula == cf &&
+        if (IsDisposed) { return; }
+
+        var oldf = CFormula; // Zwischenspeichern wegen möglichen NULL verweisen
+
+        if (oldf == cf &&
             Database == database &&
             RowKey == rowKey &&
             _pageToShow.Equals(page, StringComparison.OrdinalIgnoreCase)) { return; }
 
         SuspendLayout();
 
-        RowKey = -1;
-        _tmpShowingRow = null;
-        if (_generated) { SetInputRow(); }
-
-        _tmpShowingRow = null;
-
-        if (CFormula != cf) {
-            if (CFormula != null) {
-                CFormula.Loaded -= _cf_Loaded;
-                CFormula.Changed -= _cf_Changed;
+        if (oldf != cf) {
+            if (oldf != null) {
+                RemoveRow();
+                oldf.Loaded -= _cf_Loaded;
+                oldf.Changed -= _cf_Changed;
             }
 
+            InvalidateView();
             CFormula = cf;
 
-            if (CFormula != null) {
-                CFormula.Loaded += _cf_Loaded;
-                CFormula.Changed += _cf_Changed;
+            if (cf != null) {
+                cf.Loaded += _cf_Loaded;
+                cf.Changed += _cf_Changed;
             }
         }
 
         if (Database != database) {
             if (Database != null) {
+                RemoveRow();
                 Database.Disposing -= _Database_Disposing;
                 Database.Row.RowRemoving -= Row_RowRemoving;
             }
+            InvalidateView();
             Database = database;
 
             if (Database != null) {
@@ -227,15 +228,12 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
 
         _pageToShow = page;
 
-        InvalidateView();
-
-        //if (string.Equals(_pageToShow, value, System.StringComparison.OrdinalIgnoreCase)) { return; }
-        //RowKey = -1;
-
-        if (rowKey != -1 && Database != null && CFormula != null) {
+        if (rowKey != -1 && Database != null && cf != null) {
             RowKey = rowKey;
             _tmpShowingRow = Database?.Row.SearchByKey(RowKey);
             SetInputRow();
+        } else {
+            RemoveRow();
         }
 
         ResumeLayout();
@@ -291,6 +289,12 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         }
     }
 
+    private void RemoveRow() {
+        RowKey = -1;
+        _tmpShowingRow = null;
+        if (_generated) { SetInputRow(); }
+    }
+
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (e.Row != null && RowKey == e.Row.Key) {
             DoFormulaDatabaseAndRow(ConnectedFormula, Database, -1, Page);
@@ -298,12 +302,12 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     }
 
     private void SetInputRow() {
+        if (IsDisposed) { return; }
+
         GenerateView();
         if (!_generated) { return; }
 
         if (CFormula == null || CFormula.PadData == null) { return; }
-
-        //var listf = new List<FlexiControlForCell>();
 
         foreach (var thisIt in CFormula.PadData) {
             if (thisIt is IAcceptAndSends ripi && ripi.IsVisibleOnPage(Page)) {

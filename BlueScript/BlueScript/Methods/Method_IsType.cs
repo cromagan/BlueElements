@@ -31,7 +31,7 @@ internal class Method_IsType : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { Variable.Any_Variable }, new List<string> { VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => new() { new List<string> { Variable.Any_Variable }, StringVal };
     public override string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
