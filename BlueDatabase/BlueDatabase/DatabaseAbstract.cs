@@ -1943,9 +1943,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {
         try {
             if (e.Done) { return; }
-            e.Done = true;
+            // Es werden alle Datenbankn abgefragt, also kann nach der ersten nicht schluss sein...
 
-            if (string.IsNullOrWhiteSpace(AdditionalFilesPfadWhole())) { return; }
+            if (string.IsNullOrWhiteSpace(AdditionalFilesPfadWhole())) {
+                //OnDropMessage(FehlerArt.Info, "Bild '" + e.Name + "' nicht gefunden, da das Verzeichniss mit den Zusatzdateien nicht existiert.");
+                return;
+            }
 
             var name = e.Name.RemoveChars(Constants.Char_DateiSonderZeichen);
             var hashname = name.GetHashString();
@@ -1966,6 +1969,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             }
 
             if (FileExists(fullname)) {
+                e.Done = true;
                 e.Bmp = new BitmapExt(fullname);
                 if (!string.IsNullOrWhiteSpace(CachePfad)) {
                     _ = CopyFile(fullname, fullhashname, false);
@@ -1978,6 +1982,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 }
                 return;
             }
+            //OnDropMessage(FehlerArt.Info, "Bild '" + e.Name + "' im Verzeihniss der Zusatzdateien nicht gefunden.");
 
             var l = new List<string>();
             l.Save(fullhashname, Encoding.UTF8, false);
