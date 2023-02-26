@@ -72,10 +72,20 @@ public static partial class Extensions {
 
     // .TrimEnd(JoinChar);
 
-    public static void RemoveRange<T>(this ICollection<T> iC, List<T> remove) {
+    /// <summary>
+    /// Gib TRUE zurück, wenn ein Item erfolgreich entfernt wurde.
+    /// Gibt False zurück, wenn kein Item entfernt wurde - weil es auf Fehler lief oder gar nicht vorhanden war.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="iC"></param>
+    /// <param name="remove"></param>
+    /// <returns></returns>
+    public static bool RemoveRange<T>(this ICollection<T> iC, List<T> remove) {
+        var did = false;
         foreach (var thisItem in remove) {
-            _ = iC.Remove(thisItem);
+            if (iC.Remove(thisItem)) { did = true; }
         }
+        return did;
     }
 
     #endregion

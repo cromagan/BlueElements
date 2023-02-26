@@ -627,7 +627,7 @@ internal sealed partial class ColumnEditor {
             var x = thisFi.SplitBy("|");
 
             if (x != null && x.Count() == 3) {
-                var r = tblFilterliste.Database.Row[new FilterItem(tblFilterliste.Database.Column["SpalteName"], FilterType.Istgleich_GroﬂKleinEgal, x[0])];
+                var r = tblFilterliste.Database.Row[new FilterItem(tblFilterliste.Database?.Column["SpalteName"], FilterType.Istgleich_GroﬂKleinEgal, x[0])];
 
                 if (r != null && r.CellGetBoolean("Visible")) {
                     r.CellSet("Such", x[2].FromNonCritical());

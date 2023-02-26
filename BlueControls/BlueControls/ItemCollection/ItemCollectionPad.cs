@@ -545,7 +545,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         if (row == null) { return; }
 
         var script = row.ExecuteScript(EventTypes.export, string.Empty, false, false, true, 0);
-        if (!script.AllOk ||  script.Variables == null) { return; }
+        if (!script.AllOk || script.Variables == null) { return; }
         foreach (var thisV in script.Variables) {
             _ = ParseVariable(thisV);
         }

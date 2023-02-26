@@ -204,11 +204,11 @@ public static class IO {
     public static bool ExecuteFile(string fileName, string arguments = "", bool waitForExit = false, bool logException = true) {
         try {
             if (string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(arguments)) { return false; }
-            var processx = string.IsNullOrWhiteSpace(arguments) ? Process.Start(fileName) : Process.Start(fileName, arguments);
+            var process = string.IsNullOrWhiteSpace(arguments) ? Process.Start(fileName) : Process.Start(fileName, arguments);
             if (waitForExit) {
-                if (processx == null) { return true; }// Windows 8, DANKE!
-                processx.WaitForExit();
-                processx?.Dispose();
+                if (process == null) { return true; }// Windows 8, DANKE!
+                process.WaitForExit();
+                process.Dispose();
             }
         } catch (Exception ex) {
             if (logException) { Develop.DebugPrint("ExecuteFile konnte nicht ausgeführt werden:<br>" + ex.Message + "<br>Datei: " + fileName); }

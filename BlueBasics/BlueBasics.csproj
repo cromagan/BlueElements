@@ -124,7 +124,6 @@
     <Compile Include="Enums\DataFormat.cs" />
     <Compile Include="Enums\FehlerArt.cs" />
     <Compile Include="Extensions\GraphicsExtensions.cs" />
-    <Compile Include="ListExt.cs" />
     <Compile Include="ParsebleItem.cs" />
     <Compile Include="Polygons.cs" />
     <Compile Include="QuickImage.cs" />

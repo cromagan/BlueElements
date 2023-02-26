@@ -22,10 +22,10 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -639,7 +639,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         Allinitialized = false;
     }
 
-    protected void StyleComboBox(ComboBox? control, ICollection<BasicListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
+    protected void StyleComboBox(ComboBox control, ICollection<BasicListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
         if (control == null) {
             if (removevalueIfNotExists) {
                 ValueSet(string.Empty, true, true);
@@ -663,11 +663,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected void StyleListBox(ListBox? control, ColumnItem? column) {
+    protected void StyleListBox(ListBox control, ColumnItem? column) {
         control.Enabled = Enabled;
         control.Item.Clear();
         control.Item.CheckBehavior = CheckBehavior.MultiSelection;
-        if (column == null) { return; }
+        if (column == null) {
+            return;
+        }
+
         ItemCollectionList item = new(true);
         if (column.DropdownBearbeitungErlaubt) {
             ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
@@ -685,7 +688,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 } while (again);
             }
         }
-        control.AddAllowed = AddType.UserDef;
+
+        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
+            case EditTypeTable.Textfeld: control.AddAllowed = AddType.Text; break;
+            case EditTypeTable.Listbox: control.AddAllowed = AddType.OnlySuggests; break;
+            default: control.AddAllowed = AddType.None; break;
+        }
+
         control.FilterAllowed = false;
         control.MoveAllowed = false;
         switch (_editType) {
@@ -701,18 +710,22 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected void StyleSwapListBox(SwapListBox? control, ColumnItem? column) {
+    protected void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
         control.Enabled = Enabled;
-        control.Item.Clear();
+        control.Item.RemoveAll();
         control.Item.CheckBehavior = CheckBehavior.NoSelection;
         if (column == null) { return; }
         ItemCollectionList item = new(true);
         ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
         control.SuggestionsAdd(item);
-        control.AddAllowed = AddType.UserDef;
+        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
+            case EditTypeTable.Textfeld: control.AddAllowed = AddType.Text; break;
+            case EditTypeTable.Listbox: control.AddAllowed = AddType.OnlySuggests; break;
+            default: control.AddAllowed = AddType.None; break;
+        }
     }
 
-    protected void StyleTextBox(TextBox? control) {
+    protected void StyleTextBox(TextBox control) {
         control.Enabled = Enabled;
         control.GetStyleFrom(this);
         control.Verhalten = _multiLine || Height > 20
@@ -946,7 +959,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
     /// </summary>
     /// <param name="control"></param>
-    private void StandardBehandlung(Control? control) {
+    private void StandardBehandlung(Control control) {
         Control_Create_Caption();
         switch (_captionPosition) {
             case ÜberschriftAnordnung.ohne:

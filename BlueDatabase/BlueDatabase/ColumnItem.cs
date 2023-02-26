@@ -1201,30 +1201,18 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public List<string> Contents() => Contents(null as FilterCollection, null);
 
-    public List<string> Contents(List<FilterItem>? filter, List<RowItem?>? pinned) {
-        if (filter == null || filter.Count == 0) { return Contents(); }
-        var ficol = new FilterCollection(filter[0].Database);
-        ficol.AddRange(filter);
-        return Contents(ficol, pinned);
-    }
+    //public List<string> Contents(List<FilterItem>? filter, List<RowItem?>? pinned) {
+    //    if (filter == null || filter.Count == 0) { return Contents(); }
+    //    //var ficol = new FilterCollection(filter[0].Database);
+    //    //ficol.AddRange(filter);
+    //    return Contents(filter, pinned);
+    //}
 
     public List<string> Contents(FilterItem filter, List<RowItem?>? pinned) {
         var x = new FilterCollection(filter.Database) { filter };
         return Contents(x, pinned);
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="filter">Wird kein Filter übergeben, werden alle Inhalte zurückgegeben!</param>
-    /// <param name="pinned"></param>
-    /// <returns></returns>
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="filter">Wird kein Filter übergeben, werden alle Inhalte zurückgegeben!</param>
-    /// <param name="pinned"></param>
-    /// <returns></returns>
     public List<string> Contents(List<RowItem?>? pinned) {
         List<string> list = new();
 
@@ -1244,7 +1232,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         return list.SortedDistinctList();
     }
 
-    public List<string> Contents(FilterCollection? filter, List<RowItem?>? pinned) {
+    public List<string> Contents(ICollection<FilterItem>? filter, List<RowItem?>? pinned) {
         List<string> list = new();
         if (Database == null || Database.IsDisposed) { return list; }
 
@@ -1880,11 +1868,11 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public void Statisik(List<FilterItem>? filter, List<RowItem?>? pinnedRows) {
+    public void Statisik(ICollection<FilterItem>? filter, List<RowItem>? pinnedRows) {
         if (Database == null || Database.IsDisposed) { return; }
         var r = Database.Row.CalculateVisibleRows(filter, pinnedRows);
 
-        if (r == null || r.Count < 1) { return; }
+        if (r.Count < 1) { return; }
 
         var d = new Dictionary<string, int>();
 

@@ -20,7 +20,6 @@
 using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -53,10 +52,8 @@ internal class Method_LoadImage : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-
         // Da es keine Möglichit gibt, eine Bild Variable (außerhalb eines If) zu deklarieren,
         // darf diese Routine nicht fehlschlagen.
-
 
         //if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != FileFormat.Image) {
         //    return new DoItFeedback(infos.Data, "Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);

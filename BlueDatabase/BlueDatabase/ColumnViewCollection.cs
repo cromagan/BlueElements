@@ -253,7 +253,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         if (Database == null || Database.IsDisposed) { return; }
 
         foreach (var thisColumn in columnnames) {
-            var c = Database.Column[thisColumn];
+            var c = Database?.Column.Exists(thisColumn);
 
             if (c != null && this[c] == null) {
                 Add(new ColumnViewItem(c, ViewType.Column, this));

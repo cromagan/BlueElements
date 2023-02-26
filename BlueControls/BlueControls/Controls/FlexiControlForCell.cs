@@ -251,21 +251,16 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                 StyleListBox(listBox, column1);
                 listBox.ContextMenuInit += ListBox_ContextMenuInit;
                 listBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
-                listBox.AddClicked += ListBox_AddClicked;
                 break;
 
             case SwapListBox swapListBox:
                 StyleSwapListBox(swapListBox, column1);
-                //swapListBox.ContextMenuInit += ListBox_ContextMenuInit;
-                //swapListBox.ContextMenuItemClicked += ListBox_ContextMenuItemClicked;
-                swapListBox.AddClicked += ListBox_AddClicked;
                 break;
 
             case Button:
             case Line:
                 break;
-            //case Caption _:
-            //    break;
+
             default:
                 Develop.DebugPrint("Control unbekannt");
                 break;
@@ -276,30 +271,19 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         base.OnControlRemoved(e);
         switch (e.Control) {
             case ComboBox:
-                //comboBox.GotFocus -= GotFocus_ComboBox;
                 break;
-
-            //case EasyPic easyPic:
-            //    easyPic.ConnectedDatabase -= EasyPicConnectedDatabase;
-            //    easyPic.ImageChanged -= EasyPicImageChanged;
-            //    break;
 
             case TextBox textBox:
                 textBox.NeedDatabaseOfAdditinalSpecialChars -= textBox_NeedDatabaseOfAdditinalSpecialChars;
-                //textBox.GotFocus -= GotFocus_TextBox;
                 textBox.TextChanged -= TextBox_TextChanged;
                 break;
 
             case ListBox listBox:
                 listBox.ContextMenuInit -= ListBox_ContextMenuInit;
                 listBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
-                listBox.AddClicked -= ListBox_AddClicked;
                 break;
 
-            case SwapListBox swaplistBox:
-                //swaplistBox.ContextMenuInit -= ListBox_ContextMenuInit;
-                //swaplistBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
-                swaplistBox.AddClicked -= ListBox_AddClicked;
+            case SwapListBox _:
                 break;
 
             case Caption _:
@@ -325,15 +309,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     protected override void RemoveAll() {
         FillCellNow();
         base.RemoveAll();
-        //base.OnRemovingAll();
     }
-
-    //private void _Database_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
-    //    if (e.KeyOld != _ColKey) { return; }
-    //    _ColKey = e.KeyNew;
-    //    GetTmpVariables();
-    //    SetValueFromCell();
-    //}
 
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is TextListItem t) {
@@ -342,10 +318,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             }
         }
         if (e.HotItem is BitmapListItem) {
-            //if (FileExists(t.Internal))
-            //{
             _ = e.UserMenu.Add("Bild öffnen");
-            //}
         }
     }
 
@@ -409,52 +382,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         InfoText = newT;
     }
 
-    //private void EasyPicConnectedDatabase(object sender, MultiUserFileGiveBackEventArgs e) => e.File = _database;
-
-    //private void EasyPicImageChanged(object sender, System.EventArgs e) {
-    //    foreach (Control thisControl in Controls) {
-    //        if (thisControl is EasyPic ep) {
-    //            if (_tmpColumn == null && _tmpRow == null) { Develop.DebugPrint_NichtImplementiert(); }
-    //            if (_tmpColumn.Format != DataFormat.Link_To_Filesystem) { Develop.DebugPrint_NichtImplementiert(); }
-    //            switch (ep.SorceType) {
-    //                case SorceType.ScreenShot:
-    //                    var fil = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
-    //                    ep.Bitmap.Save(fil, ImageFormat.Png);
-    //                    ep.ChangeSource(fil, SorceType.LoadedFromDisk, false);
-    //                    ValueSet(fil, false, true);
-    //                    return;
-
-    //                case SorceType.Nichts:
-    //                    ValueSet(string.Empty, false, true);
-    //                    return;
-
-    //                case SorceType.LoadedFromDisk:
-    //                    if (ep.SorceName != _tmpColumn.SimplyFile(ep.SorceName)) {
-    //                        // DEr name kann nur vereifacht werden, wenn es bereits im richtigen Verzeichniss ist. Name wird vereinfacht (ungleich) - bereits im richtigen verzeichniss!
-    //                        ValueSet(ep.SorceName, false, true);
-    //                        return;
-    //                    }
-    //                    var fil2 = _tmpColumn.BestFile(_tmpColumn.Name + ".png", true);
-    //                    if (!string.Equals(fil2.FilePath(), ep.SorceName.FilePath(), StringComparison.OrdinalIgnoreCase)) {
-    //                        ep.Bitmap.Save(fil2, ImageFormat.Png);
-    //                    } else {
-    //                        fil2 = ep.SorceName;
-    //                    }
-    //                    ep.ChangeSource(fil2, SorceType.LoadedFromDisk, false);
-    //                    ValueSet(fil2, false, true);
-    //                    return;
-
-    //                case SorceType.EntryWithoutPic:
-    //                    ValueSet(ep.SorceName, false, true);
-    //                    // Entweder ein Dummy eintrag (Bildzeichen-Liste, wo Haupt das Bild sein sollte, aber eben nur bei den 3 Seitensichten eines da ist
-    //                    // Oder datenbank wird von einem andern PC aus gestartet
-    //                    return;
-    //            }
-    //        }
-    //    }
-    //    Develop.DebugPrint_NichtImplementiert();
-    //}
-
     private void FillCellNow() {
         if (IsFilling) { return; }
         if (!Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
@@ -483,18 +410,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             gbColumn = column;
         }
 
-        if (gbColumn != null) {
-            this.GetStyleFrom(gbColumn);
-            //Suffix = gbColumn.Suffix;
-            //AllowedChars = gbColumn.AllowedChars;
-            //Regex = gbColumn.Regex;
-            //MultiLine = gbColumn.MultiLine;
-        }
-        //else {
-        //    if (column == null) { return null; }  // Bei Steuerelementen, die manuell hinzugefügt werden
-        //    if (row == null) { return null; }  // Beim initualisieren des Controls und Linked Cell kann das vorkommen
-        //    Develop.DebugPrint("Column nicht gefunden: " + column.Name + " " + column.Database.TableName);
-        //}
+        if (gbColumn != null) { this.GetStyleFrom(gbColumn); }
 
         return gbColumn;
     }
@@ -518,61 +434,12 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         }
     }
 
-    private void ListBox_AddClicked(object sender, System.EventArgs e) {
-        var (column, _) = GetTmpVariables();
-
-        var dia = ColumnItem.UserEditDialogTypeInTable(column, false);
-
-        ListBox? lbx = null;
-
-        if (sender is ListBox lbx2) { lbx = lbx2; }
-        if (sender is SwapListBox lbx3) { lbx = lbx3.Main; }
-
-        if (lbx == null) { return; }
-
-        switch (dia) {
-            case EditTypeTable.None:
-                return;
-
-            //case EditTypeTable.FileHandling_InDateiSystem:
-            //    // korrektheit der Zelle bereits geprüft
-            //    var l = Table.FileSystem(_tmpColumn);
-
-            //    if (l == null) { return; }
-
-            //    foreach (var thisF in l) {
-            //        lbx.Item.Add(thisF.FileNameWithSuffix(), _tmpColumn, ShortenStyle.Replaced, _tmpColumn.BildTextVerhalten);
-            //    }
-
-            //    return;
-
-            case EditTypeTable.Textfeld:
-                _ = lbx.Add_Text();
-                return;
-
-            case EditTypeTable.Listbox:
-                lbx.Add_TextBySuggestion();
-                return;
-
-            default:
-                Develop.DebugPrint(dia);
-                return;
-        }
-    }
-
     private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         switch (e.ClickedComand.ToLower()) {
             case "dateiöffnen":
                 if (e.HotItem is TextListItem t) {
                     if (FileExists(t.KeyName)) {
                         _ = ExecuteFile(t.KeyName);
-                        //var b = Converter.FileToByte(t.Internal);
-                        ////b = Cryptography.SimpleCrypt(b, FileEncryptionKey, -1);
-                        //var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
-                        //Converter.ByteToFile(tmp, b);
-                        //ExecuteFile(tmp, string.Empty, true, false);
-                        //MessageBox.Show("Warte...");
-                        //DeleteFile(tmp, true);
                     }
                 }
                 break;
@@ -582,13 +449,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
                     if (bi.ImageLoaded()) {
                         PictureView x = new(bi.Bitmap);
                         x.Show();
-                        //var b = modConverter.FileToByte(t.Internal);
-                        //b = Generic.SimpleCrypt(b, FileEncryptionKey, -1);
-                        //var tmp = TempFile(string.Empty, string.Empty, t.Internal.FileSuffix());
-                        //modConverter.ByteToFile(tmp, b);
-                        //Generic.ExecuteFile(tmp, null, true, false);
-                        //MessageBox.Show("Warte...");
-                        //DeleteFile(tmp, true);
                     }
                 }
                 break;
@@ -708,25 +568,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         }
 
         switch (column.Format) {
-            //case DataFormat.Link_To_Filesystem:
-            //    var tmp = _tmpRow.CellGetList(_tmpColumn);
-            //    List<string> tmp2 = new();
-            //    foreach (var file in tmp) {
-            //        var tmpF = _tmpColumn.BestFile(file, false);
-            //        if (FileExists(tmpF)) {
-            //            tmp2.GenerateAndAdd(tmpF);
-            //        } else {
-            //            tmp2.GenerateAndAdd(file);
-            //        }
-            //    }
-            //    ValueSet(tmp2.JoinWithCr(), true, true);
-            //    //if (Value.ToUpper() != tmp2.JoinWithCr().ToUpper()) {
-            //    //    // Dieser Fehler tritt auf, wenn ein BestFile nicht gefunden wurde, weil es auf der Festplatte nicht (mehr) existiert
-            //    //  Ode noch ni existiert hat
-            //    //    Develop.DebugPrint(enFehlerArt.Warnung, "Werte ungleich: " + Value + " - " + tmp2.JoinWithCr());
-            //    //}
-            //    break;
-
             case DataFormat.Verknüpfung_zu_anderer_Datenbank:
                 _ = GetRealColumn(column, row);
                 ValueSet(row.CellGetString(column), true, true);
@@ -768,7 +609,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
             Caption = column.ReadableText() + ":";
 
             if (string.IsNullOrEmpty(_columnName)) {
-                //EditType = _tmpColumn.EditType;
                 QuickInfo = column.QuickInfoText(string.Empty);
             }
         }

@@ -67,7 +67,6 @@ namespace BlueControls.Controls {
             this.Main.Size = new Size(345, 115);
             this.Main.TabIndex = 0;
             this.Main.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.Main_ItemClicked);
-            this.Main.AddClicked += new EventHandler(this.Main_AddClicked);
             this.Main.CollectionChanged += Main_CollectionChanged; 
             // 
             // Suggest
@@ -98,7 +97,7 @@ namespace BlueControls.Controls {
         #endregion
 
         private SplitContainer splitContainer1;
-        public ListBox Main;
+        private ListBox Main;
         private ListBox Suggest;
     }
 }

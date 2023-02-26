@@ -233,7 +233,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
                 case "columnname":
                 case "column":
-                    _column = Database?.Column[pair.Value];
+                    _column = Database?.Column.Exists(pair.Value);
                     break;
 
                 case "columnkey":

@@ -114,19 +114,20 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    public RowItem? this[params FilterItem[]? filter] {
+    public RowItem? this[params FilterItem[] filter] {
         get {
-            if (filter == null || filter.Length == 0) {
-                Develop.DebugPrint("Kein Filter angekommen!");
-                return null;
-            }
-            FilterCollection d = new(filter[0].Database);
-            d.AddRange(filter);
-            return this[d];
+            //if (filter == null || filter.Length == 0) {
+            //    Develop.DebugPrint("Kein Filter angekommen!");
+            //    return null;
+            //}
+
+            return _internal.Values.FirstOrDefault(thisRow => thisRow != null && thisRow.MatchesTo(filter));
+
+            //FilterCollection d = new(filter[0].Database);
+            //d.AddRange(filter);
+            //return this[d];
         }
     }
-
-    public RowItem? this[FilterCollection? filter] => Database == null ? null : _internal.Values.FirstOrDefault(thisRow => thisRow != null && thisRow.MatchesTo(filter));
 
     #endregion
 
@@ -171,7 +172,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="filter"></param>
     /// <returns></returns>
 
-    public List<RowItem> CalculateFilteredRows(List<FilterItem>? filter) {
+    public List<RowItem> CalculateFilteredRows(ICollection<FilterItem>? filter) {
         List<RowItem> tmpVisibleRows = new();
         if (Database == null || Database.IsDisposed) { return tmpVisibleRows; }
 
@@ -193,7 +194,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return tmpVisibleRows;
     }
 
-    public List<RowData> CalculateSortedRows(List<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem?>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
+    public List<RowData> CalculateSortedRows(ICollection<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem?>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 
     public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem?>? pinnedRows, List<RowData>? reUseMe) {
         if (Database == null || Database.IsDisposed) { return new List<RowData>(); }
@@ -289,11 +290,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="pinnedRows"></param>
     /// <returns></returns>
 
-    public List<RowItem> CalculateVisibleRows(List<FilterItem>? filter, List<RowItem?>? pinnedRows) {
+    public List<RowItem> CalculateVisibleRows(ICollection<FilterItem>? filter, ICollection<RowItem>? pinnedRows) {
         List<RowItem> tmpVisibleRows = new();
         if (Database == null || Database.IsDisposed) { return tmpVisibleRows; }
 
-        pinnedRows ??= new List<RowItem?>();
+        pinnedRows ??= new List<RowItem>();
 
         var lockMe = new object();
         _ = Parallel.ForEach(Database.Row, thisRowItem => {

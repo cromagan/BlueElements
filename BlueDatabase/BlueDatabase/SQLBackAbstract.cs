@@ -397,7 +397,7 @@ public abstract class SQLBackAbstract {
     }
 
     //        for (var z = 1; z < reader.FieldCount; z++) {
-    //            row.Database.Cell.SetValueInternal(row.Database.Column[z - 1].Key, r, reader[z].ToString(false), -1, -1);
+    //            row.Database.Cell.SetValueInternal(row.Database?.Column[z - 1].Key, r, reader[z].ToString(false), -1, -1);
     //        }
     //    }
     public abstract SQLBackAbstract OtherTable(string tablename);

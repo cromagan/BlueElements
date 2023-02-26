@@ -174,7 +174,7 @@ public static class Export {
     //            if (CodeNr.Substring(0, 3) == "000") // Spaltenname für Textersetzung
     //            {
     //                if (row != null) {
-    //                    column = row.Database.Column[CodeNr.Substring(3)];
+    //                    column = row.Database?.Column[CodeNr.Substring(3)];
     //                    if (column == null || !column.ExportableTextformatForLayout()) {
     //                        TXT = "/FehlerTS/" + Code;
     //                        Ended = true;
@@ -193,7 +193,7 @@ public static class Export {
     //        case "001": // Spaltenname für Bild
     //            TextReturn = false;
     //            if (row != null) {
-    //                column = row.Database.Column[CodeNr.Substring(3)];
+    //                column = row.Database?.Column[CodeNr.Substring(3)];
     //                if (column == null) {
     //                    value = "/FehlerTS/" + Code;
     //                    Ended = true;
@@ -211,7 +211,7 @@ public static class Export {
     //            break;
     //        case "003": // Spaltenname für Bedingugnen
     //            if (row != null) {
-    //                column = row.Database.Column[CodeNr.Substring(3)];
+    //                column = row.Database?.Column[CodeNr.Substring(3)];
     //                if (column == null || !column.ExportableTextformatForLayout()) {
     //                    TXT = "/FehlerTS/" + Code;
     //                    Ended = true;

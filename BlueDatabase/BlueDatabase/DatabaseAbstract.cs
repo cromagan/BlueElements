@@ -51,48 +51,27 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public const string DatabaseVersion = "4.02";
 
-    public static readonly ListExt<DatabaseAbstract> AllFiles = new();
-
+    public static readonly ObservableCollection<DatabaseAbstract> AllFiles = new();
     public static List<Type>? DatabaseTypes;
-
     private static DateTime _lastTableCheck = new(1900, 1, 1);
-
     private readonly List<ColumnViewCollection> _columnArrangements = new();
-
     private readonly List<string> _datenbankAdmin = new();
-
     private readonly List<EventScript> _eventScript = new();
-
     private readonly LayoutCollection _layouts = new();
-
     private readonly List<BackgroundWorker> _pendingworker = new();
-
     private readonly List<long> _pendingworks = new();
-
     private readonly List<string> _permissionGroupsNewRow = new();
-
     private readonly long _startTick = DateTime.UtcNow.Ticks;
-
     private readonly List<string> _tags = new();
-
     private readonly List<VariableString> _variables = new();
-
     private string _additionalFilesPfad = string.Empty;
-
     private string _cachePfad = string.Empty;
-
     private string _caption = string.Empty;
-
     private Timer? _checker;
-
     private int _checkerTickCount = -5;
-
     private string _createDate = string.Empty;
-
     private string _creator = string.Empty;
-
     private string _eventScriptTmp = string.Empty;
-
     private double _globalScale;
     private string _globalShowPass = string.Empty;
     private DateTime _lastUserActionUtc = new(1900, 1, 1);
@@ -1454,7 +1433,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public abstract void RefreshColumnsData(List<ColumnItem> columns);
 
-    public void RefreshColumnsData(List<FilterItem>? filter) {
+    public void RefreshColumnsData(IEnumerable<FilterItem>? filter) {
         if (filter != null) {
             var c = new List<ColumnItem>();
 

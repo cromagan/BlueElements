@@ -175,7 +175,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
 
             var x = thisFi.SplitBy("|");
-            var c = linkedDatabase?.Column[x[0]];
+            var c = linkedDatabase?.Column.Exists(x[0]);
             if (c == null) { return (fi, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
 
             if (x[1] != "=") { return (fi, "Nur 'Gleich'-Fiter wird unterstützt."); }

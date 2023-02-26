@@ -29,6 +29,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
+using System.Collections;
 
 namespace BlueBasics;
 
@@ -226,6 +227,12 @@ public static partial class Extensions {
     /// <param name="value"></param>
     public static void Remove<T>(this IList<T> l, T value) where T : IComparable {
         do { } while (l.Remove(value));
+    }
+
+    public static void RemoveAll(this IList list) {
+        while (list.Count > 0) {
+            list.RemoveAt(list.Count - 1);
+        }
     }
 
     public static bool RemoveNull<T>(this IList<T>? l) {

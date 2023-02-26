@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -28,7 +29,7 @@ using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
-public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasDatabase {
+public sealed class FilterCollection : ObservableCollection<FilterItem>, IParseable, IHasDatabase, IDisposableExtended {
 
     #region Constructors
 
@@ -43,9 +44,23 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
 
     #endregion
 
+    #region Events
+
+    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~FilterCollection()
+    // {
+    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
+    public event EventHandler? Changed;
+
+    #endregion
+
     #region Properties
 
     public DatabaseAbstract? Database { get; private set; }
+
+    public bool IsDisposed { get; private set; }
 
     public bool IsParsing { get; private set; }
 
@@ -81,6 +96,12 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
 
     #region Methods
 
+    public new void Add(FilterItem filter) {
+        filter.Changed += Filter_Changed;
+        base.Add(filter);
+        OnChanged();
+    }
+
     public void Add(FilterType filterType, string filterBy) {
         if (Database == null || Database.IsDisposed) { return; }
         AddIfNotExists(new FilterItem(Database, filterType, filterBy));
@@ -113,6 +134,25 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
         AddIfNotExists(new FilterItem(column, filterType, filterBy));
     }
 
+    public void AddIfNotExists(FilterItem fi) {
+        if (Exists(fi)) { return; }
+        Add(fi);
+    }
+
+    // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
+    public void Dispose() {
+        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
+        Dispose(true);
+        // TODO: Auskommentierung der folgenden Zeile aufheben, wenn der Finalizer weiter oben überschrieben wird.
+        //GC.SuppressFinalize(this);
+    }
+
+    void IDisposable.Dispose() {
+        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(disposing: true);
+        //GC.SuppressFinalize(this);
+    }
+
     public bool Exists(FilterItem filterItem) {
         foreach (var thisFilter in this) {
             if (thisFilter.FilterType == filterItem.FilterType) {
@@ -130,20 +170,19 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
 
     public bool IsRowFilterActiv() => this[null] != null;
 
-    public bool MayHasRowFilter(ColumnItem? column) {
-        if (column == null) { return false; }
-        return !column.IgnoreAtRowFilter && IsRowFilterActiv();
-    }
+    public bool MayHasRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
+
+    public void OnChanged() { Changed?.Invoke(this, System.EventArgs.Empty); }
 
     public void Parse(string toParse) {
         IsParsing = true;
-        ThrowEvents = false;
+
         // Initialize();
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "filter":
                     if (Database != null && !Database.IsDisposed)
-                        _ = AddIfNotExists(new FilterItem(Database, pair.Value));
+                        AddIfNotExists(new FilterItem(Database, pair.Value));
                     break;
 
                 default:
@@ -151,7 +190,7 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
                     break;
             }
         }
-        ThrowEvents = true;
+
         IsParsing = false;
     }
 
@@ -162,18 +201,35 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
     }
 
     public void Remove(string columnName) {
-        var tmp = Database.Column[columnName];
+        var tmp = Database?.Column.Exists(columnName);
         if (tmp == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
         Remove(tmp);
     }
 
-    public void Remove_RowFilter() => Remove((ColumnItem?)null);
+    /// <summary>
+    /// Wirft niemals das Event Changed ab - CollectionChanged aber schon
+    /// </summary>
+    /// <param name="filterItem"></param>
+    public new bool Remove(FilterItem filterItem) {
+        filterItem.Changed -= Filter_Changed;
+        return base.Remove(filterItem);
+    }
 
-    public void RemoveOtherAndAddIfNotExists(ColumnItem? column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
+    public void Remove(FilterItem filterItem, bool throwChangedEvent) {
+        if (Remove(filterItem)) {
+            if (throwChangedEvent) {
+                OnChanged();
+            }
+        }
+    }
+
+    public void Remove_RowFilter() => Remove(null as ColumnItem);
+
+    public void RemoveOtherAndAddIfNotExists(ColumnItem column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new(column, filterType, filterBy, herkunft));
 
     public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, string filterBy, string herkunft) {
-        var column = Database.Column[columnName];
-        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
+        var column = Database?.Column.Exists(columnName);
+        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
         RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
     }
 
@@ -185,35 +241,56 @@ public sealed class FilterCollection : ListExt<FilterItem>, IParseable, IHasData
     }
 
     public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, List<string>? filterBy, string herkunft) {
-        var tmp = Database.Column[columnName];
-        if (tmp == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
-        RemoveOtherAndAddIfNotExists(new FilterItem(tmp, filterType, filterBy, herkunft));
+        var column = Database?.Column.Exists(columnName);
+        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
+        RemoveOtherAndAddIfNotExists(new(column, filterType, filterBy, herkunft));
+    }
+
+    public void RemoveRange(List<FilterItem> filter) {
+        var did = false;
+        foreach (var thisItem in filter) {
+            if (Contains(thisItem)) {
+                did = true;
+
+                Remove(thisItem, false);
+            }
+        }
+
+        if (did) { OnChanged(); }
     }
 
     public override string ToString() {
-        var w = "{";
+        var l = new List<string>();
+
         foreach (var thisFilterItem in this) {
-            if (thisFilterItem != null) {
-                w = w + "Filter=" + thisFilterItem + ", ";
+            if (thisFilterItem != null && !thisFilterItem.IsDisposed) {
+                l.ParseableAdd("Filter", thisFilterItem as IStringable);
             }
         }
-        return w.TrimEnd(", ") + "}";
+        return l.Parseable();
     }
 
-    protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-        if (Database != null && !Database.IsDisposed) {
-            Database.Disposing += Database_Disposing;
-            Database = null;
+    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+
+    private void Dispose(bool disposing) {
+        if (!IsDisposed) {
+            if (disposing) {
+                //base.Dispose(disposing);
+                if (Database != null) {
+                    Database.Disposing -= Database_Disposing;
+                    Database = null;
+                }
+            }
+
+            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // TODO: Große Felder auf NULL setzen
+            IsDisposed = true;
         }
     }
 
-    //private void AddIfNotExists(FilterItem filterItem) {
-    //    if (Exists(filterItem)) { return; }
-    //    GenerateAndAdd(filterItem);
-    //}
-
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void Filter_Changed(object sender, System.EventArgs e) {
+        OnChanged();
+    }
 
     #endregion
 }

@@ -484,8 +484,8 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         }
     }
 
-    public void AddRange(ICollection<BasicListItem?>? list) {
-        if (list == null || list.Count == 0) { return; }
+    public void AddRange(IEnumerable<BasicListItem?>? list) {
+        if (list == null) { return; }
 
         foreach (var thisitem in list) {
             if (thisitem != null) { Add(thisitem); }
@@ -508,7 +508,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         }
     }
 
-    public void AddRange(ICollection<string>? list) {
+    public void AddRange(IEnumerable<string>? list) {
         if (list == null) { return; }
 
         foreach (var thisstring in list) {
@@ -529,8 +529,8 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         }
     }
 
-    public void AddRange(ICollection<RowItem?>? list, string layoutId) {
-        if (list == null || list.Count == 0) { return; }
+    public void AddRange(IEnumerable<RowItem?>? list, string layoutId) {
+        if (list == null) { return; }
 
         foreach (var thisRow in list) {
             if (thisRow != null) {

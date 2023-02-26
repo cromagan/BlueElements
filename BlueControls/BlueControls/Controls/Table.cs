@@ -3094,7 +3094,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         break;
 
                     case "reduced":
-                        var c = Database.Column[pair.Value];
+                        var c = Database?.Column.Exists(pair.Value);
                         var cv = CurrentArrangement[c];
                         if (cv != null) { cv.TmpReduced = true; }
                         break;

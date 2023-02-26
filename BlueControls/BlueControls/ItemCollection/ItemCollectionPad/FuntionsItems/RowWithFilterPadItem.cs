@@ -498,7 +498,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     private void RepairConnections() {
         if (Parent == null) { return; }
 
-        ConnectsTo.Clear();
+        ConnectsTo.RemoveAll();
 
         foreach (var thisRow in FilterDefiniton.Row) {
             var getValueFrom = Parent[thisRow.CellGetString("suchtxt")];

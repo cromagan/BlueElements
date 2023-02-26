@@ -323,7 +323,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     }
 
     private void RepairConnections() {
-        ConnectsTo.Clear();
+        ConnectsTo.RemoveAll();
 
         if (GetRowFrom != null) {
             ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false, false));

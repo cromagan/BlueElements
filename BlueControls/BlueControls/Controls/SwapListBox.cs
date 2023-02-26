@@ -18,11 +18,12 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Controls;
-using BlueBasics.EventArgs;
+using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
@@ -39,8 +40,6 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     #endregion
 
     #region Events
-
-    public event EventHandler? AddClicked;
 
     public event EventHandler<NotifyCollectionChangedEventArgs>? CollectionChanged;
 
@@ -69,8 +68,6 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     #endregion
 
     #region Methods
-
-    public void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
     public void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
 
@@ -119,25 +116,24 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         Suggest.Enabled = Enabled;
     }
 
-    private void Main_AddClicked(object sender, System.EventArgs e) => OnAddClicked();
-
-    private void Main_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+    private void Main_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         foreach (var thisn in Main.Item) {
             Suggest.Item.Remove(thisn.KeyName);
         }
 
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
-
                 if (thisit is BasicListItem bli) {
-                    Suggest.Item.Add(bli.Clone() as BasicListItem);
+                    if (Suggest.Item[bli.KeyName] == null) {
+                        Suggest.Item.Add(bli.Clone() as BasicListItem);
+                    }
                 }
-                
             }
-
-
         }
 
+        if (e.Action == NotifyCollectionChangedAction.Reset) {
+            Develop.DebugPrint_NichtImplementiert();
+        }
 
         OnCollectionChanged(e);
     }

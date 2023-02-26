@@ -67,12 +67,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Item = new ItemCollectionList(true);
-        Item.Changed += _Item_Changed;
         Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
         Item.CollectionChanged += Item_CollectionChanged;
-        //Item.ItemAdded += _Item_ItemAdded;
-        //Item.ItemRemoved += _Item_ItemRemoved;
-        //Item.ItemRemoving += _Item_ItemRemoving;
         _appearance = BlueListBoxAppearance.Listbox;
     }
 
@@ -88,11 +84,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
-    public event EventHandler? ItemChanged;
-
     public event EventHandler? ItemCheckedChanged;
 
-    //public event EventHandler<ListEventArgs>? ItemAdded;
     public event EventHandler<BasicListItemEventArgs>? ItemClicked;
 
     public event EventHandler<BasicListItemEventArgs>? ItemDoubleClick;
@@ -111,15 +104,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    ///// <summary>
-    ///// Wird vor jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
-    ///// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
-    ///// </summary>
-    //public event EventHandler<ListEventArgs>? ItemRemoving;
-    ///// <summary>
-    ///// Wird nur ausgelöst, wenn explicit der Button gedrückt wird.
-    ///// </summary>
-    //public event EventHandler<ListOfBasicListItemEventArgs>? RemoveClicked;
     [DefaultValue(BlueListBoxAppearance.Listbox)]
     public BlueListBoxAppearance Appearance {
         get => _appearance;
@@ -141,11 +125,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    ///// <summary>
-    ///// Wird nach jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
-    ///// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
-    ///// </summary>
-    //public event EventHandler? ItemRemoved;
     [DefaultValue(CheckBehavior.SingleSelection)]
     public CheckBehavior CheckBehavior {
         get => Item.CheckBehavior;
@@ -229,19 +208,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         return i;
     }
 
-    //    var picture = BitmapExt.Image_FromFile(f[0]);
-    //    return picture != null ? Item.Add((Bitmap)picture, f[0]) : Item.Add(Converter.FileToByte(f[0]), f[0]);
-    //}
     public TextListItem? Add_Text() {
         var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", Suggestions, true);
         return Add_Text(val);
     }
 
-    //public BasicListItem? Add_FromFileSystem() {
-    //    var f = IO.GetFilesWithFileSelector(string.Empty, false);
-    //    if (f is null) { return null; }
     public void Add_TextBySuggestion() {
-        if (Suggestions == null || Suggestions.Count == 0) {
+        if (Suggestions.Count == 0) {
             MessageBox.Show("Keine (weiteren) Werte vorhanden.", ImageCode.Information, "OK");
             return;
         }
@@ -272,8 +245,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
-    public void OnItemChanged() => ItemChanged?.Invoke(this, System.EventArgs.Empty);
 
     protected override void DrawControl(Graphics gr, States state) {
 
@@ -358,7 +329,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    //protected void OnItemRemoving(ListEventArgs e) => ItemRemoving?.Invoke(this, e);
     protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
         var nd = MouseOverNode(MousePos().X, MousePos().Y);
@@ -369,7 +339,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    //protected void OnItemRemoved(System.EventArgs e) => ItemRemoved?.Invoke(this, e);
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         if (!Enabled) { return; }
@@ -391,7 +360,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    //protected void OnItemAdded(ListEventArgs e) => ItemAdded?.Invoke(this, e);
     protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (!SliderY.Visible) { return; }
@@ -416,12 +384,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         base.OnVisibleChanged(e);
     }
 
-    private void _Item_Changed(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
-        OnItemChanged();
-    }
-
     private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         CheckButtons();
@@ -429,24 +391,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         OnItemCheckedChanged();
     }
 
-    //private void _Item_ItemRemoving(object sender, ListEventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    Invalidate();
-    //    OnItemRemoving(e);
-    //}
     private bool ButtonsVisible() => Plus.Visible || Minus.Visible || Up.Visible || Down.Visible || FilterTxt.Visible;
 
-    //private void _Item_ItemAdded(object sender, ListEventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
-    //    Invalidate();
-    //    OnItemAdded(e);
-    //}
-    //private void _Item_ItemRemoved(object sender, System.EventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    Invalidate();
-    //    OnItemRemoved(e);
-    //}
     private void CheckButtons() {
         if (!Visible) { return; }
         if (Parent == null) { return; }
@@ -493,13 +439,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void Item_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (IsDisposed) { return; }
-        //Develop.DebugPrint_InvokeRequired(InvokeRequired, true);
         Invalidate();
         OnCollectionChanged(e);
     }
 
     private void Minus_Click(object sender, System.EventArgs e) {
-        //OnRemoveClicked(new ListOfBasicListItemEventArgs(Item.Checked()));
         foreach (var thisItem in Item.Checked()) {
             Item.Remove(thisItem);
         }
@@ -515,8 +459,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void OnItemClicked(BasicListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     private void OnItemDoubleClick(BasicListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
-
-    //private void OnRemoveClicked(ListOfBasicListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 
     private void Plus_Click(object sender, System.EventArgs e) {
         OnAddClicked();
@@ -535,10 +477,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             case AddType.None:
                 break;
 
-            //case AddType.BinarysFromFileSystem:
-            //    Add_FromFileSystem();
-            //    break;
-
             default:
                 Develop.DebugPrint(_addAlloweds);
                 break;
@@ -551,11 +489,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
     }
 
-    //private void SwapItems(BasicListItem Nr1, BasicListItem Nr2)
-    //{
-    //    Item.Swap(ref Nr1, ref Nr2);
-    //    CheckButtons();
-    //}
     private void Up_Click(object sender, System.EventArgs e) {
         BasicListItem? ln = null;
         foreach (var thisItem in Item.ItemOrder) {

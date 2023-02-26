@@ -133,10 +133,8 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     /// </summary>
     public Rectangle DrawingArea {
         get => _drawingArea;
-        set {
-            _drawingArea = value;
-            //OnChanged();
-        }
+        set => _drawingArea = value;
+        //OnChanged();
     }
 
     /// <summary>
@@ -144,10 +142,8 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     /// </summary>
     public Point DrawingPos {
         get => _drawingPos;
-        set {
-            _drawingPos = value;
-            //OnChanged();
-        }
+        set => _drawingPos = value;
+        //OnChanged();
     }
 
     public string HtmlText {

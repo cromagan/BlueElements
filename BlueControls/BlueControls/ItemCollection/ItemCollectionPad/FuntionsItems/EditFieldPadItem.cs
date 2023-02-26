@@ -325,7 +325,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
     //}
 
     //private void RepairConnections() {
-    //    ConnectsTo.Clear();
+    //    ConnectsTo.RemoveAll();
 
     //    if (GetRowFrom != null) {
     //        ConnectsTo.GenerateAndAdd(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false, false));

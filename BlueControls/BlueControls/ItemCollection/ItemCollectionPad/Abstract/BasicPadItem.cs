@@ -19,11 +19,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -60,12 +61,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     #region Constructors
 
     protected BasicPadItem(string internalname) : base(internalname) {
-        MovablePoint.ItemAdded += Points_ItemAdded;
-        MovablePoint.ItemRemoving += Points_ItemRemoving;
-
-        ConnectsTo.ItemAdded += ConnectsTo_ItemAdded;
-        ConnectsTo.ItemRemoving += ConnectsTo_ItemRemoving;
-        ConnectsTo.ItemRemoved += ConnectsTo_ItemRemoved;
+        MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
+        ConnectsTo.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
     #endregion
@@ -90,7 +87,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         }
     }
 
-    public ListExt<ItemConnection> ConnectsTo { get; } = new();
+    public ObservableCollection<ItemConnection> ConnectsTo { get; } = new();
 
     /// <summary>
     /// Wird ein Element gelöscht, das diese Feld befüllt hat, werden automatisch alle andern Elemente mit der selben Gruppe gelöscht.
@@ -99,8 +96,10 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
     public bool IsDisposed { get; private set; }
+
     public bool IsParsing { get; private set; }
-    public ListExt<PointM> MovablePoint { get; } = new();
+
+    public ObservableCollection<PointM> MovablePoint { get; } = new();
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
     public string Page {
@@ -132,6 +131,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     }
 
     public List<PointM> PointsForSuccesfullyMove { get; } = new();
+
     public virtual string QuickInfo { get; set; } = string.Empty;
 
     public PadStyles Stil {
@@ -145,11 +145,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     }
 
     public List<string> Tags { get; } = new();
-    ///// <summary>
-    ///// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
-    ///// </summary>
-    ///// <remarks></remarks>
-    //public List<string> Tags { get; } = new();
 
     /// <summary>
     /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
@@ -163,6 +158,11 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         }
     }
 
+    ///// <summary>
+    ///// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
+    ///// </summary>
+    ///// <remarks></remarks>
+    //public List<string> Tags { get; } = new();
     public int ZoomPadding {
         get => _zoomPadding;
         set {
@@ -495,14 +495,10 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
 
-            MovablePoint.ItemAdded -= Points_ItemAdded;
-            MovablePoint.Clear();
-            MovablePoint.ItemRemoving -= Points_ItemRemoving;
-
-            ConnectsTo.ItemAdded -= ConnectsTo_ItemAdded;
-            ConnectsTo.Clear();
-            ConnectsTo.ItemRemoving -= ConnectsTo_ItemRemoving;
-            ConnectsTo.ItemRemoved -= ConnectsTo_ItemRemoved;
+            MovablePoint.RemoveAll();
+            MovablePoint.CollectionChanged -= MovablePoint_CollectionChanged;
+            ConnectsTo.RemoveAll();
+            ConnectsTo.CollectionChanged -= ConnectsTo_CollectionChanged;
 
             //ConnectsTo = null;
 
@@ -558,37 +554,57 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     protected abstract void ParseFinished();
 
-    //protected abstract BasicPadItem? TryCreate(string id, string name);
+    private void ConnectsTo_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        if (e.NewItems != null) {
+            foreach (var thisit in e.NewItems) {
+                if (thisit is ItemConnection x) {
+                    x.OtherItem.Changed += Item_Changed;
+                }
+            }
+        }
 
-    private void ConnectsTo_ItemAdded(object sender, ListEventArgs e) {
-        var x = (ItemConnection)e.Item;
+        if (e.OldItems != null) {
+            foreach (var thisit in e.OldItems) {
+                if (thisit is ItemConnection x) {
+                    x.OtherItem.Changed -= Item_Changed;
+                }
+            }
+        }
 
-        x.OtherItem.Changed += Item_Changed;
+        if (e.Action == NotifyCollectionChangedAction.Reset) {
+            Develop.DebugPrint_NichtImplementiert();
+        }
+
         OnChanged();
-    }
-
-    private void ConnectsTo_ItemRemoved(object sender, System.EventArgs e) => OnChanged();
-
-    private void ConnectsTo_ItemRemoving(object sender, ListEventArgs e) {
-        var x = (ItemConnection)e.Item;
-        x.OtherItem.Changed -= Item_Changed;
     }
 
     private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 
-    private void Points_ItemAdded(object sender, ListEventArgs e) {
-        if (e.Item is PointM p) {
-            p.Moving += PointMoving;
-            p.Moved += PointMoved;
+    private void MovablePoint_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        if (e.NewItems != null) {
+            foreach (var thisit in e.NewItems) {
+                if (thisit is PointM p) {
+                    p.Moving += PointMoving;
+                    p.Moved += PointMoved;
+                }
+            }
         }
-    }
 
-    private void Points_ItemRemoving(object sender, ListEventArgs e) {
-        if (e.Item is PointM p) {
-            p.Moving -= PointMoving;
-            p.Moved -= PointMoved;
+        if (e.OldItems != null) {
+            foreach (var thisit in e.OldItems) {
+                if (thisit is PointM p) {
+                    p.Moving -= PointMoving;
+                    p.Moved -= PointMoved;
+                }
+            }
+        }
+
+        if (e.Action == NotifyCollectionChangedAction.Reset) {
+            Develop.DebugPrint_NichtImplementiert();
         }
     }
 
     #endregion
+
+    //protected abstract BasicPadItem? TryCreate(string id, string name);
 }

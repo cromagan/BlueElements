@@ -123,7 +123,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public ItemCollectionList Item { get; } = new ItemCollectionList(BlueListBoxAppearance.DropdownSelectbox, true);
+    public ItemCollectionList Item { get; } = new(BlueListBoxAppearance.DropdownSelectbox, true);
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
