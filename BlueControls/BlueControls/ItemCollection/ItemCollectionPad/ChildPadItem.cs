@@ -364,7 +364,6 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     //}
 
     private void _Pad_DoInvalidate(object sender, System.EventArgs e) {
-        if (IsParsing) { return; }
         OnChanged();
     }
 

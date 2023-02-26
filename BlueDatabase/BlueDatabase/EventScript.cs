@@ -105,8 +105,6 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
 
     public bool IsDisposed { get; private set; }
 
-    public bool IsParsing { get; private set; }
-
     public string KeyName { get; private set; }
 
     public bool ManualExecutable {
@@ -200,8 +198,6 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void Parse(string toParse) {
-        IsParsing = true;
-
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "name":
@@ -245,8 +241,6 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
                     break;
             }
         }
-
-        IsParsing = false;
     }
 
     public string ReadableText() {

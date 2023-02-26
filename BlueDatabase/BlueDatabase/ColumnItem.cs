@@ -1699,7 +1699,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public void ResetSystemToDefault(bool setOpticalToo) {
         if (!IsSystemColumn()) { return; }
-        //if (SetAll && !IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Ausserhalb des parsens!"); }
         // ACHTUNG: Die setOpticalToo Befehle OHNE _, die müssen geloggt werden.
         if (setOpticalToo) {
             LineLeft = ColumnLineStyle.Dünn;

@@ -91,7 +91,6 @@ public class WorkItem : IParseable {
     public DateTime Date { get; private set; }
 
     //public bool HistorischRelevant => State is ItemState.Pending or ItemState.Undo;
-    public bool IsParsing { get; private set; }
 
     public string PreviousValue { get; private set; } = string.Empty;
 
@@ -122,15 +121,10 @@ public class WorkItem : IParseable {
     public string CompareKey() => Date.ToString(Constants.Format_Date) + _colName;
 
     public void OnChanged() {
-        if (IsParsing) {
-            Develop.DebugPrint(FehlerArt.Warnung, "Falscher Parsing Zugriff!");
-            return;
-        }
         Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void Parse(string toParse) {
-        IsParsing = true;
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "st":
@@ -217,7 +211,6 @@ public class WorkItem : IParseable {
                     break;
             }
         }
-        IsParsing = false;
     }
 
     public new string ToString() => "{CO=" + (int)Comand +

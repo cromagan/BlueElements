@@ -97,8 +97,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     public bool IsDisposed { get; private set; }
 
-    public bool IsParsing { get; private set; }
-
     public ObservableCollection<PointM> MovablePoint { get; } = new();
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
@@ -340,13 +338,11 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     /// Invalidiert UsedArea und löst das Ereignis Changed aus
     /// </summary>
     public override void OnChanged() {
-        //if (this is IParseable O && O.IsParsing) { Develop.DebugPrint(enFehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
         _usedArea = default;
         base.OnChanged();
     }
 
     public void Parse(List<KeyValuePair<string, string>> toParse) {
-        IsParsing = true;
         foreach (var pair in toParse) {
             if (!ParseThis(pair.Key, pair.Value)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
@@ -354,7 +350,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         }
 
         ParseFinished();
-        IsParsing = false;
     }
 
     public override void Parse(string toParse) => Parse(toParse.GetAllTags());

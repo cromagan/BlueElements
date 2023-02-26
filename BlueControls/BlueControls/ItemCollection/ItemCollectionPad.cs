@@ -300,13 +300,8 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         get => _sheetStyle;
         set {
             if (_sheetStyle == value) { return; }
-            //        if (!_isParsing && value == SheetStyle) { return; }
-            //if (Skin.StyleDB == null) { Skin.InitStyles(); }
-            // /       Item.SheetStyle = Skin.StyleDB.Row[value];
-            //   if (Item.SheetStyle == null) { Item.SheetStyle = Skin.StyleDB.Row.First(); }// Einfach die Erste nehmen
             _sheetStyle = value;
             ApplyDesignToItems();
-            //RepairAll(0, false);
             OnChanged();
         }
     }

@@ -146,7 +146,6 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     }
 
     public bool IsDisposed { get; private set; }
-    public bool IsParsing { get; private set; }
     public string KeyName { get; private set; }
     public ReadOnlyCollection<string> SearchValue { get; private set; }
 
@@ -205,12 +204,10 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
     public void OnChanged() {
-        if (IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
         Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void Parse(string toParse) {
-        IsParsing = true;
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "identifier":
@@ -264,8 +261,6 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             }
         }
         if (toParse.Contains(", Value=}") || toParse.Contains(", Value=,")) { _ = SearchValue.AddIfNotExists(""); }
-
-        IsParsing = false;
     }
 
     public string ReadableText() {

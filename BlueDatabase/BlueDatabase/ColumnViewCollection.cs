@@ -63,8 +63,6 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
     public DatabaseAbstract? Database { get; private set; }
 
     public bool IsDisposed { get; private set; }
-    public bool IsParsing { get; private set; }
-
     public string KeyName => _name;
 
     public string Name {
@@ -182,13 +180,10 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
     }
 
     public void OnChanged() {
-        if (IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
         Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void Parse(string toParse) {
-        IsParsing = true;
-
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "name":
@@ -208,8 +203,6 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
                     break;
             }
         }
-
-        IsParsing = false;
     }
 
     public ColumnItem? PreviousVisible(ColumnItem? column) {

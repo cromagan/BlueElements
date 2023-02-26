@@ -68,8 +68,6 @@ public sealed class RowSortDefinition : IParseable {
 
     #region Properties
 
-    public bool IsParsing { get; private set; }
-
     public bool Reverse { get; private set; }
 
     #endregion
@@ -77,12 +75,10 @@ public sealed class RowSortDefinition : IParseable {
     #region Methods
 
     public void OnChanged() {
-        if (IsParsing) { Develop.DebugPrint(FehlerArt.Warnung, "Falscher Parsing Zugriff!"); return; }
         Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void Parse(string toParse) {
-        IsParsing = true;
         Initialize();
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
@@ -109,7 +105,6 @@ public sealed class RowSortDefinition : IParseable {
                     break;
             }
         }
-        IsParsing = false;
     }
 
     public override string ToString() {

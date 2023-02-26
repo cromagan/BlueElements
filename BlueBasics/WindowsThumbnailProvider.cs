@@ -179,7 +179,7 @@ public class WindowsThumbnailProvider {
         var shellItem2Guid = new Guid(IShellItem2Guid);
         var retCode = SHCreateItemFromParsingName(fileName, IntPtr.Zero, ref shellItem2Guid, out var nativeShellItem);
 
-        if (retCode != 0) { throw Marshal.GetExceptionForHR(retCode); }
+        if (retCode != 0) { return null; }
 
         var nativeSize = new NativeSize {
             Width = width,

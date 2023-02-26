@@ -486,7 +486,6 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     public abstract DoItFeedback GetValueFrom(Variable variable, LogData ld);
 
     public override void Parse(string toParse) {
-        //IsParsing = true;
         //ThrowEvents = false;
         //PermissionGroups_Show.ThrowEvents = false;
         //Initialize();
@@ -530,7 +529,6 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         }
         //PermissionGroups_Show.ThrowEvents = true;
         //ThrowEvents = true;
-        //IsParsing = false;
     }
 
     public string ReplaceInText(string txt) {

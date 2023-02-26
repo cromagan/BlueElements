@@ -62,8 +62,6 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
 
     public bool IsDisposed { get; private set; }
 
-    public bool IsParsing { get; private set; }
-
     public string RowFilterText {
         get {
             var f = this[null];
@@ -175,8 +173,6 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     public void OnChanged() { Changed?.Invoke(this, System.EventArgs.Empty); }
 
     public void Parse(string toParse) {
-        IsParsing = true;
-
         // Initialize();
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
@@ -190,8 +186,6 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
                     break;
             }
         }
-
-        IsParsing = false;
     }
 
     public void Remove(ColumnItem? column) {
