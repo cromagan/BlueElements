@@ -203,9 +203,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
-    public void OnChanged() {
-        Changed?.Invoke(this, System.EventArgs.Empty);
-    }
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void Parse(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {

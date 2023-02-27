@@ -138,18 +138,13 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     }
 
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
-    public void Dispose() {
+    public void Dispose() =>
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
-        Dispose(true);
-        // TODO: Auskommentierung der folgenden Zeile aufheben, wenn der Finalizer weiter oben überschrieben wird.
-        //GC.SuppressFinalize(this);
-    }
+        Dispose(true);// TODO: Auskommentierung der folgenden Zeile aufheben, wenn der Finalizer weiter oben überschrieben wird.//GC.SuppressFinalize(this);
 
-    void IDisposable.Dispose() {
+    void IDisposable.Dispose() =>
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(disposing: true);
-        //GC.SuppressFinalize(this);
-    }
+        Dispose(disposing: true);//GC.SuppressFinalize(this);
 
     public bool Exists(FilterItem filterItem) {
         foreach (var thisFilter in this) {
@@ -170,7 +165,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
 
     public bool MayHasRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
 
-    public void OnChanged() { Changed?.Invoke(this, System.EventArgs.Empty); }
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void Parse(string toParse) {
         // Initialize();
@@ -282,9 +277,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         }
     }
 
-    private void Filter_Changed(object sender, System.EventArgs e) {
-        OnChanged();
-    }
+    private void Filter_Changed(object sender, System.EventArgs e) => OnChanged();
 
     #endregion
 }

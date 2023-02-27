@@ -179,9 +179,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
 
     private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
 
-    private void _Database_Disposing(object sender, System.EventArgs e) {
-        DoFormulaDatabaseAndRow(ConnectedFormula, null, -1, Page);
-    }
+    private void _Database_Disposing(object sender, System.EventArgs e) => DoFormulaDatabaseAndRow(ConnectedFormula, null, -1, Page);
 
     private void DoFormulaDatabaseAndRow(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database, long rowKey, string page) {
         if (IsDisposed) { return; }

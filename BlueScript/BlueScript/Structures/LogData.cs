@@ -53,9 +53,7 @@ public class LogData {
 
     #region Methods
 
-    public void AddMessage(string errormessage) {
-        Protocol?.Add("[" + Subname + ", Zeile: " + Line + "]@" + errormessage);
-    }
+    public void AddMessage(string errormessage) => Protocol?.Add("[" + Subname + ", Zeile: " + Line + "]@" + errormessage);
 
     public void LineAdd(int c) {
         if (c < 0) {

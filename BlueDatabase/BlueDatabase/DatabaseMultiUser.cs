@@ -358,9 +358,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         }
     }
 
-    private void ToListOfByte(object sender, MultiUserToListEventArgs e) {
-        e.Data = Database.ToListOfByte(this, Works)?.ToArray();
-    }
+    private void ToListOfByte(object sender, MultiUserToListEventArgs e) => e.Data = Database.ToListOfByte(this, Works)?.ToArray();
 
     #endregion
 }

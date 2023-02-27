@@ -73,6 +73,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private BlueFont? _columnFilterFont;
     private BlueFont? _columnFont;
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
+    private FilterCollection? _filter;
     private List<RowItem>? _filteredRows;
     private int? _headSize;
 
@@ -222,12 +223,39 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public bool DropMessages { get; set; }
 
-    public FilterCollection? Filter { get; private set; }
+    public FilterCollection? Filter {
+        get {
+            if (Database == null || Database.IsDisposed) { return null; }
+            if (_filter == null) { Filter = new FilterCollection(Database); }
+            return _filter;
+        }
+        private set {
+            if (value == null && _filter == null) { return; }
+
+            if ((value == null && _filter != null) ||
+                (_filter == null && value != null) ||
+                (value!.ToString(true) != _filter!.ToString(true))) {
+                if (_filter != null) {
+                    _filter.Changed -= Filter_Changed;
+                    _filter.CollectionChanged -= Filter_CollectionChanged;
+                }
+
+                _filter = value;
+
+                if (_filter != null) {
+                    _filter.Changed += Filter_Changed;
+                    _filter.CollectionChanged += Filter_CollectionChanged;
+                }
+
+                OnFilterChanged();
+            }
+        }
+    }
 
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
-    public List<RowItem?>? PinnedRows { get; } = new();
+    public List<RowItem> PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
         //private get => _database?.PowerEdit;
@@ -414,11 +442,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         row.Database?.AddBackgroundWork(row);
     }
 
-    /// <summary>
-    /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
-    /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
-    /// </summary>
-
     public static void Draw_FormatedText(Graphics gr, string text, ColumnItem? column, Rectangle fitInRect, Design design, States state, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         if (string.IsNullOrEmpty(text)) { return; }
         var d = Skin.DesignOf(design, state);
@@ -426,6 +449,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Draw_CellTransparentDirect(gr, text, fitInRect, d.BFont, column, 16, style, bildTextverhalten, state);
     }
 
+    /// <summary>
+    /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
+    /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
+    /// </summary>
     public static Size FormatedText_NeededSize(ColumnItem? column, string originalText, BlueFont? font, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten) {
         var (s, quickImage) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
         return Skin.FormatedText_NeededSize(s, quickImage, font, minSize);
@@ -439,10 +466,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _ = x.ShowDialog();
         x?.Dispose();
     }
-
-    //        newFiles.GenerateAndAdd(neu);
-    //        delList.GenerateAndAdd(thisf);
-    //    }
 
     public static void SearchNextText(string searchTxt, Table tableView, ColumnItem? column, RowData? row, out ColumnItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
         searchTxt = searchTxt.Trim();
@@ -512,6 +535,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         } while (true);
     }
 
+    //        newFiles.GenerateAndAdd(neu);
+    //        delList.GenerateAndAdd(thisf);
+    //    }
     public static ItemCollectionList UndoItems(DatabaseAbstract db, string cellkey) {
         ItemCollectionList i = new(BlueListBoxAppearance.KontextMenu, false) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
@@ -589,12 +615,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void CheckView() {
-        if (Filter == null) {
-            Filter = new FilterCollection(Database, string.Empty);
-            Filter.Changed += Filter_Changed;
-            OnFilterChanged();
-        }
-
         if (_arrangementNr != 1) {
             if (Database?.ColumnArrangements == null || _arrangementNr >= Database.ColumnArrangements.Count || CurrentArrangement == null || !Database.PermissionCheck(CurrentArrangement.PermissionGroups_Show, null)) {
                 _arrangementNr = 1;
@@ -871,11 +891,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Database.Export_HTML(filename, CurrentArrangement, SortedRows(), execute);
     }
 
-    /// <summary>
-    /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
-    /// </summary>
-    /// <returns></returns>
-
     public List<RowItem> FilteredRows() {
         if (_filteredRows != null) { return _filteredRows; }
         if (Database == null || Database.IsDisposed) { return new List<RowItem>(); }
@@ -883,6 +898,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return _filteredRows;
     }
 
+    /// <summary>
+    /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
+    /// </summary>
+    /// <returns></returns>
     public new void Focus() {
         if (Focused()) { return; }
         _ = base.Focus();
@@ -983,12 +1002,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void ResetView() {
-        if (Filter != null) {
-            Filter.Changed -= Filter_Changed;
-            Filter = null;
-            OnFilterChanged();
-        }
-        PinnedRows.Clear();
+        Filter = null;
+
+        PinnedRows?.Clear();
         _collapsed.Clear();
 
         _mouseOverText = string.Empty;
@@ -1835,14 +1851,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    private void _Database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);
+
     //private void _Database_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
     //    // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
     //    if (string.IsNullOrEmpty(_StoredView)) { return; }
     //    _StoredView = ColumnCollection.ChangeKeysInString(_StoredView, e.KeyOld, e.KeyNew);
     //}
-
-    private void _Database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);
-
     private void _Database_ProgressbarInfo(object sender, ProgressbarEventArgs e) {
         if (e.Ends) {
             _pg?.Close();
@@ -1997,24 +2012,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Develop.Debugprint_BackgroundThread();
     }
 
-    //private bool Autofilter_Sinnvoll(ColumnItem? column) {
-    //    if (column.TmpAutoFilterSinnvoll != null) { return (bool)column.TmpAutoFilterSinnvoll; }
-    //    for (var rowcount = 0; rowcount <= SortedRows().Count - 2; rowcount++) {
-    //        if (SortedRows()[rowcount]?.Row.CellGetString(column) != SortedRows()[rowcount + 1]?.Row.CellGetString(column)) {
-    //            column.TmpAutoFilterSinnvoll = true;
-    //            return true;
-    //        }
-    //    }
-    //    column.TmpAutoFilterSinnvoll = false;
-    //    return false;
-    //}
-
-    /// <summary>
-    /// Gibt die Anzahl der SICHTBAREN Zeilen zurück, die mehr angezeigt werden würden, wenn dieser Filter deaktiviert wäre.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <returns></returns>
-
     private int Autofilter_Text(ColumnItem? column) {
         if (column.TmpIfFilterRemoved != null) { return (int)column.TmpIfFilterRemoved; }
         var tfilter = new FilterCollection(column.Database);
@@ -2026,11 +2023,27 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return (int)column.TmpIfFilterRemoved;
     }
 
+    /// <summary>
+    /// Gibt die Anzahl der SICHTBAREN Zeilen zurück, die mehr angezeigt werden würden, wenn dieser Filter deaktiviert wäre.
+    /// </summary>
+    /// <param name="column"></param>
+    /// <returns></returns>
     private void BB_Enter(object sender, System.EventArgs e) {
         if (((TextBox)sender).MultiLine) { return; }
         CloseAllComponents();
     }
 
+    //private bool Autofilter_Sinnvoll(ColumnItem? column) {
+    //    if (column.TmpAutoFilterSinnvoll != null) { return (bool)column.TmpAutoFilterSinnvoll; }
+    //    for (var rowcount = 0; rowcount <= SortedRows().Count - 2; rowcount++) {
+    //        if (SortedRows()[rowcount]?.Row.CellGetString(column) != SortedRows()[rowcount + 1]?.Row.CellGetString(column)) {
+    //            column.TmpAutoFilterSinnvoll = true;
+    //            return true;
+    //        }
+    //    }
+    //    column.TmpAutoFilterSinnvoll = false;
+    //    return false;
+    //}
     private void BB_ESC(object sender, System.EventArgs e) {
         BTB.Tag = null;
         BTB.Visible = false;
@@ -2294,17 +2307,16 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return true;
     }
 
-    //private void Cell_Edit_FileSystem(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow) {
-    //    var l = FileSystem(cellInThisDatabaseColumn);
-    //    if (l == null) { return; }
-    //    UserEdited(this, l.JoinWithCr(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cellInThisDatabaseRow?.Chapter, false);
-    //}
-
     private void CellOnCoordinate(int xpos, int ypos, out ColumnItem? column, out RowData? row) {
         column = ColumnOnCoordinate(xpos);
         row = RowOnCoordinate(ypos);
     }
 
+    //private void Cell_Edit_FileSystem(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow) {
+    //    var l = FileSystem(cellInThisDatabaseColumn);
+    //    if (l == null) { return; }
+    //    UserEdited(this, l.JoinWithCr(), cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, cellInThisDatabaseRow?.Chapter, false);
+    //}
     private void CloseAllComponents() {
         if (InvokeRequired) {
             _ = Invoke(new Action(CloseAllComponents));
@@ -2439,17 +2451,16 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return true;
     }
 
-    /// <summary>
-    /// Setzt die Variable CursorPos um X Columns und Y Reihen um. Dabei wird die Columns und Zeilensortierung berücksichtigt.
-    /// </summary>
-    /// <remarks></remarks>
-
     private void Cursor_Move(Direction richtung) {
         if (Database == null || Database.IsDisposed) { return; }
         Neighbour(CursorPosColumn, CursorPosRow, richtung, out var newCol, out var newRow);
         CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
     }
 
+    /// <summary>
+    /// Setzt die Variable CursorPos um X Columns und Y Reihen um. Dabei wird die Columns und Zeilensortierung berücksichtigt.
+    /// </summary>
+    /// <remarks></remarks>
     private void CursorPos_Set(ColumnItem? column, RowItem? row, bool ensureVisible, string chapter) => CursorPos_Set(column, SortedRows().Get(row, chapter), ensureVisible);
 
     private Rectangle DisplayRectangleWithoutSlider() => _design == BlueTableAppearance.Standard
@@ -2827,14 +2838,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_Border(gr, Enums.Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle);
     }
 
+    private int DrawY(RowData? r) => r == null ? 0 : r.Y + HeadSize() - (int)SliderY.Value;
+
     /// <summary>
     /// Berechent die Y-Position auf dem aktuellen Controll
     /// </summary>
     /// <param name="r"></param>
     /// <returns></returns>
-
-    private int DrawY(RowData? r) => r == null ? 0 : r.Y + HeadSize() - (int)SliderY.Value;
-
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         FloatingForm.Close(this);
         if (string.IsNullOrEmpty(e.ClickedComand)) { return; }
@@ -2911,6 +2921,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Filter_Changed(object sender, System.EventArgs e) {
+        Invalidate_FilteredRows();
+        OnFilterChanged();
+    }
+
+    private void Filter_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
         Invalidate_FilteredRows();
         OnFilterChanged();
     }
@@ -3062,8 +3077,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                     case "filters":
                         Filter = new FilterCollection(Database, pair.Value);
-                        Filter.Changed += Filter_Changed;
-                        OnFilterChanged();
                         break;
 
                     case "sliderx":

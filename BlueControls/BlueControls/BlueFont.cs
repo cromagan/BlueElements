@@ -519,10 +519,9 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName {
         return txt;
     }
 
-    private static void SetTextRenderingHint(Graphics gr, Font font) {
+    private static void SetTextRenderingHint(Graphics gr, Font font) =>
         //http://csharphelper.com/blog/2014/09/understand-font-aliasing-issues-in-c/
         gr.TextRenderingHint = font.Size < 11 ? TextRenderingHint.ClearTypeGridFit : TextRenderingHint.AntiAlias;
-    }
 
     private static string ToString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool vKapitälchen, bool vonlyuppe, bool vonlylower) {
         var c = "{Name=" + fontName + ", Size=" + fontSize.ToString(CultureInfo.InvariantCulture).ToNonCritical();

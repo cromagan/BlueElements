@@ -788,9 +788,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         OnChanged();
     }
 
-    protected virtual void OnItemRemoving(BasicPadItem item) {
-        ItemRemoving?.Invoke(this, new ListEventArgs(item));
-    }
+    protected virtual void OnItemRemoving(BasicPadItem item) => ItemRemoving?.Invoke(this, new ListEventArgs(item));
 
     private void ApplyDesignToItems() {
         foreach (var thisItem in this) {

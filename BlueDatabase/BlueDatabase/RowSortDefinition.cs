@@ -74,9 +74,7 @@ public sealed class RowSortDefinition : IParseable {
 
     #region Methods
 
-    public void OnChanged() {
-        Changed?.Invoke(this, System.EventArgs.Empty);
-    }
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void Parse(string toParse) {
         Initialize();

@@ -549,7 +549,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     protected abstract void ParseFinished();
 
-    private void ConnectsTo_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+    private void ConnectsTo_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
                 if (thisit is ItemConnection x) {
@@ -575,7 +575,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 
-    private void MovablePoint_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+    private void MovablePoint_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
                 if (thisit is PointM p) {

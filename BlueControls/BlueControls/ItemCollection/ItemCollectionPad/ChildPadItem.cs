@@ -363,9 +363,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     //    return null;
     //}
 
-    private void _Pad_DoInvalidate(object sender, System.EventArgs e) {
-        OnChanged();
-    }
+    private void _Pad_DoInvalidate(object sender, System.EventArgs e) => OnChanged();
 
     private void RemovePic() {
         if (_tmpBmp != null) {

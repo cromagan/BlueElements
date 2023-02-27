@@ -118,9 +118,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
 
     public object Clone() => new ColumnViewCollection(Database, ToString());
 
-    public void Dispose() {
-        Dispose(true);
-    }
+    public void Dispose() => Dispose(true);
 
     public void Hide(string columnName) {
         foreach (var thisViewItem in this) {
@@ -179,9 +177,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         } while (true);
     }
 
-    public void OnChanged() {
-        Changed?.Invoke(this, System.EventArgs.Empty);
-    }
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void Parse(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {

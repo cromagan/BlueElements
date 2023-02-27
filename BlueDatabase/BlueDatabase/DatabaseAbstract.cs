@@ -586,9 +586,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return null;
     }
 
-    public void AddBackgroundWork(RowItem row) {
-        _pendingworks.AddIfNotExists(row.Key);
-    }
+    public void AddBackgroundWork(RowItem row) => _pendingworks.AddIfNotExists(row.Key);
 
     /// <summary>
     /// Der komplette Pfad mit abschließenden \
@@ -920,6 +918,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             vars.Add(new VariableString("Usergroup", UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
             vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             vars.Add(new VariableDatabase("Database", this, true, true, "Die Datenbank, die zu dem Skript gehört"));
+            vars.Add(new VariableString("Tablename", TableName, true, false, "Der aktuelle Tabellenname."));
+            vars.Add(new VariableString("NameOfFirstColumn", Column.First?.Name ?? string.Empty, true, false, "Der Name der ersten Spalte"));
             vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(EventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
             if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
                 vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
@@ -1472,9 +1472,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public abstract bool Save();
 
-    public void SetReadOnly() {
-        ReadOnly = true;
-    }
+    public void SetReadOnly() => ReadOnly = true;
 
     public override string ToString() => base.ToString() + " " + TableName;
 
@@ -1904,9 +1902,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         _ = r.ExecuteScript(EventTypes.value_changed_extra_thread, string.Empty, false, false, false, 5);
     }
 
-    private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) {
-        _pendingworker.Remove((BackgroundWorker)sender);
-    }
+    private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => _pendingworker.Remove((BackgroundWorker)sender);
 
     //private void ConvertRules(string scriptText) {
     //    //var eves = EventScript.CloneWithClones();

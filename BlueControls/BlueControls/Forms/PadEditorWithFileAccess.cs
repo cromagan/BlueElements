@@ -80,9 +80,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => SaveTab.ShowDialog();
 
-    private void LoadTab_FileOk(object sender, CancelEventArgs e) {
-        LoadFile(LoadTab.FileName, string.Empty);
-    }
+    private void LoadTab_FileOk(object sender, CancelEventArgs e) => LoadFile(LoadTab.FileName, string.Empty);
 
     private void SaveTab_FileOk(object sender, CancelEventArgs e) {
         if (Pad?.Item == null) { return; }

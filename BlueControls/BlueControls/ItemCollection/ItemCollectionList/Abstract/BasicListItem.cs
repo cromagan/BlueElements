@@ -196,9 +196,7 @@ public abstract class BasicListItem : IComparable, ICloneable, IHasKeyName, ICha
     /// <summary>
     /// Vereinfacung für Null Conditional Operator.
     /// </summary>
-    public void Disable() {
-        Enabled = false;
-    }
+    public void Disable() => Enabled = false;
 
     public void Draw(Graphics gr, int xModifier, int yModifier, Design controldesign, Design itemdesign, States vState, bool drawBorderAndBack, string filterText, bool translate) {
         //if (Parent == null) { Develop.DebugPrint(FehlerArt.Fehler, "Parent nicht definiert"); }

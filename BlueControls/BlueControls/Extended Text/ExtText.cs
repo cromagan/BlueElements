@@ -360,9 +360,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         return _width < 5 || _height < 5 || _height == null ? new Size(32, 16) : new Size((int)_width, (int)_height);
     }
 
-    public void OnChanged() {
-        Changed?.Invoke(this, System.EventArgs.Empty);
-    }
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void StufeÄndern(int first, int last, int stufe) {
         for (var cc = first; cc <= Math.Min(last, Count - 1); cc++) {

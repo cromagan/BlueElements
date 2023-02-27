@@ -218,10 +218,9 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         return base.SetValueInternal(type, value, columnName, rowkey, isLoading);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
+    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) =>
         //var ck = Column.Exists(columnName)?.Key ?? -1;
         _ = _sql.AddUndo(tableName, comand, columnName, rowKey, previousValue, changedTo, UserName, comment);
-    }
 
     protected override void SetUserDidSomething() { }
 
