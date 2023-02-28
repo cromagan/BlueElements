@@ -61,7 +61,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private readonly List<BackgroundWorker> _pendingworker = new();
     private readonly List<long> _pendingworks = new();
     private readonly List<string> _permissionGroupsNewRow = new();
-    private readonly long _startTick = DateTime.UtcNow.Ticks;
     private readonly List<string> _tags = new();
     private readonly List<VariableString> _variables = new();
     private string _additionalFilesPfad = string.Empty;
@@ -74,7 +73,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private string _eventScriptTmp = string.Empty;
     private double _globalScale;
     private string _globalShowPass = string.Empty;
-    private DateTime _lastUserActionUtc = new(1900, 1, 1);
     private string _scripterror = string.Empty;
     private RowSortDefinition? _sortDefinition;
 
@@ -86,6 +84,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     //private string _timeCode = string.Empty;
     private int _undoCount;
 
+    private string _variableTmp = string.Empty;
     private string _zeilenQuickInfo = string.Empty;
 
     #endregion
@@ -351,8 +350,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public ReadOnlyCollection<VariableString> Variables {
         get => new(_variables);
         set {
-            if (_variables.ToString(true) == value.ToString(true)) { return; }
-            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variables.ToString(true), value.ToString(true), string.Empty);
+            if (_variableTmp == value.ToString(true)) { return; }
+            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, value.ToString(true), string.Empty);
             OnViewChanged();
         }
     }
@@ -888,9 +887,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public ScriptEndedFeedback ExecuteScript(EventScript s, bool changevalues, RowItem? row) {
-        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false); }
+        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, s.Name); }
 
-        if (!string.IsNullOrEmpty(_scripterror)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + _scripterror, false); }
+        if (!string.IsNullOrEmpty(_scripterror)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + _scripterror, false, "Allgemein"); }
 
         try {
 
@@ -983,16 +982,16 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
         try {
-            if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false); }
+            if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, "Allgemein"); }
 
             #region Script ermitteln
 
             if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
-                return new ScriptEndedFeedback("Event und Skript angekommen!", false);
+                return new ScriptEndedFeedback("Event und Skript angekommen!", false, "Allgemein");
             }
 
-            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false); }
+            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, "Allgemein"); }
 
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
                 foreach (var thisEvent in EventScript) {
@@ -1003,13 +1002,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 }
             }
 
-            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Skriptname nicht gefunden", false); }
+            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Kein Skriptname angekommen", false, "Allgemein"); }
 
             var script = EventScript.Get(scriptname);
 
-            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false); }
+            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, scriptname); }
 
-            if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false); }
+            if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, scriptname); }
 
             if (!script.NeedRow) { row = null; }
 
@@ -1479,13 +1478,19 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public abstract string UndoText(ColumnItem? column, RowItem? row);
 
     public void WriteBackDbVariables(List<Variable> vars) {
-        foreach (var thisvar in Variables) {
+        var vaa = new List<VariableString>();
+        vaa.AddRange(Variables);
+
+        foreach (var thisvar in vaa) {
             var v = vars.Get("DB_" + thisvar.Name);
 
             if (v is VariableString vs) {
+                thisvar.ReadOnly = false; // weil kein OnChanged vorhanden ist
                 thisvar.ValueString = vs.ValueString;
+                thisvar.ReadOnly = true; // weil kein OnChanged vorhanden ist
             }
         }
+        Variables = new ReadOnlyCollection<VariableString>(vaa);
     }
 
     internal void DevelopWarnung(string t) {
@@ -1697,11 +1702,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 break;
 
             case DatabaseDataType.DatabaseVariables:
+                _variableTmp = value;
                 _variables.Clear();
                 List<string> va = new(value.SplitAndCutByCr());
                 foreach (var t in va) {
                     var l = new VariableString("dummy");
                     l.Parse(t);
+                    l.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
                     _variables.Add(l);
                 }
                 break;
@@ -1784,32 +1791,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
         // TODO: große Felder auf Null setzen.
-        //ColumnArrangements.Changed -= ColumnArrangements_ListOrItemChanged;
-        //Layouts.Changed -= Layouts_ListOrItemChanged;
-        //Layouts.ItemSeted -= Layouts_ItemSeted;
-        //PermissionGroupsNewRow.Changed -= PermissionGroups_NewRow_ListOrItemChanged;
-        //Tags.Changed -= DatabaseTags_ListOrItemChanged;
-        //Export.Changed -= Export_ListOrItemChanged;
-        //DatenbankAdmin.Changed -= DatabaseAdmin_ListOrItemChanged;
 
-        //Row?.RowRemoving -= Row_RowRemoving;
-        ////Row?.RowRemoved -= Row_RowRemoved;
-        //Row?.RowAdded -= Row_RowAdded;
-
-        //Column.ItemRemoving -= Column_ItemRemoving;
-        //Column.ItemRemoved -= Column_ItemRemoved;
-        //Column.ItemAdded -= Column_ItemAdded;
         Column.Dispose();
         //Cell?.Dispose();
         Row.Dispose();
 
-        //_columnArrangements?.Dispose();
-        //_cags?.Dispose();
-        //_export?.Dispose();
-        //_datenbankAdmin?.Dispose();
-        //_permissionGroupsNewRow?.Dispose();
         _layouts.Clear();
-        //_layouts = null;
     }
 
     protected virtual void Initialize() {
@@ -1825,10 +1812,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
         _undoCount = 300;
         _caption = string.Empty;
-        //_timeCode = string.Empty;
-        //_verwaisteDaten = VerwaisteDaten.Ignorieren;
         LoadedVersion = DatabaseVersion;
-        //_rulesScript = string.Empty;
         _globalScale = 1f;
         _additionalFilesPfad = "AdditionalFiles";
         _zeilenQuickInfo = string.Empty;
@@ -1848,9 +1832,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         Loading?.Invoke(this, System.EventArgs.Empty);
     }
 
-    protected virtual void SetUserDidSomething() => _lastUserActionUtc = DateTime.UtcNow;
-
-    //protected abstract string SpecialErrorReason(ErrorReason mode);
     private void Checker_Tick(object state) {
         if (IsDisposed) { return; }
         if (ReadOnly) { return; }
@@ -1876,18 +1857,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     private void OnDisposing() => Disposing?.Invoke(this, System.EventArgs.Empty);
 
-    //    var l2 = new EventScript(this) {
-    //        NeedRow = true,
-    //        ManualExecutable = true,
-    //        Script = "//ACHTUNG: Keinesfalls dürfen startroutinenabhängig Werte verändert werden.\r\n" +
-    //                 "var Startroutine = \"manual check\";\r\n" +
-    //                 "Call(\"DatenueberpruefungIntern\", false);",
-    //        Name = "Datenüberprüfung"
-    //    };
-    //    _eventScript.Add(l2);
-    //private void Column_ItemRemoved(object sender, System.EventArgs e) {
-    //    //if (IsLoadingx) { Develop.DebugPrint(FehlerArt.Warnung, "Loading Falsch!"); }
-    //    CheckViewsAndArrangements();
     private void OnSortParameterChanged() {
         if (IsDisposed) { return; }
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
@@ -1904,19 +1873,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => _pendingworker.Remove((BackgroundWorker)sender);
 
-    //private void ConvertRules(string scriptText) {
-    //    //var eves = EventScript.CloneWithClones();
-    //    var l1 = new EventScript(this) {
-    //        NeedRow = true,
-    //        ManualExecutable = false,
-    //        Script = scriptText,
-    //        Name = "DatenueberpruefungIntern"
-    //    };
-    //    _eventScript.Add(l1);
-    //private void Column_ItemAdded(object sender, ListEventArgs e) {
-    //    if (IsLoadingx) { return; }
-    //    CheckViewsAndArrangements();
-    //}
     private bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
         var tmpName = UserName.ToUpper();
         var tmpGroup = UserGroup.ToUpper();

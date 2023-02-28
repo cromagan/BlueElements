@@ -238,8 +238,6 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         Works?.Clear();
     }
 
-    protected override void SetUserDidSomething() => _muf.SetUserDidSomething();
-
     private void _muf_HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) => e.HasPendingChanges = HasPendingChanges;
 
     //protected string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);

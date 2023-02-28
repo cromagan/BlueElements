@@ -68,8 +68,6 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     private string _lastSaveCode;
 
-    private DateTime _lastUserActionUtc = new(1900, 1, 1);
-
     //private int _loadingThreadId = -1;
 
     //private static string _lockLastastfile = string.Empty;
@@ -271,7 +269,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
 
         if (mode == Enums.ErrorReason.Load) {
-            if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
             return string.Empty;
         }
@@ -308,7 +306,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         //---------- Save ------------------------------------------------------------------------------------------
         if (mode.HasFlag(Enums.ErrorReason.Save)) {
             if (IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
-            if (DateTime.UtcNow.Subtract(_lastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
             if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
             if (CheckForLastError(ref _canWriteNextCheckUtc, ref _canWriteError) && !string.IsNullOrEmpty(_canWriteError)) {
@@ -519,8 +517,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         CreateWatcher();
     }
 
-    public void SetUserDidSomething() => _lastUserActionUtc = DateTime.UtcNow;
-
     public void UnlockHard() {
         try {
             _ = Load_Reload();
@@ -594,17 +590,9 @@ public sealed class MultiUserFile : IDisposableExtended {
 
         // Zeiten berechnen
         ReloadDelaySecond = Math.Max(ReloadDelaySecond, 10);
-        var countBackUp = Math.Min((ReloadDelaySecond / 10f) + 1, 10); // Soviele Sekunden können vergehen, bevor Backups gemacht werden. Der Wert muss kleiner sein, als Count_Save
-        var countSave = (countBackUp * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
-
-        //if (_checkerTickCount > countSave && mustSave) { CancelBackGroundWorker(); }
+        var countSave = (Math.Min((ReloadDelaySecond / 10f) + 1, 10) * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
 
         var mustReload = ReloadNeeded;
-
-        //if (_checkerTickCount > ReloadDelaySecond && mustReload) { CancelBackGroundWorker(); }
-        //if (_backgroundWorker.IsBusy) { return; }
-
-        //if (string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditNormaly))) { return; }
 
         if (mustReload && mustSave) {
             if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Load))) { return; }
@@ -619,14 +607,6 @@ public sealed class MultiUserFile : IDisposableExtended {
             _checkerTickCount = 0;
             return;
         }
-
-        //if (mustBackup && !mustReload && !mustSave && _checkerTickCount >= countBackUp && string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditAcut))) {
-        //    var nowsek = (DateTime.UtcNow.Ticks - _startTick) / 30000000;
-        //    if (nowsek % 20 != 0) { return; } // Lasten startabhängig verteilen. Bei Pending changes ist es eh immer true;
-
-        //    StartBackgroundWorker();
-        //    return;
-        //}
 
         // Überhaupt nix besonderes. Ab und zu mal Reloaden
         if (mustReload && _checkerTickCount > ReloadDelaySecond) {
@@ -960,7 +940,7 @@ public sealed class MultiUserFile : IDisposableExtended {
                 // Also, im NICHT-parallelen Prozess ist explizit der Save angestoßen worden.
                 // Somit sollte des Prgramm auf Warteschleife sein und keine Benutzereingabe mehr kommen.
                 // Problem: Wenn die ganze Save-Routine in einem Parallelen-Thread ist
-                _lastUserActionUtc = new DateTime(1900, 1, 1);
+                Develop.LastUserActionUtc = new DateTime(1900, 1, 1);
             }
             var f = ErrorReason(Enums.ErrorReason.Save);
             if (!string.IsNullOrEmpty(f)) { _doingTempFile = false; return (string.Empty, string.Empty, null); }

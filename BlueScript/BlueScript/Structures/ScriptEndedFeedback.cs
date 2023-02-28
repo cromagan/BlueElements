@@ -41,11 +41,12 @@ public class ScriptEndedFeedback {
     /// </summary>
     /// <param name="errormessage"></param>
     /// <param name="giveitanothertry"></param>
-    public ScriptEndedFeedback(string errormessage, bool giveitanothertry) {
+    public ScriptEndedFeedback(string errormessage, bool giveitanothertry, string scriptname) {
         Variables = null;
+
         GiveItAnotherTry = giveitanothertry;
         Protocol = new List<string> {
-            errormessage
+           "[" + scriptname + ", Start abgebrochen]@" + errormessage
         };
 
         ProtocolText = GenNiceProtokoll(Protocol);

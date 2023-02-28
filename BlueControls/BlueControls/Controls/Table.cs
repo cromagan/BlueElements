@@ -1099,7 +1099,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             #endregion
 
-            _ = EnsureVisible(CursorPosColumn, CursorPosRow);
+            //         _ = EnsureVisible(CursorPosColumn, CursorPosRow);
+            // EnsureVisible macht probleme, wenn mit der Maus auf ein linked Cell gezogen wird und eine andere Cell
+            //markiert ist. Dann wird sortiren angestoßen, und der Cursor zurück gesprungen
+
             OnVisibleRowsChanged();
 
             return SortedRows(); // Rekursiver aufruf. Manchmal funktiniert OnRowsSorted nicht...

@@ -220,11 +220,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) =>
         //var ck = Column.Exists(columnName)?.Key ?? -1;
-        _ = _sql.AddUndo(tableName, comand, columnName, rowKey, previousValue, changedTo, UserName, comment);
-
-    protected override void SetUserDidSomething() { }
-
-    //protected override string SpecialErrorReason(ErrorReason mode) => string.Empty;
+        _ = _sql?.AddUndo(tableName, comand, columnName, rowKey, previousValue, changedTo, UserName, comment);
 
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }

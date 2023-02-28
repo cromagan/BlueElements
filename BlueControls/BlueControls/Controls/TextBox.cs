@@ -792,7 +792,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// <summary>
     /// Löst das Ereignis aus und setzt _LastUserChangingTime auf NULL.
     /// </summary>
-    protected virtual void OnTextChanged() => TextChanged?.Invoke(this, System.EventArgs.Empty);
+    protected virtual void OnTextChanged() {
+        Develop.SetUserDidSomething();
+        TextChanged?.Invoke(this, System.EventArgs.Empty);
+    }
 
     private void _eTxt_Changed(object sender, System.EventArgs e) => Invalidate();
 

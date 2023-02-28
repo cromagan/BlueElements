@@ -39,14 +39,24 @@ public static class Develop {
 
     #region Fields
 
+    public static DateTime LastUserActionUtc = new(1900, 1, 1);
+
     private static readonly DateTime ProgrammStarted = DateTime.Now;
+
     private static readonly object SyncLockObject = new();
+
     private static string _currentTraceLogFile = string.Empty;
+
     private static bool _deleteTraceLog = true;
+
     private static bool _isTraceLogging;
+
     private static string _lastDebugMessage = string.Empty;
+
     private static DateTime _lastDebugTime = DateTime.Now;
+
     private static DateTime _stopUhr = DateTime.Now;
+
     private static TextWriterTraceListener? _traceListener;
 
     #endregion
@@ -252,6 +262,8 @@ public static class Develop {
     public static bool IsHostRunning() => Debugger.IsAttached;
 
     public static bool IsRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
+
+    public static void SetUserDidSomething() => LastUserActionUtc = DateTime.UtcNow;
 
     public static void StartService() {
         if (ServiceStarted) { return; }

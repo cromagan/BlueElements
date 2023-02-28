@@ -374,12 +374,14 @@ public class GenericControl : Control {
     protected override void OnMouseUp(MouseEventArgs e) {
         if (IsDisposed) { return; }
         if (!_mousePressing) { return; }
+        Develop.SetUserDidSomething();
         _mousePressing = false;
         base.OnMouseUp(e);
     }
 
     protected override void OnMouseWheel(MouseEventArgs e) {
         if (IsDisposed) { return; }
+        Develop.SetUserDidSomething();
         _mousePressing = false;
         base.OnMouseWheel(e);
     }

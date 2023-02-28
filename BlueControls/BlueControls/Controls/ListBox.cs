@@ -69,6 +69,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Item = new ItemCollectionList(true);
         Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
         Item.CollectionChanged += Item_CollectionChanged;
+        Item.Changed += Item_Changed;
         _appearance = BlueListBoxAppearance.Listbox;
     }
 
@@ -436,6 +437,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     private void FilterTxt_TextChanged(object sender, System.EventArgs e) => Invalidate();
+
+    private void Item_Changed(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        Invalidate();
+    }
 
     private void Item_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (IsDisposed) { return; }

@@ -60,7 +60,11 @@ internal class Method_ImportCSV : Method_Database {
 
         var sx = db?.Import(txt, true, true, sep, false, false, true);
 
-        return new DoItFeedback(infos.Data, sx ?? "Datenbank nicht gefunden");
+        if (sx == null || string.IsNullOrEmpty(sx)) {
+            return DoItFeedback.Null();
+        }
+
+        return new DoItFeedback(infos.Data, sx);
     }
 
     #endregion

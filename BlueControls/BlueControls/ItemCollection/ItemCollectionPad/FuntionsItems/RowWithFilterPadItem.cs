@@ -64,6 +64,18 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         FilterDefiniton = GenerateFilterDatabase();
         FilterDefiniton.Cell.CellValueChanged += Cell_CellValueChanged;
+        FilterDefiniton.Row.RowRemoved += Row_RowRemoved;
+        FilterDefiniton.Row.RowAdded += Row_RowAdded;
+    }
+
+    private void Row_RowAdded(object sender, RowEventArgs e) {
+        RepairConnections();
+        OnChanged();
+    }
+
+    private void Row_RowRemoved(object sender, System.EventArgs e) {
+        RepairConnections();
+        OnChanged();
     }
 
     public RowWithFilterPadItem(string intern) : this(intern, null, 0) { }
@@ -296,6 +308,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
         if (disposing) {
             FilterDefiniton.Cell.CellValueChanged -= Cell_CellValueChanged;
+            FilterDefiniton.Row.RowRemoved -= Row_RowRemoved;
+            FilterDefiniton.Row.RowAdded -= Row_RowAdded;
         }
     }
 
@@ -329,7 +343,10 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     //    return null;
     //}
 
-    private void Cell_CellValueChanged(object sender, CellEventArgs e) => RepairConnections();
+    private void Cell_CellValueChanged(object sender, CellEventArgs e) {
+        RepairConnections();
+        OnChanged();
+    }
 
     private void FilterDatabaseUpdate() {
         if (FilterDefiniton == null) { return; }

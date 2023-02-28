@@ -73,7 +73,10 @@ public class VariableString : Variable {
     public string ValueString {
         get => _valueString;
         set {
-            if (ReadOnly) { return; }
+            if (ReadOnly) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Read Only Variable!"); // Wichtig für DatabaseVariables
+                return;
+            }
             _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
         }
     }

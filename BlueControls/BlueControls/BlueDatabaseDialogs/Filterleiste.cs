@@ -337,7 +337,6 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void DoÄhnlich() {
-        //_TableView.Database.Column.Count == 0 Ist eine nigelnagelneue Datenbank
         if (_tableView?.Database == null || _tableView.Database.Column.Count == 0) { return; }
 
         var col = _tableView.Database.Column.First;
@@ -379,6 +378,14 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             DoÄhnlich();
             return;
         }
+
+        var l = new List<ColumnItem>();
+        foreach (var thisCo in _tableView.Database.Column) {
+            if (thisCo.IsInCache == null && !thisCo.IgnoreAtRowFilter) { l.Add(thisCo); }
+        }
+
+        _tableView.Database.RefreshColumnsData(l);
+
         _tableView.Filter.RowFilterText = newF;
         DoÄhnlich();
     }
