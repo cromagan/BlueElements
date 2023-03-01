@@ -164,10 +164,12 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         #endregion Vorhandene Flexis ermitteln
 
+        var cu = _tableView?.CurrentArrangement;
+
         #region Neue Flexis erstellen / updaten
 
         if (_tableView?.Database != null && _tableView.Filter != null) {
-            List<ColumnItem?> columSort = new();
+            List<ColumnItem> columSort = new();
             ColumnViewCollection? orderArrangement = null;
             foreach (var thisArr in _tableView.Database.ColumnArrangements) {
                 if (string.Equals(thisArr.Name, AnsichtName, StringComparison.OrdinalIgnoreCase)) {
@@ -175,18 +177,23 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                 }
             }
 
-            orderArrangement ??= _tableView?.CurrentArrangement;
+            orderArrangement ??= cu;
 
             #region Reihenfolge der Spalten bestimmen
 
             if (orderArrangement != null) {
                 foreach (var thisclsVitem in orderArrangement) {
-                    _ = columSort.AddIfNotExists(thisclsVitem.Column);
+                    if (thisclsVitem?.Column != null) {
+                        _ = columSort.AddIfNotExists(thisclsVitem.Column);
+                    }
                 }
             }
-            if (_tableView?.CurrentArrangement != null) {
-                foreach (var thisclsVitem in _tableView?.CurrentArrangement) {
-                    _ = columSort.AddIfNotExists(thisclsVitem.Column);
+
+            if (cu != null) {
+                foreach (var thisclsVitem in cu) {
+                    if (thisclsVitem?.Column != null) {
+                        _ = columSort.AddIfNotExists(thisclsVitem.Column);
+                    }
                 }
             }
             foreach (var thisColumn in _tableView.Database.Column) {
@@ -197,17 +204,15 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
             foreach (var thisColumn in columSort) {
                 var showMe = false;
-                var viewItemOrder = orderArrangement[thisColumn];
-                var viewItemCurrent = _tableView.CurrentArrangement[thisColumn];
+                var viewItemOrder = orderArrangement?[thisColumn];
+                var viewItemCurrent = cu?[thisColumn];
                 var filterItem = _tableView.Filter[thisColumn];
 
                 #region Sichtbarkeit des Filterelemts bestimmen
 
-                if (thisColumn != null) {
-                    if (thisColumn.AutoFilterSymbolPossible()) {
-                        if (viewItemOrder != null && Filtertypes.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
-                        if (viewItemCurrent != null && filterItem != null && Filtertypes.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { showMe = true; }
-                    }
+                if (thisColumn.AutoFilterSymbolPossible()) {
+                    if (viewItemOrder != null && Filtertypes.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
+                    if (viewItemCurrent != null && filterItem != null && Filtertypes.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { showMe = true; }
                 }
 
                 #endregion Sichtbarkeit des Filterelemts bestimmen

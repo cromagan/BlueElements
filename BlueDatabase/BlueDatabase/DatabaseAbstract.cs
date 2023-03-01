@@ -227,6 +227,57 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
+
+
+    public void Variables_RemoveAll(bool isLoading) {
+        while (_variables.Count > 0) {
+            //var va = _variables[_eventScript.Count - 1];
+            //ev.Changed -= EventScript_Changed;
+
+            _variables.RemoveAt(_variables.Count - 1);
+        }
+
+
+        if (!isLoading) { Variables_Changed(this, System.EventArgs.Empty); }
+
+    }
+
+
+    public void EventScript_RemoveAll(bool isLoading) {
+        while (_eventScript.Count > 0) {
+            var ev = _eventScript[_eventScript.Count - 1];
+            ev.Changed -= EventScript_Changed;
+
+            _eventScript.RemoveAt(_eventScript.Count - 1);
+        }
+
+
+        if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
+    }
+
+    private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = new ReadOnlyCollection<EventScript>(_eventScript);
+
+    private void Variables_Changed(object sender, System.EventArgs e) => Variables = new ReadOnlyCollection<VariableString>(_variables);
+
+
+    public void EventScript_Add(EventScript ev, bool isLoading) {
+        _eventScript.Add(ev);
+        ev.Changed += EventScript_Changed;
+
+        if(!isLoading) {            EventScript_Changed(this, System.EventArgs.Empty);        }
+
+
+    }
+
+
+    public void Variables_Add(VariableString va, bool isLoading) {
+        _variables.Add(va);
+        //ev.Changed += EventScript_Changed;
+        if (!isLoading) { Variables_Changed(this, System.EventArgs.Empty); }
+
+    }
+
+
     [Browsable(false)]
     public double GlobalScale {
         get => _globalScale;
@@ -1692,10 +1743,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             case DatabaseDataType.EventScript:
                 _eventScriptTmp = value;
-                _eventScript.Clear();
+                EventScript_RemoveAll(true);
                 List<string> ai = new(value.SplitAndCutByCr());
                 foreach (var t in ai) {
-                    _eventScript.Add(new EventScript(this, t));
+                    EventScript_Add(new EventScript(this, t), true);
                 }
 
                 CheckScriptError();
@@ -1703,13 +1754,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             case DatabaseDataType.DatabaseVariables:
                 _variableTmp = value;
-                _variables.Clear();
+                Variables_RemoveAll(true);
                 List<string> va = new(value.SplitAndCutByCr());
                 foreach (var t in va) {
                     var l = new VariableString("dummy");
                     l.Parse(t);
                     l.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
-                    _variables.Add(l);
+                    Variables_Add(l,true);
                 }
                 break;
 
@@ -1817,8 +1868,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         _additionalFilesPfad = "AdditionalFiles";
         _zeilenQuickInfo = string.Empty;
         _sortDefinition = null;
-        _eventScript.Clear();
-        _variables.Clear();
+        EventScript_RemoveAll(true);
+        Variables_RemoveAll(true);
     }
 
     protected void OnLoaded() {
