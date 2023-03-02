@@ -379,6 +379,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return null;
         }
 
+
+
         if (fullprocessing) {
             Database.Cell.SystemSet(Database.Column.SysRowCreator, item, Database.UserName);
             Database.Cell.SystemSet(Database.Column.SysRowCreateDate, item, DateTime.UtcNow.ToString(Constants.Format_Date5));
@@ -395,9 +397,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             item.CellSet(Database!.Column.First, valueOfCellInFirstColumn);
         }
 
+
         if (runScriptOfNewRow) {
-            _ = item.ExecuteScript(EventTypes.new_row, string.Empty, false, false, true, 1);
+            _ = item.ExecuteScript(EventTypes.new_row, string.Empty, true, true, true, 0.1f);
         }
+
 
         return item;
     }

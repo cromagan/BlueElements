@@ -395,10 +395,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
         if (oldVal == newValue) { return; }
 
         row.CellSet(column, newValue);
-        if (oldVal != row.CellGetString(column)) {
-            _ = row.ExecuteScript(EventTypes.value_changed, string.Empty, false, false, true, 1);
-            row.Database?.AddBackgroundWork(row);
-        }
+        //if (oldVal != row.CellGetString(column)) {
+        //    _ = row.ExecuteScript(EventTypes.value_changedx, string.Empty, false, false, true, 1);
+        //    row.Database?.AddBackgroundWork(row);
+        //}
     }
 
     private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {

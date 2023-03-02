@@ -159,7 +159,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     //    LoadFromSQLBack();
     //}
 
-    public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways) {
+    public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways, List<RowItem>? sortedRows) {
         if (rows == null || rows.Count == 0) { return false; }
 
         var l = new List<RowItem>();
@@ -172,10 +172,13 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         if (l.Count == 0) { return false; }
 
+        OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) nach.");
+
+
         try {
-            _sql.LoadRow(TableName, l, refreshAlways);
+            _sql.LoadRow(TableName, l, refreshAlways, sortedRows);
         } catch {
-            return RefreshRowData(rows, refreshAlways);
+            return RefreshRowData(rows, refreshAlways, sortedRows);
         }
 
         return true;
@@ -385,7 +388,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                 }
             }
 
-            _ = RefreshRowData(rk, true);
+            _ = RefreshRowData(rk, true, null);
         } catch {
             DoLastChanges(data);
         }

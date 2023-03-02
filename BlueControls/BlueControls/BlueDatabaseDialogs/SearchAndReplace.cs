@@ -113,19 +113,20 @@ internal sealed partial class SearchAndReplace : Form {
         if (_isWorking) { return; }
         var suchText = Alt.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
         var ersetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
-        //_blueTable.Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+        //db.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+
+        if (_blueTable?.Database is not DatabaseAbstract db) { return; }
+
         List<ColumnItem?> sp = new();
         List<RowItem> ro = new();
         if (NurinAktuellerSpalte.Checked) {
             sp.Add(_blueTable.CursorPosColumn);
         } else {
-            sp.AddRange(_blueTable?.Database?.Column.Where(thisColumn => thisColumn != null && thisColumn.Format.CanBeChangedByRules()));
+            sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Format.CanBeChangedByRules()));
         }
-        foreach (var thisRow in _blueTable.Database.Row) {
-            if (thisRow != null) {
-                if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_blueTable.Filter)) {
-                    if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(_blueTable?.Database?.Column.SysLocked)) { ro.Add(thisRow); }
-                }
+        foreach (var thisRow in db.Row) {
+            if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_blueTable.Filter)) {
+                if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(db.Column.SysLocked)) { ro.Add(thisRow); }
             }
         }
         var count = 0;
@@ -133,12 +134,12 @@ internal sealed partial class SearchAndReplace : Form {
         var co = 0;
         var p = Progressbar.Show("Ersetze...", ro.Count);
         foreach (var thisRow in ro) {
-            var rowChanged = false;
             co++;
             p.Update(co);
             foreach (var thiscolumn in sp) {
                 var trifft = false;
                 var originalText = thisRow.CellGetString(thiscolumn);
+
                 if (SucheNach.Checked) {
                     trifft = originalText.Contains(suchText);
                 } else if (SucheExact.Checked) {
@@ -146,32 +147,27 @@ internal sealed partial class SearchAndReplace : Form {
                 } else if (InhaltEgal.Checked) {
                     trifft = true;
                 }
+
                 if (trifft) {
                     if (ErsetzeMit.Checked) {
                         geändeterText = originalText.Replace(suchText, ersetzText);
                     } else if (ErsetzeKomplett.Checked) {
                         geändeterText = ersetzText;
                     } else if (FügeHinzu.Checked) {
-                        List<string?> tmp = new(originalText.SplitAndCutByCr())
-                        {
-                            ersetzText
-                        };
+                        List<string> tmp = new(originalText.SplitAndCutByCr()) { ersetzText };
                         geändeterText = tmp.SortedDistinctList().JoinWithCr();
                     }
                     if (geändeterText != originalText) {
-                        rowChanged = true;
                         count++;
                         thisRow.CellSet(thiscolumn, geändeterText);
                     }
                 }
             }
-
-            if (rowChanged) {
-                _ = thisRow.ExecuteScript(EventTypes.value_changed, string.Empty, true, false, true, 10);
-                thisRow.Database?.AddBackgroundWork(thisRow);
-            }
         }
         p?.Close();
+
+        db.ExecuteValueChanged();
+
         MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
         _isWorking = false;
     }

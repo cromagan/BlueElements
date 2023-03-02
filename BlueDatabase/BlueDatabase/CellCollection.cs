@@ -162,7 +162,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public static (List<FilterItem>? filter, string info) GetFilterFromLinkedCellData(DatabaseAbstract? linkedDatabase, ColumnItem column, RowItem? row) {
-        if (row == null || row.IsDisposed) { return (null, "Zeile verworfen."); }
+        //if (row == null || row.IsDisposed) { return (null, "Zeile verworfen."); }
         if (linkedDatabase == null || linkedDatabase.IsDisposed) { return (null, "Verlinkte Datenbank verworfen."); }
         if (column.Database == null || column.IsDisposed || column.Database.IsDisposed) { return (null, "Datenbank verworfen."); }
 
@@ -182,7 +182,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             var value = x[2].FromNonCritical();
             if (string.IsNullOrEmpty(value)) { return (fi, "Leere Suchwerte werden nicht unterstützt."); }
-            value = row.ReplaceVariables(value, false, true);
+
+            if (row != null) {
+                // Es kann auch sein, dass nur mit Texten anstelle von Variablen gearbeitet wird,
+                // und auch diese abgefragt werden
+                value = row.ReplaceVariables(value, false, true);
+            }
 
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }
@@ -453,7 +458,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var cellKey = KeyOfCell(column, row);
 
             if (column.IsInCache == null) {
-                _ = Database.RefreshRowData(row, false);
+                _ = Database.RefreshRowData(row, false, null);
             }
 
             return !ContainsKey(cellKey) ? string.Empty : this[cellKey].Value;
@@ -678,6 +683,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
 
+        if (!isLoading) {
+            Database?.AddRowWithChangedValue(rowkey);
+        }
         return string.Empty;
     }
 
@@ -1184,7 +1192,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     //}
 
     private string? TextSizeKey(ColumnItem? column, string text) {
-        if (column?.Database == null || !column.Database.IsDisposed) { return null; }
+        if (column?.Database == null || column.Database.IsDisposed) { return null; }
 
         return column.Database.TableName + "|" +
                     column.Name + "|" +

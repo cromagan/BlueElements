@@ -402,7 +402,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         //    ManualExecutable = false,
         //    Script = string.Empty ,
         //    Name = "Main",
-        //    EventTypes = EventTypes.value_changed | EventTypes.new_row
+        //    EventTypes = EventTypes.value_changedx | EventTypes.new_row
         //};
         //eves.Add(l);
         //FilterDefiniton.EventScript = new ReadOnlyCollection<EventScript>(eves);

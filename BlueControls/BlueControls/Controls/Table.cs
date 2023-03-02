@@ -438,8 +438,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
         row.CellSet(column, v[0].Substring(5));
         //Database.Cell.Set(column, row, v[0].Substring(5), false);
-        _ = row.ExecuteScript(EventTypes.value_changed, string.Empty, true, true, true, 5);
-        row.Database?.AddBackgroundWork(row);
+        //_ = row.ExecuteScript(EventTypes.value_changedx, string.Empty, true, true, true, 5);
+        //row.Database?.AddBackgroundWork(row);
+        row.Database?.ExecuteValueChanged();
     }
 
     public static void Draw_FormatedText(Graphics gr, string text, ColumnItem? column, Rectangle fitInRect, Design design, States state, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
@@ -1225,44 +1226,50 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 return;
             }
 
-            var rw = new List<RowItem>();
-            List<RowData>? sr;
+            List<RowData>? sortedRowData;
             int firstVisibleRow;
             int lastVisibleRow;
             do {
-                sr = SortedRows();
+                sortedRowData = SortedRows();
 
-                if (sr == null) {
+                if (sortedRowData == null) {
                     // Multitasking...
                     DrawWaitScreen(gr);
                     return;
                 }
 
-                firstVisibleRow = sr.Count;
+                firstVisibleRow = sortedRowData.Count;
                 lastVisibleRow = -1;
-                rw.Clear();
-                foreach (var thisRow in sr) {
-                    if (IsOnScreen(thisRow, displayRectangleWoSlider)) {
-                        if (thisRow?.Row != null) {
-                            _ = rw.AddIfNotExists(thisRow?.Row);
-                            var T = sr.IndexOf(thisRow);
+                var rowsToRefreh = new List<RowItem>();
+                List<RowItem> sortedRows = new();
+
+                foreach (var thisRow in sortedRowData) {
+                    if (thisRow?.Row is RowItem r) {
+                        if (IsOnScreen(thisRow, displayRectangleWoSlider)) {
+                            _ = rowsToRefreh.AddIfNotExists(r);
+                            var T = sortedRowData.IndexOf(thisRow);
                             firstVisibleRow = Math.Min(T, firstVisibleRow);
                             lastVisibleRow = Math.Max(T, lastVisibleRow);
+                        }
+
+                        if (sortedRows.Count < 300) {
+                            // 300 reichen, sonst dauerts so lange
+                            _ = sortedRows.AddIfNotExists(r);
                         }
                     }
                 }
 
-                if (!Database.RefreshRowData(rw, false)) { break; }
+                if (!Database.RefreshRowData(rowsToRefreh, false, sortedRows)) { break; }
                 Invalidate_SortedRowData();
             } while (true);
 
             switch (_design) {
                 case BlueTableAppearance.Standard:
-                    Draw_Table_Std(gr, sr, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement);
+                    Draw_Table_Std(gr, sortedRowData, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, CurrentArrangement);
                     break;
 
                 case BlueTableAppearance.OnlyMainColumnWithoutHead:
-                    Draw_Table_ListboxStyle(gr, sr, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow);
+                    Draw_Table_ListboxStyle(gr, sortedRowData, state, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow);
                     break;
 
                 default:
@@ -1800,9 +1807,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
                 row.CellSet(column, newValue);
             }
-            if (table.Database == column.Database) { table.CursorPos_Set(column, row, false, chapter); }
-            _ = row.ExecuteScript(EventTypes.value_changed, string.Empty, true, false, true, 5);
-            row.Database?.AddBackgroundWork(row);
+            if (table?.Database == column.Database) { table.CursorPos_Set(column, row, false, chapter); }
+
+            //_ = row.ExecuteScript(EventTypes.value_changedx, string.Empty, true, false, true, 5);
+
             // EnsureVisible ganz schlecht: Daten verändert, keine Positionen bekannt - und da soll sichtbar gemacht werden?
             // CursorPos.EnsureVisible(SliderX, SliderY, DisplayRectangle)
         } else {

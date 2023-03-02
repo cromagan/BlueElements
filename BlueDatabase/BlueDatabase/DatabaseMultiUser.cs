@@ -169,7 +169,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         }
     }
 
-    public override bool RefreshRowData(List<RowItem> row, bool refreshAlways) {
+    public override bool RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem> sortedRows) {
         if (row == null || row.Count == 0) { return false; }
 
         foreach (var thisrow in row) {

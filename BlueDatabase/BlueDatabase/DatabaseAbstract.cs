@@ -58,6 +58,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private readonly List<string> _datenbankAdmin = new();
     private readonly List<EventScript> _eventScript = new();
     private readonly LayoutCollection _layouts = new();
+    private readonly List<long> _pendingbackgroundworks = new();
     private readonly List<BackgroundWorker> _pendingworker = new();
     private readonly List<long> _pendingworks = new();
     private readonly List<string> _permissionGroupsNewRow = new();
@@ -226,57 +227,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, value.ToString(true), string.Empty);
         }
     }
-
-
-
-    public void Variables_RemoveAll(bool isLoading) {
-        while (_variables.Count > 0) {
-            //var va = _variables[_eventScript.Count - 1];
-            //ev.Changed -= EventScript_Changed;
-
-            _variables.RemoveAt(_variables.Count - 1);
-        }
-
-
-        if (!isLoading) { Variables_Changed(this, System.EventArgs.Empty); }
-
-    }
-
-
-    public void EventScript_RemoveAll(bool isLoading) {
-        while (_eventScript.Count > 0) {
-            var ev = _eventScript[_eventScript.Count - 1];
-            ev.Changed -= EventScript_Changed;
-
-            _eventScript.RemoveAt(_eventScript.Count - 1);
-        }
-
-
-        if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
-    }
-
-    private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = new ReadOnlyCollection<EventScript>(_eventScript);
-
-    private void Variables_Changed(object sender, System.EventArgs e) => Variables = new ReadOnlyCollection<VariableString>(_variables);
-
-
-    public void EventScript_Add(EventScript ev, bool isLoading) {
-        _eventScript.Add(ev);
-        ev.Changed += EventScript_Changed;
-
-        if(!isLoading) {            EventScript_Changed(this, System.EventArgs.Empty);        }
-
-
-    }
-
-
-    public void Variables_Add(VariableString va, bool isLoading) {
-        _variables.Add(va);
-        //ev.Changed += EventScript_Changed;
-        if (!isLoading) { Variables_Changed(this, System.EventArgs.Empty); }
-
-    }
-
 
     [Browsable(false)]
     public double GlobalScale {
@@ -636,8 +586,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return null;
     }
 
-    public void AddBackgroundWork(RowItem row) => _pendingworks.AddIfNotExists(row.Key);
-
     /// <summary>
     /// Der komplette Pfad mit abschließenden \
     /// </summary>
@@ -655,6 +603,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         AdditionalFilesPfadtmp = string.Empty;
         return string.Empty;
+    }
+
+    public void AddRowWithChangedValue(long rowkey) {
+        _pendingworks.AddIfNotExists(rowkey);
+        //_pendingbackgroundworks.AddIfNotExists(rowkey); // Wird erst NACH dem Script der NewValue hinzugefügt
     }
 
     public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
@@ -885,17 +838,35 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; }
 
-        //if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
-        //    if (_backgroundWorker?.IsBusy ?? false) { return "Ein Hintergrundprozess verhindert aktuell die Bearbeitung."; }
-        //}
+        if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
+            if (_pendingworker.Count > 0) { return "Es müssen noch Daten überprüft werden."; }
+        }
 
         return IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))
             ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
             : string.Empty;
     }
 
+    public void EventScript_Add(EventScript ev, bool isLoading) {
+        _eventScript.Add(ev);
+        ev.Changed += EventScript_Changed;
+
+        if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
+    }
+
+    public void EventScript_RemoveAll(bool isLoading) {
+        while (_eventScript.Count > 0) {
+            var ev = _eventScript[_eventScript.Count - 1];
+            ev.Changed -= EventScript_Changed;
+
+            _eventScript.RemoveAt(_eventScript.Count - 1);
+        }
+
+        if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
+    }
+
     public void ExecuteExtraThread() {
-        if (_pendingworks.Count == 0) { return; }
+        if (_pendingbackgroundworks.Count == 0) { return; }
 
         var ok = false;
 
@@ -908,7 +879,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         if (!ok) {
-            _pendingworks.Clear();
+            _pendingbackgroundworks.Clear();
             return;
         }
 
@@ -916,10 +887,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (IsDisposed) { return; }
             if (ReadOnly) { return; }
             if (!LogUndo) { return; }
-            if (_pendingworks.Count == 0) { return; }
+            if (_pendingbackgroundworks.Count == 0) { return; }
 
-            var key = _pendingworks.First();
-            _ = _pendingworks.Remove(key);
+            var key = _pendingbackgroundworks.First();
+            _ = _pendingbackgroundworks.Remove(key);
 
             var r = Row.SearchByKey(key);
 
@@ -1074,9 +1045,46 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
+    public void ExecuteValueChanged() {
+        if (_pendingworks.Count == 0) { return; }
+
+        //var ok = false;
+
+        //foreach (var thiss in EventScript) {
+        //    if (thiss.EventTypes.HasFlag(EventTypes.value_changed)) {
+        //        if (thiss.IsOk()) {
+        //            ok = true; break;
+        //        }
+        //    }
+        //}
+
+        //if (!ok) {
+        //    _pendingworks.Clear();
+        //    return;
+        //}
+
+        while (_pendingworks.Count > 0) {
+            if (IsDisposed) { return; }
+
+            try {
+                var key = _pendingworks[0];
+
+                var r = Row.SearchByKey(key);
+                _pendingworks.RemoveAt(0);
+
+                if (r != null) {
+                    _ = r.ExecuteScript(EventTypes.value_changed, string.Empty, true, true, true, 2);
+                }
+
+                _pendingworks.Remove(key); // Evtl.duch das Script erneut hinzugekommen.
+                _pendingbackgroundworks.Add(key);
+            } catch { }
+        }
+    }
+
     public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>
-        //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-        Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
+            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+            Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
     public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, List<RowData>? sortedRows) {
         columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
@@ -1376,24 +1384,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return Import(importText, true, true, sep, false, false, true);
     }
 
-    //public void InvalidateExports(string layoutId) {
-    //    if (ReadOnly) { return; }
-
-    //    var ex = Export.CloneWithClones();
-
-    //    foreach (var thisExport in ex) {
-    //        if (thisExport != null) {
-    //            if (thisExport.Typ == ExportTyp.EinzelnMitFormular) {
-    //                if (thisExport.ExportFormularId == layoutId) {
-    //                    thisExport.LastExportTimeUtc = new DateTime(1900, 1, 1);
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    Export = new(ex);
-    //}
-
     public bool IsAdministrator() {
         if (UserGroup.ToUpper() == "#ADMINISTRATOR") { return true; }
         if (_datenbankAdmin == null || _datenbankAdmin.Count == 0) { return false; }
@@ -1402,6 +1392,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
     }
 
+    //    Export = new(ex);
+    //}
     public bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
             if (thisFile is Database db) {
@@ -1424,17 +1416,29 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return true;
     }
 
+    //    foreach (var thisExport in ex) {
+    //        if (thisExport != null) {
+    //            if (thisExport.Typ == ExportTyp.EinzelnMitFormular) {
+    //                if (thisExport.ExportFormularId == layoutId) {
+    //                    thisExport.LastExportTimeUtc = new DateTime(1900, 1, 1);
+    //                }
+    //            }
+    //        }
+    //    }
     public void OnScriptError(RowCancelEventArgs e) {
         if (IsDisposed) { return; }
         ScriptError?.Invoke(this, e);
     }
 
+    //    var ex = Export.CloneWithClones();
     //public abstract void Load_Reload();
     public void OnViewChanged() {
         if (IsDisposed) { return; }
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
+    //public void InvalidateExports(string layoutId) {
+    //    if (ReadOnly) { return; }
     public List<string> Permission_AllUsed(bool cellLevel) {
         List<string> e = new();
         foreach (var thisColumnItem in Column) {
@@ -1496,9 +1500,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    public abstract bool RefreshRowData(List<RowItem> row, bool refreshAlways);
+    public abstract bool RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows);
 
-    public bool RefreshRowData(List<long> keys, bool refreshAlways) {
+    public bool RefreshRowData(List<long> keys, bool refreshAlways, List<RowItem>? sortedRows) {
         if (keys.Count == 0) { return false; }
 
         var r = new List<RowItem>();
@@ -1506,10 +1510,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             var ro = Row.SearchByKey(thisK);
             if (ro != null) { _ = r.AddIfNotExists(ro); }
         }
-        return RefreshRowData(r, refreshAlways);
+        return RefreshRowData(r, refreshAlways, sortedRows);
     }
 
-    public bool RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem> { row }, refreshAlways);
+    public bool RefreshRowData(RowItem row, bool refreshAlways, List<RowItem>? sortedRows) => RefreshRowData(new List<RowItem> { row }, refreshAlways, sortedRows);
 
     public virtual void RepairAfterParse() {
         Column.Repair();
@@ -1527,6 +1531,23 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public override string ToString() => base.ToString() + " " + TableName;
 
     public abstract string UndoText(ColumnItem? column, RowItem? row);
+
+    public void Variables_Add(VariableString va, bool isLoading) {
+        _variables.Add(va);
+        //ev.Changed += EventScript_Changed;
+        if (!isLoading) { Variables_Changed(this, System.EventArgs.Empty); }
+    }
+
+    public void Variables_RemoveAll(bool isLoading) {
+        while (_variables.Count > 0) {
+            //var va = _variables[_eventScript.Count - 1];
+            //ev.Changed -= EventScript_Changed;
+
+            _variables.RemoveAt(_variables.Count - 1);
+        }
+
+        if (!isLoading) { Variables_Changed(this, System.EventArgs.Empty); }
+    }
 
     public void WriteBackDbVariables(List<Variable> vars) {
         var vaa = new List<VariableString>();
@@ -1560,16 +1581,15 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         DropMessage?.Invoke(this, new MessageEventArgs(type, message));
     }
 
-    //internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    GenerateLayoutInternal?.Invoke(this, e);
-    //}
-
     internal void OnProgressbarInfo(ProgressbarEventArgs e) {
         if (IsDisposed) { return; }
         ProgressbarInfo?.Invoke(this, e);
     }
 
+    //internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    GenerateLayoutInternal?.Invoke(this, e);
+    //}
     internal void RepairColumnArrangements() {
         //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
 
@@ -1760,7 +1780,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                     var l = new VariableString("dummy");
                     l.Parse(t);
                     l.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
-                    Variables_Add(l,true);
+                    Variables_Add(l, true);
                 }
                 break;
 
@@ -1885,6 +1905,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     private void Checker_Tick(object state) {
         if (IsDisposed) { return; }
+
+        ExecuteValueChanged();
+
         if (ReadOnly) { return; }
         if (!LogUndo) { return; }
 
@@ -1905,6 +1928,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             _checkerTickCount = 0;
         }
     }
+
+    private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = new ReadOnlyCollection<EventScript>(_eventScript);
 
     private void OnDisposing() => Disposing?.Invoke(this, System.EventArgs.Empty);
 
@@ -1991,6 +2016,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             l.Save(fullhashname, Encoding.UTF8, false);
         } catch { }
     }
+
+    private void Variables_Changed(object sender, System.EventArgs e) => Variables = new ReadOnlyCollection<VariableString>(_variables);
 
     #endregion
 }
