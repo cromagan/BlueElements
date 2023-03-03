@@ -25,12 +25,11 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase, IComparable {
+public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase {
 
     #region Fields
 
@@ -93,7 +92,6 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
         }
     }
 
-    public string CompareKey => Name.ToString();
     public DatabaseAbstract? Database { get; private set; }
 
     public EventTypes EventTypes {
@@ -150,15 +148,6 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
     #region Methods
 
     public object Clone() => new EventScript(Database, ToString());
-
-    public int CompareTo(object obj) {
-        if (obj is EventScript v) {
-            return CompareKey.CompareTo(v.CompareKey);
-        }
-
-        Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
-        return 0;
-    }
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
