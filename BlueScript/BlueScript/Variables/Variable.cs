@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -324,6 +325,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         }
     }
 
+    public string CompareKey => CheckOrder.ToString(Constants.Format_Integer3) + "|" + Name.ToUpper();
     public abstract bool GetFromStringPossible { get; }
 
     public abstract bool IsNullOrEmpty { get; }
@@ -476,7 +478,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     public int CompareTo(object obj) {
         if (obj is Variable v) {
-            return CheckOrder.CompareTo(v.CheckOrder);
+            return CompareKey.CompareTo(v.CompareKey);
         }
 
         Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");

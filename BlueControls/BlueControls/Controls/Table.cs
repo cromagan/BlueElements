@@ -912,8 +912,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
-        DatabaseAbstract.ForceSaveAll();
-        MultiUserFile.ForceLoadSaveAll();
+        //DatabaseAbstract.ForceSaveAll();
+        //MultiUserFile.ForceLoadSaveAll();
 
         //Database?.Load_Reload();
         if (e == null) {
