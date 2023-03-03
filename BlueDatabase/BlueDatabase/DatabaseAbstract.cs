@@ -72,7 +72,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private string _createDate = string.Empty;
     private string _creator = string.Empty;
     private string _eventScriptTmp = string.Empty;
-    private bool _executingValueChanges = false;
     private double _globalScale;
     private string _globalShowPass = string.Empty;
     private string _scripterror = string.Empty;
@@ -224,12 +223,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public ReadOnlyCollection<EventScript> EventScript {
         get => new(_eventScript);
         set {
-            var l = new List<EventScript>();
-            l.AddRange(value);
-            l.Sort();
-
-            if (_eventScriptTmp == l.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), string.Empty);
+            if (_eventScriptTmp == value.ToString(false)) { return; }
+            _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, value.ToString(true), string.Empty);
         }
     }
 
@@ -356,12 +351,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public ReadOnlyCollection<VariableString> Variables {
         get => new(_variables);
         set {
-            var l = new List<VariableString>();
-            l.AddRange(value);
-            l.Sort();
-
-            if (_variableTmp == l.ToString(true)) { return; }
-            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, l.ToString(true), string.Empty);
+            if (_variableTmp == value.ToString(true)) { return; }
+            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, value.ToString(true), string.Empty);
             OnViewChanged();
         }
     }
@@ -1055,10 +1046,22 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public void ExecuteValueChanged() {
-        if (_executingValueChanges) { return; }
-        _executingValueChanges = true;
-
         if (_pendingworks.Count == 0) { return; }
+
+        //var ok = false;
+
+        //foreach (var thiss in EventScript) {
+        //    if (thiss.EventTypes.HasFlag(EventTypes.value_changed)) {
+        //        if (thiss.IsOk()) {
+        //            ok = true; break;
+        //        }
+        //    }
+        //}
+
+        //if (!ok) {
+        //    _pendingworks.Clear();
+        //    return;
+        //}
 
         while (_pendingworks.Count > 0) {
             if (IsDisposed) { return; }
@@ -1077,8 +1080,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 _pendingbackgroundworks.Add(key);
             } catch { }
         }
-
-        _executingValueChanges = false;
     }
 
     public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>
@@ -1920,9 +1921,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             return;
         }
 
-        if (HasPendingChanges &&
-            ((_checkerTickCount > 20 && DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds > 20) ||
-            _checkerTickCount > 180)) {
+        if (HasPendingChanges && _checkerTickCount > 20) {
             if (!string.IsNullOrEmpty(ErrorReason(BlueBasics.Enums.ErrorReason.Save))) { return; }
 
             _ = Save();

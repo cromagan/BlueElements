@@ -27,7 +27,7 @@ using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_CellSetRow : Method_Database {
+public class Method_CellSetRow : Method {
 
     #region Properties
 
@@ -60,10 +60,6 @@ public class Method_CellSetRow : Method_Database {
 
         if (row?.Database?.ReadOnly ?? true) { return new DoItFeedback(infos.Data, "Datenbank schreibgeschützt."); }
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
-
-        if (row == MyRow(s.Variables)) {
-            return new DoItFeedback(infos.Data, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
-        }
 
         row.CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
