@@ -27,7 +27,7 @@ using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_CellSetFilter : Method {
+public class Method_CellSetFilter : Method_Database {
 
     #region Properties
 
@@ -62,6 +62,10 @@ public class Method_CellSetFilter : Method {
         var r = RowCollection.MatchesTo(allFi);
         if (r == null || r.Count is 0 or > 1) {
             return DoItFeedback.Falsch();
+        }
+
+        if (r[0] == MyRow(s.Variables)) {
+            return new DoItFeedback(infos.Data, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
         }
 
         r[0].CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
