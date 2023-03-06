@@ -59,8 +59,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private readonly List<EventScript> _eventScript = new();
     private readonly LayoutCollection _layouts = new();
     private readonly List<long> _pendingbackgroundworks = new();
+    private readonly List<long> _pendingchangedrows = new();
     private readonly List<BackgroundWorker> _pendingworker = new();
-    private readonly List<long> _pendingworks = new();
     private readonly List<string> _permissionGroupsNewRow = new();
     private readonly List<string> _tags = new();
     private readonly List<VariableString> _variables = new();
@@ -72,7 +72,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private string _createDate = string.Empty;
     private string _creator = string.Empty;
     private string _eventScriptTmp = string.Empty;
-    private bool _executingValueChanges = false;
+    private bool _executingbackgroundworks;
+    private bool _executingchangedrows;
     private double _globalScale;
     private string _globalShowPass = string.Empty;
     private string _scripterror = string.Empty;
@@ -614,10 +615,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return string.Empty;
     }
 
-    public void AddRowWithChangedValue(long rowkey) {
-        _pendingworks.AddIfNotExists(rowkey);
-        //_pendingbackgroundworks.AddIfNotExists(rowkey); // Wird erst NACH dem Script der NewValue hinzugefügt
-    }
+    public void AddRowWithChangedValue(long rowkey) => _ = _pendingchangedrows.AddIfNotExists(rowkey);
 
     public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
 
@@ -730,8 +728,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         GlobalShowPass = sourceDatabase.GlobalShowPass;
         //RulesScript = sourceDatabase.RulesScript;
         if (SortDefinition == null || SortDefinition.ToString() != sourceDatabase.SortDefinition?.ToString()) {
-            SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition?.ToString());
+            if (sourceDatabase.SortDefinition != null) {
+                SortDefinition = new RowSortDefinition(this, sourceDatabase.SortDefinition.ToString());
+            }
         }
+
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
         UndoCount = sourceDatabase.UndoCount;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
@@ -876,6 +877,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public void ExecuteExtraThread() {
         if (_pendingbackgroundworks.Count == 0) { return; }
+        if (_executingbackgroundworks) { return; }
+        _executingbackgroundworks = true;
 
         var ok = false;
 
@@ -889,32 +892,37 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         if (!ok) {
             _pendingbackgroundworks.Clear();
+            _executingbackgroundworks = false;
             return;
         }
 
-        while (_pendingworker.Count < 5) {
-            if (IsDisposed) { return; }
-            if (ReadOnly) { return; }
-            if (!LogUndo) { return; }
-            if (_pendingbackgroundworks.Count == 0) { return; }
+        try {
+            while (_pendingworker.Count < 5) {
+                if (IsDisposed) { break; }
+                if (ReadOnly) { break; }
+                if (!LogUndo) { break; }
+                if (_pendingbackgroundworks.Count == 0) { break; }
 
-            var key = _pendingbackgroundworks.First();
-            _ = _pendingbackgroundworks.Remove(key);
+                var key = _pendingbackgroundworks.First();
+                _ = _pendingbackgroundworks.Remove(key);
 
-            var r = Row.SearchByKey(key);
+                var r = Row.SearchByKey(key);
 
-            if (r != null) {
-                var l = new BackgroundWorker();
-                l.WorkerReportsProgress = true;
-                l.RunWorkerCompleted += PendingWorker_RunWorkerCompleted;
-                l.DoWork += PendingWorker_DoWork;
+                if (r != null) {
+                    var l = new BackgroundWorker();
+                    l.WorkerReportsProgress = true;
+                    l.RunWorkerCompleted += PendingWorker_RunWorkerCompleted;
+                    l.DoWork += PendingWorker_DoWork;
 
-                _pendingworker.Add(l);
-                l.RunWorkerAsync(key);
+                    _pendingworker.Add(l);
+                    l.RunWorkerAsync(key);
 
-                OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + r.CellFirstString());
+                    OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + r.CellFirstString());
+                }
             }
-        }
+        } catch { }
+
+        _executingbackgroundworks = false;
     }
 
     public ScriptEndedFeedback ExecuteScript(EventScript s, bool changevalues, RowItem? row) {
@@ -1055,30 +1063,31 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public void ExecuteValueChanged() {
-        if (_executingValueChanges) { return; }
-        _executingValueChanges = true;
+        if (_pendingchangedrows.Count == 0) { return; }
+        if (_executingchangedrows) { return; }
+        _executingchangedrows = true;
 
-        if (_pendingworks.Count == 0) { return; }
-
-        while (_pendingworks.Count > 0) {
+        while (_pendingchangedrows.Count > 0) {
             if (IsDisposed) { return; }
 
             try {
-                var key = _pendingworks[0];
+                var key = _pendingchangedrows[0];
 
                 var r = Row.SearchByKey(key);
-                _pendingworks.RemoveAt(0);
+                _pendingchangedrows.RemoveAt(0);
 
                 if (r != null) {
                     _ = r.ExecuteScript(EventTypes.value_changed, string.Empty, true, true, true, 2);
+                    r.InvalidateCheckData();
+                    r.CheckRowDataIfNeeded();
                 }
 
-                _pendingworks.Remove(key); // Evtl.duch das Script erneut hinzugekommen.
+                _pendingchangedrows.Remove(key); // Evtl.duch das Script erneut hinzugekommen.
                 _pendingbackgroundworks.Add(key);
             } catch { }
         }
 
-        _executingValueChanges = false;
+        _executingchangedrows = false;
     }
 
     public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>

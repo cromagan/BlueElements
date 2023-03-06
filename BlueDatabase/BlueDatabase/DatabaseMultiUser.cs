@@ -38,7 +38,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     public List<WorkItem>? Works;
     private readonly MultiUserFile? _muf;
-    private bool _loadScriptFired = false;
+    private bool _loadScriptFired;
 
     #endregion
 

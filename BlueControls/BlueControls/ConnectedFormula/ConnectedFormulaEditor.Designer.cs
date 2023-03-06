@@ -38,11 +38,11 @@ namespace BlueControls.Forms {
             this.grpFelder = new BlueControls.Controls.GroupBox();
             this.btnBild = new BlueControls.Controls.Button();
             this.btnVariable = new BlueControls.Controls.Button();
-            this.btnTabControlAdd = new BlueControls.Controls.Button();
             this.btnFileExplorer = new BlueControls.Controls.Button();
             this.btnFeldHinzu = new BlueControls.Controls.Button();
             this.grpOptik = new BlueControls.Controls.GroupBox();
             this.btnRegisterKarte = new BlueControls.Controls.Button();
+            this.btnTabControlAdd = new BlueControls.Controls.Button();
             this.groupBox1 = new BlueControls.Controls.GroupBox();
             this.btnZeileHinzu = new BlueControls.Controls.Button();
             this.tabFile = new System.Windows.Forms.TabPage();
@@ -62,6 +62,7 @@ namespace BlueControls.Forms {
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
             this.tabSeiten.SuspendLayout();
+            this.pnlStatusBar.SuspendLayout();
             this.tabEditorStd.SuspendLayout();
             this.grpVorschau.SuspendLayout();
             this.grpFelder.SuspendLayout();
@@ -79,15 +80,19 @@ namespace BlueControls.Forms {
             // 
             this.grpDesign.Visible = false;
             // 
+            // tabHintergrund
+            // 
+            this.tabHintergrund.Size = new System.Drawing.Size(966, 81);
+            // 
             // tabRightSide
             // 
             this.tabRightSide.Location = new System.Drawing.Point(602, 136);
-            this.tabRightSide.Size = new System.Drawing.Size(372, 363);
+            this.tabRightSide.Size = new System.Drawing.Size(372, 339);
             // 
             // Pad
             // 
             this.Pad.Location = new System.Drawing.Point(0, 136);
-            this.Pad.Size = new System.Drawing.Size(602, 363);
+            this.Pad.Size = new System.Drawing.Size(602, 339);
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             // 
             // Ribbon
@@ -113,6 +118,10 @@ namespace BlueControls.Forms {
             // 
             this.tabStart.Size = new System.Drawing.Size(966, 81);
             // 
+            // tabExport
+            // 
+            this.tabExport.Size = new System.Drawing.Size(966, 81);
+            // 
             // btnVorschauModus
             // 
             this.btnVorschauModus.CheckedChanged += new System.EventHandler(this.btnVorschauModus_CheckedChanged);
@@ -121,6 +130,15 @@ namespace BlueControls.Forms {
             // 
             this.tabSeiten.Controls.Add(this.tabPage1);
             this.tabSeiten.Size = new System.Drawing.Size(974, 26);
+            // 
+            // capStatusBar
+            // 
+            this.capStatusBar.Size = new System.Drawing.Size(974, 24);
+            // 
+            // pnlStatusBar
+            // 
+            this.pnlStatusBar.Location = new System.Drawing.Point(0, 475);
+            this.pnlStatusBar.Size = new System.Drawing.Size(974, 24);
             // 
             // tabEditorStd
             // 
@@ -143,7 +161,7 @@ namespace BlueControls.Forms {
             this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
             this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpVorschau.Location = new System.Drawing.Point(568, 0);
+            this.grpVorschau.Location = new System.Drawing.Point(488, 0);
             this.grpVorschau.Name = "grpVorschau";
             this.grpVorschau.Size = new System.Drawing.Size(160, 81);
             this.grpVorschau.TabIndex = 1;
@@ -182,7 +200,7 @@ namespace BlueControls.Forms {
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
             this.grpFelder.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpFelder.Location = new System.Drawing.Point(312, 0);
+            this.grpFelder.Location = new System.Drawing.Point(232, 0);
             this.grpFelder.Name = "grpFelder";
             this.grpFelder.Size = new System.Drawing.Size(256, 81);
             this.grpFelder.TabIndex = 0;
@@ -206,7 +224,7 @@ namespace BlueControls.Forms {
             // 
             this.btnVariable.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnVariable.ImageCode = "Variable";
-            this.btnVariable.Location = new System.Drawing.Point(8, 46);
+            this.btnVariable.Location = new System.Drawing.Point(8, 24);
             this.btnVariable.Name = "btnVariable";
             this.btnVariable.QuickInfo = "Ein Feld, das eine Variable \r\neines Zeilen-Skriptes dargestellen kann.\r\nImmer sch" +
     "reibgeschützt.";
@@ -214,18 +232,6 @@ namespace BlueControls.Forms {
             this.btnVariable.TabIndex = 4;
             this.btnVariable.Text = "Variable anzeigen";
             this.btnVariable.Click += new System.EventHandler(this.btnVariable_Click);
-            // 
-            // btnTabControlAdd
-            // 
-            this.btnTabControlAdd.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnTabControlAdd.ImageCode = "Registersammlung";
-            this.btnTabControlAdd.Location = new System.Drawing.Point(8, 2);
-            this.btnTabControlAdd.Name = "btnTabControlAdd";
-            this.btnTabControlAdd.QuickInfo = resources.GetString("btnTabControlAdd.QuickInfo");
-            this.btnTabControlAdd.Size = new System.Drawing.Size(64, 66);
-            this.btnTabControlAdd.TabIndex = 3;
-            this.btnTabControlAdd.Text = "Register";
-            this.btnTabControlAdd.Click += new System.EventHandler(this.btnTabControlAdd_Click);
             // 
             // btnFileExplorer
             // 
@@ -261,7 +267,7 @@ namespace BlueControls.Forms {
             this.grpOptik.Controls.Add(this.btnTabControlAdd);
             this.grpOptik.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpOptik.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpOptik.Location = new System.Drawing.Point(152, 0);
+            this.grpOptik.Location = new System.Drawing.Point(72, 0);
             this.grpOptik.Name = "grpOptik";
             this.grpOptik.Size = new System.Drawing.Size(160, 81);
             this.grpOptik.TabIndex = 2;
@@ -280,6 +286,18 @@ namespace BlueControls.Forms {
             this.btnRegisterKarte.Text = "Neue Registerkarte";
             this.btnRegisterKarte.Click += new System.EventHandler(this.btnRegisterKarte_Click);
             // 
+            // btnTabControlAdd
+            // 
+            this.btnTabControlAdd.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnTabControlAdd.ImageCode = "Registersammlung";
+            this.btnTabControlAdd.Location = new System.Drawing.Point(8, 2);
+            this.btnTabControlAdd.Name = "btnTabControlAdd";
+            this.btnTabControlAdd.QuickInfo = resources.GetString("btnTabControlAdd.QuickInfo");
+            this.btnTabControlAdd.Size = new System.Drawing.Size(64, 66);
+            this.btnTabControlAdd.TabIndex = 3;
+            this.btnTabControlAdd.Text = "Register";
+            this.btnTabControlAdd.Click += new System.EventHandler(this.btnTabControlAdd_Click);
+            // 
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -288,7 +306,7 @@ namespace BlueControls.Forms {
             this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(152, 81);
+            this.groupBox1.Size = new System.Drawing.Size(72, 81);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Zeilen-Berechnung";
@@ -297,7 +315,7 @@ namespace BlueControls.Forms {
             // 
             this.btnZeileHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZeileHinzu.ImageCode = "Trichter|16|||||||||Zeile";
-            this.btnZeileHinzu.Location = new System.Drawing.Point(80, 2);
+            this.btnZeileHinzu.Location = new System.Drawing.Point(0, 2);
             this.btnZeileHinzu.Name = "btnZeileHinzu";
             this.btnZeileHinzu.QuickInfo = resources.GetString("btnZeileHinzu.QuickInfo");
             this.btnZeileHinzu.Size = new System.Drawing.Size(64, 66);
@@ -436,6 +454,7 @@ namespace BlueControls.Forms {
             this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
             this.tabSeiten.ResumeLayout(false);
+            this.pnlStatusBar.ResumeLayout(false);
             this.tabEditorStd.ResumeLayout(false);
             this.grpVorschau.ResumeLayout(false);
             this.grpFelder.ResumeLayout(false);

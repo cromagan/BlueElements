@@ -127,11 +127,12 @@ public partial class ConnectedFormulaEditor : PadEditor {
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
 
-        Develop.DebugPrint_NichtImplementiert(); //Todo: Ein element hinzufügen!
-        //var it = new RowInputPadItem(string.Empty);
-        //it.Bei_Export_sichtbar = false;
-        //Pad.AddCentered(it);
-        //it.Page = n;
+        var it = new RowWithFilterPadItem(string.Empty);
+        it.Bei_Export_sichtbar = false;
+
+        Pad.AddCentered(it);
+        it.Page = n;
+        ChooseDatabaseAndId(it);
     }
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.ForceLoadSaveAll();

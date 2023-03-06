@@ -38,6 +38,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cpZeile = new BlueControls.Controls.Caption();
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.grpEigenschaften = new BlueControls.Controls.GroupBox();
+            this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.chkAendertWerte = new BlueControls.Controls.Button();
             this.btnSave = new BlueControls.Controls.Button();
             this.chkExternVerfügbar = new BlueControls.Controls.Button();
@@ -55,7 +56,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts = new BlueControls.Controls.ListBox();
             this.tabVariablen = new System.Windows.Forms.TabPage();
             this.variableEditor = new BlueControls.VariableEditor();
-            this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.tabScripts.SuspendLayout();
@@ -185,6 +185,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpEigenschaften.TabStop = false;
             this.grpEigenschaften.Text = "Eigenschaften";
             // 
+            // btnSpaltenuebersicht
+            // 
+            this.btnSpaltenuebersicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.btnSpaltenuebersicht.ImageCode = "Spalte|16";
+            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(568, 48);
+            this.btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
+            this.btnSpaltenuebersicht.Size = new System.Drawing.Size(152, 24);
+            this.btnSpaltenuebersicht.TabIndex = 36;
+            this.btnSpaltenuebersicht.Text = "Spaltenübersicht";
+            this.btnSpaltenuebersicht.Click += new System.EventHandler(this.btnSpaltenuebersicht_Click);
+            // 
             // chkAendertWerte
             // 
             this.chkAendertWerte.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
@@ -272,7 +283,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // chkAuslöser_export
             // 
             this.chkAuslöser_export.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 112);
+            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 96);
             this.chkAuslöser_export.Name = "chkAuslöser_export";
             this.chkAuslöser_export.QuickInfo = "Das Skript wird vor einem Export ausgeführt.\r\n\r\nEs kann dazu verwendet werden, um" +
     " Werte temporär zu ändern,\r\nVariablen hinzuzufügen oder Bilder zu laden.";
@@ -284,7 +295,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // chkAuslöser_databaseloaded
             // 
             this.chkAuslöser_databaseloaded.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAuslöser_databaseloaded.Location = new System.Drawing.Point(8, 96);
+            this.chkAuslöser_databaseloaded.Location = new System.Drawing.Point(8, 80);
             this.chkAuslöser_databaseloaded.Name = "chkAuslöser_databaseloaded";
             this.chkAuslöser_databaseloaded.QuickInfo = "Das Skript wird direkt nach dem ersten Laden einer Datenbank angestoßen.\r\n\r\nEs ka" +
     "nn verwendet werden, um z.B. Backups zu erstellen.";
@@ -310,9 +321,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAuslöser_valuechangedThread.Location = new System.Drawing.Point(9, 64);
             this.chkAuslöser_valuechangedThread.Name = "chkAuslöser_valuechangedThread";
             this.chkAuslöser_valuechangedThread.QuickInfo = null;
-            this.chkAuslöser_valuechangedThread.Size = new System.Drawing.Size(176, 32);
+            this.chkAuslöser_valuechangedThread.Size = new System.Drawing.Size(176, 16);
             this.chkAuslöser_valuechangedThread.TabIndex = 20;
-            this.chkAuslöser_valuechangedThread.Text = "Wert geändert<br><i>Extra Thread";
+            this.chkAuslöser_valuechangedThread.Text = "Wert geändert <b><fontsize=8><i>Extra Thread";
             this.chkAuslöser_valuechangedThread.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // chkAuslöser_valuechanged
@@ -334,7 +345,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkAuslöser_prepaireformula.QuickInfo = "Das Skript wird verwendet zur Datenkonsitenzprüfung\r\nund für Variablen für Formul" +
     "are.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen oder\r\nlange dauernd" +
     "e Prozesse anstoßen.";
-            this.chkAuslöser_prepaireformula.Size = new System.Drawing.Size(200, 16);
+            this.chkAuslöser_prepaireformula.Size = new System.Drawing.Size(175, 16);
             this.chkAuslöser_prepaireformula.TabIndex = 19;
             this.chkAuslöser_prepaireformula.Text = "Formular vorbereiten";
             this.chkAuslöser_prepaireformula.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
@@ -365,7 +376,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts.Size = new System.Drawing.Size(222, 586);
             this.lstEventScripts.TabIndex = 0;
             this.lstEventScripts.AddClicked += new System.EventHandler(this.lstEventScripts_AddClicked);
-            this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);            
+            this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);
             // 
             // tabVariablen
             // 
@@ -386,17 +397,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.variableEditor.Name = "variableEditor";
             this.variableEditor.Size = new System.Drawing.Size(1283, 618);
             this.variableEditor.TabIndex = 0;
-            // 
-            // btnSpaltenuebersicht
-            // 
-            this.btnSpaltenuebersicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSpaltenuebersicht.ImageCode = "Spalte|16";
-            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(568, 48);
-            this.btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
-            this.btnSpaltenuebersicht.Size = new System.Drawing.Size(152, 24);
-            this.btnSpaltenuebersicht.TabIndex = 36;
-            this.btnSpaltenuebersicht.Text = "Spaltenübersicht";
-            this.btnSpaltenuebersicht.Click += new System.EventHandler(this.btnSpaltenuebersicht_Click);
             // 
             // DatabaseScriptEditor
             // 

@@ -121,41 +121,27 @@
     <value>Fügt eine weiter Registerkarte hinzu.
 Diese kann dann in einem Registersammlung dargestellt werden.
 
-Ein solches Register ist ein wie ein eigens Formular und muss
-einen Zeilen-Eingang besitzen, um Werte empfangen zu können.</value>
+Ein solches Register ist wie ein eigens Formular und muss
+eine "Zeile mit Filterung" besitzen, um Werte empfangen zu können.</value>
   </data>
   <data name="btnTabControlAdd.QuickInfo" xml:space="preserve">
     <value>Fügt ein Steuerelement mit Registerkarten hinzu.
 Pro Registerkarte kann ein Unterformular gewählt werden.
-Diese Unterformulare müssen eine "Zeileneingang" beinhalten.
+Diese Unterformulare müssen eine "Zeile mit Filterung" beinhalten.
 Gleichzeitig muss dieses Element an ein "Zeile mit Filterung"
 angeschlossen sein, um zu funktionieren.</value>
-  </data>
-  <data name="btnEingangsZeile.QuickInfo" xml:space="preserve">
-    <value>Fügt einen möglichen externen Übergabepunkt zu.
-Mit diesem Elemtent kann ein Wert einer Zeile
-aus einem übergeordneten Formular empfangen werden.
-Da dieses Element jede Zeile empfangen kann - auch wenn es 
-von verschiedenen Stellen mit verschiedenen Datenbanken befüllt wird -
-muss der interne Spaltenname als Text eingegeben werden.
-
-Mit einer "Zeile mit Filterung" kann dann dieser Wert verwendet werden,
-auch Zwitter Lösungen mit dem Filter "wenn nicht leer" sind möglich.</value>
   </data>
   <data name="btnZeileHinzu.QuickInfo" xml:space="preserve">
     <value>Dieses Element ist Vorraussetzung für die Anzeige weiterer Felder.
 Stellt eine Zeile einer Datenbank bereit.
 Durch einer Vorfilterung können bestimmte Zeilen einer Datenbank ausgewählt werden.
 
-Aus dieser können dann die Felder extrahiert werden.</value>
+Aus dieser berecheten Zeile können dann die Felder extrahiert werden.</value>
   </data>
   <metadata name="LoadTab.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>644, 56</value>
   </metadata>
   <metadata name="SaveTab.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>742, 56</value>
-  </metadata>
-  <metadata name="LoadTabDatabase.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>220, 26</value>
   </metadata>
 </root>

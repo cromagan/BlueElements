@@ -32,8 +32,8 @@ public class FileExplorerPadItem : CustomizableShowPadItem {
 
     #region Fields
 
-    private bool _bei_Bedarf_erzeugen = false;
-    private bool _leere_Ordner_löschen = false;
+    private bool _bei_Bedarf_erzeugen;
+    private bool _leere_Ordner_löschen;
     private string _pfad = string.Empty;
 
     #endregion
