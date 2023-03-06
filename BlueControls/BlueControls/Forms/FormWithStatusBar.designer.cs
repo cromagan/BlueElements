@@ -31,6 +31,7 @@ namespace BlueControls.Forms {
             this.capStatusBar.Location = new System.Drawing.Point(0, 0);
             this.capStatusBar.Name = "capStatusBar";
             this.capStatusBar.Size = new System.Drawing.Size(287, 24);
+            this.capStatusBar.Translate = false;
             // 
             // pnlStatusBar
             // 
