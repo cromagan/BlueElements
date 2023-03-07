@@ -19,12 +19,9 @@
 #nullable enable
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Runtime.CompilerServices;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -35,35 +32,35 @@ namespace BlueDatabase;
 //https://www.c-sharpcorner.com/article/create-a-sql-server-database-dynamically-in-C-Sharp/
 //https://www.ictdemy.com/csharp/databases/introduction-to-databases-in-csharp-net
 //https://docs.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/create-sql-server-database-programmatically
-public abstract class SQLBackAbstract {
+public abstract class SqlBackAbstract {
 
     #region Fields
 
-    public const string SYS_STYLE = "SYS_STYLE";
-    public const string SYS_UNDO = "SYS_UNDO";
-    public static List<SQLBackAbstract> ConnectedSQLBack = new();
+    public const string SysStyle = "SYS_STYLE";
+    public const string SysUndo = "SYS_UNDO";
+    public static List<SqlBackAbstract> ConnectedSqlBack = new();
 
     //public static List<SQLBackAbstract>? PossibleSQLBacks;
-    protected DbConnection? _connection;
+    protected DbConnection? Connection;
 
-    private readonly object fill = new();
-    private readonly object getChanges = new();
-    private readonly object getRow = new();
-    private readonly object openclose = new();
+    private readonly object _fill = new();
+    private readonly object _getChanges = new();
+    private readonly object _getRow = new();
+    private readonly object _openclose = new();
 
     #endregion
 
     #region Constructors
 
-    public SQLBackAbstract() =>
+    public SqlBackAbstract() =>
         //GetSQLBacks();
-        ConnectedSQLBack.Add(this);
+        ConnectedSqlBack.Add(this);
 
     #endregion
 
     #region Properties
 
-    public bool ConnectionOk => _connection != null;
+    public bool ConnectionOk => Connection != null;
     public string ConnectionString { get; protected set; } = string.Empty;
 
     public string Date => "DATE";
@@ -114,7 +111,6 @@ public abstract class SQLBackAbstract {
     /// </summary>
     /// <param name="tablename"></param>
     /// <param name="columnName"></param>
-    /// <param name="columnKey"></param>
     public string AddColumnToMain(string tablename, string columnName) {
         columnName = columnName.ToUpper();
 
@@ -126,25 +122,25 @@ public abstract class SQLBackAbstract {
     }
 
     public string AddUndo(string tablename, DatabaseDataType comand, string? columname, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
-        if (!OpenConnection()) { return "Verbindung fehlgeschlagen"; }
+        if (!OpenConnection() || Connection == null) { return "Verbindung fehlgeschlagen"; }
 
         //var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
         var rk = rowKey is not null and > -1 ? rowKey.ToString() : string.Empty;
 
-        var cmdString = "INSERT INTO " + SYS_UNDO +
+        var cmdString = "INSERT INTO " + SysUndo +
             " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, TIMECODEUTC, CMT) VALUES (" +
-             DBVAL(tablename.ToUpper()) + "," +
-             DBVAL(comand.ToString()) + "," +
-             DBVAL(columname) + "," +
-             DBVAL(rk) + "," +
-             DBVAL(previousValue) + "," +
-             DBVAL(changedTo) + "," +
-             DBVAL(userName) + "," +
+             Dbval(tablename.ToUpper()) + "," +
+             Dbval(comand.ToString()) + "," +
+             Dbval(columname) + "," +
+             Dbval(rk) + "," +
+             Dbval(previousValue) + "," +
+             Dbval(changedTo) + "," +
+             Dbval(userName) + "," +
              //DBVAL(dt.ToString(Constants.Format_Date)) + "," +
-             DBVAL(DateTime.UtcNow) + "," +
-             DBVAL(comment) + ")";
+             Dbval(DateTime.UtcNow) + "," +
+             Dbval(comment) + ")";
 
-        using var comm = _connection.CreateCommand();
+        using var comm = Connection.CreateCommand();
         comm.CommandText = cmdString;
 
         return ExecuteCommand(comm);
@@ -163,10 +159,12 @@ public abstract class SQLBackAbstract {
     }
 
     public bool CloseConnection() {
-        lock (openclose) {
-            if (_connection.State == ConnectionState.Open) { _connection.Close(); }
+        if (Connection == null) { return true; }
 
-            return _connection.State == ConnectionState.Closed;
+        lock (_openclose) {
+            if (Connection.State == ConnectionState.Open) { Connection.Close(); }
+
+            return Connection.State == ConnectionState.Closed;
         }
     }
 
@@ -180,22 +178,22 @@ public abstract class SQLBackAbstract {
     /// <summary>
     /// Datentabelle befüllen
     /// </summary>
-    /// <param name="sSQL">SQL Commando</param>
-    /// <param name="sTBLNAME">Tabellenname</param>
     /// <returns>befüllte  Tabelle - Datatable</returns>
-    public DataTable Fill_Table(string commandtext) {
+    public DataTable? Fill_Table(string commandtext) {
+        if (!OpenConnection() || Connection == null) { return null; }
+
         try {
-            lock (fill) {
-                var TBL = new DataTable();
-                using var command = _connection.CreateCommand();
+            lock (_fill) {
+                var tbl = new DataTable();
+                using var command = Connection.CreateCommand();
                 command.CommandText = commandtext;
                 _ = OpenConnection();
-                TBL.Load(command.ExecuteReader());
+                tbl.Load(command.ExecuteReader());
                 _ = CloseConnection();
                 //if (TBL.Rows.Count == 1) {
                 //    Develop.DebugPrint("Müssig");
                 //}
-                return TBL;
+                return tbl;
             }
         } catch {
             _ = CloseConnection();
@@ -218,16 +216,16 @@ public abstract class SQLBackAbstract {
 
             if (string.IsNullOrEmpty(columnName)) { columnName = "~Database~"; }
 
-            var cmd = @"select VALUE, PART from " + SYS_STYLE + " " +
-                            "where TABLENAME = " + DBVAL(tablename.ToUpper()) + " " +
-                            "and TYPE = " + DBVAL(type) + " " +
-                            "and COLUMNNAME = " + DBVAL(columnName.ToUpper()) + " " +
+            var cmd = @"select VALUE, PART from " + SysStyle + " " +
+                            "where TABLENAME = " + Dbval(tablename.ToUpper()) + " " +
+                            "and TYPE = " + Dbval(type) + " " +
+                            "and COLUMNNAME = " + Dbval(columnName.ToUpper()) + " " +
                             "ORDER BY PART ASC";
 
             var dt = Fill_Table(cmd);
 
-            //if (!OpenConnection()) { return null; }
-            //using var reader = q.ExecuteReader();
+            if (dt == null) { return null; }
+
             var value = string.Empty;
 
             foreach (var thisRow in dt.Rows) {
@@ -250,19 +248,20 @@ public abstract class SQLBackAbstract {
     /// Wird kein Spaltenname angegeben, werden die Eigenschaften der Datenbank zurück gegeben.
     /// Achtung, die Connection wird nicht geschlossen!
     /// </summary>
+    /// <param name="tablename"></param>
     /// <param name="columnName"></param>
     /// <returns></returns>
     public Dictionary<string, string> GetStyleDataAll(string tablename, string columnName) {
         try {
             var l = new Dictionary<string, string>();
 
-            if (!OpenConnection()) { return l; }
+            if (!OpenConnection() || Connection == null) { return l; }
 
-            using var q = _connection.CreateCommand();
+            using var q = Connection.CreateCommand();
 
-            q.CommandText = @"select TYPE, PART, VALUE from " + SYS_STYLE + " " +
-                            "where TABLENAME = " + DBVAL(tablename.ToUpper()) + " " +
-                            "and COLUMNNAME = " + DBVAL(columnName.ToUpper()) + " " +
+            q.CommandText = @"select TYPE, PART, VALUE from " + SysStyle + " " +
+                            "where TABLENAME = " + Dbval(tablename.ToUpper()) + " " +
+                            "and COLUMNNAME = " + Dbval(columnName.ToUpper()) + " " +
                             "ORDER BY PART ASC";
 
             using var reader = q.ExecuteReader();
@@ -272,7 +271,7 @@ public abstract class SQLBackAbstract {
                 var value = reader[2].ToString();
 
                 if (reader[1].ToString() != "001") {
-                    l[key] = l[key] + value;
+                    l[key] += value;
                 } else {
                     l.Add(key, value);
                 }
@@ -295,6 +294,12 @@ public abstract class SQLBackAbstract {
             com = com + " FROM " + tablename.ToUpper();
 
             var dt = Fill_Table(com);
+            if (dt == null) {
+                _ = CloseConnection();
+                Develop.CheckStackForOverflow();
+                LoadAllRowKeys(tablename, row);
+                return;
+            }
             //OpenConnection();
 
             //using var command = _connection.CreateCommand();
@@ -318,9 +323,6 @@ public abstract class SQLBackAbstract {
         }
     }
 
-    //    CloseConnection();
-    //}
-
     /// <summary>
     ///
     /// </summary>
@@ -330,15 +332,19 @@ public abstract class SQLBackAbstract {
     /// <param name="sortedRows"></param>
     public void LoadRow(string tablename, List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows) {
         try {
-            if (row == null || row.Count == 0 || row[0] is null || row[0]?.Database is null) { return; }
-            if (!OpenConnection()) { return; }
+            if (row.Count == 0 || row[0] is null) { return; }
 
-            lock (getRow) {
+            var db = row[0]?.Database;
+            if (db == null || db.IsDisposed) { return; }
+
+            if (!OpenConnection() || Connection == null) { return; }
+
+            lock (_getRow) {
                 var com = "SELECT RK, ";
 
                 var count = 0;
 
-                foreach (var thiscolumn in row[0].Database.Column) {
+                foreach (var thiscolumn in db.Column) {
                     if (refreshAlways || thiscolumn.IsInCache == null) {
                         count++;
                         com = com + thiscolumn.Name.ToUpper() + ", ";
@@ -349,38 +355,37 @@ public abstract class SQLBackAbstract {
 
                 com = com.TrimEnd(", ");
 
-                FillUp100(row, sortedRows);
+                _ = FillUp100(row, sortedRows);
 
                 com = com + " FROM " + tablename.ToUpper() + " WHERE ";
 
                 foreach (var thisr in row) {
-                    com = com + "RK = " + DBVAL(thisr.Key) + " OR ";
+                    com = com + "RK = " + Dbval(thisr.Key) + " OR ";
                 }
 
                 com = com.TrimEnd(" OR ");
 
-                if (!OpenConnection()) { return; }
+                if (!OpenConnection() || Connection == null) { return; }
 
                 var dt = Fill_Table(com);
 
-                //OpenConnection();
-
-                //using var command = _connection.CreateCommand();
-                //command.CommandText = com;
-
-                //using var reader = command.ExecuteReader();
+                if (dt == null) { return; }
 
                 foreach (var thisRow in dt.Rows) {
                     var reader = (DataRow)thisRow;
                     var rk = LongParse(reader[0].ToString());
-                    var r = row[0].Database.Row.SearchByKey(rk) ?? row[0].Database.Row.GenerateAndAdd(rk, string.Empty, false, false, "Load row");
+                    var r = db.Row.SearchByKey(rk) ?? db.Row.GenerateAndAdd(rk, string.Empty, false, false, "Load row");
 
-                    for (var z = 1; z < dt.Columns.Count; z++) {
-                        var cx = r.Database.Column.Exists(dt.Columns[z].ColumnName);
-                        _ = r.Database.Cell.SetValueInternal(cx.Name, r.Key, reader[z].ToString(), true);
+                    if (r != null) {
+                        for (var z = 1; z < dt.Columns.Count; z++) {
+                            var cx = db.Column.Exists(dt.Columns[z].ColumnName);
+                            if (cx != null) {
+                                _ = db.Cell.SetValueInternal(cx.Name, r.Key, reader[z].ToString(), true);
+                            }
+                        }
+
+                        r.IsInCache = DateTime.UtcNow;
                     }
-
-                    r.IsInCache = DateTime.UtcNow;
                     //if (!r.RowInChache()) {
                     //    Develop.DebugPrint(FehlerArt.Warnung, "Zeile ohne Zeitstempel, repariert! + " + com);
                     //    r.CellSet(r.Database.Column.SysRowChangeDate, DateTime.UtcNow.ToString(Constants.Format_Date5));
@@ -397,13 +402,13 @@ public abstract class SQLBackAbstract {
 
     //    Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds + " Sekunden");
     public bool OpenConnection() {
-        lock (openclose) {
-            if (_connection == null) { return false; }
-            if (_connection.State == ConnectionState.Closed) {
-                _connection.Open();
+        lock (_openclose) {
+            if (Connection == null) { return false; }
+            if (Connection.State == ConnectionState.Closed) {
+                Connection.Open();
             }
 
-            return _connection.State == ConnectionState.Open;
+            return Connection.State == ConnectionState.Open;
         }
     }
 
@@ -411,7 +416,7 @@ public abstract class SQLBackAbstract {
     //            row.Database.Cell.SetValueInternal(row.Database?.Column[z - 1].Key, r, reader[z].ToString(false), -1, -1);
     //        }
     //    }
-    public abstract SQLBackAbstract OtherTable(string tablename);
+    public abstract SqlBackAbstract OtherTable(string tablename);
 
     //    while (await reader.ReadAsync()) {
     //        var rk = LongParse(reader[0].ToString(false));
@@ -423,7 +428,7 @@ public abstract class SQLBackAbstract {
         var cmdString = @"ALTER TABLE " + tablename + " RENAME COLUMN " + oldname + " TO " + newname;
         _ = ExecuteCommand(cmdString);
 
-        cmdString = "UPDATE " + SYS_STYLE + " SET COLUMNNAME = " + DBVAL(newname) + " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) + " AND COLUMNNAME = " + DBVAL(oldname.ToUpper());
+        cmdString = "UPDATE " + SysStyle + " SET COLUMNNAME = " + Dbval(newname) + " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) + " AND COLUMNNAME = " + Dbval(oldname.ToUpper());
         _ = ExecuteCommand(cmdString);
 
         var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), newname);
@@ -458,38 +463,38 @@ public abstract class SQLBackAbstract {
 
         #region Style
 
-        if (!x.Contains(SYS_STYLE)) {
-            _ = CreateTable(SYS_STYLE, new List<string> { "TABLENAME", "COLUMNNAME", "TYPE", "PART" });
+        if (!x.Contains(SysStyle)) {
+            _ = CreateTable(SysStyle, new List<string> { "TABLENAME", "COLUMNNAME", "TYPE", "PART" });
             ChangeDataType(tablename.ToUpper(), "COLUMNNAME", 128);
             ChangeDataType(tablename.ToUpper(), "TABLENAME", 128);
             ChangeDataType(tablename.ToUpper(), "PART", 3);
         }
 
-        var colStyle = GetColumnNames(SYS_STYLE);
+        var colStyle = GetColumnNames(SysStyle);
         if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
 
-        if (!colStyle.Contains("VALUE")) { AddColumn(SYS_STYLE, "VALUE", VarChar4000, true); }
+        if (!colStyle.Contains("VALUE")) { AddColumn(SysStyle, "VALUE", VarChar4000, true); }
 
         #endregion
 
         #region  Undo
 
-        if (!x.Contains(SYS_UNDO)) { _ = CreateTable(SYS_UNDO); }
+        if (!x.Contains(SysUndo)) { _ = CreateTable(SysUndo); }
 
-        var colUndo = GetColumnNames(SYS_UNDO);
+        var colUndo = GetColumnNames(SysUndo);
         if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colUndo.Contains("TABLENAME")) { AddColumn(SYS_UNDO, "TABLENAME", VarChar255, false); }
-        if (!colUndo.Contains("COMAND")) { AddColumn(SYS_UNDO, "COMAND", false); }
+        if (!colUndo.Contains("TABLENAME")) { AddColumn(SysUndo, "TABLENAME", VarChar255, false); }
+        if (!colUndo.Contains("COMAND")) { AddColumn(SysUndo, "COMAND", false); }
         //if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SYS_UNDO, "COLUMNNAME", false); }
-        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SYS_UNDO, "COLUMNKEY", VarChar15, true); }
-        if (!colUndo.Contains("ROWKEY")) { AddColumn(SYS_UNDO, "ROWKEY", VarChar15, true); }
-        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SYS_UNDO, "PREVIOUSVALUE", VarChar4000, true); }
-        if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SYS_UNDO, "CHANGEDTO", VarChar4000, true); }
-        if (!colUndo.Contains("USERNAME")) { AddColumn(SYS_UNDO, "USERNAME", false); }
+        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", VarChar15, true); }
+        if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", VarChar15, true); }
+        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SysUndo, "PREVIOUSVALUE", VarChar4000, true); }
+        if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SysUndo, "CHANGEDTO", VarChar4000, true); }
+        if (!colUndo.Contains("USERNAME")) { AddColumn(SysUndo, "USERNAME", false); }
         //if (!colUndo.Contains("DATETIMEUTC")) { AddColumn(SYS_UNDO, "DATETIMEUTC", false); }
-        if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SYS_UNDO, "TIMECODEUTC", Date, false); }
-        if (!colUndo.Contains("CMT")) { AddColumn(SYS_UNDO, "CMT", VarChar255, true); }
-        if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SYS_UNDO, "COLUMNNAME", VarChar255, true); }
+        if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SysUndo, "TIMECODEUTC", Date, false); }
+        if (!colUndo.Contains("CMT")) { AddColumn(SysUndo, "CMT", VarChar255, true); }
+        if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SysUndo, "COLUMNNAME", VarChar255, true); }
 
         #endregion
 
@@ -539,10 +544,10 @@ public abstract class SQLBackAbstract {
         if (isVal == null) { return "Kein Wert angekommen!"; }
         if (isVal == newValue) { return string.Empty; }
 
-        _ = ExecuteCommand("DELETE FROM " + SYS_STYLE +
-                       " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) +
-                       " AND COLUMNNAME = " + DBVAL(columnName.ToUpper()) +
-                       " AND TYPE = " + DBVAL(type.ToString()));
+        _ = ExecuteCommand("DELETE FROM " + SysStyle +
+                       " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) +
+                       " AND COLUMNNAME = " + Dbval(columnName.ToUpper()) +
+                       " AND TYPE = " + Dbval(type.ToString()));
 
         do {
             c++;
@@ -582,20 +587,16 @@ public abstract class SQLBackAbstract {
         return ok;
     }
 
-    //    using var command = _connection.CreateCommand();
-    //    command.CommandText = com; //@"select * from " + tablename.ToUpper();
     /// <summary>
     /// Führt eine eine Änderung im BackEnd aus
     /// </summary>
     /// <param name="tablename"></param>
     /// <param name="type"></param>
     /// <param name="value"></param>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="width"></param>
-    /// <param name="height"></param>
+    /// <param name="columname"></param>
+    /// <param name="rowkey"></param>
     /// <returns></returns>
-    public string SetValueInternal(string tablename, DatabaseDataType type, string value, string? columname, long? rowkey, bool isLoading) {
+    public string SetValueInternal(string tablename, DatabaseDataType type, string value, string? columname, long? rowkey) {
 
         #region Ignorieren
 
@@ -625,7 +626,7 @@ public abstract class SQLBackAbstract {
 
         #region Spalten Eigenschaften
 
-        if (type.IsColumnTag()) {
+        if (type.IsColumnTag() && columname != null) {
             return SetStyleData(tablename, type, columname.ToUpper(), value);
         }
 
@@ -633,7 +634,7 @@ public abstract class SQLBackAbstract {
 
         #region Zellen-Wert
 
-        if (type.IsCellValue()) {
+        if (type.IsCellValue() && columname != null && rowkey != null) {
             return SetCellValue(tablename, columname, (long)rowkey, value);
         }
 
@@ -651,6 +652,7 @@ public abstract class SQLBackAbstract {
                     return AddColumnToMain(tablename, value);
 
                 case DatabaseDataType.Comand_RemoveColumn:
+                    if (columname == null) { return "Spalte nicht definiert!"; }
                     return RemoveColumn(tablename, columname);
 
                 case DatabaseDataType.Comand_RemoveRow:
@@ -679,8 +681,8 @@ public abstract class SQLBackAbstract {
     public List<string> Tables() {
         var l = AllTables();
 
-        _ = l.Remove(SYS_STYLE);
-        _ = l.Remove(SYS_UNDO);
+        _ = l.Remove(SysStyle);
+        _ = l.Remove(SysUndo);
         return l;
     }
 
@@ -703,34 +705,34 @@ public abstract class SQLBackAbstract {
         if (!OpenConnection()) { return null; }
 
         try {
-            lock (getChanges) {
+            lock (_getChanges) {
                 //using var q = _connection.CreateCommand();
 
-                var CommandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, TIMECODEUTC from " + SYS_UNDO + " ";
+                var commandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, TIMECODEUTC from " + SysUndo + " ";
 
                 // nur bestimmte Tabellen
-                CommandText += "WHERE (";
+                commandText += "WHERE (";
                 foreach (var thisdb in db) {
-                    CommandText += "TABLENAME=" + DBVAL(thisdb.TableName.ToUpper()) + " OR ";
+                    commandText += "TABLENAME=" + Dbval(thisdb.TableName.ToUpper()) + " OR ";
                 }
-                CommandText = CommandText.TrimEnd(" OR ") + ") AND ";
+                commandText = commandText.TrimEnd(" OR ") + ") AND ";
 
                 // Zeit einbeziehen
-                CommandText += "(TIMECODEUTC BETWEEN " + DBVAL(fromDate)
-                                 + " AND " + DBVAL(toDate) + ")";
+                commandText += "(TIMECODEUTC BETWEEN " + Dbval(fromDate)
+                                 + " AND " + Dbval(toDate) + ")";
 
                 // Sortierung nach Tabellen
-                CommandText += " ORDER BY TIMECODEUTC ASC";
+                commandText += " ORDER BY TIMECODEUTC ASC";
 
                 var fb = new List<(string tablename, string comand, string columnname, string rowid, DateTime timecode)>();
 
-                var dt = Fill_Table(CommandText);
+                var dt = Fill_Table(commandText);
 
-                //if (!OpenConnection()) { return null; }
-                //using var reader = q.ExecuteReader();
-                //while (reader.Read()) {
-                //    fb.Add((reader[0].ToString(false), reader[1].ToString(false), reader[2].ToString(false), reader[3].ToString(false)));
-                //}
+                if (dt == null) {
+                    _ = CloseConnection();
+                    Develop.CheckStackForOverflow();
+                    return GetLastChanges(db, fromDate, toDate);
+                }
 
                 foreach (var thisRow in dt.Rows) {
                     var reader = (DataRow)thisRow;
@@ -741,7 +743,7 @@ public abstract class SQLBackAbstract {
                 return fb;
             }
         } catch {
-            if (_connection != null && _connection.State != ConnectionState.Open) {
+            if (Connection != null && Connection.State != ConnectionState.Open) {
                 _ = CloseConnection();
                 Develop.CheckStackForOverflow();
                 return GetLastChanges(db, fromDate, toDate);
@@ -751,13 +753,13 @@ public abstract class SQLBackAbstract {
         }
     }
 
-    internal SQLBackAbstract? HandleMe(ConnectionInfo ci) {
+    internal SqlBackAbstract? HandleMe(ConnectionInfo ci) {
         if (ci is null) { return null; }
 
         //var s = connectionID.SplitBy("|");
         //if (s.Count() != 2) { return null; }
 
-        foreach (var thisK in ConnectedSQLBack) {
+        foreach (var thisK in ConnectedSqlBack) {
             if (thisK.ConnectionOk && thisK.ConnectionString == ci.DatabaseID) {
                 return thisK.OtherTable(ci.TableName);
             }
@@ -788,7 +790,8 @@ public abstract class SQLBackAbstract {
 
             if (columnsToLoad.Count == 0) { return; }
 
-            //if (isLoading) { Develop.DebugPrint("Loading falsch"); }
+            var db = columnsToLoad[0].Database;
+            if (db == null || db.IsDisposed) { return; }
 
             var wh = string.Empty;
 
@@ -806,10 +809,11 @@ public abstract class SQLBackAbstract {
 
             var dt = Fill_Table(com);
 
-            //if (!OpenConnection()) { return; }
-
-            //using var command = _connection.CreateCommand();
-            //command.CommandText = com;
+            if (dt == null) {
+                Develop.CheckStackForOverflow();
+                LoadColumns(tablename, columns);
+                return;
+            }
 
             //using var reader = command.ExecuteReader();
             foreach (var thisRow in dt.Rows) {
@@ -818,19 +822,19 @@ public abstract class SQLBackAbstract {
                 #region Zeile ermitteln, in die der Wert geschrieben werden soll
 
                 var rk = LongParse(reader[0].ToString());
-                var row = columnsToLoad[0].Database.Row.SearchByKey(rk);
+                var row = db.Row.SearchByKey(rk);
 
                 if (row == null) {
-                    //p
-                    //row = columnsToLoad[0].Database.Row.GenerateAndAdd(rk, string.Empty, false, false);
-                    _ = columnsToLoad[0].Database.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, true);
-                    row = columnsToLoad[0].Database.Row.SearchByKey(rk);
+                    _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, true);
+                    row = db.Row.SearchByKey(rk);
                 }
 
                 #endregion
 
-                for (var z = 1; z < dt.Columns.Count; z++) {
-                    _ = row.Database.Cell.SetValueInternal(columnsToLoad[z - 1].Name, row.Key, reader[z].ToString(), true);
+                if (row != null) {
+                    for (var z = 1; z < dt.Columns.Count; z++) {
+                        _ = db.Cell.SetValueInternal(columnsToLoad[z - 1].Name, row.Key, reader[z].ToString(), true);
+                    }
                 }
             }
 
@@ -857,24 +861,12 @@ public abstract class SQLBackAbstract {
         }
     }
 
-    //        if (!OpenConnection()) { return null; }
-    //        using var reader = q.ExecuteReader();
-    //        var value = string.Empty;
-    //        while (reader.Read()) {
-    //            value = reader[0].ToString();
-    //            break;
-    //        }
     /// <summary>
     /// Gibt alle verfügbaren Tabellen - einschließlich der Systemtabellen - zurück
     /// </summary>
     /// <returns></returns>
     protected abstract List<string> AllTables();
 
-    //        q.CommandText = @"select CHANGEDTO from " + SYS_UNDO + " ";
-    //        q.CommandText += "WHERE TABLENAME=" + DBVAL(tablename.ToUpper()) + " AND ";
-    //        q.CommandText += "COMAND=" + DBVAL(DatabaseDataType.ColumnName.ToString()) + " AND ";
-    //        q.CommandText += "COLUMNKEY=" + DBVAL(key);
-    //        q.CommandText += " ORDER BY TIMECODEUTC DESC";
     protected abstract string CreateTable(string tablename);
 
     //    try {
@@ -885,10 +877,9 @@ public abstract class SQLBackAbstract {
     //internal string? GetLastColumnName(string tablename, long key) {
     //    if (!OpenConnection()) { return null; }
     protected string ExecuteCommand(string commandtext) {
-        if (!OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
-        if (_connection == null) { return "Keine Verbindung vorhanden."; }
+        if (!OpenConnection() || Connection == null) { return "Verbindung konnte nicht geöffnet werden"; }
 
-        using var command = _connection.CreateCommand();
+        using var command = Connection.CreateCommand();
         command.CommandText = commandtext;
 
         return ExecuteCommand(command);
@@ -898,11 +889,6 @@ public abstract class SQLBackAbstract {
     //    }
     private void AddColumn(string tablename, string column, bool nullable) => AddColumn(tablename, column, VarChar255, nullable);
 
-    //    foreach (var thiscolumn in row.Database.Column) {
-    //        if (!allcols.Contains(thiscolumn.Name.ToUpper())) {
-    //            Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht auf dem Server vorhanden: " + thiscolumn.Name);
-    //        }
-    //        allcols.Remove(thiscolumn.Name.ToUpper());
     private void AddColumn(string tablename, string column, string type, bool nullable) {
         if (string.IsNullOrEmpty(column)) {
             Develop.DebugPrint(FehlerArt.Warnung, "Spalte ohne Namen!");
@@ -915,30 +901,17 @@ public abstract class SQLBackAbstract {
         _ = ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default ''" + n);
     }
 
-    //    var com = "SELECT RK, ";
-    private string AddRow(string tablename, long key) => ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + DBVAL(key) + ")");
+    private string AddRow(string tablename, long key) => ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + Dbval(key) + ")");
 
-    //    var allcols = GetColumnNames(tablename);
-    //    allcols.Remove("RK");
-    private string DBVAL(long original) => DBVAL(original.ToString());
+    private string Dbval(long original) => Dbval(original.ToString());
 
-    //    //DataTable dataTable = new DataTable();
-    //    //using var cmd = _connection.CreateCommand();
-    //    //cmd.CommandText =@"select * from " + tablename.ToUpper();
-    //    //DbDataAdapter da = DbProviderFactories.GetFactory(_connection).CreateDataAdapter();
-    //    //da.SelectCommand = cmd;
-    //    //da.Fill(dataTable);
-    //    //da?.Dispose();
-    private string DBVAL(DateTime date) =>
+    private string Dbval(DateTime date) =>
         "to_timestamp(" +
-        DBVAL(date.ToString(Constants.Format_Date9)) + ", " +
-        DBVAL(Constants.Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
+        Dbval(date.ToString(Constants.Format_Date9)) + ", " +
+        Dbval(Constants.Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
         ")";
 
-    //[Obsolete]
-    //public async void LoadAllCells(string tablename, RowCollection row) {
-    //    if (!OpenConnection()) { return; }
-    private string DBVAL(string? original) {
+    private string Dbval(string? original) {
         if (original == null) { return "''"; }
 
         original = original.CutToUtf8Length(MaxStringLenght);
@@ -964,7 +937,9 @@ public abstract class SQLBackAbstract {
     /// Füllt die Liste row um count Einträge auf. Ausgehend von thisrow
     /// </summary>
     /// <param name="row"></param>
+    /// <param name="thisrow"></param>
     /// <param name="sortedRows"></param>
+    /// <param name="count"></param>
     /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
     private bool FillUp(List<RowItem> row, RowItem thisrow, List<RowItem> sortedRows, int count) {
         var num = sortedRows.IndexOf(thisrow);
@@ -1014,7 +989,7 @@ public abstract class SQLBackAbstract {
 
         sortedRows.AddRange(db.Row.CalculateFilteredRows(null)); // ALLE Zeilen hinzufügen, nicht dass der Filter auf nein paar beschränkt ist und mehr laden könnte.
 
-        if (sortedRows == null || sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
+        if (sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
 
         var r = new List<RowItem>();
         r.AddRange(row);
@@ -1028,21 +1003,21 @@ public abstract class SQLBackAbstract {
 
     private string? GetCellValue(string tablename, string columnname, long rowkey) {
         try {
-            if (_connection == null) { return null; }
+            if (Connection == null) { return null; }
 
             if (!OpenConnection()) { return null; }
 
             //using var q = _connection.CreateCommand();
 
             var comm = @"select " + columnname.ToUpper() + " from " + tablename.ToUpper() + " " +
-                                   "where RK = " + DBVAL(rowkey);
+                                   "where RK = " + Dbval(rowkey);
 
             ////command.AddParameterWithValue("" + DBVAL(columnName.ToUpper()) , column.Name.ToUpper());
             //command.AddParameterWithValue("" + DBVAL(row.Key)", row.Key.ToString(false));
 
             var dt = Fill_Table(comm);
 
-            if (dt.Rows.Count == 0) { return string.Empty; }
+            if (dt == null || dt.Rows.Count == 0) { return string.Empty; }
             if (dt.Rows.Count > 1) {
                 // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
                 Develop.DebugPrint(columnname + " doppelt in " + tablename.ToUpper() + " vorhanden!");
@@ -1076,13 +1051,13 @@ public abstract class SQLBackAbstract {
         var b = ExecuteCommand("alter table " + tablename.ToUpper() + " drop column " + column.ToUpper());
         if (!string.IsNullOrEmpty(b)) { return "Löschen fehgeschlagen: " + b; }
 
-        b = ExecuteCommand("DELETE FROM " + SYS_STYLE + " WHERE TABLENAME = " + DBVAL(tablename.ToUpper()) + " AND COLUMNNAME = " + DBVAL(column.ToUpper()));
+        b = ExecuteCommand("DELETE FROM " + SysStyle + " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) + " AND COLUMNNAME = " + Dbval(column.ToUpper()));
         if (!string.IsNullOrEmpty(b)) { return "Löschen fehgeschlagen: " + b; }
         return string.Empty;
     }
 
     private string RemoveRow(string tablename, long key) {
-        var b = ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = " + DBVAL(key.ToString()));
+        var b = ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = " + Dbval(key.ToString()));
         if (!string.IsNullOrEmpty(b)) { return "Löschen fehgeschlagen: " + b; }
         return string.Empty;
     }
@@ -1092,9 +1067,9 @@ public abstract class SQLBackAbstract {
     /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
     /// </summary>
     /// <param name="tablename"></param>
-    /// <param name="type"></param>
-    /// <param name="columnName"></param>
+    /// <param name="rowkey"></param>
     /// <param name="newValue"></param>
+    /// <param name="columnname"></param>
     /// <returns></returns>
     private string SetCellValue(string tablename, string columnname, long rowkey, string newValue) {
         var isVal = GetCellValue(tablename, columnname, rowkey);
@@ -1102,9 +1077,9 @@ public abstract class SQLBackAbstract {
         string cmdString;
 
         if (isVal is null) {
-            cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + columnname.ToUpper() + " ) VALUES (" + DBVAL(rowkey) + ", " + DBVAL(newValue) + " )";
+            cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + columnname.ToUpper() + " ) VALUES (" + Dbval(rowkey) + ", " + Dbval(newValue) + " )";
         } else if (isVal != newValue) {
-            cmdString = "UPDATE " + tablename.ToUpper() + " SET " + columnname.ToUpper() + " = " + DBVAL(newValue) + " WHERE RK = " + DBVAL(rowkey);
+            cmdString = "UPDATE " + tablename.ToUpper() + " SET " + columnname.ToUpper() + " = " + Dbval(newValue) + " WHERE RK = " + Dbval(rowkey);
         } else {
             return string.Empty;
         }
@@ -1120,20 +1095,21 @@ public abstract class SQLBackAbstract {
     /// <param name="type"></param>
     /// <param name="columnName"></param>
     /// <param name="newValue"></param>
+    /// <param name="part"></param>
     /// <returns></returns>
     private string SetStyleData(string tablename, string type, string columnName, string newValue, int part) {
-        var cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + DBVAL(tablename.ToUpper()) + ", " + DBVAL(type) + ", " + DBVAL(columnName.ToUpper()) + ", " + DBVAL(newValue) + ", " + DBVAL(part.ToString(Constants.Format_Integer3)) + ")";
+        var cmdString = "INSERT INTO " + SysStyle + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + Dbval(tablename.ToUpper()) + ", " + Dbval(type) + ", " + Dbval(columnName.ToUpper()) + ", " + Dbval(newValue) + ", " + Dbval(part.ToString(Constants.Format_Integer3)) + ")";
         if (!OpenConnection()) { return "Verbindung konnt nicht geöffnet werden"; }
         return ExecuteCommand(cmdString);
     }
 
     private void SysUndoAufräumen() {
-        var c = "DELETE FROM " + SYS_UNDO +
-                  " WHERE RK NOT IN " +
-                    "(SELECT RK FROM (SELECT RK, ROW_NUMBER() OVER (PARTITION BY TABLENAME ORDER BY TIMECODEUTC DESC) as row_num   FROM " + SYS_UNDO + ") WHERE row_num <= 500)" +
-                     "AND TIMECODEUTC<" + DBVAL(DateTime.UtcNow.AddDays(-7));
+        var c = "DELETE FROM " + SysUndo +
+                " WHERE RK NOT IN " +
+                "(SELECT RK FROM (SELECT RK, ROW_NUMBER() OVER (PARTITION BY TABLENAME ORDER BY TIMECODEUTC DESC) as row_num FROM " + SysUndo + ") WHERE row_num <= 500)" +
+                "AND TIMECODEUTC<" + Dbval(DateTime.UtcNow.AddDays(-7));
 
-        ExecuteCommand(c);
+        _ = ExecuteCommand(c);
     }
 
     #endregion

@@ -36,7 +36,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Fields
 
-    private readonly ConcurrentDictionary<long, RowItem?> _internal = new();
+    private readonly ConcurrentDictionary<long, RowItem> _internal = new();
     private bool _throwEvents = true;
 
     #endregion
@@ -194,10 +194,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return tmpVisibleRows;
     }
 
-    public List<RowData> CalculateSortedRows(ICollection<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem?>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
+    public List<RowData> CalculateSortedRows(ICollection<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 
-    public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem?>? pinnedRows, List<RowData>? reUseMe) {
-        if (Database == null || Database.IsDisposed) { return new List<RowData>(); }
+    public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
+        var db = Database;
+        if (db == null || db.IsDisposed) { return new List<RowData>(); }
 
         VisibleRowCount = 0;
 
@@ -205,8 +206,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         var capName = pinnedRows != null && pinnedRows.Count > 0;
         if (!capName) {
-            if (filteredRows.Any(thisRow => !thisRow.CellIsNullOrEmpty(thisRow.Database.Column.SysChapter))) {
-                capName = true;
+            foreach (var thisRow in filteredRows) {
+                if (thisRow.Database != null && !thisRow.CellIsNullOrEmpty(thisRow.Database.Column.SysChapter)) {
+                    capName = true;
+                    break;
+                }
             }
         }
 
@@ -214,9 +218,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         var l = new List<ColumnItem>();
         if (rowSortDefinition != null) { l.AddRange(rowSortDefinition.Columns); }
-        if (Database.Column.SysChapter != null) { _ = l.AddIfNotExists(Database.Column.SysChapter); }
+        if (db.Column.SysChapter != null) { _ = l.AddIfNotExists(db.Column.SysChapter); }
 
-        Database.RefreshColumnsData(l);
+        db.RefreshColumnsData(l);
 
         #region _Angepinnten Zeilen erstellen (_pinnedData)
 
@@ -247,7 +251,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
             var added = markYellow;
 
-            var caps = thisRow.CellGetList(thisRow.Database.Column.SysChapter);
+            var caps = thisRow.CellGetList(thisRow.Database?.Column.SysChapter);
 
             if (caps.Count > 0) {
                 if (caps.Contains(string.Empty)) {
@@ -324,7 +328,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         GC.SuppressFinalize(this);
     }
 
-    public string ExecuteScript(EventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem?>? pinned, bool fullCheck, bool changevalues) {
+    public string ExecuteScript(EventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem>? pinned, bool fullCheck, bool changevalues) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
 
         var rows = CalculateVisibleRows(filter, pinned);
@@ -365,28 +369,27 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="comment"></param>
     /// <returns></returns>
     public RowItem? GenerateAndAdd(long key, string valueOfCellInFirstColumn, bool runScriptOfNewRow, bool fullprocessing, string comment) {
-        if (Database == null || Database.IsDisposed) { return null; }
+        var db = Database;
+        if (db == null || db.IsDisposed) { return null; }
 
         var item = SearchByKey(key);
         if (item != null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
             return null;
         }
-        _ = Database?.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString(), comment);
+        _ = db.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString(), comment);
         item = SearchByKey(key);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
             return null;
         }
 
-
-
         if (fullprocessing) {
-            Database.Cell.SystemSet(Database.Column.SysRowCreator, item, Database.UserName);
-            Database.Cell.SystemSet(Database.Column.SysRowCreateDate, item, DateTime.UtcNow.ToString(Constants.Format_Date5));
+            db.Cell.SystemSet(db.Column.SysRowCreator, item, db.UserName);
+            db.Cell.SystemSet(db.Column.SysRowCreateDate, item, DateTime.UtcNow.ToString(Constants.Format_Date5));
 
             // Dann die Inital-Werte reinschreiben
-            foreach (var thisColum in Database.Column) {
+            foreach (var thisColum in db.Column) {
                 if (thisColum != null && !string.IsNullOrEmpty(thisColum.CellInitValue)) {
                     item.CellSet(thisColum, thisColum.CellInitValue);
                 }
@@ -394,14 +397,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (!string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
-            item.CellSet(Database!.Column.First, valueOfCellInFirstColumn);
+            item.CellSet(db.Column.First, valueOfCellInFirstColumn);
         }
-
 
         if (runScriptOfNewRow) {
             _ = item.ExecuteScript(EventTypes.new_row, string.Empty, true, true, true, 0.1f);
         }
-
 
         return item;
     }
@@ -413,8 +414,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Am Schluß wird noch das Skript ausgeführt.
     /// </summary>
     /// <param name="fi"></param>
+    /// <param name="comment"></param>
     /// <returns></returns>
-
     public RowItem? GenerateAndAdd(List<FilterItem> fi, string comment) {
         if (Database == null || Database.IsDisposed) { return null; }
 
@@ -460,12 +461,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public bool Remove(long key, string comment) => string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString(), comment));
 
-    public bool Remove(FilterItem filter, List<RowItem?>? pinned, string comment) {
+    public bool Remove(FilterItem filter, List<RowItem>? pinned, string comment) {
         FilterCollection nf = new(Database) { filter };
         return Remove(nf, pinned, comment);
     }
 
-    public bool Remove(FilterCollection? filter, List<RowItem?>? pinned, string comment) {
+    public bool Remove(FilterCollection? filter, List<RowItem>? pinned, string comment) {
         var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.Key).Select(dummy => dummy).ToList();
         var did = false;
 
@@ -485,7 +486,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public bool Remove(RowItem? row, string comment) => row != null && Remove(row.Key, comment);
 
     public bool RemoveOlderThan(float inHours, string comment) {
-        var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate) where DateTime.Now.Subtract(d).TotalHours > inHours select thisrowitem.Key).Select(dummy => dummy).ToList();
+        var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(Database?.Column.SysRowCreateDate) where DateTime.Now.Subtract(d).TotalHours > inHours select thisrowitem.Key).Select(dummy => dummy).ToList();
         //foreach (var thisrowitem in _Internal.Values)
         //{
         //    if (thisrowitem != null)
@@ -510,10 +511,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    internal static List<RowItem> MatchesTo(FilterItem? filterItem) {
+    internal static List<RowItem> MatchesTo(FilterItem filterItem) {
         List<RowItem> l = new();
 
-        if (filterItem == null) { return l; }
+        if (filterItem.Database == null) { return l; }
 
         l.AddRange(filterItem.Database.Row.Where(thisRow => thisRow.MatchesTo(filterItem)));
         return l;
@@ -523,8 +524,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         List<RowItem> l = new();
 
         if (filterItem == null || filterItem.Count < 1) { return l; }
+        var db = filterItem[0].Database;
+        if (db == null || db.IsDisposed) { return l; }
 
-        l.AddRange(filterItem[0].Database.Row.Where(thisRow => thisRow.MatchesTo(filterItem)));
+        l.AddRange(db.Row.Where(thisRow => thisRow.MatchesTo(filterItem)));
         return l;
     }
 
@@ -538,7 +541,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // Zeilen erzeugen und Format übertragen
         foreach (var thisRow in sourceDatabase.Row) {
             var l = SearchByKey(thisRow.Key) ?? GenerateAndAdd(thisRow.Key, string.Empty, false, false, "Clone - Zeile fehlt");
-            l.CloneFrom(thisRow, true);
+            l?.CloneFrom(thisRow, true);
         }
 
         if (sourceDatabase.Row.Count != Count) {
@@ -585,8 +588,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     internal string SetValueInternal(DatabaseDataType type, long? key, bool isLoading) {
         if (key is null or < 0) { return "Schlüsselfehler"; }
 
+        var db = Database;
+        if (db == null || db.IsDisposed) { return "Datenbank verworfen"; }
+
         if (type == DatabaseDataType.Comand_AddRow) {
-            var c = new RowItem(Database, (long)key);
+            var c = new RowItem(db, (long)key);
 
             return Add(c);
         }
@@ -596,9 +602,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (row == null) { return "Zeile nicht vorhanden"; }
 
             OnRowRemoving(new RowEventArgs(row));
-            foreach (var thisColumnItem in Database.Column) {
+            foreach (var thisColumnItem in db.Column) {
                 if (thisColumnItem != null) {
-                    Database.Cell.Delete(thisColumnItem, (long)key);
+                    db.Cell.Delete(thisColumnItem, (long)key);
                 }
             }
 

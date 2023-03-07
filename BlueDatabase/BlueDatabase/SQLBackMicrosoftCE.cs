@@ -31,7 +31,7 @@ namespace BlueDatabase;
 //https://www.c-sharpcorner.com/article/create-a-sql-server-database-dynamically-in-C-Sharp/
 //https://www.ictdemy.com/csharp/databases/introduction-to-databases-in-csharp-net
 //https://docs.microsoft.com/en-us/troubleshoot/developer/visualstudio/csharp/language-compilers/create-sql-server-database-programmatically
-public class SQLBackMicrosoftCE : SQLBackAbstract {
+public class SQLBackMicrosoftCE : SqlBackAbstract {
 
     #region Constructors
 
@@ -42,7 +42,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
 
         Filename = sql.Filename;
         ConnectionString = sql.ConnectionString;
-        _connection = sql._connection;
+        Connection = sql.Connection;
         RepairAll(tablename.ToUpper());
     }
 
@@ -53,7 +53,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
                            "Integrated Security=True;Trusted_Connection=Yes;";
 
         Filename = filename;
-        _connection = new SqlConnection(ConnectionString);
+        Connection = new SqlConnection(ConnectionString);
 
         RepairAll(string.Empty);
     }
@@ -68,7 +68,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         ConnectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=" + filename + ";" +
                            "Integrated Security=True;Trusted_Connection=Yes;";
 
-        _connection = new SqlConnection(ConnectionString);
+        Connection = new SqlConnection(ConnectionString);
 
         RepairAll(tablename.ToUpper());
     }
@@ -138,7 +138,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
 
         var columns = new List<string>();
 
-        using var com = _connection.CreateCommand();
+        using var com = Connection.CreateCommand();
 
         com.CommandText = @"SELECT * FROM " + tablename;
 
@@ -155,7 +155,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
         return columns;
     }
 
-    public override SQLBackAbstract OtherTable(string tablename) => new SQLBackMicrosoftCE(this, tablename);
+    public override SqlBackAbstract OtherTable(string tablename) => new SQLBackMicrosoftCE(this, tablename);
 
     public override string VarChar(int lenght) => "VARCHAR(" + lenght + ")";
 
@@ -164,7 +164,7 @@ public class SQLBackMicrosoftCE : SQLBackAbstract {
 
         _ = OpenConnection();
 
-        var dt = _connection.GetSchema("Tables");
+        var dt = Connection.GetSchema("Tables");
         foreach (DataRow row in dt.Rows) {
             var tablename = (string)row[2];
             tables.Add(tablename);

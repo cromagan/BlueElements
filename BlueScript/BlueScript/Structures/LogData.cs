@@ -32,7 +32,7 @@ public class LogData {
     /// <summary>
     ///  In welcher Sub wir uns gerade befinden
     /// </summary>
-    public readonly string Subname = string.Empty;
+    public readonly string Subname;
 
     #endregion
 
@@ -53,7 +53,7 @@ public class LogData {
 
     #region Methods
 
-    public void AddMessage(string errormessage) => Protocol?.Add("[" + Subname + ", Zeile: " + Line + "]@" + errormessage);
+    public void AddMessage(string errormessage) => Protocol.Add("[" + Subname + ", Zeile: " + Line + "]@" + errormessage);
 
     public void LineAdd(int c) {
         if (c < 0) {

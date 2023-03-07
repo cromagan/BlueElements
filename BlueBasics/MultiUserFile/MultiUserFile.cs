@@ -241,7 +241,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     public void Dispose(bool disposing) {
         if (!IsDisposed) {
-            AllFiles.Remove(this);
+            _ = AllFiles.Remove(this);
             if (disposing) {
                 // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
             }

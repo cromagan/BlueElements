@@ -20,10 +20,8 @@
 using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
 

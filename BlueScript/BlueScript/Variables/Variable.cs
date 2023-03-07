@@ -18,7 +18,6 @@
 #nullable enable
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -400,7 +399,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernStd);
         if (uu > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, uu), s, ld);
-            if (!txt1.AllOk) {
+            if (!txt1.AllOk || txt1.Variable == null) {
                 return new DoItFeedback(ld, "Befehls-Berechnungsfehler vor &&");
             }
 
@@ -413,7 +412,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernStd);
         if (oo > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, oo), s, ld);
-            if (!txt1.AllOk) {
+            if (!txt1.AllOk || txt1.Variable == null) {
                 return new DoItFeedback(ld, "Befehls-Berechnungsfehler vor ||");
             }
 
@@ -440,7 +439,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         var (posa, _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
         if (posa > -1) {
             var (pose, _) = NextText(txt, posa, KlammerZu, false, false, KlammernStd);
-            if (pose <= posa) { return DoItFeedback.Klammerfehler(null); }
+            if (pose <= posa) { return DoItFeedback.Klammerfehler(ld); }
 
             var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
             if (!string.IsNullOrEmpty(tmptxt)) {

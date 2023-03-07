@@ -36,7 +36,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     #region Fields
 
-    public List<WorkItem>? Works;
+    public List<WorkItem> Works;
     private readonly MultiUserFile? _muf;
     private bool _loadScriptFired;
 
@@ -127,7 +127,8 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         var nn = Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
         foreach (var thisn in nn) {
-            gb.Add(ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false));
+            var tmp = ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false);
+            if (tmp != null) { gb.Add(tmp); }
         }
         return gb;
     }
@@ -139,7 +140,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
         if (checkExists && !File.Exists(f)) { return null; }
 
-        return new ConnectionInfo(SQLBackAbstract.MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
+        return new ConnectionInfo(SqlBackAbstract.MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
     }
 
     public void DiscardPendingChanges(object sender, System.EventArgs e) => ChangeWorkItems();
@@ -162,15 +163,15 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     }
 
     public override void RefreshColumnsData(List<ColumnItem> columns) {
-        if (columns == null || columns.Count == 0) { return; }
+        if (columns.Count == 0) { return; }
 
         foreach (var thiscol in columns) {
             if (thiscol != null) { thiscol.IsInCache = DateTime.UtcNow; }
         }
     }
 
-    public override bool RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem> sortedRows) {
-        if (row == null || row.Count == 0) { return false; }
+    public override bool RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows) {
+        if (row.Count == 0) { return false; }
 
         foreach (var thisrow in row) {
             thisrow.IsInCache = DateTime.UtcNow;
@@ -199,7 +200,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     public override string UndoText(ColumnItem? column, RowItem? row) => Database.UndoText(column, row, Works);
 
-    public void UnlockHard() => _muf.UnlockHard();
+    public void UnlockHard() => _muf?.UnlockHard();
 
     internal override string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
@@ -228,14 +229,14 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     protected override void Dispose(bool disposing) {
         _muf?.Dispose();
-        Works?.Clear();
+        Works.Clear();
         base.Dispose(disposing);
     }
 
     protected override void Initialize() {
         base.Initialize();
-        _muf.ReloadDelaySecond = 600;
-        Works?.Clear();
+        if (_muf != null) { _muf.ReloadDelaySecond = 600; }
+        Works.Clear();
     }
 
     private void _muf_HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) => e.HasPendingChanges = HasPendingChanges;
@@ -277,7 +278,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     }
 
     private void ExecutePending() {
-        if (!_muf.IsLoading) { Develop.DebugPrint(FehlerArt.Fehler, "Nur während des Parsens möglich"); }
+        if (_muf == null || !_muf.IsLoading) { Develop.DebugPrint(FehlerArt.Fehler, "Nur während des Parsens möglich"); }
 
         if (!HasPendingChanges) { return; }
         // Erst die Neuen Zeilen / Spalten alle neutralisieren

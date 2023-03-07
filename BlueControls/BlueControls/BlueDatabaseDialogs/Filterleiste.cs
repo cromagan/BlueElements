@@ -257,7 +257,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             thisFlexi.Visible = false;
             //thisFlexi.thisFilter = null;
             Controls.Remove(thisFlexi);
-            thisFlexi?.Dispose();
+            thisFlexi.Dispose();
         }
 
         #endregion Unnötige Flexis löschen
@@ -410,7 +410,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         var f = (FlexiControlForFilter)sender;
         if (f.CaptionPosition == ÜberschriftAnordnung.ohne) {
             // ein Großer Knopf ohne Überschrift, da wird der evl. Filter gelöscht
-            _tableView.Filter.Remove(((FlexiControlForFilter)sender).Filter);
+            _ = _tableView.Filter.Remove(((FlexiControlForFilter)sender).Filter);
             return;
         }
         //f.Enabled = false;
@@ -444,7 +444,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                 flx.Filter.Changeto(FilterType.Istgleich_ODER_GroßKleinEgal, v);
             } else {
                 if (string.IsNullOrEmpty(v)) {
-                    _tableView.Filter.Remove(flx.Filter);
+                    _ = _tableView.Filter.Remove(flx.Filter);
                 } else {
                     flx.Filter.Changeto(FilterType.Instr_GroßKleinEgal, v);
                     // flx.Filter.SearchValue[0] =v;

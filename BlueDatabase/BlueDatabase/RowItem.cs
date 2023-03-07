@@ -49,7 +49,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Constructors
 
-    public RowItem(DatabaseAbstract? database, long key) {
+    public RowItem(DatabaseAbstract database, long key) {
         Database = database;
         Key = key;
         _tmpQuickInfo = null;
@@ -172,7 +172,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 break;
 
             case ScriptType.Numeral:
-                FloatTryParse(wert, out var f);
+                _ = FloatTryParse(wert, out var f);
                 vars.Add(new VariableFloat(column.Name, f, ro, false, qi));
                 break;
 
@@ -297,7 +297,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var tmp = LastCheckedRowFeedback;
         if (tmp != null && tmp.Count > 0) {
             foreach (var thiss in tmp) {
-                cols.AddIfNotExists(thiss);
+                _ = cols.AddIfNotExists(thiss);
                 var t = thiss.SplitBy("|");
                 var thisc = Database?.Column.Exists(t[0]);
                 if (thisc != null) {
@@ -310,7 +310,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
         }
 
-        if (Database.Column.SysCorrect.SaveContent) {
+        if (Database?.Column.SysCorrect != null && Database.Column.SysCorrect.SaveContent) {
             if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
                 CellSet(Database.Column.SysCorrect, cols.Count == 0);
             }
@@ -322,12 +322,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void CloneFrom(RowItem source, bool nameAndKeyToo) {
-        if (nameAndKeyToo) {
-            Key = source.Key;
-        }
+        if (Database is null || Database.IsDisposed) { return; }
+
+        var sdb = source.Database;
+        if (sdb is null || sdb.IsDisposed) { return; }
+
+        if (nameAndKeyToo) { Key = source.Key; }
 
         foreach (var thisColumn in Database.Column) {
-            Database.Cell.SetValueBehindLinkedValue(thisColumn, this, source.Database.Cell.GetStringBehindLinkedValue(source.Database?.Column[thisColumn.Name], source), false);
+            Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.Name], source), false);
         }
     }
 
@@ -335,24 +338,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         StringBuilder r = new();
         if (columns != null) {
             foreach (var t in columns) {
-                r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
+                _ = r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
             }
         }
-        r.Append(Constants.SecondSortChar + "<key>" + Key);
+        _ = r.Append(Constants.SecondSortChar + "<key>" + Key);
         return r.ToString();
     }
 
     public string CompareKey() => CompareKey(Database?.SortDefinition?.Columns);
 
-    /// <summary>
-    /// Erstellt einen Sortierfähigen String eine Zeile
-    /// </summary>
-    /// <param name="columns">Nur diese Spalten in deser Reihenfolge werden berücksichtigt</param>
-    /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
-    /// <summary>
-    /// Erstellt einen sortierfähigen String eine Zeile mit der Standard sortierung
-    /// </summary>
-    /// <returns>Den String mit dem abschluß <<>key<>> und dessen Key.</returns>
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
@@ -396,10 +390,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return Database.Cell.IsNullOrEmpty(column, this);
     }
 
-    public bool MatchesTo(FilterItem? filter) {
+    public bool MatchesTo(FilterItem filter) {
         if (Database == null || Database.IsDisposed) { return false; }
 
-        if (filter == null || filter.IsDisposed) { return true; }
+        if (filter.IsDisposed) { return true; }
 
         if (filter.Database != Database) { return false; }
 

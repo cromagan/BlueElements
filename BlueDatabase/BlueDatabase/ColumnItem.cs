@@ -1178,10 +1178,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         //BestFile_StandardFolder = source.BestFile_StandardFolder;
     }
 
-    /// <summary>
-    /// Überschreibt alle Spalteeigenschaften mit der der Vorlage.
-    /// </summary>
-    /// <param name="nameAndKeyToo"></param>
     public bool ColumNameAllowed(string nameToTest) {
         if (!IsValidColumnName(nameToTest)) { return false; }
 
@@ -1208,7 +1204,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //    return Contents(filter, pinned);
     //}
 
-    public List<string> Contents(FilterItem filter, List<RowItem?>? pinned) {
+    public List<string> Contents(FilterItem filter, List<RowItem>? pinned) {
         var x = new FilterCollection(filter.Database) { filter };
         return Contents(x, pinned);
     }
@@ -1232,7 +1228,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         return list.SortedDistinctList();
     }
 
-    public List<string> Contents(ICollection<FilterItem>? filter, List<RowItem?>? pinned) {
+    public List<string> Contents(ICollection<FilterItem>? filter, List<RowItem>? pinned) {
         List<string> list = new();
         if (Database == null || Database.IsDisposed) { return list; }
 
@@ -1269,18 +1265,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="filter">Wird kein Filter übergeben, werden alle Inhalte zurückgegeben!</param>
-    /// <param name="pinned"></param>
-    /// <returns></returns>
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="filter">Wird kein Filter übergeben, werden alle Inhalte gelöscht!</param>
-    /// <param name="pinned"></param>
-    /// <returns></returns>
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
@@ -1444,12 +1428,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public void Invalidate_ColumAndContent() {
+        if (Database == null || Database.IsDisposed) { return; }
         Invalidate_Head();
         Invalidate_ContentWidth();
         Invalidate_LinkedDatabase();
-        //foreach (var thisRow in Database.Row) {
-        //    if (thisRow != null) { CellCollection.Invalidate_CellContentSize(this, thisRow); }
-        //}
         Database.OnViewChanged();
     }
 
@@ -1503,6 +1485,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public void OnChanged() => Changed?.Invoke(this, new ColumnEventArgs(this));
 
     public string QuickInfoText(string additionalText) {
+        if (Database == null || Database.IsDisposed) { return string.Empty; }
         var T = string.Empty;
         if (!string.IsNullOrEmpty(_quickInfo)) { T += _quickInfo; }
         if (Database.IsAdministrator() && !string.IsNullOrEmpty(_adminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + _adminInfo; }
@@ -1517,6 +1500,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public string ReadableText() {
+        if (Database == null || Database.IsDisposed) { return string.Empty; }
+
         var ret = _caption;
         if (Database.Column.Any(thisColumnItem => thisColumnItem != null && thisColumnItem != this && string.Equals(thisColumnItem.Caption, _caption, StringComparison.OrdinalIgnoreCase))) {
             var done = false;
@@ -1557,32 +1542,33 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public void Repair() {
+        if (Database == null || Database.IsDisposed) { return; }
         // Unbekannt = -1,
         // Nothing = 0,
         //    Text = 1,
 
         //Bit = 2,
 
-        //// Binärdaten_Bild = 19,
-        //// Passwort = 20, // String
-        ////  Text_Ohne_Kritische_Zeichen = 21,
-        //// Binärdaten = 39,
-        //// Link_To_BlueDataSystem = 42
-        //// Telefonnummer = 43, // Spezielle Formate
+        // Binärdaten_Bild = 19,
+        // Passwort = 20, // String
+        //  Text_Ohne_Kritische_Zeichen = 21,
+        // Binärdaten = 39,
+        // Link_To_BlueDataSystem = 42
+        // Telefonnummer = 43, // Spezielle Formate
         //FarbeInteger = 45, // Color
 
-        //// Email = 46, // Spezielle Formate
-        //// InternetAdresse = 47, // Spezielle Formate
-        //// Relation = 65,
-        //// Event = 66,
-        //// Tendenz = 67
-        //// Einschätzung = 68,
+        // Email = 46, // Spezielle Formate
+        // InternetAdresse = 47, // Spezielle Formate
+        // Relation = 65,
+        // Event = 66,
+        // Tendenz = 67
+        // Einschätzung = 68,
         //Schrift = 69,
 
         //Text_mit_Formatierung = 70,
 
-        //// TextmitFormatierungUndLinkToAnotherDatabase = 71
-        //// Relation_And_Event_Mixed = 72,
+        // TextmitFormatierungUndLinkToAnotherDatabase = 71
+        // Relation_And_Event_Mixed = 72,
         //Link_To_Filesystem = 73,
 
         //LinkedCell = 74,
@@ -1592,11 +1578,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         //RelationText = 77,
 
-        //// KeyForSame = 78
+        // KeyForSame = 78
         //Button = 79
 
-        //// bis 999 wird geprüft
-        ///
+        // bis 999 wird geprüft
 
         //CheckIfIAmAKeyColumn();
 
@@ -2503,10 +2488,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (!_linkedDatabaseFile.Contains("|") && !_linkedDatabaseFile.IsFormat(FormatHolder.FilepathAndName)) {
             _linkedDatabaseFile = _linkedDatabaseFile.ToUpper().TrimEnd(".MDB");
-            _linkedDatabaseFile = SQLBackAbstract.MakeValidTableName(_linkedDatabaseFile);
+            _linkedDatabaseFile = SqlBackAbstract.MakeValidTableName(_linkedDatabaseFile);
         }
 
-        if (SQLBackAbstract.IsValidTableName(_linkedDatabaseFile)) {
+        if (SqlBackAbstract.IsValidTableName(_linkedDatabaseFile)) {
             _linkedDatabase = Database.GetOtherTable(_linkedDatabaseFile);
         }
 

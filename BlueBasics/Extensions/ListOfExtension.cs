@@ -197,8 +197,8 @@ public static partial class Extensions {
         var l = new StringBuilder();
 
         foreach (var thisString in value) {
-            l.Append(thisString.ToNonCritical());
-            l.Append("|");
+            _ = l.Append(thisString.ToNonCritical());
+            _ = l.Append("|");
         }
 
         col.Add(tagname + "=" + l.ToString().TrimEnd("|"));

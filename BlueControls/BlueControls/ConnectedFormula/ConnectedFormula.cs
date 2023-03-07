@@ -237,7 +237,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {
-            AllFiles.Remove(this);
+            _ = AllFiles.Remove(this);
             if (disposing) {
                 _ = _muf?.Save(true);
                 _muf?.Dispose();

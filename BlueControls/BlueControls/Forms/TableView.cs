@@ -871,7 +871,7 @@ public partial class TableView : FormWithStatusBar {
         if (Table?.Database == null || Table.Database.IsDisposed) { return; }
 
         var se = new DatabaseScriptEditor(Table.Database);
-        se.ShowDialog();
+        _ = se.ShowDialog();
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
@@ -977,9 +977,8 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
-        if (!Table.Database.IsAdministrator()) {
-            return;
-        }
+        if (Table?.Database == null || Table.Database.IsDisposed) { return; }
+        if (!Table.Database.IsAdministrator()) { return; }
 
         var m = MessageBox.Show("Angezeigte Zeilen löschen?", ImageCode.Warnung, "Ja", "Nein");
         if (m != 0) {

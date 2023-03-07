@@ -20,10 +20,8 @@
 using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -54,13 +52,16 @@ public class Method_CellSetFilter : Method_Database {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
-        if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
+        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
-        var columnToSet = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
+        var db = allFi[0].Database;
+        if (db == null || db.IsDisposed) { return new DoItFeedback(infos.Data, "Datenbank verworfen."); }
+
+        var columnToSet = db.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
         if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
 
         var r = RowCollection.MatchesTo(allFi);
-        if (r == null || r.Count is 0 or > 1) {
+        if (r.Count is 0 or > 1) {
             return DoItFeedback.Falsch();
         }
 

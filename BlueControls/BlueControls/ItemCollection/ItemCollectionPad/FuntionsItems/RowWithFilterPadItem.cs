@@ -231,7 +231,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 var na = value.FromNonCritical();
 
                 if (na.IsFormat(FormatHolder.FilepathAndName)) {
-                    na = na.FilePath() + SQLBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
+                    na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
                 Database = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null);
@@ -247,7 +247,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 _ = FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false);
                 var exi = FilterDefiniton.Column.Exists("SuchSym");
                 if (exi != null) {
-                    FilterDefiniton.Column.Remove("SuchSym", "Veraltete Spalte");
+                    _ = FilterDefiniton.Column.Remove("SuchSym", "Veraltete Spalte");
                 }
                 //foreach (var thisRow in FilterDefiniton.Row) {
                 //    var n = thisRow.CellGetString("Spalte");

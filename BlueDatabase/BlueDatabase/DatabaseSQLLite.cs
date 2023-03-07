@@ -49,7 +49,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// <summary>
     /// Nicht static, weil verschiedene Datenbankverbindngen möglich sind.
     /// </summary>
-    private readonly SQLBackAbstract? _sql;
+    private readonly SqlBackAbstract? _sql;
 
     #endregion
 
@@ -57,7 +57,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public DatabaseSQLLite(ConnectionInfo ci) : this(((DatabaseSQLLite?)ci.Provider)?._sql, false, ci.TableName) { }
 
-    public DatabaseSQLLite(SQLBackAbstract? sql, bool readOnly, string tablename) : base(tablename, readOnly) {
+    public DatabaseSQLLite(SqlBackAbstract? sql, bool readOnly, string tablename) : base(tablename, readOnly) {
         if (sql == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL_Verbindung übergeben.");
             return;
@@ -174,7 +174,6 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) nach.");
 
-
         try {
             _sql.LoadRow(TableName, l, refreshAlways, sortedRows);
         } catch {
@@ -195,7 +194,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     /// <param name="column"></param>
     /// <param name="sql"></param>
 
-    internal void GetColumnAttributesColumn(ColumnItem column, SQLBackAbstract sql) {
+    internal void GetColumnAttributesColumn(ColumnItem column, SqlBackAbstract sql) {
         var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), column.Name);
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
@@ -215,7 +214,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         if (!isLoading && !ReadOnly) {
             var c = Column.Exists(columnName);
 
-            _ = _sql?.SetValueInternal(TableName, type, value, c?.Name, rowkey, isLoading);
+            _ = _sql?.SetValueInternal(TableName, type, value, c?.Name, rowkey);
         }
 
         return base.SetValueInternal(type, value, columnName, rowkey, isLoading);
@@ -262,7 +261,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         _isInTimer = false;
     }
 
-    private static List<DatabaseSQLLite> LoadedDatabasesWithThisSQL(SQLBackAbstract sql) {
+    private static List<DatabaseSQLLite> LoadedDatabasesWithThisSQL(SqlBackAbstract sql) {
         var oo = new List<DatabaseSQLLite>();
         foreach (var thisDb in AllFiles) {
             if (thisDb is DatabaseSQLLite thidDBSQLLIte) {

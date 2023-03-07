@@ -237,7 +237,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                     if (thisit is BasicPadItem bi) { itemsDoDelete.Add(bi); }
                 }
                 Unselect();
-                _item.RemoveRange(itemsDoDelete);
+                _ = _item.RemoveRange(itemsDoDelete);
                 break;
 
             case Keys.Up:

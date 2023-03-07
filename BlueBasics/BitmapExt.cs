@@ -50,7 +50,6 @@ public class BitmapExt : IDisposableExtended {
 
     #region Constructors
 
-    // public PixelFormat _pixelformat = PixelFormat.Format32bppPArgb;
     public BitmapExt(string filename) {
         var p = Image_FromFile(filename);
         if (p is Bitmap bmp) {

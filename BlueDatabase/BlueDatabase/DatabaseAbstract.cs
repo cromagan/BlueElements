@@ -98,7 +98,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         Develop.StartService();
 
         ReadOnly = readOnly;
-        TableName = SQLBackAbstract.MakeValidTableName(tablename);
+        TableName = SqlBackAbstract.MakeValidTableName(tablename);
         UserGroup = "#Administrator";
         Cell = new CellCollection(this);
 
@@ -501,8 +501,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         #endregion
 
-        if (SQLBackAbstract.ConnectedSQLBack != null) {
-            foreach (var thisSql in SQLBackAbstract.ConnectedSQLBack) {
+        if (SqlBackAbstract.ConnectedSqlBack != null) {
+            foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
                 var h = thisSql.HandleMe(ci);
                 if (h != null) {
                     return new DatabaseSQLLite(h, false, ci.TableName);
@@ -1082,7 +1082,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                     r.CheckRowDataIfNeeded();
                 }
 
-                _pendingchangedrows.Remove(key); // Evtl.duch das Script erneut hinzugekommen.
+                _ = _pendingchangedrows.Remove(key); // Evtl.duch das Script erneut hinzugekommen.
                 _pendingbackgroundworks.Add(key);
             } catch { }
         }
@@ -1244,7 +1244,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         //    return null;
         //}
 
-        if (!SQLBackAbstract.IsValidTableName(tablename)) {
+        if (!SqlBackAbstract.IsValidTableName(tablename)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Ungültiger Tabellenname: " + tablename);
             return null;
         }
@@ -1316,7 +1316,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                     OnDropMessage(FehlerArt.Warnung, "Abbruch,<br>leerer Spaltenname.");
                     return "Abbruch,<br>leerer Spaltenname.";
                 }
-                zeil[0][spaltNo] = SQLBackAbstract.MakeValidColumnName(zeil[0][spaltNo]);
+                zeil[0][spaltNo] = SqlBackAbstract.MakeValidColumnName(zeil[0][spaltNo]);
 
                 var col = Column.Exists(zeil[0][spaltNo]);
                 if (col == null) {
@@ -1859,7 +1859,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         IsDisposed = true;
 
         OnDisposing();
-        AllFiles.Remove(this);
+        _ = AllFiles.Remove(this);
 
         //base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
         if (disposing) {

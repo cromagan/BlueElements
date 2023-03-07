@@ -66,7 +66,7 @@ public class Script {
     /// </summary>
     public string AdditionalFilesPath { get; }
 
-    public MethodType AllowedMethods { get; } = MethodType.Standard;
+    public MethodType AllowedMethods { get; }
     public bool BreakFired { get; set; }
     public bool ChangeValues { get; }
     public bool EndScript { get; set; }

@@ -65,7 +65,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
                 }
             }
 
-            TableName = SQLBackAbstract.MakeValidTableName(uniqueId.FileNameWithoutSuffix());
+            TableName = SqlBackAbstract.MakeValidTableName(uniqueId.FileNameWithoutSuffix());
             Provider = null;
             DatabaseID = preveredFileFormatId ?? Database.DatabaseId;
             AdditionalData = uniqueId;
@@ -79,7 +79,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
 
         #region Prüfen, ob eine ConnectionInfo als String übergeben wurde
 
-        if (SQLBackAbstract.IsValidTableName(x[0]) && !string.IsNullOrEmpty(x[1])) {
+        if (SqlBackAbstract.IsValidTableName(x[0]) && !string.IsNullOrEmpty(x[1])) {
             TableName = x[0];
             Provider = null;
             DatabaseID = x[1];
@@ -198,7 +198,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
     /// </summary>
     public string TableName {
         get => _tablename; set {
-            if (!SQLBackAbstract.IsValidTableName(value)) {
+            if (!SqlBackAbstract.IsValidTableName(value)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + value);
             }
 

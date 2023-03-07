@@ -84,7 +84,7 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
         Code = Name;
         lock (Locker) {
             CorrectSize(-1, -1, bmp);
-            Pics.TryAdd(Code, this);
+            _ = Pics.TryAdd(Code, this);
         }
 
         if (bmp == null) {
@@ -234,7 +234,7 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
         lock (Locker) {
             if (Pics.TryGetValue(imageCode, out var p)) { return p; }
             x = new QuickImage(imageCode, false);
-            Pics.TryAdd(imageCode, x);
+            _ = Pics.TryAdd(imageCode, x);
         }
 
         x.Generate();

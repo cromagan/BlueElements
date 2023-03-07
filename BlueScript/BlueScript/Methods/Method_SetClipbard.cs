@@ -52,7 +52,7 @@ internal class Method_SetClipboard : Method {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var vs = (VariableString)attvar.Attributes[0];
-        CopytoClipboard(vs.ValueString);
+        _ = CopytoClipboard(vs.ValueString);
 
         return DoItFeedback.Null();
     }

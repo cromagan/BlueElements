@@ -37,7 +37,7 @@ public sealed class Database : DatabaseAbstract {
 
     #region Fields
 
-    public List<WorkItem>? Works;
+    public readonly List<WorkItem> Works = new();
 
     #endregion
 
@@ -577,7 +577,7 @@ public sealed class Database : DatabaseAbstract {
 
         if (checkExists && !File.Exists(f)) { return null; }
 
-        return new ConnectionInfo(SQLBackAbstract.MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
+        return new ConnectionInfo(SqlBackAbstract.MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
     }
 
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword) {

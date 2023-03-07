@@ -26,7 +26,6 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using Form = BlueControls.Forms.Form;
 using MessageBox = BlueControls.Forms.MessageBox;
