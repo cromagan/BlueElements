@@ -485,13 +485,11 @@ public abstract class SqlBackAbstract {
         if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
         if (!colUndo.Contains("TABLENAME")) { AddColumn(SysUndo, "TABLENAME", VarChar255, false); }
         if (!colUndo.Contains("COMAND")) { AddColumn(SysUndo, "COMAND", false); }
-        //if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SYS_UNDO, "COLUMNNAME", false); }
         if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", VarChar15, true); }
         if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", VarChar15, true); }
         if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SysUndo, "PREVIOUSVALUE", VarChar4000, true); }
         if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SysUndo, "CHANGEDTO", VarChar4000, true); }
         if (!colUndo.Contains("USERNAME")) { AddColumn(SysUndo, "USERNAME", false); }
-        //if (!colUndo.Contains("DATETIMEUTC")) { AddColumn(SYS_UNDO, "DATETIMEUTC", false); }
         if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SysUndo, "TIMECODEUTC", Date, false); }
         if (!colUndo.Contains("CMT")) { AddColumn(SysUndo, "CMT", VarChar255, true); }
         if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SysUndo, "COLUMNNAME", VarChar255, true); }
@@ -499,19 +497,6 @@ public abstract class SqlBackAbstract {
         #endregion
 
         SysUndoAufräumen();
-
-        //#region  Backup
-
-        //if (!x.Contains(SYS_BACKUP)) { _ = CreateTable(SYS_BACKUP); }
-
-        //var colBackup = GetColumnNames(SYS_BACKUP);
-        //if (colBackup == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        //if (!colBackup.Contains("TABLENAME")) { AddColumn(SYS_BACKUP, "TABLENAME", VarChar255, false); }
-        //if (!colBackup.Contains("TYPE")) { AddColumn(SYS_BACKUP, "TYPE", VarChar255, false); }
-        //if (!colBackup.Contains("TIMECODEUTC")) { AddColumn(SYS_BACKUP, "TIMECODEUTC", Date, false); }
-        //if (!colBackup.Contains("FILENAME")) { AddColumn(SYS_BACKUP, "FILENAME", VarChar(1000), true); }
-
-        //#endregion
 
         _ = CloseConnection();
     }
