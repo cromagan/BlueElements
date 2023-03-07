@@ -19,9 +19,11 @@
 #nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -37,7 +39,6 @@ public abstract class SQLBackAbstract {
 
     #region Fields
 
-    public const string SYS_BACKUP = "SYS_BACKUP";
     public const string SYS_STYLE = "SYS_STYLE";
     public const string SYS_UNDO = "SYS_UNDO";
     public static List<SQLBackAbstract> ConnectedSQLBack = new();
@@ -492,18 +493,20 @@ public abstract class SQLBackAbstract {
 
         #endregion
 
-        #region  Backup
+        SysUndoAufräumen();
 
-        if (!x.Contains(SYS_BACKUP)) { _ = CreateTable(SYS_BACKUP); }
+        //#region  Backup
 
-        var colBackup = GetColumnNames(SYS_BACKUP);
-        if (colBackup == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colBackup.Contains("TABLENAME")) { AddColumn(SYS_BACKUP, "TABLENAME", VarChar255, false); }
-        if (!colBackup.Contains("TYPE")) { AddColumn(SYS_BACKUP, "TYPE", VarChar255, false); }
-        if (!colBackup.Contains("TIMECODEUTC")) { AddColumn(SYS_BACKUP, "TIMECODEUTC", Date, false); }
-        if (!colBackup.Contains("FILENAME")) { AddColumn(SYS_BACKUP, "FILENAME", VarChar(1000), true); }
+        //if (!x.Contains(SYS_BACKUP)) { _ = CreateTable(SYS_BACKUP); }
 
-        #endregion
+        //var colBackup = GetColumnNames(SYS_BACKUP);
+        //if (colBackup == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
+        //if (!colBackup.Contains("TABLENAME")) { AddColumn(SYS_BACKUP, "TABLENAME", VarChar255, false); }
+        //if (!colBackup.Contains("TYPE")) { AddColumn(SYS_BACKUP, "TYPE", VarChar255, false); }
+        //if (!colBackup.Contains("TIMECODEUTC")) { AddColumn(SYS_BACKUP, "TIMECODEUTC", Date, false); }
+        //if (!colBackup.Contains("FILENAME")) { AddColumn(SYS_BACKUP, "FILENAME", VarChar(1000), true); }
+
+        //#endregion
 
         _ = CloseConnection();
     }
@@ -678,7 +681,6 @@ public abstract class SQLBackAbstract {
 
         _ = l.Remove(SYS_STYLE);
         _ = l.Remove(SYS_UNDO);
-        _ = l.Remove(SYS_BACKUP);
         return l;
     }
 
@@ -884,6 +886,7 @@ public abstract class SQLBackAbstract {
     //    if (!OpenConnection()) { return null; }
     protected string ExecuteCommand(string commandtext) {
         if (!OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
+        if (_connection == null) { return "Keine Verbindung vorhanden."; }
 
         using var command = _connection.CreateCommand();
         command.CommandText = commandtext;
@@ -1013,7 +1016,6 @@ public abstract class SQLBackAbstract {
 
         if (sortedRows == null || sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
 
-
         var r = new List<RowItem>();
         r.AddRange(row);
 
@@ -1123,6 +1125,15 @@ public abstract class SQLBackAbstract {
         var cmdString = "INSERT INTO " + SYS_STYLE + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + DBVAL(tablename.ToUpper()) + ", " + DBVAL(type) + ", " + DBVAL(columnName.ToUpper()) + ", " + DBVAL(newValue) + ", " + DBVAL(part.ToString(Constants.Format_Integer3)) + ")";
         if (!OpenConnection()) { return "Verbindung konnt nicht geöffnet werden"; }
         return ExecuteCommand(cmdString);
+    }
+
+    private void SysUndoAufräumen() {
+        var c = "DELETE FROM " + SYS_UNDO +
+                  " WHERE RK NOT IN " +
+                    "(SELECT RK FROM (SELECT RK, ROW_NUMBER() OVER (PARTITION BY TABLENAME ORDER BY TIMECODEUTC DESC) as row_num   FROM " + SYS_UNDO + ") WHERE row_num <= 500)" +
+                     "AND TIMECODEUTC<" + DBVAL(DateTime.UtcNow.AddDays(-7));
+
+        ExecuteCommand(c);
     }
 
     #endregion
