@@ -56,7 +56,7 @@ public class VariableFloat : Variable {
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => false;
     public override string MyClassId => ClassId;
-    public override string ReadableText => _double.ToString(Constants.Format_Float1);
+    public override string ReadableText => _double.ToString(Constants.Format_Float5);
     public override bool ToStringPossible => true;
 
     public override string ValueForReplace => ReadableText;

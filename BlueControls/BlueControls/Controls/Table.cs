@@ -1234,7 +1234,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 if (sortedRowData == null) {
                     // Multitasking...
-                    DrawWaitScreen(gr);
+                    Develop.CheckStackForOverflow();
+                    DrawControl(gr, state);
                     return;
                 }
 
