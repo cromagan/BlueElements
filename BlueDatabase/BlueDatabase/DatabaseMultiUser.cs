@@ -89,6 +89,16 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     #region Methods
 
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword) {
+        if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
+
+        if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
+
+        if (!FileExists(ci.AdditionalData)) { return null; }
+
+        return new DatabaseMultiUser(ci, false, needPassword);
+    }
+
     public override string AdditionalFilesPfadWhole() {
         var x = base.AdditionalFilesPfadWhole();
         if (!string.IsNullOrEmpty(x)) { return x; }

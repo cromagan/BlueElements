@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueDatabase;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -73,11 +75,22 @@ public sealed class Database : DatabaseAbstract {
     public static string DatabaseId => typeof(Database).Name;
 
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename);
+
     public string Filename { get; set; } = string.Empty;
 
     #endregion
 
     #region Methods
+
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword) {
+        if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
+
+        if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
+
+        if (!FileExists(ci.AdditionalData)) { return null; }
+
+        return new Database(ci, false, needPassword);
+    }
 
     public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, out long rowKey, out string value, out string colName) {
         colName = string.Empty;

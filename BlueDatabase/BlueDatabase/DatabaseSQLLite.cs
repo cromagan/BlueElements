@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using BlueDatabase;
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -25,6 +27,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+using System.Collections;
 
 namespace BlueDatabase;
 
@@ -59,11 +62,16 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public DatabaseSQLLite(SqlBackAbstract? sql, bool readOnly, string tablename) : base(tablename, readOnly) {
         if (sql == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL_Verbindung übergeben.");
+            Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL-Verbindung übergeben: " + tablename);
             return;
         }
 
         _sql = sql.OtherTable(tablename);
+
+        if (sql == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL-Verbindung erhalten: " + tablename);
+            return;
+        }
 
         Initialize();
         LoadFromSQLBack();
@@ -75,9 +83,11 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
     public static string DatabaseId => typeof(DatabaseSQLLite).Name;
 
-    //private bool _isLoading = false;
     public override ConnectionInfo ConnectionData {
         get {
+            if (_sql == null) {
+                return new(TableName, null, string.Empty, string.Empty);
+            }
             var connectionData = _sql.ConnectionData(TableName);
             connectionData.Provider = this;
             return connectionData;
@@ -87,6 +97,17 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     #endregion
 
     #region Methods
+
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword) {
+        if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
+
+        var sql = ((DatabaseSQLLite?)ci.Provider)?._sql;
+        if (sql == null) { return null; }
+
+        var at = sql.Tables();
+        if (!at.Contains(ci.TableName)) { return null; }
+        return new DatabaseSQLLite(ci);
+    }
 
     public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
         if (allreadychecked != null) {

@@ -658,7 +658,6 @@ public abstract class SqlBackAbstract {
         return string.Empty;
     }
 
-    //    OpenConnection();
     /// <summary>
     /// Gibt alle verfügbaren Tabellen - außer die Systemtabellen - zurück
     /// </summary>

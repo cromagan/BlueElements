@@ -482,7 +482,17 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         foreach (var thist in DatabaseTypes) {
             if (thist.Name.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) {
-                return (DatabaseAbstract)Activator.CreateInstance(thist, ci, false, needPassword);
+                if (ci != null) {
+                    var l = new object?[2];
+                    l[0] = ci;
+                    l[1] = needPassword;
+                    var v = thist.GetMethod("CanProvide").Invoke(null, l);
+
+                    if (v is DatabaseAbstract db) {
+                        return db;
+                        //          return (DatabaseAbstract)Activator.CreateInstance(thist, ci, false, needPassword);
+                    }
+                }
             }
 
             //MethodInfo parseMethod = thist.GetMethod("DatabaseId");
@@ -509,6 +519,18 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 }
             }
         }
+
+        #region Zu guter Letzte, den Tablenamen nehmen...
+
+        foreach (var thisFile in AllFiles) {
+            var d = thisFile.ConnectionData;
+
+            if (string.Equals(d.TableName, ci.TableName, StringComparison.OrdinalIgnoreCase)) {
+                return thisFile;
+            }
+        }
+
+        #endregion
 
         return null;
     }
