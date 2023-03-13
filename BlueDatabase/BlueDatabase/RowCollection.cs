@@ -29,6 +29,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -287,13 +288,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return rowData;
     }
 
-    /// <summary>
-    /// Gibt die mit dieser Kombination sichtbaren Zeilen zurück. Ohne Sortierung. Jede Zeile kann maximal einmal vorkommen.
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="pinnedRows"></param>
-    /// <returns></returns>
-
     public List<RowItem> CalculateVisibleRows(ICollection<FilterItem>? filter, ICollection<RowItem>? pinnedRows) {
         List<RowItem> tmpVisibleRows = new();
         if (Database == null || Database.IsDisposed) { return tmpVisibleRows; }
@@ -320,12 +314,45 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return tmpVisibleRows;
     }
 
+    /// <summary>
+    /// Gibt die mit dieser Kombination sichtbaren Zeilen zurück. Ohne Sortierung. Jede Zeile kann maximal einmal vorkommen.
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <param name="pinnedRows"></param>
+    /// <returns></returns>
     public bool Clear(string comment) => Remove(new FilterCollection(Database), null, comment);
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    public void DoLinkedDatabase(List<RowItem> row) {
+        if (row.Count == 0) { return; }
+
+        if (Database is not DatabaseAbstract db) { return; }
+        if (db.IsDisposed) { return; }
+
+        List<DatabaseAbstract> done = new();
+
+        foreach (var thisColumn in Database.Column) {
+            if (thisColumn.LinkedDatabase is DatabaseAbstract dbl) {
+                if (!done.Contains(dbl)) {
+                    done.Add(dbl);
+
+                    var key = new List<long>();
+
+                    foreach (var thisRow in row) {
+                        var s = Database.Cell.GetStringBehindLinkedValue(thisColumn, thisRow);
+
+                        if (LongTryParse(s, out var v)) { key.Add(v); }
+                    }
+
+                    dbl.RefreshRowData(key, false, null);
+                }
+            }
+        }
     }
 
     public string ExecuteScript(EventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem>? pinned, bool fullCheck, bool changevalues) {
@@ -355,6 +382,35 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
         Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Füllt die Liste row auf, bis sie 100 Einträge enthält.
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="sortedRows"></param>
+    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
+    public bool FillUp100(List<RowItem> row, List<RowItem>? sortedRows) {
+        if (row.Count is > 99 or 0) { return false; }
+
+        if (Database is not DatabaseAbstract db) { return false; }
+        if (db.IsDisposed) { return false; }
+
+        sortedRows ??= new List<RowItem>();
+
+        sortedRows.AddRange(db.Row.CalculateFilteredRows(null)); // ALLE Zeilen hinzufügen, nicht dass der Filter auf nein paar beschränkt ist und mehr laden könnte.
+
+        if (sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
+
+        var r = new List<RowItem>();
+        r.AddRange(row);
+
+        foreach (var thisRow in r) {
+            var all = FillUp(row, thisRow, sortedRows, (100 / r.Count) + 1);
+            if (all) { return true; }
+        }
+
+        return false;
     }
 
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null && !thisRowItem.IsDisposed);
@@ -642,6 +698,46 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             // TODO: Große Felder auf NULL setzen
             IsDisposed = true;
         }
+    }
+
+    /// <summary>
+    /// Füllt die Liste row um count Einträge auf. Ausgehend von thisrow
+    /// </summary>
+    /// <param name="row"></param>
+    /// <param name="thisrow"></param>
+    /// <param name="sortedRows"></param>
+    /// <param name="count"></param>
+    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
+    private bool FillUp(List<RowItem> row, RowItem thisrow, List<RowItem> sortedRows, int count) {
+        var num = sortedRows.IndexOf(thisrow);
+        if (num == -1) { return false; } // Wie bitte?
+
+        var c = 1;
+
+        while (count > 0) {
+            var n1 = num - c;
+
+            if (n1 >= 0) {
+                if (sortedRows[n1].IsInCache == null && !row.Contains(sortedRows[n1])) {
+                    row.Add(sortedRows[n1]);
+                    count--;
+                }
+            }
+
+            var n2 = num + c;
+
+            if (n2 < sortedRows.Count) {
+                if (sortedRows[n2].IsInCache == null && !row.Contains(sortedRows[n2])) {
+                    row.Add(sortedRows[n2]);
+                    count--;
+                }
+            } else {
+                return true;
+            }
+            c++;
+        }
+
+        return false;
     }
 
     //internal void Repair() {

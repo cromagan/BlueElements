@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -31,6 +32,15 @@ public static partial class Extensions {
 
         var arr2 = arr.Distinct().ToList();
         if (arr2.Contains(string.Empty)) { _ = arr2.Remove(string.Empty); }
+        arr2.Sort();
+        return arr2;
+    }
+
+    public static List<T> SortedDistinctList<T>(this IEnumerable<T> arr) where T : IComparable {
+        if (arr == null || !arr.Any()) { return new List<T>(); }
+
+        var arr2 = arr.Distinct().ToList();
+        //if (arr2.Contains(null)) { _ = arr2.Remove(null); }
         arr2.Sort();
         return arr2;
     }

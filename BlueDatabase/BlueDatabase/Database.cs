@@ -657,7 +657,14 @@ public sealed class Database : DatabaseAbstract {
         if (columns == null || columns.Count == 0) { return; }
 
         foreach (var thiscol in columns) {
-            if (thiscol != null) { thiscol.IsInCache = DateTime.UtcNow; }
+            if (thiscol != null) {
+                thiscol.IsInCache = DateTime.UtcNow;
+
+                if (thiscol.LinkedDatabase is DatabaseAbstract dbl &&
+                    dbl.Column.Exists(thiscol.LinkedCell_ColumnNameOfLinkedDatabase) is ColumnItem col) {
+                    dbl.RefreshColumnsData(col);
+                }
+            }
         }
     }
 
@@ -667,7 +674,7 @@ public sealed class Database : DatabaseAbstract {
         foreach (var thisrow in row) {
             thisrow.IsInCache = DateTime.UtcNow;
         }
-
+        Row.DoLinkedDatabase(row);
         return false;
     }
 

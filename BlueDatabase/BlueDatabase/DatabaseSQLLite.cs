@@ -28,6 +28,8 @@ using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using System.Collections;
+using System.Linq;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -161,6 +163,11 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
         foreach (var thisColumn in columns) {
             if (thisColumn != null && thisColumn.IsInCache == null) {
                 need = true;
+
+                if (thisColumn.LinkedDatabase is DatabaseAbstract dbl &&
+                     dbl.Column.Exists(thisColumn.LinkedCell_ColumnNameOfLinkedDatabase) is ColumnItem col) {
+                    dbl.RefreshColumnsData(col);
+                }
             }
         }
 
@@ -187,16 +194,19 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         foreach (var thisr in rows) {
             if (refreshAlways || thisr.IsInCache == null) {
-                _ = l.AddIfNotExists(thisr);
+                l.Add(thisr);
             }
         }
 
         if (l.Count == 0) { return false; }
+        l = l.Distinct().ToList();
+
+        Row.DoLinkedDatabase(rows);
 
         OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) nach.");
 
         try {
-            _sql.LoadRow(TableName, l, refreshAlways, sortedRows);
+            _sql?.LoadRow(TableName, l, refreshAlways, sortedRows);
         } catch {
             return RefreshRowData(rows, refreshAlways, sortedRows);
         }

@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Text;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -340,34 +341,40 @@ public abstract class SqlBackAbstract {
             if (!OpenConnection() || Connection == null) { return; }
 
             lock (_getRow) {
-                var com = "SELECT RK, ";
+                var com = new StringBuilder();
+                com.Append("SELECT RK, ");
 
                 var count = 0;
 
                 foreach (var thiscolumn in db.Column) {
                     if (refreshAlways || thiscolumn.IsInCache == null) {
+                        if (count > 0) { com.Append(", "); }
+
                         count++;
-                        com = com + thiscolumn.Name.ToUpper() + ", ";
+                        com.Append(thiscolumn.Name.ToUpper());
                     }
                 }
 
                 if (count == 0) { return; }
 
-                com = com.TrimEnd(", ");
+                _ = db.Row.FillUp100(row, sortedRows);
 
-                _ = FillUp100(row, sortedRows);
+                com.Append(" FROM " + tablename.ToUpper());
 
-                com = com + " FROM " + tablename.ToUpper() + " WHERE ";
+                if (row.Count < 1000) {
+                    com.Append(" WHERE ");
+                    count = 0;
+                    foreach (var thisr in row) {
+                        if (count > 0) { com.Append(" OR "); }
 
-                foreach (var thisr in row) {
-                    com = com + "RK = " + Dbval(thisr.Key) + " OR ";
+                        count++;
+                        com.Append("RK = " + Dbval(thisr.Key));
+                    }
                 }
-
-                com = com.TrimEnd(" OR ");
 
                 if (!OpenConnection() || Connection == null) { return; }
 
-                var dt = Fill_Table(com);
+                var dt = Fill_Table(com.ToString());
 
                 if (dt == null) { return; }
 
@@ -392,6 +399,8 @@ public abstract class SqlBackAbstract {
                     //}
                 }
                 _ = CloseConnection();
+
+                db.Row.DoLinkedDatabase(row);
             }
         } catch {
             _ = CloseConnection();
@@ -915,74 +924,6 @@ public abstract class SqlBackAbstract {
         } finally {
             _ = CloseConnection();
         }
-    }
-
-    /// <summary>
-    /// Füllt die Liste row um count Einträge auf. Ausgehend von thisrow
-    /// </summary>
-    /// <param name="row"></param>
-    /// <param name="thisrow"></param>
-    /// <param name="sortedRows"></param>
-    /// <param name="count"></param>
-    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
-    private bool FillUp(List<RowItem> row, RowItem thisrow, List<RowItem> sortedRows, int count) {
-        var num = sortedRows.IndexOf(thisrow);
-        if (num == -1) { return false; } // Wie bitte?
-
-        var c = 1;
-
-        while (count > 0) {
-            var n1 = num - c;
-
-            if (n1 >= 0) {
-                if (sortedRows[n1].IsInCache == null && !row.Contains(sortedRows[n1])) {
-                    row.Add(sortedRows[n1]);
-                    count--;
-                }
-            }
-
-            var n2 = num + c;
-
-            if (n2 < sortedRows.Count) {
-                if (sortedRows[n2].IsInCache == null && !row.Contains(sortedRows[n2])) {
-                    row.Add(sortedRows[n2]);
-                    count--;
-                }
-            } else {
-                return true;
-            }
-            c++;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// Füllt die Liste row auf, bis sie 100 Einträge enthält.
-    /// </summary>
-    /// <param name="row"></param>
-    /// <param name="sortedRows"></param>
-    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
-    private bool FillUp100(List<RowItem> row, List<RowItem>? sortedRows) {
-        if (row.Count is > 99 or 0) { return false; }
-
-        if (row[0].Database is not DatabaseAbstract db) { return false; }
-        if (db.IsDisposed) { return false; }
-
-        sortedRows ??= new List<RowItem>();
-
-        sortedRows.AddRange(db.Row.CalculateFilteredRows(null)); // ALLE Zeilen hinzufügen, nicht dass der Filter auf nein paar beschränkt ist und mehr laden könnte.
-
-        if (sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
-
-        var r = new List<RowItem>();
-        r.AddRange(row);
-
-        foreach (var thisRow in r) {
-            var all = FillUp(row, thisRow, sortedRows, (100 / r.Count) + 1);
-            if (all) { return true; }
-        }
-        return false;
     }
 
     private string? GetCellValue(string tablename, string columnname, long rowkey) {

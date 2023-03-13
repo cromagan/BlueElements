@@ -35,7 +35,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasDatabase, IComparable {
 
     #region Fields
 
@@ -338,14 +338,26 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         StringBuilder r = new();
         if (columns != null) {
             foreach (var t in columns) {
-                _ = r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
+                if (t.LinkedDatabase == null) {
+                    // LinkedDatabase = null - Ansonsten wird beim Sortieren alles immer wieder geladen,
+                    _ = r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
+                }
             }
         }
-        _ = r.Append(Constants.SecondSortChar + "<key>" + Key);
+        _ = r.Append(Constants.SecondSortChar + Key);
         return r.ToString();
     }
 
     public string CompareKey() => CompareKey(Database?.SortDefinition?.Columns);
+
+    public int CompareTo(object obj) {
+        if (obj is RowItem tobj) {
+            return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
+        }
+
+        Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
+        return 0;
+    }
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.

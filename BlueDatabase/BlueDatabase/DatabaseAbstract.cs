@@ -979,6 +979,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             vars.Add(new VariableDatabase("Database", this, true, true, "Die Datenbank, die zu dem Skript gehört"));
             vars.Add(new VariableString("Tablename", TableName, true, false, "Der aktuelle Tabellenname."));
+            vars.Add(new VariableFloat("Rows", Row.Count, true, false, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
             vars.Add(new VariableString("NameOfFirstColumn", Column.First?.Name ?? string.Empty, true, false, "Der Name der ersten Spalte"));
             vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(EventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
             if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
@@ -1153,6 +1154,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 Develop.DebugPrint(firstRow);
                 break;
         }
+
+        RefreshRowData(sortedRows, false);
+
         foreach (var thisRow in sortedRows) {
             if (thisRow != null) {
                 for (var colNr = 0; colNr < columnList.Count; colNr++) {
@@ -1200,6 +1204,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         da.RowEnd();
+        RefreshRowData(sortedRows, false);
+
         foreach (var thisRow in sortedRows) {
             if (thisRow != null) {
                 da.RowBeginn();
@@ -1530,6 +1536,16 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
+    public bool RefreshRowData(List<RowData> rowdata, bool refreshAlways) {
+        if (rowdata.Count == 0) { return false; }
+
+        var r = new List<RowItem>();
+        foreach (var thisRow in rowdata) {
+            if (thisRow.Row != null) { r.Add(thisRow.Row); }
+        }
+        return RefreshRowData(r, refreshAlways, null);
+    }
+
     public abstract bool RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows);
 
     public bool RefreshRowData(List<long> keys, bool refreshAlways, List<RowItem>? sortedRows) {
@@ -1538,7 +1554,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         var r = new List<RowItem>();
         foreach (var thisK in keys) {
             var ro = Row.SearchByKey(thisK);
-            if (ro != null) { _ = r.AddIfNotExists(ro); }
+            if (ro != null) { r.Add(ro); }
         }
         return RefreshRowData(r, refreshAlways, sortedRows);
     }
