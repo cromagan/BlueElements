@@ -203,7 +203,7 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
 
         Row.DoLinkedDatabase(rows);
 
-        OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) nach.");
+        OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) der Datenbank '" + TableName + "' nach.");
 
         try {
             _sql?.LoadRow(TableName, l, refreshAlways, sortedRows);

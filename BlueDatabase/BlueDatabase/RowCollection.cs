@@ -407,9 +407,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisRow in r) {
             var all = FillUp(row, thisRow, sortedRows, (100 / r.Count) + 1);
-            if (all) { return true; }
+            if (all) {
+                DoLinkedDatabase(row);
+                return true; 
+            }
         }
-
+        DoLinkedDatabase(row);
         return false;
     }
 

@@ -39,7 +39,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public ColumnPadItem(string internalname) : base(internalname) { }
 
-    public ColumnPadItem(ColumnItem c) : base(c.Name) {
+    public ColumnPadItem(ColumnItem c) : base(c.Database?.TableName + "|" +  c.Name) {
         Column = c;
 
         if (Column != null) {

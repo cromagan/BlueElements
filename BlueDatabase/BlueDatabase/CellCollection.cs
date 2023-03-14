@@ -823,13 +823,19 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
         if (value == oldValue) { return; }
 
-        _ = dbtmp.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Name, row.Key, oldValue, value, string.Empty);
+        var message = dbtmp.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Name, row.Key, oldValue, value, string.Empty);
+
+        if (!string.IsNullOrEmpty(message)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Wert nicht gesetzt: " + message);
+            return;
+        }
+
         column.UcaseNamesSortedByLenght = null;
 
         var checkValue = string.Empty;
         if (ContainsKey(cellKey)) { checkValue = this[cellKey].Value; }
         if (checkValue != value) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Wert nicht gesetzt!");
+            Develop.DebugPrint(FehlerArt.Fehler, "Nachprüfung fehlgeschlagen");
             return;
         }
 

@@ -1673,6 +1673,15 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         if (type.IsObsolete()) { return string.Empty; }
 
+        if (type.IsCellValue()) {
+            if (columnName == null || rowkey == null) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Spalte/Zeile ist null! " + type);
+                return "Wert nicht gesetzt!";
+            }
+
+            return Cell.SetValueInternal(columnName, (long)rowkey, value, isLoading);
+        }
+
         if (type.IsColumnTag()) {
             var c = Column.Exists(columnName);
             if (c == null) {
@@ -1682,14 +1691,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             return c.SetValueInternal(type, value, isLoading);
         }
 
-        if (type.IsCellValue()) {
-            if (columnName == null || rowkey == null) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Spalte/Zeile ist null! " + type);
-                return "Wert nicht gesetzt!";
-            }
 
-            return Cell.SetValueInternal(columnName, (long)rowkey, value, isLoading);
-        }
 
         if (type.IsCommand()) {
             switch (type) {

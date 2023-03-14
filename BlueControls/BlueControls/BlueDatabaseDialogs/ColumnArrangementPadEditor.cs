@@ -436,7 +436,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var kx = 0f;
         foreach (var thisCombi in dbColumnCombi) {
             foreach (var thisc in ca) {
-                var it = Pad.Item[thisc?.Column?.Name] as ColumnPadItem;
+                var it = Pad.Item[thisc?.Column?.Database?.TableName +"|"+    thisc?.Column?.Name] as ColumnPadItem;
 
                 if (thisc.Column.LinkedDatabase != null) {
                     // String als Namen als eindeutige Kennung
@@ -456,7 +456,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
                             foreach (var thisc2 in thisc?.Column?.Database?.Column) {
                                 if (tmp[2].Contains("~" + thisc2.Name + "~")) {
-                                    var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Name];
+                                    var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Database.TableName + "|" +   thisc2.Name];
                                     _ = rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                 }
                             }
