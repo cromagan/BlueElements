@@ -15,11 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+
 namespace BlueControls.Interfaces;
 
 /// <summary>
 /// Wird verwendet, wenn das Control Zeilen abgeben kann, und eine Eingangszeile Empfangen kann.
 /// </summary>
+[Obsolete]
 public interface IAcceptAndSends : IItemToControl {
 
     #region Methods

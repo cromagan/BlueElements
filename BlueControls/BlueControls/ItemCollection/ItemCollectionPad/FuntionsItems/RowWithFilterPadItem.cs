@@ -40,6 +40,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
+[Obsolete]
 public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl, IHasDatabase {
 
     #region Fields
@@ -66,16 +67,6 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         FilterDefiniton.Cell.CellValueChanged += Cell_CellValueChanged;
         FilterDefiniton.Row.RowRemoved += Row_RowRemoved;
         FilterDefiniton.Row.RowAdded += Row_RowAdded;
-    }
-
-    private void Row_RowAdded(object sender, RowEventArgs e) {
-        RepairConnections();
-        OnChanged();
-    }
-
-    private void Row_RowRemoved(object sender, System.EventArgs e) {
-        RepairConnections();
-        OnChanged();
     }
 
     public RowWithFilterPadItem(string intern) : this(intern, null, 0) { }
@@ -336,18 +327,17 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         RepairConnections();
     }
 
+    private void Cell_CellValueChanged(object sender, CellEventArgs e) {
+        RepairConnections();
+        OnChanged();
+    }
+
     //protected override BasicPadItem? TryCreate(string id, string name) {
     //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
     //        return new RowWithFilterPadItem(name);
     //    }
     //    return null;
     //}
-
-    private void Cell_CellValueChanged(object sender, CellEventArgs e) {
-        RepairConnections();
-        OnChanged();
-    }
-
     private void FilterDatabaseUpdate() {
         if (FilterDefiniton == null) { return; }
 
@@ -524,6 +514,16 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, getValueFrom, ConnectionType.Bottom, false, false));
             }
         }
+    }
+
+    private void Row_RowAdded(object sender, RowEventArgs e) {
+        RepairConnections();
+        OnChanged();
+    }
+
+    private void Row_RowRemoved(object sender, System.EventArgs e) {
+        RepairConnections();
+        OnChanged();
     }
 
     #endregion

@@ -872,6 +872,7 @@ public partial class TableView : FormWithStatusBar {
 
         var se = new DatabaseScriptEditor(Table.Database);
         _ = se.ShowDialog();
+        UpdateScripts(Table.Database);
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {

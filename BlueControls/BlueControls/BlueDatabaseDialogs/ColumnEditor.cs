@@ -501,6 +501,7 @@ internal sealed partial class ColumnEditor {
         _column.SortType = (SortierTyp)IntParse(cbxSort.Text);
         _column.AutoRemove = txbAutoRemove.Text;
         _column.SaveContent = butSaveContent.Checked;
+        _column.Invalidate_ColumAndContent();
         GetLinkedCellFilter();
 
         _column.Repair();
