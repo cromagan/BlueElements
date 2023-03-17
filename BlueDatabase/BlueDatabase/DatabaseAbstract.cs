@@ -471,7 +471,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         #region Schauen, ob der Provider sie herstellen kann
 
         if (ci.Provider != null) {
-            return ci.Provider.GetOtherTable(ci.TableName);
+            var db = ci.Provider.GetOtherTable(ci.TableName);
+            if (db != null) { return db; }
         }
 
         #endregion
