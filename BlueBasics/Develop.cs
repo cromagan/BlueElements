@@ -109,12 +109,12 @@ public static class Develop {
 
     public static void DebugPrint(string warnung) => DebugPrint(FehlerArt.Warnung, warnung);
 
-    public static void DebugPrint(FehlerArt art, Exception ex) {
+    public static void DebugPrint(FehlerArt art, string message, Exception ex) {
         if (art != FehlerArt.Info && art != FehlerArt.DevelopInfo && IsHostRunning()) { Debugger.Break(); }
-        DebugPrint(art, "Es wurde ein allgemeiner Fehler abgefangen.\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace);
+        DebugPrint(art, message + "\r\nMeldung: " + ex.Message + "\r\n" + ex.StackTrace);
     }
 
-    public static void DebugPrint(Exception warnung) => DebugPrint(FehlerArt.Warnung, warnung);
+    public static void DebugPrint(string message, Exception warnung) => DebugPrint(FehlerArt.Warnung, message, warnung);
 
     public static void DebugPrint<T>(T @enum) where T : Enum => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
 

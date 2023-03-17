@@ -577,7 +577,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (und) { return true; } // alle "Und" stimmen!
             return false; // Gar kein "Oder" trifft zu...
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Unerwarteter Filter-Fehler", ex);
             Pause(1, true);
             return MatchesTo(column, row, filter);
         }

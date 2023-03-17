@@ -225,7 +225,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
                 e.ToolTipText = r.CellGetString("Kommentar") + " ";
             }
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Fehler beim Tooltip generieren", ex);
         }
     }
 

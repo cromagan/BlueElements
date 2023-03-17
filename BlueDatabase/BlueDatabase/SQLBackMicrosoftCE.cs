@@ -119,7 +119,7 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
             //MessageBox.Show("DataBase is Created Successfully", "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
             ok = true;
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Befehl konnte nicht ausgeführt werden", ex);
             //MessageBox.Show(ex.ToString(false), "MyProgram", MessageBoxButtons.OK, MessageBoxIcon.Information);
         } finally {
             if (myConn.State == ConnectionState.Open) {

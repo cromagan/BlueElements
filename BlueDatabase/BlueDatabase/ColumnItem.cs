@@ -1678,7 +1678,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
             ResetSystemToDefault(false);
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Reparatur der Spalte fehlgeschlagen: " + Name, ex);
         }
     }
 

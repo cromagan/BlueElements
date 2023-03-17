@@ -81,7 +81,7 @@ public partial class QuickInfo : FloatingForm {
                 Close(autoClose);
                 return;
             } catch (Exception ex) {
-                Develop.DebugPrint(ex);
+                Develop.DebugPrint("Fehler beim Schließen des QuickInfos", ex);
             }
         }
     }

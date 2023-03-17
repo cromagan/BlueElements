@@ -852,7 +852,7 @@ public class BitmapExt : IDisposableExtended {
                 gr.Clear(Color.White);
                 gr.DrawString("Vorschaubild fehlgeschlagen!", new Font("Arial", 9), Brushes.Red, new Point(0, 0));
                 l.Add(x2);
-                Develop.DebugPrint(ex);
+                Develop.DebugPrint("Vorschaubild fehlgeschlagen", ex);
             }
         }
         imageStreamSource.Close();
@@ -880,7 +880,7 @@ public class BitmapExt : IDisposableExtended {
                 gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
             } catch (Exception ex) {
                 if (DateTime.Now.Subtract(tim).TotalSeconds > 5) {
-                    Develop.DebugPrint(ex);
+                    Develop.DebugPrint("Bild konnte nicht geklont werden", ex);
                     Width = -1;
                     Height = -1;
                     _bitmap = null;
@@ -983,7 +983,7 @@ public class BitmapExt : IDisposableExtended {
                 gr.DrawImage(oldBmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
             }
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Resize fehlgeschlagen", ex);
             // if (!collectGarbage) { Generic.CollectGarbage(); }
             // if (sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern)
             // {

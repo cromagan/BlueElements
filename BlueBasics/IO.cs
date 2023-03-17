@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -448,7 +449,7 @@ public static class IO {
             File.WriteAllText(filename, contents, encoding);
             if (executeAfter) { _ = ExecuteFile(filename); }
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Fehler beim Speichern der Datei: " + filename, ex);
         }
     }
 

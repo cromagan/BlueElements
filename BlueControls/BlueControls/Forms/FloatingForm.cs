@@ -145,7 +145,7 @@ public partial class FloatingForm : Form {
         } catch (ObjectDisposedException) {
             // kommt vor, wenn der Aufbau zu lange dauert. Ignorierbar.
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Floating Form konnte nicht angezeigt werden", ex);
         }
     }
 
@@ -161,7 +161,7 @@ public partial class FloatingForm : Form {
                             Close(connectedControl, design);
                             return;
                         } catch (Exception ex) {
-                            Develop.DebugPrint(ex);
+                            Develop.DebugPrint("Fehler beim Schließen der Floating Form", ex);
                         }
                     }
                 }

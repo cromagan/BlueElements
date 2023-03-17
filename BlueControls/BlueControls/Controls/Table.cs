@@ -2457,7 +2457,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
             SliderSchaltenWaage(displayR, maxX);
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Fehler beim Berechnen der Zellpositionen", ex);
             return false;
         }
         return true;

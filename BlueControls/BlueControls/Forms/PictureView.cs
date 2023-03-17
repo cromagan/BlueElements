@@ -102,7 +102,7 @@ public partial class PictureView : Form, IDisposableExtended {
                 Pad.Bmp = BitmapExt.Image_FromFile(_fileList[nr]) as Bitmap;
             } catch (Exception ex) {
                 Pad.Bmp = null;
-                Develop.DebugPrint(ex);
+                Develop.DebugPrint("Fehler beim Laden des Bildes", ex);
             }
         } else {
             Pad.Bmp = null;

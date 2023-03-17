@@ -85,7 +85,7 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
                 Skin.Draw_Border(e.Graphics, Design.RibbonBar_Frame, state, r);
                 if (!string.IsNullOrEmpty(Text)) {
                     Rectangle bottomTxt = new(0, 0, Width, Height + 2);
-                    Skin.Draw_FormatedText(e.Graphics, Text, Design.RibbonBar_Frame, state, null, Alignment.Bottom_HorizontalCenter, bottomTxt, this, false, true);
+                    Skin.Draw_FormatedText(e.Graphics, base.Text, Design.RibbonBar_Frame, state, null, Alignment.Bottom_HorizontalCenter, bottomTxt, this, false, true);
                 }
                 break;
 
@@ -94,7 +94,7 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
                     Skin.Draw_Border(e.Graphics, Design.GroupBox, state, r);
                     if (!string.IsNullOrEmpty(Text)) {
                         Rectangle topTxt = new(Skin.Padding, 0, Width, Height);
-                        Skin.Draw_FormatedText(e.Graphics, Text, Design.GroupBox, state, null, Alignment.Top_Left, topTxt, this, true, true);
+                        Skin.Draw_FormatedText(e.Graphics, base.Text, Design.GroupBox, state, null, Alignment.Top_Left, topTxt, this, true, true);
                     }
                 }
                 break;
@@ -104,7 +104,7 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
                     Skin.Draw_Border(e.Graphics, Design.GroupBoxBold, state, r);
                     if (!string.IsNullOrEmpty(Text)) {
                         Rectangle topTxt = new(Skin.Padding, Skin.PaddingSmal, Width, Height);
-                        Skin.Draw_FormatedText(e.Graphics, Text, Design.GroupBoxBold, state, null, Alignment.Top_Left, topTxt, this, false, true);
+                        Skin.Draw_FormatedText(e.Graphics, base.Text, Design.GroupBoxBold, state, null, Alignment.Top_Left, topTxt, this, false, true);
                     }
                 }
                 break;
@@ -175,15 +175,15 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
         switch (l) {
             case PartentType.RibbonPage:
                 GroupBoxStyle = GroupBoxStyle.RibbonBar;
-                BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
+                base.BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
                 break;
 
             case PartentType.TabPage:
-                BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
+                base.BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
                 break;
 
             case PartentType.Form:
-                BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
+                base.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
                 break;
         }
     }

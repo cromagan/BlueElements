@@ -344,7 +344,7 @@
     <Compile Include="Controls\RibbonBar.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="clsDesign.cs" />
+    <Compile Include="SkinDesign.cs" />
     <Compile Include="ScriptEditor.cs">
       <SubType>Component</SubType>
     </Compile>

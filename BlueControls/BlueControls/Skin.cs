@@ -834,7 +834,7 @@ public static class Skin {
 
     #region Fields
 
-    public static readonly Dictionary<Design, Dictionary<States, clsDesign>> Design = new();
+    public static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = new();
     public static readonly string DummyStandardFont = "<Name=Arial, Size=10>";
     public static readonly string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
     public static readonly int Padding = 9;
@@ -875,11 +875,11 @@ public static class Skin {
 
     public static Color Color_Back(Design vDesign, States vState) => DesignOf(vDesign, vState).BackColor1;
 
-    public static clsDesign DesignOf(Design design, States state) {
+    public static SkinDesign DesignOf(Design design, States state) {
         try {
             return Design[design][state];
         } catch {
-            clsDesign d = new() {
+            SkinDesign d = new() {
                 BackColor1 = Color.White,
                 BorderColor1 = Color.Red,
                 BFont = BlueFont.Get("Arial", 10f, false, false, false, false, false, Color.Red, Color.Black, false, false, false),
@@ -893,7 +893,7 @@ public static class Skin {
 
     public static void Draw_Back(Graphics gr, Design design, States state, Rectangle r, Control? control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
 
-    public static void Draw_Back(Graphics gr, clsDesign design, Rectangle r, Control? control, bool needTransparenz) {
+    public static void Draw_Back(Graphics gr, SkinDesign design, Rectangle r, Control? control, bool needTransparenz) {
         try {
             if (design.Need) {
                 if (!needTransparenz) { design.Need = false; }
@@ -965,7 +965,7 @@ public static class Skin {
                     break;
             }
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Fehler beim Zeichnen des Skins:" + design, ex);
         }
     }
 
@@ -1016,7 +1016,7 @@ public static class Skin {
 
     public static void Draw_Border(Graphics gr, Design vDesign, States vState, Rectangle r) => Draw_Border(gr, DesignOf(vDesign, vState), r);
 
-    public static void Draw_Border(Graphics gr, clsDesign design, Rectangle r) {
+    public static void Draw_Border(Graphics gr, SkinDesign design, Rectangle r) {
         if (design.Kontur == Enums.Kontur.Ohne || design.RahmenArt == RahmenArt.Ohne) { return; }
 
         if (design.Kontur == Enums.Kontur.Unbekannt) {
@@ -1083,7 +1083,7 @@ public static class Skin {
                     break;
             }
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Fehler beim Zeichen des Randes " + design, ex);
         }
     }
 
@@ -1130,7 +1130,7 @@ public static class Skin {
     /// <param name="child"></param>
     /// <param name="deleteBack"></param>
 
-    public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, clsDesign design, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) {
+    public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, SkinDesign design, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) {
         if (string.IsNullOrEmpty(txt) && qi == null) { return; }
         QuickImage? tmpImage = null;
         if (qi != null) { tmpImage = QuickImage.Get(qi, AdditionalState(design.Status)); }

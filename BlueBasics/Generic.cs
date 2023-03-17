@@ -108,7 +108,7 @@ public static class Generic {
             writer.Flush();
             return true;
         } catch (Exception ex) {
-            Develop.DebugPrint(FehlerArt.Warnung, ex);
+            Develop.DebugPrint("Fehler beim Shortcut anlegen", ex);
             return false;
         }
     }

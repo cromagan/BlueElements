@@ -235,7 +235,7 @@ public class BitmapListItem : BasicListItem {
                 _bitmap = BitmapExt.Image_FromFile(_imageFilename) as Bitmap;
             }
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Fehler beim laden des Bildes", ex);
         }
     }
 

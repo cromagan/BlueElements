@@ -919,7 +919,7 @@ public abstract class SqlBackAbstract {
             _ = command.ExecuteNonQuery();
             return string.Empty;
         } catch (Exception ex) {
-            Develop.DebugPrint(ex);
+            Develop.DebugPrint("Datenbank Befehl konnte nicht ausgeführt werden: " + command.CommandText, ex);
             return "Allgemeiner Fehler beim Ausführen, siehe Protocol";
         } finally {
             _ = CloseConnection();

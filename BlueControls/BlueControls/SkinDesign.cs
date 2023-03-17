@@ -23,25 +23,25 @@ using BlueBasics;
 using BlueControls;
 using BlueControls.Enums;
 
-public static class clsDesignExtensions {
+public static class SkinDesignExtensions {
 
     #region Methods
 
-    public static void Add(this Dictionary<Design, Dictionary<States, clsDesign>> dictControl, Design ds, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, RahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
-        Dictionary<States, clsDesign> dictState;
+    public static void Add(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, RahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
+        Dictionary<States, SkinDesign> dictState;
 
         if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
             dictState = existingDictOfControl;
         } else {
-            dictState = new Dictionary<States, clsDesign>();
+            dictState = new Dictionary<States, SkinDesign>();
             dictControl.Add(ds, dictState);
         }
 
         dictState.Add(status, enKontur, x1, y1, x2, y2, hint, verlauf, bc1, bc2, bc3, rahm, boc1, boc2, boc3, f, pic);
     }
 
-    public static void Add(this Dictionary<States, clsDesign> dictStats, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, RahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
-        clsDesign des = new() {
+    public static void Add(this Dictionary<States, SkinDesign> dictStats, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, RahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
+        SkinDesign des = new() {
             Need = true,
             Kontur = enKontur,
             X1 = x1,
@@ -66,7 +66,7 @@ public static class clsDesignExtensions {
         dictStats.Add(status, des);
     }
 
-    public static void Remove(this Dictionary<Design, Dictionary<States, clsDesign>> dictControl, Design ds, States status) {
+    public static void Remove(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status) {
         if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
             _ = existingDictOfControl.Remove(status);
         }
@@ -75,7 +75,7 @@ public static class clsDesignExtensions {
     #endregion
 }
 
-public class clsDesign {
+public class SkinDesign {
 
     #region Properties
 

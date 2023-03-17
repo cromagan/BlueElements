@@ -1511,7 +1511,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 return true;
             }
         } catch (Exception ex) {
-            Develop.DebugPrint(FehlerArt.Warnung, ex);
+            Develop.DebugPrint(FehlerArt.Warnung, "Fehler beim Rechte-Check", ex);
         }
         return false;
     }
@@ -1690,8 +1690,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             }
             return c.SetValueInternal(type, value, isLoading);
         }
-
-
 
         if (type.IsCommand()) {
             switch (type) {
