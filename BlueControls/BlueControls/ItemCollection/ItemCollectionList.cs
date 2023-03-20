@@ -24,6 +24,7 @@ using System.Collections.Specialized;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Data;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -62,6 +63,8 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
     public ItemCollectionList(bool autosort) : this(BlueListBoxAppearance.Listbox, autosort) { }
 
     public ItemCollectionList(BlueListBoxAppearance design, bool autosort) : base() {
+        BindingOperations.EnableCollectionSynchronization(this, new object());
+
         _maxNeededItemSize = Size.Empty;
         _appearance = BlueListBoxAppearance.Listbox;
         _itemDesign = Design.Undefiniert;
@@ -926,7 +929,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
     private void PreComputeSize() {
         try {
             _ = Parallel.ForEach(this, thisItem => {
-                _ = thisItem.SizeUntouchedForListBox(ItemDesign);
+                _ = thisItem?.SizeUntouchedForListBox(ItemDesign);
             });
         } catch {
             PreComputeSize();

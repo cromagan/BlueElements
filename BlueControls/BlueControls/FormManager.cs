@@ -33,8 +33,6 @@ public class FormManager : ApplicationContext {
     public static dExecuteAtEnd? ExecuteAtEnd = null;
     public static bool First = true;
     public static bool FirstWindowShown;
-    public static List<Form> Forms = new();
-
     public static dNewModeSelectionForm? NewModeSelectionForm = null;
     public static Form? StartForm;
 
@@ -43,6 +41,7 @@ public class FormManager : ApplicationContext {
     //in the Program class
     private static readonly Lazy<FormManager> _current = new();
 
+    private static List<Form> Forms = new();
     private Form? _lastStartForm;
 
     #endregion

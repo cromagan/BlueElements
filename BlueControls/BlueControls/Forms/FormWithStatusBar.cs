@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -29,19 +30,28 @@ public partial class FormWithStatusBar : Form {
 
     #region Fields
 
+    /// <summary>
+    /// FormManager kennt manache Forms gar nicht, z.b. Splash Screen. Deswegen eigene Collection
+    /// </summary>
+    public static List<FormWithStatusBar> Forms = new();
+
     private DateTime _lastMessage = DateTime.UtcNow;
 
     #endregion
 
     #region Constructors
 
-    public FormWithStatusBar() : base() => InitializeComponent();
+    public FormWithStatusBar() : base() {
+        InitializeComponent();
+        Forms.Add(this);
+    }
 
     #endregion
 
     #region Properties
 
     public bool DropMessages { get; set; } = true;
+
     public int MessageSeconds { get; set; } = 10;
 
     #endregion
@@ -63,7 +73,7 @@ public partial class FormWithStatusBar : Form {
 
         var did = false;
         try {
-            foreach (var thisf in FormManager.Forms) {
+            foreach (var thisf in Forms) {
                 if (thisf is FormWithStatusBar fd) {
                     var x = fd.UpdateStatus(type, text, did);
                     if (x) { did = true; }
@@ -120,6 +130,11 @@ public partial class FormWithStatusBar : Form {
     }
 
     internal static void Db_DropMessage(object sender, MessageEventArgs e) => UpdateStatusBar(e.Type, e.Message, true);
+
+    protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e) {
+        Forms.Remove(this);
+        base.OnFormClosed(e);
+    }
 
     private void timMessageClearer_Tick(object sender, System.EventArgs e) {
         if (IsDisposed) {

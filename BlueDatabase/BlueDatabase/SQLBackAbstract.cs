@@ -543,9 +543,11 @@ public abstract class SqlBackAbstract {
                        " AND COLUMNNAME = " + Dbval(columnName.ToUpper()) +
                        " AND TYPE = " + Dbval(type.ToString()));
 
+        var MaxPartStringLenght = Math.Min(MaxStringLenght, 250);
+
         do {
             c++;
-            var tmp = utf8.CutToUtf8Length(MaxStringLenght);
+            var tmp = utf8.CutToUtf8Length(MaxPartStringLenght);
 
             var ok2 = SetStyleData(tablename, ty, columnName, tmp, c);
             if (!string.IsNullOrEmpty(ok2)) { ok = ok2; }

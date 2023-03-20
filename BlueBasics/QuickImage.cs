@@ -34,7 +34,6 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
 
     #region Fields
 
-    private static readonly object Locker = new();
     private static readonly ConcurrentDictionary<string, QuickImage> Pics = new();
 
     #endregion
@@ -82,10 +81,14 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
 
         Name = imagecode;
         Code = Name;
-        lock (Locker) {
-            CorrectSize(-1, -1, bmp);
-            _ = Pics.TryAdd(Code, this);
+
+        CorrectSize(-1, -1, bmp);
+
+        if (Pics.Count == 0) {
+            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(Pics, new object());
         }
+
+        _ = Pics.TryAdd(Code, this);
 
         if (bmp == null) {
             GenerateErrorImage();
@@ -231,11 +234,15 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
         if (imageCode == null || string.IsNullOrWhiteSpace(imageCode)) { return null; }
 
         QuickImage x;
-        lock (Locker) {
-            if (Pics.TryGetValue(imageCode, out var p)) { return p; }
-            x = new QuickImage(imageCode, false);
-            _ = Pics.TryAdd(imageCode, x);
+
+        if (Pics.TryGetValue(imageCode, out var p)) { return p; }
+        x = new QuickImage(imageCode, false);
+
+        if (Pics.Count == 0) {
+            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(Pics, new object());
         }
+
+        _ = Pics.TryAdd(imageCode, x);
 
         x.Generate();
         return x;

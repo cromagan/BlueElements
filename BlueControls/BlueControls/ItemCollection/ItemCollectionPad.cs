@@ -25,6 +25,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Windows.Data;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -73,6 +74,8 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     #region Constructors
 
     public ItemCollectionPad() : base() {
+        BindingOperations.EnableCollectionSynchronization(this, new object());
+
         PadItemTypes ??= GetInstaceOfType<BasicPadItem>("NAME");
 
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
