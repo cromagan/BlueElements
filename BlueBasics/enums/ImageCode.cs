@@ -18,8 +18,10 @@
 namespace BlueBasics.Enums;
 
 public enum ImageCode {
-    None,
+
+    //None,
     Abspielen,
+
     Anwendung,
     Aufnahme,
     AZ,

@@ -52,14 +52,14 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList? list) : this(expr, 1, list, ImageCode.None) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList? list) : this(expr, 1, list, null) { }
 
     /// <summary>
     /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="rowCount"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null, ImageCode.None) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null, null) { }
 
     /// <summary>
     /// Anzeige als Button
@@ -72,11 +72,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null, ImageCode.None) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null, null) { }
 
-    public FlexiControlForProperty() : this(null, 1, null, ImageCode.None) { }
+    public FlexiControlForProperty() : this(null, 1, null, null) { }
 
-    private FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList? list, ImageCode image) : base() {
+    private FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList? list, ImageCode? image) : base() {
         _accessor = new Accessor<T>(expr);
 
         GenFehlerText();
@@ -85,7 +85,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         EditType = EditTypeFormula.Textfeld;
         Size = new Size(200, 24);
 
-        _isButton = image != ImageCode.None;
+        _isButton = image != null;
 
         UpdateControlData(rowCount, list, image);
         _ = CheckEnabledState();
@@ -290,7 +290,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         }
     }
 
-    private void UpdateControlData(int textLines, ItemCollectionList? list, ImageCode image) {
+    private void UpdateControlData(int textLines, ItemCollectionList? list, ImageCode? image) {
 
         #region Caption setzen
 
@@ -308,8 +308,8 @@ public class FlexiControlForProperty<T> : FlexiControl {
             Size = new Size((int)s0.Width + 50 + 22, 30);
             if (CreateSubControls() is Button c0) {
                 c0.Text = Caption.TrimEnd(":");
-                if (image != ImageCode.None) {
-                    c0.ImageCode = QuickImage.Get(image, 22).ToString();
+                if (image is ImageCode im) {
+                    c0.ImageCode = QuickImage.Get(im, 22).ToString();
                 }
             }
         } else {

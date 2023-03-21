@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Runtime.CompilerServices;
 using System.Text;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -44,6 +45,7 @@ public abstract class SqlBackAbstract {
     //public static List<SQLBackAbstract>? PossibleSQLBacks;
     protected DbConnection? Connection;
 
+    private static DateTime LastLoadUTC = DateTime.UtcNow;
     private readonly object _fill = new();
     private readonly object _getChanges = new();
     private readonly object _getRow = new();
@@ -181,7 +183,12 @@ public abstract class SqlBackAbstract {
     /// </summary>
     /// <returns>befüllte  Tabelle - Datatable</returns>
     public DataTable? Fill_Table(string commandtext) {
+
+        PauseSystem();
+
         if (!OpenConnection() || Connection == null) { return null; }
+
+
 
         try {
             lock (_fill) {
@@ -191,9 +198,7 @@ public abstract class SqlBackAbstract {
                 _ = OpenConnection();
                 tbl.Load(command.ExecuteReader());
                 _ = CloseConnection();
-                //if (TBL.Rows.Count == 1) {
-                //    Develop.DebugPrint("Müssig");
-                //}
+                LastLoadUTC = DateTime.UtcNow;
                 return tbl;
             }
         } catch {
@@ -324,6 +329,12 @@ public abstract class SqlBackAbstract {
         }
     }
 
+
+    private void PauseSystem() {
+        while (DateTime.UtcNow.Subtract(LastLoadUTC).TotalMilliseconds < 1) { }
+        LastLoadUTC = DateTime.UtcNow;
+    }
+
     /// <summary>
     ///
     /// </summary>
@@ -331,14 +342,18 @@ public abstract class SqlBackAbstract {
     /// <param name="row"></param>
     /// <param name="refreshAlways">Bei TRUE wird die gesamte Zeile aktualistert, weil evtl. eine Änderung aufgetreten ist. Bei FLASE werden nur die fehlenden Daten der noch nicht geladenen Spalten nachgeladen.</param>
     /// <param name="sortedRows"></param>
-    public void LoadRow(string tablename, List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows) {
+    public string LoadRow(string tablename, List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows, int trycount) {
+        PauseSystem();
+
+        if (trycount > 5) { return "Nach 10 Versuchen abgebrochen"; }
+
         try {
-            if (row.Count == 0 || row[0] is null) { return; }
+            if (row.Count == 0 || row[0] is null) { return string.Empty; }
 
             var db = row[0]?.Database;
-            if (db == null || db.IsDisposed) { return; }
+            if (db == null || db.IsDisposed) { return "Datenbank verworfen"; }
 
-            if (!OpenConnection() || Connection == null) { return; }
+            if (!OpenConnection() || Connection == null) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
             lock (_getRow) {
                 var com = new StringBuilder();
@@ -355,7 +370,7 @@ public abstract class SqlBackAbstract {
                     }
                 }
 
-                if (count == 0) { return; }
+                if (count == 0) { return string.Empty; }
 
                 _ = db.Row.FillUp100(row, sortedRows);
 
@@ -372,11 +387,13 @@ public abstract class SqlBackAbstract {
                     }
                 }
 
-                if (!OpenConnection() || Connection == null) { return; }
+                if (!OpenConnection() || Connection == null) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
+
 
                 var dt = Fill_Table(com.ToString());
 
-                if (dt == null) { return; }
+
+                if (dt == null) { return "Keine gültige Rückgabe erhalten"; }
 
                 foreach (var thisRow in dt.Rows) {
                     var reader = (DataRow)thisRow;
@@ -400,12 +417,12 @@ public abstract class SqlBackAbstract {
                 }
                 _ = CloseConnection();
 
-                db.Row.DoLinkedDatabase(row);
+                return db.Row.DoLinkedDatabase(row);
             }
         } catch {
             _ = CloseConnection();
             Develop.CheckStackForOverflow();
-            LoadRow(tablename, row, refreshAlways, sortedRows);
+            return LoadRow(tablename, row, refreshAlways, sortedRows, trycount++);
         }
     }
 

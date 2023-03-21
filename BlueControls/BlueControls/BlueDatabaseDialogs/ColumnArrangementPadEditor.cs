@@ -116,6 +116,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
+        if (Database == null || Database.IsDisposed) { return; }
         var ca = CurrentArrangement;
         if (ca == null) { return; }
 
@@ -131,9 +132,11 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {
+        if (Database == null || Database.IsDisposed) { return; }
+
         var mitVorlage = false;
         if (_arrangement > 0 && CurrentArrangement != null) {
-            mitVorlage = Convert.ToBoolean(MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0);
+            mitVorlage = MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0;
         }
 
         var car = Database.ColumnArrangements.CloneWithClones();
@@ -167,7 +170,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
 
         ColumnItem? vorlage = null;
-        if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.Column.Database == Database) {
+        if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.Column?.Database == Database) {
             vorlage = cpi.Column;
         }
 
@@ -191,6 +194,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
             }
         }
         var newc = Database.Column.GenerateAndAdd();
+
+        if (newc == null) { return; }
+
         if (vorlage != null) {
             newc.CloneFrom(vorlage, false);
             if (mitDaten) {
@@ -213,6 +219,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
+        if (Database == null || Database.IsDisposed) { return; }
+
         var ca = CurrentArrangement;
         if (ca == null) { return; }
 
@@ -252,6 +260,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     /// </summary>
 
     private void FixColumnArrangement() {
+        if (Database == null || Database.IsDisposed) { return; }
         if (Generating || Sorting) { return; }
 
         var cloneOfColumnArrangements = Database.ColumnArrangements.CloneWithClones();
@@ -352,12 +361,14 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void Item_ItemAdded(object sender, ListEventArgs e) {
+        if (Database == null || Database.IsDisposed) { return; }
+
         if (e.Item is ColumnPadItem cpi) {
             cpi.AdditionalStyleOptions = null;
 
             var c = CurrentArrangement;
 
-            if (c != null && cpi.Column.Database == Database && _arrangement > 0) {
+            if (c != null && cpi.Column?.Database == Database && _arrangement > 0) {
                 var oo = c[cpi.Column];
 
                 if (oo != null) {
@@ -372,6 +383,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void Item_ItemRemoved(object sender, System.EventArgs e) => Pad_MouseUp(null, null);
 
     private ColumnPadItem? LeftestItem(ICollection<BasicPadItem> ignore) {
+        if (Database == null || Database.IsDisposed) { return null; }
+        if (Pad?.Item == null) { return null; }
+
         ColumnPadItem? found = null;
 
         foreach (var thisIt in Pad.Item) {
@@ -394,6 +408,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void ShowOrder() {
+        if (Database == null || Database.IsDisposed) { return; }
+        if (Pad?.Item == null) { return; }
+
         if (Generating || Fixing > 0) { Develop.DebugPrint("Generating falsch!"); }
 
         Generating = true;
@@ -436,9 +453,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var kx = 0f;
         foreach (var thisCombi in dbColumnCombi) {
             foreach (var thisc in ca) {
-                var it = Pad.Item[thisc?.Column?.Database?.TableName +"|"+    thisc?.Column?.Name] as ColumnPadItem;
+                var it = Pad.Item[thisc?.Column?.Database?.TableName + "|" + thisc?.Column?.Name] as ColumnPadItem;
 
-                if (thisc.Column.LinkedDatabase != null) {
+                if (thisc?.Column?.LinkedDatabase != null) {
                     // String als Namen als eindeutige Kennung
                     var toCheckCombi = thisc.Column.LinkedDatabase.ConnectionData.TableName + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
 
@@ -456,7 +473,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
                             foreach (var thisc2 in thisc?.Column?.Database?.Column) {
                                 if (tmp[2].Contains("~" + thisc2.Name + "~")) {
-                                    var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Database.TableName + "|" +   thisc2.Name];
+                                    var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Database.TableName + "|" + thisc2.Name];
                                     _ = rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                 }
                             }

@@ -102,8 +102,8 @@ public partial class Notification : FloatingForm {
         x.Show();
     }
 
-    public static void Show(string text, ImageCode img) {
-        if (img != ImageCode.None) {
+    public static void Show(string text, ImageCode? img) {
+        if (img != null) {
             text = "<ImageCode=" + Enum.GetName(img.GetType(), img) + "|32> <zbx_store><top>" + text;
         }
         Show(text);

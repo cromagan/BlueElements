@@ -458,7 +458,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var cellKey = KeyOfCell(column, row);
 
             if (column.IsInCache == null) {
-                _ = Database.RefreshRowData(row, false, null);
+                var x = Database.RefreshRowData(row, false, null);
+                if (!string.IsNullOrEmpty(x.Item2)) {
+                    Database.OnDropMessage(FehlerArt.Fehler, x.Item2);
+                }
             }
 
             return !ContainsKey(cellKey) ? string.Empty : this[cellKey].Value;

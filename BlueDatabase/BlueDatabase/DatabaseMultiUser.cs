@@ -187,14 +187,14 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         }
     }
 
-    public override bool RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows) {
-        if (row.Count == 0) { return false; }
+    public override (bool, string) RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows) {
+        if (row.Count == 0) { return (false, string.Empty); }
 
         foreach (var thisrow in row) {
             thisrow.IsInCache = DateTime.UtcNow;
         }
-        Row.DoLinkedDatabase(row);
-        return false;
+        var x = Row.DoLinkedDatabase(row);
+        return (false, x);
     }
 
     public override bool Save() {

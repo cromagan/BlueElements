@@ -1229,7 +1229,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             List<RowData>? sortedRowData;
             int firstVisibleRow;
             int lastVisibleRow;
+            var count = 0;
             do {
+                count++;
+                if (count > 10) {
+                    DrawWaitScreen(gr);
+                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Fehler, "Datenbank-laden nach 10 Versuchen aufgegeben", true);
+                    return;
+                }
+
                 sortedRowData = SortedRows();
 
                 if (sortedRowData == null) {
@@ -1260,7 +1268,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     }
                 }
 
-                if (!Database.RefreshRowData(rowsToRefreh, false, sortedRows)) { break; }
+                var x = Database.RefreshRowData(rowsToRefreh, false, sortedRows);
+
+                if (!string.IsNullOrEmpty(x.Item2)) {
+                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Fehler, x.Item2, true);
+                }
+
+                if (!x.Item1) { break; }
                 Invalidate_SortedRowData();
             } while (true);
 

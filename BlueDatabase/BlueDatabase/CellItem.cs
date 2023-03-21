@@ -124,18 +124,24 @@ public class CellItem {
                 return QuickImage.Get("Kritisch|" + gr);
 
             case BildTextVerhalten.Interpretiere_Bool:
+
                 if (originalText == "+") {
-                    return column == column.Database.Column.SysCorrect ? QuickImage.Get("Häkchen|" + gr + "||||||||80") : QuickImage.Get("Häkchen|" + gr);
+                    return column == column?.Database?.Column.SysCorrect ?
+                        QuickImage.Get("Häkchen|" + gr + "||||||||80") :
+                        QuickImage.Get("Häkchen|" + gr);
                 }
 
                 if (originalText == "-") {
-                    return column == column.Database.Column.SysCorrect ? QuickImage.Get("Warnung|" + gr) :
+                    return column == column?.Database?.Column.SysCorrect ?
+                        QuickImage.Get("Warnung|" + gr) :
                         QuickImage.Get("Kreuz|" + gr);
                 }
-                if (originalText.ToLower() == "o") {
+
+                if (originalText is "o" or "O") {
                     return QuickImage.Get("Kreis2|" + gr);
                 }
-                if (originalText.ToLower() == "?") {
+
+                if (originalText == "?") {
                     return QuickImage.Get("Fragezeichen|" + gr);
                 }
 
@@ -239,7 +245,7 @@ public class CellItem {
     /// </summary>
     /// <returns></returns>
 
-    public static List<string> ValuesReadable(ColumnItem? column, RowItem Row, ShortenStyle style) {
+    public static List<string> ValuesReadable(ColumnItem column, RowItem Row, ShortenStyle style) {
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
             //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
@@ -264,7 +270,7 @@ public class CellItem {
 
     //internal void InvalidateSize() => Size = Size.Empty;
 
-    private static QuickImage? StandardImage(ColumnItem? column, string originalText, string replacedText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
+    private static QuickImage? StandardImage(ColumnItem column, string originalText, string replacedText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird
         if (bildTextverhalten == BildTextVerhalten.Nur_Text) { return null; }
         if (style == ShortenStyle.HTML) { return null; }
@@ -272,7 +278,7 @@ public class CellItem {
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, BildTextVerhalten.Nur_Text, true); }
         if (string.IsNullOrEmpty(replacedText)) { return null; }
 
-        var gr = Math.Truncate(column.Database.GlobalScale * 16).ToString(Constants.Format_Integer1);
+        var gr = column.Database == null ? "16" : Math.Truncate(column.Database.GlobalScale * 16).ToString(Constants.Format_Integer1);
         if (!string.IsNullOrEmpty(column.ConstantHeightOfImageCode)) { gr = column.ConstantHeightOfImageCode; }
 
         var x = (replacedText + "||").SplitBy("|");

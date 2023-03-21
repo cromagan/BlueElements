@@ -187,8 +187,8 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
     //    LoadFromSQLBack();
     //}
 
-    public override bool RefreshRowData(List<RowItem> rows, bool refreshAlways, List<RowItem>? sortedRows) {
-        if (rows == null || rows.Count == 0) { return false; }
+    public override (bool, string) RefreshRowData(List<RowItem> rows, bool refreshAlways, List<RowItem>? sortedRows) {
+        if (rows == null || rows.Count == 0) { return (false, string.Empty); }
 
         var l = new List<RowItem>();
 
@@ -198,20 +198,20 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
             }
         }
 
-        if (l.Count == 0) { return false; }
+        if (l.Count == 0) { return (false, string.Empty); }
         l = l.Distinct().ToList();
 
         Row.DoLinkedDatabase(rows);
 
         OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) der Datenbank '" + TableName + "' nach.");
 
+        if (_sql == null) { return (false, "SQL Verbindung fehlerhaft"); }
+
         try {
-            _sql?.LoadRow(TableName, l, refreshAlways, sortedRows);
+            return (true, _sql.LoadRow(TableName, l, refreshAlways, sortedRows, 1));
         } catch {
             return RefreshRowData(rows, refreshAlways, sortedRows);
         }
-
-        return true;
     }
 
     public override bool Save() => _sql.ConnectionOk;
@@ -418,7 +418,10 @@ public sealed class DatabaseSQLLite : DatabaseAbstract {
                 }
             }
 
-            _ = RefreshRowData(rk, true, null);
+            var x = RefreshRowData(rk, true, null);
+            if (!string.IsNullOrEmpty(x.Item2)) {
+                OnDropMessage(FehlerArt.Fehler, x.Item2);
+            }
         } catch {
             DoLastChanges(data);
         }

@@ -227,11 +227,11 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
         return c.ToString().TrimEnd('|');
     }
 
-    public static QuickImage? Get(QuickImage imageCode, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? imageCode
+    public static QuickImage Get(QuickImage imageCode, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? imageCode
         : Get(GenerateCode(imageCode.Name, imageCode.Width, imageCode.Height, imageCode.Effekt | additionalState, imageCode.Färbung, imageCode.ChangeGreenTo, imageCode.Sättigung, imageCode.Helligkeit, imageCode.DrehWinkel, imageCode.Transparenz, imageCode.Zweitsymbol));
 
-    public static QuickImage? Get(string? imageCode) {
-        if (imageCode == null || string.IsNullOrWhiteSpace(imageCode)) { return null; }
+    public static QuickImage Get(string imageCode) {
+        //if (imageCode == null || string.IsNullOrWhiteSpace(imageCode)) { return null; }
 
         QuickImage x;
 
@@ -248,8 +248,8 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
         return x;
     }
 
-    public static QuickImage? Get(string image, int squareWidth) {
-        if (string.IsNullOrEmpty(image)) { return null; }
+    public static QuickImage Get(string image, int squareWidth) {
+        //if (string.IsNullOrEmpty(image)) { return null; }
         if (image.Contains("|")) {
             var w = (image + "||||||").Split('|');
             w[1] = squareWidth.ToString();
@@ -259,15 +259,13 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
         return Get(GenerateCode(image, squareWidth, 0, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
     }
 
-    public static QuickImage? Get(ImageCode image) => Get(image, 16);
+    public static QuickImage Get(ImageCode image) => Get(image, 16);
 
-    public static QuickImage? Get(ImageCode image, int squareWidth) => image == ImageCode.None ? null
-        : Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, string.Empty));
 
-    public static QuickImage? Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => image == ImageCode.None ? null
-        : Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, färbung.ToHtmlCode(), changeGreenTo.ToHtmlCode(), 100, 100, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.Ohne, färbung.ToHtmlCode(), changeGreenTo.ToHtmlCode(), 100, 100, 0, 0, string.Empty));
 
-    public static QuickImage? Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
+    public static QuickImage Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
 
     public static implicit operator Bitmap?(QuickImage? p) {
         //if (!p._generated && !p._generating) { p.Generate(); }

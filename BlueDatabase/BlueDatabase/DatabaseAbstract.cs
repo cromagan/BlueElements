@@ -1156,7 +1156,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 break;
         }
 
-        RefreshRowData(sortedRows, false);
+        var x = RefreshRowData(sortedRows, false);
+        if (!string.IsNullOrEmpty(x.Item2)) {
+            OnDropMessage(FehlerArt.Fehler, x.Item2);
+        }
 
         foreach (var thisRow in sortedRows) {
             if (thisRow != null) {
@@ -1205,7 +1208,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         da.RowEnd();
-        RefreshRowData(sortedRows, false);
+        var x = RefreshRowData(sortedRows, false);
+        if (!string.IsNullOrEmpty(x.Item2)) {
+            OnDropMessage(FehlerArt.Fehler, x.Item2);
+        }
 
         foreach (var thisRow in sortedRows) {
             if (thisRow != null) {
@@ -1537,8 +1543,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    public bool RefreshRowData(List<RowData> rowdata, bool refreshAlways) {
-        if (rowdata.Count == 0) { return false; }
+    public (bool, string) RefreshRowData(List<RowData> rowdata, bool refreshAlways) {
+        if (rowdata.Count == 0) { return (false, string.Empty); }
 
         var r = new List<RowItem>();
         foreach (var thisRow in rowdata) {
@@ -1547,10 +1553,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return RefreshRowData(r, refreshAlways, null);
     }
 
-    public abstract bool RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows);
+    public abstract (bool, string) RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows);
 
-    public bool RefreshRowData(List<long> keys, bool refreshAlways, List<RowItem>? sortedRows) {
-        if (keys.Count == 0) { return false; }
+    public (bool, string) RefreshRowData(List<long> keys, bool refreshAlways, List<RowItem>? sortedRows) {
+        if (keys.Count == 0) { return (false, string.Empty); }
 
         var r = new List<RowItem>();
         foreach (var thisK in keys) {
@@ -1560,7 +1566,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return RefreshRowData(r, refreshAlways, sortedRows);
     }
 
-    public bool RefreshRowData(RowItem row, bool refreshAlways, List<RowItem>? sortedRows) => RefreshRowData(new List<RowItem> { row }, refreshAlways, sortedRows);
+    public (bool, string) RefreshRowData(RowItem row, bool refreshAlways, List<RowItem>? sortedRows) => RefreshRowData(new List<RowItem> { row }, refreshAlways, sortedRows);
 
     public virtual void RepairAfterParse() {
         Column.Repair();
@@ -2036,7 +2042,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 if (FileExists(fullhashname)) {
                     FileInfo f = new(fullhashname);
-                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 20) {
+                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 30 && Constants.GlobalRND.Next(0,100) != 1 ) {
                         if (f.Length < 5) { return; }
                         e.Bmp = new BitmapExt(fullhashname);
                         return;
