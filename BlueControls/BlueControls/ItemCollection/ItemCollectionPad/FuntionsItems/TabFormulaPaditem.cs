@@ -37,7 +37,7 @@ using TabControl = BlueControls.Controls.TabControl;
 
 namespace BlueControls.ItemCollection;
 
-public class TabFormulaPadItem : CustomizableShowPadItem, IHasConnectedFormula {
+public class TabFormulaPadItem : CustomizableShowPadItem, IHasConnectedFormula, IItemAcceptRow {
 
     #region Fields
 

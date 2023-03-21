@@ -37,7 +37,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection;
 
-public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToControl {
+public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToControl, IItemAcceptRow {
 
     #region Fields
 

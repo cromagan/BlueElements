@@ -301,7 +301,7 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
 
     public string ReadableText() => string.Empty;
 
-    public QuickImage SymbolForReadableText() => this;
+    public QuickImage? SymbolForReadableText() => this;
 
     /// <summary>
     /// Gibt den ImageCode zurück

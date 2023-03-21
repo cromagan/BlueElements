@@ -28,7 +28,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
-public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl {
+public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl, IItemAcceptRow {
 
     #region Fields
 

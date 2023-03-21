@@ -22,7 +22,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
-using System.Runtime.CompilerServices;
 using System.Text;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -45,7 +44,7 @@ public abstract class SqlBackAbstract {
     //public static List<SQLBackAbstract>? PossibleSQLBacks;
     protected DbConnection? Connection;
 
-    private static DateTime LastLoadUTC = DateTime.UtcNow;
+    private static DateTime _lastLoadUtc = DateTime.UtcNow;
     private readonly object _fill = new();
     private readonly object _getChanges = new();
     private readonly object _getRow = new();
@@ -183,12 +182,9 @@ public abstract class SqlBackAbstract {
     /// </summary>
     /// <returns>befüllte  Tabelle - Datatable</returns>
     public DataTable? Fill_Table(string commandtext) {
-
         PauseSystem();
 
         if (!OpenConnection() || Connection == null) { return null; }
-
-
 
         try {
             lock (_fill) {
@@ -198,7 +194,7 @@ public abstract class SqlBackAbstract {
                 _ = OpenConnection();
                 tbl.Load(command.ExecuteReader());
                 _ = CloseConnection();
-                LastLoadUTC = DateTime.UtcNow;
+                _lastLoadUtc = DateTime.UtcNow;
                 return tbl;
             }
         } catch {
@@ -329,12 +325,6 @@ public abstract class SqlBackAbstract {
         }
     }
 
-
-    private void PauseSystem() {
-        while (DateTime.UtcNow.Subtract(LastLoadUTC).TotalMilliseconds < 1) { }
-        LastLoadUTC = DateTime.UtcNow;
-    }
-
     /// <summary>
     ///
     /// </summary>
@@ -342,6 +332,7 @@ public abstract class SqlBackAbstract {
     /// <param name="row"></param>
     /// <param name="refreshAlways">Bei TRUE wird die gesamte Zeile aktualistert, weil evtl. eine Änderung aufgetreten ist. Bei FLASE werden nur die fehlenden Daten der noch nicht geladenen Spalten nachgeladen.</param>
     /// <param name="sortedRows"></param>
+    /// <param name="trycount"></param>
     public string LoadRow(string tablename, List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows, int trycount) {
         PauseSystem();
 
@@ -389,9 +380,7 @@ public abstract class SqlBackAbstract {
 
                 if (!OpenConnection() || Connection == null) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
-
                 var dt = Fill_Table(com.ToString());
-
 
                 if (dt == null) { return "Keine gültige Rückgabe erhalten"; }
 
@@ -422,7 +411,8 @@ public abstract class SqlBackAbstract {
         } catch {
             _ = CloseConnection();
             Develop.CheckStackForOverflow();
-            return LoadRow(tablename, row, refreshAlways, sortedRows, trycount++);
+            trycount++;
+            return LoadRow(tablename, row, refreshAlways, sortedRows, trycount);
         }
     }
 
@@ -560,11 +550,11 @@ public abstract class SqlBackAbstract {
                        " AND COLUMNNAME = " + Dbval(columnName.ToUpper()) +
                        " AND TYPE = " + Dbval(type.ToString()));
 
-        var MaxPartStringLenght = Math.Min(MaxStringLenght, 250);
+        var maxPartStringLenght = Math.Min(MaxStringLenght, 250);
 
         do {
             c++;
-            var tmp = utf8.CutToUtf8Length(MaxPartStringLenght);
+            var tmp = utf8.CutToUtf8Length(maxPartStringLenght);
 
             var ok2 = SetStyleData(tablename, ty, columnName, tmp, c);
             if (!string.IsNullOrEmpty(ok2)) { ok = ok2; }
@@ -713,7 +703,7 @@ public abstract class SqlBackAbstract {
     /// <param name="fromDate"></param>
     /// <param name="toDate"></param>
     /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
-    internal List<(string tablename, string comand, string columname, string rowkey, DateTime timecode)>? GetLastChanges(List<DatabaseSQLLite> db, DateTime fromDate, DateTime toDate) {
+    internal List<(string tablename, string comand, string columname, string rowkey, DateTime timecode)>? GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate) {
         if (!OpenConnection()) { return null; }
 
         try {
@@ -989,6 +979,11 @@ public abstract class SqlBackAbstract {
             Develop.CheckStackForOverflow();
             return GetCellValue(tablename, columnname, rowkey);
         }
+    }
+
+    private void PauseSystem() {
+        while (DateTime.UtcNow.Subtract(_lastLoadUtc).TotalMilliseconds < 1) { }
+        _lastLoadUtc = DateTime.UtcNow;
     }
 
     private string RemoveColumn(string tablename, string column) {

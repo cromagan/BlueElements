@@ -28,6 +28,7 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
+using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 
@@ -38,7 +39,7 @@ namespace BlueControls.ItemCollection;
 /// Stellt auch alle Methode breit, zum Einrichten der Breite und Benutzer-Sichtbarkeiten.
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet
 /// </summary>
-public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IItemToControl {
+public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IItemToControl, IItemAcceptRow {
 
     #region Fields
 
@@ -143,6 +144,8 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             OnChanged();
         }
     }
+
+    public DatabaseAbstract? InputDatabase => GetRowFrom?.Database;
 
     public string Sichtbarkeit {
         get => string.Empty;

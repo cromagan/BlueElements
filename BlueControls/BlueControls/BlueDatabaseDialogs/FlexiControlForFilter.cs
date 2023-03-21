@@ -38,22 +38,18 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
+    //public FlexiControlForFilter() : this(null, null) { }
 
     #region Constructors
 
-    public FlexiControlForFilter() : this(null, null, null) {
-        // Dieser Aufruf ist für den Designer erforderlich.
-        // InitializeComponent();
-    }
-
-    public FlexiControlForFilter(Table? tableView, FilterItem? filter, Filterleiste? myParent) {
+    public FlexiControlForFilter(Table? tableView, FilterItem filter) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Size = new Size(300, 300);
         TableView = tableView;
         Filter = filter;
-        UpdateFilterData(myParent);
+        UpdateFilterData();
         Filter.Changed += Filter_Changed;
     }
 
@@ -73,7 +69,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
     /// ACHTUNG: Das Control wird niemals den Filter selbst ändern.
     /// Der Filter wird nur zur einfacheren Identifizierung der nachfolgenden Steuerelemente behalten.
     /// </summary>
-    public FilterItem? Filter { get; }
+    public FilterItem Filter { get; }
 
     public Table? TableView { get; }
 
@@ -126,7 +122,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
         hotItem = null;
-        if (Filter?.Column?.Database == null || !Filter.Column.Database.IsAdministrator()) { return; }
+        if (Filter.Column?.Database == null || !Filter.Column.Database.IsAdministrator()) { return; }
 
         hotItem = Filter.Column;
         _ = items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));
@@ -180,7 +176,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
                 btn.ImageCode = "Trichter|16||1";
                 btn.Text = Filter.ReadableText();
             } else {
-                if (Filter?.SearchValue != null && Filter.SearchValue.Count > 0 && !string.IsNullOrEmpty(Filter.SearchValue[0])) {
+                if (Filter.SearchValue.Count > 0 && !string.IsNullOrEmpty(Filter.SearchValue[0])) {
                     btn.ImageCode = "Trichter|16";
                     btn.Text = LanguageTool.DoTranslate("wählen ({0})", true, Filter.SearchValue.Count.ToString());
                 } else {
@@ -210,7 +206,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         if (listFilterString.Count == 0) {
             _ = cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false);
         } else if (listFilterString.Count < 400) {
-            cbx.Item.AddRange(listFilterString, Filter.Column, ShortenStyle.Replaced, Filter.Column.BehaviorOfImageAndText);
+            if (Filter.Column != null) { cbx.Item.AddRange(listFilterString, Filter.Column, ShortenStyle.Replaced, Filter.Column.BehaviorOfImageAndText); }
             //cbx.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
         } else {
             _ = cbx.Item.Add("Zu viele Einträge", "|~", ImageCode.Kreuz, false);
@@ -223,10 +219,10 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         }
     }
 
-    private void Filter_Changed(object sender, System.EventArgs e) => UpdateFilterData((Filterleiste)Parent);
+    private void Filter_Changed(object sender, System.EventArgs e) => UpdateFilterData();
 
-    private void UpdateFilterData(Filterleiste? myParent) {
-        if (Filter?.Column == null) {
+    private void UpdateFilterData() {
+        if (Filter.Column == null) {
             DisabledReason = "Bezug zum Filter verloren.";
             Caption = string.Empty;
             EditType = EditTypeFormula.None;

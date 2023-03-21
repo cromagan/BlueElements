@@ -41,7 +41,7 @@ using static BlueBasics.Converter;
 namespace BlueControls.ItemCollection;
 
 [Obsolete]
-public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl, IHasDatabase {
+public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl, IHasDatabase, IItemSendRow {
 
     #region Fields
 
@@ -149,6 +149,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     /// Laufende Nummer, bestimmt die Einfärbung
     /// </summary>
     public int Id { get; set; }
+
+    public DatabaseAbstract? OutputDatabase => Database;
 
     public string Überschrift {
         get => _überschrift;

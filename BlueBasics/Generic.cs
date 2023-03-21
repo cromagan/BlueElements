@@ -31,7 +31,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Windows.Forms;
-using BlueBasics.Enums;
 using Microsoft.Win32;
 using static BlueBasics.IO;
 using Clipboard = System.Windows.Clipboard;
@@ -120,17 +119,21 @@ public static class Generic {
         return wc.DownloadString(url);
     }
 
-    public static Image DownloadImage(string url) {
+    public static Image? DownloadImage(string url) {
         var request = WebRequest.Create(url);
         var response = request.GetResponse();
         var remoteStream = response.GetResponseStream();
-        StreamReader readStream = new(remoteStream);
-        var img = Image.FromStream(remoteStream);
-        response.Close();
-        remoteStream?.Close();
+        if (remoteStream != null) {
+            StreamReader readStream = new(remoteStream);
+            var img = Image.FromStream(remoteStream);
+            response.Close();
+            remoteStream.Close();
 
-        readStream.Close();
-        return img;
+            readStream.Close();
+            return img;
+        }
+
+        return null;
     }
 
     public static Stream? GetEmmbedResource(Assembly? assembly, string name) {

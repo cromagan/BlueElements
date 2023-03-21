@@ -122,6 +122,10 @@
     <Compile Include="Forms\FormWithStatusBar.designer.cs">
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\NewInterfaces\IItemAcceptRow.cs" />
+    <Compile Include="Interfaces\NewInterfaces\IItemSendRow.cs" />
+    <Compile Include="Interfaces\NewInterfaces\IItemSendFilter.cs" />
+    <Compile Include="Interfaces\NewInterfaces\IItemAcceptFilter.cs" />
     <Compile Include="Interfaces\IHasConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormulaView.cs">

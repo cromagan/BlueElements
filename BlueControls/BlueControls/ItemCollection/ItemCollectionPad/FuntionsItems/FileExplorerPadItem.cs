@@ -28,7 +28,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
-public class FileExplorerPadItem : CustomizableShowPadItem {
+public class FileExplorerPadItem : CustomizableShowPadItem, IItemAcceptRow {
 
     #region Fields
 

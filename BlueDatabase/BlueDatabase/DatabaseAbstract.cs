@@ -483,21 +483,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         foreach (var thist in DatabaseTypes) {
             if (thist.Name.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) {
-                if (ci != null) {
-                    var l = new object?[2];
-                    l[0] = ci;
-                    l[1] = needPassword;
-                    var v = thist.GetMethod("CanProvide").Invoke(null, l);
+                var l = new object?[2];
+                l[0] = ci;
+                l[1] = needPassword;
+                var v = thist.GetMethod("CanProvide")?.Invoke(null, l);
 
-                    if (v is DatabaseAbstract db) {
-                        return db;
-                        //          return (DatabaseAbstract)Activator.CreateInstance(thist, ci, false, needPassword);
-                    }
-                }
+                if (v is DatabaseAbstract db) { return db; }
             }
-
-            //MethodInfo parseMethod = thist.GetMethod("DatabaseId");
-            //object value = parseMethod.Invoke(null, new object[] { });
         }
 
         #endregion
@@ -516,7 +508,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
                 var h = thisSql.HandleMe(ci);
                 if (h != null) {
-                    return new DatabaseSQLLite(h, false, ci.TableName);
+                    return new DatabaseSqlLite(h, false, ci.TableName);
                 }
             }
         }
@@ -1182,9 +1174,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, List<RowData>? sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
 
-    public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter, List<RowItem?>? pinned) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
+    public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
 
-    public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem?>? pinned) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
+    public void Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
 
     public void Export_HTML(string filename, List<ColumnItem>? columnList, List<RowData>? sortedRows, bool execute) {
         if (columnList == null || columnList.Count == 0) {
@@ -1588,7 +1580,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public void Variables_Add(VariableString va, bool isLoading) {
         _variables.Add(va);
         //ev.Changed += EventScript_Changed;
-        if (!isLoading) { Variables_Changed(this, System.EventArgs.Empty); }
+        if (!isLoading) { Variables_Changed(); }
     }
 
     public void Variables_RemoveAll(bool isLoading) {
@@ -1599,7 +1591,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             _variables.RemoveAt(_variables.Count - 1);
         }
 
-        if (!isLoading) { Variables_Changed(this, System.EventArgs.Empty); }
+        if (!isLoading) { Variables_Changed(); }
     }
 
     public void WriteBackDbVariables(List<Variable> vars) {
@@ -1646,7 +1638,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     internal void RepairColumnArrangements() {
         //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
 
-        var x = _columnArrangements.CloneWithClones();
+        var x = _columnArrangements!.CloneWithClones();
 
         for (var z = 0; z < Math.Max(2, x.Count); z++) {
             if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
@@ -2042,7 +2034,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 if (FileExists(fullhashname)) {
                     FileInfo f = new(fullhashname);
-                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 30 && Constants.GlobalRND.Next(0,100) != 1 ) {
+                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 30 && Constants.GlobalRND.Next(0, 100) != 1) {
                         if (f.Length < 5) { return; }
                         e.Bmp = new BitmapExt(fullhashname);
                         return;
@@ -2072,7 +2064,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         } catch { }
     }
 
-    private void Variables_Changed(object sender, System.EventArgs e) => Variables = new ReadOnlyCollection<VariableString>(_variables);
+    private void Variables_Changed() => Variables = new ReadOnlyCollection<VariableString>(_variables);
 
     #endregion
 }

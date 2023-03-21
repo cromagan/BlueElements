@@ -31,7 +31,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText {
+public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IItemAcceptRow {
 
     #region Fields
 

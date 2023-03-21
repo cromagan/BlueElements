@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using BlueDatabase;
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -39,7 +37,7 @@ public sealed class Database : DatabaseAbstract {
 
     #region Fields
 
-    public readonly List<WorkItem> Works = new();
+    public readonly List<WorkItem> Works;
 
     #endregion
 
@@ -374,6 +372,8 @@ public sealed class Database : DatabaseAbstract {
     }
 
     public static void SaveToByteList(ColumnItem c, ref List<byte> l) {
+        if (c.Database is not DatabaseAbstract db) { return; }
+
         var name = c.Name;
 
         SaveToByteList(l, DatabaseDataType.ColumnName, c.Name, name);
@@ -434,7 +434,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
         //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
 
-        foreach (var thisR in c.Database.Row) {
+        foreach (var thisR in db.Row) {
             SaveToByteList(l, c, thisR);
         }
     }
@@ -578,7 +578,8 @@ public sealed class Database : DatabaseAbstract {
         var nn = Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
         foreach (var thisn in nn) {
-            gb.Add(ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false));
+            var t = ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false);
+            if (t != null) { gb.Add(t); }
         }
         return gb;
     }
@@ -803,7 +804,7 @@ public sealed class Database : DatabaseAbstract {
 
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
 
-    private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
+    //private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 
     //protected override string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
     private static int NummerCode3(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
@@ -823,6 +824,7 @@ public sealed class Database : DatabaseAbstract {
         do {
             byteCount--;
             var te = (long)Math.Pow(255, byteCount);
+            // ReSharper disable once PossibleLossOfFraction
             var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
 
             list.Add(mu);

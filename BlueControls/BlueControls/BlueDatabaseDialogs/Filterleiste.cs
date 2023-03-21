@@ -230,7 +230,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                         _ = flexsToDelete.Remove(flx);
                     } else {
                         // Na gut, eben neuen Flex erstellen
-                        flx = new FlexiControlForFilter(_tableView, filterItem, this);
+                        flx = new FlexiControlForFilter(_tableView, filterItem);
                         flx.ValueChanged += Flx_ValueChanged;
                         flx.ButtonClicked += Flx_ButtonClicked;
                         Controls.Add(flx);
@@ -272,8 +272,10 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
     private void _TableView_EnabledChanged(object sender, System.EventArgs e) {
         var hasDb = _tableView?.Database != null;
-        txbZeilenFilter.Enabled = hasDb && LanguageTool.Translation == null && Enabled && _tableView.Enabled;
-        btnAlleFilterAus.Enabled = hasDb && Enabled && _tableView.Enabled;
+        var tabViewEbabled = _tableView?.Enabled ?? false;
+
+        txbZeilenFilter.Enabled = hasDb && LanguageTool.Translation == null && Enabled && tabViewEbabled;
+        btnAlleFilterAus.Enabled = hasDb && Enabled && tabViewEbabled;
     }
 
     private void _TableView_PinnedOrFilterChanged(object sender, System.EventArgs e) => FillFilters();
@@ -281,9 +283,12 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     private void _TableView_ViewChanged(object sender, System.EventArgs e) => FillFilters();
 
     private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
+        if (_tableView?.Filter == null) { return; }
+
         _tableView.Filter.Remove(e.Column);
         if (e.Comand != "Filter") { return; }
-        //e.Filter.Herkunft = "Filterleiste";
+
+        if (e.Filter == null) { return; }
         _tableView.Filter.Add(e.Filter);
     }
 
@@ -296,28 +301,34 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     //}
 
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {
-        List<FilterItem> fl = new() { new FilterItem(_tableView.Database.Column.First, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
+        if (_tableView?.Database == null || _tableView.Database.IsDisposed) { return; }
+
+        if (_tableView.Database.Column.First is not ColumnItem co) { return; }
+
+        List<FilterItem> fl = new() { new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
         var r = _tableView.Database.Row.CalculateFilteredRows(fl);
-        if (r == null || r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
+        if (r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
             MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
             return;
         }
 
         btnAlleFilterAus_Click(null, null);
         foreach (var thiscolumnitem in _ähnliche) {
-            if (thiscolumnitem.Column.AutoFilterSymbolPossible()) {
-                if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
-                    FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
-                    _tableView.Filter.Add(fi);
-                } else if (thiscolumnitem.Column.MultiLine) {
-                    var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
-                    FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
-                    _tableView.Filter.Add(fi);
-                } else {
-                    var l = r[0].CellGetString(thiscolumnitem.Column);
-                    FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
-                    _tableView.Filter.Add(fi);
+            if (thiscolumnitem?.Column != null && _tableView?.Filter != null) {
+                if (thiscolumnitem.Column.AutoFilterSymbolPossible()) {
+                    if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
+                        FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
+                        _tableView.Filter.Add(fi);
+                    } else if (thiscolumnitem.Column.MultiLine) {
+                        var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
+                        FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
+                        _tableView.Filter.Add(fi);
+                    } else {
+                        var l = r[0].CellGetString(thiscolumnitem.Column);
+                        FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
+                        _tableView.Filter.Add(fi);
+                    }
                 }
             }
         }
@@ -407,12 +418,17 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     }
 
     private void Flx_ButtonClicked(object sender, System.EventArgs e) {
+        if (_tableView?.Filter == null) { return; }
+
         var f = (FlexiControlForFilter)sender;
         if (f.CaptionPosition == ÜberschriftAnordnung.ohne) {
             // ein Großer Knopf ohne Überschrift, da wird der evl. Filter gelöscht
             _ = _tableView.Filter.Remove(((FlexiControlForFilter)sender).Filter);
             return;
         }
+
+        if (f.Filter.Column == null) { return; }
+
         //f.Enabled = false;
         AutoFilter autofilter = new(f.Filter.Column, _tableView.Filter, _tableView.PinnedRows);
         var p = f.PointToScreen(Point.Empty);
@@ -426,11 +442,11 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         if (_isFilling) { return; }
         if (sender is FlexiControlForFilter flx) {
             if (flx.EditType == EditTypeFormula.Button) { return; }
-            if (_tableView == null) { return; }
+            if (_tableView?.Filter == null) { return; }
             var isFilter = flx.WasThisValueClicked(); //  flx.Value.StartsWith("|");
             //flx.Filter.Herkunft = "Filterleiste";
             var v = flx.Value; //.Trim("|");
-            if (_tableView.Filter == null || _tableView.Filter.Count == 0 || !_tableView.Filter.Contains(flx.Filter)) {
+            if (_tableView.Filter.Count == 0 || !_tableView.Filter.Contains(flx.Filter)) {
                 if (isFilter) { flx.Filter.FilterType = FilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werden
                 flx.Filter.Changeto(flx.Filter.FilterType, v);
                 _tableView.Filter.Add(flx.Filter);
