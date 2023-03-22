@@ -243,7 +243,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
                 //    break;
 
                 case "database":
-                    Database = DatabaseAbstract.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
+                    //Database = DatabaseAbstract.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
                     break;
 
                 default:

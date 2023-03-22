@@ -33,7 +33,11 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript.Variables;
 using static BlueBasics.BitmapExt;
+using static BlueBasics.Extensions;
 using static BlueBasics.IO;
+
+using static BlueBasics.Extensions;
+
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;

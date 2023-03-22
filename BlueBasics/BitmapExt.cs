@@ -30,7 +30,7 @@ using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using static BlueBasics.IO;
+using static BlueBasics.Extensions;
 
 namespace BlueBasics;
 
@@ -383,28 +383,9 @@ public class BitmapExt : IDisposableExtended {
             bitmap = new Bitmap(outStream);
         }
         if (maxSize > 0) {
-            bitmap = Resize(bitmap, maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
+            bitmap = bitmap.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true);
         }
         return bitmap;
-    }
-
-    public static BitmapExt? GetEmmbedBitmap(Assembly assembly, string name) {
-        if (name.Contains("|")) { return null; }
-        if (name.Contains("[")) { return null; }
-        using var d = Generic.GetEmmbedResource(assembly, name);
-        if (d == null) { return null; }
-
-        switch (name.FileType()) {
-            case FileFormat.Image:
-                return new BitmapExt(new Bitmap(d));
-
-            case FileFormat.Icon:
-                return new BitmapExt(new Icon(d));
-
-            default:
-                Develop.DebugPrint(name.FileType());
-                return null;
-        }
     }
 
     public static Bitmap Grayscale(Bitmap original) {
@@ -428,26 +409,6 @@ public class BitmapExt : IDisposableExtended {
         using var g = Graphics.FromImage(bmp);
         g.DrawImage(sourceBmp, 0, 0, sourceBmp.Width, sourceBmp.Height); // Unerklärlich, orgiImage.Width, orgiImage.Height muss stehen bleiben!
         return bmp;
-    }
-
-    /// <summary>
-    /// Diese Routine ist genau so schnell wie Image.fromFile, setzt aber KEINEN Datei-Lock.
-    /// </summary>
-    /// <param name="filename"></param>
-    /// <returns></returns>
-    /// <remarks></remarks>
-    public static Image? Image_FromFile(string filename) {
-        if (string.IsNullOrEmpty(filename)) { return null; }
-        if (!FileExists(filename)) { return null; }
-        try {
-            FileStream fs = new(filename, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var im = Image.FromStream(fs);
-            fs.Close();
-            fs.Dispose();
-            return im;
-        } catch (Exception) {
-            return null;
-        }
     }
 
     public static Bitmap? ImageBlurFilter(Bitmap? bmp, BlurType blurType) {
@@ -706,80 +667,6 @@ public class BitmapExt : IDisposableExtended {
         return target;
     }
 
-    public static Bitmap? Resize(Bitmap? bmp, int width, int height, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
-        if (bmp == null) { return null; }
-        if (width < 1 && height < 1) { return null; }
-        if (collectGarbage) { Generic.CollectGarbage(); }
-        if (width < 1) { width = 1; }
-        if (height < 1) { height = 1; }
-        var scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
-
-        switch (sizeMode) {
-            case SizeModes.EmptySpace:
-                break;
-
-            case SizeModes.BildAbschneiden:
-                break;
-
-            case SizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
-                // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                width = (int)(scale * bmp.Width);
-                height = (int)(scale * bmp.Height);
-                break;
-
-            case SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
-                // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                if (scale >= 1) { return bmp; }
-                width = (int)(scale * bmp.Width);
-                height = (int)(scale * bmp.Height);
-                break;
-
-            case SizeModes.Verzerren:
-                scale = 1; // Dummy setzen
-                break;
-
-            default:
-                Develop.DebugPrint(sizeMode);
-                return null;
-        }
-        var nw = (int)(bmp.Width * scale);
-        var nh = (int)(bmp.Height * scale);
-        if (sizeMode == SizeModes.Verzerren) {
-            nw = width;
-            nh = height;
-        }
-
-        try {
-            Bitmap imageResize = new(width, height); // Kein Format32bppPArgb --> Fehler
-            using var gr = Graphics.FromImage(imageResize);
-            gr.InterpolationMode = interpolationMode;
-            gr.PixelOffsetMode = PixelOffsetMode.Half;
-            // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
-            if (bmp.Width > 20000 && nw < 4000) {
-                var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else if (bmp.Width > 15000 && nw < 4000) {
-                var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else if (bmp.Width > 10000 && nw < 2500) {
-                var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else if (bmp.Width > 8000 && nw < 2000) {
-                var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else {
-                gr.DrawImage(bmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            }
-
-            return imageResize;
-        } catch {
-            if (!collectGarbage) { Generic.CollectGarbage(); }
-            return sizeMode == SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern
-                ? (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero)
-                : null;
-        }
-    }
-
     /// <summary>
     /// Helligkeit, Kontrast und Gammawert eines Bitmaps ändern
     /// </summary>
@@ -836,7 +723,7 @@ public class BitmapExt : IDisposableExtended {
                 l.Clear();
                 Generic.CollectGarbage();
                 var x = (Bitmap?)Image_FromFile(fileName);
-                l.Add(Resize(x, maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
+                l.Add(x.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
                 if (frames > 1) {
                     Bitmap x2 = new(200, 200);
                     var gr = Graphics.FromImage(x2);

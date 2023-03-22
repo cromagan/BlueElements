@@ -23,6 +23,7 @@ using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
@@ -65,7 +66,7 @@ internal class Method_LoadImage : Method {
 
         try {
             Generic.CollectGarbage();
-            var bmp = (Bitmap)BitmapExt.Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
+            var bmp = (Bitmap)Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
             return new DoItFeedback(bmp);
         } catch {
             return new DoItFeedback(null as Bitmap);

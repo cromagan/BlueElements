@@ -47,7 +47,8 @@ public abstract class SqlBackAbstract {
     private static DateTime _lastLoadUtc = DateTime.UtcNow;
     private readonly object _fill = new();
     private readonly object _getChanges = new();
-    private readonly object _getRow = new();
+
+    //private readonly object _getRow = new();
     private readonly object _openclose = new();
 
     #endregion
@@ -161,12 +162,19 @@ public abstract class SqlBackAbstract {
     }
 
     public bool CloseConnection() {
-        if (Connection == null) { return true; }
 
-        lock (_openclose) {
-            if (Connection.State == ConnectionState.Open) { Connection.Close(); }
+        try {
 
-            return Connection.State == ConnectionState.Closed;
+            if (Connection == null) { return true; }
+
+            lock (_openclose) {
+                if (Connection.State == ConnectionState.Open) { Connection.Close(); }
+
+                return Connection.State == ConnectionState.Closed;
+            }
+        } catch {
+            Develop.CheckStackForOverflow();
+           return CloseConnection();
         }
     }
 
@@ -346,68 +354,68 @@ public abstract class SqlBackAbstract {
 
             if (!OpenConnection() || Connection == null) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
-            lock (_getRow) {
-                var com = new StringBuilder();
-                com.Append("SELECT RK, ");
+            //lock (_getRow) {
+            var com = new StringBuilder();
+            com.Append("SELECT RK, ");
 
-                var count = 0;
+            var count = 0;
 
-                foreach (var thiscolumn in db.Column) {
-                    if (refreshAlways || thiscolumn.IsInCache == null) {
-                        if (count > 0) { com.Append(", "); }
+            foreach (var thiscolumn in db.Column) {
+                if (refreshAlways || thiscolumn.IsInCache == null) {
+                    if (count > 0) { com.Append(", "); }
 
-                        count++;
-                        com.Append(thiscolumn.Name.ToUpper());
-                    }
+                    count++;
+                    com.Append(thiscolumn.Name.ToUpper());
                 }
-
-                if (count == 0) { return string.Empty; }
-
-                _ = db.Row.FillUp100(row, sortedRows);
-
-                com.Append(" FROM " + tablename.ToUpper());
-
-                if (row.Count < 1000) {
-                    com.Append(" WHERE ");
-                    count = 0;
-                    foreach (var thisr in row) {
-                        if (count > 0) { com.Append(" OR "); }
-
-                        count++;
-                        com.Append("RK = " + Dbval(thisr.Key));
-                    }
-                }
-
-                if (!OpenConnection() || Connection == null) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
-
-                var dt = Fill_Table(com.ToString());
-
-                if (dt == null) { return "Keine gültige Rückgabe erhalten"; }
-
-                foreach (var thisRow in dt.Rows) {
-                    var reader = (DataRow)thisRow;
-                    var rk = LongParse(reader[0].ToString());
-                    var r = db.Row.SearchByKey(rk) ?? db.Row.GenerateAndAdd(rk, string.Empty, false, false, "Load row");
-
-                    if (r != null) {
-                        for (var z = 1; z < dt.Columns.Count; z++) {
-                            var cx = db.Column.Exists(dt.Columns[z].ColumnName);
-                            if (cx != null) {
-                                _ = db.Cell.SetValueInternal(cx.Name, r.Key, reader[z].ToString(), true);
-                            }
-                        }
-
-                        r.IsInCache = DateTime.UtcNow;
-                    }
-                    //if (!r.RowInChache()) {
-                    //    Develop.DebugPrint(FehlerArt.Warnung, "Zeile ohne Zeitstempel, repariert! + " + com);
-                    //    r.CellSet(r.Database.Column.SysRowChangeDate, DateTime.UtcNow.ToString(Constants.Format_Date5));
-                    //}
-                }
-                _ = CloseConnection();
-
-                return db.Row.DoLinkedDatabase(row);
             }
+
+            if (count == 0) { return string.Empty; }
+
+            _ = db.Row.FillUp100(row, sortedRows);
+
+            com.Append(" FROM " + tablename.ToUpper());
+
+            if (row.Count < 1000) {
+                com.Append(" WHERE ");
+                count = 0;
+                foreach (var thisr in row) {
+                    if (count > 0) { com.Append(" OR "); }
+
+                    count++;
+                    com.Append("RK = " + Dbval(thisr.Key));
+                }
+            }
+
+            if (!OpenConnection() || Connection == null) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
+
+            var dt = Fill_Table(com.ToString());
+
+            if (dt == null) { return "Keine gültige Rückgabe erhalten"; }
+
+            foreach (var thisRow in dt.Rows) {
+                var reader = (DataRow)thisRow;
+                var rk = LongParse(reader[0].ToString());
+                var r = db.Row.SearchByKey(rk) ?? db.Row.GenerateAndAdd(rk, string.Empty, false, false, "Load row");
+
+                if (r != null) {
+                    for (var z = 1; z < dt.Columns.Count; z++) {
+                        var cx = db.Column.Exists(dt.Columns[z].ColumnName);
+                        if (cx != null) {
+                            _ = db.Cell.SetValueInternal(cx.Name, r.Key, reader[z].ToString(), true);
+                        }
+                    }
+
+                    r.IsInCache = DateTime.UtcNow;
+                }
+                //if (!r.RowInChache()) {
+                //    Develop.DebugPrint(FehlerArt.Warnung, "Zeile ohne Zeitstempel, repariert! + " + com);
+                //    r.CellSet(r.Database.Column.SysRowChangeDate, DateTime.UtcNow.ToString(Constants.Format_Date5));
+                //}
+            }
+            _ = CloseConnection();
+
+            return db.Row.DoLinkedDatabase(row);
+            //}
         } catch {
             _ = CloseConnection();
             Develop.CheckStackForOverflow();

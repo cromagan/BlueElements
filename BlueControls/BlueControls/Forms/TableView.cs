@@ -1043,7 +1043,7 @@ public partial class TableView : FormWithStatusBar {
 
         const bool enTabAllgemein = true;
         var enTabellenAnsicht = true;
-        if (Table.Database == null || !Table.Database.IsAdministrator()) {
+        if (Table.Database == null || Table.Database.IsDisposed || !Table.Database.IsAdministrator()) {
             tabAdmin.Enabled = false;
             return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
         }

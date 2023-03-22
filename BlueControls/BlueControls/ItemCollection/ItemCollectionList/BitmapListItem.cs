@@ -24,6 +24,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using static BlueBasics.IO;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollection.ItemCollectionList;
 
@@ -232,7 +233,7 @@ public class BitmapListItem : BasicListItem {
         if (_bitmap != null) { return; }
         try {
             if (FileExists(_imageFilename)) {
-                _bitmap = BitmapExt.Image_FromFile(_imageFilename) as Bitmap;
+                _bitmap = Image_FromFile(_imageFilename) as Bitmap;
             }
         } catch (Exception ex) {
             Develop.DebugPrint("Fehler beim laden des Bildes", ex);

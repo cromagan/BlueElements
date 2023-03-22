@@ -83,13 +83,11 @@ public partial class FormWithStatusBar : Form {
     }
 
     public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) {
-        if (IsDisposed) { return false; }
-
         try {
             if (InvokeRequired) {
                 return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, message, didAlreadyMessagebox)));
             }
-
+            if (IsDisposed) { return false; }
             _lastMessage = DateTime.UtcNow;
             timMessageClearer.Enabled = true;
 
@@ -137,6 +135,11 @@ public partial class FormWithStatusBar : Form {
     }
 
     private void timMessageClearer_Tick(object sender, System.EventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => timMessageClearer_Tick(sender, e)));
+            return;
+        }
+
         if (IsDisposed) {
             timMessageClearer.Enabled = false;
             return;

@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Interfaces;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.Forms;
 
@@ -99,7 +100,7 @@ public partial class PictureView : Form, IDisposableExtended {
         _nr = nr;
         if (_fileList != null && nr < _fileList.Count && nr > -1) {
             try {
-                Pad.Bmp = BitmapExt.Image_FromFile(_fileList[nr]) as Bitmap;
+                Pad.Bmp = Image_FromFile(_fileList[nr]) as Bitmap;
             } catch (Exception ex) {
                 Pad.Bmp = null;
                 Develop.DebugPrint("Fehler beim Laden des Bildes", ex);

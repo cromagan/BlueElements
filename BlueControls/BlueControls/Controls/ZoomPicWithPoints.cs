@@ -33,6 +33,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection.ItemCollectionList;
 using static BlueBasics.IO;
+using static BlueBasics.Extensions;
 using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
@@ -107,7 +108,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         Bitmap? bmp = null;
         List<string> tags = new();
         if (FileExists(pathOfPicture)) {
-            bmp = (Bitmap?)BitmapExt.Image_FromFile(pathOfPicture);
+            bmp = (Bitmap?)Image_FromFile(pathOfPicture);
         }
         var ftxt = FilenameTxt(pathOfPicture);
         if (FileExists(ftxt)) {
@@ -120,7 +121,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     public static Tuple<Bitmap?, List<string>> ResizeData(Bitmap? pic, List<string> tags, int width, int height) {
         var zoomx = (float)width / pic.Width;
         var zoomy = (float)height / pic.Height;
-        var pic2 = BitmapExt.Resize(pic, width, height, SizeModes.Verzerren, InterpolationMode.HighQualityBicubic, true);
+        var pic2 = pic.Resize(width, height, SizeModes.Verzerren, InterpolationMode.HighQualityBicubic, true);
         List<string> tags2 = new(tags);
         var names = tags2.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
         foreach (var thisO in names) {

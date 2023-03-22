@@ -31,6 +31,7 @@ using BlueControls.Interfaces;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
+using static BlueBasics.Extensions;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection;
@@ -98,7 +99,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
             _ = e.ShowDialog();
 
             if (!FileExists(e.FileName)) { return; }
-            Bitmap = (Bitmap?)BitmapExt.Image_FromFile(e.FileName);
+            Bitmap = (Bitmap?)Image_FromFile(e.FileName);
         }
     }
 

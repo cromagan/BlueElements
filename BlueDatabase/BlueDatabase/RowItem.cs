@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -330,7 +331,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (nameAndKeyToo) { Key = source.Key; }
 
         foreach (var thisColumn in Database.Column) {
-            Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.Name], source), false);
+            var value = sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.Name], source);
+
+            _ = Database.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn.Name, Key, string.Empty, value, string.Empty);
+
+            //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.Name], source), false);
         }
     }
 

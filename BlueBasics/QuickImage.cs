@@ -27,14 +27,17 @@ using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueBasics;
 
-public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
+public sealed class QuickImage : IReadableText, IStringable {
 
     #region Fields
 
     private static readonly ConcurrentDictionary<string, QuickImage> Pics = new();
+
+    private Bitmap? _bitmap;
 
     #endregion
 
@@ -93,7 +96,7 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
         if (bmp == null) {
             GenerateErrorImage();
         } else {
-            CloneFromBitmap(bmp);
+            _bitmap = bmp.CloneFromBitmap();
         }
     }
 
@@ -267,31 +270,16 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
 
     public static QuickImage Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
 
-    public static implicit operator Bitmap?(QuickImage? p) {
-        //if (!p._generated && !p._generating) { p.Generate(); }
-        Bitmap? bmp;
-        var tim = DateTime.Now;
-
-        do {
-            if (DateTime.Now.Subtract(tim).TotalSeconds > 5) { return null; }
-
-            try { // .... wir an anderer Stelle verwendet....
-                bmp = (BitmapExt?)p;
-                if (bmp == null || p == null || bmp.Width < p.Width) { bmp = null; }
-            } catch { bmp = null; }
-        } while (bmp == null);
-
-        return bmp;
-    }
+    public static implicit operator Bitmap?(QuickImage? p) => p?._bitmap;
 
     public string CompareKey() => ToString();
 
     public void GenerateErrorImage() {
         IsError = true;
 
-        EmptyBitmap(Width, Height);
+        _bitmap = new Bitmap(Width, Height);
 
-        using var gr = Graphics.FromImage(this);
+        using var gr = Graphics.FromImage(_bitmap);
         gr.Clear(Color.Black);
         gr.DrawLine(new Pen(Color.Red, 3), 0, 0, Width - 1, Height - 1);
         gr.DrawLine(new Pen(Color.Red, 3), Width - 1, 0, 0, Height - 1);
@@ -343,8 +331,7 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
         #region Bild ohne besonderen Effekte, schnell abhandeln
 
         if (Effekt == ImageCodeEffect.Ohne && string.IsNullOrEmpty(ChangeGreenTo) && string.IsNullOrEmpty(Färbung) && Sättigung == 100 && Helligkeit == 100 && Transparenz == 100 && string.IsNullOrEmpty(Zweitsymbol)) {
-            CloneFromBitmap(bmpOri);
-            Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
+            _bitmap = bmpOri.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
             return;
         }
 
@@ -375,7 +362,7 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
 
         #endregion
 
-        var bmpTmp = new BitmapExt(bmpOri.Width, bmpOri.Height);
+        var bmpTmp = new Bitmap(bmpOri.Width, bmpOri.Height);
 
         #region Bild Pixelgerecht berechnen
 
@@ -436,8 +423,7 @@ public sealed class QuickImage : BitmapExt, IReadableText, IStringable {
 
         #endregion
 
-        bmpTmp.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
-        CloneFromBitmap(bmpTmp);
+        _bitmap = bmpTmp.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
     }
 
     private Bitmap? GetBitmap(string tmpname) {

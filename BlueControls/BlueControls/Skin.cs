@@ -1155,7 +1155,7 @@ public static class Skin {
         float xp = 0;
         float yp1 = 0;
         float yp2 = 0;
-        if (qi != null) { pSize = qi.Size; }
+        if (qi != null) { pSize = ((Bitmap)qi).Size; }
         if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, translate); }
         if (bFont != null) {
             if (fitInRect.Width > 0) { txt = bFont.TrimByWidth(txt, fitInRect.Width - pSize.Width); }
@@ -1189,7 +1189,7 @@ public static class Skin {
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
             if (font == null) { return new Size(3, 3); }
-            if (image != null) { pSize = image.Size; }
+            if (image != null) { pSize = ((Bitmap)image).Size; }
             if (!string.IsNullOrEmpty(text)) { tSize = BlueFont.MeasureString(text, font.Font()); }
 
             if (!string.IsNullOrEmpty(text)) {
