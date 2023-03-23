@@ -308,7 +308,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         if (CFormula == null || CFormula.PadData == null) { return; }
 
         foreach (var thisIt in CFormula.PadData) {
-            if (thisIt is IAcceptAndSends ripi && ripi.IsVisibleOnPage(Page)) {
+            if (thisIt is IItemToControl ripi && ripi.IsVisibleOnPage(Page)) {
                 var c = SearchOrGenerate(ripi);
                 if (c is IAcceptRowKey fcfc) {
                     fcfc.SetData(Database, RowKey);

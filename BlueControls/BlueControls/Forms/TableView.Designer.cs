@@ -973,7 +973,6 @@ namespace BlueControls.Forms {
             // 
             this.SaveTab.Filter = "*.MDB Datenbanken|*.MDB|*.* Alle Dateien|*";
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
-            this.SaveTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
             // TableView
             // 

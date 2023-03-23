@@ -820,7 +820,7 @@ public partial class TableView : FormWithStatusBar {
             _ = DeleteFile(SaveTab.FileName, true);
         }
 
-        var db = new Database(false, string.Empty);
+        var db = new Database(false, SaveTab.FileName.FileNameWithoutSuffix());
         db.SaveAsAndChangeTo(SaveTab.FileName);
         _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID));
     }
@@ -1145,8 +1145,11 @@ public partial class TableView : FormWithStatusBar {
         }
     }
 
-    private void LoadTab_FileOk(object sender, CancelEventArgs e) =>
+    private void LoadTab_FileOk(object sender, CancelEventArgs e) {
+        if (!FileExists(LoadTab.FileName)) { return; }
+
         SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName, PreveredDatabaseID));
+    }
 
     private string NameRepair(string istName, RowItem? vRow) {
         var newName = istName;

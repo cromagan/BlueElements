@@ -40,8 +40,11 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-[Obsolete]
-public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, IAcceptAndSends, ICalculateRowsItemLevel, IItemToControl, IHasDatabase, IItemSendRow {
+/// <summary>
+/// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
+/// </summary>
+
+public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
 
     #region Fields
 
@@ -54,11 +57,11 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     #region Constructors
 
-    public RowWithFilterPadItem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
+    public InputFilterOutputFilterPadItem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
 
-    public RowWithFilterPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
+    public InputFilterOutputFilterPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
 
-    public RowWithFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
+    public InputFilterOutputFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
         Database = db;
 
         Id = id;
@@ -69,13 +72,13 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         FilterDefiniton.Row.RowAdded += Row_RowAdded;
     }
 
-    public RowWithFilterPadItem(string intern) : this(intern, null, 0) { }
+    public InputFilterOutputFilterPadItem(string intern) : this(intern, null, 0) { }
 
     #endregion
 
     #region Properties
 
-    public static string ClassId => "FI-RowWithFilter";
+    public static string ClassId => "FI-InputOutputElement";
 
     [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
     public string Anzeige {
@@ -167,13 +170,15 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     #region Methods
 
-    public Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
-            EditType = _bearbeitung,
-            CaptionPosition = CaptionPosition,
-            Name = DefaultItemToControlName()
-        };
-        return con;
+    public new Control CreateControl(ConnectedFormulaView parent) {
+        //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
+        //    EditType = _bearbeitung,
+        //    CaptionPosition = CaptionPosition,
+        //    Name = DefaultItemToControlName()
+        //};
+        //return con;
+        Develop.DebugPrint_NichtImplementiert();
+        return new Control();
     }
 
     public Table FilterTable() {
@@ -505,6 +510,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     }
 
     private void RepairConnections() {
+        Develop.DebugPrint_NichtImplementiert();
         if (Parent == null) { return; }
 
         ConnectsTo.RemoveAll();

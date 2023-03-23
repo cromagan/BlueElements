@@ -30,6 +30,7 @@ public interface IItemAcceptRow : IDisposableExtended, IItemToControl {
 
     #region Properties
 
+    public IItemSendRow? GetRowFrom { get; set; }
     public DatabaseAbstract? InputDatabase { get; }
 
     #endregion

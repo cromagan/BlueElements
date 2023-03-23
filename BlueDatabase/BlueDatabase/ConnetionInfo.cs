@@ -139,7 +139,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
         //    }
         //}
 
-        Develop.DebugPrint(FehlerArt.Warnung, "Datenbank konnte nicht gefunden werden: " + uniqueId);
+        //Develop.DebugPrint(FehlerArt.Warnung, "Datenbank konnte nicht gefunden werden: " + uniqueId);
     }
 
     public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string? additionalInfo) {

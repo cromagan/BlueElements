@@ -22,6 +22,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.MultiUserFile;
+using BlueControls.ConnectedFormula;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
@@ -51,6 +52,11 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     #region Methods
 
+    private void btnBenutzerFilterWahl_Click(object sender, System.EventArgs e) {
+        var x = new InputFilterOutputFilterPadItem(string.Empty);
+        Pad.AddCentered(x);
+    }
+
     private void btnBild_Click(object sender, System.EventArgs e) {
         var l = Pad.LastClickedItem;
 
@@ -63,6 +69,11 @@ public partial class ConnectedFormulaEditor : PadEditor {
             x.GetRowFrom = efi.GetRowFrom;
         }
 
+        Pad.AddCentered(x);
+    }
+
+    private void btnDropdownmenu_Click(object sender, System.EventArgs e) {
+        var x = new DropDownSelectRowPadItem(string.Empty);
         Pad.AddCentered(x);
     }
 
@@ -79,9 +90,14 @@ public partial class ConnectedFormulaEditor : PadEditor {
             x.GetRowFrom = efi.GetRowFrom;
         }
 
-        if (x.GetRowFrom != null && x.GetRowFrom.Database != null) {
+        if (x.GetRowFrom != null && x.GetRowFrom.OutputDatabase != null) {
             x.Spalte_wählen = string.Empty; // Dummy setzen
         }
+    }
+
+    private void btnFilterConverter_Click(object sender, System.EventArgs e) {
+        var x = new ScriptChangeFilterPadItem(string.Empty);
+        Pad.AddCentered(x);
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs? e) {
@@ -127,12 +143,16 @@ public partial class ConnectedFormulaEditor : PadEditor {
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
 
-        var it = new RowWithFilterPadItem(string.Empty);
-        it.Bei_Export_sichtbar = false;
-
-        Pad.AddCentered(it);
+        var it = new RowEntryPadItem(string.Empty);
         it.Page = n;
-        ChooseDatabaseAndId(it);
+        Pad.Item.Add(it);
+        CFormula.Repair();
+
+        //it.Bei_Export_sichtbar = false;
+
+        //Pad.AddCentered(it);
+
+        //ChooseDatabaseAndId(it);
     }
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.ForceLoadSaveAll();
@@ -143,6 +163,11 @@ public partial class ConnectedFormulaEditor : PadEditor {
         var x = new TabFormulaPadItem(string.Empty, CFormula) {
             Bei_Export_sichtbar = true
         };
+        Pad.AddCentered(x);
+    }
+
+    private void btnTable_Click(object sender, System.EventArgs e) {
+        var x = new TabFormulaPadItem(string.Empty);
         Pad.AddCentered(x);
     }
 
@@ -169,22 +194,32 @@ public partial class ConnectedFormulaEditor : PadEditor {
         EditBoxRow_NEW.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", CFormula, true);
     }
 
+    private void btnZeileAnlegen_Click(object sender, System.EventArgs e) {
+        var x = new AddRowPaditem(string.Empty);
+        Pad.AddCentered(x);
+    }
+
     private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
         var it = new RowWithFilterPadItem(string.Empty);
         Pad.AddCentered(it);
         ChooseDatabaseAndId(it);
     }
 
+    private void btnZeileZuFilter_Click(object sender, System.EventArgs e) {
+        var x = new InputRowOutputFilterPadItem(string.Empty);
+        Pad.AddCentered(x);
+    }
+
     private void CheckButtons() { }
 
-    private void ChooseDatabaseAndId(ICalculateRowsItemLevel? it) {
+    private void ChooseDatabaseAndId(IItemSendRow? it) {
         if (CFormula == null || it == null) { return; }
 
         var db = CommonDialogs.ChooseKnownDatabase();
 
         if (db == null) { return; }
 
-        it.Database = db;
+        it.OutputDatabase = db;
         it.Id = CFormula.NextId();
     }
 

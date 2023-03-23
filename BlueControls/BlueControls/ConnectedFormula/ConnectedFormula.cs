@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Controls;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -206,6 +207,50 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     public void OnNotAllowedChildsChanged() => NotAllowedChildsChanged?.Invoke(this, System.EventArgs.Empty);
 
+    public void Repair() {
+        // Reparatur-Routine
+
+        if (PadData == null) {
+            PadData = new ItemCollectionPad();
+        }
+
+        foreach (var thisIt in PadData) {
+            if (string.IsNullOrEmpty(thisIt.Page)) {
+                thisIt.Page = "Head";
+            }
+
+            foreach (var thisCon in thisIt.ConnectsTo) {
+                thisCon.Bei_Export_sichtbar = false;
+            }
+
+            if (thisIt is IHasConnectedFormula itcf) {
+                itcf.CFormula = this;
+            }
+        }
+
+        var pg = PadData.AllPages();
+        pg.AddIfNotExists("Head");
+
+        foreach (var thisP in pg) {
+            RowEntryPadItem? found = null;
+
+            foreach (var thisit in PadData) {
+                if (thisit is RowEntryPadItem repi) {
+                    if (string.Equals(thisP, repi.Page, StringComparison.OrdinalIgnoreCase)) { found = repi; break; }
+                }
+            }
+            if (found == null) {
+                found = new RowEntryPadItem(string.Empty);
+
+                PadData.Add(found);
+            }
+
+            found.SetCoordinates(new RectangleF(0, -20, PadData.SheetSizeInPix.Width, 20), true);
+            found.Page = thisP;
+            found.Bei_Export_sichtbar = false;
+        }
+    }
+
     public void Save() => _muf?.Save(true);
 
     /// <summary>
@@ -327,23 +372,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     //    if (_saving || (_muf?.IsLoading ?? true)) { return; }
     //    _saved = false;
     //}
-
     private void OnLoaded(object sender, System.EventArgs e) {
-        // Reparatur-Routine
-
-        foreach (var thisIt in PadData) {
-            if (string.IsNullOrEmpty(thisIt.Page)) {
-                thisIt.Page = "Head";
-            }
-
-            foreach (var thisCon in thisIt.ConnectsTo) {
-                thisCon.Bei_Export_sichtbar = false;
-            }
-
-            if (thisIt is IHasConnectedFormula itcf) {
-                itcf.CFormula = this;
-            }
-        }
+        Repair();
 
         Loaded?.Invoke(this, e);
     }
@@ -375,8 +405,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         foreach (var thisit in PadData) {
             if (thisit is RowWithFilterPadItem rwf) {
-                if (rwf.Database != null) {
-                    _ = _databaseFiles.AddIfNotExists(rwf.Database.ConnectionData.UniqueID);
+                if (rwf.OutputDatabase != null) {
+                    _ = _databaseFiles.AddIfNotExists(rwf.OutputDatabase.ConnectionData.UniqueID);
                     _id = Math.Max(_id, rwf.Id);
                 }
             }

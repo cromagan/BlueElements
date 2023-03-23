@@ -93,7 +93,6 @@ internal class Method_Export : Method_Database {
         if (string.IsNullOrEmpty(filn)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
         if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
 
-
         var pf = filn.PathParent();
         if (string.IsNullOrEmpty(pf)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
         if (!Directory.Exists(pf)) { return new DoItFeedback(infos.Data, "Verzeichniss existiert nicht"); }
@@ -107,7 +106,7 @@ internal class Method_Export : Method_Database {
 
         switch (((VariableString)attvar.Attributes[1]).ValueString.ToUpper()) {
             case "MDB": {
-                    var bytes = Database.ToListOfByte(db, null);
+                    var bytes = Database.ToListOfByte(db, null, 100);
 
                     if (bytes == null) {
                         return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Daten.");

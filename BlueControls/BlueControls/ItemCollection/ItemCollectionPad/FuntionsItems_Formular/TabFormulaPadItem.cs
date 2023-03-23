@@ -37,6 +37,9 @@ using TabControl = BlueControls.Controls.TabControl;
 
 namespace BlueControls.ItemCollection;
 
+/// <summary>
+/// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
+/// </summary>
 public class TabFormulaPadItem : CustomizableShowPadItem, IHasConnectedFormula, IItemAcceptRow {
 
     #region Fields

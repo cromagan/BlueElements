@@ -439,7 +439,7 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public static List<byte>? ToListOfByte(DatabaseAbstract db, List<WorkItem>? works) {
+    public static List<byte>? ToListOfByte(DatabaseAbstract db, List<WorkItem>? works, int minLen) {
         try {
             List<byte> l = new();
             // Wichtig, Reihenfolge und Länge NIE verändern!
@@ -513,14 +513,14 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.9)));
             SaveToByteList(l, DatabaseDataType.EOF, "END");
 
-            if (l.Count < 5000) {
+            if (l.Count < minLen) {
                 //Develop.DebugPrint(FehlerArt.Fehler, "ToString Fehler!");
                 return null;
             }
 
             return l;
         } catch {
-            return ToListOfByte(db, works);
+            return ToListOfByte(db, works, minLen);
         }
     }
 
@@ -711,7 +711,7 @@ public sealed class Database : DatabaseAbstract {
 
         Filename = newFileName;
 
-        var l = ToListOfByte(this, Works);
+        var l = ToListOfByte(this, Works, 100);
 
         if (l == null) { return; }
 
@@ -889,7 +889,7 @@ public sealed class Database : DatabaseAbstract {
         var f = ErrorReason(BlueBasics.Enums.ErrorReason.Save);
         if (!string.IsNullOrEmpty(f)) { return string.Empty; }
 
-        var dataUncompressed = ToListOfByte(this, Works)?.ToArray();
+        var dataUncompressed = ToListOfByte(this, Works, 5000)?.ToArray();
 
         if (dataUncompressed == null) { return string.Empty; }
 

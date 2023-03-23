@@ -38,5 +38,7 @@ public interface IItemToControl : IHasKeyName {
 
     public Control? CreateControl(ConnectedFormulaView parent);
 
+    public bool IsVisibleOnPage(string page);
+
     #endregion
 }

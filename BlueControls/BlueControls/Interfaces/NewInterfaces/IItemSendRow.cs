@@ -30,7 +30,12 @@ public interface IItemSendRow : IDisposableExtended, IItemToControl {
 
     #region Properties
 
-    public DatabaseAbstract? OutputDatabase { get; }
+    /// <summary>
+    /// Laufende Nummer, bestimmt die Einfärbung
+    /// </summary>
+    public int Id { get; set; }
+
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 }

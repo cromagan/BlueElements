@@ -47,7 +47,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
     public List<string> VisibleFor = new();
     private string? _getValueFromkey;
-    private ICalculateRowsItemLevel? _tmpgetValueFrom;
+    private IItemSendRow? _tmpgetValueFrom;
 
     #endregion
 
@@ -86,9 +86,9 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
     public string Datenbank {
         get {
-            if (GetRowFrom?.Database == null || GetRowFrom.Database.IsDisposed) { return "?"; }
+            if (GetRowFrom?.OutputDatabase == null || GetRowFrom.OutputDatabase.IsDisposed) { return "?"; }
 
-            return GetRowFrom.Database.TableName;
+            return GetRowFrom.OutputDatabase.TableName;
         }
     }
 
@@ -125,11 +125,11 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         }
     }
 
-    public ICalculateRowsItemLevel? GetRowFrom {
+    public IItemSendRow? GetRowFrom {
         get {
             if (Parent == null || _getValueFromkey == null) { return null; }
 
-            _tmpgetValueFrom ??= Parent[_getValueFromkey] as ICalculateRowsItemLevel;
+            _tmpgetValueFrom ??= Parent[_getValueFromkey] as IItemSendRow;
 
             return _tmpgetValueFrom;
         }
@@ -145,7 +145,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         }
     }
 
-    public DatabaseAbstract? InputDatabase => GetRowFrom?.Database;
+    public DatabaseAbstract? InputDatabase => GetRowFrom?.OutputDatabase;
 
     public string Sichtbarkeit {
         get => string.Empty;

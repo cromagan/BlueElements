@@ -37,6 +37,10 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection;
 
+/// <summary>
+/// Erzeut ein FlexiControllForCell
+/// Standard-Bearbeitungs-Feld
+/// </summary>
 public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToControl, IItemAcceptRow {
 
     #region Fields
@@ -70,7 +74,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
 
     public ColumnItem? Column {
         get {
-            _column ??= GetRowFrom?.Database?.Column.Exists(_columnName);
+            _column ??= GetRowFrom?.OutputDatabase?.Column.Exists(_columnName);
 
             return _column;
         }
@@ -120,20 +124,20 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
                 return;
             }
 
-            if (GetRowFrom.Database == null) {
+            if (GetRowFrom.OutputDatabase == null) {
                 MessageBox.Show("Quelle fehlerhaft!");
                 return;
             }
 
             var lst = new ItemCollectionList.ItemCollectionList(true);
-            lst.AddRange(GetRowFrom.Database.Column, false);
+            lst.AddRange(GetRowFrom.OutputDatabase.Column, false);
             //lst.Sort();
 
             var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
 
             if (sho == null || sho.Count != 1) { return; }
 
-            var col = GetRowFrom.Database.Column.Exists(sho[0]);
+            var col = GetRowFrom.OutputDatabase.Column.Exists(sho[0]);
 
             if (col == Column) { return; }
             Column = col;

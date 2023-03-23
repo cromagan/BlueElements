@@ -31,6 +31,10 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
+/// <summary>
+/// Erzeut ein Flexi-Controll, dass nur einen Wert anzeigen kann. z.B. eine Variable
+/// </summary>
+
 public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IItemAcceptRow {
 
     #region Fields

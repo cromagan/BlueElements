@@ -287,10 +287,15 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
     }
 
     private void ChangeWorkItems() {
-        foreach (var thisWork in Works) {
-            if (thisWork != null) {
-                thisWork.IsPending = false;
+        try {
+            foreach (var thisWork in Works) {
+                if (thisWork != null) {
+                    thisWork.IsPending = false;
+                }
             }
+        } catch {
+            Develop.CheckStackForOverflow();
+            ChangeWorkItems();
         }
     }
 
@@ -374,7 +379,7 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         }
     }
 
-    private void ToListOfByte(object sender, MultiUserToListEventArgs e) => e.Data = Database.ToListOfByte(this, Works)?.ToArray();
+    private void ToListOfByte(object sender, MultiUserToListEventArgs e) => e.Data = Database.ToListOfByte(this, Works, 5000)?.ToArray();
 
     #endregion
 }
