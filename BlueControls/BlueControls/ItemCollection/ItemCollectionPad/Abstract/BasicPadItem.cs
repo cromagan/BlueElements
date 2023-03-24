@@ -51,9 +51,13 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     private bool _beiExportSichtbar = true;
 
     private string _page = string.Empty;
+
     private ItemCollectionPad? _parent;
+
     private PadStyles _style = PadStyles.Style_Standard;
+
     private RectangleF _usedArea;
+
     private int _zoomPadding;
 
     #endregion
@@ -62,7 +66,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     protected BasicPadItem(string internalname) : base(internalname) {
         MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
-        ConnectsTo.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
     #endregion
@@ -86,8 +89,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
             OnChanged();
         }
     }
-
-    public ObservableCollection<ItemConnection> ConnectsTo { get; } = new();
 
     /// <summary>
     /// Wird ein Element gelöscht, das diese Feld befüllt hat, werden automatisch alle andern Elemente mit der selben Gruppe gelöscht.
@@ -257,20 +258,23 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
         #region Verknüpfte Pfeile Zeichnen
 
-        var line = 1f;
-        if (zoom > 1) { line = zoom; }
-        foreach (var thisV in ConnectsTo) {
-            if (!forPrinting || thisV.Bei_Export_sichtbar) {
-                if (thisV != null && _parent.Contains(thisV.OtherItem) && thisV.OtherItem != this) {
-                    if (!forPrinting || thisV.OtherItem.Bei_Export_sichtbar) {
-                        var t1 = ItemConnection.GetConnectionPoint(this, thisV.MyItemType, thisV.OtherItem).ZoomAndMove(zoom, shiftX, shiftY);
-                        var t2 = ItemConnection.GetConnectionPoint(thisV.OtherItem, thisV.OtherItemType, this).ZoomAndMove(zoom, shiftX, shiftY);
+        if (!forPrinting) {
+            var line = 1f;
+            if (zoom > 1) { line = zoom; }
 
-                        if (Geometry.GetLenght(t1, t2) > 1) {
-                            gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
-                            var wi = Geometry.Winkel(t1, t2);
-                            if (thisV.ArrowOnMyItem) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
-                            if (thisV.ArrowOnOtherItem) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
+            foreach (var thisV in _parent.Connections) {
+                if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
+                    if (thisV != null && _parent.Contains(thisV.Item2) && thisV.Item2 != this) {
+                        if (thisV.Item2.Bei_Export_sichtbar) {
+                            var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(zoom, shiftX, shiftY);
+                            var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(zoom, shiftX, shiftY);
+
+                            if (Geometry.GetLenght(t1, t2) > 1) {
+                                gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
+                                var wi = Geometry.Winkel(t1, t2);
+                                if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, zoom * 20); }
+                                if (thisV.ArrowOnItem2) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, zoom * 20); }
+                            }
                         }
                     }
                 }
@@ -440,6 +444,16 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     /// </summary>
     public virtual void ProcessStyleChange() { }
 
+    public void RemoveAllConnections() {
+        foreach (var thisCon in Parent.Connections) {
+            if (thisCon.Item1 == this || thisCon.Item2 == this) {
+                Parent.Connections.Remove(thisCon);
+                RemoveAllConnections();
+                return;
+            }
+        }
+    }
+
     public override string ToString() {
         List<string> result = new();
 
@@ -490,12 +504,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
 
-            MovablePoint.RemoveAll();
             MovablePoint.CollectionChanged -= MovablePoint_CollectionChanged;
-            ConnectsTo.RemoveAll();
-            ConnectsTo.CollectionChanged -= ConnectsTo_CollectionChanged;
-
-            //ConnectsTo = null;
+            MovablePoint.RemoveAll();
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
@@ -548,30 +558,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     protected virtual void OnParentChanged() => ParentChanged?.Invoke(this, System.EventArgs.Empty);
 
     protected abstract void ParseFinished();
-
-    private void ConnectsTo_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-        if (e.NewItems != null) {
-            foreach (var thisit in e.NewItems) {
-                if (thisit is ItemConnection x) {
-                    x.OtherItem.Changed += Item_Changed;
-                }
-            }
-        }
-
-        if (e.OldItems != null) {
-            foreach (var thisit in e.OldItems) {
-                if (thisit is ItemConnection x) {
-                    x.OtherItem.Changed -= Item_Changed;
-                }
-            }
-        }
-
-        if (e.Action == NotifyCollectionChangedAction.Reset) {
-            Develop.DebugPrint_NichtImplementiert();
-        }
-
-        OnChanged();
-    }
 
     private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 

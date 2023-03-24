@@ -20,17 +20,12 @@
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System.Collections.ObjectModel;
 
 namespace BlueControls.Interfaces;
 
 /// <summary>
 /// Wird verwendet, einen einzelnen Filter berechnen kann
 /// </summary>
-public interface IItemSendFilter : IDisposableExtended {
-
-    #region Properties
-
-    public DatabaseAbstract? OutputDatabase { get; }
-
-    #endregion
+public interface IItemSendFilter : IItemSendSomething {
 }

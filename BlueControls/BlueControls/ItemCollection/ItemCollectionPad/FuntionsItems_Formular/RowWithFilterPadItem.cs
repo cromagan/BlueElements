@@ -37,6 +37,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
+using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -99,6 +100,8 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         }
     }
 
+    public ObservableCollection<string> ChildIds { get; } = new();
+
     public string Datenbank_wählen {
         get => string.Empty;
         set {
@@ -110,8 +113,6 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
             OutputDatabase = db;
 
             FilterDatabaseUpdate();
-
-            RepairConnections();
         }
     }
 
@@ -169,14 +170,12 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     #region Methods
 
     public new Control CreateControl(ConnectedFormulaView parent) {
-        //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
-        //    EditType = _bearbeitung,
-        //    CaptionPosition = CaptionPosition,
-        //    Name = DefaultItemToControlName()
-        //};
-        //return con;
-        Develop.DebugPrint_NichtImplementiert();
-        return new Control();
+        var con = new FlexiControlRowSelector(OutputDatabase, FilterDefiniton, _überschrift, _anzeige) {
+            EditType = _bearbeitung,
+            CaptionPosition = CaptionPosition,
+            Name = DefaultItemToControlName()
+        };
+        return con;
     }
 
     public Table FilterTable() {
@@ -330,11 +329,11 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        RepairConnections();
+        //RepairConnections();
     }
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
-        RepairConnections();
+        //RepairConnections();
         OnChanged();
     }
 
@@ -508,27 +507,13 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         return x;
     }
 
-    private void RepairConnections() {
-        if (Parent == null) { return; }
-
-        ConnectsTo.RemoveAll();
-
-        foreach (var thisRow in FilterDefiniton.Row) {
-            var getValueFrom = Parent[thisRow.CellGetString("suchtxt")];
-
-            if (getValueFrom != null) {
-                ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, getValueFrom, ConnectionType.Bottom, false, false));
-            }
-        }
-    }
-
     private void Row_RowAdded(object sender, RowEventArgs e) {
-        RepairConnections();
+        //RepairConnections();
         OnChanged();
     }
 
     private void Row_RowRemoved(object sender, System.EventArgs e) {
-        RepairConnections();
+        //RepairConnections();
         OnChanged();
     }
 

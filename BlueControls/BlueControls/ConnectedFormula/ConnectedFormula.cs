@@ -214,13 +214,13 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             PadData = new ItemCollectionPad();
         }
 
+        foreach (var thisCon in PadData.Connections) {
+            thisCon.Bei_Export_sichtbar = false;
+        }
+
         foreach (var thisIt in PadData) {
             if (string.IsNullOrEmpty(thisIt.Page)) {
                 thisIt.Page = "Head";
-            }
-
-            foreach (var thisCon in thisIt.ConnectsTo) {
-                thisCon.Bei_Export_sichtbar = false;
             }
 
             if (thisIt is IHasConnectedFormula itcf) {
@@ -240,14 +240,16 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                 }
             }
             if (found == null) {
-                found = new RowEntryPadItem(string.Empty);
+                //found = new RowEntryPadItem(string.Empty);
 
-                PadData.Add(found);
+                //PadData.Add(found);
             }
 
-            found.SetCoordinates(new RectangleF(0, -20, PadData.SheetSizeInPix.Width, 20), true);
-            found.Page = thisP;
-            found.Bei_Export_sichtbar = false;
+            if (found != null) {
+                found.SetCoordinates(new RectangleF(0, -20, PadData.SheetSizeInPix.Width, 20), true);
+                found.Page = thisP;
+                found.Bei_Export_sichtbar = false;
+            }
         }
     }
 

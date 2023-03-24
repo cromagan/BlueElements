@@ -37,6 +37,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
+using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -97,6 +98,8 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
         }
     }
 
+    public ObservableCollection<string> ChildIds { get; } = new();
+
     public string Datenbank_wählen {
         get => string.Empty;
         set {
@@ -107,7 +110,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
             if (db == OutputDatabase) { return; }
             OutputDatabase = db;
 
-            RepairConnections();
+            //RepairConnections();
         }
     }
 
@@ -156,7 +159,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
             if (kn == _getValueFromkey) { return; }
             _getValueFromkey = kn;
             _tmpgetValueFrom = null;
-            RepairConnections();
+            RepairConnections(value);
             RaiseVersion();
             OnChanged();
         }
@@ -295,22 +298,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        RepairConnections();
-    }
-
-    private void RepairConnections() {
-        Develop.DebugPrint_NichtImplementiert();
-        //if (Parent == null) { return; }
-
-        //ConnectsTo.RemoveAll();
-
-        //foreach (var thisRow in FilterDefiniton.Row) {
-        //    var getValueFrom = Parent[thisRow.CellGetString("suchtxt")];
-
-        //    if (getValueFrom != null) {
-        //        ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, getValueFrom, ConnectionType.Bottom, false, false));
-        //    }
-        //}
+        //RepairConnections();
     }
 
     #endregion

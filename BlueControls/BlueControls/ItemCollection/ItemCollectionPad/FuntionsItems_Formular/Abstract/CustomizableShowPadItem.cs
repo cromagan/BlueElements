@@ -31,6 +31,7 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -139,7 +140,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             if (kn == _getValueFromkey) { return; }
             _getValueFromkey = kn;
             _tmpgetValueFrom = null;
-            RepairConnections();
+            RepairConnections(value);
             RaiseVersion();
             OnChanged();
         }
@@ -323,14 +324,6 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         l.Add("#User: " + Generic.UserName());
 
         return l.SortedDistinctList();
-    }
-
-    private void RepairConnections() {
-        ConnectsTo.RemoveAll();
-
-        if (GetRowFrom != null) {
-            ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false, false));
-        }
     }
 
     #endregion

@@ -37,6 +37,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
+using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -66,6 +67,7 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
     #region Properties
 
     public static string ClassId => "FI-SelectRowWithTable";
+    public ObservableCollection<string> ChildIds { get; } = new();
 
     public string Datenbank_wählen {
         get => string.Empty;
@@ -77,7 +79,7 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
             if (db == OutputDatabase) { return; }
             OutputDatabase = db;
 
-            RepairConnections();
+            //RepairConnections();
         }
     }
 
@@ -193,22 +195,7 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        RepairConnections();
-    }
-
-    private void RepairConnections() {
-        Develop.DebugPrint_NichtImplementiert();
-        //if (Parent == null) { return; }
-
-        //ConnectsTo.RemoveAll();
-
-        //foreach (var thisRow in FilterDefiniton.Row) {
-        //    var getValueFrom = Parent[thisRow.CellGetString("suchtxt")];
-
-        //    if (getValueFrom != null) {
-        //        ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, getValueFrom, ConnectionType.Bottom, false, false));
-        //    }
-        //}
+        //RepairConnections();
     }
 
     #endregion

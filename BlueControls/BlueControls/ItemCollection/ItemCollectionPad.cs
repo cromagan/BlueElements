@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -88,25 +89,25 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         _sheetStyle = null;
         _sheetStyleScale = 1f;
         if (Skin.StyleDb != null) { _sheetStyle = Skin.StyleDb.Row.First(); }
+
+        Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
     public ItemCollectionPad(string layoutId, DatabaseAbstract database, long rowkey) : this(database.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
         _ = ResetVariables();
         ParseVariable(database.Row.SearchByKey(rowkey));
+
+        Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
     public ItemCollectionPad(RowItem r, int index) : this(r.Database.Layouts[index], string.Empty) {
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
         _ = ResetVariables();
         ParseVariable(r);
-    }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="toParse"></param>
-    /// <param name="useThisId">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
+        Connections.CollectionChanged += ConnectsTo_CollectionChanged;
+    }
 
     public ItemCollectionPad(string toParse, string useThisId) : this() {
         if (string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }
@@ -214,6 +215,11 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
     #region Destructors
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="toParse"></param>
+    /// <param name="useThisId">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
     ~ItemCollectionPad() {
         Dispose(false);
     }
@@ -235,6 +241,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     #region Properties
 
     public Color BackColor { get; set; } = Color.White;
+    public ObservableCollection<ItemConnection> Connections { get; } = new();
 
     [DefaultValue(10.0)]
     public float GridShow {
@@ -269,15 +276,6 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         }
     }
 
-    //public string ScriptName {
-    //    get => _scriptName;
-    //    set {
-    //        if (_scriptName == value) { return; }
-    //        _scriptName = value;
-    //        OnChanged();
-    //    }
-    //}
-
     public SizeF SheetSizeInMm {
         get => _sheetSizeInMm;
         set {
@@ -289,6 +287,14 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         }
     }
 
+    //public string ScriptName {
+    //    get => _scriptName;
+    //    set {
+    //        if (_scriptName == value) { return; }
+    //        _scriptName = value;
+    //        OnChanged();
+    //    }
+    //}
     public SizeF SheetSizeInPix {
         get {
             if (_prRu == null || _prLo == null || _prRu == null || _prLo == null) {
@@ -707,11 +713,10 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         var tmp = result.Parseable();
 
         result.Clear();
-        //t += "Connections={";
         foreach (var thisitem in this) {
-            if (thisitem != null) {
-                foreach (var thisCon in thisitem.ConnectsTo) {
-                    result.ParseableAdd("Connection", thisCon.ToString(thisitem));
+            foreach (var thisCon in Connections) {
+                if (thisCon.Item1 != null && thisCon.Item2 != null) {
+                    result.ParseableAdd("Connection", thisCon.ToString());
                 }
             }
         }
@@ -719,16 +724,10 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         return result.Parseable(tmp);
     }
 
-    //    base.Swap(item1, item2);
     internal Rectangle DruckbereichRect() =>
                 _prLo == null || _prRu == null ? Rectangle.Empty :
                                                  new Rectangle((int)_prLo.X, (int)_prLo.Y, (int)(_prRu.X - _prLo.X), (int)(_prRu.Y - _prLo.Y));
 
-    //public void Swap(BasicPadItem item1, BasicPadItem item2) {
-    //    var g1 = item1.Gruppenzugehörigkeit;
-    //    item1.Gruppenzugehörigkeit = string.Empty;
-    //    var g2 = item2.Gruppenzugehörigkeit;
-    //    item2.Gruppenzugehörigkeit = string.Empty;
     internal void InDenHintergrund(BasicPadItem thisItem) {
         if (IndexOf(thisItem) == 0) { return; }
         var g1 = thisItem.Gruppenzugehörigkeit;
@@ -800,6 +799,30 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         OnChanged();
     }
 
+    private void ConnectsTo_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+        if (e.NewItems != null) {
+            foreach (var thisit in e.NewItems) {
+                if (thisit is ItemConnection x) {
+                    x.Item2.Changed += Item_Changed;
+                }
+            }
+        }
+
+        if (e.OldItems != null) {
+            foreach (var thisit in e.OldItems) {
+                if (thisit is ItemConnection x) {
+                    x.Item2.Changed -= Item_Changed;
+                }
+            }
+        }
+
+        if (e.Action == NotifyCollectionChangedAction.Reset) {
+            Develop.DebugPrint_NichtImplementiert();
+        }
+
+        OnChanged();
+    }
+
     //    IsSaved = false;
     //}
     private void CreateConnection(string toParse) {
@@ -847,7 +870,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
             }
         }
         if (item1 == null || item2 == null) { return; }
-        item1.ConnectsTo.Add(new ItemConnection(con1, arrow1, item2, con2, arrow2, pm));
+        Connections.Add(new ItemConnection(item1, con1, arrow1, item2, con2, arrow2, pm));
     }
 
     //    item.Parent = this;
@@ -882,6 +905,9 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         if (disposing) {
             _sheetStyle = null;
         }
+
+        Connections.CollectionChanged -= ConnectsTo_CollectionChanged;
+        Connections.RemoveAll();
     }
 
     //protected override void OnItemAdded(BasicPadItem item) {

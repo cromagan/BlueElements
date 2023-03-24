@@ -123,6 +123,7 @@
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\NewInterfaces\IItemAcceptRow.cs" />
+    <Compile Include="Interfaces\NewInterfaces\IItemSendSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemSendRow.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemSendFilter.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemAcceptFilter.cs" />
@@ -345,7 +346,7 @@
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\PhysicPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\AbstractPhysicPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\GenericPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_ColumnArrangement_Edito\ColumnPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_ColumnArrangement_Editor\ColumnPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectangleBitmapPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\RectanglePadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />

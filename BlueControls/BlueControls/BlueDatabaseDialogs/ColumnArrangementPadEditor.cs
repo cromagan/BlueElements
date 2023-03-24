@@ -474,7 +474,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                             foreach (var thisc2 in thisc?.Column?.Database?.Column) {
                                 if (tmp[2].Contains("~" + thisc2.Name + "~")) {
                                     var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Database.TableName + "|" + thisc2.Name];
-                                    _ = rkcolit?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
+                                    _ = Pad.Item.Connections.AddIfNotExists(new ItemConnection(rkcolit, ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                 }
                             }
                         }
@@ -484,11 +484,11 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                             var it2 = new ColumnPadItem(c2);
                             Pad.Item.Add(it2);
                             it2.SetLeftTopPoint(kx, 600);
-                            it2.ConnectsTo.Add(new ItemConnection(ConnectionType.Top, false, it, ConnectionType.Bottom, true, false));
+                            Pad.Item.Connections.Add(new ItemConnection(it2, ConnectionType.Top, false, it, ConnectionType.Bottom, true, false));
                             kx = it2.UsedArea.Right;
 
                             // und noch die Datenbank auf die Spalte zeigen lassem
-                            _ = databItem?.ConnectsTo.AddIfNotExists(new ItemConnection(ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
+                            _ = Pad.Item.Connections.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
                         }
                     }
                 }

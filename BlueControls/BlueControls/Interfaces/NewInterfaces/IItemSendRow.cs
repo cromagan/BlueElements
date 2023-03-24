@@ -20,22 +20,12 @@
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System.Collections.ObjectModel;
 
 namespace BlueControls.Interfaces;
 
 /// <summary>
 /// Wird verwendet, einen einzelnen Filter berechnen kann
 /// </summary>
-public interface IItemSendRow : IDisposableExtended, IItemToControl {
-
-    #region Properties
-
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int Id { get; set; }
-
-    public DatabaseAbstract? OutputDatabase { get; set; }
-
-    #endregion
+public interface IItemSendRow : IItemSendSomething {
 }

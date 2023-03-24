@@ -37,6 +37,7 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
+using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -94,6 +95,8 @@ public class DropDownSelectRowPadItem : RectanglePadItemWithVersion, IReadableTe
             OnChanged();
         }
     }
+
+    public ObservableCollection<string> ChildIds { get; } = new();
 
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
@@ -227,27 +230,7 @@ public class DropDownSelectRowPadItem : RectanglePadItemWithVersion, IReadableTe
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        RepairConnections();
-    }
-
-    private void Cell_CellValueChanged(object sender, CellEventArgs e) {
-        RepairConnections();
-        OnChanged();
-    }
-
-    private void RepairConnections() {
-        Develop.DebugPrint_NichtImplementiert();
-        //if (Parent == null) { return; }
-
-        //ConnectsTo.RemoveAll();
-
-        //foreach (var thisRow in FilterDefiniton.Row) {
-        //    var getValueFrom = Parent[thisRow.CellGetString("suchtxt")];
-
-        //    if (getValueFrom != null) {
-        //        ConnectsTo.Add(new ItemConnection(ConnectionType.Top, true, getValueFrom, ConnectionType.Bottom, false, false));
-        //    }
-        //}
+        //RepairConnections();
     }
 
     #endregion

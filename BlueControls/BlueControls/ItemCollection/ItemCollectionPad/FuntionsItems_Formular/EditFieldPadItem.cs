@@ -328,14 +328,6 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
     //    return null;
     //}
 
-    //private void RepairConnections() {
-    //    ConnectsTo.RemoveAll();
-
-    //    if (GetRowFrom != null) {
-    //        ConnectsTo.GenerateAndAdd(new ItemConnection(ConnectionType.Top, true, (BasicPadItem)GetRowFrom, ConnectionType.Bottom, false, false));
-    //    }
-    //}
-
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     // ~BitmapPadItem()
     // {

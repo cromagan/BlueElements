@@ -32,11 +32,12 @@ public class ItemConnection : IStringable, IChangedFeedback {
 
     #region Fields
 
-    internal readonly bool ArrowOnMyItem;
-    internal readonly bool ArrowOnOtherItem;
-    internal readonly ConnectionType MyItemType;
-    internal readonly BasicPadItem OtherItem;
-    internal readonly ConnectionType OtherItemType;
+    internal readonly bool ArrowOnItem1;
+    internal readonly bool ArrowOnItem2;
+    internal readonly BasicPadItem Item1;
+    internal readonly ConnectionType Item1Type;
+    internal readonly BasicPadItem Item2;
+    internal readonly ConnectionType Item2Type;
 
     private bool _beiExportSichtbar;
 
@@ -44,12 +45,13 @@ public class ItemConnection : IStringable, IChangedFeedback {
 
     #region Constructors
 
-    public ItemConnection(ConnectionType myItemType, bool arrowOnMyItem, BasicPadItem otheritem, ConnectionType otherItemType, bool arrowOnOtherItem, bool showinPrintMode) {
-        OtherItem = otheritem;
-        OtherItemType = otherItemType;
-        MyItemType = myItemType;
-        ArrowOnMyItem = arrowOnMyItem;
-        ArrowOnOtherItem = arrowOnOtherItem;
+    public ItemConnection(BasicPadItem item1, ConnectionType item1Type, bool arrowOnItem1, BasicPadItem item2, ConnectionType item2Type, bool arrowOnItem2, bool showinPrintMode) {
+        Item2 = item2;
+        Item2Type = item2Type;
+        Item1 = item1;
+        Item1Type = item1Type;
+        ArrowOnItem1 = arrowOnItem1;
+        ArrowOnItem2 = arrowOnItem2;
         _beiExportSichtbar = showinPrintMode;
     }
 
@@ -99,14 +101,14 @@ public class ItemConnection : IStringable, IChangedFeedback {
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-    internal string ToString(BasicPadItem myItem) {
+    internal new string ToString() {
         List<string> result = new();
-        result.ParseableAdd("Item1", myItem.KeyName);
-        result.ParseableAdd("Arrow1", ArrowOnMyItem);
-        result.ParseableAdd("Type1", MyItemType);
-        result.ParseableAdd("Item2", OtherItem.KeyName);
-        result.ParseableAdd("Arrow2", ArrowOnOtherItem);
-        result.ParseableAdd("Type2", OtherItemType);
+        result.ParseableAdd("Item1", Item1.KeyName);
+        result.ParseableAdd("Arrow1", ArrowOnItem1);
+        result.ParseableAdd("Type1", Item1Type);
+        result.ParseableAdd("Item2", Item2.KeyName);
+        result.ParseableAdd("Arrow2", ArrowOnItem2);
+        result.ParseableAdd("Type2", Item2Type);
         result.ParseableAdd("Print", _beiExportSichtbar);
         return result.Parseable();
     }
