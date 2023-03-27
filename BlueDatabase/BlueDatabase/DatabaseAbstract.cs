@@ -855,7 +855,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         //var f = SpecialErrorReason(mode);
 
         //if (!string.IsNullOrEmpty(f)) { return f; }
-        if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
+        if (mode is BlueBasics.Enums.ErrorReason.OnlyRead or BlueBasics.Enums.ErrorReason.Load) { return string.Empty; }
 
         //if (mode.HasFlag(BlueBasics.Enums.ErrorReason.Load)) {
         //    if (_backgroundWorker.IsBusy) { return "Ein Hintergrundprozess verhindert aktuell das Neuladen."; }
@@ -1038,6 +1038,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, "Allgemein"); }
+
+            if (IsDisposed || ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", false, "Allgemein"); }
 
             #region Script ermitteln
 

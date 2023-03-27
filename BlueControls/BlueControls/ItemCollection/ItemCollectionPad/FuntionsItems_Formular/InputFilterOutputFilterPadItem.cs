@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollection;
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
 /// </summary>
 
-public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
+public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadableText, IItemToControl, IItemAcceptFilter {
 
     #region Fields
 

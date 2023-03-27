@@ -197,6 +197,16 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         return (false, x);
     }
 
+    public override void RepairAfterParse() {
+        base.RepairAfterParse();
+
+        if (!string.IsNullOrEmpty(Filename)) {
+            if (!string.Equals(TableName, Filename.FileNameWithoutSuffix(), StringComparison.OrdinalIgnoreCase)) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Tabellenname stimmt nicht: " + Filename);
+            }
+        }
+    }
+
     public override bool Save() {
         if (_muf == null || IsDisposed || ReadOnly || !HasPendingChanges) { return false; }
 

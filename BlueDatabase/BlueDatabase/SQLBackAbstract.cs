@@ -146,7 +146,7 @@ public abstract class SqlBackAbstract {
         using var comm = Connection.CreateCommand();
         comm.CommandText = cmdString;
 
-        return ExecuteCommand(comm);
+        return ExecuteCommand(comm, false);
     }
 
     public void ChangeDataType(string tablename, string column, int charlenght) {
@@ -158,13 +158,11 @@ public abstract class SqlBackAbstract {
         if (s == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { charlenght = Math.Max(charlenght, 15); }
 
         var cmdString = @"ALTER TABLE " + tablename + " MODIFY (" + column + " " + VarChar(charlenght) + ")";
-        _ = ExecuteCommand(cmdString);
+        _ = ExecuteCommand(cmdString, true);
     }
 
     public bool CloseConnection() {
-
         try {
-
             if (Connection == null) { return true; }
 
             lock (_openclose) {
@@ -174,7 +172,7 @@ public abstract class SqlBackAbstract {
             }
         } catch {
             Develop.CheckStackForOverflow();
-           return CloseConnection();
+            return CloseConnection();
         }
     }
 
@@ -450,10 +448,10 @@ public abstract class SqlBackAbstract {
 
         //https://www.1keydata.com/sql/alter-table-rename-column.html
         var cmdString = @"ALTER TABLE " + tablename + " RENAME COLUMN " + oldname + " TO " + newname;
-        _ = ExecuteCommand(cmdString);
+        _ = ExecuteCommand(cmdString, true);
 
         cmdString = "UPDATE " + SysStyle + " SET COLUMNNAME = " + Dbval(newname) + " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) + " AND COLUMNNAME = " + Dbval(oldname.ToUpper());
-        _ = ExecuteCommand(cmdString);
+        _ = ExecuteCommand(cmdString, true);
 
         var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), newname);
 
@@ -497,7 +495,10 @@ public abstract class SqlBackAbstract {
         var colStyle = GetColumnNames(SysStyle);
         if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
 
-        if (!colStyle.Contains("VALUE")) { AddColumn(SysStyle, "VALUE", VarChar4000, true); }
+        if (!colStyle.Contains("VALUE")) {
+            AddColumn(SysStyle, "VALUE", VarChar4000, true);
+            ChangeDataType(tablename.ToUpper(), "VALUE", 255);
+        }
 
         #endregion
 
@@ -556,7 +557,7 @@ public abstract class SqlBackAbstract {
         _ = ExecuteCommand("DELETE FROM " + SysStyle +
                        " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) +
                        " AND COLUMNNAME = " + Dbval(columnName.ToUpper()) +
-                       " AND TYPE = " + Dbval(type.ToString()));
+                       " AND TYPE = " + Dbval(type.ToString()), true);
 
         var maxPartStringLenght = Math.Min(MaxStringLenght, 250);
 
@@ -886,13 +887,13 @@ public abstract class SqlBackAbstract {
     //    com = com.TrimEnd(", ");
     //internal string? GetLastColumnName(string tablename, long key) {
     //    if (!OpenConnection()) { return null; }
-    protected string ExecuteCommand(string commandtext) {
+    protected string ExecuteCommand(string commandtext, bool abort) {
         if (!OpenConnection() || Connection == null) { return "Verbindung konnte nicht geöffnet werden"; }
 
         using var command = Connection.CreateCommand();
         command.CommandText = commandtext;
 
-        return ExecuteCommand(command);
+        return ExecuteCommand(command, abort);
     }
 
     //        com = com + thiscolumn.Name.ToUpper() + ", ";
@@ -908,10 +909,10 @@ public abstract class SqlBackAbstract {
         var n = " NOT NULL";
         if (nullable) { n = string.Empty; }
 
-        _ = ExecuteCommand("alter table " + tablename.ToUpper() + " add " + column + " " + type + " default ''" + n);
+        _ = ExecuteCommand("ALTER TABLE " + tablename.ToUpper() + " add " + column + " " + type + " default ''" + n, true);
     }
 
-    private string AddRow(string tablename, long key) => ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + Dbval(key) + ")");
+    private string AddRow(string tablename, long key) => ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + Dbval(key) + ")", true);
 
     private string Dbval(long original) => Dbval(original.ToString());
 
@@ -929,13 +930,17 @@ public abstract class SqlBackAbstract {
         return "'" + original + "'";
     }
 
-    private string ExecuteCommand(IDbCommand command) {
+    private string ExecuteCommand(IDbCommand command, bool abort) {
         if (!OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
 
         try {
             _ = command.ExecuteNonQuery();
             return string.Empty;
         } catch (Exception ex) {
+            if (abort) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Befehl konnte nicht ausgeführt werden: " + command.CommandText, ex);
+            }
+
             Develop.DebugPrint("Datenbank Befehl konnte nicht ausgeführt werden: " + command.CommandText, ex);
             return "Allgemeiner Fehler beim Ausführen, siehe Protocol";
         } finally {
@@ -995,16 +1000,16 @@ public abstract class SqlBackAbstract {
     }
 
     private string RemoveColumn(string tablename, string column) {
-        var b = ExecuteCommand("alter table " + tablename.ToUpper() + " drop column " + column.ToUpper());
+        var b = ExecuteCommand("ALTER TABLE " + tablename.ToUpper() + " drop column " + column.ToUpper(), true);
         if (!string.IsNullOrEmpty(b)) { return "Löschen fehgeschlagen: " + b; }
 
-        b = ExecuteCommand("DELETE FROM " + SysStyle + " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) + " AND COLUMNNAME = " + Dbval(column.ToUpper()));
+        b = ExecuteCommand("DELETE FROM " + SysStyle + " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) + " AND COLUMNNAME = " + Dbval(column.ToUpper()), true);
         if (!string.IsNullOrEmpty(b)) { return "Löschen fehgeschlagen: " + b; }
         return string.Empty;
     }
 
     private string RemoveRow(string tablename, long key) {
-        var b = ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = " + Dbval(key.ToString()));
+        var b = ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = " + Dbval(key.ToString()), true);
         if (!string.IsNullOrEmpty(b)) { return "Löschen fehgeschlagen: " + b; }
         return string.Empty;
     }
@@ -1031,7 +1036,7 @@ public abstract class SqlBackAbstract {
             return string.Empty;
         }
 
-        return ExecuteCommand(cmdString);
+        return ExecuteCommand(cmdString, false);
     }
 
     /// <summary>
@@ -1047,7 +1052,7 @@ public abstract class SqlBackAbstract {
     private string SetStyleData(string tablename, string type, string columnName, string newValue, int part) {
         var cmdString = "INSERT INTO " + SysStyle + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + Dbval(tablename.ToUpper()) + ", " + Dbval(type) + ", " + Dbval(columnName.ToUpper()) + ", " + Dbval(newValue) + ", " + Dbval(part.ToString(Constants.Format_Integer3)) + ")";
         if (!OpenConnection()) { return "Verbindung konnt nicht geöffnet werden"; }
-        return ExecuteCommand(cmdString);
+        return ExecuteCommand(cmdString, false);
     }
 
     private void SysUndoAufräumen() {
@@ -1056,7 +1061,7 @@ public abstract class SqlBackAbstract {
                 "(SELECT RK FROM (SELECT RK, ROW_NUMBER() OVER (PARTITION BY TABLENAME ORDER BY TIMECODEUTC DESC) as row_num FROM " + SysUndo + ") WHERE row_num <= 500)" +
                 "AND TIMECODEUTC<" + Dbval(DateTime.UtcNow.AddDays(-7));
 
-        _ = ExecuteCommand(c);
+        _ = ExecuteCommand(c, false);
     }
 
     #endregion

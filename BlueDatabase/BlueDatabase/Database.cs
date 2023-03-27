@@ -679,6 +679,16 @@ public sealed class Database : DatabaseAbstract {
         return (false, x);
     }
 
+    public override void RepairAfterParse() {
+        base.RepairAfterParse();
+
+        if (!string.IsNullOrEmpty(Filename)) {
+            if (!string.Equals(TableName, Filename.FileNameWithoutSuffix(), StringComparison.OrdinalIgnoreCase)) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Tabellenname stimmt nicht: " + Filename);
+            }
+        }
+    }
+
     public override bool Save() {
         if (ReadOnly) { return false; }
         if (string.IsNullOrEmpty(Filename)) { return false; }

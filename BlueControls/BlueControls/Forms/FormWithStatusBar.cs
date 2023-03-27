@@ -87,6 +87,9 @@ public partial class FormWithStatusBar : Form {
             if (InvokeRequired) {
                 return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, message, didAlreadyMessagebox)));
             }
+
+            if (capStatusBar.InvokeRequired) { return false; }
+
             if (IsDisposed) { return false; }
             _lastMessage = DateTime.UtcNow;
             timMessageClearer.Enabled = true;

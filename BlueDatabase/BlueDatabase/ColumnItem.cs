@@ -1543,6 +1543,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public void Repair() {
         if (Database == null || Database.IsDisposed) { return; }
+        if (Database.ReadOnly) { return; }
         // Unbekannt = -1,
         // Nothing = 0,
         //    Text = 1,
