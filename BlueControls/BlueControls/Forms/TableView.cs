@@ -90,6 +90,7 @@ public partial class TableView : FormWithStatusBar {
 
     #region Properties
 
+    public virtual string DefaultUserGroup { get; } = DatabaseAbstract.Administrator;
     public string PreveredDatabaseID { get; set; } = Database.DatabaseId;
 
     /// <summary>
@@ -820,7 +821,7 @@ public partial class TableView : FormWithStatusBar {
             _ = DeleteFile(SaveTab.FileName, true);
         }
 
-        var db = new Database(false, SaveTab.FileName.FileNameWithoutSuffix());
+        var db = new Database(false, SaveTab.FileName.FileNameWithoutSuffix(), DatabaseAbstract.Administrator);
         db.SaveAsAndChangeTo(SaveTab.FileName);
         _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID));
     }
@@ -1275,7 +1276,7 @@ public partial class TableView : FormWithStatusBar {
 
         var s = (List<object>)e.TabPage.Tag;
 
-        var db = DatabaseAbstract.GetById((ConnectionInfo)s[0], Table.Database_NeedPassword);
+        var db = DatabaseAbstract.GetById((ConnectionInfo)s[0], Table.Database_NeedPassword, DefaultUserGroup);
 
         if (db is Database bdb) {
             if (!string.IsNullOrEmpty(bdb.Filename)) {

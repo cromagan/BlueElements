@@ -23,6 +23,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text;
+using System.Threading;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -51,6 +53,8 @@ public abstract class SqlBackAbstract {
     //private readonly object _getRow = new();
     private readonly object _openclose = new();
 
+    private bool _didBackup = false;
+
     #endregion
 
     #region Constructors
@@ -64,6 +68,7 @@ public abstract class SqlBackAbstract {
     #region Properties
 
     public bool ConnectionOk => Connection != null;
+
     public string ConnectionString { get; protected set; } = string.Empty;
 
     public string Date => "DATE";
@@ -74,10 +79,13 @@ public abstract class SqlBackAbstract {
     public string Filename { get; protected set; } = string.Empty;
 
     public abstract int MaxStringLenght { get; }
+
     public abstract string Primary { get; }
 
     public string VarChar15 => VarChar(15);
+
     public string VarChar255 => VarChar(255);
+
     public string VarChar4000 => VarChar(4000);
 
     #endregion
@@ -88,10 +96,12 @@ public abstract class SqlBackAbstract {
         var t = tablename.ToUpper();
 
         if (t.StartsWith("SYS_")) { return false; }
+        if (t.StartsWith("BAK_")) { return false; }
 
         if (!t.ContainsOnlyChars(Constants.Char_AZ + Constants.Char_Numerals + "_")) { return false; }
 
-        if (t.Length > 128) { return false; }
+        // eigentlich 128, aber minus BAK_ und _2023_03_28
+        if (t.Length > 100) { return false; }
 
         return true;
     }
@@ -692,9 +702,20 @@ public abstract class SqlBackAbstract {
     public List<string> Tables() {
         var l = AllTables();
 
-        _ = l.Remove(SysStyle);
-        _ = l.Remove(SysUndo);
-        return l;
+        //_ = l.Remove(SysStyle);
+        //_ = l.Remove(SysUndo);
+
+        var l2 = new List<string>();
+
+        foreach (var thiss in l) {
+            var thiss2 = thiss.ToUpper();
+
+            if (!thiss2.StartsWith("SYS_") && !thiss2.StartsWith("BAK_")) {
+                l2.Add(thiss2);
+            }
+        }
+
+        return l2;
     }
 
     public abstract string VarChar(int lenght);
@@ -884,6 +905,58 @@ public abstract class SqlBackAbstract {
     //        using var q = _connection.CreateCommand();
     protected abstract string CreateTable(string tablename, List<string> keycolumns);
 
+    protected abstract string DeleteTable(string tablename);
+
+    protected void DoBackUp() {
+        if (_didBackup) { return; }
+        _didBackup = true;
+
+        try {
+            var tbl = Tables();
+            tbl.Add(SysStyle);
+
+            var alltb = AllTables();
+
+            #region Kopie des aktuellen Standes erstellen
+
+            var d = DateTime.UtcNow.ToString(BlueBasics.Constants.Format_Date10);
+
+            foreach (var thist in tbl) {
+                var ntc = "BAK_" + thist.ToUpper() + "_" + d;
+
+                if (!alltb.Contains(ntc)) {
+                    if (CopyTable(thist, ntc)) {
+                        alltb.Add(ntc);
+                    }
+                }
+            }
+
+            #endregion
+
+            #region Altes Zeugs ermitteln und löschen
+
+            foreach (var thist in tbl) {
+                var ntc = "BAK_" + thist.ToUpper() + "_";
+                var l = new BackupVerwalter();
+                foreach (var thisat in alltb) {
+                    if (thisat.StartsWith(ntc)) {
+                        if (DateTimeTryParse(thisat.TrimStart(ntc), out var dt)) {
+                            l.AddData(dt, thisat);
+                        }
+                    }
+                }
+
+                foreach (var thisttd in l.Deleteable) {
+                    if (thisttd.StartsWith("BAK_")) {
+                        DeleteTable(thisttd);
+                    }
+                }
+            }
+
+            #endregion
+        } catch { }
+    }
+
     //    com = com.TrimEnd(", ");
     //internal string? GetLastColumnName(string tablename, long key) {
     //    if (!OpenConnection()) { return null; }
@@ -913,6 +986,12 @@ public abstract class SqlBackAbstract {
     }
 
     private string AddRow(string tablename, long key) => ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + Dbval(key) + ")", true);
+
+    private bool CopyTable(string tablename, string newtablename) {
+        var s = "CREATE TABLE " + newtablename + " AS SELECT * FROM " + tablename;
+
+        return string.IsNullOrEmpty(ExecuteCommand(s, false));
+    }
 
     private string Dbval(long original) => Dbval(original.ToString());
 

@@ -97,6 +97,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Accessor.cs" />
+    <Compile Include="BackupVerwalter.cs" />
     <Compile Include="BitmapExt.cs" />
     <Compile Include="Enums\AdditionalCheck.cs" />
     <Compile Include="Enums\SortierTyp.cs" />

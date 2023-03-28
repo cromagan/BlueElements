@@ -44,6 +44,7 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
         ConnectionString = sql.ConnectionString;
         Connection = sql.Connection;
         RepairAll(tablename.ToUpper());
+        DoBackUp();
     }
 
     public SQLBackMicrosoftCE(string filename, bool create) : base() {
@@ -176,14 +177,14 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
     }
 
     protected override string CreateTable(string tablename) {
-        var b = ExecuteCommand("DROP TABLE IF EXISTS " + tablename, true);
+        var b = DeleteTable(tablename);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         return ExecuteCommand(@"CREATE TABLE " + tablename + "(RK " + Primary + " NOT NULL PRIMARY KEY)", true);
     }
 
     protected override string CreateTable(string tablename, List<string> keycolumns) {
-        var b = ExecuteCommand("DROP TABLE IF EXISTS " + tablename, true);
+        var b = DeleteTable(tablename);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         // http://www.sql-server-helper.com/error-messages/msg-8110.aspx
@@ -205,6 +206,8 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
 
         return ExecuteCommand(t, true);
     }
+
+    protected override string DeleteTable(string tablename) => ExecuteCommand("DROP TABLE IF EXISTS " + tablename, false);
 
     #endregion
 }

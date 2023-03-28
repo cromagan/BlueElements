@@ -59,7 +59,7 @@ internal class Method_Do : Method {
             var scx = Method_CallByFilename.CallSub(s, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname);
             if (!scx.AllOk) { return scx; }
 
-            if (s.BreakFired) { break; }
+            if (s.BreakFired || s.EndScript) { break; }
         } while (true);
 
         s.BreakFired = false;

@@ -157,7 +157,7 @@ public class AddRowPaditem : CustomizableShowPadItem, IReadableText, IItemToCont
                     na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
-                InputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null);
+                InputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
                 return true;
 
             case "id":

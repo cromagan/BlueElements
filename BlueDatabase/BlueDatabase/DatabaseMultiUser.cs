@@ -44,11 +44,9 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     #region Constructors
 
-    public DatabaseMultiUser(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.AdditionalData, readOnly, false, ci.TableName) { }
+    public DatabaseMultiUser(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword, string userGroup) : this(ci.AdditionalData, readOnly, false, userGroup) { }
 
-    public DatabaseMultiUser(bool readOnly, string tablename) : this(string.Empty, readOnly, true, tablename) { }
-
-    public DatabaseMultiUser(string filename, bool readOnly, bool create, string tablename) : base(tablename, readOnly) {
+    public DatabaseMultiUser(string filename, bool readOnly, bool create, string userGroup) : base(readOnly, userGroup) {
         _muf = new MultiUserFile();
 
         _muf.Loaded += _muf_Loaded;
@@ -85,18 +83,26 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
 
     public bool ReloadNeeded => _muf?.ReloadNeeded ?? false;
 
+    public override string TableName {
+        get {
+            if (IsDisposed) { return string.Empty; }
+            if (_muf == null || _muf.IsDisposed) { return string.Empty; }
+            return SqlBackAbstract.MakeValidTableName(_muf.Filename.FileNameWithoutSuffix());
+        }
+    }
+
     #endregion
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword, string userGroup) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
 
         if (!FileExists(ci.AdditionalData)) { return null; }
 
-        return new DatabaseMultiUser(ci, false, needPassword);
+        return new DatabaseMultiUser(ci, false, needPassword, userGroup);
     }
 
     public override string AdditionalFilesPfadWhole() {
@@ -195,16 +201,6 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         }
         var x = Row.DoLinkedDatabase(row);
         return (false, x);
-    }
-
-    public override void RepairAfterParse() {
-        base.RepairAfterParse();
-
-        if (!string.IsNullOrEmpty(Filename)) {
-            if (!string.Equals(TableName, Filename.FileNameWithoutSuffix(), StringComparison.OrdinalIgnoreCase)) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Tabellenname stimmt nicht: " + Filename);
-            }
-        }
     }
 
     public override bool Save() {

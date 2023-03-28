@@ -56,6 +56,7 @@
     <Compile Include="Methods\Method_AddPrefix.cs" />
     <Compile Include="Methods\Method_AddSuffix.cs" />
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
+    <Compile Include="Methods\Method_BackupControl.cs" />
     <Compile Include="Methods\Method_Return.cs" />
     <Compile Include="Methods\Method_SaveImage.cs" />
     <Compile Include="Methods\Method_SetClipbard.cs" />

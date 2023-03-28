@@ -39,22 +39,26 @@ public sealed class Database : DatabaseAbstract {
 
     public readonly List<WorkItem> Works;
 
+    private readonly string _tablename = string.Empty;
+
     #endregion
 
     #region Constructors
 
-    public Database(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.AdditionalData, readOnly, false, ci.TableName, needPassword) { }
+    public Database(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword, string userGroup) : this(ci.AdditionalData, readOnly, false, needPassword, userGroup) { }
 
-    public Database(Stream stream, string tablename) : this(stream, string.Empty, true, false, tablename, null) { }
+    public Database(Stream stream, string tablename, string userGroup) : this(stream, string.Empty, true, false, tablename, null, userGroup) { }
 
-    public Database(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, tablename, null) { }
+    public Database(bool readOnly, string tablename, string userGroup) : this(null, string.Empty, readOnly, true, tablename, null, userGroup) { }
 
-    public Database(string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : this(null, filename, readOnly, create, tablename, needPassword) { }
+    public Database(string filename, bool readOnly, bool create, NeedPassword? needPassword, string userGroup) : this(null, filename, readOnly, create, filename.FileNameWithoutSuffix(), needPassword, userGroup) { }
 
-    private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : base(tablename, readOnly) {
+    private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword, string userGroup) : base(readOnly, userGroup) {
         //Develop.StartService();
 
         Works = new List<WorkItem>();
+
+        _tablename = SqlBackAbstract.MakeValidTableName(tablename);
 
         Initialize();
 
@@ -71,23 +75,22 @@ public sealed class Database : DatabaseAbstract {
     #region Properties
 
     public static string DatabaseId => typeof(Database).Name;
-
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename);
-
-    public string Filename { get; set; } = string.Empty;
+    public string Filename { get; private set; } = string.Empty;
+    public override string TableName => _tablename;
 
     #endregion
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword, string userGroup) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
 
         if (!FileExists(ci.AdditionalData)) { return null; }
 
-        return new Database(ci, false, needPassword);
+        return new Database(ci, false, needPassword, userGroup);
     }
 
     public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, out long rowKey, out string value, out string colName) {
@@ -437,6 +440,23 @@ public sealed class Database : DatabaseAbstract {
         foreach (var thisR in db.Row) {
             SaveToByteList(l, c, thisR);
         }
+    }
+
+    public static bool SaveToFile(DatabaseAbstract db, List<WorkItem>? works, int minLen, string filn) {
+        var bytes = ToListOfByte(db, works, minLen);
+
+        if (bytes == null) {
+            return false;
+        }
+
+        try {
+            using FileStream x = new(filn, FileMode.Create, FileAccess.Write, FileShare.None);
+            x.Write(bytes.ToArray(), 0, bytes.ToArray().Length);
+            x.Flush();
+            x.Close();
+        } catch { return false; }
+
+        return true;
     }
 
     public static List<byte>? ToListOfByte(DatabaseAbstract db, List<WorkItem>? works, int minLen) {

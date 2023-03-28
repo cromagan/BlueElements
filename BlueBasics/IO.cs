@@ -129,9 +129,11 @@ public static class IO {
 
         if (pfad.Contains("/")) { pfad = pfad.Replace("/", "\\"); }
 
-        var homep = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
-        pfad = pfad.Replace("%homepath%\\", homep, RegexOptions.IgnoreCase);
-        pfad = pfad.Replace("%homepath%", homep, RegexOptions.IgnoreCase);
+        if (pfad.Contains("%")) {
+            var homep = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
+            pfad = pfad.Replace("%homepath%\\", homep, RegexOptions.IgnoreCase);
+            pfad = pfad.Replace("%homepath%", homep, RegexOptions.IgnoreCase);
+        }
 
         if (pfad.Substring(pfad.Length - 1) != "\\") { pfad += "\\"; }
         if (pfad.IndexOf("\\\\", 1, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }

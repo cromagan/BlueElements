@@ -150,7 +150,7 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
                     na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
-                OutputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null);
+                OutputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
                 return true;
 
             case "id":

@@ -57,6 +57,7 @@ public static class Constants {
     public const char FirstSortChar = '-';
 
     public const string Format_Date = "yyyy/MM/dd HH:mm:ss.fff";
+    public const string Format_Date10 = "yyyy_MM_dd";
     public const string Format_Date2 = "yyyy/MM/dd HH:mm:ss";
     public const string Format_Date3 = "yyyy/MM/dd";
     public const string Format_Date4 = "yyyy-MM-dd_HH-mm-ss";

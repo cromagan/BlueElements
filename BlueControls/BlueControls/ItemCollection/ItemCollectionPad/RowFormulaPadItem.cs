@@ -141,7 +141,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
                 return true;
 
             case "database":
-                Database = DatabaseAbstract.GetById(new ConnectionInfo(value.FromNonCritical(), null), null);
+                Database = DatabaseAbstract.GetById(new ConnectionInfo(value.FromNonCritical(), null), null, string.Empty);
                 Database.Disposing += _Database_Disposing;
                 return true;
 

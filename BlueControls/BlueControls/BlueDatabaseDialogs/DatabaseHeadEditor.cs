@@ -241,7 +241,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
     }
 
     private void GenerateUndoTabelle() {
-        Database x = new(false, "Undo " + Database.ConnectionData.TableName);
+        Database x = new(false, "Undo " + Database.ConnectionData.TableName, string.Empty);
         _ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
         _ = x.Column.GenerateAndAdd("db", "Herkunft", ColumnFormatHolder.Text);
@@ -345,7 +345,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         Database.DatenbankAdmin = new(DatenbankAdmin.Item.ToListOfString());
 
         var tmp = PermissionGroups_NewRow.Item.ToListOfString();
-        _ = tmp.Remove("#Administrator");
+        _ = tmp.Remove(DatabaseAbstract.Administrator);
         Database.PermissionGroupsNewRow = new(tmp);
 
         #region Sortierung

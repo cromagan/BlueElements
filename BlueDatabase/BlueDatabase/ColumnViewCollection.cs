@@ -277,7 +277,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
             }
         }
         var tmp = PermissionGroups_Show.SortedDistinctList();
-        tmp.RemoveString("#Administrator", false);
+        tmp.RemoveString(DatabaseAbstract.Administrator, false);
         foreach (var t in tmp) {
             if (!string.IsNullOrEmpty(t)) {
                 result = result + ", Permissiongroup=" + t;
@@ -301,7 +301,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         #endregion
 
         var tmp = PermissionGroups_Show.SortedDistinctList();
-        tmp.RemoveString("#Administrator", false);
+        tmp.RemoveString(DatabaseAbstract.Administrator, false);
         tmp.RemoveNullOrEmpty();
 
         switch (number) {
@@ -312,7 +312,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
 
             case 1:
                 if (string.IsNullOrEmpty(Name)) { Name = "Standard"; }
-                _ = tmp.AddIfNotExists("#Everybody");
+                _ = tmp.AddIfNotExists(DatabaseAbstract.Everybody);
                 break;
         }
 

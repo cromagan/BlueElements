@@ -49,8 +49,11 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     #region Fields
 
     public const int Dpi = 300;
+
     public static List<BasicPadItem>? PadItemTypes;
+
     internal string Caption;
+
     internal string Id;
 
     /// <summary>
@@ -59,15 +62,25 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     private readonly int _idCount;
 
     private float _gridShow = 10;
+
     private float _gridsnap = 1;
+
     private PointM? _prLo;
+
     private PointM? _prLu;
+
     private PointM? _prRo;
+
     private PointM? _prRu;
+
     private Padding _randinMm = Padding.Empty;
+
     private SizeF _sheetSizeInMm = SizeF.Empty;
+
     private RowItem? _sheetStyle;
+
     private float _sheetStyleScale;
+
     private SnapMode _snapMode = SnapMode.SnapToGrid;
 
     #endregion
@@ -241,6 +254,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     #region Properties
 
     public Color BackColor { get; set; } = Color.White;
+
     public ObservableCollection<ItemConnection> Connections { get; } = new();
 
     [DefaultValue(10.0)]
@@ -287,14 +301,6 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         }
     }
 
-    //public string ScriptName {
-    //    get => _scriptName;
-    //    set {
-    //        if (_scriptName == value) { return; }
-    //        _scriptName = value;
-    //        OnChanged();
-    //    }
-    //}
     public SizeF SheetSizeInPix {
         get {
             if (_prRu == null || _prLo == null || _prRu == null || _prLo == null) {
@@ -578,38 +584,12 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         OnChanged();
     }
 
-    //private void ParseVariable(string VariableName, ColumnItem Column, RowItem Row) {
-    //    switch (Column.Format) {
-    //        case DataFormat.Text:
-    //        case DataFormat.Text_mit_Formatierung:
-    //        case DataFormat.Gleitkommazahl:
-    //        case DataFormat.Datum_und_Uhrzeit:
-    //        case DataFormat.Bit:
-    //        case DataFormat.Ganzzahl:
-    //        case DataFormat.RelationText:
-    //            ParseVariable(VariableName, Row.CellGetString(Column));
-    //            break;
-    //        case DataFormat.Link_To_Filesystem:
-    //            if (!Column.MultiLine) {
-    //                var f = Column.BestFile(Row.CellGetString(Column), false);
-    //                if (FileExists(f)) {
-    //                    if (Column.MultiLine) {
-    //                        ParseVariable(VariableName, f);
-    //                    } else {
-    //                        var x = (Bitmap)BitmapExt.Image_FromFile(f);
-    //                        ParseVariable(VariableName, x);
-    //                    }
-    //                }
-    //            }
-    //            break;
-    //        //case DataFormat.Relation:
-    //        //    ParseVariable(VariableName, enValueType.Unknown, "Nicht implementiert");
-    //        //    break;
-    //        default:
-    //            Develop.DebugPrint("Format unbekannt: " + Column.Format);
-    //            break;
-    //    }
-    //}
+    public void RemoveRange(List<BasicPadItem> remove) {
+        foreach (var thisItem in remove) {
+            Remove(thisItem);
+        }
+    }
+
     public bool ResetVariables() {
         var did = false;
         foreach (var thisItem in this) {
@@ -682,10 +662,6 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         return I;
     }
 
-    //    item1.Gruppenzugehörigkeit = g1;
-    //    item2.Gruppenzugehörigkeit = g2;
-    //    OnChanged();
-    //}
     public new string ToString() {
         List<string> result = new();
         result.ParseableAdd("ID", Id);
@@ -823,8 +799,6 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         OnChanged();
     }
 
-    //    IsSaved = false;
-    //}
     private void CreateConnection(string toParse) {
         if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
 
@@ -873,8 +847,6 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         Connections.Add(new ItemConnection(item1, con1, arrow1, item2, con2, arrow2, pm));
     }
 
-    //    item.Parent = this;
-    //    base.OnItemAdded(item);
     private void CreateItems(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key.ToLower()) {
@@ -910,13 +882,6 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         Connections.RemoveAll();
     }
 
-    //protected override void OnItemAdded(BasicPadItem item) {
-    //    //if (item == null) {
-    //    //    Develop.DebugPrint(FehlerArt.Fehler, "Null Item soll hinzugefügt werden!");
-    //    //}
-    //    if (string.IsNullOrEmpty(item.KeyName)) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Der Auflistung soll ein Item hinzugefügt werden, welches keinen Namen hat " + item.KeyName);
-    //    }
     private bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, string seite) {
         try {
             if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }

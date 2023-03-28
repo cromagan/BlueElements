@@ -66,6 +66,7 @@ internal class Method_Call : Method_Database {
 
         var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, "Subroutinen-Aufruf [" + vs.ValueString + "]", f, ((VariableBool)attvar.Attributes[1]).ValueBool, 0, vs.ValueString);
         s.BreakFired = false;
+        s.EndScript = false;
 
         return scx;
     }

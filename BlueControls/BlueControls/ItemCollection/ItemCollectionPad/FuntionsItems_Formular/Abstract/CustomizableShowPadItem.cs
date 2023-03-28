@@ -154,7 +154,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             ItemCollectionList.ItemCollectionList aa = new(true);
             aa.AddRange(Permission_AllUsed());
 
-            if (aa["#Administrator"] == null) { _ = aa.Add("#Administrator"); }
+            if (aa[DatabaseAbstract.Administrator] == null) { _ = aa.Add(DatabaseAbstract.Administrator); }
             //aa.Sort();
             aa.CheckBehavior = CheckBehavior.MultiSelection;
             aa.Check(VisibleFor, true);
@@ -164,12 +164,12 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
             VisibleFor.AddRange(b.ToArray());
 
-            if (VisibleFor.Count > 1 && VisibleFor.Contains("#Everybody", false)) {
+            if (VisibleFor.Count > 1 && VisibleFor.Contains(DatabaseAbstract.Everybody, false)) {
                 VisibleFor.Clear();
-                VisibleFor.Add("#Everybody");
+                VisibleFor.Add(DatabaseAbstract.Everybody);
             }
 
-            if (VisibleFor.Count == 0) { VisibleFor.Add("#Administrator"); }
+            if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Administrator); }
             RaiseVersion();
             OnChanged();
         }
@@ -272,7 +272,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
                 foreach (var thiss in tmp) {
                     VisibleFor.Add(thiss.FromNonCritical());
                 }
-                if (VisibleFor.Count == 0) { VisibleFor.Add("#Everybody"); }
+                if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Everybody); }
                 return true;
         }
         return false;
@@ -290,7 +290,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
 
         result.ParseableAdd("Version", Version);
 
-        if (VisibleFor.Count == 0) { VisibleFor.Add("#Everybody"); }
+        if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Everybody); }
 
         result.ParseableAdd("VisibleFor", VisibleFor);
         result.ParseableAdd("GetValueFrom", _getValueFromkey);
@@ -301,9 +301,9 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     internal bool IsVisibleForMe(string? myGroup, string? myName) {
         if (myGroup == null || myName == null) { return false; }
 
-        if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains("#Everybody", false)) { return true; }
+        if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains(DatabaseAbstract.Everybody, false)) { return true; }
 
-        if (myGroup.Equals("#Administrator", StringComparison.OrdinalIgnoreCase)) { return true; }
+        if (myGroup.Equals(DatabaseAbstract.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
 
         if (VisibleFor.Contains(myGroup, false)) { return true; }
 
@@ -320,7 +320,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             }
         }
 
-        l.Add("#Everybody");
+        l.Add(DatabaseAbstract.Everybody);
         l.Add("#User: " + Generic.UserName());
 
         return l.SortedDistinctList();

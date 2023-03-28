@@ -230,7 +230,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                     na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
-                OutputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null);
+                OutputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
                 return true;
 
             case "id":
@@ -452,7 +452,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     }
 
     private DatabaseAbstract GenerateFilterDatabase() {
-        Database x = new(false, "Filterdatabase_" + KeyName);
+        Database x = new(false, "Filterdatabase_" + KeyName, DatabaseAbstract.Administrator);
         x.DropMessages = false;
 
         var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.TextOptions);

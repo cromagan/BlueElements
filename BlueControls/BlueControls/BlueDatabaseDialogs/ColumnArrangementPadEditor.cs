@@ -127,7 +127,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         aa.Check(ca.PermissionGroups_Show, true);
         var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, AddType.Text, true);
         if (b == null) { return; }
-        if (_arrangement == 1) { b.Add("#Everybody"); }
+        if (_arrangement == 1) { b.Add(DatabaseAbstract.Everybody); }
         ca.PermissionGroups_Show = new ReadOnlyCollection<string>(b);
     }
 

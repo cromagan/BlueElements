@@ -1361,7 +1361,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         foreach (var thisS in _permissionGroupsChangeCell) {
             if (thisS.Contains("|")) { return "Unerlaubtes Zeichen bei den Gruppen, die eine Zelle bearbeiten dürfen."; }
-            if (thisS.ToUpper() == "#ADMINISTRATOR") { return "'#Administrator' bei den Bearbeitern entfernen."; }
+            if (thisS.ToUpper() == DatabaseAbstract.Administrator.ToUpper()) { return "'#Administrator' bei den Bearbeitern entfernen."; }
         }
         if (_dropdownBearbeitungErlaubt || tmpEditDialog == EditTypeTable.Dropdown_Single) {
             if (_format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
@@ -2493,13 +2493,13 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
 
         if (SqlBackAbstract.IsValidTableName(_linkedDatabaseFile)) {
-            _linkedDatabase = Database.GetOtherTable(_linkedDatabaseFile);
+            _linkedDatabase = Database.GetOtherTable(_linkedDatabaseFile, Database.UserGroup);
         }
 
         if (_linkedDatabase == null) {
             var ci = new ConnectionInfo(_linkedDatabaseFile, null);
 
-            _linkedDatabase = DatabaseAbstract.GetById(ci, null);
+            _linkedDatabase = DatabaseAbstract.GetById(ci, null, Database.UserGroup);
             if (_linkedDatabase != null) {
                 _linkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                 _linkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;

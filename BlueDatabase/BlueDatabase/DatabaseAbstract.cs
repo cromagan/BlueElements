@@ -49,8 +49,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     #region Fields
 
+    public const string Administrator = "#Administrator";
     public const string DatabaseVersion = "4.02";
-
+    public const string Everybody = "#Everybody";
     public static readonly ObservableCollection<DatabaseAbstract> AllFiles = new();
     public static List<Type>? DatabaseTypes;
     private static DateTime _lastTableCheck = new(1900, 1, 1);
@@ -94,12 +95,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     #region Constructors
 
-    protected DatabaseAbstract(string tablename, bool readOnly) {
+    protected DatabaseAbstract(bool readOnly, string userGroup) {
         Develop.StartService();
 
         ReadOnly = readOnly;
-        TableName = SqlBackAbstract.MakeValidTableName(tablename);
-        UserGroup = "#Administrator";
+
+        UserGroup = userGroup;
         Cell = new CellCollection(this);
 
         QuickImage.NeedImage += QuickImage_NeedImage;
@@ -331,7 +332,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    public string TableName { get; }
+    public abstract string TableName { get; }
 
     public ReadOnlyCollection<string> Tags {
         get => new(_tags);
@@ -447,7 +448,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    public static DatabaseAbstract? GetById(ConnectionInfo? ci, NeedPassword? needPassword) {
+    public static DatabaseAbstract? GetById(ConnectionInfo? ci, NeedPassword? needPassword, string userGroup) {
         if (ci is null) { return null; }
 
         #region Schauen, ob die Datenbank bereits geladen ist
@@ -471,7 +472,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         #region Schauen, ob der Provider sie herstellen kann
 
         if (ci.Provider != null) {
-            var db = ci.Provider.GetOtherTable(ci.TableName);
+            var db = ci.Provider.GetOtherTable(ci.TableName, userGroup);
             if (db != null) { return db; }
         }
 
@@ -483,9 +484,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         foreach (var thist in DatabaseTypes) {
             if (thist.Name.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) {
-                var l = new object?[2];
+                var l = new object?[3];
                 l[0] = ci;
                 l[1] = needPassword;
+                l[2] = userGroup;
                 var v = thist.GetMethod("CanProvide")?.Invoke(null, l);
 
                 if (v is DatabaseAbstract db) { return db; }
@@ -498,7 +500,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         if (FileExists(ci.AdditionalData)) {
             if (ci.AdditionalData.FileSuffix().ToLower() == "mdb") {
-                return new Database(ci.AdditionalData, false, false, ci.TableName, needPassword);
+                return new Database(ci.AdditionalData, false, false, needPassword, userGroup);
             }
         }
 
@@ -508,7 +510,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
                 var h = thisSql.HandleMe(ci);
                 if (h != null) {
-                    return new DatabaseSqlLite(h, false, ci.TableName);
+                    return new DatabaseSqlLite(h, false, ci.TableName, userGroup);
                 }
             }
         }
@@ -531,7 +533,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     /// <summary>
     /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
-    public static DatabaseAbstract? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream) {
+    public static DatabaseAbstract? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream, string userGroup) {
         if (Develop.IsHostRunning() && !mustBeStream) {
             var x = -1;
             string? pf;
@@ -585,15 +587,15 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 if (FileExists(pf)) {
                     var ci = new ConnectionInfo(pf, Database.DatabaseId);
 
-                    var tmp = GetById(ci, null);
+                    var tmp = GetById(ci, null, userGroup);
                     if (tmp != null) { return tmp; }
-                    tmp = new Database(pf, false, false, pf.FileNameWithoutSuffix(), null);
+                    tmp = new Database(pf, false, false, null, userGroup);
                     return tmp;
                 }
             } while (pf != string.Empty);
         }
         var d = Generic.GetEmmbedResource(assembly, name);
-        if (d != null) { return new Database(d, name.ToUpper().TrimEnd(".MDB")); }
+        if (d != null) { return new Database(d, name.ToUpper().TrimEnd(".MDB"), userGroup); }
         if (fehlerAusgeben) { Develop.DebugPrint(FehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
         return null;
     }
@@ -1260,7 +1262,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return null;
     }
 
-    public DatabaseAbstract? GetOtherTable(string tablename) {
+    public DatabaseAbstract? GetOtherTable(string tablename, string userGroup) {
         //if (string.IsNullOrEmpty(tablename)) { return null; }
 
         //var newpf = Filename.FilePath() + tablename.FileNameWithoutSuffix() + ".mdb";
@@ -1283,7 +1285,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
 
-        return GetById(x, null);// new DatabaseSQL(_sql, readOnly, tablename);
+        return GetById(x, null, userGroup);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
     public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic) {
@@ -1422,9 +1424,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public bool IsAdministrator() {
-        if (UserGroup.ToUpper() == "#ADMINISTRATOR") { return true; }
+        if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
         if (_datenbankAdmin == null || _datenbankAdmin.Count == 0) { return false; }
-        if (_datenbankAdmin.Contains("#EVERYBODY", false)) { return true; }
+        if (_datenbankAdmin.Contains(Everybody, false)) { return true; }
         if (!string.IsNullOrEmpty(UserName) && _datenbankAdmin.Contains("#User: " + UserName, false)) { return true; }
         return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
     }
@@ -1491,14 +1493,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         //foreach (var thisArrangement in OldFormulaViews) {
         //    e.AddRange(thisArrangement.PermissionGroups_Show);
         //}
-        e.Add("#Everybody");
+        e.Add(DatabaseAbstract.Everybody);
         e.Add("#User: " + UserName);
         if (cellLevel) {
             e.Add("#RowCreator");
         } else {
             e.RemoveString("#RowCreator", false);
         }
-        e.RemoveString("#Administrator", false);
+        e.RemoveString(DatabaseAbstract.Administrator, false);
         if (!IsAdministrator()) { e.Add(UserGroup); }
         return e.SortedDistinctList();
     }
@@ -2001,7 +2003,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
         var tmpName = UserName.ToUpper();
         var tmpGroup = UserGroup.ToUpper();
-        if (allowed.ToUpper() == "#EVERYBODY") {
+        if (allowed.ToUpper() == DatabaseAbstract.Everybody) {
             return true;
         }
 

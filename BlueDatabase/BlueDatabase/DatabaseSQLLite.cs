@@ -52,19 +52,23 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     /// </summary>
     private readonly SqlBackAbstract? _sql;
 
+    private readonly string _tablename = string.Empty;
+
     #endregion
 
     #region Constructors
 
-    public DatabaseSqlLite(ConnectionInfo ci) : this(((DatabaseSqlLite?)ci.Provider)?._sql, false, ci.TableName) { }
+    public DatabaseSqlLite(ConnectionInfo ci, string userGroup) : this(((DatabaseSqlLite?)ci.Provider)?._sql, false, ci.TableName, userGroup) { }
 
-    public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnly, string tablename) : base(tablename, readOnly) {
+    public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnly, string tablename, string userGroup) : base(readOnly, userGroup) {
         if (sql == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL-Verbindung übergeben: " + tablename);
             return;
         }
 
         _sql = sql.OtherTable(tablename);
+
+        _tablename = tablename;
 
         Initialize();
         LoadFromSqlBack();
@@ -87,11 +91,13 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
+    public override string TableName => _tablename;
+
     #endregion
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword, string userGroup) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         var sql = ((DatabaseSqlLite?)ci.Provider)?._sql;
@@ -99,7 +105,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         var at = sql.Tables();
         if (!at.Contains(ci.TableName)) { return null; }
-        return new DatabaseSqlLite(ci);
+        return new DatabaseSqlLite(ci, userGroup);
     }
 
     public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {

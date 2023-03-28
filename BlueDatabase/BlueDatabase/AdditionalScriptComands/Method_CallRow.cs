@@ -76,6 +76,8 @@ public class Method_CallRow : Method {
             return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs.ValueString + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");
         }
         s.Sub--;
+        s.BreakFired = false;
+        s.EndScript = false;
         return DoItFeedback.Null();
     }
 

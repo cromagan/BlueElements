@@ -70,8 +70,6 @@ public static partial class Extensions {
         return sb.ToString();
     }
 
-    // .TrimEnd(JoinChar);
-
     /// <summary>
     /// Gib TRUE zurück, wenn ein Item erfolgreich entfernt wurde.
     /// Gibt False zurück, wenn kein Item entfernt wurde - weil es auf Fehler lief oder gar nicht vorhanden war.
@@ -80,7 +78,10 @@ public static partial class Extensions {
     /// <param name="iC"></param>
     /// <param name="remove"></param>
     /// <returns></returns>
-    public static bool RemoveRange<T>(this ICollection<T> iC, List<T> remove) {
+    public static bool RemoveRange(this List<string> iC, List<string> remove) {
+        //Obacht! nicht für Obersvalbe Collections benutzen.
+        // ist eine Vererbung / Überschreibung von Remove vorhnanden, wird diese hiermit auser kraft gesetzt!
+
         var did = false;
         foreach (var thisItem in remove) {
             if (iC.Remove(thisItem)) { did = true; }

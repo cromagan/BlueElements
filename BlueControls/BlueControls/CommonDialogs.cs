@@ -24,7 +24,7 @@ internal static class CommonDialogs {
 
         if (x == null || x.Count != 1) { return null; }
 
-        return DatabaseAbstract.GetById(new ConnectionInfo(x[0], null), Table.Database_NeedPassword);
+        return DatabaseAbstract.GetById(new ConnectionInfo(x[0], null), Table.Database_NeedPassword, DatabaseAbstract.Administrator);
     }
 
     #endregion

@@ -85,6 +85,7 @@ public class Method_CallByFilename : Method {
         s.Sub--;
 
         if (s.Sub < 0) { return new DoItFeedback(infos.Data, "Subroutinen-Fehler"); }
+        s.BreakFired = false;
 
         return DoItFeedback.Null();
     }
@@ -112,7 +113,11 @@ public class Method_CallByFilename : Method {
 
         f = Script.ReduceText(f);
 
-        return CallSub(s, infos, "Datei-Subroutinen-Aufruf [" + vs.ValueString + "]", f, ((VariableBool)attvar.Attributes[1]).ValueBool, 0, vs.ValueString.FileNameWithSuffix());
+        var v = CallSub(s, infos, "Datei-Subroutinen-Aufruf [" + vs.ValueString + "]", f, ((VariableBool)attvar.Attributes[1]).ValueBool, 0, vs.ValueString.FileNameWithSuffix());
+        s.BreakFired = false;
+        s.EndScript = false;
+        return v;
+
     }
 
     #endregion

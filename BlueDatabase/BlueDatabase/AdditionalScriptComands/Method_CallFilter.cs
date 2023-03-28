@@ -85,11 +85,12 @@ public class Method_CallFilter : Method {
                 }
                 s.Sub--;
             }
+
+            s.BreakFired = false;
+            s.EndScript = false;
         }
 
         if (s.Sub < 0) { return new DoItFeedback(infos.Data, "Subroutinen-Fehler"); }
-
-        s.BreakFired = false;
 
         return DoItFeedback.Null();
     }
