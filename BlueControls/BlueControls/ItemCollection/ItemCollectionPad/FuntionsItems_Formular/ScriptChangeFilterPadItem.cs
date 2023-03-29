@@ -49,6 +49,12 @@ namespace BlueControls.ItemCollection;
 
 public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
 
+    #region Fields
+
+    private int _inputColorId = -1;
+
+    #endregion
+
     #region Constructors
 
     public ScriptChangeFilterPadItem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
@@ -68,7 +74,13 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
     #region Properties
 
     public static string ClassId => "FI-ChangeFilterWithScriptElement";
+
     public ObservableCollection<string> ChildIds { get; } = new();
+
+    /// <summary>
+    /// Laufende Nummer, bestimmt die Einfärbung
+    /// </summary>
+    public int ColorId { get; set; }
 
     public string Datenbank_wählen {
         get => string.Empty;
@@ -80,6 +92,7 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
             if (db == OutputDatabase) { return; }
             OutputDatabase = db;
 
+            this.DoChilds();
             //RepairConnections();
         }
     }
@@ -98,6 +111,7 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
     public int Id { get; set; }
 
     public DatabaseAbstract? InputDatabase => OutputDatabase;
+
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     protected override int SaveOrder => 1;
@@ -157,6 +171,13 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         return "Filterconverter";
     }
 
+    public void SetInputColorId(int inputColorId) {
+        if (_inputColorId == inputColorId) { return; }
+
+        _inputColorId = inputColorId;
+        OnChanged();
+    }
+
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
 
     public override string ToString() {
@@ -169,6 +190,8 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, Id);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", -1);
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", ColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Filterconverter: " + OutputDatabase.Caption;
@@ -183,6 +206,7 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
+        this.DoParentChanged();
         //RepairConnections();
     }
 

@@ -48,6 +48,12 @@ namespace BlueControls.ItemCollection;
 
 public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow {
 
+    #region Fields
+
+    private int _inputColorId = -1;
+
+    #endregion
+
     #region Constructors
 
     public TableSelectRowPadItem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
@@ -67,7 +73,13 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
     #region Properties
 
     public static string ClassId => "FI-SelectRowWithTable";
+
     public ObservableCollection<string> ChildIds { get; } = new();
+
+    /// <summary>
+    /// Laufende Nummer, bestimmt die Einfärbung
+    /// </summary>
+    public int ColorId { get; set; }
 
     public string Datenbank_wählen {
         get => string.Empty;
@@ -79,6 +91,7 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
             if (db == OutputDatabase) { return; }
             OutputDatabase = db;
 
+            this.DoChilds();
             //RepairConnections();
         }
     }
@@ -97,7 +110,9 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
     public int Id { get; set; }
 
     public DatabaseAbstract? InputDatabase => OutputDatabase;
+
     public DatabaseAbstract? OutputDatabase { get; set; }
+
     protected override int SaveOrder => 1;
 
     #endregion
@@ -168,6 +183,13 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
         return "Tabellenansicht einer Datenbank";
     }
 
+    public void SetInputColorId(int inputColorId) {
+        if (_inputColorId == inputColorId) { return; }
+
+        _inputColorId = inputColorId;
+        OnChanged();
+    }
+
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
 
     public override string ToString() {
@@ -180,6 +202,9 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, Id);
+
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _inputColorId);
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Tabellenansicht " + OutputDatabase.Caption;
@@ -195,6 +220,7 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
+        this.DoParentChanged();
         //RepairConnections();
     }
 

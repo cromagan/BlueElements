@@ -1258,6 +1258,8 @@ public static class Skin {
     }
 
     public static Color IDColor(int id) {
+        if (id < 0) { return Color.White; }
+
         switch (id % 10) {
             case 0:
                 return Color.Red;

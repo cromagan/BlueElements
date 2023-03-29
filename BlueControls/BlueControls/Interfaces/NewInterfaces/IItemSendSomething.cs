@@ -28,22 +28,13 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace BlueControls.Interfaces;
 
-/// <summary>
-/// Wird verwendet, einen einzelnen Filter berechnen kann
-/// </summary>
-public interface IItemSendSomething : IDisposableExtended, IItemToControl, IHasKeyName {
+public interface IItemSendSomething : IDisposableExtended, IItemToControl, IHasKeyName, IHasColorId, IChangedFeedback {
 
     #region Properties
 
     public ObservableCollection<string> ChildIds { get; }
-
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int Id { get; set; }
-
     public DatabaseAbstract? OutputDatabase { get; set; }
-
+    public string Page { get; }
     public ItemCollectionPad? Parent { get; }
 
     #endregion
@@ -59,7 +50,29 @@ public static class IItemSendSomethingExtensions {
 
     #region Methods
 
-    public static void RepairConnections(IItemSendSomething item) {
+    public static void DoChilds(this IItemSendSomething item) {
+        item.RemoveAllConnections();
+        //var item1 = item.Parent[item.KeyName];
+        foreach (var thisChild in item.ChildIds) {
+            var item2 = item.Parent[thisChild];
+
+            if (item2 is IItemAcceptSomething ias) {
+                ias.SetInputColorId(item.ColorId);
+            }
+        }
+    }
+
+    public static void DoParentChanged(this IItemSendSomething item) {
+        if (item.Parent != null) {
+            item.ColorId = -1;
+            item.ColorId = item.Parent.GetFreeColorId(item.Page);
+        }
+        DoChilds(item);
+
+        item.OnChanged();
+    }
+
+    public static void RepairConnections(this IItemSendSomething item) {
         item.RemoveAllConnections();
         var item1 = item.Parent[item.KeyName];
         foreach (var thisChild in item.ChildIds) {

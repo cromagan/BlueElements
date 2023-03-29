@@ -279,7 +279,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
     public QuickImage? SymbolForReadableText() {
         if (GetRowFrom == null) { return null; }
 
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.Id));
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.ColorId));
     }
 
     public override string ToString() {
@@ -292,9 +292,10 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.Id; }
+        if (GetRowFrom != null) { id = GetRowFrom.ColorId; }
 
         if (!forPrinting) {
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
             DrawColorScheme(gr, positionModified, zoom, id);
         }
 

@@ -44,7 +44,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollection;
 
-public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposableExtended {
+public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposableExtended, IHasKeyName {
 
     #region Fields
 
@@ -54,33 +54,21 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
     internal string Caption;
 
-    internal string Id;
-
     /// <summary>
     /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter für den Dateinamen
     /// </summary>
     private readonly int _idCount;
 
     private float _gridShow = 10;
-
     private float _gridsnap = 1;
-
     private PointM? _prLo;
-
     private PointM? _prLu;
-
     private PointM? _prRo;
-
     private PointM? _prRu;
-
     private Padding _randinMm = Padding.Empty;
-
     private SizeF _sheetSizeInMm = SizeF.Empty;
-
     private RowItem? _sheetStyle;
-
     private float _sheetStyleScale;
-
     private SnapMode _snapMode = SnapMode.SnapToGrid;
 
     #endregion
@@ -97,7 +85,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         RandinMm = Padding.Empty;
         Caption = string.Empty;
         _idCount++;
-        Id = "#" + DateTime.UtcNow.ToString(Constants.Format_Date) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
+        KeyName = "#" + DateTime.UtcNow.ToString(Constants.Format_Date) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         _sheetStyle = null;
         _sheetStyleScale = 1f;
@@ -122,10 +110,10 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(string toParse, string useThisId) : this() {
+    public ItemCollectionPad(string toParse, string useThisKeyName) : this() {
         if (string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }
         if (toParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
-        Id = useThisId;
+        KeyName = useThisKeyName;
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key.ToLower()) {
                 case "sheetsize":
@@ -155,9 +143,9 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
                 //case "scriptname":
                 //    _scriptName = pair.Value;
                 //    break;
-
+                case "keyname":
                 case "id":
-                    if (string.IsNullOrEmpty(Id)) { Id = pair.Value.FromNonCritical(); }
+                    if (string.IsNullOrEmpty(KeyName)) { KeyName = pair.Value.FromNonCritical(); }
                     break;
 
                 case "style":
@@ -254,7 +242,6 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     #region Properties
 
     public Color BackColor { get; set; } = Color.White;
-
     public ObservableCollection<ItemConnection> Connections { get; } = new();
 
     [DefaultValue(10.0)]
@@ -281,6 +268,8 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
     [DefaultValue(true)]
     public bool IsSaved { get; set; }
+
+    public string KeyName { get; set; }
 
     public Padding RandinMm {
         get => _randinMm;
@@ -664,7 +653,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
     public new string ToString() {
         List<string> result = new();
-        result.ParseableAdd("ID", Id);
+        result.ParseableAdd("ID", KeyName);
         result.ParseableAdd("Caption", Caption);
         result.ParseableAdd("Style", SheetStyle?.CellFirstString());
 
@@ -703,6 +692,21 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     internal Rectangle DruckbereichRect() =>
                 _prLo == null || _prRu == null ? Rectangle.Empty :
                                                  new Rectangle((int)_prLo.X, (int)_prLo.Y, (int)(_prRu.X - _prLo.X), (int)(_prRu.Y - _prLo.Y));
+
+    internal int GetFreeColorId(string page) {
+        var usedids = new List<int>();
+
+        foreach (var thisIt in this) {
+            if (thisIt != null && thisIt is IHasColorId hci && thisIt.IsVisibleOnPage(page))
+
+                usedids.Add(hci.ColorId);
+        }
+
+        for (var c = 0; c < 9999; c++) {
+            if (!usedids.Contains(c)) { return c; }
+        }
+        return -1;
+    }
 
     internal void InDenHintergrund(BasicPadItem thisItem) {
         if (IndexOf(thisItem) == 0) { return; }

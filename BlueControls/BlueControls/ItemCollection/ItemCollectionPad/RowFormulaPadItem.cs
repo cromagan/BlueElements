@@ -58,7 +58,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         _rowKey = rowkey;
         if (Database != null && string.IsNullOrEmpty(layoutId)) {
             ItemCollectionPad p = new(Database.Layouts[0], string.Empty);
-            layoutId = p.Id;
+            layoutId = p.KeyName;
         }
         _layoutId = layoutId;
     }
@@ -126,7 +126,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         ItemCollectionList.ItemCollectionList layouts = new(true);
         foreach (var thisLayouts in Row.Database.Layouts) {
             ItemCollectionPad p = new(thisLayouts, string.Empty);
-            _ = layouts.Add(p.Caption, p.Id, ImageCode.Stern);
+            _ = layouts.Add(p.Caption, p.KeyName, ImageCode.Stern);
         }
         l.Add(new FlexiControlForProperty<string>(() => Layout_Id, layouts));
         l.AddRange(base.GetStyleOptions());

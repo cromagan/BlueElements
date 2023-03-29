@@ -95,7 +95,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (database != null && !database.IsDisposed) {
             foreach (var t in database.Layouts) {
                 ItemCollectionPad p = new(t, string.Empty);
-                _ = addHere.Add(p.Caption, p.Id, ImageCode.Stern);
+                _ = addHere.Add(p.Caption, p.KeyName, ImageCode.Stern);
             }
         }
         if (!addDiskLayouts) { return; }

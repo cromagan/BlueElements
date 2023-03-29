@@ -66,6 +66,11 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IIte
         }
     }
 
+    /// <summary>
+    /// Laufende Nummer, bestimmt die Einfärbung
+    /// </summary>
+    public int ColorId { get; set; }
+
     public string Überschrift {
         get => _überschrift;
         set {
@@ -157,7 +162,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IIte
     public QuickImage? SymbolForReadableText() {
         if (GetRowFrom == null) { return null; }
 
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.Id));
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.ColorId));
     }
 
     public override string ToString() {
@@ -171,10 +176,11 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IIte
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.Id; }
+        if (GetRowFrom != null) { id = GetRowFrom.ColorId; }
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
         }
 
         if (GetRowFrom == null) {

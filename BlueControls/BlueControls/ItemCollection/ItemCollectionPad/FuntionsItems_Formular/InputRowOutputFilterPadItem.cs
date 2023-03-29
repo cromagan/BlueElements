@@ -53,8 +53,11 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     private string _anzeige = string.Empty;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
     private string? _getValueFromkey;
+    private int _inputColorId = -1;
     private IItemSendRow? _tmpgetValueFrom;
+
     private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+
     private string _überschrift = string.Empty;
 
     #endregion
@@ -68,7 +71,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     public InputRowOutputFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
         OutputDatabase = db;
 
-        Id = id;
+        ColorId = id;
     }
 
     public InputRowOutputFilterPadItem(string intern) : this(intern, null, 0) { }
@@ -100,6 +103,11 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     public ObservableCollection<string> ChildIds { get; } = new();
 
+    /// <summary>
+    /// Laufende Nummer, bestimmt die Einfärbung
+    /// </summary>
+    public int ColorId { get; set; }
+
     public string Datenbank_wählen {
         get => string.Empty;
         set {
@@ -109,6 +117,8 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
             if (db == OutputDatabase) { return; }
             OutputDatabase = db;
+
+            this.DoChilds();
 
             //RepairConnections();
         }
@@ -159,18 +169,14 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
             if (kn == _getValueFromkey) { return; }
             _getValueFromkey = kn;
             _tmpgetValueFrom = null;
-            RepairConnections(value);
+            //RepairConnections(value);
             RaiseVersion();
             OnChanged();
         }
     }
 
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int Id { get; set; }
-
     public DatabaseAbstract? InputDatabase => OutputDatabase;
+
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     public string Überschrift {
@@ -234,7 +240,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
                 return true;
 
             case "id":
-                Id = IntParse(value);
+                ColorId = IntParse(value);
                 return true;
 
             case "edittype":
@@ -264,7 +270,14 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
         return "Zeile einer Datenbank";
     }
 
-    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
+    public void SetInputColorId(int inputColorId) {
+        if (_inputColorId == inputColorId) { return; }
+
+        _inputColorId = inputColorId;
+        OnChanged();
+    }
+
+    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(ColorId));
 
     public override string ToString() {
         var result = new List<string>();
@@ -272,7 +285,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
         result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _überschiftanordung);
-        result.ParseableAdd("ID", Id);
+        result.ParseableAdd("ID", ColorId);
         result.ParseableAdd("OutputDatabase", OutputDatabase);
         result.ParseableAdd("FilterDB", FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, null as List<ColumnItem>, null));
         return result.Parseable(base.ToString());
@@ -280,7 +293,9 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, Id);
+            DrawColorScheme(gr, positionModified, zoom, ColorId);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Filter", ColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "eine Zeile aus " + OutputDatabase.Caption;
@@ -298,6 +313,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
+        this.DoParentChanged();
         //RepairConnections();
     }
 

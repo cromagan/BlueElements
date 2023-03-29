@@ -130,8 +130,8 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
 
     private void btnCopyID_Click(object sender, System.EventArgs e) {
         SaveCurrentLayout();
-        if (Pad.Item?.Id != null) {
-            _ = Generic.CopytoClipboard(Pad.Item.Id);
+        if (Pad.Item?.KeyName != null) {
+            _ = Generic.CopytoClipboard(Pad.Item.KeyName);
             Notification.Show("ID kopiert.", ImageCode.Clipboard);
         }
     }
@@ -151,13 +151,13 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         Database.Layouts = lay;
 
         BefülleLayoutDropdown();
-        LoadLayout(c.Id);
+        LoadLayout(c.KeyName);
         CheckButtons();
     }
 
     private void btnLayoutLöschen_Click(object sender, System.EventArgs e) {
         SaveCurrentLayout();
-        var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);
+        var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.KeyName);
         if (ind < 0) {
             MessageBox.Show("Layout kann nur manuell gelöscht werden.");
             return;
@@ -177,7 +177,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
 
     private void btnLayoutUmbenennen_Click(object sender, System.EventArgs e) {
         SaveCurrentLayout();
-        var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);
+        var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.KeyName);
         if (ind < 0) {
             MessageBox.Show("Layout kann nur manuell umbenannt werden.");
             return;
@@ -247,7 +247,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         //scriptEditor.WriteScriptBack();
         if (Database == null || Database.IsDisposed) { return; }
         var newl = Pad.Item.ToString();
-        var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.Id);
+        var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.KeyName);
         if (ind > -1) {
             if (Database.Layouts[ind] == newl) { return; }
 
@@ -258,8 +258,8 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             if (!newl.StartsWith("{ID=#")) { Develop.DebugPrint("ID nicht gefunden: " + newl); }
             var ko = newl.IndexOf(", ", StringComparison.Ordinal);
             var id = newl.Substring(4, ko - 4);
-        } else if (Pad.Item.Id.FileSuffix().ToUpper() == "BCR") {
-            WriteAllText(Pad.Item.Id, newl, Encoding.UTF8, false);
+        } else if (Pad.Item.KeyName.FileSuffix().ToUpper() == "BCR") {
+            WriteAllText(Pad.Item.KeyName, newl, Encoding.UTF8, false);
         }
     }
 

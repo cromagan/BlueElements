@@ -85,7 +85,7 @@ public class Method_CallByFilename : Method {
         s.Sub--;
 
         if (s.Sub < 0) { return new DoItFeedback(infos.Data, "Subroutinen-Fehler"); }
-        s.BreakFired = false;
+        //s.BreakFired = false;
 
         return DoItFeedback.Null();
     }

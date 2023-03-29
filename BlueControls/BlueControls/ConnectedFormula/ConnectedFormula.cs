@@ -197,12 +197,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         }
     }
 
-    public int NextId() {
-        _id++;
-        _saved = false;
-        return _id;
-    }
-
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void OnNotAllowedChildsChanged() => NotAllowedChildsChanged?.Invoke(this, System.EventArgs.Empty);
@@ -246,7 +240,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             }
 
             if (found != null) {
-                found.SetCoordinates(new RectangleF(0, -20, PadData.SheetSizeInPix.Width, 20), true);
+                found.SetCoordinates(new RectangleF(PadData.SheetSizeInPix.Width / 2 - 150, -30, 300, 30), true);
                 found.Page = thisP;
                 found.Bei_Export_sichtbar = false;
             }

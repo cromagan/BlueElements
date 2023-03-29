@@ -38,6 +38,7 @@ using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueControls.Interfaces.IItemSendSomethingExtensions;
+using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection;
 
@@ -51,24 +52,29 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
     #region Constructors
 
-    public RowEntryPadItem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
+    public RowEntryPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => Parse(toParse);
 
-    public RowEntryPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
+    public RowEntryPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
-    public RowEntryPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
+    public RowEntryPadItem(string intern, DatabaseAbstract? db) : base(intern) {
         OutputDatabase = db;
-
-        Id = id;
+        ColorId = -1;
     }
 
-    public RowEntryPadItem(string intern) : this(intern, null, 0) { }
+    public RowEntryPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
 
     #endregion
 
     #region Properties
 
     public static string ClassId => "FI-RowEntryElement";
+
     public ObservableCollection<string> ChildIds { get; } = new();
+
+    /// <summary>
+    /// Laufende Nummer, bestimmt die Einfärbung
+    /// </summary>
+    public int ColorId { get; set; }
 
     public string Datenbank_wählen {
         get => string.Empty;
@@ -80,6 +86,7 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
             if (db == OutputDatabase) { return; }
             OutputDatabase = db;
 
+            this.DoChilds();
             //RepairConnections();
         }
     }
@@ -92,11 +99,6 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         }
     }
 
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int Id { get; set; }
-
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     protected override int SaveOrder => 1;
@@ -104,6 +106,57 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
     #endregion
 
     #region Methods
+
+    public static void DrawInputArrow(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, string symbol, int colorId) {
+        var p = positionModified.PointOf(Alignment.Top_HorizontalCenter);
+        var s = (int)(zoom * 15);
+        var s2 = (int)(zoom * 25);
+        var pa = Poly_Arrow(new Rectangle(0, 0, s, s2));
+
+        gr.TranslateTransform(p.X + s2 / 2, p.Y - s * 0.6f);
+
+        gr.RotateTransform(90);
+
+        var c = Skin.IDColor(colorId);
+        var c2 = c.Darken(0.8);
+
+        gr.FillPath(new SolidBrush(c), pa);
+        gr.DrawPath(new Pen(c2, 2 * zoom), pa);
+
+        gr.RotateTransform(-90);
+        gr.TranslateTransform(-p.X - s2 / 2, -p.Y + s * 0.6f);
+
+        if (!string.IsNullOrEmpty(symbol)) {
+            var sy = QuickImage.Get(symbol, (int)(7 * zoom));
+            gr.DrawImage(sy, p.X - sy.Width / 2, p.Y - s * 0.3f);
+        }
+    }
+
+    public static void DrawOutputArrow(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, string symbol, int colorId) {
+        var p = positionModified.PointOf(Alignment.Bottom_HorizontalCenter);
+        var s = (int)(zoom * 15);
+        var s2 = (int)(zoom * 25);
+        var pa = Poly_Arrow(new Rectangle(0, 0, s, s2));
+
+        gr.TranslateTransform(p.X + s2 / 2, p.Y - s * 0.3f);
+
+        gr.RotateTransform(90);
+
+        var c = Skin.IDColor(colorId);
+        var c2 = c.Darken(0.8);
+
+        gr.FillPath(new SolidBrush(c), pa);
+        gr.DrawPath(new Pen(c2, 2 * zoom), pa);
+
+        gr.RotateTransform(-90);
+
+        gr.TranslateTransform(-p.X - s2 / 2, -p.Y + s * 0.3f);
+
+        if (!string.IsNullOrEmpty(symbol)) {
+            var sy = QuickImage.Get(symbol, (int)(7 * zoom));
+            gr.DrawImage(sy, p.X - sy.Width / 2, p.Y + s * 0.05f);
+        }
+    }
 
     public new Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
@@ -141,8 +194,8 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
                 OutputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
                 return true;
 
-            case "id":
-                Id = IntParse(value);
+            case "id": // TODO: 29.03.2023
+                //Id = IntParse(value);
                 return true;
         }
         return false;
@@ -156,33 +209,35 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         return "Eingangs-Zeile einer Datenbank";
     }
 
-    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
+    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(ColorId));
 
     public override string ToString() {
         var result = new List<string>();
-        result.ParseableAdd("ID", Id);
+        //result.ParseableAdd("ID", Id);
         result.ParseableAdd("OutputDatabase", OutputDatabase);
         return result.Parseable(base.ToString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, Id);
+            DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
+            DrawColorScheme(gr, positionModified, zoom, ColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-                var txt = "eine Zeile aus " + OutputDatabase.Caption;
-
-                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
+                Skin.Draw_FormatedText(gr, "Eingangszeile: " + OutputDatabase.Caption, QuickImage.Get(ImageCode.Datenbank, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             } else {
-                Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
+                Skin.Draw_FormatedText(gr, "Eingangszeile: Bezug fehlt", QuickImage.Get(ImageCode.Datenbank, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+
+        DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
     }
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
+        this.DoParentChanged();
         //RepairConnections();
     }
 

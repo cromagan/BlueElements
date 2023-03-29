@@ -220,7 +220,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (db == null) { return; }
 
         it.OutputDatabase = db;
-        it.Id = CFormula.NextId();
+        //it.Id = CFormula.NextId();
     }
 
     private void FormulaSet(string? filename, ReadOnlyCollection<string>? notAllowedchilds) {

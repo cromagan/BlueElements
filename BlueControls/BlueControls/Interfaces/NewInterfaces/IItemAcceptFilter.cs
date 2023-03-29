@@ -26,11 +26,5 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das Steuerelement einen Filter empfangen kann
 /// </summary>
-public interface IItemAcceptFilter : IDisposableExtended {
-
-    #region Properties
-
-    public DatabaseAbstract? InputDatabase { get; }
-
-    #endregion
+public interface IItemAcceptFilter : IDisposableExtended, IItemAcceptSomething {
 }

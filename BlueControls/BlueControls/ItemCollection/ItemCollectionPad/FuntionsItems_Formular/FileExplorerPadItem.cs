@@ -146,10 +146,11 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemAcceptRow {
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.Id; }
+        if (GetRowFrom != null) { id = GetRowFrom.ColorId; }
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _inputColorId);
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\");

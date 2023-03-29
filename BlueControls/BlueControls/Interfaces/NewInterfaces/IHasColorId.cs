@@ -20,17 +20,15 @@
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System.Collections.ObjectModel;
 
 namespace BlueControls.Interfaces;
 
-/// <summary>
-/// Wird verwendet, wenn das Steuerelement einen Zeilen empfangen kann
-/// </summary>
-public interface IItemAcceptRow : IDisposableExtended, IItemToControl, IItemAcceptSomething {
+public interface IHasColorId {
 
     #region Properties
 
-    public IItemSendRow? GetRowFrom { get; set; }
+    int ColorId { get; set; }
 
     #endregion
 }

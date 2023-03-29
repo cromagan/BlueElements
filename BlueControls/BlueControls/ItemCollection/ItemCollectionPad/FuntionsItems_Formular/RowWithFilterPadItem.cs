@@ -102,6 +102,11 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     public ObservableCollection<string> ChildIds { get; } = new();
 
+    /// <summary>
+    /// Laufende Nummer, bestimmt die Einfärbung
+    /// </summary>
+    public int ColorId { get; set; }
+
     public string Datenbank_wählen {
         get => string.Empty;
         set {
@@ -313,6 +318,9 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, Id);
 
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", -1);
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
+
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "eine Zeile aus " + OutputDatabase.Caption;
 
@@ -329,11 +337,13 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
+        this.DoParentChanged();
         //RepairConnections();
     }
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         //RepairConnections();
+        this.DoChilds();
         OnChanged();
     }
 
@@ -509,11 +519,13 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
 
     private void Row_RowAdded(object sender, RowEventArgs e) {
         //RepairConnections();
+        this.DoChilds();
         OnChanged();
     }
 
     private void Row_RowRemoved(object sender, System.EventArgs e) {
         //RepairConnections();
+        this.DoChilds();
         OnChanged();
     }
 

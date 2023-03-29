@@ -24,13 +24,19 @@ using BlueDatabase.Interfaces;
 namespace BlueControls.Interfaces;
 
 /// <summary>
-/// Wird verwendet, wenn das Steuerelement einen Zeilen empfangen kann
+/// Wird verwendet, wenn das Steuerelement etwas empfangen kann
 /// </summary>
-public interface IItemAcceptRow : IDisposableExtended, IItemToControl, IItemAcceptSomething {
+public interface IItemAcceptSomething : IDisposableExtended, IItemToControl {
 
     #region Properties
 
-    public IItemSendRow? GetRowFrom { get; set; }
+    public DatabaseAbstract? InputDatabase { get; }
+
+    #endregion
+
+    #region Methods
+
+    public void SetInputColorId(int inputColorId);
 
     #endregion
 }

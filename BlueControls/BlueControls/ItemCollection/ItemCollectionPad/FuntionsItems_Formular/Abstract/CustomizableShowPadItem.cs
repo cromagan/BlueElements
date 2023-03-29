@@ -47,6 +47,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public static BlueFont? CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
     public List<string> VisibleFor = new();
+    protected int _inputColorId = -1;
     private string? _getValueFromkey;
     private IItemSendRow? _tmpgetValueFrom;
 
@@ -140,7 +141,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             if (kn == _getValueFromkey) { return; }
             _getValueFromkey = kn;
             _tmpgetValueFrom = null;
-            RepairConnections(value);
+            //RepairConnections(value);
             RaiseVersion();
             OnChanged();
         }
@@ -276,6 +277,13 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
                 return true;
         }
         return false;
+    }
+
+    public void SetInputColorId(int inputColorId) {
+        if (_inputColorId == inputColorId) { return; }
+
+        _inputColorId = inputColorId;
+        OnChanged();
     }
 
     public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition, int breiteInspalten) {

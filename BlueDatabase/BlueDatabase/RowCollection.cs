@@ -174,17 +174,17 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
 
     public List<RowItem> CalculateFilteredRows(ICollection<FilterItem>? filter) {
-        List<RowItem> tmpVisibleRows = new();
-        if (Database == null || Database.IsDisposed) { return tmpVisibleRows; }
+        if (Database == null || Database.IsDisposed) { return new List<RowItem>(); }
 
         Database.RefreshColumnsData(filter);
 
+        ConcurrentBag<RowItem> tmpVisibleRows = new();
+
         try {
-            var lockMe = new object();
             _ = Parallel.ForEach(Database.Row, thisRowItem => {
                 if (thisRowItem != null) {
                     if (thisRowItem.MatchesTo(filter)) {
-                        lock (lockMe) { tmpVisibleRows.Add(thisRowItem); }
+                        tmpVisibleRows.Add(thisRowItem);
                     }
                 }
             });
@@ -192,7 +192,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return CalculateFilteredRows(filter);
         }
 
-        return tmpVisibleRows;
+        var l = new List<RowItem>();
+        l.AddRange(tmpVisibleRows);
+        return l;
     }
 
     public List<RowData> CalculateSortedRows(ICollection<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);

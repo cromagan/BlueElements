@@ -2003,17 +2003,17 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
         var tmpName = UserName.ToUpper();
         var tmpGroup = UserGroup.ToUpper();
-        if (allowed.ToUpper() == DatabaseAbstract.Everybody) {
+        if (string.Equals(allowed, Everybody, StringComparison.OrdinalIgnoreCase)) {
             return true;
         }
 
-        if (allowed.ToUpper() == "#ROWCREATOR") {
+        if (string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
             if (row != null && Cell.GetString(Column.SysRowCreator, row).ToUpper() == tmpName) { return true; }
-        } else if (allowed.ToUpper() == "#USER: " + tmpName) {
+        } else if (string.Equals(allowed, "#USER: " + tmpName, StringComparison.OrdinalIgnoreCase)) {
             return true;
-        } else if (allowed.ToUpper() == "#USER:" + tmpName) {
+        } else if (string.Equals(allowed, "#USER:" + tmpName, StringComparison.OrdinalIgnoreCase)) {
             return true;
-        } else if (allowed.ToUpper() == tmpGroup) {
+        } else if (string.Equals(allowed, tmpGroup, StringComparison.OrdinalIgnoreCase)) {
             return true;
         }
         return false;

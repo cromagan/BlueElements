@@ -45,7 +45,7 @@ namespace BlueControls.ItemCollection;
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
 /// </summary>
 
-public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadableText, IItemToControl, IItemAcceptFilter {
+public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
 
     #region Fields
 
@@ -63,7 +63,7 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
     public InputFilterOutputFilterPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
 
     public InputFilterOutputFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
-        Database = db;
+        OutputDatabase = db;
 
         Id = id;
     }
@@ -96,7 +96,11 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
     }
 
     public ObservableCollection<string> ChildIds { get; } = new();
-    public DatabaseAbstract? Database { get; set; }
+
+    /// <summary>
+    /// Laufende Nummer, bestimmt die Einfärbung
+    /// </summary>
+    public int ColorId { get; set; }
 
     public string Datenbank_wählen {
         get => string.Empty;
@@ -105,9 +109,10 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
 
             if (db == null) { return; }
 
-            if (db == Database) { return; }
-            Database = db;
+            if (db == OutputDatabase) { return; }
+            OutputDatabase = db;
 
+            this.DoChilds();
             //RepairConnections();
         }
     }
@@ -115,8 +120,8 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
     public string Datenbankkopf {
         get => string.Empty;
         set {
-            if (Database == null || Database.IsDisposed) { return; }
-            TableView.OpenDatabaseHeadEditor(Database);
+            if (OutputDatabase == null || OutputDatabase.IsDisposed) { return; }
+            TableView.OpenDatabaseHeadEditor(OutputDatabase);
         }
     }
 
@@ -125,7 +130,7 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
     /// </summary>
     public int Id { get; set; }
 
-    public DatabaseAbstract? OutputDatabase => Database;
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     public string Überschrift {
         get => _überschrift;
@@ -158,7 +163,7 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
             new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
             new FlexiControl()
         };
-        if (Database == null || Database.IsDisposed) { return l; }
+        if (OutputDatabase == null || OutputDatabase.IsDisposed) { return l; }
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));
 
@@ -183,7 +188,7 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
                     na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
-                Database = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
+                OutputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
                 return true;
 
             case "id":
@@ -210,8 +215,8 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
     }
 
     public string ReadableText() {
-        if (Database != null && !Database.IsDisposed) {
-            return "eine Zeile aus: " + Database.Caption;
+        if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
+            return "eine Zeile aus: " + OutputDatabase.Caption;
         }
 
         return "Zeile einer Datenbank";
@@ -226,16 +231,18 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _überschiftanordung);
         result.ParseableAdd("ID", Id);
-        result.ParseableAdd("Database", Database);
+        result.ParseableAdd("Database", OutputDatabase);
         return result.Parseable(base.ToString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, Id);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", _inputColorId);
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", ColorId);
 
-            if (Database != null && !Database.IsDisposed) {
-                var txt = "eine Zeile aus " + Database.Caption;
+            if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
+                var txt = "eine Zeile aus " + OutputDatabase.Caption;
 
                 Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             } else {
@@ -250,6 +257,7 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
+        this.DoParentChanged();
         //RepairConnections();
     }
 
