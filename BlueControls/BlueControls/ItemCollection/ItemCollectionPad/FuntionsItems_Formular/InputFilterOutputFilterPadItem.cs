@@ -37,7 +37,6 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
-using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -50,9 +49,15 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     #region Fields
 
     private string _anzeige = string.Empty;
+
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-    private List<IItemSendFilter> _getFilterFrom = new() { };
+
+    private ItemAcceptFilter _iaf;
+
+    private ItemSendFilter _isf;
+
     private string _überschrift = string.Empty;
+
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -96,6 +101,11 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         }
     }
 
+    public ReadOnlyCollection<string>? ChildIds {
+        get => _isf.ChildIdsGet();
+        set => _isf.ChildIdsSet(value, this);
+    }
+
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
     /// </summary>
@@ -103,36 +113,23 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     public string Datenbank_wählen {
         get => string.Empty;
-        set {
-            var db = CommonDialogs.ChooseKnownDatabase();
-
-            if (db == null) { return; }
-
-            if (db == OutputDatabase) { return; }
-            OutputDatabase = db;
-
-            this.DoChilds();
-            //RepairConnections();
-        }
+        set => _isf.Datenbank_wählen(this);
     }
 
     public string Datenbankkopf {
         get => string.Empty;
-        set {
-            if (OutputDatabase == null || OutputDatabase.IsDisposed) { return; }
-            TableView.OpenDatabaseHeadEditor(OutputDatabase);
-        }
+        set => _isf.Datenbankkopf();
     }
 
     [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
     public string Datenquelle_hinzufügen {
         get => string.Empty;
-        set => FakeControlPadItem.Datenquelle_hinzufügen_Filter(this);
+        set => _iaf.Datenquelle_hinzufügen(this);
     }
 
     public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
-        get => new(_getFilterFrom);
-        set => this.ChangeFilterTo(_getFilterFrom, value);
+        get => _iaf.GetFilterFromGet();
+        set => _iaf.GetFilterFromSet(value, this);
     }
 
     /// <summary>
@@ -140,7 +137,15 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     /// </summary>
     public int Id { get; set; }
 
-    public DatabaseAbstract? OutputDatabase { get; set; }
+    public override int InputColorId {
+        get => _iaf.InputColorIdGet();
+        set => _iaf.InputColorIdSet(value, this);
+    }
+
+    public DatabaseAbstract? OutputDatabase {
+        get => _isf.OutputDatabaseGet();
+        set => _isf.OutputDatabaseSet(value, this);
+    }
 
     public string Überschrift {
         get => _überschrift;
@@ -157,7 +162,9 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     #region Methods
 
-    public new Control CreateControl(ConnectedFormulaView parent) {
+    public void AddChild(IHasKeyName add) => _isf.AddChild(add, this);
+
+    public override Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
         //    EditType = _bearbeitung,
         //    CaptionPosition = CaptionPosition,
@@ -232,6 +239,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         return "Zeile einer Datenbank";
     }
 
+    public void RemoveChild(IHasKeyName remove) => _isf.RemoveChild(remove, this);
+
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
 
     public override string ToString() {
@@ -248,7 +257,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, Id);
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", _inputColorId);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", InputColorId);
             RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", ColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
@@ -267,7 +276,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        this.DoParentChanged();
+        _isf.DoParentChanged(this);
         //RepairConnections();
     }
 

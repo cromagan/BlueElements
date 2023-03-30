@@ -28,7 +28,7 @@ public interface IHasColorId {
 
     #region Properties
 
-    int ColorId { get; set; }
+    int InputColorId { get; set; }
 
     #endregion
 }

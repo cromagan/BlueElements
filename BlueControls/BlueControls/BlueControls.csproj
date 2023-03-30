@@ -330,9 +330,6 @@
     </Compile>
     <Compile Include="ItemCollection\ItemCollectionList\ReadableListItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\Abstract\AcceptSomethingPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\Abstract\FakeControlAcceptFilterPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\Abstract\FakeControlAcceptRowPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\AddRowPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\RowEntryPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\TableSelectRowPadItem.cs" />

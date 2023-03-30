@@ -29,3 +29,5 @@ namespace BlueControls.Interfaces;
 /// </summary>
 public interface IItemSendRow : IItemSendSomething {
 }
+
+public class ItemSendRow : ItemSendSomething { }

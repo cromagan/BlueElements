@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -40,11 +41,13 @@ namespace BlueControls.ItemCollection;
 /// <summary>
 /// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
 /// </summary>
-public class TabFormulaPadItem : FakeControlAcceptRowPadItem, IHasConnectedFormula, IItemAcceptRow {
+public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptRow {
 
     #region Fields
 
     private readonly List<string> _childs = new();
+
+    private ItemAcceptRow _iar;
 
     #endregion
 
@@ -71,6 +74,22 @@ public class TabFormulaPadItem : FakeControlAcceptRowPadItem, IHasConnectedFormu
     /// Wird benötigt bei ToString - um die eigenen Ansichten wieder zu finden.
     /// </summary>
     public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
+
+    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_wählen {
+        get => string.Empty;
+        set => _iar.Datenquelle_wählen(this);
+    }
+
+    public IItemSendRow? GetRowFrom {
+        get => _iar.GetRowFromGet(this);
+        set => _iar.GetRowFromSet(value, this);
+    }
+
+    public override int InputColorId {
+        get => _iar.InputColorIdGet();
+        set => _iar.InputColorIdSet(value, this);
+    }
 
     protected override int SaveOrder => 1000;
 
@@ -231,13 +250,11 @@ public class TabFormulaPadItem : FakeControlAcceptRowPadItem, IHasConnectedFormu
         //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
         Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
 
-     
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         if (!forPrinting) {
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _inputColorId);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
         }
-
     }
 
     //protected override BasicPadItem? TryCreate(string id, string name) {

@@ -38,8 +38,6 @@ using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 
-using static BlueControls.Interfaces.IItemSendSomethingExtensions;
-
 namespace BlueControls.ItemCollection;
 
 /// <summary>
@@ -47,13 +45,13 @@ namespace BlueControls.ItemCollection;
 /// Per Tabellenansicht
 /// </summary>
 
-public class AddRowPaditem : FakeControlAcceptFilterPadItem, IReadableText, IItemToControl, IItemAcceptFilter {
+public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter {
 
     #region Fields
 
     private string _anzeige = string.Empty;
 
-    private List<IItemSendFilter> _getFilterFrom = new() { };
+    private ItemAcceptFilter _iaf;
 
     #endregion
 
@@ -79,13 +77,29 @@ public class AddRowPaditem : FakeControlAcceptFilterPadItem, IReadableText, IIte
         }
     }
 
+    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_hinzufügen {
+        get => string.Empty;
+        set => _iaf.Datenquelle_hinzufügen(this);
+    }
+
+    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
+        get => _iaf.GetFilterFromGet();
+        set => _iaf.GetFilterFromSet(value, this);
+    }
+
+    public override int InputColorId {
+        get => _iaf.InputColorIdGet();
+        set => _iaf.InputColorIdSet(value, this);
+    }
+
     protected override int SaveOrder => 1;
 
     #endregion
 
     #region Methods
 
-    public new Control CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
         //    EditType = _bearbeitung,
         //    CaptionPosition = CaptionPosition,
@@ -113,7 +127,7 @@ public class AddRowPaditem : FakeControlAcceptFilterPadItem, IReadableText, IIte
     }
 
     public string ReadableText() {
-        var db = this.InputDatabase();
+        var db = _iaf.InputDatabase();
 
         if (db != null && !db.IsDisposed) {
             return "Neue Zeile anlegen in: " + db.Caption;
@@ -132,7 +146,7 @@ public class AddRowPaditem : FakeControlAcceptFilterPadItem, IReadableText, IIte
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            var db = this.InputDatabase();
+            var db = _iaf.InputDatabase();
 
             DrawColorScheme(gr, positionModified, zoom, -1);
 

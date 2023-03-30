@@ -35,13 +35,18 @@ namespace BlueControls.ItemCollection;
 /// Erzeut ein Flexi-Controll, dass nur einen Wert anzeigen kann. z.B. eine Variable
 /// </summary>
 
-public class VariableFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, IItemAcceptRow {
+public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcceptRow {
 
     #region Fields
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
+
+    private ItemAcceptRow _iar;
+
     private string _überschrift = string.Empty;
+
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+
     private string _variable = string.Empty;
 
     #endregion
@@ -70,6 +75,22 @@ public class VariableFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, 
     /// Laufende Nummer, bestimmt die Einfärbung
     /// </summary>
     public int ColorId { get; set; }
+
+    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_wählen {
+        get => string.Empty;
+        set => _iar.Datenquelle_wählen(this);
+    }
+
+    public IItemSendRow? GetRowFrom {
+        get => _iar.GetRowFromGet(this);
+        set => _iar.GetRowFromSet(value, this);
+    }
+
+    public override int InputColorId {
+        get => _iar.InputColorIdGet();
+        set => _iar.InputColorIdSet(value, this);
+    }
 
     public string Überschrift {
         get => _überschrift;
@@ -162,7 +183,7 @@ public class VariableFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, 
     public QuickImage? SymbolForReadableText() {
         if (GetRowFrom == null) { return null; }
 
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.ColorId));
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.InputColorId));
     }
 
     public override string ToString() {
@@ -176,7 +197,7 @@ public class VariableFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, 
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.ColorId; }
+        if (GetRowFrom != null) { id = GetRowFrom.InputColorId; }
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);

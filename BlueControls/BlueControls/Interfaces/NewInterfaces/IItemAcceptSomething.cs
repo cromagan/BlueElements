@@ -27,18 +27,35 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das Steuerelement etwas empfangen kann
 /// </summary>
-public interface IItemAcceptSomething : IDisposableExtended, IItemToControl, IChangedFeedback, IHasVersion {
+public interface IItemAcceptSomething : IHasColorId, IHasKeyName, IChangedFeedback, IHasVersion {
 
     #region Properties
 
+    public int InputColorId { get; set; }
     public string Page { get; }
     public ItemCollectionPad? Parent { get; }
+
+    #endregion
+}
+
+public class ItemAcceptSomething {
+
+    #region Fields
+
+    private int _inputColorId = -1;
 
     #endregion
 
     #region Methods
 
-    public void SetInputColorId(int inputColorId);
+    public int InputColorIdGet() => _inputColorId;
+
+    public void InputColorIdSet(int value, IItemAcceptSomething item) {
+        if (_inputColorId == value) { return; }
+
+        _inputColorId = value;
+        item.OnChanged();
+    }
 
     #endregion
 }

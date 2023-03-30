@@ -20,6 +20,7 @@
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
@@ -31,7 +32,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace BlueControls.Interfaces;
 
-public interface IItemSendSomething : IDisposableExtended, IItemToControl, IHasKeyName, IHasColorId, IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion {
+public interface IItemSendSomething : IHasColorId, IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion {
 
     #region Properties
 
@@ -42,67 +43,103 @@ public interface IItemSendSomething : IDisposableExtended, IItemToControl, IHasK
 
     #endregion
 
+    #region Methods
+
+    public void AddChild(IHasKeyName add);
+
+    public void RemoveChild(IHasKeyName remove);
+
+    #endregion
+
     //public void RemoveAllConnections();
 }
 
-public static class IItemSendSomethingExtensions {
+public class ItemSendSomething {
+
+    #region Fields
+
+    private readonly List<string> _childIds = new();
+
+    private DatabaseAbstract? _outputDatabase;
+
+    #endregion
 
     #region Methods
 
-    public static void AddChild(this IItemSendSomething item, IHasKeyName add) {
+    public void AddChild(IHasKeyName add, IItemSendSomething item) {
         var l = new List<string>();
+        l.AddRange(_childIds);
+        l.Add(add.KeyName);
 
-        if (item.ChildIds != null) { l.AddRange(item.ChildIds); }
-
-        l.AddIfNotExists(add.KeyName);
-
-        item.ChildIds = new ReadOnlyCollection<string>(l);
+        ChildIdsSet(new ReadOnlyCollection<string>(l), item);
     }
 
-    public static void DoChilds(this IItemSendSomething item) {
-        if (item.ChildIds == null) { return; }
+    public ReadOnlyCollection<string> ChildIdsGet() => new ReadOnlyCollection<string>(_childIds);
+
+    public void ChildIdsSet(ReadOnlyCollection<string> value, IItemSendSomething item) {
+        if (!_childIds.IsDifferentTo(value)) { return; }
+
+        _childIds.Clear();
+        _childIds.AddRange(value);
+        item.RaiseVersion();
+        DoChilds(item);
+        item.OnChanged();
+    }
+
+    public void Datenbank_wählen(IItemSendSomething item) {
+        var db = CommonDialogs.ChooseKnownDatabase();
+
+        if (db == null) { return; }
+
+        OutputDatabaseSet(db, item);
+    }
+
+    public void Datenbankkopf() {
+        if (_outputDatabase == null || _outputDatabase.IsDisposed) { return; }
+        TableView.OpenDatabaseHeadEditor(_outputDatabase);
+    }
+
+    public void DoChilds(IItemSendSomething item) {
+        //if (_childIds == null) { return; }
 
         if (item.Parent == null) { return; }
 
-        foreach (var thisChild in item.ChildIds) {
+        foreach (var thisChild in _childIds) {
             var item2 = item.Parent[thisChild];
 
             if (item2 is IItemAcceptSomething ias) {
-                ias.SetInputColorId(item.ColorId);
+                ias.InputColorId = item.InputColorId;
             }
         }
     }
 
-    public static void DoParentChanged(this IItemSendSomething item) {
+    public void DoParentChanged(IItemSendSomething item) {
         if (item.Parent != null) {
-            item.ColorId = -1;
-            item.ColorId = item.Parent.GetFreeColorId(item.Page);
+            item.InputColorId = -1;
+            item.InputColorId = item.Parent.GetFreeColorId(item.Page);
         }
         DoChilds(item);
 
         item.OnChanged();
     }
 
-    public static void RemoveChild(this IItemSendSomething item, IHasKeyName remove) {
+    public DatabaseAbstract? OutputDatabaseGet() => _outputDatabase;
+
+    public void OutputDatabaseSet(DatabaseAbstract? value, IItemSendSomething item) {
+        if (value == _outputDatabase) { return; }
+
+        _outputDatabase = value;
+        item.RaiseVersion();
+        DoChilds(item);
+        item.OnChanged();
+    }
+
+    public void RemoveChild(IHasKeyName remove, IItemSendSomething item) {
         var l = new List<string>();
-
-        if (item.ChildIds != null) {
-            l.AddRange(item.ChildIds);
-
-            l.Remove(remove.KeyName);
-        }
-        item.ChildIds = new ReadOnlyCollection<string>(l);
+        l.AddRange(_childIds);
+        l.Remove(remove.KeyName);
+        ChildIdsSet(new ReadOnlyCollection<string>(l), item);
     }
 
     #endregion
-
-    //public static void RepairConnections(this IItemSendSomething item) {
-    //    item.RemoveAllConnections();
-    //    var item1 = item.Parent[item.KeyName];
-    //    foreach (var thisChild in item.ChildIds) {
-    //        var item2 = item.Parent[thisChild];
-
-    //        item1.Parent.Connections.Add(new ItemConnection(item1, ConnectionType.Bottom, false, item2, ConnectionType.Top, true, false));
-    //    }
-    //}
 }

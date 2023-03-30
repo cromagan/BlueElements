@@ -31,7 +31,6 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
-using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 using static BlueControls.Interfaces.IHasVersionExtensions;
 using System.Collections.ObjectModel;
 
@@ -42,7 +41,7 @@ namespace BlueControls.ItemCollection;
 /// Stellt auch alle Methode breit, zum Einrichten der Breite und Benutzer-Sichtbarkeiten.
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet
 /// </summary>
-public abstract class FakeControlPadItem : AcceptSomethingPadItem, IItemToControl, IItemAcceptSomething {
+public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToControl, IItemAcceptSomething {
 
     #region Fields
 
@@ -84,6 +83,8 @@ public abstract class FakeControlPadItem : AcceptSomethingPadItem, IItemToContro
             this.RaiseVersion();
         }
     }
+
+    public abstract int InputColorId { get; set; }
 
     public string Sichtbarkeit {
         get => string.Empty;
@@ -172,6 +173,8 @@ public abstract class FakeControlPadItem : AcceptSomethingPadItem, IItemToContro
             gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
         }
     }
+
+    public abstract Control? CreateControl(ConnectedFormulaView parent);
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }

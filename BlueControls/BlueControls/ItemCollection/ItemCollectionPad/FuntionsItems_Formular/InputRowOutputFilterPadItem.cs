@@ -37,8 +37,6 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
-using static BlueControls.Interfaces.IItemSendSomethingExtensions;
-using static BlueControls.Interfaces.IItemAcceptRowExtension;
 
 namespace BlueControls.ItemCollection;
 
@@ -47,13 +45,13 @@ namespace BlueControls.ItemCollection;
 /// Unsichtbares Element, wird nicht angezeigt
 /// </summary>
 
-public class InputRowOutputFilterPadItem : AcceptSomethingPadItem, IReadableText, IItemToControl, IItemAcceptRow, IItemSendFilter {
+public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptRow, IItemSendFilter {
 
     #region Fields
 
-    private string? _getValueFromkey;
+    private ItemAcceptRow _iar;
 
-    private IItemSendRow? _tmpgetValueFrom;
+    private ItemSendFilter _isf;
 
     #endregion
 
@@ -77,39 +75,25 @@ public class InputRowOutputFilterPadItem : AcceptSomethingPadItem, IReadableText
 
     public static string ClassId => "FI-UserSelectionFilter";
 
+    public ReadOnlyCollection<string>? ChildIds {
+        get => _isf.ChildIdsGet();
+        set => _isf.ChildIdsSet(value, this);
+    }
+
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
     /// </summary>
     public int ColorId { get; set; }
 
-    public string Datenbank_wählen {
-        get => string.Empty;
-        set {
-            var db = CommonDialogs.ChooseKnownDatabase();
-
-            if (db == null) { return; }
-
-            if (db == OutputDatabase) { return; }
-            OutputDatabase = db;
-
-            this.DoChilds();
-
-            //RepairConnections();
-        }
-    }
-
     public string Datenbankkopf {
         get => string.Empty;
-        set {
-            if (OutputDatabase == null || OutputDatabase.IsDisposed) { return; }
-            TableView.OpenDatabaseHeadEditor(OutputDatabase);
-        }
+        set => _isf.Datenbankkopf();
     }
 
     [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
     public string Datenquelle_wählen {
         get => string.Empty;
-        set => FakeControlPadItem.Datenquelle_wählen_Zeile(this);
+        set => _iar.Datenquelle_wählen(this);
     }
 
     public string Filter_hinzufügen {
@@ -136,31 +120,27 @@ public class InputRowOutputFilterPadItem : AcceptSomethingPadItem, IReadableText
     public DatabaseAbstract FilterDefiniton { get; }
 
     public IItemSendRow? GetRowFrom {
-        get {
-            if (Parent == null || _getValueFromkey == null) { return null; }
-
-            _tmpgetValueFrom ??= Parent[_getValueFromkey] as IItemSendRow;
-
-            return _tmpgetValueFrom;
-        }
-        set {
-            var f = GetRowFrom;
-            this.ChangeGetRowFrom(ref f, value);
-
-            _tmpgetValueFrom = f;
-            _getValueFromkey = null;
-
-            _getValueFromkey = f?.KeyName ?? string.Empty;
-        }
+        get => _iar.GetRowFromGet(this);
+        set => _iar.GetRowFromSet(value, this);
     }
 
-    public DatabaseAbstract? OutputDatabase { get; set; }
+    public int InputColorId {
+        get => _iar.InputColorIdGet();
+        set => _iar.InputColorIdSet(value, this);
+    }
+
+    public DatabaseAbstract? OutputDatabase {
+        get => _isf.OutputDatabaseGet();
+        set => _isf.OutputDatabaseSet(value, this);
+    }
 
     protected override int SaveOrder => 1;
 
     #endregion
 
     #region Methods
+
+    public void AddChild(IHasKeyName add) => _isf.AddChild(add, this);
 
     public new Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
@@ -216,6 +196,8 @@ public class InputRowOutputFilterPadItem : AcceptSomethingPadItem, IReadableText
         return "Zeile einer Datenbank";
     }
 
+    public void RemoveChild(IHasKeyName remove) => _isf.RemoveChild(remove, this);
+
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(ColorId));
 
     public override string ToString() {
@@ -246,7 +228,7 @@ public class InputRowOutputFilterPadItem : AcceptSomethingPadItem, IReadableText
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        this.DoParentChanged();
+        _isf.DoParentChanged(this);
         //RepairConnections();
     }
 

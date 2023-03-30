@@ -37,7 +37,6 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
-using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -45,13 +44,18 @@ namespace BlueControls.ItemCollection;
 /// Altes Element, Filter und Zeilenauswahl in einem
 /// </summary>
 [Obsolete]
-public class RowWithFilterPadItem : AcceptSomethingPadItem, IReadableText, ICalculateRowsItemLevel, IItemToControl, IItemSendRow {
+public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculateRowsItemLevel, IItemToControl, IItemSendRow {
 
     #region Fields
 
     private string _anzeige = string.Empty;
+
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+
+    private ItemSendRow _isr;
+
     private string _überschrift = string.Empty;
+
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -100,6 +104,11 @@ public class RowWithFilterPadItem : AcceptSomethingPadItem, IReadableText, ICalc
         }
     }
 
+    public ReadOnlyCollection<string>? ChildIds {
+        get => _isr.ChildIdsGet();
+        set => _isr.ChildIdsSet(value, this);
+    }
+
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
     /// </summary>
@@ -108,12 +117,7 @@ public class RowWithFilterPadItem : AcceptSomethingPadItem, IReadableText, ICalc
     public string Datenbank_wählen {
         get => string.Empty;
         set {
-            var db = CommonDialogs.ChooseKnownDatabase();
-
-            if (db == null) { return; }
-
-            if (db == OutputDatabase) { return; }
-            OutputDatabase = db;
+            _isr.Datenbank_wählen(this);
 
             FilterDatabaseUpdate();
         }
@@ -121,10 +125,7 @@ public class RowWithFilterPadItem : AcceptSomethingPadItem, IReadableText, ICalc
 
     public string Datenbankkopf {
         get => string.Empty;
-        set {
-            if (OutputDatabase == null || OutputDatabase.IsDisposed) { return; }
-            TableView.OpenDatabaseHeadEditor(OutputDatabase);
-        }
+        set => _isr.Datenbankkopf();
     }
 
     public string Filter_hinzufügen {
@@ -155,7 +156,15 @@ public class RowWithFilterPadItem : AcceptSomethingPadItem, IReadableText, ICalc
     /// </summary>
     public int Id { get; set; }
 
-    public DatabaseAbstract? OutputDatabase { get; set; }
+    public override int InputColorId {
+        get;
+        set;
+    }
+
+    public DatabaseAbstract? OutputDatabase {
+        get => _isr.OutputDatabaseGet();
+        set => _isr.OutputDatabaseSet(value, this);
+    }
 
     public string Überschrift {
         get => _überschrift;
@@ -172,7 +181,9 @@ public class RowWithFilterPadItem : AcceptSomethingPadItem, IReadableText, ICalc
 
     #region Methods
 
-    public new Control CreateControl(ConnectedFormulaView parent) {
+    public void AddChild(IHasKeyName add) => _isr.AddChild(add, this);
+
+    public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlRowSelector(OutputDatabase, FilterDefiniton, _überschrift, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition,
@@ -288,6 +299,8 @@ public class RowWithFilterPadItem : AcceptSomethingPadItem, IReadableText, ICalc
         return "Zeile einer Datenbank";
     }
 
+    public void RemoveChild(IHasKeyName remove) => _isr.RemoveChild(remove, this);
+
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
 
     public override string ToString() {
@@ -335,13 +348,13 @@ public class RowWithFilterPadItem : AcceptSomethingPadItem, IReadableText, ICalc
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        this.DoParentChanged();
+        _isr.DoParentChanged(this);
         //RepairConnections();
     }
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         //RepairConnections();
-        this.DoChilds();
+        _isr.DoChilds(this);
         OnChanged();
     }
 
@@ -517,13 +530,13 @@ public class RowWithFilterPadItem : AcceptSomethingPadItem, IReadableText, ICalc
 
     private void Row_RowAdded(object sender, RowEventArgs e) {
         //RepairConnections();
-        this.DoChilds();
+        _isr.DoChilds(this);
         OnChanged();
     }
 
     private void Row_RowRemoved(object sender, System.EventArgs e) {
         //RepairConnections();
-        this.DoChilds();
+        _isr.DoChilds(this);
         OnChanged();
     }
 

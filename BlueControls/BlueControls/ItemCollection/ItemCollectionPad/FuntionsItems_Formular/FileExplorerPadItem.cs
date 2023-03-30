@@ -32,12 +32,16 @@ namespace BlueControls.ItemCollection;
 /// Erzeut ein File-Explorer-Element
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class FileExplorerPadItem : FakeControlAcceptRowPadItem, IItemAcceptRow {
+public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     #region Fields
 
     private bool _bei_Bedarf_erzeugen;
+
+    private ItemAcceptRow _iar;
+
     private bool _leere_Ordner_löschen;
+
     private string _pfad = string.Empty;
 
     #endregion
@@ -62,6 +66,22 @@ public class FileExplorerPadItem : FakeControlAcceptRowPadItem, IItemAcceptRow {
             this.RaiseVersion();
             OnChanged();
         }
+    }
+
+    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_wählen {
+        get => string.Empty;
+        set => _iar.Datenquelle_wählen(this);
+    }
+
+    public IItemSendRow? GetRowFrom {
+        get => _iar.GetRowFromGet(this);
+        set => _iar.GetRowFromSet(value, this);
+    }
+
+    public override int InputColorId {
+        get => _iar.InputColorIdGet();
+        set => _iar.InputColorIdSet(value, this);
     }
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
@@ -146,11 +166,11 @@ public class FileExplorerPadItem : FakeControlAcceptRowPadItem, IItemAcceptRow {
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.ColorId; }
+        if (GetRowFrom != null) { id = GetRowFrom.InputColorId; }
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _inputColorId);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\");

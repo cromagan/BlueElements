@@ -31,17 +31,19 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
-using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 using static BlueControls.Interfaces.IHasVersionExtensions;
 using System.Collections.ObjectModel;
+using System.Windows.Forms.VisualStyles;
 using BlueBasics.Interfaces;
+using BlueControls.ItemCollection;
+using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Interfaces;
 
 /// <summary>
 /// Wird verwendet, wenn das Steuerelement einen Filter empfangen kann
 /// </summary>
-public interface IItemAcceptFilter : IDisposableExtended, IItemAcceptSomething {
+public interface IItemAcceptFilter : IItemAcceptSomething {
 
     #region Properties
 
@@ -51,31 +53,67 @@ public interface IItemAcceptFilter : IDisposableExtended, IItemAcceptSomething {
     #endregion
 }
 
-public static class IItemAcceptFilterExtension {
+public class ItemAcceptFilter : ItemAcceptSomething {
+
+    #region Fields
+
+    private readonly List<IItemSendFilter> _getFilterFrom = new();
+
+    #endregion
 
     #region Methods
 
-    public static void ChangeFilterTo(this IItemAcceptFilter item, List<IItemSendFilter> current, ReadOnlyCollection<IItemSendFilter>? newvalue) {
-        if (!current.IsDifferentTo(newvalue)) { return; }
+    public void Datenquelle_hinzufügen(IItemAcceptSomething item) {
+        if (item.Parent is null) { return; }
 
-        foreach (var thisItem in current) {
-            thisItem.RemoveChild(item);
+        var x = new ItemCollectionList(true);
+        foreach (var thisR in item.Parent) {
+            if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
+                _ = x.Add(rfp);
+            }
         }
 
-        current.Clear();
-        current.AddRange(newvalue);
+        _ = x.Add("<Abbruch>");
 
-        foreach (var thisItem in current) {
-            thisItem.AddChild(item);
+        var it = InputBoxListBoxStyle.Show("Quelle hinzufügen:", x, AddType.None, true);
+
+        if (it == null || it.Count != 1) { return; }
+
+        var t = item.Parent[it[0]];
+
+        if (t is IItemSendFilter rfp2) {
+            _getFilterFrom.AddIfNotExists(rfp2);
         }
-
-        item.RaiseVersion();
-        item.OnChanged();
     }
 
-    public static DatabaseAbstract? InputDatabase(this IItemAcceptFilter item) {
-        if (item.GetFilterFrom == null || item.GetFilterFrom.Count == 0) { return null; }
-        return item.GetFilterFrom[0].OutputDatabase;
+    public ReadOnlyCollection<IItemSendFilter>? GetFilterFromGet() => new(_getFilterFrom);
+
+    public void GetFilterFromSet(ICollection<IItemSendFilter>? value, IItemAcceptSomething item) {
+        {
+            if (!_getFilterFrom.IsDifferentTo(value)) { return; }
+
+            foreach (var thisItem in _getFilterFrom) {
+                thisItem.RemoveChild(item);
+            }
+
+            _getFilterFrom.Clear();
+
+            if (value != null) {
+                _getFilterFrom.AddRange(value);
+            }
+
+            foreach (var thisItem in _getFilterFrom) {
+                thisItem.AddChild(item);
+            }
+
+            item.RaiseVersion();
+            item.OnChanged();
+        }
+    }
+
+    public DatabaseAbstract? InputDatabase() {
+        if (_getFilterFrom.Count == 0) { return null; }
+        return _getFilterFrom[0].OutputDatabase;
     }
 
     #endregion

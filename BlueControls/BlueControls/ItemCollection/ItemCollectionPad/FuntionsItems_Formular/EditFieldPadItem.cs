@@ -42,13 +42,18 @@ namespace BlueControls.ItemCollection;
 /// Erzeut ein FlexiControllForCell
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class EditFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, IItemToControl, IItemAcceptRow, IHasVersion {
+public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptRow, IHasVersion {
 
     #region Fields
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
+
     private ColumnItem? _column;
+
     private string _columnName = string.Empty;
+
+    private ItemAcceptRow _iar;
+
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -88,6 +93,12 @@ public class EditFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, IIte
         }
     }
 
+    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_wählen {
+        get => string.Empty;
+        set => _iar.Datenquelle_wählen(this);
+    }
+
     public EditTypeFormula EditType {
         get => _bearbeitung;
         set {
@@ -96,6 +107,16 @@ public class EditFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, IIte
             _bearbeitung = value;
             OnChanged();
         }
+    }
+
+    public IItemSendRow? GetRowFrom {
+        get => _iar.GetRowFromGet(this);
+        set => _iar.GetRowFromSet(value, this);
+    }
+
+    public override int InputColorId {
+        get => _iar.InputColorIdGet();
+        set => _iar.InputColorIdSet(value, this);
     }
 
     public string Interner_Name {
@@ -280,7 +301,7 @@ public class EditFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, IIte
     public QuickImage? SymbolForReadableText() {
         if (GetRowFrom == null) { return null; }
 
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.ColorId));
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.InputColorId));
     }
 
     public override string ToString() {
@@ -293,7 +314,7 @@ public class EditFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, IIte
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.ColorId; }
+        if (GetRowFrom != null) { id = GetRowFrom.InputColorId; }
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);

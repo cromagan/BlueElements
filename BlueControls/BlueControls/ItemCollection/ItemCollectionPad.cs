@@ -699,7 +699,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         foreach (var thisIt in this) {
             if (thisIt != null && thisIt is IHasColorId hci && thisIt.IsVisibleOnPage(page))
 
-                usedids.Add(hci.ColorId);
+                usedids.Add(hci.InputColorId);
         }
 
         for (var c = 0; c < 9999; c++) {

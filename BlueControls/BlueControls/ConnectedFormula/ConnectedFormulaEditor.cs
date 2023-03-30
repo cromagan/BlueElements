@@ -65,9 +65,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (l is ICalculateRowsItemLevel ri) {
             x.GetRowFrom = ri;
         }
-        if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
-            x.GetRowFrom = efi.GetRowFrom;
-        }
 
         Pad.AddCentered(x);
     }
@@ -83,16 +80,16 @@ public partial class ConnectedFormulaEditor : PadEditor {
         var x = new EditFieldPadItem(string.Empty);
         Pad.AddCentered(x);
 
-        if (l is ICalculateRowsItemLevel ri) {
-            x.GetRowFrom = ri;
-        }
-        if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
-            x.GetRowFrom = efi.GetRowFrom;
-        }
+        //if (l is ICalculateRowsItemLevel ri) {
+        //    x.GetRowFrom = ri;
+        //}
+        //if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
+        //    x.GetRowFrom = efi.GetRowFrom;
+        //}
 
-        if (x.GetRowFrom != null && x.GetRowFrom.OutputDatabase != null) {
-            x.Spalte_wählen = string.Empty; // Dummy setzen
-        }
+        //if (x.GetRowFrom != null && x.GetRowFrom.OutputDatabase != null) {
+        //    x.Spalte_wählen = string.Empty; // Dummy setzen
+        //}
     }
 
     private void btnFilterConverter_Click(object sender, System.EventArgs e) {
@@ -176,13 +173,13 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         var x = new VariableFieldPadItem(string.Empty);
 
-        if (l is ICalculateRowsItemLevel ri) {
-            x.GetRowFrom = ri;
-        }
+        //if (l is ICalculateRowsItemLevel ri) {
+        //    x.GetRowFrom = ri;
+        //}
 
-        if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
-            x.GetRowFrom = efi.GetRowFrom;
-        }
+        //if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
+        //    x.GetRowFrom = efi.GetRowFrom;
+        //}
 
         Pad.AddCentered(x);
     }
@@ -257,12 +254,12 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         var x = new FileExplorerPadItem(string.Empty);
 
-        if (l is ICalculateRowsItemLevel ri) {
-            x.GetRowFrom = ri;
-        }
-        if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
-            x.GetRowFrom = efi.GetRowFrom;
-        }
+        //if (l is ICalculateRowsItemLevel ri) {
+        //    x.GetRowFrom = ri;
+        //}
+        //if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
+        //    x.GetRowFrom = efi.GetRowFrom;
+        //}
 
         Pad.AddCentered(x);
     }

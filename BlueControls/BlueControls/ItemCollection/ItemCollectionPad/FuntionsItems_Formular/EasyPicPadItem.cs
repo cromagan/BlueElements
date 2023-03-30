@@ -32,11 +32,13 @@ namespace BlueControls.ItemCollection;
 /// Erzeut ein EasyPic
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class EasyPicPadItem : FakeControlAcceptRowPadItem, IItemToControl, IItemAcceptRow {
+public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow {
 
     #region Fields
 
     private string _bild_Dateiname = string.Empty;
+
+    private ItemAcceptRow _iar;
 
     #endregion
 
@@ -60,6 +62,22 @@ public class EasyPicPadItem : FakeControlAcceptRowPadItem, IItemToControl, IItem
             this.RaiseVersion();
             OnChanged();
         }
+    }
+
+    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_wählen {
+        get => string.Empty;
+        set => _iar.Datenquelle_wählen(this);
+    }
+
+    public IItemSendRow? GetRowFrom {
+        get => _iar.GetRowFromGet(this);
+        set => _iar.GetRowFromSet(value, this);
+    }
+
+    public override int InputColorId {
+        get => _iar.InputColorIdGet();
+        set => _iar.InputColorIdSet(value, this);
     }
 
     protected override int SaveOrder => 4;
@@ -106,11 +124,11 @@ public class EasyPicPadItem : FakeControlAcceptRowPadItem, IItemToControl, IItem
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.ColorId; }
+        if (GetRowFrom != null) { id = GetRowFrom.InputColorId; }
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _inputColorId);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");

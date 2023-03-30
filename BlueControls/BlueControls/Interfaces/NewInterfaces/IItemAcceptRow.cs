@@ -18,8 +18,11 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
+using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 
@@ -28,7 +31,7 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das Steuerelement einen Zeilen empfangen kann
 /// </summary>
-public interface IItemAcceptRow : IDisposableExtended, IItemToControl, IItemAcceptSomething {
+public interface IItemAcceptRow : IItemAcceptSomething, IChangedFeedback, IHasVersion {
 
     #region Properties
 
@@ -38,22 +41,67 @@ public interface IItemAcceptRow : IDisposableExtended, IItemToControl, IItemAcce
     #endregion
 }
 
-public static class IItemAcceptRowExtension {
+public class ItemAcceptRow : ItemAcceptSomething {
+
+    #region Fields
+
+    private string? _getValueFromkey;
+    private IItemSendRow? _tmpgetValueFrom;
+
+    #endregion
 
     #region Methods
 
-    public static void ChangeGetRowFrom(this IItemAcceptRow item, ref IItemSendRow? current, IItemSendRow? newvalue) {
-        if (current == newvalue) { return; }
+    public void Datenquelle_wählen(IItemAcceptRow item) {
+        if (item.Parent is null) { return; }
 
-        if (current is IItemSendRow old) { old.RemoveChild(item); }
-        current = newvalue;
-        if (current is IItemSendRow ne) { ne.AddChild(item); }
+        var x = new ItemCollectionList(true);
+        foreach (var thisR in item.Parent) {
+            if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendRow rfp) {
+                _ = x.Add(rfp);
+            }
+        }
+
+        _ = x.Add("<Keine Quelle>");
+
+        var it = InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
+
+        if (it == null || it.Count != 1) { return; }
+
+        var newGetRowFrom = item.Parent[it[0]];
+
+        if (newGetRowFrom is IItemSendRow rfp2) {
+            item.GetRowFrom = rfp2;
+        } else {
+            item.GetRowFrom = null;
+        }
+        item.RaiseVersion();
+        item.OnChanged();
+    }
+
+    public IItemSendRow? GetRowFromGet(IItemAcceptRow item) {
+        if (item.Parent == null || _getValueFromkey == null) { return null; }
+
+        _tmpgetValueFrom ??= item.Parent[_getValueFromkey] as IItemSendRow;
+
+        return _tmpgetValueFrom;
+    }
+
+    public void GetRowFromSet(IItemSendRow? value, IItemAcceptRow item) {
+        var f = GetRowFromGet(item);
+
+        if (f == value) { return; }
+
+        if (f is IItemSendRow old) { old.RemoveChild(item); }
+        _tmpgetValueFrom = value;
+        _getValueFromkey = value?.KeyName ?? string.Empty;
+        if (_tmpgetValueFrom is IItemSendRow ne) { ne.AddChild(item); }
 
         item.RaiseVersion();
         item.OnChanged();
     }
 
-    public static DatabaseAbstract? InputDatabase(this FakeControlAcceptRowPadItem item) => item?.GetRowFrom?.OutputDatabase;
+    public DatabaseAbstract? InputDatabase(IItemAcceptRow item) => GetRowFromGet(item)?.OutputDatabase;
 
     #endregion
 }

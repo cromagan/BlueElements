@@ -33,11 +33,11 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using BlueDatabase.AdditionalScriptComands;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
-using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -46,7 +46,7 @@ namespace BlueControls.ItemCollection;
 /// Per Dropwdown menü
 /// </summary>
 
-public class DropDownSelectRowPadItem : FakeControlAcceptFilterPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow {
+public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow {
 
     #region Fields
 
@@ -54,7 +54,9 @@ public class DropDownSelectRowPadItem : FakeControlAcceptFilterPadItem, IReadabl
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
-    private ReadOnlyCollection<string>? _ChildIds;
+    private ItemAcceptFilter _iaf;
+
+    private ItemSendRow _isr;
 
     private string _überschrift = string.Empty;
 
@@ -102,15 +104,8 @@ public class DropDownSelectRowPadItem : FakeControlAcceptFilterPadItem, IReadabl
     }
 
     public ReadOnlyCollection<string>? ChildIds {
-        get => _ChildIds;
-        set {
-            if (!_ChildIds.IsDifferentTo(value)) { return; }
-
-            _ChildIds = value;
-            this.RaiseVersion();
-            this.DoChilds();
-            OnChanged();
-        }
+        get => _isr.ChildIdsGet();
+        set => _isr.ChildIdsSet(value, this);
     }
 
     /// <summary>
@@ -118,7 +113,31 @@ public class DropDownSelectRowPadItem : FakeControlAcceptFilterPadItem, IReadabl
     /// </summary>
     public int ColorId { get; set; }
 
-    public DatabaseAbstract? OutputDatabase { get; set; }
+    public string Datenbank_wählen {
+        get => string.Empty;
+        set => _isr.Datenbank_wählen(this);
+    }
+
+    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_hinzufügen {
+        get => string.Empty;
+        set => _iaf.Datenquelle_hinzufügen(this);
+    }
+
+    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
+        get => _iaf.GetFilterFromGet();
+        set => _iaf.GetFilterFromSet(value, this);
+    }
+
+    public override int InputColorId {
+        get => _iaf.InputColorIdGet();
+        set => _iaf.InputColorIdSet(value, this);
+    }
+
+    public DatabaseAbstract? OutputDatabase {
+        get => _isr.OutputDatabaseGet();
+        set => _isr.OutputDatabaseSet(value, this);
+    }
 
     public string Überschrift {
         get => _überschrift;
@@ -134,6 +153,8 @@ public class DropDownSelectRowPadItem : FakeControlAcceptFilterPadItem, IReadabl
     #endregion
 
     #region Methods
+
+    public void AddChild(IHasKeyName add) => _isr.AddChild(add, this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
@@ -211,6 +232,8 @@ public class DropDownSelectRowPadItem : FakeControlAcceptFilterPadItem, IReadabl
         return "Zeile einer Datenbank";
     }
 
+    public void RemoveChild(IHasKeyName remove) => _isr.RemoveChild(remove, this);
+
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(ColorId));
 
     public override string ToString() {
@@ -247,7 +270,7 @@ public class DropDownSelectRowPadItem : FakeControlAcceptFilterPadItem, IReadabl
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        this.DoParentChanged();
+        _isr.DoParentChanged(this);
         //RepairConnections();
     }
 

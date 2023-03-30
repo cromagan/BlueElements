@@ -37,7 +37,6 @@ using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
-using static BlueControls.Interfaces.IItemSendSomethingExtensions;
 using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection;
@@ -48,7 +47,13 @@ namespace BlueControls.ItemCollection;
 /// Unsichtbares Element, wird nicht angezeigt
 /// </summary>
 
-public class RowEntryPadItem : AcceptSomethingPadItem, IReadableText, IItemToControl, IItemSendRow {
+public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemSendRow {
+
+    #region Fields
+
+    private ItemSendRow _isr;
+
+    #endregion
 
     #region Constructors
 
@@ -68,6 +73,11 @@ public class RowEntryPadItem : AcceptSomethingPadItem, IReadableText, IItemToCon
 
     public static string ClassId => "FI-RowEntryElement";
 
+    public ReadOnlyCollection<string>? ChildIds {
+        get => _isr.ChildIdsGet();
+        set => _isr.ChildIdsSet(value, this);
+    }
+
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
     /// </summary>
@@ -75,28 +85,20 @@ public class RowEntryPadItem : AcceptSomethingPadItem, IReadableText, IItemToCon
 
     public string Datenbank_wählen {
         get => string.Empty;
-        set {
-            var db = CommonDialogs.ChooseKnownDatabase();
-
-            if (db == null) { return; }
-
-            if (db == OutputDatabase) { return; }
-            OutputDatabase = db;
-
-            this.DoChilds();
-            //RepairConnections();
-        }
+        set => _isr.Datenbank_wählen(this);
     }
 
     public string Datenbankkopf {
         get => string.Empty;
-        set {
-            if (OutputDatabase == null || OutputDatabase.IsDisposed) { return; }
-            TableView.OpenDatabaseHeadEditor(OutputDatabase);
-        }
+        set => _isr.Datenbankkopf();
     }
 
-    public DatabaseAbstract? OutputDatabase { get; set; }
+    public int InputColorId { get; set; }
+
+    public DatabaseAbstract? OutputDatabase {
+        get => _isr.OutputDatabaseGet();
+        set => _isr.OutputDatabaseSet(value, this);
+    }
 
     protected override int SaveOrder => 1;
 
@@ -161,6 +163,8 @@ public class RowEntryPadItem : AcceptSomethingPadItem, IReadableText, IItemToCon
         }
     }
 
+    public void AddChild(IHasKeyName add) => _isr.AddChild(add, this);
+
     public new Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
         //    EditType = _bearbeitung,
@@ -212,6 +216,8 @@ public class RowEntryPadItem : AcceptSomethingPadItem, IReadableText, IItemToCon
         return "Eingangs-Zeile einer Datenbank";
     }
 
+    public void RemoveChild(IHasKeyName remove) => _isr.RemoveChild(remove, this);
+
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(ColorId));
 
     public override string ToString() {
@@ -240,9 +246,11 @@ public class RowEntryPadItem : AcceptSomethingPadItem, IReadableText, IItemToCon
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        this.DoParentChanged();
+        _isr.DoParentChanged(this);
         //RepairConnections();
     }
 
     #endregion
+
+    // Dummy, wird nicht benötigt
 }
