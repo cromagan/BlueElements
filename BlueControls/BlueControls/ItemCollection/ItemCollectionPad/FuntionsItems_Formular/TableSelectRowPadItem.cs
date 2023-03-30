@@ -46,13 +46,7 @@ namespace BlueControls.ItemCollection;
 /// Per Tabellenansicht
 /// </summary>
 
-public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow {
-
-    #region Fields
-
-    private int _inputColorId = -1;
-
-    #endregion
+public class TableSelectRowPadItem : FakeControlAcceptFilterPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow {
 
     #region Constructors
 
@@ -73,8 +67,6 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
     #region Properties
 
     public static string ClassId => "FI-SelectRowWithTable";
-
-    public ObservableCollection<string> ChildIds { get; } = new();
 
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
@@ -109,8 +101,6 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
     /// </summary>
     public int Id { get; set; }
 
-    public DatabaseAbstract? InputDatabase => OutputDatabase;
-
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     protected override int SaveOrder => 1;
@@ -119,7 +109,7 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
 
     #region Methods
 
-    public Control CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
         //    EditType = _bearbeitung,
         //    CaptionPosition = CaptionPosition,
@@ -181,13 +171,6 @@ public class TableSelectRowPadItem : RectanglePadItemWithVersion, IReadableText,
         }
 
         return "Tabellenansicht einer Datenbank";
-    }
-
-    public void SetInputColorId(int inputColorId) {
-        if (_inputColorId == inputColorId) { return; }
-
-        _inputColorId = inputColorId;
-        OnChanged();
     }
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));

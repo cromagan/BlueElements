@@ -18,6 +18,8 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
+using BlueControls.Interfaces;
+using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 
@@ -30,7 +32,28 @@ public interface IItemAcceptRow : IDisposableExtended, IItemToControl, IItemAcce
 
     #region Properties
 
+    public string Datenquelle_wählen { get; set; }
     public IItemSendRow? GetRowFrom { get; set; }
+
+    #endregion
+}
+
+public static class IItemAcceptRowExtension {
+
+    #region Methods
+
+    public static void ChangeGetRowFrom(this IItemAcceptRow item, ref IItemSendRow? current, IItemSendRow? newvalue) {
+        if (current == newvalue) { return; }
+
+        if (current is IItemSendRow old) { old.RemoveChild(item); }
+        current = newvalue;
+        if (current is IItemSendRow ne) { ne.AddChild(item); }
+
+        item.RaiseVersion();
+        item.OnChanged();
+    }
+
+    public static DatabaseAbstract? InputDatabase(this FakeControlAcceptRowPadItem item) => item?.GetRowFrom?.OutputDatabase;
 
     #endregion
 }

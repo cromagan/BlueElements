@@ -17,9 +17,24 @@
 
 #nullable enable
 
-using BlueBasics.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Windows.Forms;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Interfaces;
+using BlueDatabase.Enums;
+using static BlueBasics.Converter;
+using static BlueControls.Interfaces.IItemSendSomethingExtensions;
+using static BlueControls.Interfaces.IHasVersionExtensions;
+using System.Collections.ObjectModel;
+using BlueBasics.Interfaces;
 
 namespace BlueControls.Interfaces;
 
@@ -27,4 +42,41 @@ namespace BlueControls.Interfaces;
 /// Wird verwendet, wenn das Steuerelement einen Filter empfangen kann
 /// </summary>
 public interface IItemAcceptFilter : IDisposableExtended, IItemAcceptSomething {
+
+    #region Properties
+
+    public string Datenquelle_hinzufügen { get; set; }
+    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom { get; set; }
+
+    #endregion
+}
+
+public static class IItemAcceptFilterExtension {
+
+    #region Methods
+
+    public static void ChangeFilterTo(this IItemAcceptFilter item, List<IItemSendFilter> current, ReadOnlyCollection<IItemSendFilter>? newvalue) {
+        if (!current.IsDifferentTo(newvalue)) { return; }
+
+        foreach (var thisItem in current) {
+            thisItem.RemoveChild(item);
+        }
+
+        current.Clear();
+        current.AddRange(newvalue);
+
+        foreach (var thisItem in current) {
+            thisItem.AddChild(item);
+        }
+
+        item.RaiseVersion();
+        item.OnChanged();
+    }
+
+    public static DatabaseAbstract? InputDatabase(this IItemAcceptFilter item) {
+        if (item.GetFilterFrom == null || item.GetFilterFrom.Count == 0) { return null; }
+        return item.GetFilterFrom[0].OutputDatabase;
+    }
+
+    #endregion
 }

@@ -32,7 +32,7 @@ namespace BlueControls.ItemCollection;
 /// Erzeut ein File-Explorer-Element
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class FileExplorerPadItem : CustomizableShowPadItem, IItemAcceptRow {
+public class FileExplorerPadItem : FakeControlAcceptRowPadItem, IItemAcceptRow {
 
     #region Fields
 
@@ -59,7 +59,7 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemAcceptRow {
         set {
             if (value == _bei_Bedarf_erzeugen) { return; }
             _bei_Bedarf_erzeugen = value;
-            RaiseVersion();
+            this.RaiseVersion();
             OnChanged();
         }
     }
@@ -71,7 +71,7 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemAcceptRow {
         set {
             if (value == _leere_Ordner_löschen) { return; }
             _leere_Ordner_löschen = value;
-            RaiseVersion();
+            this.RaiseVersion();
             OnChanged();
         }
     }
@@ -83,7 +83,7 @@ public class FileExplorerPadItem : CustomizableShowPadItem, IItemAcceptRow {
         set {
             if (value == _pfad) { return; }
             _pfad = value;
-            RaiseVersion();
+            this.RaiseVersion();
             OnChanged();
         }
     }

@@ -35,7 +35,7 @@ namespace BlueControls.ItemCollection;
 /// Erzeut ein Flexi-Controll, dass nur einen Wert anzeigen kann. z.B. eine Variable
 /// </summary>
 
-public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IItemAcceptRow {
+public class VariableFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, IItemAcceptRow {
 
     #region Fields
 
@@ -62,7 +62,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IIte
             if (_überschriftanordung == value) { return; }
             _überschriftanordung = value;
             OnChanged();
-            RaiseVersion();
+            this.RaiseVersion();
         }
     }
 
@@ -77,7 +77,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IIte
             if (_überschrift == value) { return; }
             _überschrift = value;
             OnChanged();
-            RaiseVersion();
+            this.RaiseVersion();
         }
     }
 
@@ -88,7 +88,7 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IIte
             if (_variable == value) { return; }
             _variable = value;
             OnChanged();
-            RaiseVersion();
+            this.RaiseVersion();
         }
     }
 
@@ -180,7 +180,6 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IIte
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
         }
 
         if (GetRowFrom == null) {
@@ -190,6 +189,10 @@ public class VariableFieldPadItem : CustomizableShowPadItem, IReadableText, IIte
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+
+        if (!forPrinting) {
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
+        }
     }
 
     #endregion

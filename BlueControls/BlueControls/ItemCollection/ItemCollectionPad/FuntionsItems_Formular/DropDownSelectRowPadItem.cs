@@ -46,16 +46,19 @@ namespace BlueControls.ItemCollection;
 /// Per Dropwdown menü
 /// </summary>
 
-public class DropDownSelectRowPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow {
+public class DropDownSelectRowPadItem : FakeControlAcceptFilterPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow {
 
     #region Fields
 
     private string _anzeige = string.Empty;
+
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-    private int _inputColorId = -1;
-    private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+
+    private ReadOnlyCollection<string>? _ChildIds;
 
     private string _überschrift = string.Empty;
+
+    private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
 
@@ -90,22 +93,30 @@ public class DropDownSelectRowPadItem : RectanglePadItemWithVersion, IReadableTe
     }
 
     public ÜberschriftAnordnung CaptionPosition {
-        get => _überschiftanordung;
+        get => _überschriftanordung;
         set {
-            if (_überschiftanordung == value) { return; }
-            _überschiftanordung = value;
+            if (_überschriftanordung == value) { return; }
+            _überschriftanordung = value;
             OnChanged();
         }
     }
 
-    public ObservableCollection<string> ChildIds { get; } = new();
+    public ReadOnlyCollection<string>? ChildIds {
+        get => _ChildIds;
+        set {
+            if (!_ChildIds.IsDifferentTo(value)) { return; }
+
+            _ChildIds = value;
+            this.RaiseVersion();
+            this.DoChilds();
+            OnChanged();
+        }
+    }
 
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
     /// </summary>
     public int ColorId { get; set; }
-
-    public DatabaseAbstract? InputDatabase => OutputDatabase;
 
     public DatabaseAbstract? OutputDatabase { get; set; }
 
@@ -124,7 +135,7 @@ public class DropDownSelectRowPadItem : RectanglePadItemWithVersion, IReadableTe
 
     #region Methods
 
-    public Control CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
         //    EditType = _bearbeitung,
         //    CaptionPosition = CaptionPosition,
@@ -178,7 +189,7 @@ public class DropDownSelectRowPadItem : RectanglePadItemWithVersion, IReadableTe
                 return true;
 
             case "caption":
-                _überschiftanordung = (ÜberschriftAnordnung)IntParse(value);
+                _überschriftanordung = (ÜberschriftAnordnung)IntParse(value);
                 return true;
 
             case "captiontext":
@@ -200,13 +211,6 @@ public class DropDownSelectRowPadItem : RectanglePadItemWithVersion, IReadableTe
         return "Zeile einer Datenbank";
     }
 
-    public void SetInputColorId(int inputColorId) {
-        if (_inputColorId == inputColorId) { return; }
-
-        _inputColorId = inputColorId;
-        OnChanged();
-    }
-
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(ColorId));
 
     public override string ToString() {
@@ -214,7 +218,7 @@ public class DropDownSelectRowPadItem : RectanglePadItemWithVersion, IReadableTe
         result.ParseableAdd("CaptionText", _überschrift);
         result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _überschiftanordung);
+        result.ParseableAdd("Caption", _überschriftanordung);
         result.ParseableAdd("ID", ColorId);
         result.ParseableAdd("OutputDatabase", OutputDatabase);
         return result.Parseable(base.ToString());
@@ -235,7 +239,7 @@ public class DropDownSelectRowPadItem : RectanglePadItemWithVersion, IReadableTe
                 Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
         } else {
-            CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
+            FakeControlPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

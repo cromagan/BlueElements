@@ -45,14 +45,15 @@ namespace BlueControls.ItemCollection;
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
 /// </summary>
 
-public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
+public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
 
     #region Fields
 
     private string _anzeige = string.Empty;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-    private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+    private List<IItemSendFilter> _getFilterFrom = new() { };
     private string _überschrift = string.Empty;
+    private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
 
@@ -87,15 +88,13 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
     }
 
     public ÜberschriftAnordnung CaptionPosition {
-        get => _überschiftanordung;
+        get => _überschriftanordung;
         set {
-            if (_überschiftanordung == value) { return; }
-            _überschiftanordung = value;
+            if (_überschriftanordung == value) { return; }
+            _überschriftanordung = value;
             OnChanged();
         }
     }
-
-    public ObservableCollection<string> ChildIds { get; } = new();
 
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
@@ -123,6 +122,17 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
             if (OutputDatabase == null || OutputDatabase.IsDisposed) { return; }
             TableView.OpenDatabaseHeadEditor(OutputDatabase);
         }
+    }
+
+    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_hinzufügen {
+        get => string.Empty;
+        set => FakeControlPadItem.Datenquelle_hinzufügen_Filter(this);
+    }
+
+    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
+        get => new(_getFilterFrom);
+        set => this.ChangeFilterTo(_getFilterFrom, value);
     }
 
     /// <summary>
@@ -200,7 +210,7 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
                 return true;
 
             case "caption":
-                _überschiftanordung = (ÜberschriftAnordnung)IntParse(value);
+                _überschriftanordung = (ÜberschriftAnordnung)IntParse(value);
                 return true;
 
             case "captiontext":
@@ -229,7 +239,7 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
         result.ParseableAdd("CaptionText", _überschrift);
         result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _überschiftanordung);
+        result.ParseableAdd("Caption", _überschriftanordung);
         result.ParseableAdd("ID", Id);
         result.ParseableAdd("Database", OutputDatabase);
         return result.Parseable(base.ToString());
@@ -249,7 +259,7 @@ public class InputFilterOutputFilterPadItem : CustomizableShowPadItem, IReadable
                 Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
         } else {
-            CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
+            FakeControlPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

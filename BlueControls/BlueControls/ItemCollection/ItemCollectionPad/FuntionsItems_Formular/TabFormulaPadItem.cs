@@ -40,7 +40,7 @@ namespace BlueControls.ItemCollection;
 /// <summary>
 /// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
 /// </summary>
-public class TabFormulaPadItem : CustomizableShowPadItem, IHasConnectedFormula, IItemAcceptRow {
+public class TabFormulaPadItem : FakeControlAcceptRowPadItem, IHasConnectedFormula, IItemAcceptRow {
 
     #region Fields
 
@@ -231,9 +231,13 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IHasConnectedFormula, 
         //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
         Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
 
-        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _inputColorId);
-
+     
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+
+        if (!forPrinting) {
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _inputColorId);
+        }
+
     }
 
     //protected override BasicPadItem? TryCreate(string id, string name) {
@@ -283,7 +287,7 @@ public class TabFormulaPadItem : CustomizableShowPadItem, IHasConnectedFormula, 
         _childs.Clear();
         _childs.AddRange(((ListBox)sender).Item.ToListOfString());
         OnChanged();
-        RaiseVersion();
+        this.RaiseVersion();
     }
 
     private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuComands.Bearbeiten);

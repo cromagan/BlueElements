@@ -18,27 +18,31 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 namespace BlueControls.Interfaces;
 
-/// <summary>
-/// Wird verwendet, wenn das Steuerelement etwas empfangen kann
-/// </summary>
-public interface IItemAcceptSomething : IDisposableExtended, IItemToControl, IChangedFeedback, IHasVersion {
+public interface IHasVersion {
 
     #region Properties
 
-    public string Page { get; }
-    public ItemCollectionPad? Parent { get; }
+    public int Version { get; set; }
 
     #endregion
+}
+
+public static class IHasVersionExtensions {
 
     #region Methods
 
-    public void SetInputColorId(int inputColorId);
+    public static void RaiseVersion(this IHasVersion item) {
+        if (item.Version == int.MaxValue) { item.Version = 0; }
+        item.Version++;
+    }
 
     #endregion
 }

@@ -19,11 +19,12 @@
 
 using System.Collections.Generic;
 using BlueBasics;
+using BlueControls.Interfaces;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public abstract class RectanglePadItemWithVersion : RectanglePadItem {
+public abstract class RectanglePadItemWithVersion : RectanglePadItem, IHasVersion {
 
     #region Constructors
 
@@ -49,11 +50,6 @@ public abstract class RectanglePadItemWithVersion : RectanglePadItem {
                 return true;
         }
         return false;
-    }
-
-    public void RaiseVersion() {
-        if (Version == int.MaxValue) { Version = 0; }
-        Version++;
     }
 
     public override string ToString() {

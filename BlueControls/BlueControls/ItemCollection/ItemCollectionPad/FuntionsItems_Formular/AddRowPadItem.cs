@@ -47,27 +47,21 @@ namespace BlueControls.ItemCollection;
 /// Per Tabellenansicht
 /// </summary>
 
-public class AddRowPaditem : CustomizableShowPadItem, IReadableText, IItemToControl, IItemAcceptFilter {
+public class AddRowPaditem : FakeControlAcceptFilterPadItem, IReadableText, IItemToControl, IItemAcceptFilter {
 
     #region Fields
 
     private string _anzeige = string.Empty;
 
+    private List<IItemSendFilter> _getFilterFrom = new() { };
+
     #endregion
 
     #region Constructors
 
-    public AddRowPaditem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
+    public AddRowPaditem(string keyname, string toParse) : this(keyname) => Parse(toParse);
 
-    public AddRowPaditem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
-
-    public AddRowPaditem(string intern, DatabaseAbstract? db, int id) : base(intern) {
-        InputDatabase = db;
-
-        Id = id;
-    }
-
-    public AddRowPaditem(string intern) : this(intern, null, 0) { }
+    public AddRowPaditem(string intern) : base(intern) { }
 
     #endregion
 
@@ -85,36 +79,6 @@ public class AddRowPaditem : CustomizableShowPadItem, IReadableText, IItemToCont
         }
     }
 
-    public string Datenbank_wählen {
-        get => string.Empty;
-        set {
-            var db = CommonDialogs.ChooseKnownDatabase();
-
-            if (db == null) { return; }
-
-            if (db == InputDatabase) { return; }
-            InputDatabase = db;
-
-            //FilterDatabaseUpdate();
-
-            //RepairConnections(this);
-        }
-    }
-
-    public string Datenbankkopf {
-        get => string.Empty;
-        set {
-            if (InputDatabase == null || InputDatabase.IsDisposed) { return; }
-            TableView.OpenDatabaseHeadEditor(InputDatabase);
-        }
-    }
-
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int Id { get; set; }
-
-    public DatabaseAbstract? InputDatabase { get; set; }
     protected override int SaveOrder => 1;
 
     #endregion
@@ -133,15 +97,7 @@ public class AddRowPaditem : CustomizableShowPadItem, IReadableText, IItemToCont
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() {
-            new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
-            new FlexiControl()
-        };
-        if (InputDatabase == null || InputDatabase.IsDisposed) { return l; }
-
-        l.Add(new FlexiControlForProperty<string>(() => Anzeige));
-
-        l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
+        List<GenericControl> l = new();
 
         return l;
     }
@@ -149,21 +105,6 @@ public class AddRowPaditem : CustomizableShowPadItem, IReadableText, IItemToCont
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
-            case "inputdatabase":
-
-                var na = value.FromNonCritical();
-
-                if (na.IsFormat(FormatHolder.FilepathAndName)) {
-                    na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
-                }
-
-                InputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
-                return true;
-
-            case "id":
-                Id = IntParse(value);
-                return true;
-
             case "showformat":
                 _anzeige = value.FromNonCritical();
                 return true;
@@ -172,29 +113,31 @@ public class AddRowPaditem : CustomizableShowPadItem, IReadableText, IItemToCont
     }
 
     public string ReadableText() {
-        if (InputDatabase != null && !InputDatabase.IsDisposed) {
-            return "Neue Zeile anlegen in: " + InputDatabase.Caption;
+        var db = this.InputDatabase();
+
+        if (db != null && !db.IsDisposed) {
+            return "Neue Zeile anlegen in: " + db.Caption;
         }
 
         return "Neue Zeile anlegen einer Datenbank";
     }
 
-    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.PlusZeichen, 10, Color.Transparent, Skin.IDColor(Id));
+    public QuickImage? SymbolForReadableText() => null;
 
     public override string ToString() {
         var result = new List<string>();
         result.ParseableAdd("ShowFormat", _anzeige);
-        result.ParseableAdd("ID", Id);
-        result.ParseableAdd("InputDatabase", InputDatabase);
         return result.Parseable(base.ToString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, Id);
+            var db = this.InputDatabase();
 
-            if (InputDatabase != null && !InputDatabase.IsDisposed) {
-                var txt = "Neue Zeile anlegen Zeile in " + InputDatabase.Caption;
+            DrawColorScheme(gr, positionModified, zoom, -1);
+
+            if (db != null && !db.IsDisposed) {
+                var txt = "Neue Zeile anlegen Zeile in " + db.Caption;
 
                 Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             } else {

@@ -444,15 +444,15 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     /// </summary>
     public virtual void ProcessStyleChange() { }
 
-    public void RemoveAllConnections() {
-        foreach (var thisCon in Parent.Connections) {
-            if (thisCon.Item1 == this || thisCon.Item2 == this) {
-                Parent.Connections.Remove(thisCon);
-                RemoveAllConnections();
-                return;
-            }
-        }
-    }
+    //public void RemoveAllConnections() {
+    //    foreach (var thisCon in Parent.Connections) {
+    //        if (thisCon.Item1 == this || thisCon.Item2 == this) {
+    //            Parent.Connections.Remove(thisCon);
+    //            RemoveAllConnections();
+    //            return;
+    //        }
+    //    }
+    //}
 
     public override string ToString() {
         List<string> result = new();

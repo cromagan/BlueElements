@@ -32,7 +32,7 @@ namespace BlueControls.ItemCollection;
 /// Erzeut ein EasyPic
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl, IItemAcceptRow {
+public class EasyPicPadItem : FakeControlAcceptRowPadItem, IItemToControl, IItemAcceptRow {
 
     #region Fields
 
@@ -57,7 +57,7 @@ public class EasyPicPadItem : CustomizableShowPadItem, IItemToControl, IItemAcce
         set {
             if (value == _bild_Dateiname) { return; }
             _bild_Dateiname = value;
-            RaiseVersion();
+            this.RaiseVersion();
             OnChanged();
         }
     }

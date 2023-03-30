@@ -122,6 +122,7 @@
     <Compile Include="Forms\FormWithStatusBar.designer.cs">
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\NewInterfaces\IHasVersion.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemAcceptSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemAcceptRow.cs" />
     <Compile Include="Interfaces\NewInterfaces\IHasColorId.cs" />
@@ -329,6 +330,9 @@
     </Compile>
     <Compile Include="ItemCollection\ItemCollectionList\ReadableListItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\Abstract\AcceptSomethingPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\Abstract\FakeControlAcceptFilterPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\Abstract\FakeControlAcceptRowPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\AddRowPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\RowEntryPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\TableSelectRowPadItem.cs" />
@@ -338,7 +342,7 @@
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\InputFilterOutputFilterPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\InputRowOutputFilterPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\TabFormulaPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\Abstract\CustomizableShowPadItem.cs" />
+    <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\Abstract\FakeControlPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\VariableFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\FileExplorerPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FuntionsItems_Formular\EditFieldPadItem.cs" />

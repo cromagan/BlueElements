@@ -44,11 +44,11 @@ namespace BlueControls.ItemCollection;
 
 /// <summary>
 /// Diese Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element
-/// Hat NICHT IAcceptRowItem, da es nur von einer einzigen Intneren Routine befüllt werden darf
+/// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf
 /// Unsichtbares Element, wird nicht angezeigt
 /// </summary>
 
-public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemSendRow {
+public class RowEntryPadItem : AcceptSomethingPadItem, IReadableText, IItemToControl, IItemSendRow {
 
     #region Constructors
 
@@ -58,7 +58,6 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
     public RowEntryPadItem(string intern, DatabaseAbstract? db) : base(intern) {
         OutputDatabase = db;
-        ColorId = -1;
     }
 
     public RowEntryPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
@@ -68,8 +67,6 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
     #region Properties
 
     public static string ClassId => "FI-RowEntryElement";
-
-    public ObservableCollection<string> ChildIds { get; } = new();
 
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
@@ -108,53 +105,59 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
     #region Methods
 
     public static void DrawInputArrow(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, string symbol, int colorId) {
+        if (forPrinting) { return; }
+
         var p = positionModified.PointOf(Alignment.Top_HorizontalCenter);
-        var s = (int)(zoom * 15);
+        var s = (int)(zoom * 12);
         var s2 = (int)(zoom * 25);
         var pa = Poly_Arrow(new Rectangle(0, 0, s, s2));
 
-        gr.TranslateTransform(p.X + s2 / 2, p.Y - s * 0.6f);
+        var c = Skin.IDColor(colorId);
+        var c2 = c.Darken(0.4);
+
+        gr.TranslateTransform(p.X + s2 / 2, p.Y - s * 0.35f);
 
         gr.RotateTransform(90);
 
-        var c = Skin.IDColor(colorId);
-        var c2 = c.Darken(0.8);
-
         gr.FillPath(new SolidBrush(c), pa);
-        gr.DrawPath(new Pen(c2, 2 * zoom), pa);
+        gr.DrawPath(new Pen(c2, 1 * zoom), pa);
 
         gr.RotateTransform(-90);
-        gr.TranslateTransform(-p.X - s2 / 2, -p.Y + s * 0.6f);
+        gr.TranslateTransform(-p.X - s2 / 2, -p.Y + s * 0.35f);
 
         if (!string.IsNullOrEmpty(symbol)) {
-            var sy = QuickImage.Get(symbol, (int)(7 * zoom));
-            gr.DrawImage(sy, p.X - sy.Width / 2, p.Y - s * 0.3f);
+            var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
+            var sy = QuickImage.Get(co);
+            gr.DrawImage(sy, p.X - sy.Width / 2, p.Y - s * 0.15f);
         }
     }
 
     public static void DrawOutputArrow(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, string symbol, int colorId) {
+        if (forPrinting) { return; }
+
         var p = positionModified.PointOf(Alignment.Bottom_HorizontalCenter);
-        var s = (int)(zoom * 15);
+        var s = (int)(zoom * 12);
         var s2 = (int)(zoom * 25);
         var pa = Poly_Arrow(new Rectangle(0, 0, s, s2));
 
-        gr.TranslateTransform(p.X + s2 / 2, p.Y - s * 0.3f);
+        var c = Skin.IDColor(colorId);
+        var c2 = c.Darken(0.4);
+
+        gr.TranslateTransform(p.X + s2 / 2, p.Y - s * 0.45f);
 
         gr.RotateTransform(90);
-
-        var c = Skin.IDColor(colorId);
-        var c2 = c.Darken(0.8);
-
         gr.FillPath(new SolidBrush(c), pa);
-        gr.DrawPath(new Pen(c2, 2 * zoom), pa);
+        gr.DrawPath(new Pen(c2, 1 * zoom), pa);
 
         gr.RotateTransform(-90);
 
-        gr.TranslateTransform(-p.X - s2 / 2, -p.Y + s * 0.3f);
+        gr.TranslateTransform(-p.X - s2 / 2, -p.Y + s * 0.45f);
 
         if (!string.IsNullOrEmpty(symbol)) {
-            var sy = QuickImage.Get(symbol, (int)(7 * zoom));
-            gr.DrawImage(sy, p.X - sy.Width / 2, p.Y + s * 0.05f);
+            var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
+
+            var sy = QuickImage.Get(co);
+            gr.DrawImage(sy, p.X - sy.Width / 2, p.Y + s * 0.02f);
         }
     }
 

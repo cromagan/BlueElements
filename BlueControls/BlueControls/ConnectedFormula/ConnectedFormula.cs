@@ -265,7 +265,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             if (string.IsNullOrEmpty(page) ||
                 string.IsNullOrEmpty(thisItem.Page) ||
                 page.Equals(thisItem.Page, StringComparison.OrdinalIgnoreCase)) {
-                if (thisItem is CustomizableShowPadItem cspi) {
+                if (thisItem is FakeControlPadItem cspi) {
                     if (cspi.IsVisibleForMe(myGroup, myName)) { return true; }
                 }
             }

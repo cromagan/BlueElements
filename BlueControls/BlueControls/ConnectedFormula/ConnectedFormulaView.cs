@@ -259,7 +259,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
                         if (o is Control c) {
                             _ = unused.Remove(c);
 
-                            if (thisit is CustomizableShowPadItem cspi) {
+                            if (thisit is FakeControlPadItem cspi) {
                                 c.Visible = cspi.IsVisibleForMe(Database?.UserGroup, Database?.UserName);
                             } else {
                                 c.Visible = true;

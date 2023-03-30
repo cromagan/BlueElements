@@ -17,42 +17,53 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows.Forms.Design;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace BlueControls.Interfaces;
 
-public interface IItemSendSomething : IDisposableExtended, IItemToControl, IHasKeyName, IHasColorId, IChangedFeedback {
+public interface IItemSendSomething : IDisposableExtended, IItemToControl, IHasKeyName, IHasColorId, IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion {
 
     #region Properties
 
-    public ObservableCollection<string> ChildIds { get; }
+    public ReadOnlyCollection<string>? ChildIds { get; set; }
     public DatabaseAbstract? OutputDatabase { get; set; }
     public string Page { get; }
     public ItemCollectionPad? Parent { get; }
 
     #endregion
 
-    #region Methods
-
-    public void RemoveAllConnections();
-
-    #endregion
+    //public void RemoveAllConnections();
 }
 
 public static class IItemSendSomethingExtensions {
 
     #region Methods
 
+    public static void AddChild(this IItemSendSomething item, IHasKeyName add) {
+        var l = new List<string>();
+
+        if (item.ChildIds != null) { l.AddRange(item.ChildIds); }
+
+        l.AddIfNotExists(add.KeyName);
+
+        item.ChildIds = new ReadOnlyCollection<string>(l);
+    }
+
     public static void DoChilds(this IItemSendSomething item) {
-        item.RemoveAllConnections();
-        //var item1 = item.Parent[item.KeyName];
+        if (item.ChildIds == null) { return; }
+
+        if (item.Parent == null) { return; }
+
         foreach (var thisChild in item.ChildIds) {
             var item2 = item.Parent[thisChild];
 
@@ -72,15 +83,26 @@ public static class IItemSendSomethingExtensions {
         item.OnChanged();
     }
 
-    public static void RepairConnections(this IItemSendSomething item) {
-        item.RemoveAllConnections();
-        var item1 = item.Parent[item.KeyName];
-        foreach (var thisChild in item.ChildIds) {
-            var item2 = item.Parent[thisChild];
+    public static void RemoveChild(this IItemSendSomething item, IHasKeyName remove) {
+        var l = new List<string>();
 
-            item1.Parent.Connections.Add(new ItemConnection(item1, ConnectionType.Bottom, false, item2, ConnectionType.Top, true, false));
+        if (item.ChildIds != null) {
+            l.AddRange(item.ChildIds);
+
+            l.Remove(remove.KeyName);
         }
+        item.ChildIds = new ReadOnlyCollection<string>(l);
     }
 
     #endregion
+
+    //public static void RepairConnections(this IItemSendSomething item) {
+    //    item.RemoveAllConnections();
+    //    var item1 = item.Parent[item.KeyName];
+    //    foreach (var thisChild in item.ChildIds) {
+    //        var item2 = item.Parent[thisChild];
+
+    //        item1.Parent.Connections.Add(new ItemConnection(item1, ConnectionType.Bottom, false, item2, ConnectionType.Top, true, false));
+    //    }
+    //}
 }

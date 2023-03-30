@@ -47,11 +47,11 @@ namespace BlueControls.ItemCollection;
 /// Unsichtbares element, wird nicht angezeigt
 /// </summary>
 
-public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
+public class ScriptChangeFilterPadItem : AcceptSomethingPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
 
     #region Fields
 
-    private int _inputColorId = -1;
+    private List<IItemSendFilter> _getFilterFrom = new() { };
 
     #endregion
 
@@ -74,8 +74,6 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
     #region Properties
 
     public static string ClassId => "FI-ChangeFilterWithScriptElement";
-
-    public ObservableCollection<string> ChildIds { get; } = new();
 
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
@@ -105,12 +103,23 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         }
     }
 
+    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_hinzufügen {
+        get => string.Empty;
+        set => FakeControlPadItem.Datenquelle_hinzufügen_Filter(this);
+    }
+
+    public string Datenquelle_wählen { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+
+    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
+        get => new(_getFilterFrom);
+        set => this.ChangeFilterTo(_getFilterFrom, value);
+    }
+
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
     /// </summary>
     public int Id { get; set; }
-
-    public DatabaseAbstract? InputDatabase => OutputDatabase;
 
     public DatabaseAbstract? OutputDatabase { get; set; }
 
@@ -120,7 +129,7 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
 
     #region Methods
 
-    public Control CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
         //    EditType = _bearbeitung,
         //    CaptionPosition = CaptionPosition,
@@ -169,13 +178,6 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         }
 
         return "Filterconverter";
-    }
-
-    public void SetInputColorId(int inputColorId) {
-        if (_inputColorId == inputColorId) { return; }
-
-        _inputColorId = inputColorId;
-        OnChanged();
     }
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));

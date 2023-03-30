@@ -65,7 +65,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (l is ICalculateRowsItemLevel ri) {
             x.GetRowFrom = ri;
         }
-        if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
+        if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
             x.GetRowFrom = efi.GetRowFrom;
         }
 
@@ -86,7 +86,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (l is ICalculateRowsItemLevel ri) {
             x.GetRowFrom = ri;
         }
-        if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
+        if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
             x.GetRowFrom = efi.GetRowFrom;
         }
 
@@ -180,7 +180,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
             x.GetRowFrom = ri;
         }
 
-        if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
+        if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
             x.GetRowFrom = efi.GetRowFrom;
         }
 
@@ -260,7 +260,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (l is ICalculateRowsItemLevel ri) {
             x.GetRowFrom = ri;
         }
-        if (l is CustomizableShowPadItem efi && efi.GetRowFrom != null) {
+        if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
             x.GetRowFrom = efi.GetRowFrom;
         }
 

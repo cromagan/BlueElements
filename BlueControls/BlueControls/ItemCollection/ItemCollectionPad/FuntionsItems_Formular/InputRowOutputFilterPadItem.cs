@@ -38,27 +38,22 @@ using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueControls.Interfaces.IItemSendSomethingExtensions;
+using static BlueControls.Interfaces.IItemAcceptRowExtension;
 
 namespace BlueControls.ItemCollection;
 
 /// <summary>
-/// Dieses Element kann eine Zeile empfangen, und einen Filter für eine andere Datanbank basteln und diesen abgeben.
+/// Dieses Element kann eine Zeile empfangen, und einen Filter für eine andere Datenbank basteln und diesen abgeben.
 /// Unsichtbares Element, wird nicht angezeigt
 /// </summary>
 
-public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptRow, IItemSendFilter {
+public class InputRowOutputFilterPadItem : AcceptSomethingPadItem, IReadableText, IItemToControl, IItemAcceptRow, IItemSendFilter {
 
     #region Fields
 
-    private string _anzeige = string.Empty;
-    private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
     private string? _getValueFromkey;
-    private int _inputColorId = -1;
+
     private IItemSendRow? _tmpgetValueFrom;
-
-    private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
-
-    private string _überschrift = string.Empty;
 
     #endregion
 
@@ -81,27 +76,6 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     #region Properties
 
     public static string ClassId => "FI-UserSelectionFilter";
-
-    [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
-    public string Anzeige {
-        get => _anzeige;
-        set {
-            if (_anzeige == value) { return; }
-            _anzeige = value;
-            OnChanged();
-        }
-    }
-
-    public ÜberschriftAnordnung CaptionPosition {
-        get => _überschiftanordung;
-        set {
-            if (_überschiftanordung == value) { return; }
-            _überschiftanordung = value;
-            OnChanged();
-        }
-    }
-
-    public ObservableCollection<string> ChildIds { get; } = new();
 
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
@@ -130,6 +104,12 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
             if (OutputDatabase == null || OutputDatabase.IsDisposed) { return; }
             TableView.OpenDatabaseHeadEditor(OutputDatabase);
         }
+    }
+
+    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_wählen {
+        get => string.Empty;
+        set => FakeControlPadItem.Datenquelle_wählen_Zeile(this);
     }
 
     public string Filter_hinzufügen {
@@ -164,29 +144,17 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
             return _tmpgetValueFrom;
         }
         set {
-            var kn = value?.KeyName ?? string.Empty;
+            var f = GetRowFrom;
+            this.ChangeGetRowFrom(ref f, value);
 
-            if (kn == _getValueFromkey) { return; }
-            _getValueFromkey = kn;
-            _tmpgetValueFrom = null;
-            //RepairConnections(value);
-            RaiseVersion();
-            OnChanged();
+            _tmpgetValueFrom = f;
+            _getValueFromkey = null;
+
+            _getValueFromkey = f?.KeyName ?? string.Empty;
         }
     }
-
-    public DatabaseAbstract? InputDatabase => OutputDatabase;
 
     public DatabaseAbstract? OutputDatabase { get; set; }
-
-    public string Überschrift {
-        get => _überschrift;
-        set {
-            if (_überschrift == value) { return; }
-            _überschrift = value;
-            OnChanged();
-        }
-    }
 
     protected override int SaveOrder => 1;
 
@@ -206,17 +174,11 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() {
-            new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
-            new FlexiControl()
-        };
-        if (OutputDatabase == null || OutputDatabase.IsDisposed) { return l; }
-        l.Add(new FlexiControlForProperty<string>(() => Überschrift));
-        l.Add(new FlexiControlForProperty<string>(() => Anzeige));
+        var l = base.GetStyleOptions();
 
         var u = new ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
-        l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
+
         l.Add(new FlexiControl());
 
         l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
@@ -242,22 +204,6 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
             case "id":
                 ColorId = IntParse(value);
                 return true;
-
-            case "edittype":
-                _bearbeitung = (EditTypeFormula)IntParse(value);
-                return true;
-
-            case "caption":
-                _überschiftanordung = (ÜberschriftAnordnung)IntParse(value);
-                return true;
-
-            case "captiontext":
-                _überschrift = value.FromNonCritical();
-                return true;
-
-            case "showformat":
-                _anzeige = value.FromNonCritical();
-                return true;
         }
         return false;
     }
@@ -270,21 +216,10 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
         return "Zeile einer Datenbank";
     }
 
-    public void SetInputColorId(int inputColorId) {
-        if (_inputColorId == inputColorId) { return; }
-
-        _inputColorId = inputColorId;
-        OnChanged();
-    }
-
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(ColorId));
 
     public override string ToString() {
         var result = new List<string>();
-        result.ParseableAdd("CaptionText", _überschrift);
-        result.ParseableAdd("ShowFormat", _anzeige);
-        result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _überschiftanordung);
         result.ParseableAdd("ID", ColorId);
         result.ParseableAdd("OutputDatabase", OutputDatabase);
         result.ParseableAdd("FilterDB", FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, null as List<ColumnItem>, null));
@@ -304,8 +239,6 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
             } else {
                 Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
-        } else {
-            CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

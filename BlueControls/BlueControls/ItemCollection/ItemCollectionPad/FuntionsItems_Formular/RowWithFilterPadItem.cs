@@ -45,14 +45,14 @@ namespace BlueControls.ItemCollection;
 /// Altes Element, Filter und Zeilenauswahl in einem
 /// </summary>
 [Obsolete]
-public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, ICalculateRowsItemLevel, IItemToControl, IItemSendRow {
+public class RowWithFilterPadItem : AcceptSomethingPadItem, IReadableText, ICalculateRowsItemLevel, IItemToControl, IItemSendRow {
 
     #region Fields
 
     private string _anzeige = string.Empty;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-    private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
     private string _überschrift = string.Empty;
+    private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
 
@@ -92,15 +92,13 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
     }
 
     public ÜberschriftAnordnung CaptionPosition {
-        get => _überschiftanordung;
+        get => _überschriftanordung;
         set {
-            if (_überschiftanordung == value) { return; }
-            _überschiftanordung = value;
+            if (_überschriftanordung == value) { return; }
+            _überschriftanordung = value;
             OnChanged();
         }
     }
-
-    public ObservableCollection<string> ChildIds { get; } = new();
 
     /// <summary>
     /// Laufende Nummer, bestimmt die Einfärbung
@@ -268,7 +266,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 return true;
 
             case "caption":
-                _überschiftanordung = (ÜberschriftAnordnung)IntParse(value);
+                _überschriftanordung = (ÜberschriftAnordnung)IntParse(value);
                 return true;
 
             case "captiontext":
@@ -297,7 +295,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
         result.ParseableAdd("CaptionText", _überschrift);
         result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _überschiftanordung);
+        result.ParseableAdd("Caption", _überschriftanordung);
         result.ParseableAdd("ID", Id);
         result.ParseableAdd("Database", OutputDatabase);
         result.ParseableAdd("FilterDB", FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, null as List<ColumnItem>, null));
@@ -329,7 +327,7 @@ public class RowWithFilterPadItem : RectanglePadItemWithVersion, IReadableText, 
                 Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
         } else {
-            CustomizableShowPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
+            FakeControlPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

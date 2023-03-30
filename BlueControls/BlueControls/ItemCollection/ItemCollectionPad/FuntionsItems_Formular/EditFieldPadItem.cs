@@ -34,6 +34,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
+using static BlueControls.Interfaces.IHasVersionExtensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -41,14 +42,14 @@ namespace BlueControls.ItemCollection;
 /// Erzeut ein FlexiControllForCell
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToControl, IItemAcceptRow {
+public class EditFieldPadItem : FakeControlAcceptRowPadItem, IReadableText, IItemToControl, IItemAcceptRow, IHasVersion {
 
     #region Fields
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
     private ColumnItem? _column;
     private string _columnName = string.Empty;
-    private ÜberschriftAnordnung _überschiftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+    private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
 
@@ -63,11 +64,11 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
     public static string ClassId => "FI-EditField";
 
     public ÜberschriftAnordnung CaptionPosition {
-        get => _überschiftanordung;
+        get => _überschriftanordung;
         set {
-            if (_überschiftanordung == value) { return; }
-            RaiseVersion();
-            _überschiftanordung = value;
+            if (_überschriftanordung == value) { return; }
+            this.RaiseVersion();
+            _überschriftanordung = value;
             OnChanged();
         }
     }
@@ -91,7 +92,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
         get => _bearbeitung;
         set {
             if (_bearbeitung == value) { return; }
-            RaiseVersion();
+            this.RaiseVersion();
             _bearbeitung = value;
             OnChanged();
         }
@@ -141,7 +142,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
 
             if (col == Column) { return; }
             Column = col;
-            RaiseVersion();
+            this.RaiseVersion();
             OnChanged();
         }
     }
@@ -256,7 +257,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
                 return true;
 
             case "caption":
-                _überschiftanordung = (ÜberschriftAnordnung)IntParse(value);
+                _überschriftanordung = (ÜberschriftAnordnung)IntParse(value);
                 return true;
         }
         return false;
@@ -286,7 +287,7 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
         var result = new List<string>();
         result.ParseableAdd("ColumnName", _columnName);
         result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _überschiftanordung);
+        result.ParseableAdd("Caption", _überschriftanordung);
         return result.Parseable(base.ToString());
     }
 
@@ -295,7 +296,6 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
         if (GetRowFrom != null) { id = GetRowFrom.ColorId; }
 
         if (!forPrinting) {
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
             DrawColorScheme(gr, positionModified, zoom, id);
         }
 
@@ -308,6 +308,10 @@ public class EditFieldPadItem : CustomizableShowPadItem, IReadableText, IItemToC
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+
+        if (!forPrinting) {
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
+        }
     }
 
     #endregion

@@ -32,6 +32,8 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueControls.Interfaces.IItemSendSomethingExtensions;
+using static BlueControls.Interfaces.IHasVersionExtensions;
+using System.Collections.ObjectModel;
 
 namespace BlueControls.ItemCollection;
 
@@ -40,22 +42,19 @@ namespace BlueControls.ItemCollection;
 /// Stellt auch alle Methode breit, zum Einrichten der Breite und Benutzer-Sichtbarkeiten.
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet
 /// </summary>
-public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IItemToControl, IItemAcceptRow {
+public abstract class FakeControlPadItem : AcceptSomethingPadItem, IItemToControl, IItemAcceptSomething {
 
     #region Fields
 
     public static BlueFont? CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
     public List<string> VisibleFor = new();
-    protected int _inputColorId = -1;
-    private string? _getValueFromkey;
-    private IItemSendRow? _tmpgetValueFrom;
 
     #endregion
 
     #region Constructors
 
-    protected CustomizableShowPadItem(string internalname) : base(internalname) => SetCoordinates(new RectangleF(0, 0, 50, 30), true);
+    protected FakeControlPadItem(string internalname) : base(internalname) => SetCoordinates(new RectangleF(0, 0, 50, 30), true);
 
     #endregion
 
@@ -82,72 +81,9 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             var anzbr = IntParse(doit[0]);
             var npos = IntParse(doit[1]);
             SetXPosition(anzbr, npos, 1);
-            RaiseVersion();
+            this.RaiseVersion();
         }
     }
-
-    public string Datenbank {
-        get {
-            if (GetRowFrom?.OutputDatabase == null || GetRowFrom.OutputDatabase.IsDisposed) { return "?"; }
-
-            return GetRowFrom.OutputDatabase.TableName;
-        }
-    }
-
-    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_wählen {
-        get => string.Empty;
-        set {
-            if (Parent is null) { return; }
-
-            var x = new ItemCollectionList.ItemCollectionList(true);
-            foreach (var thisR in Parent) {
-                if (thisR.IsVisibleOnPage(Page) && thisR is ICalculateRowsItemLevel rfp) {
-                    _ = x.Add(rfp);
-                }
-            }
-
-            _ = x.Add("<Keine Quelle>");
-
-            var it = InputBoxListBoxStyle.Show("Quelle wählen:", x, AddType.None, true);
-
-            if (it == null || it.Count != 1) { return; }
-
-            var t = Parent[it[0]];
-
-            if (t is ICalculateRowsItemLevel rfp2) {
-                if (rfp2 != GetRowFrom) {
-                    GetRowFrom = rfp2;
-                }
-            } else {
-                GetRowFrom = null;
-            }
-            RaiseVersion();
-            OnChanged();
-        }
-    }
-
-    public IItemSendRow? GetRowFrom {
-        get {
-            if (Parent == null || _getValueFromkey == null) { return null; }
-
-            _tmpgetValueFrom ??= Parent[_getValueFromkey] as IItemSendRow;
-
-            return _tmpgetValueFrom;
-        }
-        set {
-            var kn = value?.KeyName ?? string.Empty;
-
-            if (kn == _getValueFromkey) { return; }
-            _getValueFromkey = kn;
-            _tmpgetValueFrom = null;
-            //RepairConnections(value);
-            RaiseVersion();
-            OnChanged();
-        }
-    }
-
-    public DatabaseAbstract? InputDatabase => GetRowFrom?.OutputDatabase;
 
     public string Sichtbarkeit {
         get => string.Empty;
@@ -171,7 +107,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             }
 
             if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Administrator); }
-            RaiseVersion();
+            this.RaiseVersion();
             OnChanged();
         }
     }
@@ -187,7 +123,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
             x.Height = (int)((x.Height / he1) + 0.99) * he1;
 
             if (x.Height < he) { x.Height = he; }
-            RaiseVersion();
+            this.RaiseVersion();
             SetCoordinates(x, true);
         }
     }
@@ -237,34 +173,9 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         }
     }
 
-    public virtual Control? CreateControl(ConnectedFormulaView parent) => throw new NotImplementedException();
-
-    public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() {
-            new FlexiControlForProperty<string>(() => Datenquelle_wählen, ImageCode.Pfeil_Rechts),
-            new FlexiControlForProperty<string>(() => Datenbank),
-
-            new FlexiControl(),
-            new FlexiControlForProperty<string>(() => Sichtbarkeit, ImageCode.Schild),
-            new FlexiControlForProperty<string>(() => Standardhöhe_setzen, ImageCode.GrößeÄndern),
-            new FlexiControlForProperty<string>(() => Breite_berechnen, ImageCode.GrößeÄndern)
-        };
-
-        return l;
-    }
-
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
-            case "version":
-                Version = IntParse(value);
-                return true;
-
-            case "getvaluefrom":
-                _getValueFromkey = value.FromNonCritical();
-
-                return true;
-
             case "visiblefor":
                 value = value.Replace("\r", "|");
 
@@ -279,13 +190,6 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
         return false;
     }
 
-    public void SetInputColorId(int inputColorId) {
-        if (_inputColorId == inputColorId) { return; }
-
-        _inputColorId = inputColorId;
-        OnChanged();
-    }
-
     public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition, int breiteInspalten) {
         var x = UsedArea;
         x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
@@ -296,12 +200,9 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     public override string ToString() {
         var result = new List<string>();
 
-        result.ParseableAdd("Version", Version);
-
         if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Everybody); }
 
         result.ParseableAdd("VisibleFor", VisibleFor);
-        result.ParseableAdd("GetValueFrom", _getValueFromkey);
 
         return result.Parseable(base.ToString());
     }
@@ -323,7 +224,7 @@ public abstract class CustomizableShowPadItem : RectanglePadItemWithVersion, IIt
     private List<string> Permission_AllUsed() {
         var l = new List<string>();
         foreach (var thisIt in Parent) {
-            if (thisIt is CustomizableShowPadItem csi) {
+            if (thisIt is FakeControlPadItem csi) {
                 l.AddRange(csi.VisibleFor);
             }
         }
