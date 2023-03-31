@@ -347,9 +347,7 @@ public partial class TableView : FormWithStatusBar {
         chkAnsichtFormular.Enabled = datenbankDa;
         chkAnsichtTableFormular.Enabled = datenbankDa;
 
-        if (Table?.Database is DatabaseMultiUser bdb) {
-            btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(bdb.Filename);
-        } else if (Table?.Database is Database bd) {
+        if (Table?.Database is Database bd) {
             btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(bd.Filename);
         } else {
             btnDatenbankenSpeicherort.Enabled = false;
@@ -735,10 +733,6 @@ public partial class TableView : FormWithStatusBar {
     private void btnDatenbankenSpeicherort_Click(object sender, System.EventArgs e) {
         DatabaseAbstract.ForceSaveAll();
         MultiUserFile.ForceLoadSaveAll();
-
-        if (Table.Database is DatabaseMultiUser bdbm) {
-            _ = ExecuteFile(bdbm.Filename.FilePath());
-        }
 
         if (Table.Database is Database bdb) {
             _ = ExecuteFile(bdb.Filename.FilePath());

@@ -583,9 +583,6 @@ public sealed class Database : DatabaseAbstract {
                 if (thisa is Database db) {
                     if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
                 }
-                if (thisa is DatabaseMultiUser dbm) {
-                    if (string.Equals(dbm.Filename.FilePath(), Filename.FilePath())) { return null; }
-                }
             }
         }
 
@@ -703,7 +700,7 @@ public sealed class Database : DatabaseAbstract {
         base.RepairAfterParse();
 
         if (!string.IsNullOrEmpty(Filename)) {
-            if (!string.Equals(TableName, Filename.FileNameWithoutSuffix(), StringComparison.OrdinalIgnoreCase)) {
+            if (!string.Equals( TableName, SqlBackAbstract.MakeValidTableName( Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Tabellenname stimmt nicht: " + Filename);
             }
         }

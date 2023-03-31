@@ -1440,14 +1440,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                     return false;
                 }
             }
-
-            if (thisFile is DatabaseMultiUser dbm) {
-                if (string.Equals(dbm.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                    _ = thisFile.Save();
-                    Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
-                    return false;
-                }
-            }
         }
 
         return true;
@@ -2036,7 +2028,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 if (FileExists(fullhashname)) {
                     FileInfo f = new(fullhashname);
-                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < VorhalteZeit && Constants.GlobalRND.Next(0, VorhalteZeit*20) != 1) {
+                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < VorhalteZeit && Constants.GlobalRND.Next(0, VorhalteZeit * 20) != 1) {
                         if (f.Length < 5) { return; }
                         e.Bmp = new BitmapExt(fullhashname);
                         return;
