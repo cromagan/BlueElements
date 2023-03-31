@@ -38,13 +38,16 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
 
     private string _bild_Dateiname = string.Empty;
 
-    private ItemAcceptRow _iar;
+    private ItemAcceptRow _itemAccepts;
 
     #endregion
 
     #region Constructors
 
-    public EasyPicPadItem(string internalname) : base(internalname) => SetCoordinates(new RectangleF(0, 0, 50, 30), true);
+    public EasyPicPadItem(string internalname) : base(internalname) {
+        _itemAccepts = new();
+        SetCoordinates(new RectangleF(0, 0, 50, 30), true);
+    }
 
     #endregion
 
@@ -67,17 +70,17 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
     [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
     public string Datenquelle_wählen {
         get => string.Empty;
-        set => _iar.Datenquelle_wählen(this);
+        set => _itemAccepts.Datenquelle_wählen(this);
     }
 
     public IItemSendRow? GetRowFrom {
-        get => _iar.GetRowFromGet(this);
-        set => _iar.GetRowFromSet(value, this);
+        get => _itemAccepts.GetRowFromGet(this);
+        set => _itemAccepts.GetRowFromSet(value, this);
     }
 
     public override int InputColorId {
-        get => _iar.InputColorIdGet();
-        set => _iar.InputColorIdSet(value, this);
+        get => _itemAccepts.InputColorIdGet();
+        set => _itemAccepts.InputColorIdSet(value, this);
     }
 
     protected override int SaveOrder => 4;

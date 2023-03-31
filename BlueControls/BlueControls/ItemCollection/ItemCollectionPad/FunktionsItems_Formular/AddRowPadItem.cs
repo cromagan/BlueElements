@@ -51,7 +51,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     private string _anzeige = string.Empty;
 
-    private ItemAcceptFilter _iaf;
+    private ItemAcceptFilter _itemAccepts;
 
     #endregion
 
@@ -59,7 +59,9 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public AddRowPaditem(string keyname, string toParse) : this(keyname) => Parse(toParse);
 
-    public AddRowPaditem(string intern) : base(intern) { }
+    public AddRowPaditem(string intern) : base(intern) {
+        _itemAccepts = new();
+    }
 
     #endregion
 
@@ -80,17 +82,17 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
     [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
     public string Datenquelle_hinzufügen {
         get => string.Empty;
-        set => _iaf.Datenquelle_hinzufügen(this);
+        set => _itemAccepts.Datenquelle_hinzufügen(this);
     }
 
     public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
-        get => _iaf.GetFilterFromGet();
-        set => _iaf.GetFilterFromSet(value, this);
+        get => _itemAccepts.GetFilterFromGet();
+        set => _itemAccepts.GetFilterFromSet(value, this);
     }
 
     public override int InputColorId {
-        get => _iaf.InputColorIdGet();
-        set => _iaf.InputColorIdSet(value, this);
+        get => _itemAccepts.InputColorIdGet();
+        set => _itemAccepts.InputColorIdSet(value, this);
     }
 
     protected override int SaveOrder => 1;
@@ -127,7 +129,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
     }
 
     public string ReadableText() {
-        var db = _iaf.InputDatabase();
+        var db = _itemAccepts.InputDatabase();
 
         if (db != null && !db.IsDisposed) {
             return "Neue Zeile anlegen in: " + db.Caption;
@@ -146,7 +148,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            var db = _iaf.InputDatabase();
+            var db = _itemAccepts.InputDatabase();
 
             DrawColorScheme(gr, positionModified, zoom, -1);
 

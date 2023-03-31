@@ -52,10 +52,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
-    private ItemAcceptFilter _iaf;
-
     private ItemSendFilter _isf;
-
+    private ItemAcceptFilter _itemAccepts;
     private string _überschrift = string.Empty;
 
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -69,6 +67,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     public InputFilterOutputFilterPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
 
     public InputFilterOutputFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
+        _itemAccepts = new();
+
         OutputDatabase = db;
 
         Id = id;
@@ -106,11 +106,6 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         set => _isf.ChildIdsSet(value, this);
     }
 
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int ColorId { get; set; }
-
     public string Datenbank_wählen {
         get => string.Empty;
         set => _isf.Datenbank_wählen(this);
@@ -124,12 +119,12 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
     public string Datenquelle_hinzufügen {
         get => string.Empty;
-        set => _iaf.Datenquelle_hinzufügen(this);
+        set => _itemAccepts.Datenquelle_hinzufügen(this);
     }
 
     public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
-        get => _iaf.GetFilterFromGet();
-        set => _iaf.GetFilterFromSet(value, this);
+        get => _itemAccepts.GetFilterFromGet();
+        set => _itemAccepts.GetFilterFromSet(value, this);
     }
 
     /// <summary>
@@ -138,8 +133,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     public int Id { get; set; }
 
     public override int InputColorId {
-        get => _iaf.InputColorIdGet();
-        set => _iaf.InputColorIdSet(value, this);
+        get => _itemAccepts.InputColorIdGet();
+        set => _itemAccepts.InputColorIdSet(value, this);
     }
 
     public DatabaseAbstract? OutputDatabase {
@@ -258,7 +253,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, Id);
             RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", InputColorId);
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", ColorId);
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", InputColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "eine Zeile aus " + OutputDatabase.Caption;

@@ -52,7 +52,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
-    private ItemSendRow _isr;
+    private ItemSendRow _itemSends;
 
     private string _überschrift = string.Empty;
 
@@ -67,6 +67,8 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
     public RowWithFilterPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
 
     public RowWithFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
+        _itemSends = new();
+
         OutputDatabase = db;
 
         Id = id;
@@ -105,19 +107,14 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
     }
 
     public ReadOnlyCollection<string>? ChildIds {
-        get => _isr.ChildIdsGet();
-        set => _isr.ChildIdsSet(value, this);
+        get => _itemSends.ChildIdsGet();
+        set => _itemSends.ChildIdsSet(value, this);
     }
-
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int ColorId { get; set; }
 
     public string Datenbank_wählen {
         get => string.Empty;
         set {
-            _isr.Datenbank_wählen(this);
+            _itemSends.Datenbank_wählen(this);
 
             FilterDatabaseUpdate();
         }
@@ -125,7 +122,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
 
     public string Datenbankkopf {
         get => string.Empty;
-        set => _isr.Datenbankkopf();
+        set => _itemSends.Datenbankkopf();
     }
 
     public string Filter_hinzufügen {
@@ -162,8 +159,8 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
     }
 
     public DatabaseAbstract? OutputDatabase {
-        get => _isr.OutputDatabaseGet();
-        set => _isr.OutputDatabaseSet(value, this);
+        get => _itemSends.OutputDatabaseGet();
+        set => _itemSends.OutputDatabaseSet(value, this);
     }
 
     public string Überschrift {
@@ -181,7 +178,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
 
     #region Methods
 
-    public void AddChild(IHasKeyName add) => _isr.AddChild(add, this);
+    public void AddChild(IHasKeyName add) => _itemSends.AddChild(add, this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlRowSelector(OutputDatabase, FilterDefiniton, _überschrift, _anzeige) {
@@ -299,7 +296,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
         return "Zeile einer Datenbank";
     }
 
-    public void RemoveChild(IHasKeyName remove) => _isr.RemoveChild(remove, this);
+    public void RemoveChild(IHasKeyName remove) => _itemSends.RemoveChild(remove, this);
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
 
@@ -330,7 +327,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
             DrawColorScheme(gr, positionModified, zoom, Id);
 
             RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", -1);
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "eine Zeile aus " + OutputDatabase.Caption;
@@ -348,13 +345,13 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        _isr.DoParentChanged(this);
+        _itemSends.DoParentChanged(this);
         //RepairConnections();
     }
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         //RepairConnections();
-        _isr.DoChilds(this);
+        _itemSends.DoChilds(this);
         OnChanged();
     }
 
@@ -530,13 +527,13 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
 
     private void Row_RowAdded(object sender, RowEventArgs e) {
         //RepairConnections();
-        _isr.DoChilds(this);
+        _itemSends.DoChilds(this);
         OnChanged();
     }
 
     private void Row_RowRemoved(object sender, System.EventArgs e) {
         //RepairConnections();
-        _isr.DoChilds(this);
+        _itemSends.DoChilds(this);
         OnChanged();
     }
 

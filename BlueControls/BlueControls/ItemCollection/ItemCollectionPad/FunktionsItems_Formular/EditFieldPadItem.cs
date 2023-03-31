@@ -52,7 +52,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     private string _columnName = string.Empty;
 
-    private ItemAcceptRow _iar;
+    private ItemAcceptRow _itemAccepts;
 
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
@@ -60,7 +60,9 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     #region Constructors
 
-    public EditFieldPadItem(string internalname) : base(internalname) { }
+    public EditFieldPadItem(string internalname) : base(internalname) {
+        _itemAccepts = new();
+    }
 
     #endregion
 
@@ -96,7 +98,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
     public string Datenquelle_wählen {
         get => string.Empty;
-        set => _iar.Datenquelle_wählen(this);
+        set => _itemAccepts.Datenquelle_wählen(this);
     }
 
     public EditTypeFormula EditType {
@@ -110,13 +112,13 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public IItemSendRow? GetRowFrom {
-        get => _iar.GetRowFromGet(this);
-        set => _iar.GetRowFromSet(value, this);
+        get => _itemAccepts.GetRowFromGet(this);
+        set => _itemAccepts.GetRowFromSet(value, this);
     }
 
     public override int InputColorId {
-        get => _iar.InputColorIdGet();
-        set => _iar.InputColorIdSet(value, this);
+        get => _itemAccepts.InputColorIdGet();
+        set => _itemAccepts.InputColorIdSet(value, this);
     }
 
     public string Interner_Name {

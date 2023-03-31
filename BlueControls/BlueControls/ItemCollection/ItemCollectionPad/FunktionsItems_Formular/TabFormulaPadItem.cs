@@ -47,15 +47,18 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     private readonly List<string> _childs = new();
 
-    private ItemAcceptRow _iar;
+    private ItemAcceptRow _itemAccepts;
 
     #endregion
 
     #region Constructors
 
-    public TabFormulaPadItem() : this(Generic.UniqueInternal(), null) { }
+    public TabFormulaPadItem() : this(Generic.UniqueInternal(), null) {
+    }
 
     public TabFormulaPadItem(string intern, ConnectedFormula.ConnectedFormula? cf) : base(intern) {
+        _itemAccepts = new();
+
         CFormula = cf;
         if (CFormula != null) {
             CFormula.NotAllowedChildsChanged += NotAllowedChilds_Changed;
@@ -78,17 +81,17 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
     public string Datenquelle_wählen {
         get => string.Empty;
-        set => _iar.Datenquelle_wählen(this);
+        set => _itemAccepts.Datenquelle_wählen(this);
     }
 
     public IItemSendRow? GetRowFrom {
-        get => _iar.GetRowFromGet(this);
-        set => _iar.GetRowFromSet(value, this);
+        get => _itemAccepts.GetRowFromGet(this);
+        set => _itemAccepts.GetRowFromSet(value, this);
     }
 
     public override int InputColorId {
-        get => _iar.InputColorIdGet();
-        set => _iar.InputColorIdSet(value, this);
+        get => _itemAccepts.InputColorIdGet();
+        set => _itemAccepts.InputColorIdSet(value, this);
     }
 
     protected override int SaveOrder => 1000;

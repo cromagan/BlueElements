@@ -41,7 +41,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
 
-    private ItemAcceptRow _iar;
+    private ItemAcceptRow _itemAccepts;
 
     private string _überschrift = string.Empty;
 
@@ -53,7 +53,9 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     #region Constructors
 
-    public VariableFieldPadItem(string internalname) : base(internalname) { }
+    public VariableFieldPadItem(string internalname) : base(internalname) {
+        _itemAccepts = new();
+    }
 
     #endregion
 
@@ -71,25 +73,20 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         }
     }
 
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int ColorId { get; set; }
-
     [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
     public string Datenquelle_wählen {
         get => string.Empty;
-        set => _iar.Datenquelle_wählen(this);
+        set => _itemAccepts.Datenquelle_wählen(this);
     }
 
     public IItemSendRow? GetRowFrom {
-        get => _iar.GetRowFromGet(this);
-        set => _iar.GetRowFromSet(value, this);
+        get => _itemAccepts.GetRowFromGet(this);
+        set => _itemAccepts.GetRowFromSet(value, this);
     }
 
     public override int InputColorId {
-        get => _iar.InputColorIdGet();
-        set => _iar.InputColorIdSet(value, this);
+        get => _itemAccepts.InputColorIdGet();
+        set => _itemAccepts.InputColorIdSet(value, this);
     }
 
     public string Überschrift {

@@ -51,7 +51,7 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
     #region Fields
 
-    private ItemSendRow _isr;
+    private ItemSendRow _itemSends;
 
     #endregion
 
@@ -62,6 +62,8 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
     public RowEntryPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
     public RowEntryPadItem(string intern, DatabaseAbstract? db) : base(intern) {
+        _itemSends = new();
+
         OutputDatabase = db;
     }
 
@@ -74,30 +76,25 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
     public static string ClassId => "FI-RowEntryElement";
 
     public ReadOnlyCollection<string>? ChildIds {
-        get => _isr.ChildIdsGet();
-        set => _isr.ChildIdsSet(value, this);
+        get => _itemSends.ChildIdsGet();
+        set => _itemSends.ChildIdsSet(value, this);
     }
-
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int ColorId { get; set; }
 
     public string Datenbank_wählen {
         get => string.Empty;
-        set => _isr.Datenbank_wählen(this);
+        set => _itemSends.Datenbank_wählen(this);
     }
 
     public string Datenbankkopf {
         get => string.Empty;
-        set => _isr.Datenbankkopf();
+        set => _itemSends.Datenbankkopf();
     }
 
     public int InputColorId { get; set; }
 
     public DatabaseAbstract? OutputDatabase {
-        get => _isr.OutputDatabaseGet();
-        set => _isr.OutputDatabaseSet(value, this);
+        get => _itemSends.OutputDatabaseGet();
+        set => _itemSends.OutputDatabaseSet(value, this);
     }
 
     protected override int SaveOrder => 1;
@@ -163,7 +160,7 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         }
     }
 
-    public void AddChild(IHasKeyName add) => _isr.AddChild(add, this);
+    public void AddChild(IHasKeyName add) => _itemSends.AddChild(add, this);
 
     public new Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
@@ -216,9 +213,9 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         return "Eingangs-Zeile einer Datenbank";
     }
 
-    public void RemoveChild(IHasKeyName remove) => _isr.RemoveChild(remove, this);
+    public void RemoveChild(IHasKeyName remove) => _itemSends.RemoveChild(remove, this);
 
-    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(ColorId));
+    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(InputColorId));
 
     public override string ToString() {
         var result = new List<string>();
@@ -229,8 +226,8 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
-            DrawColorScheme(gr, positionModified, zoom, ColorId);
+            DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 Skin.Draw_FormatedText(gr, "Eingangszeile: " + OutputDatabase.Caption, QuickImage.Get(ImageCode.Datenbank, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
@@ -241,12 +238,12 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
+        DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        _isr.DoParentChanged(this);
+        _itemSends.DoParentChanged(this);
         //RepairConnections();
     }
 

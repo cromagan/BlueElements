@@ -54,10 +54,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
-    private ItemAcceptFilter _iaf;
-
-    private ItemSendRow _isr;
-
+    private ItemAcceptFilter _itemAccepts;
+    private ItemSendRow _itemSends;
     private string _überschrift = string.Empty;
 
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -66,17 +64,18 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     #region Constructors
 
-    public DropDownSelectRowPadItem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
+    public DropDownSelectRowPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => Parse(toParse);
 
-    public DropDownSelectRowPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
+    public DropDownSelectRowPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
-    public DropDownSelectRowPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
+    public DropDownSelectRowPadItem(string intern, DatabaseAbstract? db) : base(intern) {
+        _itemAccepts = new();
+        _itemSends = new();
+
         OutputDatabase = db;
-
-        ColorId = id;
     }
 
-    public DropDownSelectRowPadItem(string intern) : this(intern, null, 0) { }
+    public DropDownSelectRowPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
 
     #endregion
 
@@ -104,39 +103,34 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     }
 
     public ReadOnlyCollection<string>? ChildIds {
-        get => _isr.ChildIdsGet();
-        set => _isr.ChildIdsSet(value, this);
+        get => _itemSends.ChildIdsGet();
+        set => _itemSends.ChildIdsSet(value, this);
     }
-
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int ColorId { get; set; }
 
     public string Datenbank_wählen {
         get => string.Empty;
-        set => _isr.Datenbank_wählen(this);
+        set => _itemSends.Datenbank_wählen(this);
     }
 
     [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
     public string Datenquelle_hinzufügen {
         get => string.Empty;
-        set => _iaf.Datenquelle_hinzufügen(this);
+        set => _itemAccepts.Datenquelle_hinzufügen(this);
     }
 
     public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
-        get => _iaf.GetFilterFromGet();
-        set => _iaf.GetFilterFromSet(value, this);
+        get => _itemAccepts.GetFilterFromGet();
+        set => _itemAccepts.GetFilterFromSet(value, this);
     }
 
     public override int InputColorId {
-        get => _iaf.InputColorIdGet();
-        set => _iaf.InputColorIdSet(value, this);
+        get => _itemAccepts.InputColorIdGet();
+        set => _itemAccepts.InputColorIdSet(value, this);
     }
 
     public DatabaseAbstract? OutputDatabase {
-        get => _isr.OutputDatabaseGet();
-        set => _isr.OutputDatabaseSet(value, this);
+        get => _itemSends.OutputDatabaseGet();
+        set => _itemSends.OutputDatabaseSet(value, this);
     }
 
     public string Überschrift {
@@ -154,7 +148,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     #region Methods
 
-    public void AddChild(IHasKeyName add) => _isr.AddChild(add, this);
+    public void AddChild(IHasKeyName add) => _itemSends.AddChild(add, this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
@@ -202,7 +196,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
                 return true;
 
             case "id":
-                ColorId = IntParse(value);
+                //ColorId = IntParse(value);
                 return true;
 
             case "edittype":
@@ -232,9 +226,9 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         return "Zeile einer Datenbank";
     }
 
-    public void RemoveChild(IHasKeyName remove) => _isr.RemoveChild(remove, this);
+    public void RemoveChild(IHasKeyName remove) => _itemSends.RemoveChild(remove, this);
 
-    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(ColorId));
+    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(_itemAccepts.InputColorIdGet()));
 
     public override string ToString() {
         var result = new List<string>();
@@ -242,17 +236,17 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _überschriftanordung);
-        result.ParseableAdd("ID", ColorId);
+        //result.ParseableAdd("ID", ColorId);
         result.ParseableAdd("OutputDatabase", OutputDatabase);
         return result.Parseable(base.ToString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, ColorId);
+            DrawColorScheme(gr, positionModified, zoom, _itemAccepts.InputColorIdGet());
 
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _itemAccepts.InputColorIdGet());
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _itemAccepts.InputColorIdGet());
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "eine Zeile aus " + OutputDatabase.Caption;
@@ -270,7 +264,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        _isr.DoParentChanged(this);
+        _itemSends.DoParentChanged(this);
         //RepairConnections();
     }
 

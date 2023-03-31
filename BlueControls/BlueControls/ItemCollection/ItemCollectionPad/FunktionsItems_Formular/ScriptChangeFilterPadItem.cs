@@ -41,92 +41,76 @@ using static BlueBasics.Converter;
 namespace BlueControls.ItemCollection;
 
 /// <summary>
-/// Dieses Element kann eine Zeile empfangen, und einen Filter für eine andere Datenbank basteln und diesen abgeben.
-/// Unsichtbares Element, wird nicht angezeigt
+/// Dieses Element kann Filter empfangen, und per Skript einen komplett anderen filter ausgeben.
+/// Wir verwenden, wenn z.b. Zwei Werte gefiltert werden, aber in Wirklichkeit ein komplett anderer filter verwendet werden soll
+/// Unsichtbares element, wird nicht angezeigt
 /// </summary>
 
-public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptRow, IItemSendFilter {
+public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
 
     #region Fields
 
-    private ItemAcceptRow _iar;
-
     private ItemSendFilter _isf;
+    private ItemAcceptFilter _itemAccepts;
 
     #endregion
 
     #region Constructors
 
-    public InputRowOutputFilterPadItem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
+    public ScriptChangeFilterPadItem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
 
-    public InputRowOutputFilterPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
+    public ScriptChangeFilterPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
 
-    public InputRowOutputFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
+    public ScriptChangeFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
+        _itemAccepts = new();
+
         OutputDatabase = db;
 
-        ColorId = id;
+        Id = id;
     }
 
-    public InputRowOutputFilterPadItem(string intern) : this(intern, null, 0) { }
+    public ScriptChangeFilterPadItem(string intern) : this(intern, null, 0) { }
 
     #endregion
 
     #region Properties
 
-    public static string ClassId => "FI-UserSelectionFilter";
+    public static string ClassId => "FI-ChangeFilterWithScriptElement";
 
     public ReadOnlyCollection<string>? ChildIds {
         get => _isf.ChildIdsGet();
         set => _isf.ChildIdsSet(value, this);
     }
 
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int ColorId { get; set; }
+    public string Datenbank_wählen {
+        get => string.Empty;
+        set => _isf.Datenbank_wählen(this);
+    }
 
     public string Datenbankkopf {
         get => string.Empty;
         set => _isf.Datenbankkopf();
     }
 
-    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_wählen {
+    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
+    public string Datenquelle_hinzufügen {
         get => string.Empty;
-        set => _iar.Datenquelle_wählen(this);
+        set => _itemAccepts.Datenquelle_hinzufügen(this);
     }
 
-    public string Filter_hinzufügen {
-        get => string.Empty;
-        set {
-            if (OutputDatabase == null || OutputDatabase.IsDisposed) { return; }
-
-            var c = new ItemCollectionList.ItemCollectionList(true);
-            foreach (var thiscol in OutputDatabase.Column) {
-                if (thiscol.Format.Autofilter_möglich() && !thiscol.Format.NeedTargetDatabase()) {
-                    _ = c.Add(thiscol);
-                }
-            }
-
-            var t = InputBoxListBoxStyle.Show("Filter für welche Spalte?", c, AddType.None, true);
-
-            if (t == null || t.Count != 1) { return; }
-
-            var r = FilterDefiniton.Row.GenerateAndAdd(t[0], "Neuer Filter");
-            r.CellSet("FilterArt", "=");
-        }
+    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
+        get => _itemAccepts.GetFilterFromGet();
+        set => _itemAccepts.GetFilterFromSet(value, this);
     }
 
-    public DatabaseAbstract FilterDefiniton { get; }
-
-    public IItemSendRow? GetRowFrom {
-        get => _iar.GetRowFromGet(this);
-        set => _iar.GetRowFromSet(value, this);
-    }
+    /// <summary>
+    /// Laufende Nummer, bestimmt die Einfärbung
+    /// </summary>
+    public int Id { get; set; }
 
     public int InputColorId {
-        get => _iar.InputColorIdGet();
-        set => _iar.InputColorIdSet(value, this);
+        get => _itemAccepts.InputColorIdGet();
+        set => _itemAccepts.InputColorIdSet(value, this);
     }
 
     public DatabaseAbstract? OutputDatabase {
@@ -142,7 +126,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     public void AddChild(IHasKeyName add) => _isf.AddChild(add, this);
 
-    public new Control CreateControl(ConnectedFormulaView parent) {
+    public Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
         //    EditType = _bearbeitung,
         //    CaptionPosition = CaptionPosition,
@@ -154,14 +138,11 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        var l = base.GetStyleOptions();
-
-        var u = new ItemCollectionList.ItemCollectionList(false);
-        u.AddRange(typeof(ÜberschriftAnordnung));
-
-        l.Add(new FlexiControl());
-
-        l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
+        List<GenericControl> l = new() {
+            new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
+            new FlexiControl()
+        };
+        if (OutputDatabase == null || OutputDatabase.IsDisposed) { return l; }
 
         return l;
     }
@@ -182,7 +163,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
                 return true;
 
             case "id":
-                ColorId = IntParse(value);
+                Id = IntParse(value);
                 return true;
         }
         return false;
@@ -190,39 +171,37 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     public string ReadableText() {
         if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-            return "eine Zeile aus: " + OutputDatabase.Caption;
+            return "Filterconverter: " + OutputDatabase.Caption;
         }
 
-        return "Zeile einer Datenbank";
+        return "Filterconverter";
     }
 
     public void RemoveChild(IHasKeyName remove) => _isf.RemoveChild(remove, this);
 
-    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(ColorId));
+    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
 
     public override string ToString() {
         var result = new List<string>();
-        result.ParseableAdd("ID", ColorId);
-        result.ParseableAdd("OutputDatabase", OutputDatabase);
-        result.ParseableAdd("FilterDB", FilterDefiniton.Export_CSV(FirstRow.ColumnInternalName, null as List<ColumnItem>, null));
+        result.ParseableAdd("ID", Id);
+        result.ParseableAdd("outputdatabase", OutputDatabase);
         return result.Parseable(base.ToString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, ColorId);
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", ColorId);
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Filter", ColorId);
+            DrawColorScheme(gr, positionModified, zoom, Id);
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", -1);
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", InputColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-                var txt = "eine Zeile aus " + OutputDatabase.Caption;
+                var txt = "Filterconverter: " + OutputDatabase.Caption;
 
                 Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             } else {
                 Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
         }
-
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 

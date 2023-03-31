@@ -38,7 +38,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     private bool _bei_Bedarf_erzeugen;
 
-    private ItemAcceptRow _iar;
+    private ItemAcceptRow _itemAccepts;
 
     private bool _leere_Ordner_löschen;
 
@@ -48,7 +48,10 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     #region Constructors
 
-    public FileExplorerPadItem(string internalname) : base(internalname) => SetCoordinates(new RectangleF(0, 0, 50, 30), true);
+    public FileExplorerPadItem(string internalname) : base(internalname) {
+        _itemAccepts = new();
+        SetCoordinates(new RectangleF(0, 0, 50, 30), true);
+    }
 
     #endregion
 
@@ -71,17 +74,17 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
     [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
     public string Datenquelle_wählen {
         get => string.Empty;
-        set => _iar.Datenquelle_wählen(this);
+        set => _itemAccepts.Datenquelle_wählen(this);
     }
 
     public IItemSendRow? GetRowFrom {
-        get => _iar.GetRowFromGet(this);
-        set => _iar.GetRowFromSet(value, this);
+        get => _itemAccepts.GetRowFromGet(this);
+        set => _itemAccepts.GetRowFromSet(value, this);
     }
 
     public override int InputColorId {
-        get => _iar.InputColorIdGet();
-        set => _iar.InputColorIdSet(value, this);
+        get => _itemAccepts.InputColorIdGet();
+        set => _itemAccepts.InputColorIdSet(value, this);
     }
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
