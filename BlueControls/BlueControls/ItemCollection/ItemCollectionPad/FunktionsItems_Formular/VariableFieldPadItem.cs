@@ -154,6 +154,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
+        if (_itemAccepts.ParseThis(tag, value)) { return true; }
 
         switch (tag) {
             case "edittype":
@@ -180,11 +181,14 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     public QuickImage? SymbolForReadableText() {
         if (GetRowFrom == null) { return null; }
 
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.InputColorId));
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.OutputColorId));
     }
 
     public override string ToString() {
         var result = new List<string>();
+
+        result.AddRange(_itemAccepts.ParsableTags());
+
         result.ParseableAdd("CaptionText", _überschrift);
         result.ParseableAdd("Variable", _variable);
         result.ParseableAdd("EditType", _bearbeitung);
@@ -194,7 +198,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.InputColorId; }
+        if (GetRowFrom != null) { id = GetRowFrom.OutputColorId; }
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);

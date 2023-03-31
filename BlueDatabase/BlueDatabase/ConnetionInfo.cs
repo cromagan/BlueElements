@@ -79,7 +79,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
 
         #region Prüfen, ob eine ConnectionInfo als String übergeben wurde
 
-        if (SqlBackAbstract.IsValidTableName(x[0]) && !string.IsNullOrEmpty(x[1])) {
+        if (SqlBackAbstract.IsValidTableName(x[0], false) && !string.IsNullOrEmpty(x[1])) {
             TableName = x[0];
             Provider = null;
             DatabaseID = x[1];
@@ -198,7 +198,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
     /// </summary>
     public string TableName {
         get => _tablename; set {
-            if (!SqlBackAbstract.IsValidTableName(value)) {
+            if (!SqlBackAbstract.IsValidTableName(value, false)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + value);
             }
 

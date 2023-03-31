@@ -261,6 +261,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         //var v = key.SplitAndCutBy("|");
         //if (v.Length != 2) { return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists); }
         var linkedColumn = linkedDatabase.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase); // linkedDatabase.Column.SearchByKey(LongParse(v[0]));
+
+        if (linkedColumn != null) {
+            linkedDatabase.RefreshColumnsData(linkedColumn);
+        }
+
         var linkedRow = linkedDatabase.Row.SearchByKey(LongParse(key));
 
         return (linkedColumn, linkedRow, string.Empty);

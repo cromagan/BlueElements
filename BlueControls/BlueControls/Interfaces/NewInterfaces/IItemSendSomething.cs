@@ -32,11 +32,12 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace BlueControls.Interfaces;
 
-public interface IItemSendSomething : IHasColorId, IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion {
+public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion, IHasKeyName {
 
     #region Properties
 
     public ReadOnlyCollection<string>? ChildIds { get; set; }
+    int OutputColorId { get; set; }
     public DatabaseAbstract? OutputDatabase { get; set; }
     public string Page { get; }
     public ItemCollectionPad? Parent { get; }
@@ -59,6 +60,7 @@ public class ItemSendSomething {
     #region Fields
 
     private readonly List<string> _childIds = new();
+    private int _outputColorId = -1;
 
     private DatabaseAbstract? _outputDatabase;
 
@@ -108,18 +110,27 @@ public class ItemSendSomething {
             var item2 = item.Parent[thisChild];
 
             if (item2 is IItemAcceptSomething ias) {
-                ias.InputColorId = item.InputColorId;
+                ias.InputColorId = item.OutputColorId;
             }
         }
     }
 
     public void DoParentChanged(IItemSendSomething item) {
         if (item.Parent != null) {
-            item.InputColorId = -1;
-            item.InputColorId = item.Parent.GetFreeColorId(item.Page);
+            item.OutputColorId = -1;
+            item.OutputColorId = item.Parent.GetFreeColorId(item.Page);
         }
         DoChilds(item);
 
+        item.OnChanged();
+    }
+
+    public int OutputColorIdGet() => _outputColorId;
+
+    public void OutputColorIdSet(int value, IItemSendSomething item) {
+        if (_outputColorId == value) { return; }
+
+        _outputColorId = value;
         item.OnChanged();
     }
 
@@ -132,6 +143,42 @@ public class ItemSendSomething {
         item.RaiseVersion();
         DoChilds(item);
         item.OnChanged();
+    }
+
+    public virtual List<string> ParsableTags() {
+        var result = new List<string>();
+
+        result.ParseableAdd("OutputDatabase", _outputDatabase);
+
+        result.ParseableAdd("SentToChildIds", _childIds);
+
+        return result;
+    }
+
+    public virtual bool ParseThis(string tag, string value) {
+        switch (tag) {
+            case "database":
+            case "outputdatabase":
+                var na = value.FromNonCritical();
+
+                if (na.IsFormat(FormatHolder.FilepathAndName)) {
+                    na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
+                }
+
+                _outputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
+                return true;
+
+            case "senttochildids":
+                value = value.Replace("\r", "|");
+
+                var tmp = value.FromNonCritical().SplitBy("|");
+                _childIds.Clear();
+                foreach (var thiss in tmp) {
+                    _childIds.Add(thiss.FromNonCritical());
+                }
+                return true;
+        }
+        return false;
     }
 
     public void RemoveChild(IHasKeyName remove, IItemSendSomething item) {

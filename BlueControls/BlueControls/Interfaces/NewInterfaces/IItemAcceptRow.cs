@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.Forms;
@@ -25,6 +26,8 @@ using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System.Collections.Generic;
+using System.Security;
 
 namespace BlueControls.Interfaces;
 
@@ -102,6 +105,26 @@ public class ItemAcceptRow : ItemAcceptSomething {
     }
 
     public DatabaseAbstract? InputDatabase(IItemAcceptRow item) => GetRowFromGet(item)?.OutputDatabase;
+
+    public override List<string> ParsableTags() {
+        var result = base.ParsableTags();
+
+        result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
+
+        return result;
+    }
+
+    public override bool ParseThis(string tag, string value) {
+        if (base.ParseThis(tag, value)) { return true; }
+
+        switch (tag) {
+            case "getvaluefrom":
+            case "getvaluefromkey":
+                _getValueFromkey = value.FromNonCritical();
+                return true;
+        }
+        return false;
+    }
 
     #endregion
 }

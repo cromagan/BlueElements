@@ -92,6 +92,11 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
     public int InputColorId { get; set; }
 
+    public int OutputColorId {
+        get => _itemSends.OutputColorIdGet();
+        set => _itemSends.OutputColorIdSet(value, this);
+    }
+
     public DatabaseAbstract? OutputDatabase {
         get => _itemSends.OutputDatabaseGet();
         set => _itemSends.OutputDatabaseSet(value, this);
@@ -186,18 +191,9 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
+        if (_itemSends.ParseThis(tag, value)) { return true; }
+
         switch (tag) {
-            case "outputdatabase":
-
-                var na = value.FromNonCritical();
-
-                if (na.IsFormat(FormatHolder.FilepathAndName)) {
-                    na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
-                }
-
-                OutputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
-                return true;
-
             case "id": // TODO: 29.03.2023
                 //Id = IntParse(value);
                 return true;
@@ -219,8 +215,7 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
     public override string ToString() {
         var result = new List<string>();
-        //result.ParseableAdd("ID", Id);
-        result.ParseableAdd("OutputDatabase", OutputDatabase);
+        result.AddRange(_itemSends.ParsableTags());
         return result.Parseable(base.ToString());
     }
 
@@ -238,7 +233,7 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
     }
 
     protected override void OnParentChanged() {

@@ -180,7 +180,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public CellCollection Cell { get; }
-
     public ColumnCollection Column { get; }
 
     public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
@@ -287,7 +286,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public string LoadedVersion { get; private set; } = "0.00";
-
     public bool LogUndo { get; set; } = true;
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
@@ -299,9 +297,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public DateTime PowerEdit { get; set; }
-
     public bool ReadOnly { get; private set; }
-
     public RowCollection Row { get; }
 
     [Browsable(false)]
@@ -352,7 +348,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public string UserGroup { get; set; }
-
     public string UserName { get; } = Generic.UserName().ToUpper();
 
     public ReadOnlyCollection<VariableString> Variables {
@@ -367,6 +362,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             OnViewChanged();
         }
     }
+
+    public int VorhalteZeit { get; set; } = 30;
 
     [Browsable(false)]
     public string ZeilenQuickInfo {
@@ -734,6 +731,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         //FirstColumn = sourceDatabase.FirstColumn;
         AdditionalFilesPfad = sourceDatabase.AdditionalFilesPfad;
         CachePfad = sourceDatabase.CachePfad; // Nicht so wichtig ;-)
+        VorhalteZeit = sourceDatabase.VorhalteZeit; // Nicht so wichtig ;-)
         Caption = sourceDatabase.Caption;
         //TimeCode = sourceDatabase.TimeCode;
         CreateDate = sourceDatabase.CreateDate;
@@ -1275,7 +1273,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         //    return null;
         //}
 
-        if (!SqlBackAbstract.IsValidTableName(tablename)) {
+        if (!SqlBackAbstract.IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Ungültiger Tabellenname: " + tablename);
             return null;
         }
@@ -2038,7 +2036,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 if (FileExists(fullhashname)) {
                     FileInfo f = new(fullhashname);
-                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < 30 && Constants.GlobalRND.Next(0, 100) != 1) {
+                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < VorhalteZeit && Constants.GlobalRND.Next(0, VorhalteZeit*20) != 1) {
                         if (f.Length < 5) { return; }
                         e.Bmp = new BitmapExt(fullhashname);
                         return;

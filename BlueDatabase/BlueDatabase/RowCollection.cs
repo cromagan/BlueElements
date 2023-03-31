@@ -330,37 +330,37 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         GC.SuppressFinalize(this);
     }
 
-    public string DoLinkedDatabase(List<RowItem> row) {
-        if (row.Count == 0) { return string.Empty; }
+    //public string DoLinkedDatabase(List<RowItem> row) {
+    //    if (row.Count == 0) { return string.Empty; }
 
-        if (Database is not DatabaseAbstract db) { return "Verlinkung zur Datenbank fehlhlerhaft"; }
-        if (db.IsDisposed) { return "Datenbank verworfen"; }
+    //    if (Database is not DatabaseAbstract db) { return "Verlinkung zur Datenbank fehlhlerhaft"; }
+    //    if (db.IsDisposed) { return "Datenbank verworfen"; }
 
-        List<DatabaseAbstract> done = new();
+    //    List<DatabaseAbstract> done = new();
 
-        foreach (var thisColumn in Database.Column) {
-            if (thisColumn.LinkedDatabase is DatabaseAbstract dbl) {
-                if (!done.Contains(dbl)) {
-                    done.Add(dbl);
+    //    foreach (var thisColumn in Database.Column) {
+    //        if (thisColumn.LinkedDatabase is DatabaseAbstract dbl) {
+    //            if (!done.Contains(dbl)) {
+    //                done.Add(dbl);
 
-                    var key = new List<long>();
+    //                var key = new List<long>();
 
-                    foreach (var thisRow in row) {
-                        var s = Database.Cell.GetStringBehindLinkedValue(thisColumn, thisRow);
+    //                foreach (var thisRow in row) {
+    //                    var s = Database.Cell.GetStringBehindLinkedValue(thisColumn, thisRow);
 
-                        if (LongTryParse(s, out var v)) { key.Add(v); }
-                    }
+    //                    if (LongTryParse(s, out var v)) { key.Add(v); }
+    //                }
 
-                    var x = dbl.RefreshRowData(key, false, null);
-                    if (!string.IsNullOrEmpty(x.Item2)) {
-                        Database.OnDropMessage(FehlerArt.Fehler, x.Item2);
-                        return x.Item2;
-                    }
-                }
-            }
-        }
-        return string.Empty;
-    }
+    //                var x = dbl.RefreshRowData(key, false, null);
+    //                if (!string.IsNullOrEmpty(x.Item2)) {
+    //                    Database.OnDropMessage(FehlerArt.Fehler, x.Item2);
+    //                    return x.Item2;
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return string.Empty;
+    //}
 
     public string ExecuteScript(EventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem>? pinned, bool fullCheck, bool changevalues) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
@@ -415,11 +415,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisRow in r) {
             var all = FillUp(row, thisRow, sortedRows, (100 / r.Count) + 1);
             if (all) {
-                DoLinkedDatabase(row);
+                //DoLinkedDatabase(row);
                 return true;
             }
         }
-        DoLinkedDatabase(row);
+        //DoLinkedDatabase(row);
         return false;
     }
 

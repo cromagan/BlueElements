@@ -36,7 +36,7 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
     #region Constructors
 
     public SQLBackMicrosoftCE(SQLBackMicrosoftCE sql, string tablename) : base() {
-        if (!IsValidTableName(tablename)) {
+        if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
         }
 
@@ -60,7 +60,7 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
     }
 
     public SQLBackMicrosoftCE(string filename, bool create, string tablename) : base() {
-        if (!IsValidTableName(tablename)) {
+        if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
         }
 
@@ -176,15 +176,21 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
         return tables;
     }
 
-    protected override string CreateTable(string tablename) {
-        var b = DeleteTable(tablename);
+    protected override string CreateTable(string tablename, bool allowSystemTableNames) {
+        var b = DeleteTable(tablename, allowSystemTableNames);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         return ExecuteCommand(@"CREATE TABLE " + tablename + "(RK " + Primary + " NOT NULL PRIMARY KEY)", true);
     }
 
-    protected override string CreateTable(string tablename, List<string> keycolumns) {
-        var b = DeleteTable(tablename);
+    protected override string CreateTable(string tablename, List<string> keycolumns, bool allowSystemTableNames) {
+        if (!IsValidTableName(tablename, allowSystemTableNames)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+
+            return "Tabellenname ungültig:" + tablename;
+        }
+
+        var b = DeleteTable(tablename, allowSystemTableNames);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
         // http://www.sql-server-helper.com/error-messages/msg-8110.aspx
@@ -207,7 +213,19 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
         return ExecuteCommand(t, true);
     }
 
-    protected override string DeleteTable(string tablename) => ExecuteCommand("DROP TABLE IF EXISTS " + tablename, false);
+    protected override string DeleteTable(string tablename, bool allowSystemTableNames) {
+        if (!IsValidTableName(tablename, allowSystemTableNames)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+
+            return "Tabellenname ungültig:" + tablename;
+        }
+
+
+
+        return ExecuteCommand("DROP TABLE IF EXISTS " + tablename, false);
+    }
+
+
 
     #endregion
 }

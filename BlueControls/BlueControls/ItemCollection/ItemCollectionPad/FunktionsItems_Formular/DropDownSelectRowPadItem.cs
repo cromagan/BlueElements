@@ -118,14 +118,19 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         set => _itemAccepts.Datenquelle_hinzufügen(this);
     }
 
-    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
-        get => _itemAccepts.GetFilterFromGet();
-        set => _itemAccepts.GetFilterFromSet(value, this);
+    public ReadOnlyCollection<string>? GetFilterFromKeys {
+        get => _itemAccepts.GetFilterFromKeysGet();
+        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
         set => _itemAccepts.InputColorIdSet(value, this);
+    }
+
+    public int OutputColorId {
+        get => _itemSends.OutputColorIdGet();
+        set => _itemSends.OutputColorIdSet(value, this);
     }
 
     public DatabaseAbstract? OutputDatabase {
@@ -161,6 +166,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         return new Control();
     }
 
+    ReadOnlyCollection<IItemSendFilter>? IItemAcceptFilter.GetFilterFrom() => _itemAccepts.GetFilterFromGet(this);
+
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
         //    new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
@@ -182,19 +189,10 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
+        if (_itemAccepts.ParseThis(tag, value)) { return true; }
+        if (_itemSends.ParseThis(tag, value)) { return true; }
+
         switch (tag) {
-            case "outputdatabase":
-            case "database":
-
-                var na = value.FromNonCritical();
-
-                if (na.IsFormat(FormatHolder.FilepathAndName)) {
-                    na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
-                }
-
-                OutputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
-                return true;
-
             case "id":
                 //ColorId = IntParse(value);
                 return true;
@@ -232,12 +230,15 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public override string ToString() {
         var result = new List<string>();
+        result.AddRange(_itemAccepts.ParsableTags());
+        result.AddRange(_itemSends.ParsableTags());
+
         result.ParseableAdd("CaptionText", _überschrift);
         result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _überschriftanordung);
         //result.ParseableAdd("ID", ColorId);
-        result.ParseableAdd("OutputDatabase", OutputDatabase);
+
         return result.Parseable(base.ToString());
     }
 
@@ -245,21 +246,22 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, _itemAccepts.InputColorIdGet());
 
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _itemAccepts.InputColorIdGet());
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", _itemAccepts.InputColorIdGet());
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-                var txt = "eine Zeile aus " + OutputDatabase.Caption;
+                var txt = "Zeilenauswahl aus: " + OutputDatabase.Caption;
 
                 Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             } else {
-                Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
+                Skin.Draw_FormatedText(gr, "Zeilenauswahl", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
         } else {
             FakeControlPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+
+        RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
     }
 
     protected override void OnParentChanged() {

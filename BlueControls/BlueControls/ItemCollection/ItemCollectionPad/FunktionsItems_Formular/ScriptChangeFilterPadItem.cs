@@ -50,26 +50,25 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
 
     #region Fields
 
-    private ItemSendFilter _isf;
     private ItemAcceptFilter _itemAccepts;
+    private ItemSendFilter _itemSends;
 
     #endregion
 
     #region Constructors
 
-    public ScriptChangeFilterPadItem(string keyname, string toParse) : this(keyname, null, 0) => Parse(toParse);
+    public ScriptChangeFilterPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => Parse(toParse);
 
-    public ScriptChangeFilterPadItem(DatabaseAbstract? db, int id) : this(string.Empty, db, id) { }
+    public ScriptChangeFilterPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
-    public ScriptChangeFilterPadItem(string intern, DatabaseAbstract? db, int id) : base(intern) {
+    public ScriptChangeFilterPadItem(string intern, DatabaseAbstract? db) : base(intern) {
         _itemAccepts = new();
+        _itemSends = new();
 
         OutputDatabase = db;
-
-        Id = id;
     }
 
-    public ScriptChangeFilterPadItem(string intern) : this(intern, null, 0) { }
+    public ScriptChangeFilterPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
 
     #endregion
 
@@ -78,18 +77,18 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
     public static string ClassId => "FI-ChangeFilterWithScriptElement";
 
     public ReadOnlyCollection<string>? ChildIds {
-        get => _isf.ChildIdsGet();
-        set => _isf.ChildIdsSet(value, this);
+        get => _itemSends.ChildIdsGet();
+        set => _itemSends.ChildIdsSet(value, this);
     }
 
     public string Datenbank_wählen {
         get => string.Empty;
-        set => _isf.Datenbank_wählen(this);
+        set => _itemSends.Datenbank_wählen(this);
     }
 
     public string Datenbankkopf {
         get => string.Empty;
-        set => _isf.Datenbankkopf();
+        set => _itemSends.Datenbankkopf();
     }
 
     [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
@@ -98,24 +97,24 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         set => _itemAccepts.Datenquelle_hinzufügen(this);
     }
 
-    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
-        get => _itemAccepts.GetFilterFromGet();
-        set => _itemAccepts.GetFilterFromSet(value, this);
+    public ReadOnlyCollection<string>? GetFilterFromKeys {
+        get => _itemAccepts.GetFilterFromKeysGet();
+        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
-
-    /// <summary>
-    /// Laufende Nummer, bestimmt die Einfärbung
-    /// </summary>
-    public int Id { get; set; }
 
     public int InputColorId {
         get => _itemAccepts.InputColorIdGet();
         set => _itemAccepts.InputColorIdSet(value, this);
     }
 
+    public int OutputColorId {
+        get => _itemSends.OutputColorIdGet();
+        set => _itemSends.OutputColorIdSet(value, this);
+    }
+
     public DatabaseAbstract? OutputDatabase {
-        get => _isf.OutputDatabaseGet();
-        set => _isf.OutputDatabaseSet(value, this);
+        get => _itemSends.OutputDatabaseGet();
+        set => _itemSends.OutputDatabaseSet(value, this);
     }
 
     protected override int SaveOrder => 1;
@@ -124,7 +123,7 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
 
     #region Methods
 
-    public void AddChild(IHasKeyName add) => _isf.AddChild(add, this);
+    public void AddChild(IHasKeyName add) => _itemSends.AddChild(add, this);
 
     public Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
@@ -136,6 +135,8 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         Develop.DebugPrint_NichtImplementiert();
         return new Control();
     }
+
+    ReadOnlyCollection<IItemSendFilter>? IItemAcceptFilter.GetFilterFrom() => _itemAccepts.GetFilterFromGet(this);
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new() {
@@ -149,21 +150,11 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
+        if (_itemSends.ParseThis(tag, value)) { return true; }
+        if (_itemAccepts.ParseThis(tag, value)) { return true; }
         switch (tag) {
-            case "outputdatabase":
-            case "database":
-
-                var na = value.FromNonCritical();
-
-                if (na.IsFormat(FormatHolder.FilepathAndName)) {
-                    na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
-                }
-
-                OutputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
-                return true;
-
             case "id":
-                Id = IntParse(value);
+                //Id = IntParse(value);
                 return true;
         }
         return false;
@@ -177,22 +168,21 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         return "Filterconverter";
     }
 
-    public void RemoveChild(IHasKeyName remove) => _isf.RemoveChild(remove, this);
+    public void RemoveChild(IHasKeyName remove) => _itemSends.RemoveChild(remove, this);
 
-    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(Id));
+    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(InputColorId));
 
     public override string ToString() {
         var result = new List<string>();
-        result.ParseableAdd("ID", Id);
-        result.ParseableAdd("outputdatabase", OutputDatabase);
+        result.AddRange(_itemAccepts.ParsableTags());
+        result.AddRange(_itemSends.ParsableTags());
         return result.Parseable(base.ToString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, Id);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId);
             RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", -1);
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", InputColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Filterconverter: " + OutputDatabase.Caption;
@@ -203,11 +193,12 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
             }
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
     }
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        _isf.DoParentChanged(this);
+        _itemSends.DoParentChanged(this);
         //RepairConnections();
     }
 

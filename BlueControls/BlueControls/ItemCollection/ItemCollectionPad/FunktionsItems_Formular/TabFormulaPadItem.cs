@@ -189,6 +189,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
+        if (_itemAccepts.ParseThis(tag, value)) { return true; }
+
         switch (tag) {
             case "parent":
                 CFormula = ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
@@ -216,6 +218,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public override string ToString() {
         var result = new List<string>();
+        result.AddRange(_itemAccepts.ParsableTags());
+
         result.ParseableAdd("Parent", CFormula);
         result.ParseableAdd("Childs", _childs);
         return result.Parseable(base.ToString());

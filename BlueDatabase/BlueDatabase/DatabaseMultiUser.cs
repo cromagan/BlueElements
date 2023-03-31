@@ -199,8 +199,8 @@ public sealed class DatabaseMultiUser : DatabaseAbstract {
         foreach (var thisrow in row) {
             thisrow.IsInCache = DateTime.UtcNow;
         }
-        var x = Row.DoLinkedDatabase(row);
-        return (false, x);
+        //var x = Row.DoLinkedDatabase(row);
+        return (false, string.Empty);
     }
 
     public override bool Save() {

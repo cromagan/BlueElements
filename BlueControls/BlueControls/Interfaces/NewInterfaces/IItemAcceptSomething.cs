@@ -17,21 +17,24 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System.Collections.Generic;
 
 namespace BlueControls.Interfaces;
 
 /// <summary>
 /// Wird verwendet, wenn das Steuerelement etwas empfangen kann
 /// </summary>
-public interface IItemAcceptSomething : IHasColorId, IHasKeyName, IChangedFeedback, IHasVersion {
+public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersion {
 
     #region Properties
 
-    public int InputColorId { get; set; }
+    int InputColorId { get; set; }
+
     public string Page { get; }
     public ItemCollectionPad? Parent { get; }
 
@@ -55,6 +58,23 @@ public class ItemAcceptSomething {
 
         _inputColorId = value;
         item.OnChanged();
+    }
+
+    public virtual List<string> ParsableTags() {
+        var result = new List<string>();
+
+        //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
+
+        return result;
+    }
+
+    public virtual bool ParseThis(string tag, string value) {
+        switch (tag) {
+            //case "getvaluefromkey":
+            //    _getValueFromkey = value.FromNonCritical();
+            //    return true;
+        }
+        return false;
     }
 
     #endregion

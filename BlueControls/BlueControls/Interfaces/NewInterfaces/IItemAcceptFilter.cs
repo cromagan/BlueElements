@@ -48,7 +48,13 @@ public interface IItemAcceptFilter : IItemAcceptSomething {
     #region Properties
 
     public string Datenquelle_hinzufügen { get; set; }
-    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom { get; set; }
+    public ReadOnlyCollection<string>? GetFilterFromKeys { get; set; }
+
+    #endregion
+
+    #region Methods
+
+    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom();
 
     #endregion
 }
@@ -57,7 +63,8 @@ public class ItemAcceptFilter : ItemAcceptSomething {
 
     #region Fields
 
-    private readonly List<IItemSendFilter> _getFilterFrom = new();
+    public readonly List<string> _getFilterFromKeys = new List<string>();
+    private ReadOnlyCollection<IItemSendFilter>? _getFilterFrom;
 
     #endregion
 
@@ -82,27 +89,48 @@ public class ItemAcceptFilter : ItemAcceptSomething {
         var t = item.Parent[it[0]];
 
         if (t is IItemSendFilter rfp2) {
-            _getFilterFrom.AddIfNotExists(rfp2);
+            _getFilterFrom = null;
+            _getFilterFromKeys.AddIfNotExists(rfp2.KeyName);
         }
     }
 
-    public ReadOnlyCollection<IItemSendFilter>? GetFilterFromGet() => new(_getFilterFrom);
+    public ReadOnlyCollection<IItemSendFilter> GetFilterFromGet(IItemAcceptFilter item) {
+        if (_getFilterFrom == null) {
+            var l = new List<IItemSendFilter>();
 
-    public void GetFilterFromSet(ICollection<IItemSendFilter>? value, IItemAcceptSomething item) {
+            foreach (var thisk in _getFilterFromKeys) {
+                if (item.Parent[thisk] is IItemSendFilter isf) {
+                    l.Add(isf);
+                }
+            }
+
+            _getFilterFrom = new(l);
+        }
+
+        return _getFilterFrom;
+    }
+
+    public ReadOnlyCollection<string> GetFilterFromKeysGet() => new(_getFilterFromKeys);
+
+    public void GetFilterFromKeysSet(ICollection<string>? value, IItemAcceptFilter item) {
         {
-            if (!_getFilterFrom.IsDifferentTo(value)) { return; }
+            if (!_getFilterFromKeys.IsDifferentTo(value)) { return; }
 
-            foreach (var thisItem in _getFilterFrom) {
+            var g = GetFilterFromGet(item);
+
+            foreach (var thisItem in g) {
                 thisItem.RemoveChild(item);
             }
 
-            _getFilterFrom.Clear();
+            _getFilterFrom = null;
+            _getFilterFromKeys.Clear();
 
             if (value != null) {
-                _getFilterFrom.AddRange(value);
+                _getFilterFromKeys.AddRange(value);
             }
 
-            foreach (var thisItem in _getFilterFrom) {
+            g = GetFilterFromGet(item);
+            foreach (var thisItem in g) {
                 thisItem.AddChild(item);
             }
 
@@ -111,9 +139,35 @@ public class ItemAcceptFilter : ItemAcceptSomething {
         }
     }
 
-    public DatabaseAbstract? InputDatabase() {
-        if (_getFilterFrom.Count == 0) { return null; }
-        return _getFilterFrom[0].OutputDatabase;
+    public DatabaseAbstract? InputDatabase(IItemAcceptFilter item) {
+        var g = GetFilterFromGet(item);
+
+        if (g == null || g.Count == 0) { return null; }
+        return g[0].OutputDatabase;
+    }
+
+    public override List<string> ParsableTags() {
+        var result = base.ParsableTags();
+
+        result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys);
+
+        return result;
+    }
+
+    public override bool ParseThis(string tag, string value) {
+        if (base.ParseThis(tag, value)) { return true; }
+
+        switch (tag) {
+            case "getfilterfromkeys":
+                var tmp = value.FromNonCritical().SplitBy("|");
+                _getFilterFromKeys.Clear();
+                foreach (var thiss in tmp) {
+                    _getFilterFromKeys.Add(thiss.FromNonCritical());
+                }
+                _getFilterFrom = null;
+                return true;
+        }
+        return false;
     }
 
     #endregion

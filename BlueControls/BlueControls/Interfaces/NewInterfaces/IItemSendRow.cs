@@ -17,9 +17,11 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
 namespace BlueControls.Interfaces;
@@ -30,4 +32,28 @@ namespace BlueControls.Interfaces;
 public interface IItemSendRow : IItemSendSomething {
 }
 
-public class ItemSendRow : ItemSendSomething { }
+public class ItemSendRow : ItemSendSomething {
+
+    #region Methods
+
+    public override List<string> ParsableTags() {
+        var result = base.ParsableTags();
+
+        //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
+
+        return result;
+    }
+
+    public override bool ParseThis(string tag, string value) {
+        if (base.ParseThis(tag, value)) { return true; }
+
+        switch (tag) {
+            //case "getvaluefromkey":
+            //    _getValueFromkey = value.FromNonCritical();
+            //    return true;
+        }
+        return false;
+    }
+
+    #endregion
+}

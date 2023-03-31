@@ -178,7 +178,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         if (!need) { return; }
 
-        OnDropMessage(FehlerArt.Info, "Lade " + columns.Count + " Spalte(n) nach.");
+        OnDropMessage(FehlerArt.Info, "Lade " + columns.Count + " Spalte(n) der Datenbank '" + TableName + "' nach.");
 
         try {
             _sql.LoadColumns(TableName, columns);
@@ -206,7 +206,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (l.Count == 0) { return (false, string.Empty); }
         l = l.Distinct().ToList();
 
-        Row.DoLinkedDatabase(rows);
+        //Row.DoLinkedDatabase(rows);
 
         OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) der Datenbank '" + TableName + "' nach.");
 

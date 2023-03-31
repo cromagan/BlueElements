@@ -85,9 +85,9 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         set => _itemAccepts.Datenquelle_hinzufügen(this);
     }
 
-    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom {
-        get => _itemAccepts.GetFilterFromGet();
-        set => _itemAccepts.GetFilterFromSet(value, this);
+    public ReadOnlyCollection<string>? GetFilterFromKeys {
+        get => _itemAccepts.GetFilterFromKeysGet();
+        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public override int InputColorId {
@@ -112,6 +112,8 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         return new Control();
     }
 
+    ReadOnlyCollection<IItemSendFilter>? IItemAcceptFilter.GetFilterFrom() => _itemAccepts.GetFilterFromGet(this);
+
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
 
@@ -120,6 +122,9 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
+
+        if (_itemAccepts.ParseThis(tag, value)) { return true; }
+
         switch (tag) {
             case "showformat":
                 _anzeige = value.FromNonCritical();
@@ -129,7 +134,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
     }
 
     public string ReadableText() {
-        var db = _itemAccepts.InputDatabase();
+        var db = _itemAccepts.InputDatabase(this);
 
         if (db != null && !db.IsDisposed) {
             return "Neue Zeile anlegen in: " + db.Caption;
@@ -142,13 +147,16 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public override string ToString() {
         var result = new List<string>();
+
+        result.AddRange(_itemAccepts.ParsableTags());
+
         result.ParseableAdd("ShowFormat", _anzeige);
         return result.Parseable(base.ToString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            var db = _itemAccepts.InputDatabase();
+            var db = _itemAccepts.InputDatabase(this);
 
             DrawColorScheme(gr, positionModified, zoom, -1);
 

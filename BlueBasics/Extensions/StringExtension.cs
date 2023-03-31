@@ -789,6 +789,11 @@ public static partial class Extensions {
         return tXt;
     }
 
+    /// <summary>
+    /// Gibt eine Liste der KeyNamen zurück
+    /// </summary>
+    /// <param name="items"></param>
+    /// <returns></returns>
     public static List<string> ToListOfString(this IEnumerable<IHasKeyName?>? items) {
         List<string> w = new();
         if (items == null || !items.Any()) { return w; }

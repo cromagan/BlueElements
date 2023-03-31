@@ -264,6 +264,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
+        if (_itemAccepts.ParseThis(tag, value)) { return true; }
 
         switch (tag) {
             case "column":
@@ -303,11 +304,14 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public QuickImage? SymbolForReadableText() {
         if (GetRowFrom == null) { return null; }
 
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.InputColorId));
+        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.OutputColorId));
     }
 
     public override string ToString() {
         var result = new List<string>();
+
+        result.AddRange(_itemAccepts.ParsableTags());
+
         result.ParseableAdd("ColumnName", _columnName);
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _überschriftanordung);
@@ -315,11 +319,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.InputColorId; }
-
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, id);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId);
         }
 
         if (GetRowFrom == null) {
@@ -332,9 +333,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        if (!forPrinting) {
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
-        }
+        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     #endregion

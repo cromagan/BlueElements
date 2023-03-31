@@ -66,7 +66,7 @@ internal class Method_BackupControl : Method {
 
         if (fix.Length == 0) { return DoItFeedback.Null(); }
         try {
-            var bvw = new BackupVerwalter();
+            var bvw = new BackupVerwalter(2, 20);
 
             foreach (var thisF in fix) {
                 var fi = new FileInfo(thisF);

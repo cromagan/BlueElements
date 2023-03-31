@@ -403,7 +403,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             if (thisit is RowWithFilterPadItem rwf) {
                 if (rwf.OutputDatabase != null) {
                     _ = _databaseFiles.AddIfNotExists(rwf.OutputDatabase.ConnectionData.UniqueID);
-                    _id = Math.Max(_id, rwf.Id);
+                    _id = Math.Max(_id, rwf.InputColorId);
                 }
             }
         }

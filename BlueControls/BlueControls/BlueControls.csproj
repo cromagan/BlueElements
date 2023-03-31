@@ -125,7 +125,6 @@
     <Compile Include="Interfaces\NewInterfaces\IHasVersion.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemAcceptSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemAcceptRow.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IHasColorId.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemSendSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemSendRow.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemSendFilter.cs" />

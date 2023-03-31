@@ -2492,7 +2492,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             _linkedDatabaseFile = SqlBackAbstract.MakeValidTableName(_linkedDatabaseFile);
         }
 
-        if (SqlBackAbstract.IsValidTableName(_linkedDatabaseFile)) {
+        if (SqlBackAbstract.IsValidTableName(_linkedDatabaseFile, false)) {
             _linkedDatabase = Database.GetOtherTable(_linkedDatabaseFile, Database.UserGroup);
         }
 

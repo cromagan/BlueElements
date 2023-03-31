@@ -143,6 +143,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
+        if (_itemAccepts.ParseThis(tag, value)) { return true; }
+
         switch (tag) {
             case "pfad":
                 _pfad = value.FromNonCritical();
@@ -161,6 +163,9 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     public override string ToString() {
         var result = new List<string>();
+
+        result.AddRange(_itemAccepts.ParsableTags());
+
         result.ParseableAdd("Pfad", _pfad);
         result.ParseableAdd("CreateDir", _bei_Bedarf_erzeugen);
         result.ParseableAdd("DeleteDir", _leere_Ordner_löschen);
@@ -169,7 +174,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.InputColorId; }
+        if (GetRowFrom != null) { id = GetRowFrom.OutputColorId; }
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);

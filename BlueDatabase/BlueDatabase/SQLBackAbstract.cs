@@ -46,14 +46,13 @@ public abstract class SqlBackAbstract {
     //public static List<SQLBackAbstract>? PossibleSQLBacks;
     protected DbConnection? Connection;
 
+    private static bool _didBackup = false;
     private static DateTime _lastLoadUtc = DateTime.UtcNow;
     private readonly object _fill = new();
     private readonly object _getChanges = new();
 
     //private readonly object _getRow = new();
     private readonly object _openclose = new();
-
-    private bool _didBackup = false;
 
     #endregion
 
@@ -92,11 +91,15 @@ public abstract class SqlBackAbstract {
 
     #region Methods
 
-    public static bool IsValidTableName(string tablename) {
+    public static bool IsValidTableName(string tablename, bool allowSystemnames) {
+        if (string.IsNullOrEmpty(tablename)) { return false; }
+
         var t = tablename.ToUpper();
 
-        if (t.StartsWith("SYS_")) { return false; }
-        if (t.StartsWith("BAK_")) { return false; }
+        if (!allowSystemnames) {
+            if (t.StartsWith("SYS_")) { return false; }
+            if (t.StartsWith("BAK_")) { return false; }
+        }
 
         if (!t.ContainsOnlyChars(Constants.Char_AZ + Constants.Char_Numerals + "_")) { return false; }
 
@@ -124,12 +127,12 @@ public abstract class SqlBackAbstract {
     /// </summary>
     /// <param name="tablename"></param>
     /// <param name="columnName"></param>
-    public string AddColumnToMain(string tablename, string columnName) {
+    public string AddColumnToMain(string tablename, string columnName, bool allowSystemTableNames) {
         columnName = columnName.ToUpper();
 
         var colMain = GetColumnNames(tablename.ToUpper());
         if (colMain == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return "Spalte nicht gefunden"; }
-        if (!colMain.Contains(columnName)) { AddColumn(tablename.ToUpper(), columnName, VarChar4000, true); }
+        if (!colMain.Contains(columnName)) { AddColumn(tablename.ToUpper(), columnName, VarChar4000, true, allowSystemTableNames); }
 
         return SetStyleData(tablename, DatabaseDataType.ColumnName, columnName.ToUpper(), columnName.ToUpper());
     }
@@ -159,8 +162,14 @@ public abstract class SqlBackAbstract {
         return ExecuteCommand(comm, false);
     }
 
-    public void ChangeDataType(string tablename, string column, int charlenght) {
+    public void ChangeDataType(string tablename, string column, int charlenght, bool allowSystemTableNames) {
         //https://stackoverflow.com/questions/10321775/changing-the-data-type-of-a-column-in-oracle
+
+        if (!IsValidTableName(tablename, allowSystemTableNames)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+
+            return;
+        }
 
         var s = (DataFormat)IntParse(GetStyleData(tablename, DatabaseDataType.ColumnFormat.ToString(), column));
 
@@ -422,7 +431,7 @@ public abstract class SqlBackAbstract {
             }
             _ = CloseConnection();
 
-            return db.Row.DoLinkedDatabase(row);
+            return string.Empty; // db.Row.DoLinkedDatabase(row);
             //}
         } catch {
             _ = CloseConnection();
@@ -453,8 +462,13 @@ public abstract class SqlBackAbstract {
     //    while (await reader.ReadAsync()) {
     //        var rk = LongParse(reader[0].ToString(false));
     //        var r = row.GenerateAndAdd(rk, string.Empty, false, false);
-    public void RenameColumn(string tablename, string oldname, string newname) {
+    public void RenameColumn(string tablename, string oldname, string newname, bool allowSystemTableNames) {
         if (oldname.Equals(newname, StringComparison.OrdinalIgnoreCase)) { return; }
+
+        if (!IsValidTableName(tablename, allowSystemTableNames)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+            return;
+        }
 
         //https://www.1keydata.com/sql/alter-table-rename-column.html
         var cmdString = @"ALTER TABLE " + tablename + " RENAME COLUMN " + oldname + " TO " + newname;
@@ -475,7 +489,7 @@ public abstract class SqlBackAbstract {
     public void RepairAll(string tablename) {
         Develop.StartService();
 
-        if (!IsValidTableName(tablename)) {
+        if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
             return;
         }
@@ -486,8 +500,8 @@ public abstract class SqlBackAbstract {
 
         if (!string.IsNullOrEmpty(tablename)) {
             if (!x.Contains(tablename.ToUpper())) {
-                _ = CreateTable(tablename.ToUpper(), new List<string> { "RK" });
-                ChangeDataType(tablename.ToUpper(), "RK", 15);
+                _ = CreateTable(tablename.ToUpper(), new List<string> { "RK" }, false);
+                ChangeDataType(tablename.ToUpper(), "RK", 15, false);
             }
         }
 
@@ -496,38 +510,38 @@ public abstract class SqlBackAbstract {
         #region Style
 
         if (!x.Contains(SysStyle)) {
-            _ = CreateTable(SysStyle, new List<string> { "TABLENAME", "COLUMNNAME", "TYPE", "PART" });
-            ChangeDataType(tablename.ToUpper(), "COLUMNNAME", 128);
-            ChangeDataType(tablename.ToUpper(), "TABLENAME", 128);
-            ChangeDataType(tablename.ToUpper(), "PART", 3);
+            _ = CreateTable(SysStyle, new List<string> { "TABLENAME", "COLUMNNAME", "TYPE", "PART" }, true);
+            ChangeDataType(tablename.ToUpper(), "COLUMNNAME", 128, true);
+            ChangeDataType(tablename.ToUpper(), "TABLENAME", 128, true);
+            ChangeDataType(tablename.ToUpper(), "PART", 3, true);
         }
 
         var colStyle = GetColumnNames(SysStyle);
         if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
 
         if (!colStyle.Contains("VALUE")) {
-            AddColumn(SysStyle, "VALUE", VarChar4000, true);
-            ChangeDataType(tablename.ToUpper(), "VALUE", 255);
+            AddColumn(SysStyle, "VALUE", VarChar4000, true, true);
+            ChangeDataType(tablename.ToUpper(), "VALUE", 255, true);
         }
 
         #endregion
 
         #region  Undo
 
-        if (!x.Contains(SysUndo)) { _ = CreateTable(SysUndo); }
+        if (!x.Contains(SysUndo)) { _ = CreateTable(SysUndo, true); }
 
         var colUndo = GetColumnNames(SysUndo);
         if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colUndo.Contains("TABLENAME")) { AddColumn(SysUndo, "TABLENAME", VarChar255, false); }
-        if (!colUndo.Contains("COMAND")) { AddColumn(SysUndo, "COMAND", false); }
-        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", VarChar15, true); }
-        if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", VarChar15, true); }
-        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SysUndo, "PREVIOUSVALUE", VarChar4000, true); }
-        if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SysUndo, "CHANGEDTO", VarChar4000, true); }
-        if (!colUndo.Contains("USERNAME")) { AddColumn(SysUndo, "USERNAME", false); }
-        if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SysUndo, "TIMECODEUTC", Date, false); }
-        if (!colUndo.Contains("CMT")) { AddColumn(SysUndo, "CMT", VarChar255, true); }
-        if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SysUndo, "COLUMNNAME", VarChar255, true); }
+        if (!colUndo.Contains("TABLENAME")) { AddColumn(SysUndo, "TABLENAME", VarChar255, false, true); }
+        if (!colUndo.Contains("COMAND")) { AddColumn(SysUndo, "COMAND", false, true); }
+        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", VarChar15, true, true); }
+        if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", VarChar15, true, true); }
+        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SysUndo, "PREVIOUSVALUE", VarChar4000, true, true); }
+        if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SysUndo, "CHANGEDTO", VarChar4000, true, true); }
+        if (!colUndo.Contains("USERNAME")) { AddColumn(SysUndo, "USERNAME", false, true); }
+        if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SysUndo, "TIMECODEUTC", Date, false, true); }
+        if (!colUndo.Contains("CMT")) { AddColumn(SysUndo, "CMT", VarChar255, true, true); }
+        if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SysUndo, "COLUMNNAME", VarChar255, true, true); }
 
         #endregion
 
@@ -585,10 +599,10 @@ public abstract class SqlBackAbstract {
 
         if (type == DatabaseDataType.ColumnName) {
             // Wichtig, erst den Wert seetzen, dann umbenennen! Somit wird der Wert richtig mit umbenannt
-            RenameColumn(tablename, columnName.ToUpper(), newValue.ToUpper());
+            RenameColumn(tablename, columnName.ToUpper(), newValue.ToUpper(), false);
         }
         if (type == DatabaseDataType.MaxTextLenght) {
-            ChangeDataType(tablename, columnName.ToUpper(), IntParse(newValue));
+            ChangeDataType(tablename, columnName.ToUpper(), IntParse(newValue), false);
         }
 
         //if (type == DatabaseDataType.ColumnName) {
@@ -671,11 +685,11 @@ public abstract class SqlBackAbstract {
                 //    return AddColumnToMain(tablename, ColumnItem.TmpNewDummy, (long)columnkey);
 
                 case DatabaseDataType.Comand_AddColumnByName:
-                    return AddColumnToMain(tablename, value);
+                    return AddColumnToMain(tablename, value, false);
 
                 case DatabaseDataType.Comand_RemoveColumn:
                     if (columname == null) { return "Spalte nicht definiert!"; }
-                    return RemoveColumn(tablename, columname);
+                    return RemoveColumn(tablename, columname, false);
 
                 case DatabaseDataType.Comand_RemoveRow:
                     return RemoveRow(tablename, LongParse(value));
@@ -899,13 +913,13 @@ public abstract class SqlBackAbstract {
     /// <returns></returns>
     protected abstract List<string> AllTables();
 
-    protected abstract string CreateTable(string tablename);
+    protected abstract string CreateTable(string tablename, bool allowSystemTableNames);
 
     //    try {
     //        using var q = _connection.CreateCommand();
-    protected abstract string CreateTable(string tablename, List<string> keycolumns);
+    protected abstract string CreateTable(string tablename, List<string> keycolumns, bool allowSystemTableNames);
 
-    protected abstract string DeleteTable(string tablename);
+    protected abstract string DeleteTable(string tablename, bool allowSystemTableNames);
 
     protected void DoBackUp() {
         if (_didBackup) { return; }
@@ -937,7 +951,7 @@ public abstract class SqlBackAbstract {
 
             foreach (var thist in tbl) {
                 var ntc = "BAK_" + thist.ToUpper() + "_";
-                var l = new BackupVerwalter();
+                var l = new BackupVerwalter(3, 3);
                 foreach (var thisat in alltb) {
                     if (thisat.StartsWith(ntc)) {
                         if (DateTimeTryParse(thisat.TrimStart(ntc), out var dt)) {
@@ -948,7 +962,7 @@ public abstract class SqlBackAbstract {
 
                 foreach (var thisttd in l.Deleteable) {
                     if (thisttd.StartsWith("BAK_")) {
-                        DeleteTable(thisttd);
+                        DeleteTable(thisttd, true);
                     }
                 }
             }
@@ -971,11 +985,16 @@ public abstract class SqlBackAbstract {
 
     //        com = com + thiscolumn.Name.ToUpper() + ", ";
     //    }
-    private void AddColumn(string tablename, string column, bool nullable) => AddColumn(tablename, column, VarChar255, nullable);
+    private void AddColumn(string tablename, string column, bool nullable, bool allowSystemTableNames) => AddColumn(tablename, column, VarChar255, nullable, allowSystemTableNames);
 
-    private void AddColumn(string tablename, string column, string type, bool nullable) {
+    private void AddColumn(string tablename, string column, string type, bool nullable, bool allowSystemTableNames) {
         if (string.IsNullOrEmpty(column)) {
             Develop.DebugPrint(FehlerArt.Warnung, "Spalte ohne Namen!");
+            return;
+        }
+
+        if (!IsValidTableName(tablename, allowSystemTableNames)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
             return;
         }
 
@@ -988,6 +1007,16 @@ public abstract class SqlBackAbstract {
     private string AddRow(string tablename, long key) => ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + Dbval(key) + ")", true);
 
     private bool CopyTable(string tablename, string newtablename) {
+        if (!IsValidTableName(tablename, true)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+            return false;
+        }
+
+        if (!IsValidTableName(newtablename, true)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+            return false;
+        }
+
         var s = "CREATE TABLE " + newtablename + " AS SELECT * FROM " + tablename;
 
         return string.IsNullOrEmpty(ExecuteCommand(s, false));
@@ -1029,6 +1058,14 @@ public abstract class SqlBackAbstract {
 
     private string? GetCellValue(string tablename, string columnname, long rowkey) {
         try {
+
+            if (!IsValidTableName(tablename, false)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+
+                return "Tabellenname ungültig: " + tablename;
+            }
+
+
             if (Connection == null) { return null; }
 
             if (!OpenConnection()) { return null; }
@@ -1078,7 +1115,13 @@ public abstract class SqlBackAbstract {
         _lastLoadUtc = DateTime.UtcNow;
     }
 
-    private string RemoveColumn(string tablename, string column) {
+    private string RemoveColumn(string tablename, string column, bool allowSystemTableNames) {
+        if (!IsValidTableName(tablename, allowSystemTableNames)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+
+            return "Tabellenname ungültig: " + tablename;
+        }
+
         var b = ExecuteCommand("ALTER TABLE " + tablename.ToUpper() + " drop column " + column.ToUpper(), true);
         if (!string.IsNullOrEmpty(b)) { return "Löschen fehgeschlagen: " + b; }
 
@@ -1103,6 +1146,15 @@ public abstract class SqlBackAbstract {
     /// <param name="columnname"></param>
     /// <returns></returns>
     private string SetCellValue(string tablename, string columnname, long rowkey, string newValue) {
+
+        if (!IsValidTableName(tablename, false)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+
+            return "Tabellenname ungültig: " + tablename;
+        }
+
+
+
         var isVal = GetCellValue(tablename, columnname, rowkey);
 
         string cmdString;
