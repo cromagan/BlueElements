@@ -31,6 +31,7 @@ using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
+using static BlueControls.Interfaces.HasVersionExtensions;
 
 namespace BlueControls.Controls;
 
@@ -119,33 +120,18 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     public Control? SearchOrGenerate(IItemToControl? thisit) {
         if (thisit == null) { return null; }
 
-        //if (thisit.Page != Page) {
-        //    Develop.DebugPrint("Falscher Seitenaufruf!");
-        //    return null;
-        //}
-
         foreach (var thisC in Controls) {
-            if (thisC is Control c) {
-                if (c.Name is string s) {
-                    if (s == thisit.KeyName + "-" + thisit.Version) { return c; }
-                }
-            }
+            if (thisC is Control cx && cx.Name is string sx && sx == thisit.DefaultItemToControlName()) { return cx; }
         }
 
-        if (thisit is IItemToControl it) {
-            var c = it.CreateControl(this);
-            if (c != null && c.Name is string s && s == thisit.KeyName + "-" + it.Version) {
-                //alles ok
-            } else {
-                Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
-                return null;
-            }
-            Controls.Add(c);
-            return c;
+        var c = thisit.CreateControl(this);
+        if (c == null || c.Name is not string s || s != thisit.DefaultItemToControlName()) {
+            Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
+            return null;
         }
 
-        Develop.DebugPrint("Typ nicht definiert.");
-        return null;
+        Controls.Add(c);
+        return c;
     }
 
     public void SetData(DatabaseAbstract? database, long? rowkey) {

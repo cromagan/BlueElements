@@ -112,16 +112,12 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FileBrowser {
             OriginalText = Pfad,
-            Name = DefaultItemToControlName(),
             CreateDir = _bei_Bedarf_erzeugen,
             DeleteDir = _leere_Ordner_löschen
         };
-        con.DoInputSettings(this);
-        con.DoOutputSettings(this);
-        if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
-            var ff = parent.SearchOrGenerate(rfw2);
-            if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
-        }
+        con.DoInputSettings(this, parent);
+        //con.DoOutputSettings(this);
+
         return con;
     }
 

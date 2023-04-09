@@ -43,7 +43,7 @@ namespace BlueControls.ItemCollection;
 /// Altes Element, Filter und Zeilenauswahl in einem
 /// </summary>
 [Obsolete]
-public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculateRowsItemLevel, IItemToControl, IItemSendRow {
+public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemSendRow {
 
     #region Fields
 
@@ -144,11 +144,10 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
         var con = new FlexiControlRowSelector(OutputDatabase, FilterDefiniton, _überschrift, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition,
-            Name = DefaultItemToControlName()
         };
 
-        con.DoInputSettings(this);
-        con.DoOutputSettings(this);
+        con.DoInputSettings(this, parent);
+        con.DoOutputSettings(this, parent);
 
         return con;
     }

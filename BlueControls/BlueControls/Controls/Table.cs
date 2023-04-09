@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -63,9 +64,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
     public static readonly int RowCaptionSizeY = 50;
-
     private readonly List<string> _collapsed = new();
     private readonly object _lockUserAction = new();
+    private readonly List<IControlSendFilter> _parentSender = new();
     private int _arrangementNr = 1;
     private AutoFilter? _autoFilter;
     private BlueFont? _cellFont;
@@ -76,7 +77,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private FilterCollection? _filter;
     private List<RowItem>? _filteredRows;
     private int? _headSize;
-
     private bool _isinClick;
     private bool _isinDoubleClick;
     private bool _isinKeyDown;
@@ -97,13 +97,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private string _mouseOverText = string.Empty;
     private BlueFont? _newRowFont;
     private Progressbar? _pg;
-
     private int _pix16 = 16;
     private int _pix18 = 18;
     private int _rowCaptionFontY = 26;
     private SearchAndReplace? _searchAndReplace;
     private bool _showNumber;
-
     private RowSortDefinition? _sortDefinitionTemporary;
     private List<RowData>? _sortedRowData;
     private string _storedView = string.Empty;
@@ -252,10 +250,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, Filter, Database);
+
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
     public DatabaseAbstract? OutputDatabase { get => Database; set => Database = value; }
+    public ReadOnlyCollection<IControlSendFilter> ParentSender => new ReadOnlyCollection<IControlSendFilter>(_parentSender);
+
     public List<RowItem> PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
@@ -616,6 +618,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    public void AddParentSender(IControlSendFilter item) {
+        _parentSender.Add(item);
+        Invalidate_FilteredRows();
+    }
+
     public void CheckView() {
         if (_arrangementNr != 1) {
             if (Database?.ColumnArrangements == null || _arrangementNr >= Database.ColumnArrangements.Count || CurrentArrangement == null || !Database.PermissionCheck(CurrentArrangement.PermissionGroups_Show, null)) {
@@ -893,13 +900,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Database.Export_HTML(filename, CurrentArrangement, SortedRows(), execute);
     }
 
-    public List<RowItem> FilteredRows() {
-        if (_filteredRows != null) { return _filteredRows; }
-        if (Database == null || Database.IsDisposed) { return new List<RowItem>(); }
-        _filteredRows = Database.Row.CalculateFilteredRows(Filter);
-        return _filteredRows;
-    }
-
     /// <summary>
     /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
     /// </summary>
@@ -953,6 +953,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         foreach (var thisArrangement in Database.ColumnArrangements) {
             thisArrangement?.Invalidate_DrawWithOfAllItems();
         }
+    }
+
+    public void Invalidate_FilteredRows() {
+        _filteredRows = null;
+        ////CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
+        Invalidate_Filterinfo();
+        Invalidate_SortedRowData();
     }
 
     public void Invalidate_HeadSize() {
@@ -1040,7 +1047,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 sortedRowDataNew = new List<RowData?>();
             } else {
                 sortedRowDataNew =
-                    Database.Row.CalculateSortedRows(FilteredRows(), SortUsed(), PinnedRows, _sortedRowData);
+                    Database.Row.CalculateSortedRows(FilteredRows, SortUsed(), PinnedRows, _sortedRowData);
             }
 
             if (_sortedRowData != null && !_sortedRowData.IsDifferentTo(sortedRowDataNew)) { return _sortedRowData; }
@@ -1184,7 +1191,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public List<RowItem> VisibleUniqueRows() {
         var l = new List<RowItem>();
-        var f = FilteredRows();
+        var f = FilteredRows;
         var lockMe = new object();
         _ = Parallel.ForEach(Database.Row, thisRowItem => {
             if (thisRowItem != null) {
@@ -1807,7 +1814,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
                 row = column.Database.Row.GenerateAndAdd(newValue, "Neue Zeile über Tabellen-Ansicht");
                 if (table.Database == column.Database) {
-                    var l = table.FilteredRows();
+                    var l = table.FilteredRows;
                     if (row != null && !l.Contains(row)) {
                         if (MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
                             table.PinAdd(row);
@@ -2046,7 +2053,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (thisFilter != null && thisFilter.Column != column) { tfilter.Add(thisFilter); }
         }
         var temp = Database.Row.CalculateFilteredRows(tfilter);
-        column.TmpIfFilterRemoved = FilteredRows().Count - temp.Count;
+        column.TmpIfFilterRemoved = FilteredRows.Count - temp.Count;
         return (int)column.TmpIfFilterRemoved;
     }
 
@@ -2980,13 +2987,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Invalidate_DrawWidth(ColumnItem? vcolumn) => CurrentArrangement[vcolumn]?.Invalidate_DrawWidth();
-
-    private void Invalidate_FilteredRows() {
-        _filteredRows = null;
-        ////CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
-        Invalidate_Filterinfo();
-        Invalidate_SortedRowData();
-    }
 
     private void Invalidate_Filterinfo() {
         if (Database == null || Database.IsDisposed) { return; }

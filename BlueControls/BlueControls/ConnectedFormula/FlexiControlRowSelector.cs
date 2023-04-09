@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BlueBasics;
@@ -41,8 +42,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     private readonly List<IControlSendSomething> _childs = new();
     private readonly string _showformat;
     private bool _disposing;
+    private List<RowItem>? _filteredRows;
     private RowItem? _row;
-    private List<RowItem>? _rows;
 
     #endregion
 
@@ -70,6 +71,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     #region Properties
 
     public DatabaseAbstract? FilterDefiniton { get; }
+    public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), OutputDatabase);
     public DatabaseAbstract? OutputDatabase { get; }
 
     public RowItem? Row {
@@ -117,6 +119,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
         _childs.Add(c);
         DoChilds(_childs, OutputDatabase, _row?.Key);
     }
+
+    public void Invalidate_FilteredRows() => _filteredRows = null;
 
     public void SetData(DatabaseAbstract? otherdatabase, long? rowkey) {
         if (_disposing || IsDisposed) { return; }
@@ -216,7 +220,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
                 #region Zeile(n) ermitteln und Script löschen
 
-                _rows = calcrows ? OutputDatabase?.Row.CalculateFilteredRows(f) : null;
+                _filteredRows = calcrows ? OutputDatabase?.Row.CalculateFilteredRows(f) : null;
 
                 #endregion
             }
@@ -239,7 +243,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
             _disposing = true;
             _childs.Clear();
 
-            _rows = null;
+            _filteredRows = null;
         }
     }
 
@@ -268,8 +272,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
         #region Zeilen erzeugen
 
-        if (_rows != null) {
-            foreach (var thisR in _rows) {
+        if (_filteredRows != null) {
+            foreach (var thisR in _filteredRows) {
                 if (cb?.Item?[thisR.Key.ToString()] == null) {
                     var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
                     _ = cb?.Item?.Add(tmpQuickInfo, thisR.Key.ToString());

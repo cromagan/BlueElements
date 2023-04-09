@@ -40,8 +40,6 @@ public abstract class RectanglePadItemWithVersion : RectanglePadItem, IHasVersio
 
     #region Methods
 
-    public string DefaultItemToControlName() => KeyName + "-" + Version;
-
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {

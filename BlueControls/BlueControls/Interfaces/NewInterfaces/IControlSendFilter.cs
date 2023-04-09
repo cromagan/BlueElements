@@ -26,17 +26,26 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using static BlueControls.Interfaces.HasVersionExtensions;
 
 namespace BlueControls.Interfaces;
 
 public interface IControlSendFilter : IControlSendSomething {
+
+    #region Properties
+
+    public FilterItem? Filter { get; }
+
+    #endregion
 }
 
 public static class IControlSendFilterExtension {
 
     #region Methods
 
-    public static void DoOutputSettings(this IControlSendFilter dest, IItemSendFilter source) { }
+    public static void DoOutputSettings(this IControlSendFilter dest, ConnectedFormulaView parent, IItemSendFilter source) {
+        dest.Name = source.DefaultItemToControlName();
+    }
 
     #endregion
 }

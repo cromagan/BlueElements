@@ -33,7 +33,9 @@ public interface IControlSendSomething {
 
     #region Properties
 
-    public ReadOnlyCollection<IControlSendSomething> Childs { get; }
+    //public ReadOnlyCollection<IControlSendSomething> Childs { get; }
+    public string Name { get; set; }
+
     public DatabaseAbstract? OutputDatabase { get; }
 
     #endregion

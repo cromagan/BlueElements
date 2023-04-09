@@ -107,23 +107,15 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     #region Methods
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControl {
+        var con = new FlexiControlVariable {
             Caption = Überschrift + ":",
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition,
-            Name = DefaultItemToControlName(),
             OriginalText = _variable
         };
-        if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
-            var ff = parent.SearchOrGenerate(rfw2);
 
-            if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
-            con.DisabledReason = "Dieser Wert ist nur eine Anzeige.";
-        } else {
-            con.DisabledReason = "Keine gültige Verknüpfung";
-        }
-        con.DoInputSettings(this);
-        con.DoOutputSettings(this);
+        con.DoInputSettings(this, parent);
+        con.DoOutputSettings(this, parent);
         return con;
     }
 

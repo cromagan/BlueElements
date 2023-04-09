@@ -17,9 +17,13 @@
 
 #nullable enable
 
+using BlueBasics.Interfaces;
+using System.Windows.Media.Animation;
+using System;
+
 namespace BlueControls.Interfaces;
 
-public interface IHasVersion {
+public interface IHasVersion : IHasKeyName {
 
     #region Properties
 
@@ -28,9 +32,11 @@ public interface IHasVersion {
     #endregion
 }
 
-public static class IHasVersionExtensions {
+public static class HasVersionExtensions {
 
     #region Methods
+
+    public static string DefaultItemToControlName(this IHasVersion item) => item.KeyName + "-" + item.Version;
 
     public static void RaiseVersion(this IHasVersion item) {
         if (item.Version == int.MaxValue) { item.Version = 0; }

@@ -32,7 +32,6 @@ namespace BlueControls.ItemCollection;
 
 /// <summary>
 /// Dieses Element ist ein Button. Dieser kann Filter empfangen und mit diesen Filtern eine neue Zeile anlegen
-/// Per Tabellenansicht
 /// </summary>
 
 public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter {
@@ -85,17 +84,12 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
     #region Methods
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
-        //    EditType = _bearbeitung,
-        //    CaptionPosition = CaptionPosition,
-        //    Name = DefaultItemToControlName()
-        //};
-        //return con;
+        var con = new ButtonAddRow();
 
-        con.DoInputSettings(this);
-        con.DoOutputSettings(this);
-        Develop.DebugPrint_NichtImplementiert();
-        return new Control();
+        con.DoInputSettings(this, parent);
+        //con.DoOutputSettings(this);
+
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {

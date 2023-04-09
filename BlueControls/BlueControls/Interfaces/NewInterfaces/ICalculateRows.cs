@@ -26,21 +26,38 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Forms;
+using static BlueControls.Interfaces.HasVersionExtensions;
 
 namespace BlueControls.Interfaces;
 
-public interface IControlAcceptSomething {
+public interface ICalculateRows {
 
     #region Properties
 
-    public string Name { get; set; }
+    public List<RowItem> FilteredRows { get; }
+
+    #endregion
+
+    #region Methods
+
+    public void Invalidate_FilteredRows();
 
     #endregion
 }
 
-public static class IControlAcceptSomethingExtension {
+public static class ICalculateRowsExtension {
+
+    #region Methods
+
+    public static List<RowItem> CalculateFilteredRows(this ICalculateRows item, ref List<RowItem>? precalculaeItems, FilterCollection? filter, DatabaseAbstract? database) {
+        if (precalculaeItems != null) { return precalculaeItems; }
+        if (database == null || database.IsDisposed) { return new List<RowItem>(); }
+        precalculaeItems = database.Row.CalculateFilteredRows(filter);
+        return precalculaeItems;
+    }
+
+    #endregion
 }
 
-public class ControlAcceptSomething {
+public class CalculateRows {
 }

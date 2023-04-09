@@ -95,16 +95,10 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     #region Methods
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new TabControl {
-            Name = DefaultItemToControlName()
-        };
+        var con = new TabControl();
 
-        if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
-            var ff = parent.SearchOrGenerate(rfw2);
-            if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
-        }
-        con.DoInputSettings(this);
-        con.DoOutputSettings(this);
+        con.DoInputSettings(this, parent);
+        //con.DoOutputSettings(this);
         return con;
     }
 

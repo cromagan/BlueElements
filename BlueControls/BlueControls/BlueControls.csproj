@@ -115,7 +115,19 @@
     </Compile>
     <Compile Include="BlueFont.cs" />
     <Compile Include="CommonDialogs.cs" />
+    <Compile Include="ConnectedFormula\NewControls\FlexiControlVariable.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ConnectedFormula\NewControls\FlexiControlVariable.Designer.cs">
+      <DependentUpon>FlexiControlVariable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ConnectedFormula\NewControls\FlexiControlRowSelector.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Controls\FlexiControlForDelegate.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ConnectedFormula\NewControls\ButtonAddRow.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="FormManager.cs" />
@@ -128,6 +140,7 @@
     <Compile Include="Interfaces\NewInterfaces\IControlAcceptFilter.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlSendFilter.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlAcceptRow.cs" />
+    <Compile Include="Interfaces\NewInterfaces\ICalculateRows.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlSendRow.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlAcceptSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IHasVersion.cs" />
@@ -323,7 +336,6 @@
       <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IAcceptVariableList.cs" />
-    <Compile Include="Interfaces\ICalculateRowsItemLevel.cs" />
     <Compile Include="Interfaces\IDisabledReason.cs" />
     <Compile Include="Interfaces\IAcceptRowKey.cs" />
     <Compile Include="Interfaces\IItemToControl.cs" />
@@ -611,6 +623,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\Filterleiste.resx">
       <DependentUpon>Filterleiste.cs</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="ConnectedFormula\NewControls\FlexiControlVariable.resx">
+      <DependentUpon>FlexiControlVariable.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\Caption.resx">

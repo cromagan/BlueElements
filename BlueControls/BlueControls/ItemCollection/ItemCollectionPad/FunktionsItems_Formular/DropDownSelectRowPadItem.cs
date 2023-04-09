@@ -25,6 +25,7 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueDatabase;
@@ -136,17 +137,15 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(add, this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
-        //    EditType = _bearbeitung,
-        //    CaptionPosition = CaptionPosition,
-        //    Name = DefaultItemToControlName()
-        //};
-        //return con;
+        var con = new FlexiControlRowSelectorNew(OutputDatabase, _überschrift, _anzeige) {
+            EditType = _bearbeitung,
+            CaptionPosition = CaptionPosition,
+        };
 
-        con.DoInputSettings(this);
-        con.DoOutputSettings(this);
-        Develop.DebugPrint_NichtImplementiert();
-        return new Control();
+        con.DoInputSettings(this, parent);
+        con.DoOutputSettings(this, parent);
+
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {

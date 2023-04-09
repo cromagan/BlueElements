@@ -35,7 +35,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(ButtonDesigner))]
 [DefaultEvent("Click")]
-public sealed class Button : GenericControl, IBackgroundNone, ITranslateable {
+public class Button : GenericControl, IBackgroundNone, ITranslateable {
 
     #region Fields
 

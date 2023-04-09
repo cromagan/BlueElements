@@ -139,8 +139,10 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         //    Name = DefaultItemToControlName()
         //};
         //return con;
-        Develop.DebugPrint_NichtImplementiert();
-        return new Control();
+        con.DoInputSettings(this, parent);
+        con.DoOutputSettings(this, parent);
+
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {

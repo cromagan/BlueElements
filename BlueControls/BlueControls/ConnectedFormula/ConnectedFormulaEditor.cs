@@ -57,13 +57,9 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnBild_Click(object sender, System.EventArgs e) {
-        var l = Pad.LastClickedItem;
+        //var l = Pad.LastClickedItem;
 
         var x = new EasyPicPadItem(string.Empty);
-
-        if (l is ICalculateRowsItemLevel ri) {
-            x.GetRowFrom = ri;
-        }
 
         Pad.AddCentered(x);
     }
@@ -74,7 +70,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
-        var l = Pad.LastClickedItem;
+        //var l = Pad.LastClickedItem;
 
         var x = new EditFieldPadItem(string.Empty);
         Pad.AddCentered(x);
@@ -168,7 +164,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnVariable_Click(object sender, System.EventArgs e) {
-        var l = Pad.LastClickedItem;
+        //var l = Pad.LastClickedItem;
 
         var x = new VariableFieldPadItem(string.Empty);
 
@@ -249,7 +245,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {
-        var l = Pad.LastClickedItem;
+        //var l = Pad.LastClickedItem;
 
         var x = new FileExplorerPadItem(string.Empty);
 

@@ -26,23 +26,20 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using static BlueControls.Interfaces.HasVersionExtensions;
 
 namespace BlueControls.Interfaces;
 
-public interface IControlSendRow : IControlSendSomething {
-
-    #region Properties
-
-    public IControlAcceptRow Child { get; set; }
-
-    #endregion
+public interface IControlSendRow : IControlSendSomething, ICalculateRows {
 }
 
 public static class IControlSendRowExtension {
 
     #region Methods
 
-    public static void DoOutputSettings(this IControlSendRow dest, IControlSendRow source) { }
+    public static void DoOutputSettings(this IControlSendRow dest, ConnectedFormulaView parent, IItemSendRow source) {
+        dest.Name = source.DefaultItemToControlName();
+    }
 
     #endregion
 }

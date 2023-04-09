@@ -26,6 +26,7 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using static BlueControls.Interfaces.HasVersionExtensions;
 
 namespace BlueControls.Interfaces;
 
@@ -48,7 +49,42 @@ public static class IControlAcceptFilterExtension {
 
     #region Methods
 
-    public static void DoInputSettings(this IControlAcceptFilter dest, IItemAcceptFilter source) { }
+    public static void DoInputSettings(this IControlAcceptFilter dest, ConnectedFormulaView parent, IItemAcceptFilter source) {
+        dest.Name = source.DefaultItemToControlName();
+
+        if (source.GetFilterFromKeys != null) {
+            foreach (var thisKey in source.GetFilterFromKeys) {
+                var it = source.Parent[thisKey];
+
+                if (it is IItemToControl itc) {
+                    var ff = parent.SearchOrGenerate(itc);
+
+                    if (ff is IControlSendFilter ffx) {
+                        dest.AddParentSender(ffx);
+                    }
+                }
+            }
+        }
+    }
+
+    public static FilterCollection? FilterOfSender(this IControlAcceptFilter item) {
+        if (item.InputDatabase() is not DatabaseAbstract db) { return null; }
+
+        var x = new FilterCollection(db);
+
+        foreach (var thiss in item.ParentSender) {
+            if (thiss.Filter is FilterItem f) {
+                x.Add(f);
+            }
+        }
+
+        return x;
+    }
+
+    public static DatabaseAbstract? InputDatabase(this IControlAcceptFilter item) {
+        if (item.ParentSender == null || item.ParentSender.Count == 0) { return null; }
+        return item.ParentSender[0].OutputDatabase;
+    }
 
     #endregion
 }

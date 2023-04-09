@@ -26,23 +26,43 @@ using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
+using static BlueControls.Interfaces.HasVersionExtensions;
 
 namespace BlueControls.Interfaces;
 
 public interface IControlAcceptRow : IControlAcceptSomething {
-
-    #region Properties
-
-    public IControlSendRow ParentSender { get; set; }
-
-    #endregion
+    //public IControlSendRow GetRowFrom { get; set; }
 }
 
 public static class IControlAcceptRowExtension {
 
     #region Methods
 
-    public static void DoInputSettings(this IControlAcceptRow dest, IItemAcceptRow source) { }
+    public static void DoInputSettings(this IControlAcceptRow dest, ConnectedFormulaView parent, IItemAcceptRow source) {
+        dest.Name = source.DefaultItemToControlName();
+
+        //if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
+        //    var ff = parent.SearchOrGenerate(rfw2);
+        //    if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
+        //}
+
+        //if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
+
+        //if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
+        //    var ff = parent.SearchOrGenerate(rfw2);
+        //    if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
+        //}
+
+        //if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
+        //    var ff = parent.SearchOrGenerate(rfw2);
+
+        //    if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
+        //    con.DisabledReason = "Dieser Wert ist nur eine Anzeige.";
+        //} else {
+        //    con.DisabledReason = "Keine gültige Verknüpfung";
+        //}
+    }
 
     #endregion
 }
