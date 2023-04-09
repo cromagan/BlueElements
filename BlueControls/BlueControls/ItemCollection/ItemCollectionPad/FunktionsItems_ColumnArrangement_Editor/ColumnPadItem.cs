@@ -67,14 +67,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     /// Wird von Flexoptions aufgerufen
     /// </summary>
 
-    public string Spalte_bearbeiten {
-        get => string.Empty;
-        set {
-            if (Column == null) { return; }
-            TableView.OpenColumnEditor(Column, null, null);
-        }
-    }
-
     protected override int SaveOrder => 999;
 
     #endregion
@@ -87,7 +79,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         l.Add(new FlexiControlForProperty<string>(() => Datenbank));
         l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
-        l.Add(new FlexiControlForProperty<string>(() => Spalte_bearbeiten, ImageCode.Spalte));
+        l.Add(new FlexiControlForDelegate(Spalte_bearbeiten, "Spalte bearbeiten", ImageCode.Spalte));
         l.Add(new FlexiControl());
         l.Add(new FlexiControlForProperty<string>(() => Column.Caption));
         l.Add(new FlexiControl());
@@ -111,6 +103,11 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         //l.GenerateAndAdd(new FlexiControlForProperty(()=> this.Layout-ID", layouts));
         //l.AddRange(base.GetStyleOptions());
         return l;
+    }
+
+    public void Spalte_bearbeiten() {
+        if (Column == null) { return; }
+        TableView.OpenColumnEditor(Column, null, null);
     }
 
     public override string ToString() {

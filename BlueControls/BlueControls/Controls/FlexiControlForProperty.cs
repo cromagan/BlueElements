@@ -40,8 +40,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     #region Fields
 
-    private readonly Accessor<T> _accessor;
-    private readonly bool _isButton;
+    private readonly Accessor<T?>? _accessor;
 
     #endregion
 
@@ -52,32 +51,25 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList? list) : this(expr, 1, list, null) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList? list) : this(expr, 1, list) { }
 
     /// <summary>
     /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="rowCount"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null, null) { }
-
-    /// <summary>
-    /// Anzeige als Button
-    /// </summary>
-    /// <param name="expr"></param>
-    /// <param name="image"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, ImageCode image) : this(expr, 1, null, image) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, int rowCount) : this(expr, rowCount, null) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
     /// </summary>
     /// <param name="expr"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null, null) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr) : this(expr, 1, null) { }
 
-    public FlexiControlForProperty() : this(null, 1, null, null) { }
+    public FlexiControlForProperty() : this(null, 1, null) { }
 
-    private FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList? list, ImageCode? image) : base() {
-        _accessor = new Accessor<T>(expr);
+    private FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList? list) : base() {
+        _accessor = new(expr);
 
         GenFehlerText();
         _IdleTimer.Tick += Checker_Tick;
@@ -85,9 +77,84 @@ public class FlexiControlForProperty<T> : FlexiControl {
         EditType = EditTypeFormula.Textfeld;
         Size = new Size(200, 24);
 
-        _isButton = image != null;
+        #region Caption setzen
 
-        UpdateControlData(rowCount, list, image);
+        var x = _accessor.Name.SplitAndCutBy("__");
+        Caption = x[0].Replace("_", " ") + ":";
+
+        #endregion Caption setzen
+
+        #region Art des Steuerelements bestimmen
+
+        switch (_accessor) {
+            case Accessor<bool>: {
+                    EditType = EditTypeFormula.Ja_Nein_Knopf;
+                    var s1 = BlueFont.MeasureStringOfCaption(Caption);
+                    Size = new Size((int)s1.Width + 30, 22);
+                    break;
+                }
+            default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
+            {
+                    if (list != null) {
+                        EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+                        list.Appearance = BlueListBoxAppearance.ComboBox_Textbox;
+                        var s2 = BlueFont.MeasureStringOfCaption(Caption);
+                        var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
+                        var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);
+                        var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
+                        Size = new Size(x2, y2);
+                        StyleComboBox(CreateSubControls() as ComboBox, list.ItemOrder, ComboBoxStyle.DropDownList, true);
+                    } else {
+                        EditType = EditTypeFormula.Textfeld;
+                        if (rowCount >= 2) {
+                            CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
+                            Size = new Size(200, 16 + (24 * rowCount));
+                            MultiLine = true;
+                            this.GetStyleFrom(FormatHolder.Text);
+                        } else {
+                            CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+                            Size = new Size(200, 24);
+                            MultiLine = false;
+                            switch (_accessor) {
+                                case Accessor<string>:
+                                    this.GetStyleFrom(FormatHolder.Text);
+                                    break;
+
+                                case Accessor<int>:
+                                    this.GetStyleFrom(FormatHolder.Integer);
+                                    break;
+
+                                case Accessor<float>:
+                                    this.GetStyleFrom(FormatHolder.Float);
+                                    break;
+
+                                case Accessor<double>:
+                                    this.GetStyleFrom(FormatHolder.Float);
+                                    break;
+
+                                case Accessor<Color>:
+                                    this.GetStyleFrom(FormatHolder.Text);
+                                    break;
+
+                                default:
+                                    this.GetStyleFrom(FormatHolder.Text);
+                                    break;
+                            }
+                        }
+
+                        StyleTextBox(CreateSubControls() as TextBox);
+                    }
+                    break;
+                }
+        }
+
+        #endregion Art des Steuerelements bestimmen
+
+        QuickInfo = _accessor.QuickInfo;
+
+        SetValueFromProperty();
+        GenFehlerText();
+
         _ = CheckEnabledState();
     }
 
@@ -99,17 +166,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
         _IdleTimer.Tick -= Checker_Tick;
         //if (_propertyObject is IReloadable LS) { LS.LoadedFromDisk -= OnLoadedFromDisk; }
         base.Dispose(disposing);
-    }
-
-    protected override void OnButtonClicked() {
-        base.OnButtonClicked();
-        if (_isButton) {
-            _accessor?.Set(default);
-        }
-
-        //if (_methInfo != null) {
-        //    _methInfo.Invoke(_propertyObject, null);
-        //}
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
@@ -166,7 +222,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
         if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
 
         if (_accessor == null || !_accessor.CanRead || !_accessor.CanWrite) { return; }
-        if (_isButton) { return; }
 
         switch (_accessor) {
             case Accessor<string> al:
@@ -288,100 +343,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 Develop.DebugPrint(FehlerArt.Fehler, "Art unbekannt!");
                 break;
         }
-    }
-
-    private void UpdateControlData(int textLines, ItemCollectionList? list, ImageCode? image) {
-
-        #region Caption setzen
-
-        var x = _accessor.Name.SplitAndCutBy("__");
-        Caption = x[0].Replace("_", " ") + ":";
-
-        #endregion Caption setzen
-
-        #region Art des Steuerelements bestimmen
-
-        if (_isButton) {
-            EditType = EditTypeFormula.Button;
-            CaptionPosition = ÜberschriftAnordnung.ohne;
-            var s0 = BlueFont.MeasureStringOfCaption(Caption.TrimEnd(":"));
-            Size = new Size((int)s0.Width + 50 + 22, 30);
-            if (CreateSubControls() is Button c0) {
-                c0.Text = Caption.TrimEnd(":");
-                if (image is ImageCode im) {
-                    c0.ImageCode = QuickImage.Get(im, 22).ToString();
-                }
-            }
-        } else {
-            switch (_accessor) {
-                case Accessor<bool>: {
-                        EditType = EditTypeFormula.Ja_Nein_Knopf;
-                        var s1 = BlueFont.MeasureStringOfCaption(Caption);
-                        Size = new Size((int)s1.Width + 30, 22);
-                        break;
-                    }
-                default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
-                {
-                        if (list != null) {
-                            EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-                            list.Appearance = BlueListBoxAppearance.ComboBox_Textbox;
-                            var s2 = BlueFont.MeasureStringOfCaption(Caption);
-                            var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
-                            var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);
-                            var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
-                            Size = new Size(x2, y2);
-                            StyleComboBox(CreateSubControls() as ComboBox, list.ItemOrder, ComboBoxStyle.DropDownList, true);
-                        } else {
-                            EditType = EditTypeFormula.Textfeld;
-                            if (textLines >= 2) {
-                                CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
-                                Size = new Size(200, 16 + (24 * textLines));
-                                MultiLine = true;
-                                this.GetStyleFrom(FormatHolder.Text);
-                            } else {
-                                CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
-                                Size = new Size(200, 24);
-                                MultiLine = false;
-                                switch (_accessor) {
-                                    case Accessor<string>:
-                                        this.GetStyleFrom(FormatHolder.Text);
-                                        break;
-
-                                    case Accessor<int>:
-                                        this.GetStyleFrom(FormatHolder.Integer);
-                                        break;
-
-                                    case Accessor<float>:
-                                        this.GetStyleFrom(FormatHolder.Float);
-                                        break;
-
-                                    case Accessor<double>:
-                                        this.GetStyleFrom(FormatHolder.Float);
-                                        break;
-
-                                    case Accessor<Color>:
-                                        this.GetStyleFrom(FormatHolder.Text);
-                                        break;
-
-                                    default:
-                                        this.GetStyleFrom(FormatHolder.Text);
-                                        break;
-                                }
-                            }
-
-                            StyleTextBox(CreateSubControls() as TextBox);
-                        }
-                        break;
-                    }
-            }
-        }
-
-        #endregion Art des Steuerelements bestimmen
-
-        QuickInfo = _accessor.QuickInfo;
-
-        SetValueFromProperty();
-        GenFehlerText();
     }
 
     #endregion

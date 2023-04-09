@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
@@ -31,8 +30,6 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
-using static BlueControls.Interfaces.IHasVersionExtensions;
-using System.Collections.ObjectModel;
 
 namespace BlueControls.ItemCollection;
 

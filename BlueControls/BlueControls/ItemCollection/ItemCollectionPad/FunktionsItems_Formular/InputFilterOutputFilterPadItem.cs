@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -26,16 +25,10 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -48,12 +41,9 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     #region Fields
 
+    private readonly ItemAcceptFilter _itemAccepts;
+    private readonly ItemSendFilter _itemSends;
     private string _anzeige = string.Empty;
-
-    private ItemAcceptFilter _itemAccepts;
-
-    private ItemSendFilter _itemSends;
-
     private string _überschrift = string.Empty;
 
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -105,22 +95,6 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public string Datenbank_wählen {
-        get => string.Empty;
-        set => _itemSends.Datenbank_wählen(this);
-    }
-
-    public string Datenbankkopf {
-        get => string.Empty;
-        set => _itemSends.Datenbankkopf();
-    }
-
-    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_hinzufügen {
-        get => string.Empty;
-        set => _itemAccepts.Datenquelle_hinzufügen(this);
-    }
-
     public ReadOnlyCollection<string>? GetFilterFromKeys {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
@@ -169,23 +143,22 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         return new Control();
     }
 
-    ReadOnlyCollection<IItemSendFilter>? IItemAcceptFilter.GetFilterFrom() => _itemAccepts.GetFilterFromGet(this);
-
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() {
-            new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
-            new FlexiControl()
-        };
-        if (OutputDatabase == null || OutputDatabase.IsDisposed) { return l; }
+        List<GenericControl> l = new();
+        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemSends.GetStyleOptions(this));
+
+        l.Add(new FlexiControl());
+
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));
 
         var u = new ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
-        l.Add(new FlexiControl());
 
-        l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
 
         return l;
     }
@@ -240,13 +213,11 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-               RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
+        RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
 
-        
         if (!forPrinting) {
-           
             DrawColorScheme(gr, positionModified, zoom, InputColorId);
-     
+
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Filter der Datenbank " + OutputDatabase.Caption;
 
@@ -255,14 +226,11 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
                 Skin.Draw_FormatedText(gr, "Filter", QuickImage.Get(ImageCode.Trichter, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
         } else {
-            FakeControlPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
+            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
-
-
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", InputColorId);
-
     }
 
     protected override void OnParentChanged() {

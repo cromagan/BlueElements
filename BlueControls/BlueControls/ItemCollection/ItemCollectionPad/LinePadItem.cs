@@ -102,6 +102,7 @@ public class LinePadItem : BasicPadItem {
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
+
         ItemCollectionList.ItemCollectionList verhalt = new(false)
         {
             { "Linie direkt zwischen zwei Punkten", ((int)ConectorStyle.Direct).ToString(), QuickImage.Get(ImageCode.Linie) },

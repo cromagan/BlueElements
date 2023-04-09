@@ -23,8 +23,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Text;
-using System.Threading;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -46,7 +44,7 @@ public abstract class SqlBackAbstract {
     //public static List<SQLBackAbstract>? PossibleSQLBacks;
     protected DbConnection? Connection;
 
-    private static bool _didBackup = false;
+    private static bool _didBackup;
     private static DateTime _lastLoadUtc = DateTime.UtcNow;
     private readonly object _fill = new();
     private readonly object _getChanges = new();
@@ -127,6 +125,7 @@ public abstract class SqlBackAbstract {
     /// </summary>
     /// <param name="tablename"></param>
     /// <param name="columnName"></param>
+    /// <param name="allowSystemTableNames"></param>
     public string AddColumnToMain(string tablename, string columnName, bool allowSystemTableNames) {
         columnName = columnName.ToUpper();
 
@@ -933,7 +932,7 @@ public abstract class SqlBackAbstract {
 
             #region Kopie des aktuellen Standes erstellen
 
-            var d = DateTime.UtcNow.ToString(BlueBasics.Constants.Format_Date10);
+            var d = DateTime.UtcNow.ToString(Constants.Format_Date10);
 
             foreach (var thist in tbl) {
                 var ntc = "BAK_" + thist.ToUpper() + "_" + d;
@@ -1058,13 +1057,11 @@ public abstract class SqlBackAbstract {
 
     private string? GetCellValue(string tablename, string columnname, long rowkey) {
         try {
-
             if (!IsValidTableName(tablename, false)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
 
                 return "Tabellenname ungültig: " + tablename;
             }
-
 
             if (Connection == null) { return null; }
 
@@ -1146,14 +1143,11 @@ public abstract class SqlBackAbstract {
     /// <param name="columnname"></param>
     /// <returns></returns>
     private string SetCellValue(string tablename, string columnname, long rowkey, string newValue) {
-
         if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
 
             return "Tabellenname ungültig: " + tablename;
         }
-
-
 
         var isVal = GetCellValue(tablename, columnname, rowkey);
 

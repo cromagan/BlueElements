@@ -29,7 +29,6 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
@@ -316,12 +315,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return tmpVisibleRows;
     }
 
-    /// <summary>
-    /// Gibt die mit dieser Kombination sichtbaren Zeilen zurück. Ohne Sortierung. Jede Zeile kann maximal einmal vorkommen.
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="pinnedRows"></param>
-    /// <returns></returns>
     public bool Clear(string comment) => Remove(new FilterCollection(Database), null, comment);
 
     public void Dispose() {

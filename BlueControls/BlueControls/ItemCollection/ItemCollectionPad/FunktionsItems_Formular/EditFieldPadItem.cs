@@ -34,7 +34,6 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
-using static BlueControls.Interfaces.IHasVersionExtensions;
 
 namespace BlueControls.ItemCollection;
 
@@ -46,14 +45,12 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     #region Fields
 
+    private readonly ItemAcceptRow _itemAccepts;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
 
     private ColumnItem? _column;
 
     private string _columnName = string.Empty;
-
-    private ItemAcceptRow _itemAccepts;
-
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -95,12 +92,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
     }
 
-    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_wählen {
-        get => string.Empty;
-        set => _itemAccepts.Datenquelle_wählen(this);
-    }
-
     public EditTypeFormula EditType {
         get => _bearbeitung;
         set {
@@ -128,50 +119,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
     }
 
-    public string Spalte_bearbeiten {
-        get => string.Empty;
-        set {
-            if (Column == null) { return; }
-            TableView.OpenColumnEditor(Column, null, null);
-
-            OnChanged();
-        }
-    }
-
-    //public bool Hintergrund_Weiß_Füllen { get; set; }
-    [Description("Wählt die Spalte, die angezeigt werden soll.\r\nDiese bestimmt maßgeblich die Eigenschaften")]
-    public string Spalte_wählen {
-        get => string.Empty;
-        set {
-            if (GetRowFrom == null) {
-                MessageBox.Show("Zuerst Datenquelle wählen.");
-                return;
-            }
-
-            if (GetRowFrom.OutputDatabase == null) {
-                MessageBox.Show("Quelle fehlerhaft!");
-                return;
-            }
-
-            var lst = new ItemCollectionList.ItemCollectionList(true);
-            lst.AddRange(GetRowFrom.OutputDatabase.Column, false);
-            //lst.Sort();
-
-            var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
-
-            if (sho == null || sho.Count != 1) { return; }
-
-            var col = GetRowFrom.OutputDatabase.Column.Exists(sho[0]);
-
-            if (col == Column) { return; }
-            Column = col;
-            this.RaiseVersion();
-            OnChanged();
-        }
-    }
-
-    //public Bitmap? Bitmap { get; set; }
-
     public string Spalten_AdminInfo {
         get {
             if (Column != null) { return Column.AdminInfo; }
@@ -181,8 +128,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             if (Column != null) { Column.AdminInfo = value; }
         }
     }
-
-    //public enSizeModes Bild_Modus { get; set; }
 
     public string Spalten_QuickInfo {
         get {
@@ -198,6 +143,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     #region Methods
 
+    //public Bitmap? Bitmap { get; set; }
+    //public enSizeModes Bild_Modus { get; set; }
     public static List<BasicListItem> GetAllowedEditTypes(ColumnItem? column) {
         var l = new List<BasicListItem>();
         if (column == null) { return l; }
@@ -243,10 +190,11 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
 
-        l.AddRange(base.GetStyleOptions());
-        l.Add(new FlexiControlForProperty<string>(() => Spalte_wählen, ImageCode.Pfeil_Rechts));
+        l.AddRange(_itemAccepts.GetStyleOptions(this));
+
+        l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
         l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
-        l.Add(new FlexiControlForProperty<string>(() => Spalte_bearbeiten, ImageCode.Spalte));
+        l.Add(new FlexiControlForDelegate(Spalte_bearbeiten, "Spalte bearbeiten", ImageCode.Spalte));
 
         var u = new ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
@@ -257,8 +205,9 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         l.Add(new FlexiControl());
         l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
         l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
-        l.Add(new FlexiControl());
 
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 
@@ -299,6 +248,42 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
 
         return "Wert einer Spalte";
+    }
+
+    public void Spalte_bearbeiten() {
+        if (Column == null) { return; }
+        TableView.OpenColumnEditor(Column, null, null);
+
+        OnChanged();
+    }
+
+    //public bool Hintergrund_Weiß_Füllen { get; set; }
+    [Description("Wählt die Spalte, die angezeigt werden soll.\r\nDiese bestimmt maßgeblich die Eigenschaften")]
+    public void Spalte_wählen() {
+        if (GetRowFrom == null) {
+            MessageBox.Show("Zuerst Datenquelle wählen.");
+            return;
+        }
+
+        if (GetRowFrom.OutputDatabase == null) {
+            MessageBox.Show("Quelle fehlerhaft!");
+            return;
+        }
+
+        var lst = new ItemCollectionList.ItemCollectionList(true);
+        lst.AddRange(GetRowFrom.OutputDatabase.Column, false);
+        //lst.Sort();
+
+        var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
+
+        if (sho == null || sho.Count != 1) { return; }
+
+        var col = GetRowFrom.OutputDatabase.Column.Exists(sho[0]);
+
+        if (col == Column) { return; }
+        Column = col;
+        this.RaiseVersion();
+        OnChanged();
     }
 
     public QuickImage? SymbolForReadableText() {

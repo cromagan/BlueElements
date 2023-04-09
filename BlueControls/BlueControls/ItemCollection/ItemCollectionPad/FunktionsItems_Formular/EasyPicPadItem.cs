@@ -36,9 +36,8 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
 
     #region Fields
 
+    private readonly ItemAcceptRow _itemAccepts;
     private string _bild_Dateiname = string.Empty;
-
-    private ItemAcceptRow _itemAccepts;
 
     #endregion
 
@@ -65,12 +64,6 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
             this.RaiseVersion();
             OnChanged();
         }
-    }
-
-    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_wählen {
-        get => string.Empty;
-        set => _itemAccepts.Datenquelle_wählen(this);
     }
 
     public IItemSendRow? GetRowFrom {
@@ -104,8 +97,11 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(_itemAccepts.GetStyleOptions(this));
         l.Add(new FlexiControlForProperty<string>(() => Bild_Dateiname));
+
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 

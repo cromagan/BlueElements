@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -26,17 +25,10 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
-using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
@@ -49,8 +41,8 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     #region Fields
 
-    private ItemAcceptRow _itemAccepts;
-    private ItemSendFilter _itemSends;
+    private readonly ItemAcceptRow _itemAccepts;
+    private readonly ItemSendFilter _itemSends;
 
     #endregion
 
@@ -78,17 +70,6 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     public ReadOnlyCollection<string>? ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
-    }
-
-    public string Datenbankkopf {
-        get => string.Empty;
-        set => _itemSends.Datenbankkopf();
-    }
-
-    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_wählen {
-        get => string.Empty;
-        set => _itemAccepts.Datenquelle_wählen(this);
     }
 
     public IItemSendRow? GetRowFrom {
@@ -134,11 +115,15 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
         var l = base.GetStyleOptions();
 
         var u = new ItemCollectionList.ItemCollectionList(false);
+
+        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemSends.GetStyleOptions(this));
+
+        l.Add(new FlexiControl());
         u.AddRange(typeof(ÜberschriftAnordnung));
 
         l.Add(new FlexiControl());
-
-        l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
+        l.AddRange(base.GetStyleOptions());
 
         return l;
     }

@@ -17,26 +17,16 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
-using static BlueBasics.Converter;
 using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection;
@@ -51,7 +41,7 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
     #region Fields
 
-    private ItemSendRow _itemSends;
+    private readonly ItemSendRow _itemSends;
 
     #endregion
 
@@ -78,16 +68,6 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
     public ReadOnlyCollection<string>? ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
-    }
-
-    public string Datenbank_wählen {
-        get => string.Empty;
-        set => _itemSends.Datenbank_wählen(this);
-    }
-
-    public string Datenbankkopf {
-        get => string.Empty;
-        set => _itemSends.Datenbankkopf();
     }
 
     public int InputColorId { get; set; }
@@ -179,13 +159,13 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() {
-            new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
-            new FlexiControl()
-        };
-        if (OutputDatabase == null || OutputDatabase.IsDisposed) { return l; }
+        List<GenericControl> l = new();
 
-        l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
+        l.AddRange(_itemSends.GetStyleOptions(this));
+
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
+
         return l;
     }
 

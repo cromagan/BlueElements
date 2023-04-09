@@ -18,16 +18,15 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using BlueDatabase.Interfaces;
 using System.Collections.Generic;
-using System.Security;
+using System.ComponentModel;
 
 namespace BlueControls.Interfaces;
 
@@ -38,24 +37,17 @@ public interface IItemAcceptRow : IItemAcceptSomething, IChangedFeedback, IHasVe
 
     #region Properties
 
-    public string Datenquelle_wählen { get; set; }
     public IItemSendRow? GetRowFrom { get; set; }
 
     #endregion
 }
 
-public class ItemAcceptRow : ItemAcceptSomething {
-
-    #region Fields
-
-    private string? _getValueFromkey;
-    private IItemSendRow? _tmpgetValueFrom;
-
-    #endregion
+public static class ItemAcceptRowExtensions {
 
     #region Methods
 
-    public void Datenquelle_wählen(IItemAcceptRow item) {
+    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
+    public static void Datenquelle_wählen(this IItemAcceptRow item) {
         if (item.Parent is null) { return; }
 
         var x = new ItemCollectionList(true);
@@ -81,6 +73,21 @@ public class ItemAcceptRow : ItemAcceptSomething {
         item.RaiseVersion();
         item.OnChanged();
     }
+
+    #endregion
+}
+
+public class ItemAcceptRow : ItemAcceptSomething {
+
+    #region Fields
+
+    private string? _getValueFromkey;
+
+    private IItemSendRow? _tmpgetValueFrom;
+
+    #endregion
+
+    #region Methods
 
     public IItemSendRow? GetRowFromGet(IItemAcceptRow item) {
         if (item.Parent == null || _getValueFromkey == null) { return null; }
@@ -124,6 +131,15 @@ public class ItemAcceptRow : ItemAcceptSomething {
                 return true;
         }
         return false;
+    }
+
+    internal List<GenericControl> GetStyleOptions(IItemAcceptRow item) {
+        var l = new List<GenericControl>();
+        l.AddRange(base.GetStyleOptions(item));
+
+        l.Add(new FlexiControlForDelegate(item.Datenquelle_wählen, "Datenquelle wählen", ImageCode.Zeile));
+
+        return l;
     }
 
     #endregion

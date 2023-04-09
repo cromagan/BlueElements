@@ -17,11 +17,8 @@
 
 #nullable enable
 
-using BlueBasics.Interfaces;
-using BlueDatabase;
-using BlueDatabase.Interfaces;
+using BlueControls.Controls;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace BlueControls.Interfaces;
 
@@ -52,6 +49,12 @@ public class ItemSendFilter : ItemSendSomething {
             //    return true;
         }
         return false;
+    }
+
+    internal List<GenericControl> GetStyleOptions(IItemSendFilter item) {
+        var l = new List<GenericControl>();
+        l.AddRange(base.GetStyleOptions(item));
+        return l;
     }
 
     #endregion

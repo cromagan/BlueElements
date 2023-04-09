@@ -17,26 +17,16 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
-using static BlueBasics.Converter;
-using static BlueControls.Interfaces.IHasVersionExtensions;
 using System.Collections.ObjectModel;
-using System.Windows.Forms.VisualStyles;
-using BlueBasics.Interfaces;
-using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
+using BlueBasics.Enums;
+using System.ComponentModel;
 
 namespace BlueControls.Interfaces;
 
@@ -47,30 +37,17 @@ public interface IItemAcceptFilter : IItemAcceptSomething {
 
     #region Properties
 
-    public string Datenquelle_hinzufügen { get; set; }
     public ReadOnlyCollection<string>? GetFilterFromKeys { get; set; }
-
-    #endregion
-
-    #region Methods
-
-    public ReadOnlyCollection<IItemSendFilter>? GetFilterFrom();
 
     #endregion
 }
 
-public class ItemAcceptFilter : ItemAcceptSomething {
-
-    #region Fields
-
-    public readonly List<string> _getFilterFromKeys = new List<string>();
-    private ReadOnlyCollection<IItemSendFilter>? _getFilterFrom;
-
-    #endregion
+public static class ItemAcceptFilterExtensions {
 
     #region Methods
 
-    public void Datenquelle_hinzufügen(IItemAcceptSomething item) {
+    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
+    public static void Datenquelle_hinzufügen(this IItemAcceptFilter item) {
         if (item.Parent is null) { return; }
 
         var x = new ItemCollectionList(true);
@@ -89,10 +66,29 @@ public class ItemAcceptFilter : ItemAcceptSomething {
         var t = item.Parent[it[0]];
 
         if (t is IItemSendFilter rfp2) {
-            _getFilterFrom = null;
-            _getFilterFromKeys.AddIfNotExists(rfp2.KeyName);
+            var l = new List<string>();
+            if (item.GetFilterFromKeys != null) { l.AddRange(item.GetFilterFromKeys); }
+            l.Add(rfp2.KeyName);
+            item.GetFilterFromKeys = new ReadOnlyCollection<string>(l);
+
+            //_getFilterFrom = null;
+            //_getFilterFromKeys.AddIfNotExists(rfp2.KeyName);
         }
     }
+
+    #endregion
+}
+
+public class ItemAcceptFilter : ItemAcceptSomething {
+
+    #region Fields
+
+    public readonly List<string> _getFilterFromKeys = new List<string>();
+    private ReadOnlyCollection<IItemSendFilter>? _getFilterFrom;
+
+    #endregion
+
+    #region Methods
 
     public ReadOnlyCollection<IItemSendFilter> GetFilterFromGet(IItemAcceptFilter item) {
         if (_getFilterFrom == null) {
@@ -168,6 +164,15 @@ public class ItemAcceptFilter : ItemAcceptSomething {
                 return true;
         }
         return false;
+    }
+
+    internal List<GenericControl> GetStyleOptions(IItemAcceptFilter item) {
+        var l = new List<GenericControl>();
+        l.AddRange(base.GetStyleOptions(item));
+
+        l.Add(new FlexiControlForDelegate(item.Datenquelle_hinzufügen, "Datenquelle hinzufügen", ImageCode.Trichter));
+
+        return l;
     }
 
     #endregion

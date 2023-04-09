@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Controls;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -234,9 +233,9 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                 }
             }
             if (found == null) {
-                //found = new RowEntryPadItem(string.Empty);
+                found = new RowEntryPadItem(string.Empty);
 
-                //PadData.Add(found);
+                PadData.Add(found);
             }
 
             if (found != null) {

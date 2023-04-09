@@ -72,36 +72,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
     public static string ClassId => "IMAGE";
     public SizeModes Bild_Modus { get; set; }
 
-    public string Bildschirmbereich_wählen {
-        get => string.Empty;
-        set {
-            if (Bitmap != null) {
-                if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            }
-            Bitmap = ScreenShot.GrabArea(null);
-        }
-    }
-
     public Bitmap? Bitmap { get; set; }
-
-    public string Datei_laden {
-        get => string.Empty;
-        set {
-            if (Bitmap != null) {
-                if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-            }
-            OpenFileDialog e = new() {
-                CheckFileExists = true,
-                Multiselect = false,
-                Title = "Bild wählen:",
-                Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap|*.bmp"
-            };
-            _ = e.ShowDialog();
-
-            if (!FileExists(e.FileName)) { return; }
-            Bitmap = (Bitmap?)Image_FromFile(e.FileName);
-        }
-    }
 
     public bool Hintergrund_Weiß_Füllen { get; set; }
 
@@ -114,11 +85,34 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     #region Methods
 
+    public void Bildschirmbereich_wählen() {
+        if (Bitmap != null) {
+            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        }
+        Bitmap = ScreenShot.GrabArea(null);
+    }
+
+    public void Datei_laden() {
+        if (Bitmap != null) {
+            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        }
+        OpenFileDialog e = new() {
+            CheckFileExists = true,
+            Multiselect = false,
+            Title = "Bild wählen:",
+            Filter = "PNG Portable Network Graphics|*.png|JPG Jpeg Interchange|*.jpg|Bmp Windows Bitmap|*.bmp"
+        };
+        _ = e.ShowDialog();
+
+        if (!FileExists(e.FileName)) { return; }
+        Bitmap = (Bitmap?)Image_FromFile(e.FileName);
+    }
+
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new()
         {
-            new FlexiControlForProperty<string>(() => Bildschirmbereich_wählen, ImageCode.Bild),
-            new FlexiControlForProperty<string>(() => Datei_laden, ImageCode.Ordner),
+            new FlexiControlForDelegate( Bildschirmbereich_wählen, "Bildschirmbereich wählen",ImageCode.Bild),
+            new FlexiControlForDelegate( Datei_laden, "Bild laden", ImageCode.Ordner),
             new FlexiControl(),
             new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2),
             new FlexiControl()

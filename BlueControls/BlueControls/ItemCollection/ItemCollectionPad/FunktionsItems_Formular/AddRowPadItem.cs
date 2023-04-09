@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -26,17 +25,8 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
-using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
@@ -49,9 +39,8 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     #region Fields
 
+    private readonly ItemAcceptFilter _itemAccepts;
     private string _anzeige = string.Empty;
-
-    private ItemAcceptFilter _itemAccepts;
 
     #endregion
 
@@ -77,12 +66,6 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
             _anzeige = value;
             OnChanged();
         }
-    }
-
-    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_hinzufügen {
-        get => string.Empty;
-        set => _itemAccepts.Datenquelle_hinzufügen(this);
     }
 
     public ReadOnlyCollection<string>? GetFilterFromKeys {
@@ -112,11 +95,12 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         return new Control();
     }
 
-    ReadOnlyCollection<IItemSendFilter>? IItemAcceptFilter.GetFilterFrom() => _itemAccepts.GetFilterFromGet(this);
-
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
+        l.AddRange(_itemAccepts.GetStyleOptions(this));
 
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 

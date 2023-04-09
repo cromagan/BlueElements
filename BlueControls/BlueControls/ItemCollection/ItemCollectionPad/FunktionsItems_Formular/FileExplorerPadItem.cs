@@ -36,10 +36,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     #region Fields
 
+    private readonly ItemAcceptRow _itemAccepts;
     private bool _bei_Bedarf_erzeugen;
-
-    private ItemAcceptRow _itemAccepts;
-
     private bool _leere_Ordner_löschen;
 
     private string _pfad = string.Empty;
@@ -69,12 +67,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
             this.RaiseVersion();
             OnChanged();
         }
-    }
-
-    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_wählen {
-        get => string.Empty;
-        set => _itemAccepts.Datenquelle_wählen(this);
     }
 
     public IItemSendRow? GetRowFrom {
@@ -134,10 +126,14 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(_itemAccepts.GetStyleOptions(this));
+
         l.Add(new FlexiControlForProperty<string>(() => Pfad));
         l.Add(new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen));
         l.Add(new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen));
+
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 

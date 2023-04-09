@@ -1483,14 +1483,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         //foreach (var thisArrangement in OldFormulaViews) {
         //    e.AddRange(thisArrangement.PermissionGroups_Show);
         //}
-        e.Add(DatabaseAbstract.Everybody);
+        e.Add(Everybody);
         e.Add("#User: " + UserName);
         if (cellLevel) {
             e.Add("#RowCreator");
         } else {
             e.RemoveString("#RowCreator", false);
         }
-        e.RemoveString(DatabaseAbstract.Administrator, false);
+        e.RemoveString(Administrator, false);
         if (!IsAdministrator()) { e.Add(UserGroup); }
         return e.SortedDistinctList();
     }

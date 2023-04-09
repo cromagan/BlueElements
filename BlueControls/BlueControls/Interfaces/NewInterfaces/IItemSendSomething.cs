@@ -18,17 +18,14 @@
 #nullable enable
 
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.Enums;
+using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using BlueDatabase.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Windows.Forms.Design;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
 
 namespace BlueControls.Interfaces;
 
@@ -38,8 +35,11 @@ public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangin
 
     public ReadOnlyCollection<string>? ChildIds { get; set; }
     int OutputColorId { get; set; }
+
     public DatabaseAbstract? OutputDatabase { get; set; }
+
     public string Page { get; }
+
     public ItemCollectionPad? Parent { get; }
 
     #endregion
@@ -55,11 +55,30 @@ public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangin
     //public void RemoveAllConnections();
 }
 
+public static class ItemSendSomethingExtension {
+
+    #region Methods
+
+    public static void Datenbank_wählen(this IItemSendSomething item) {
+        var db = CommonDialogs.ChooseKnownDatabase();
+        if (db == null) { return; }
+        item.OutputDatabase = db;
+    }
+
+    public static void Datenbankkopf(this IItemSendSomething item) {
+        if (item.OutputDatabase == null || item.OutputDatabase.IsDisposed) { return; }
+        TableView.OpenDatabaseHeadEditor(item.OutputDatabase);
+    }
+
+    #endregion
+}
+
 public class ItemSendSomething {
 
     #region Fields
 
     private readonly List<string> _childIds = new();
+
     private int _outputColorId = -1;
 
     private DatabaseAbstract? _outputDatabase;
@@ -86,19 +105,6 @@ public class ItemSendSomething {
         item.RaiseVersion();
         DoChilds(item);
         item.OnChanged();
-    }
-
-    public void Datenbank_wählen(IItemSendSomething item) {
-        var db = CommonDialogs.ChooseKnownDatabase();
-
-        if (db == null) { return; }
-
-        OutputDatabaseSet(db, item);
-    }
-
-    public void Datenbankkopf() {
-        if (_outputDatabase == null || _outputDatabase.IsDisposed) { return; }
-        TableView.OpenDatabaseHeadEditor(_outputDatabase);
     }
 
     public void DoChilds(IItemSendSomething item) {
@@ -186,6 +192,18 @@ public class ItemSendSomething {
         l.AddRange(_childIds);
         l.Remove(remove.KeyName);
         ChildIdsSet(new ReadOnlyCollection<string>(l), item);
+    }
+
+    protected List<GenericControl> GetStyleOptions(IItemSendSomething item) {
+        var l = new List<GenericControl> {
+            new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank)
+        };
+
+        if (item.OutputDatabase == null || item.OutputDatabase.IsDisposed) { return l; }
+
+        l.Add(new FlexiControlForDelegate(item.Datenbankkopf, "Datenbank: '" + item.OutputDatabase.Caption + "'", ImageCode.Stift));
+
+        return l;
     }
 
     #endregion

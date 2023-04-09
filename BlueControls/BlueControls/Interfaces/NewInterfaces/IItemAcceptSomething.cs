@@ -17,11 +17,9 @@
 
 #nullable enable
 
-using BlueBasics;
 using BlueBasics.Interfaces;
+using BlueControls.Controls;
 using BlueControls.ItemCollection;
-using BlueDatabase;
-using BlueDatabase.Interfaces;
 using System.Collections.Generic;
 
 namespace BlueControls.Interfaces;
@@ -75,6 +73,12 @@ public class ItemAcceptSomething {
             //    return true;
         }
         return false;
+    }
+
+    protected List<GenericControl> GetStyleOptions(IItemAcceptSomething item) {
+        var l = new List<GenericControl>();
+        //l.AddRange(base.GetStyleOptions(this));
+        return l;
     }
 
     #endregion

@@ -39,10 +39,8 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     #region Fields
 
+    private readonly ItemAcceptRow _itemAccepts;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-
-    private ItemAcceptRow _itemAccepts;
-
     private string _überschrift = string.Empty;
 
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -71,12 +69,6 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
             OnChanged();
             this.RaiseVersion();
         }
-    }
-
-    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_wählen {
-        get => string.Empty;
-        set => _itemAccepts.Datenquelle_wählen(this);
     }
 
     public IItemSendRow? GetRowFrom {
@@ -136,7 +128,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(_itemAccepts.GetStyleOptions(this));
 
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Variable));
@@ -148,7 +140,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         //b.AddRange(typeof(EditTypeFormula));
         //l.GenerateAndAdd(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
         l.Add(new FlexiControl());
-
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 

@@ -20,19 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using System.Windows.Media.Imaging;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using static System.Net.WebRequestMethods;
-using static BlueBasics.Extensions;
 
 namespace BlueBasics;
 
@@ -40,12 +27,11 @@ public class BackupVerwalter {
 
     #region Fields
 
-    private Dictionary<string, string> _data = new();
+    private readonly Dictionary<string, string> _data = new();
 
+    private readonly int _maxfiles;
+    private readonly int _multi;
     private List<string>? _deletable;
-
-    private int _maxfiles;
-    private int _multi;
 
     #endregion
 
@@ -72,8 +58,8 @@ public class BackupVerwalter {
 
     #region Methods
 
-    public void AddData(DateTime dateUTC, string file) {
-        var d = dateUTC.ToString(Constants.Format_Date6);
+    public void AddData(DateTime dateUtc, string file) {
+        var d = dateUtc.ToString(Constants.Format_Date6);
         if (_data.ContainsKey(d)) { return; }
         _data.Add(d, file.ToUpper());
         _deletable = null;

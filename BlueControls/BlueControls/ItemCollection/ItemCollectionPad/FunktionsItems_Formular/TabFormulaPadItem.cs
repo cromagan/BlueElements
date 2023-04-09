@@ -47,7 +47,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     private readonly List<string> _childs = new();
 
-    private ItemAcceptRow _itemAccepts;
+    private readonly ItemAcceptRow _itemAccepts;
 
     #endregion
 
@@ -77,12 +77,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     /// Wird benötigt bei ToString - um die eigenen Ansichten wieder zu finden.
     /// </summary>
     public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
-
-    [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_wählen {
-        get => string.Empty;
-        set => _itemAccepts.Datenquelle_wählen(this);
-    }
 
     public IItemSendRow? GetRowFrom {
         get => _itemAccepts.GetRowFromGet(this);
@@ -181,9 +175,11 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(_itemAccepts.GetStyleOptions(this));
         l.Add(Childs());
 
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 

@@ -21,8 +21,6 @@ using BlueBasics.Enums;
 using System.Drawing.Drawing2D;
 using System.Drawing;
 using System;
-using System.Runtime.InteropServices;
-using System.Windows.Media.Media3D;
 using System.IO;
 using static BlueBasics.IO;
 using System.Reflection;
@@ -40,10 +38,10 @@ public static partial class Extensions {
 
         do {
             try { // wird an anderer stelle verwendet
-                var _bitmap = new Bitmap(bmp.Width, bmp.Height);
-                using var gr = Graphics.FromImage(_bitmap);
+                var bitmap = new Bitmap(bmp.Width, bmp.Height);
+                using var gr = Graphics.FromImage(bitmap);
                 gr.DrawImage(bmp, new Rectangle(0, 0, bmp.Width, bmp.Height));
-                return _bitmap;
+                return bitmap;
             } catch (Exception ex) {
                 if (DateTime.Now.Subtract(tim).TotalSeconds > 5) {
                     Develop.DebugPrint("Bild konnte nicht geklont werden", ex);

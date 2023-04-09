@@ -41,7 +41,7 @@ public class FormManager : ApplicationContext {
     //in the Program class
     private static readonly Lazy<FormManager> _current = new();
 
-    private static List<Form> Forms = new();
+    private static readonly List<Form> Forms = new();
     private Form? _lastStartForm;
 
     #endregion

@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -26,17 +25,9 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
-using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
@@ -49,8 +40,8 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     #region Fields
 
-    private ItemAcceptFilter _itemAccepts;
-    private ItemSendRow _itemSends;
+    private readonly ItemAcceptFilter _itemAccepts;
+    private readonly ItemSendRow _itemSends;
 
     #endregion
 
@@ -78,17 +69,6 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     public ReadOnlyCollection<string>? ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
-    }
-
-    public string Datenbank_wählen {
-        get => string.Empty;
-        set => _itemSends.Datenbank_wählen(this);
-    }
-
-    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_hinzufügen {
-        get => string.Empty;
-        set => _itemAccepts.Datenquelle_hinzufügen(this);
     }
 
     public ReadOnlyCollection<string>? GetFilterFromKeys {
@@ -130,28 +110,13 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         return new Control();
     }
 
-    ReadOnlyCollection<IItemSendFilter>? IItemAcceptFilter.GetFilterFrom() => _itemAccepts.GetFilterFromGet(this);
-
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new();// {
-        //    new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
-        //    new FlexiControl()
-        //};
-        if (OutputDatabase == null || OutputDatabase.IsDisposed) { return l; }
-        //l.Add(new FlexiControlForProperty<string>(() => Überschrift));
-        //l.Add(new FlexiControlForProperty<string>(() => Anzeige));
+        List<GenericControl> l = new();
+        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemSends.GetStyleOptions(this));
 
-        //var u = new ItemCollectionList.ItemCollectionList(false);
-        //u.AddRange(typeof(ÜberschriftAnordnung));
-        //l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
-        //l.Add(new FlexiControl());
-
-        //l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
-
-        //FilterDatabaseUpdate();
-        //l.Add(new FlexiControlForProperty<string>(() => Filter_hinzufügen, ImageCode.PlusZeichen));
-        //l.Add(FilterTable());
-
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 

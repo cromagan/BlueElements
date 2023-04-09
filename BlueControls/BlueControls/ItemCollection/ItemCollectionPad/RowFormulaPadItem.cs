@@ -71,17 +71,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public DatabaseAbstract? Database { get; private set; }
 
     /// <summary>
-    /// Wird von Flexoptions aufgerufen
-    /// </summary>
-    public string Datensatz_bearbeiten {
-        get => string.Empty;
-        set {
-            _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
-            EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
-        }
-    }
-
-    /// <summary>
     /// Namen so lassen, wegen Kontextmenu
     /// </summary>
     public string Layout_Id {
@@ -111,16 +100,22 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     }
 
     public RowItem? Row => Database?.Row.SearchByKey(_rowKey);
+
     protected override int SaveOrder => 999;
 
     #endregion
 
     #region Methods
 
+    public void Datensatz_bearbeiten() {
+        _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
+        EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
+    }
+
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new()
         {
-            new FlexiControlForProperty<string>(() => Datensatz_bearbeiten, ImageCode.Stift),
+            new FlexiControlForDelegate( Datensatz_bearbeiten,  "Datensatz bearbeiten", ImageCode.Stift),
             new FlexiControl()
         };
         ItemCollectionList.ItemCollectionList layouts = new(true);

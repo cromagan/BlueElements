@@ -35,7 +35,6 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
@@ -48,12 +47,10 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
 
     #region Fields
 
+    private readonly ItemSendRow _itemSends;
     private string _anzeige = string.Empty;
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-
-    private ItemSendRow _itemSends;
-
     private string _überschrift = string.Empty;
 
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -109,41 +106,6 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public string Datenbank_wählen {
-        get => string.Empty;
-        set {
-            _itemSends.Datenbank_wählen(this);
-
-            FilterDatabaseUpdate();
-        }
-    }
-
-    public string Datenbankkopf {
-        get => string.Empty;
-        set => _itemSends.Datenbankkopf();
-    }
-
-    public string Filter_hinzufügen {
-        get => string.Empty;
-        set {
-            if (OutputDatabase == null || OutputDatabase.IsDisposed) { return; }
-
-            var c = new ItemCollectionList.ItemCollectionList(true);
-            foreach (var thiscol in OutputDatabase.Column) {
-                if (thiscol.Format.Autofilter_möglich() && !thiscol.Format.NeedTargetDatabase()) {
-                    _ = c.Add(thiscol);
-                }
-            }
-
-            var t = InputBoxListBoxStyle.Show("Filter für welche Spalte?", c, AddType.None, true);
-
-            if (t == null || t.Count != 1) { return; }
-
-            var r = FilterDefiniton.Row.GenerateAndAdd(t[0], "Neuer Filter");
-            r.CellSet("FilterArt", "=");
-        }
-    }
-
     public DatabaseAbstract FilterDefiniton { get; }
 
     public override int InputColorId {
@@ -187,6 +149,24 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
         return con;
     }
 
+    public void Filter_hinzufügen() {
+        if (OutputDatabase == null || OutputDatabase.IsDisposed) { return; }
+
+        var c = new ItemCollectionList.ItemCollectionList(true);
+        foreach (var thiscol in OutputDatabase.Column) {
+            if (thiscol.Format.Autofilter_möglich() && !thiscol.Format.NeedTargetDatabase()) {
+                _ = c.Add(thiscol);
+            }
+        }
+
+        var t = InputBoxListBoxStyle.Show("Filter für welche Spalte?", c, AddType.None, true);
+
+        if (t == null || t.Count != 1) { return; }
+
+        var r = FilterDefiniton.Row.GenerateAndAdd(t[0], "Neuer Filter");
+        r.CellSet("FilterArt", "=");
+    }
+
     public Table FilterTable() {
         var filterTable = new Table {
             DropMessages = false,
@@ -205,11 +185,10 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() {
-            new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
-            new FlexiControl()
-        };
-        if (OutputDatabase == null || OutputDatabase.IsDisposed) { return l; }
+        List<GenericControl> l = new();
+
+        l.AddRange(_itemSends.GetStyleOptions(this));
+
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));
 
@@ -218,11 +197,12 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
         l.Add(new FlexiControl());
 
-        l.Add(new FlexiControlForProperty<string>(() => Datenbankkopf, ImageCode.Datenbank));
-
         FilterDatabaseUpdate();
-        l.Add(new FlexiControlForProperty<string>(() => Filter_hinzufügen, ImageCode.PlusZeichen));
+        l.Add(new FlexiControlForDelegate(Filter_hinzufügen, "Filter hinzufügen", ImageCode.PlusZeichen));
         l.Add(FilterTable());
+
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
 
         return l;
     }
@@ -326,7 +306,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
                 Skin.Draw_FormatedText(gr, "ALT Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
         } else {
-            FakeControlPadItem.DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
+            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

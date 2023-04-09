@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -26,17 +25,9 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
-using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
@@ -50,8 +41,8 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
 
     #region Fields
 
-    private ItemAcceptFilter _itemAccepts;
-    private ItemSendFilter _itemSends;
+    private readonly ItemAcceptFilter _itemAccepts;
+    private readonly ItemSendFilter _itemSends;
 
     #endregion
 
@@ -79,22 +70,6 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
     public ReadOnlyCollection<string>? ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
-    }
-
-    public string Datenbank_wählen {
-        get => string.Empty;
-        set => _itemSends.Datenbank_wählen(this);
-    }
-
-    public string Datenbankkopf {
-        get => string.Empty;
-        set => _itemSends.Datenbankkopf();
-    }
-
-    [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
-    public string Datenquelle_hinzufügen {
-        get => string.Empty;
-        set => _itemAccepts.Datenquelle_hinzufügen(this);
     }
 
     public ReadOnlyCollection<string>? GetFilterFromKeys {
@@ -136,14 +111,12 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         return new Control();
     }
 
-    ReadOnlyCollection<IItemSendFilter>? IItemAcceptFilter.GetFilterFrom() => _itemAccepts.GetFilterFromGet(this);
-
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new() {
-            new FlexiControlForProperty<string>(() => Datenbank_wählen, ImageCode.Datenbank),
-            new FlexiControl()
-        };
-        if (OutputDatabase == null || OutputDatabase.IsDisposed) { return l; }
+        List<GenericControl> l = new();// {
+        l.AddRange(_itemAccepts.GetStyleOptions(this));
+
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
 
         return l;
     }

@@ -38,14 +38,14 @@ public class Accessor<T> {
 
     #region Constructors
 
-    public Accessor(Expression<Func<T>> expr) {
-        var memberExpression = (MemberExpression)expr.Body;
-        var instanceExpression = memberExpression.Expression;
+    public Accessor(Expression<Func<T>>? expr) {
+        var memberExpression = (MemberExpression?)expr?.Body;
+        var instanceExpression = memberExpression?.Expression;
         var parameter = Expression.Parameter(typeof(T));
 
         IEnumerable<Attribute>? ca = null;
 
-        if (memberExpression.Member is PropertyInfo propertyInfo) {
+        if (memberExpression?.Member is PropertyInfo propertyInfo) {
             var setm = propertyInfo.GetSetMethod();
             if (setm != null) {
                 _setter = Expression.Lambda<Action<T>>(Expression.Call(instanceExpression, setm, parameter), parameter).Compile();
@@ -60,7 +60,7 @@ public class Accessor<T> {
             Name = propertyInfo.Name;
             //TypeFullname = propertyInfo.PropertyType.FullName;
             ca = propertyInfo.GetCustomAttributes();
-        } else if (memberExpression.Member is FieldInfo fieldInfo) {
+        } else if (memberExpression?.Member is FieldInfo fieldInfo) {
             _setter = Expression.Lambda<Action<T>>(Expression.Assign(memberExpression, parameter), parameter).Compile();
             _getter = Expression.Lambda<Func<T>>(Expression.Field(instanceExpression, fieldInfo)).Compile();
             CanWrite = !fieldInfo.IsInitOnly;

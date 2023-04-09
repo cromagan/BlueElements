@@ -24,7 +24,6 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
@@ -554,7 +553,7 @@ public class BitmapExt : IDisposableExtended {
         g.DrawImage(source, new Rectangle(0, 0, source.Width, source.Height),
             0, 0, source.Width, source.Height, GraphicsUnit.Pixel, attributes);
         // dispose the Graphics object
-        g?.Dispose();
+        g.Dispose();
         return newBitmap;
     }
 
@@ -743,7 +742,7 @@ public class BitmapExt : IDisposableExtended {
             }
         }
         imageStreamSource.Close();
-        imageStreamSource?.Dispose();
+        imageStreamSource.Dispose();
         return l;
     }
 
@@ -780,10 +779,13 @@ public class BitmapExt : IDisposableExtended {
 
     public BitmapExt Crop(Rectangle re) {
         BitmapExt newBmp = new(re.Width, re.Height);
-        using var gr = Graphics.FromImage(newBmp._bitmap);
-        gr.Clear(Color.Transparent);
-        gr.PixelOffsetMode = PixelOffsetMode.Half;
-        gr.DrawImage(_bitmap, re with { X = 0, Y = 0 }, re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel);
+        if (newBmp._bitmap != null) {
+            using var gr = Graphics.FromImage(newBmp._bitmap);
+            gr.Clear(Color.Transparent);
+            gr.PixelOffsetMode = PixelOffsetMode.Half;
+            if (_bitmap != null) { gr.DrawImage(_bitmap, re with { X = 0, Y = 0 }, re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel); }
+        }
+
         return newBmp;
     }
 
@@ -802,9 +804,12 @@ public class BitmapExt : IDisposableExtended {
         CloneFromBitmap(x);
     }
 
-    public Color GetPixel(int x, int y) => Color.FromArgb(Bits[x + (y * Width)]);
+    public Color GetPixel(int x, int y) {
+        if (Bits != null) { return Color.FromArgb(Bits[x + (y * Width)]); }
+        return Color.Transparent;
+    }
 
-    public void MakeTransparent(Color color) => _bitmap.MakeTransparent(color);
+    public void MakeTransparent(Color color) => _bitmap?.MakeTransparent(color);
 
     public void Resize(int width, int height, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
         if (_bitmap == null) { return; }
@@ -880,9 +885,11 @@ public class BitmapExt : IDisposableExtended {
         }
     }
 
-    public void Save(string name, ImageFormat imageFormat) => _bitmap.Save(name, imageFormat);
+    public void Save(string name, ImageFormat imageFormat) => _bitmap?.Save(name, imageFormat);
 
-    public void SetPixel(int x, int y, Color colour) => Bits[x + (y * Width)] = colour.ToArgb();
+    public void SetPixel(int x, int y, Color colour) {
+        if (Bits != null) Bits[x + (y * Width)] = colour.ToArgb();
+    }
 
     protected void EmptyBitmap(int width, int height) {
         Width = width;
