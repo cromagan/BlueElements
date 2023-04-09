@@ -29,7 +29,7 @@ using System.Collections.ObjectModel;
 
 namespace BlueControls.Interfaces;
 
-public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion, IHasKeyName {
+public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion, IHasKeyName, IItemToControl {
 
     #region Properties
 

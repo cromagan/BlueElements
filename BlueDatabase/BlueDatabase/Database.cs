@@ -700,7 +700,7 @@ public sealed class Database : DatabaseAbstract {
         base.RepairAfterParse();
 
         if (!string.IsNullOrEmpty(Filename)) {
-            if (!string.Equals( TableName, SqlBackAbstract.MakeValidTableName( Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
+            if (!string.Equals(TableName, SqlBackAbstract.MakeValidTableName(Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Tabellenname stimmt nicht: " + Filename);
             }
         }

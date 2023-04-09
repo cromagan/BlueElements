@@ -35,7 +35,7 @@ using static BlueControls.ConnectedFormula.ConnectedFormula;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAcceptRowKey, IHasDatabase {
+public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAcceptRowKey, IHasDatabase, IControlAcceptRow {
 
     #region Fields
 

@@ -39,7 +39,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone, IAcceptVariableList {
+public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone, IAcceptVariableList, IControlAcceptRow {
 
     #region Fields
 

@@ -146,6 +146,10 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, ICalculat
             CaptionPosition = CaptionPosition,
             Name = DefaultItemToControlName()
         };
+
+        con.DoInputSettings(this);
+        con.DoOutputSettings(this);
+
         return con;
     }
 

@@ -103,7 +103,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
             var ff = parent.SearchOrGenerate(rfw2);
             if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
         }
-
+        con.DoInputSettings(this);
+        con.DoOutputSettings(this);
         return con;
     }
 

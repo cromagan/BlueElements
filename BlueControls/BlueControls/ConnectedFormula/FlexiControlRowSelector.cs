@@ -34,11 +34,11 @@ using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLevel, IHasDatabase {
+internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControlAcceptRow {
 
     #region Fields
 
-    private readonly List<Control> _childs = new();
+    private readonly List<IControlSendSomething> _childs = new();
     private readonly string _showformat;
     private bool _disposing;
     private RowItem? _row;
@@ -59,7 +59,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
             _showformat = "~" + fc.Name + "~";
         }
 
-        Database = database;
+        OutputDatabase = database;
         FilterDefiniton = filterdef;
 
         SetData(database, null);
@@ -69,8 +69,8 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     #region Properties
 
-    public DatabaseAbstract? Database { get; }
     public DatabaseAbstract? FilterDefiniton { get; }
+    public DatabaseAbstract? OutputDatabase { get; }
 
     public RowItem? Row {
         get => IsDisposed ? null : _row;
@@ -78,7 +78,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
             if (IsDisposed) { return; }
             if (value == _row) { return; }
             _row = value;
-            DoChilds(_childs, Database, _row?.Key);
+            DoChilds(_childs, OutputDatabase, _row?.Key);
         }
     }
 
@@ -86,7 +86,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     #region Methods
 
-    public static void DoChilds(List<Control> childs, DatabaseAbstract? db, long? rowkey) {
+    public static void DoChilds(List<IControlSendSomething> childs, DatabaseAbstract? db, long? rowkey) {
         var r = db?.Row.SearchByKey(rowkey);
         r?.CheckRowDataIfNeeded();
 
@@ -112,10 +112,10 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
         }
     }
 
-    public void ChildAdd(Control c) {
+    public void ChildAdd(IControlSendSomething c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
-        DoChilds(_childs, Database, _row?.Key);
+        DoChilds(_childs, OutputDatabase, _row?.Key);
     }
 
     public void SetData(DatabaseAbstract? otherdatabase, long? rowkey) {
@@ -127,13 +127,13 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
             #region Filter erstellen
 
-            var f = new FilterCollection(Database);
+            var f = new FilterCollection(OutputDatabase);
 
             foreach (var thisR in FilterDefiniton.Row) {
 
                 #region Column ermitteln
 
-                var column = Database?.Column.Exists(thisR.CellGetString("Spalte"));
+                var column = OutputDatabase?.Column.Exists(thisR.CellGetString("Spalte"));
                 if (column == null) {
                     return;
                 }
@@ -216,7 +216,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
                 #region Zeile(n) ermitteln und Script löschen
 
-                _rows = calcrows ? Database?.Row.CalculateFilteredRows(f) : null;
+                _rows = calcrows ? OutputDatabase?.Row.CalculateFilteredRows(f) : null;
 
                 #endregion
             }
@@ -245,7 +245,7 @@ internal class FlexiControlRowSelector : FlexiControl, ICalculateRowsControlLeve
 
     protected override void OnValueChanged() {
         base.OnValueChanged();
-        Row = string.IsNullOrEmpty(Value) ? null : Database?.Row.SearchByKey(LongParse(Value));
+        Row = string.IsNullOrEmpty(Value) ? null : OutputDatabase?.Row.SearchByKey(LongParse(Value));
     }
 
     private void UpdateMyCollection() {

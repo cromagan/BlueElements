@@ -125,9 +125,15 @@
     <Compile Include="Forms\FormWithStatusBar.designer.cs">
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\NewInterfaces\IControlAcceptFilter.cs" />
+    <Compile Include="Interfaces\NewInterfaces\IControlSendFilter.cs" />
+    <Compile Include="Interfaces\NewInterfaces\IControlAcceptRow.cs" />
+    <Compile Include="Interfaces\NewInterfaces\IControlSendRow.cs" />
+    <Compile Include="Interfaces\NewInterfaces\IControlAcceptSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IHasVersion.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemAcceptSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemAcceptRow.cs" />
+    <Compile Include="Interfaces\NewInterfaces\IControlSendSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemSendSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemSendRow.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemSendFilter.cs" />
@@ -319,7 +325,6 @@
     <Compile Include="Interfaces\IAcceptVariableList.cs" />
     <Compile Include="Interfaces\ICalculateRowsItemLevel.cs" />
     <Compile Include="Interfaces\IDisabledReason.cs" />
-    <Compile Include="Interfaces\ICalculateRowsControlLevel.cs" />
     <Compile Include="Interfaces\IAcceptRowKey.cs" />
     <Compile Include="Interfaces\IItemToControl.cs" />
     <Compile Include="Interfaces\IBackgroundNone.cs" />

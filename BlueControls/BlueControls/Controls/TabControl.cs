@@ -26,7 +26,7 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-public class TabControl : AbstractTabControl, IAcceptRowKey {
+public class TabControl : AbstractTabControl, IAcceptRowKey, IControlAcceptRow {
 
     #region Constructors
 

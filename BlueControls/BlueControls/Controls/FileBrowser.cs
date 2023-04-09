@@ -43,7 +43,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
-public partial class FileBrowser : GenericControl, IAcceptVariableList//UserControl //
+public partial class FileBrowser : GenericControl, IAcceptVariableList, IControlAcceptRow   //UserControl //
 {
     #region Fields
 
@@ -458,8 +458,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         var newPath = txbPfad.Text.Trim("\\") + "\\";
 
         if (_lastcheck == newPath) { return; }
-        if(!newPath.IsFormat(FormatHolder.Filepath)) {return;}
-
+        if (!newPath.IsFormat(FormatHolder.Filepath)) { return; }
 
         _lastcheck = newPath;
 
@@ -549,10 +548,7 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
 
         #endregion
 
-
-
         #region Verzeichniss objekte Flott erstellen
-
 
         var allD = Directory.GetDirectories(newPath, "*", SearchOption.TopDirectoryOnly);
         foreach (var thisString in allD) {
@@ -569,7 +565,6 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList//UserCont
         }
 
         #endregion
-
 
         #region  Vorschau Bilder erstellen
 

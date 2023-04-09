@@ -142,6 +142,9 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         //    Name = DefaultItemToControlName()
         //};
         //return con;
+
+        con.DoInputSettings(this);
+        con.DoOutputSettings(this);
         Develop.DebugPrint_NichtImplementiert();
         return new Control();
     }

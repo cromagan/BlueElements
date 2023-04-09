@@ -122,7 +122,8 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         } else {
             con.DisabledReason = "Keine gültige Verknüpfung";
         }
-
+        con.DoInputSettings(this);
+        con.DoOutputSettings(this);
         return con;
     }
 

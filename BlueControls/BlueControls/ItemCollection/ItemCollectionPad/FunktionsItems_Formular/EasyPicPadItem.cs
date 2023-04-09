@@ -92,6 +92,9 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
             var ff = parent.SearchOrGenerate(rfw2);
             if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
         }
+
+        con.DoInputSettings(this);
+        con.DoOutputSettings(this);
         return con;
     }
 

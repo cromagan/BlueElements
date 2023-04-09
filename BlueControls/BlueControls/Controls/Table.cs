@@ -54,7 +54,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase {
+public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptFilter, IControlSendRow {
 
     #region Fields
 
@@ -255,6 +255,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
+    public DatabaseAbstract? OutputDatabase { get => Database; set => Database = value; }
     public List<RowItem> PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
@@ -3242,6 +3243,4 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     #endregion
-
-    // QickInfo beisst sich mit den letzten Änderungen Quickinfo//DialogBoxes.QuickInfo.Show("<IMAGECODE=Stift|16||1> " + Reason);
 }

@@ -171,7 +171,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             if (ff is ICalculateRowsControlLevel cc) { cc.ChildAdd(con); }
             return con;
         }
-
+        con.DoInputSettings(this);
+        con.DoOutputSettings(this);
         var cy = new FlexiControl();
         if (Column == null) {
             cy.Caption = "?Kein Bezug?:";

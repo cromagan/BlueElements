@@ -106,6 +106,8 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         //    Name = DefaultItemToControlName()
         //};
         //return con;
+        con.DoInputSettings(this);
+        con.DoOutputSettings(this);
         Develop.DebugPrint_NichtImplementiert();
         return new Control();
     }
