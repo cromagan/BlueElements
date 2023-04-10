@@ -98,7 +98,7 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
 
     #region Methods
 
-    public void AddChild(IHasKeyName add) => _itemSends.AddChild(add, this);
+    public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
     public Control CreateControl(ConnectedFormulaView parent) {
         //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {

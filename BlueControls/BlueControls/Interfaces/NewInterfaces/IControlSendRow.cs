@@ -37,6 +37,32 @@ public static class IControlSendRowExtension {
 
     #region Methods
 
+    public static void DoChilds(this IControlSendRow item, List<IControlSendSomething> childs, DatabaseAbstract? db, long? rowkey) {
+        var r = db?.Row.SearchByKey(rowkey);
+        r?.CheckRowDataIfNeeded();
+
+        foreach (var thischild in childs) {
+            var did = false;
+
+            if (!did && thischild is IAcceptRowKey fcfc) {
+                fcfc.SetData(db, rowkey);
+                did = true;
+            }
+
+            if (!did && thischild is IAcceptVariableList rv) {
+                _ = rv.ParseVariables(r?.LastCheckedEventArgs?.Variables);
+                did = true;
+            }
+
+            if (thischild is IDisabledReason id) {
+                if (!did) {
+                    id.DeleteValue();
+                    id.DisabledReason = "Keine Befüllmethode bekannt.";
+                }
+            }
+        }
+    }
+
     public static void DoOutputSettings(this IControlSendRow dest, ConnectedFormulaView parent, IItemSendRow source) {
         dest.Name = source.DefaultItemToControlName();
     }

@@ -138,7 +138,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
 
     #region Methods
 
-    public void AddChild(IHasKeyName add) => _itemSends.AddChild(add, this);
+    public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlRowSelector(OutputDatabase, FilterDefiniton, _überschrift, _anzeige) {
@@ -146,8 +146,8 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
             CaptionPosition = CaptionPosition,
         };
 
-        con.DoInputSettings(this, parent);
-        con.DoOutputSettings(this, parent);
+        //con.DoInputSettings(parent, this);
+        con.DoOutputSettings(parent, this);
 
         return con;
     }
@@ -324,7 +324,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         //RepairConnections();
-        _itemSends.DoChilds(this);
+        //_itemSends.DoChilds(this);
         OnChanged();
     }
 
@@ -500,13 +500,14 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
 
     private void Row_RowAdded(object sender, RowEventArgs e) {
         //RepairConnections();
-        _itemSends.DoChilds(this);
+        //_itemSends.DoChilds(this);
+        //this.In
         OnChanged();
     }
 
     private void Row_RowRemoved(object sender, System.EventArgs e) {
         //RepairConnections();
-        _itemSends.DoChilds(this);
+        //_itemSends.DoChilds(this);
         OnChanged();
     }
 

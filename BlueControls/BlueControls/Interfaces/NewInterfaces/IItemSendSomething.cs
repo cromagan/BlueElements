@@ -70,6 +70,20 @@ public static class ItemSendSomethingExtension {
         TableView.OpenDatabaseHeadEditor(item.OutputDatabase);
     }
 
+    public static void DoChilds(this IItemSendSomething item) {
+        //if (_childIds == null) { return; }
+
+        if (item.Parent == null) { return; }
+
+        foreach (var thisChild in item.ChildIds) {
+            var item2 = item.Parent[thisChild];
+
+            if (item2 is IItemAcceptSomething ias) {
+                ias.InputColorId = item.OutputColorId;
+            }
+        }
+    }
+
     #endregion
 }
 
@@ -87,15 +101,15 @@ public class ItemSendSomething {
 
     #region Methods
 
-    public void AddChild(IHasKeyName add, IItemSendSomething item) {
+    public void AddChild(IItemSendSomething item, IHasKeyName add) {
         var l = new List<string>();
-        l.AddRange(_childIds);
+        l.AddRange(item.ChildIds);
         l.Add(add.KeyName);
 
         ChildIdsSet(new ReadOnlyCollection<string>(l), item);
     }
 
-    public ReadOnlyCollection<string> ChildIdsGet() => new ReadOnlyCollection<string>(_childIds);
+    public ReadOnlyCollection<string> ChildIdsGet() => new(_childIds);
 
     public void ChildIdsSet(ReadOnlyCollection<string> value, IItemSendSomething item) {
         if (!_childIds.IsDifferentTo(value)) { return; }
@@ -103,22 +117,8 @@ public class ItemSendSomething {
         _childIds.Clear();
         _childIds.AddRange(value);
         item.RaiseVersion();
-        DoChilds(item);
+        item.DoChilds();
         item.OnChanged();
-    }
-
-    public void DoChilds(IItemSendSomething item) {
-        //if (_childIds == null) { return; }
-
-        if (item.Parent == null) { return; }
-
-        foreach (var thisChild in _childIds) {
-            var item2 = item.Parent[thisChild];
-
-            if (item2 is IItemAcceptSomething ias) {
-                ias.InputColorId = item.OutputColorId;
-            }
-        }
     }
 
     public void DoParentChanged(IItemSendSomething item) {
@@ -126,7 +126,7 @@ public class ItemSendSomething {
             item.OutputColorId = -1;
             item.OutputColorId = item.Parent.GetFreeColorId(item.Page);
         }
-        DoChilds(item);
+        item.DoChilds();
 
         item.OnChanged();
     }
@@ -147,7 +147,7 @@ public class ItemSendSomething {
 
         _outputDatabase = value;
         item.RaiseVersion();
-        DoChilds(item);
+        item.DoChilds();
         item.OnChanged();
     }
 

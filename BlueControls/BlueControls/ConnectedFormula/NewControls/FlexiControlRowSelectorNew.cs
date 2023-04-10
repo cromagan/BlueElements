@@ -82,39 +82,13 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
             if (IsDisposed) { return; }
             if (value == _row) { return; }
             _row = value;
-            DoChilds(_childs, OutputDatabase, _row?.Key);
+            this.DoChilds(_childs, OutputDatabase, _row?.Key);
         }
     }
 
     #endregion
 
     #region Methods
-
-    public static void DoChilds(List<IControlSendSomething> childs, DatabaseAbstract? db, long? rowkey) {
-        var r = db?.Row.SearchByKey(rowkey);
-        r?.CheckRowDataIfNeeded();
-
-        foreach (var thischild in childs) {
-            var did = false;
-
-            if (!did && thischild is IAcceptRowKey fcfc) {
-                fcfc.SetData(db, rowkey);
-                did = true;
-            }
-
-            if (!did && thischild is IAcceptVariableList rv) {
-                _ = rv.ParseVariables(r?.LastCheckedEventArgs?.Variables);
-                did = true;
-            }
-
-            if (thischild is IDisabledReason id) {
-                if (!did) {
-                    id.DeleteValue();
-                    id.DisabledReason = "Keine Befüllmethode bekannt.";
-                }
-            }
-        }
-    }
 
     public void AddParentSender(IControlSendFilter item) {
         _parentSender.Add(item);
@@ -124,7 +98,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
     public void ChildAdd(IControlSendSomething c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
-        DoChilds(_childs, OutputDatabase, _row?.Key);
+        this.DoChilds(_childs, OutputDatabase, _row?.Key);
     }
 
     public void Invalidate_FilteredRows() => _filteredRows = null;

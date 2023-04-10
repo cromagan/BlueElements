@@ -64,6 +64,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
     public static readonly int RowCaptionSizeY = 50;
+    private readonly List<IControlSendSomething> _childs = new();
     private readonly List<string> _collapsed = new();
     private readonly object _lockUserAction = new();
     private readonly List<IControlSendFilter> _parentSender = new();
@@ -94,19 +95,33 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private ColumnItem? _mouseOverColumn;
 
     private RowData? _mouseOverRow;
+
     private string _mouseOverText = string.Empty;
+
     private BlueFont? _newRowFont;
+
     private Progressbar? _pg;
+
     private int _pix16 = 16;
+
     private int _pix18 = 18;
+
     private int _rowCaptionFontY = 26;
+
     private SearchAndReplace? _searchAndReplace;
+
     private bool _showNumber;
+
     private RowSortDefinition? _sortDefinitionTemporary;
+
     private List<RowData>? _sortedRowData;
+
     private string _storedView = string.Empty;
+
     private Rectangle _tmpCursorRect = Rectangle.Empty;
+
     private RowItem? _unterschiede;
+
     private int _wiederHolungsSpaltenWidth;
 
     #endregion
@@ -191,6 +206,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public ColumnItem? CursorPosColumn { get; private set; }
+
     public RowData? CursorPosRow { get; private set; }
 
     [Browsable(false)]
@@ -256,6 +272,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public double FontScale => Database?.GlobalScale ?? 1f;
 
     public DatabaseAbstract? OutputDatabase { get => Database; set => Database = value; }
+
     public ReadOnlyCollection<IControlSendFilter> ParentSender => new ReadOnlyCollection<IControlSendFilter>(_parentSender);
 
     public List<RowItem> PinnedRows { get; } = new();
@@ -634,6 +651,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (_mouseOverRow?.Row != null && _mouseOverRow?.Row.Database != Database) { _mouseOverRow = null; }
         if (CursorPosColumn != null && CursorPosColumn.Database != Database) { CursorPosColumn = null; }
         if (CursorPosRow?.Row != null && CursorPosRow?.Row.Database != Database) { CursorPosRow = null; }
+    }
+
+    public void ChildAdd(IControlSendSomething c) {
+        if (IsDisposed) { return; }
+        _childs.Add(c);
+        this.DoChilds(_childs, OutputDatabase, CursorPosRow?.Row?.Key);
     }
 
     public void CollapesAll() {

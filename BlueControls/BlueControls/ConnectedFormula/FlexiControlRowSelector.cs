@@ -33,6 +33,29 @@ using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using ComboBox = BlueControls.Controls.ComboBox;
 
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Design;
+using System.Windows.Documents;
+
+using System.Windows.Forms;
+using BlueBasics;
+
+using BlueBasics.Enums;
+using BlueControls.Designer_Support;
+using BlueControls.Enums;
+using BlueControls.Extended_Text;
+
+using BlueControls.Interfaces;
+using BlueDatabase;
+using BlueDatabase.Interfaces;
+
+using static BlueControls.Interfaces.ICalculateRowsExtension;
+
 namespace BlueControls.ConnectedFormula;
 
 internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControlAcceptRow {
@@ -42,6 +65,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     private readonly List<IControlSendSomething> _childs = new();
     private readonly string _showformat;
     private bool _disposing;
+    private FilterCollection? _filter = null;
     private List<RowItem>? _filteredRows;
     private RowItem? _row;
 
@@ -71,7 +95,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     #region Properties
 
     public DatabaseAbstract? FilterDefiniton { get; }
-    public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), OutputDatabase);
+    public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, _filter, OutputDatabase);
     public DatabaseAbstract? OutputDatabase { get; }
 
     public RowItem? Row {
@@ -80,7 +104,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
             if (IsDisposed) { return; }
             if (value == _row) { return; }
             _row = value;
-            DoChilds(_childs, OutputDatabase, _row?.Key);
+            this.DoChilds(_childs, OutputDatabase, _row?.Key);
         }
     }
 
@@ -88,36 +112,10 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
     #region Methods
 
-    public static void DoChilds(List<IControlSendSomething> childs, DatabaseAbstract? db, long? rowkey) {
-        var r = db?.Row.SearchByKey(rowkey);
-        r?.CheckRowDataIfNeeded();
-
-        foreach (var thischild in childs) {
-            var did = false;
-
-            if (!did && thischild is IAcceptRowKey fcfc) {
-                fcfc.SetData(db, rowkey);
-                did = true;
-            }
-
-            if (!did && thischild is IAcceptVariableList rv) {
-                _ = rv.ParseVariables(r?.LastCheckedEventArgs?.Variables);
-                did = true;
-            }
-
-            if (thischild is IDisabledReason id) {
-                if (!did) {
-                    id.DeleteValue();
-                    id.DisabledReason = "Keine Befüllmethode bekannt.";
-                }
-            }
-        }
-    }
-
     public void ChildAdd(IControlSendSomething c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
-        DoChilds(_childs, OutputDatabase, _row?.Key);
+        this.DoChilds(_childs, OutputDatabase, _row?.Key);
     }
 
     public void Invalidate_FilteredRows() => _filteredRows = null;
@@ -131,7 +129,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
             #region Filter erstellen
 
-            var f = new FilterCollection(OutputDatabase);
+            _filter = new FilterCollection(OutputDatabase);
 
             foreach (var thisR in FilterDefiniton.Row) {
 
@@ -213,16 +211,16 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
                 #endregion
 
                 if (value.Count > 0 || !onlyifhasvalue) {
-                    f.Add(new FilterItem(column, ft, value));
+                    _filter.Add(new FilterItem(column, ft, value));
                 }
 
                 #endregion
 
-                #region Zeile(n) ermitteln und Script löschen
+                //#region Zeile(n) ermitteln und Script löschen
 
-                _filteredRows = calcrows ? OutputDatabase?.Row.CalculateFilteredRows(f) : null;
+                //_filteredRows = FilteredRows
 
-                #endregion
+                //#endregion
             }
 
             if (_disposing || IsDisposed) { return; } // Multitasking...

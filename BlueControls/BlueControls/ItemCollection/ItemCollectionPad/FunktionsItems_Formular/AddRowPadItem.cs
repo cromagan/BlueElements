@@ -86,7 +86,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new ButtonAddRow();
 
-        con.DoInputSettings(this, parent);
+        con.DoInputSettings(parent, this);
         //con.DoOutputSettings(this);
 
         return con;

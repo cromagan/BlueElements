@@ -159,33 +159,31 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        if (GetRowFrom is ICalculateRowsItemLevel rfw2) {
-            //var ff = parent.SearchOrGenerate(rfw2);
+        //var ff = parent.SearchOrGenerate(rfw2);
 
-            var con = new FlexiControlForCell();
-            con.SetData(Column?.Database, -1);
-            con.ColumnName = Column?.Name ?? string.Empty;
-            con.EditType = EditType;
-            con.CaptionPosition = CaptionPosition;
+        var con = new FlexiControlForCell();
+        con.SetData(Column?.Database, -1);
+        con.ColumnName = Column?.Name ?? string.Empty;
+        con.EditType = EditType;
+        con.CaptionPosition = CaptionPosition;
 
-            con.DoInputSettings(this, parent);
-            //con.DoOutputSettings(this);
-            return con;
-        }
+        con.DoInputSettings(parent, this);
+        //con.DoOutputSettings(this);
+        return con;
 
-        var cy = new FlexiControl();
-        if (Column == null) {
-            cy.Caption = "?Kein Bezug?:";
-        } else {
-            cy.Caption = Column.ReadableText() + ":";
-        }
+        //var cy = new FlexiControl();
+        //if (Column == null) {
+        //    cy.Caption = "?Kein Bezug?:";
+        //} else {
+        //    cy.Caption = Column.ReadableText() + ":";
+        //}
 
-        cy.EditType = EditType;
-        cy.CaptionPosition = CaptionPosition;
-        cy.DisabledReason = "Keine Verknüpfung vorhanden.";
-        cy.Tag = KeyName;
-        //cy.Name = DefaultItemToControlName();
-        return cy;
+        //cy.EditType = EditType;
+        //cy.CaptionPosition = CaptionPosition;
+        //cy.DisabledReason = "Keine Verknüpfung vorhanden.";
+        //cy.Tag = KeyName;
+        ////cy.Name = DefaultItemToControlName();
+        //return cy;
     }
 
     public override List<GenericControl> GetStyleOptions() {

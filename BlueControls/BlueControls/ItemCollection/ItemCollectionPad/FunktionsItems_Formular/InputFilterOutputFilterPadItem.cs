@@ -130,17 +130,17 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     #region Methods
 
-    public void AddChild(IHasKeyName add) => _itemSends.AddChild(add, this);
+    public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
-        //    EditType = _bearbeitung,
-        //    CaptionPosition = CaptionPosition,
-        //    Name = DefaultItemToControlName()
-        //};
+        var con = new FlexiControlForFilterNew(OutputDatabase) {
+            //EditType = _bearbeitung,
+            //CaptionPosition = CaptionPosition,
+            //Name = DefaultItemToControlName()
+        };
         //return con;
-        con.DoInputSettings(this, parent);
-        con.DoOutputSettings(this, parent);
+        con.DoInputSettings(parent, this);
+        con.DoOutputSettings(parent, this);
 
         return con;
     }

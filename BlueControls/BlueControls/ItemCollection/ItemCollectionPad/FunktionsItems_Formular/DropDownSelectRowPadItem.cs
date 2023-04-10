@@ -134,7 +134,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     #region Methods
 
-    public void AddChild(IHasKeyName add) => _itemSends.AddChild(add, this);
+    public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlRowSelectorNew(OutputDatabase, _überschrift, _anzeige) {
@@ -142,8 +142,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             CaptionPosition = CaptionPosition,
         };
 
-        con.DoInputSettings(this, parent);
-        con.DoOutputSettings(this, parent);
+        con.DoInputSettings(parent, this);
+        con.DoOutputSettings(parent, this);
 
         return con;
     }

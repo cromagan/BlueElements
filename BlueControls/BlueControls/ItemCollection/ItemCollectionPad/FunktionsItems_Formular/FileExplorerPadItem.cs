@@ -115,7 +115,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
             CreateDir = _bei_Bedarf_erzeugen,
             DeleteDir = _leere_Ordner_löschen
         };
-        con.DoInputSettings(this, parent);
+        con.DoInputSettings(parent, this);
         //con.DoOutputSettings(this);
 
         return con;

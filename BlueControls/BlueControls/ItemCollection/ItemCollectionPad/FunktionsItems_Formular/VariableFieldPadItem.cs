@@ -114,8 +114,8 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
             OriginalText = _variable
         };
 
-        con.DoInputSettings(this, parent);
-        con.DoOutputSettings(this, parent);
+        con.DoInputSettings(parent, this);
+        //con.DoOutputSettings(parent, this);
         return con;
     }
 

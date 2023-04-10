@@ -97,7 +97,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new TabControl();
 
-        con.DoInputSettings(this, parent);
+        con.DoInputSettings(parent, this);
         //con.DoOutputSettings(this);
         return con;
     }
