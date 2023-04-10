@@ -17,23 +17,10 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Design;
-using System.Windows.Documents;
-using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Interfaces;
-using static BlueControls.Interfaces.ICalculateRowsExtension;
 
 namespace BlueControls.Controls;
 

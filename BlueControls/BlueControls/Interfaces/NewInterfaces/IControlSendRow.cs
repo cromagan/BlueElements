@@ -17,16 +17,8 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
-using BlueControls.Forms;
-using BlueControls.ItemCollection;
-using BlueDatabase;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using static BlueControls.Interfaces.HasVersionExtensions;
 
 namespace BlueControls.Interfaces;
 
@@ -37,15 +29,15 @@ public static class IControlSendRowExtension {
 
     #region Methods
 
-    public static void DoChilds(this IControlSendRow item, List<IControlSendSomething> childs, DatabaseAbstract? db, long? rowkey) {
-        var r = db?.Row.SearchByKey(rowkey);
+    public static void DoChilds(this IControlSendRow item, List<IControlAcceptSomething> childs, long? rowkey) {
+        var r = item.OutputDatabase?.Row.SearchByKey(rowkey);
         r?.CheckRowDataIfNeeded();
 
         foreach (var thischild in childs) {
             var did = false;
 
             if (!did && thischild is IAcceptRowKey fcfc) {
-                fcfc.SetData(db, rowkey);
+                fcfc.SetData(item.OutputDatabase, rowkey);
                 did = true;
             }
 

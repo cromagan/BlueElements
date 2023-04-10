@@ -48,7 +48,7 @@ public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangin
 
     public void AddChild(IHasKeyName add);
 
-    public void RemoveChild(IHasKeyName remove);
+    public void RemoveChild(IItemAcceptSomething remove);
 
     #endregion
 
@@ -75,11 +75,13 @@ public static class ItemSendSomethingExtension {
 
         if (item.Parent == null) { return; }
 
-        foreach (var thisChild in item.ChildIds) {
-            var item2 = item.Parent[thisChild];
+        if (item.ChildIds != null) {
+            foreach (var thisChild in item.ChildIds) {
+                var item2 = item.Parent[thisChild];
 
-            if (item2 is IItemAcceptSomething ias) {
-                ias.InputColorId = item.OutputColorId;
+                if (item2 is IItemAcceptSomething ias) {
+                    ias.InputColorId = item.OutputColorId;
+                }
             }
         }
     }
@@ -103,7 +105,7 @@ public class ItemSendSomething {
 
     public void AddChild(IItemSendSomething item, IHasKeyName add) {
         var l = new List<string>();
-        l.AddRange(item.ChildIds);
+        if (item.ChildIds != null) { l.AddRange(item.ChildIds); }
         l.Add(add.KeyName);
 
         ChildIdsSet(new ReadOnlyCollection<string>(l), item);
@@ -121,13 +123,12 @@ public class ItemSendSomething {
         item.OnChanged();
     }
 
-    public void DoParentChanged(IItemSendSomething item) {
+    public void DoCreativePadParentChanged(IItemSendSomething item) {
         if (item.Parent != null) {
             item.OutputColorId = -1;
             item.OutputColorId = item.Parent.GetFreeColorId(item.Page);
         }
         item.DoChilds();
-
         item.OnChanged();
     }
 
@@ -161,6 +162,8 @@ public class ItemSendSomething {
         return result;
     }
 
+    public void ParseFinished(IItemSendSomething item) { }
+
     public virtual bool ParseThis(string tag, string value) {
         switch (tag) {
             case "database":
@@ -187,10 +190,11 @@ public class ItemSendSomething {
         return false;
     }
 
-    public void RemoveChild(IHasKeyName remove, IItemSendSomething item) {
+    public void RemoveChild(IItemAcceptSomething remove, IItemSendSomething item) {
         var l = new List<string>();
         l.AddRange(_childIds);
         l.Remove(remove.KeyName);
+        remove.InputColorId = -1;
         ChildIdsSet(new ReadOnlyCollection<string>(l), item);
     }
 

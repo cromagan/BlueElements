@@ -31,7 +31,6 @@ using BlueDatabase;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
-using static BlueControls.Interfaces.HasVersionExtensions;
 
 namespace BlueControls.Controls;
 

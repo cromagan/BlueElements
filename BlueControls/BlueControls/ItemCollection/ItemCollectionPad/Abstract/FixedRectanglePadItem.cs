@@ -162,7 +162,10 @@ public abstract class FixedRectanglePadItem : BasicPadItem {
         return new RectangleF(_pLo.X, _pLo.Y, Size.Width, Size.Height);
     }
 
-    protected override void ParseFinished() => SizeChanged();
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        SizeChanged();
+    }
 
     #endregion
 }

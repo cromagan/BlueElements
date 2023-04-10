@@ -90,6 +90,15 @@ public class ItemAcceptFilter : ItemAcceptSomething {
 
     #region Methods
 
+    public void DoCreativePadParentChanged(IItemAcceptFilter item) {
+        var l = GetFilterFromGet(item);
+
+        foreach (var thiss in l) {
+            thiss.DoChilds();
+        }
+        item.OnChanged();
+    }
+
     public ReadOnlyCollection<IItemSendFilter> GetFilterFromGet(IItemAcceptFilter item) {
         if (_getFilterFrom == null) {
             var l = new List<IItemSendFilter>();
@@ -149,6 +158,8 @@ public class ItemAcceptFilter : ItemAcceptSomething {
 
         return result;
     }
+
+    public void ParseFinished(IItemAcceptFilter item) { }
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }

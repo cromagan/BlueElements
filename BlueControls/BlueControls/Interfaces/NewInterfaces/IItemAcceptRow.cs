@@ -89,6 +89,11 @@ public class ItemAcceptRow : ItemAcceptSomething {
 
     #region Methods
 
+    public void DoCreativePadParentChanged(IItemAcceptRow item) {
+        GetRowFromGet(item)?.DoChilds();
+        item.OnChanged();
+    }
+
     public IItemSendRow? GetRowFromGet(IItemAcceptRow item) {
         if (item.Parent == null || _getValueFromkey == null) { return null; }
 
@@ -121,6 +126,8 @@ public class ItemAcceptRow : ItemAcceptSomething {
         return result;
     }
 
+    public void ParseFinished(IItemAcceptRow item) { }
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
 
@@ -128,6 +135,9 @@ public class ItemAcceptRow : ItemAcceptSomething {
             case "getvaluefrom":
             case "getvaluefromkey":
                 _getValueFromkey = value.FromNonCritical();
+
+                //var l = GetRowFromGet(this);
+
                 return true;
         }
         return false;

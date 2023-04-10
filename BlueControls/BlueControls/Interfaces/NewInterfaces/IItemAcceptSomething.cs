@@ -51,7 +51,7 @@ public class ItemAcceptSomething {
 
     public int InputColorIdGet() => _inputColorId;
 
-    public void InputColorIdSet(int value, IItemAcceptSomething item) {
+    public void InputColorIdSet(IItemAcceptSomething item, int value) {
         if (_inputColorId == value) { return; }
 
         _inputColorId = value;

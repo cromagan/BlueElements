@@ -19,7 +19,6 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
@@ -41,6 +40,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
+
     private readonly ItemSendRow _itemSends;
 
     #endregion
@@ -78,7 +78,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(value, this);
+        set => _itemAccepts.InputColorIdSet(this, value);
     }
 
     public int OutputColorId {
@@ -136,7 +136,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         return "Tabellenansicht einer Datenbank";
     }
 
-    public void RemoveChild(IHasKeyName remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(InputColorId));
 
@@ -168,8 +168,15 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        _itemSends.DoParentChanged(this);
+        _itemSends.DoCreativePadParentChanged(this);
+        _itemAccepts.DoCreativePadParentChanged(this);
         //RepairConnections();
+    }
+
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        _itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

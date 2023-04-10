@@ -44,10 +44,13 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
+
     private readonly ItemSendRow _itemSends;
+
     private string _anzeige = string.Empty;
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+
     private string _überschrift = string.Empty;
 
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -106,7 +109,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(value, this);
+        set => _itemAccepts.InputColorIdSet(this, value);
     }
 
     public int OutputColorId {
@@ -195,7 +198,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         return "Zeile einer Datenbank";
     }
 
-    public void RemoveChild(IHasKeyName remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(_itemAccepts.InputColorIdGet()));
 
@@ -237,8 +240,15 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        _itemSends.DoParentChanged(this);
+        _itemSends.DoCreativePadParentChanged(this);
+        _itemAccepts.DoCreativePadParentChanged(this);
         //RepairConnections();
+    }
+
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        _itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

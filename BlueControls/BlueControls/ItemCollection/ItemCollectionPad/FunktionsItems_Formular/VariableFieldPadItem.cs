@@ -40,7 +40,9 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
+
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
+
     private string _überschrift = string.Empty;
 
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -78,7 +80,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(value, this);
+        set => _itemAccepts.InputColorIdSet(this, value);
     }
 
     public string Überschrift {
@@ -200,6 +202,19 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         if (!forPrinting) {
             RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
         }
+    }
+
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        //_itemSends.DoCreativePadParentChanged(this);
+        _itemAccepts.DoCreativePadParentChanged(this);
+        //RepairConnections();
+    }
+
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

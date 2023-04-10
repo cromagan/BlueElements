@@ -37,7 +37,9 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
+
     private bool _bei_Bedarf_erzeugen;
+
     private bool _leere_Ordner_löschen;
 
     private string _pfad = string.Empty;
@@ -76,7 +78,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(value, this);
+        set => _itemAccepts.InputColorIdSet(this, value);
     }
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
@@ -177,6 +179,19 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\");
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+    }
+
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        //_itemSends.DoCreativePadParentChanged(this);
+        _itemAccepts.DoCreativePadParentChanged(this);
+        //RepairConnections();
+    }
+
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

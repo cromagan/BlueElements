@@ -37,6 +37,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
+
     private string _bild_Dateiname = string.Empty;
 
     #endregion
@@ -73,7 +74,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
 
     public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(value, this);
+        set => _itemAccepts.InputColorIdSet(this, value);
     }
 
     protected override int SaveOrder => 4;
@@ -135,6 +136,18 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+    }
+
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        //_itemSends.DoCreativePadParentChanged(this);
+        _itemAccepts.DoCreativePadParentChanged(this);
+    }
+
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

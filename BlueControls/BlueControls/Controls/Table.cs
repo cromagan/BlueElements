@@ -64,7 +64,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
     public static readonly int RowCaptionSizeY = 50;
-    private readonly List<IControlSendSomething> _childs = new();
+    private readonly List<IControlAcceptSomething> _childs = new();
     private readonly List<string> _collapsed = new();
     private readonly object _lockUserAction = new();
     private readonly List<IControlSendFilter> _parentSender = new();
@@ -653,10 +653,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (CursorPosRow?.Row != null && CursorPosRow?.Row.Database != Database) { CursorPosRow = null; }
     }
 
-    public void ChildAdd(IControlSendSomething c) {
+    public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
-        this.DoChilds(_childs, OutputDatabase, CursorPosRow?.Row?.Key);
+        this.DoChilds(_childs, CursorPosRow?.Row?.Key);
     }
 
     public void CollapesAll() {

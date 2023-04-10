@@ -17,16 +17,9 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
-using BlueControls.Forms;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using static BlueControls.Interfaces.HasVersionExtensions;
 
 namespace BlueControls.Interfaces;
 
@@ -43,7 +36,7 @@ public static class IControlSendFilterExtension {
 
     #region Methods
 
-    public static void DoChilds(this IControlSendFilter item, List<IControlSendSomething> childs, DatabaseAbstract? db, long? rowkey) {
+    public static void DoChilds(this IControlSendFilter item, List<IControlAcceptSomething> childs, long? rowkey) {
         //var r = db?.Row.SearchByKey(rowkey);
         //r?.CheckRowDataIfNeeded();
 

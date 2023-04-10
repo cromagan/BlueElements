@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -85,7 +84,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(value, this);
+        set => _itemAccepts.InputColorIdSet(this, value);
     }
 
     protected override int SaveOrder => 1000;
@@ -253,6 +252,19 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         if (!forPrinting) {
             RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
         }
+    }
+
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        //_itemSends.DoCreativePadParentChanged(this);
+        _itemAccepts.DoCreativePadParentChanged(this);
+        //RepairConnections();
+    }
+
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     //protected override BasicPadItem? TryCreate(string id, string name) {

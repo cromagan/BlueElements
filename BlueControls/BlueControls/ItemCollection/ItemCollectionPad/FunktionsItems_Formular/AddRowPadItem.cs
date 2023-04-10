@@ -74,7 +74,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(value, this);
+        set => _itemAccepts.InputColorIdSet(this, value);
     }
 
     protected override int SaveOrder => 1;
@@ -155,7 +155,15 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        //RepairConnections(this);
+        //_itemSends.DoCreativePadParentChanged(this);
+        _itemAccepts.DoCreativePadParentChanged(this);
+        //RepairConnections();
+    }
+
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

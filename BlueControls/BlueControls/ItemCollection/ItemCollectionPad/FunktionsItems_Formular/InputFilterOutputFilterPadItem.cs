@@ -42,8 +42,11 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
+
     private readonly ItemSendFilter _itemSends;
+
     private string _anzeige = string.Empty;
+
     private string _überschrift = string.Empty;
 
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -102,7 +105,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(value, this);
+        set => _itemAccepts.InputColorIdSet(this, value);
     }
 
     public int OutputColorId {
@@ -198,7 +201,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         return "Zeile einer Datenbank";
     }
 
-    public void RemoveChild(IHasKeyName remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(InputColorId));
 
@@ -237,8 +240,15 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        _itemSends.DoParentChanged(this);
+        _itemSends.DoCreativePadParentChanged(this);
+        _itemAccepts.DoCreativePadParentChanged(this);
         //RepairConnections();
+    }
+
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        _itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

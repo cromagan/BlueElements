@@ -17,15 +17,7 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueControls.Controls;
-using BlueControls.Forms;
-using BlueControls.ItemCollection;
 using BlueDatabase;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 
 namespace BlueControls.Interfaces;
 
@@ -42,7 +34,7 @@ public interface IControlSendSomething {
 
     #region Methods
 
-    public void ChildAdd(IControlSendSomething c);
+    public void ChildAdd(IControlAcceptSomething c);
 
     #endregion
 }

@@ -192,7 +192,10 @@ public abstract class RectanglePadItem : BasicPadItem {
                                                                Math.Abs(_pRu.X - _pLo.X),
                                                                Math.Abs(_pRu.Y - _pLo.Y));
 
-    protected override void ParseFinished() => SizeChanged();
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        SizeChanged();
+    }
 
     #endregion
 }

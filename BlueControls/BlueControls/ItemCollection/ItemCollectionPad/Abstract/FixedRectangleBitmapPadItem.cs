@@ -99,7 +99,10 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
     protected abstract void GeneratePic();
 
-    protected override void ParseFinished() => SizeChanged();
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        SizeChanged();
+    }
 
     protected void RemovePic() {
         _generatedBitmap?.Dispose();

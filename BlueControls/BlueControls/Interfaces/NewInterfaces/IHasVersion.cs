@@ -18,8 +18,6 @@
 #nullable enable
 
 using BlueBasics.Interfaces;
-using System.Windows.Media.Animation;
-using System;
 
 namespace BlueControls.Interfaces;
 

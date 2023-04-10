@@ -48,9 +48,11 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
     #region Fields
 
     private readonly ItemSendRow _itemSends;
+
     private string _anzeige = string.Empty;
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+
     private string _überschrift = string.Empty;
 
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -267,7 +269,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
         return "Zeile einer Datenbank";
     }
 
-    public void RemoveChild(IHasKeyName remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(InputColorId));
 
@@ -318,8 +320,15 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
 
     protected override void OnParentChanged() {
         base.OnParentChanged();
-        _itemSends.DoParentChanged(this);
+        _itemSends.DoCreativePadParentChanged(this);
+        //_itemAccepts.DoCreativePadParentChanged(this);
         //RepairConnections();
+    }
+
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        _itemSends.ParseFinished(this);
+        //_itemAccepts.ParseFinished(this);
     }
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {

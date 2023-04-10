@@ -46,11 +46,13 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
+
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
 
     private ColumnItem? _column;
 
     private string _columnName = string.Empty;
+
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -109,7 +111,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(value, this);
+        set => _itemAccepts.InputColorIdSet(this, value);
     }
 
     public string Interner_Name {
@@ -318,6 +320,19 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+    }
+
+    protected override void OnParentChanged() {
+        base.OnParentChanged();
+        //_itemSends.DoCreativePadParentChanged(this);
+        _itemAccepts.DoCreativePadParentChanged(this);
+        //RepairConnections();
+    }
+
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

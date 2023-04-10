@@ -17,20 +17,14 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
-using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
-using static BlueBasics.Develop;
 using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
@@ -39,7 +33,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     #region Fields
 
-    private readonly List<IControlSendSomething> _childs = new();
+    private readonly List<IControlAcceptSomething> _childs = new();
     private readonly List<IControlSendFilter> _parentSender = new();
     private readonly string _showformat;
     private bool _disposing;
@@ -82,7 +76,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
             if (IsDisposed) { return; }
             if (value == _row) { return; }
             _row = value;
-            this.DoChilds(_childs, OutputDatabase, _row?.Key);
+            this.DoChilds(_childs, _row?.Key);
         }
     }
 
@@ -95,10 +89,10 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
         Invalidate_FilteredRows();
     }
 
-    public void ChildAdd(IControlSendSomething c) {
+    public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
-        this.DoChilds(_childs, OutputDatabase, _row?.Key);
+        this.DoChilds(_childs, _row?.Key);
     }
 
     public void Invalidate_FilteredRows() => _filteredRows = null;

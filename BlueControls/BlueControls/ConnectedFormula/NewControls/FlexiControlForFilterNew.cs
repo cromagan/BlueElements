@@ -17,46 +17,15 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using BlueDatabase.Enums;
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-
-using System.Drawing.Design;
-using System.Windows.Documents;
-
-using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
-
-using BlueControls.Extended_Text;
-
-using BlueControls.Interfaces;
-using BlueDatabase;
-
-using BlueDatabase.Interfaces;
-using static BlueControls.Interfaces.ICalculateRowsExtension;
 
 namespace BlueControls.Controls;
 
@@ -66,7 +35,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
 
     #region Fields
 
-    private readonly List<IControlSendSomething> _childs = new();
+    private readonly List<IControlAcceptSomething> _childs = new();
 
     private readonly List<IControlSendFilter> _parentSender = new();
 
@@ -86,14 +55,6 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
 
     #endregion
 
-    #region Events
-
-    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
-    public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
-
-    #endregion
-
     #region Properties
 
     public FilterItem? Filter { get; }
@@ -109,15 +70,11 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
         _parentSender.Add(item);
     }
 
-    public void ChildAdd(IControlSendSomething c) {
+    public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
-        this.DoChilds(_childs, OutputDatabase, null);
+        this.DoChilds(_childs, null);
     }
-
-    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
-    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     internal ComboBox? GetComboBox() {
         foreach (var thisc in Controls) {

@@ -557,7 +557,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     protected virtual void OnParentChanged() => ParentChanged?.Invoke(this, System.EventArgs.Empty);
 
-    protected abstract void ParseFinished();
+    protected virtual void ParseFinished() { }
 
     private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 

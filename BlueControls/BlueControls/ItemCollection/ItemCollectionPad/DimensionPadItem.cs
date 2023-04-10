@@ -309,7 +309,10 @@ public class DimensionPadItem : BasicPadItem {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override void ParseFinished() => CalculateOtherPoints();
+    protected override void ParseFinished() {
+        base.ParseFinished();
+        CalculateOtherPoints();
+    }
 
     //protected override BasicPadItem? TryCreate(string id, string name) {
     //    if (id.Equals("blueelements.clsitemimage", StringComparison.OrdinalIgnoreCase) ||

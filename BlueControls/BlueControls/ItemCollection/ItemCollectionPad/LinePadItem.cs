@@ -172,8 +172,6 @@ public class LinePadItem : BasicPadItem {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override void ParseFinished() { }
-
     //protected override BasicPadItem? TryCreate(string id, string name) {
     //    if (id.Equals("blueelements.clsitemline", StringComparison.OrdinalIgnoreCase) ||
     //        id.Equals("blueelements.itemline", StringComparison.OrdinalIgnoreCase) ||
