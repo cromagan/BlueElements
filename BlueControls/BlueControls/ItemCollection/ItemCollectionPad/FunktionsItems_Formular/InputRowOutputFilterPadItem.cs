@@ -100,15 +100,11 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
-    public new Control CreateControl(ConnectedFormulaView parent) {
-        //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
-        //    EditType = _bearbeitung,
-        //    CaptionPosition = CaptionPosition,
-        //    Name = DefaultItemToControlName()
-        //};
-        //return con;
-        Develop.DebugPrint_NichtImplementiert();
-        return new Control();
+    public Control CreateControl(ConnectedFormulaView parent) {
+        var con = new InputRowOutputFilterControl();
+        con.DoInputSettings(parent, this);
+        con.DoOutputSettings(parent, this);
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {
@@ -161,8 +157,10 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
+
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, _itemAccepts.InputColorIdGet());
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+ 
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Filtergenerator für " + OutputDatabase.Caption;
@@ -171,10 +169,13 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
             } else {
                 Skin.Draw_FormatedText(gr, "Filtergenerator", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
             }
+
+            base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+
+            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
         }
 
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Filter", OutputColorId);
+
     }
 
     protected override void OnParentChanged() {

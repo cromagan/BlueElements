@@ -173,12 +173,13 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\");
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     protected override void OnParentChanged() {

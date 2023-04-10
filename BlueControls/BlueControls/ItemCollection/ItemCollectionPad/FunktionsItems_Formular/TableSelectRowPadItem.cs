@@ -149,9 +149,10 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId);
 
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Tabellenansicht " + OutputDatabase.Caption;
@@ -163,7 +164,8 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
+        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+
     }
 
     protected override void OnParentChanged() {

@@ -384,8 +384,9 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
         if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Item ohne Namen!"); return; }
 
-        item.Parent = this;
         base.Add(item);
+        item.Parent = this;
+
         IsSaved = false;
         OnItemAdded(item);
         item.Changed += Item_Changed;

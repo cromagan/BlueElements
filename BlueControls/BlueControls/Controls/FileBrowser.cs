@@ -43,7 +43,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
-public partial class FileBrowser : GenericControl, IAcceptVariableList, IControlAcceptRow   //UserControl //
+public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserControl //
 {
     #region Fields
 
@@ -78,6 +78,9 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList, IControl
             CheckButtons(DirectoryExists(txbPfad.Text));
         }
     }
+
+    public IControlSendRow? GetRowFrom { get; set; }
+    public RowItem? LastInputRow { get; private set; }
 
     public string OriginalText {
         get => _originalText;
@@ -150,6 +153,16 @@ public partial class FileBrowser : GenericControl, IAcceptVariableList, IControl
     }
 
     public void Reload() => ÖffnePfad(txbPfad.Text);
+
+    public void SetData(DatabaseAbstract? database, long? rowkey) {
+        if (this.InputDatabase() != database) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
+        }
+
+        var row = database?.Row.SearchByKey(rowkey);
+        row?.CheckRowDataIfNeeded();
+        ParseVariables(row?.LastCheckedEventArgs?.Variables);
+    }
 
     protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
 

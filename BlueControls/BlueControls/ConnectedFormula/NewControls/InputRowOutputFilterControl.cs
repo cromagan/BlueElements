@@ -19,35 +19,53 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class ButtonAddRow : Button, IControlAcceptFilter, ICalculateRows {
+internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, IControlSendFilter {
 
     #region Fields
 
-    private readonly List<IControlSendFilter> _parentSender = new();
-    private List<RowItem>? _filteredRows;
+    private readonly List<IControlAcceptSomething> _childs = new();
 
     #endregion
 
     #region Properties
 
-    public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), this.InputDatabase());
-    public ReadOnlyCollection<IControlSendFilter> ParentSender => new(_parentSender);
+    public FilterItem Filter { get; }
+    public IControlSendRow? GetRowFrom { get; set; }
+    public RowItem? LastInputRow { get; private set; }
+    public DatabaseAbstract? OutputDatabase { get; }
 
     #endregion
 
     #region Methods
 
-    public void AddParentSender(IControlSendFilter item) {
-        Invalidate_FilteredRows();
-        _parentSender.Add(item);
+    public void ChildAdd(IControlAcceptSomething c) {
+        if (IsDisposed) { return; }
+        _childs.Add(c);
+        this.DoChilds(_childs);
     }
 
-    public void Invalidate_FilteredRows() => _filteredRows = null;
+    public void SetData(DatabaseAbstract? database, long? rowkey) {
+        if (OutputDatabase != database) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
+        }
+
+        Develop.DebugPrint_NichtImplementiert();
+
+        var nr = OutputDatabase?.Row.SearchByKey(rowkey);
+        if (nr == LastInputRow) { return; }
+
+        LastInputRow = nr;
+        LastInputRow?.CheckRowDataIfNeeded();
+
+        this.DoChilds(_childs);
+    }
 
     #endregion
 }

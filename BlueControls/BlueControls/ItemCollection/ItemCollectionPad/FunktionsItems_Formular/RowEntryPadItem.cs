@@ -37,7 +37,7 @@ namespace BlueControls.ItemCollection;
 /// Unsichtbares Element, wird nicht angezeigt
 /// </summary>
 
-public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemSendRow {
+public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemSendRow, IItemRowInput {
 
     #region Fields
 
@@ -147,15 +147,11 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
-    public new Control CreateControl(ConnectedFormulaView parent) {
-        //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
-        //    EditType = _bearbeitung,
-        //    CaptionPosition = CaptionPosition,
-        //    Name = DefaultItemToControlName()
-        //};
-        //return con;
-        Develop.DebugPrint_NichtImplementiert();
-        return new Control();
+    public Control CreateControl(ConnectedFormulaView parent) {
+        var con = new RowEntryControl(OutputDatabase);
+        //con.DoInputSettings(parent, this);
+        con.DoOutputSettings(parent, this);
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {

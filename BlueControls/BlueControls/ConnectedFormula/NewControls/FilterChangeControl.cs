@@ -24,18 +24,22 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class ButtonAddRow : Button, IControlAcceptFilter, ICalculateRows {
+internal class FilterChangeControl : BlueControls.Controls.GenericControl, IControlAcceptFilter, IControlSendFilter {
 
     #region Fields
 
+    private readonly List<IControlAcceptSomething> _childs = new();
+
     private readonly List<IControlSendFilter> _parentSender = new();
-    private List<RowItem>? _filteredRows;
 
     #endregion
 
     #region Properties
 
-    public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), this.InputDatabase());
+    public FilterItem Filter { get; }
+
+    public DatabaseAbstract? OutputDatabase { get; }
+
     public ReadOnlyCollection<IControlSendFilter> ParentSender => new(_parentSender);
 
     #endregion
@@ -43,11 +47,15 @@ internal class ButtonAddRow : Button, IControlAcceptFilter, ICalculateRows {
     #region Methods
 
     public void AddParentSender(IControlSendFilter item) {
-        Invalidate_FilteredRows();
+        //Invalidate_FilteredRows();
         _parentSender.Add(item);
     }
 
-    public void Invalidate_FilteredRows() => _filteredRows = null;
+    public void ChildAdd(IControlAcceptSomething c) {
+        if (IsDisposed) { return; }
+        _childs.Add(c);
+        this.DoChilds(_childs);
+    }
 
     #endregion
 }

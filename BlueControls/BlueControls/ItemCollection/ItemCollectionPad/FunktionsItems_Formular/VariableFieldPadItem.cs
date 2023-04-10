@@ -199,9 +199,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        if (!forPrinting) {
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
-        }
+        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
     }
 
     protected override void OnParentChanged() {

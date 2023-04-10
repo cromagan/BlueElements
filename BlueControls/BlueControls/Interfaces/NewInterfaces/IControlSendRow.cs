@@ -17,32 +17,36 @@
 
 #nullable enable
 
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using System.Collections.Generic;
+using BlueBasics;
+using BlueBasics.Enums;
+using BlueDatabase;
 
 namespace BlueControls.Interfaces;
 
-public interface IControlSendRow : IControlSendSomething, ICalculateRows {
+public interface IControlSendRow : IControlSendSomething, IDisposableExtended {
 }
 
 public static class IControlSendRowExtension {
 
     #region Methods
 
-    public static void DoChilds(this IControlSendRow item, List<IControlAcceptSomething> childs, long? rowkey) {
-        var r = item.OutputDatabase?.Row.SearchByKey(rowkey);
-        r?.CheckRowDataIfNeeded();
+    public static void DoChilds(this IControlSendRow item, List<IControlAcceptSomething> childs, RowItem? row) {
+        if (row != null && row.Database != item.OutputDatabase) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
+            row = null;
+        }
+
+        row?.CheckRowDataIfNeeded();
 
         foreach (var thischild in childs) {
             var did = false;
 
-            if (!did && thischild is IAcceptRowKey fcfc) {
-                fcfc.SetData(item.OutputDatabase, rowkey);
-                did = true;
-            }
-
-            if (!did && thischild is IAcceptVariableList rv) {
-                _ = rv.ParseVariables(r?.LastCheckedEventArgs?.Variables);
+            if (!did && thischild is IControlAcceptRow fcfc) {
+                fcfc.GetRowFrom = item;
+                fcfc.SetData(item.OutputDatabase, row?.Key);
                 did = true;
             }
 

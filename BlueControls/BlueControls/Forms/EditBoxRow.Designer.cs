@@ -3,8 +3,7 @@ using BlueControls.Controls;
 
 namespace BlueControls.Forms
 {
-    partial class EditBoxRow
-    {
+    partial class EditBoxRow {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -42,11 +41,11 @@ namespace BlueControls.Forms
             this.formToEdit.Size = new System.Drawing.Size(592, 648);
             this.formToEdit.TabIndex = 4;
             // 
-            // EditBoxRow
+            // EditBoxRow_NEW
             // 
             this.ClientSize = new System.Drawing.Size(612, 663);
             this.Controls.Add(this.formToEdit);
-            this.Name = "EditBoxRow";
+            this.Name = "EditBoxRow_NEW";
             this.Controls.SetChildIndex(this.formToEdit, 0);
             this.ResumeLayout(false);
 

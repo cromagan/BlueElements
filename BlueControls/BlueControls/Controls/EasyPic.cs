@@ -31,6 +31,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
+using BlueDatabase;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
@@ -39,7 +40,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone, IAcceptVariableList, IControlAcceptRow {
+public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone, IControlAcceptRow {
 
     #region Fields
 
@@ -87,6 +88,9 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
             ZoomFitInvalidateAndCheckButtons();
         }
     }
+
+    public IControlSendRow? GetRowFrom { get; set; }
+    public RowItem? LastInputRow { get; private set; }
 
     public string OriginalText {
         get => _originalText;
@@ -173,6 +177,16 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
         FileName = ct;
         return ct == OriginalText;
+    }
+
+    public void SetData(DatabaseAbstract? database, long? rowkey) {
+        if (this.InputDatabase() != database) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
+        }
+
+        var row = database?.Row.SearchByKey(rowkey);
+        row?.CheckRowDataIfNeeded();
+        ParseVariables(row?.LastCheckedEventArgs?.Variables);
     }
 
     protected override void DrawControl(Graphics gr, States vState) {

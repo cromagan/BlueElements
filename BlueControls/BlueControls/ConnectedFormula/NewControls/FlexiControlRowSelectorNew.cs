@@ -29,7 +29,7 @@ using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, IControlAcceptFilter {
+internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, IControlAcceptFilter, ICalculateRows {
 
     #region Fields
 
@@ -76,7 +76,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
             if (IsDisposed) { return; }
             if (value == _row) { return; }
             _row = value;
-            this.DoChilds(_childs, _row?.Key);
+            this.DoChilds(_childs, _row);
         }
     }
 
@@ -92,7 +92,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
     public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
-        this.DoChilds(_childs, _row?.Key);
+        this.DoChilds(_childs, _row);
     }
 
     public void Invalidate_FilteredRows() => _filteredRows = null;

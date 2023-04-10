@@ -105,19 +105,15 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     #endregion
 
+    //public void Datensatz_bearbeiten() {
+    //    _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
+    //    EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
+    //}
+
     #region Methods
 
-    public void Datensatz_bearbeiten() {
-        _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
-        EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
-    }
-
     public override List<GenericControl> GetStyleOptions() {
-        List<GenericControl> l = new()
-        {
-            new FlexiControlForDelegate( Datensatz_bearbeiten,  "Datensatz bearbeiten", ImageCode.Stift),
-            new FlexiControl()
-        };
+        List<GenericControl> l = new();
         ItemCollectionList.ItemCollectionList layouts = new(true);
         foreach (var thisLayouts in Row.Database.Layouts) {
             ItemCollectionPad p = new(thisLayouts, string.Empty);

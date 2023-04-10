@@ -73,7 +73,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
     public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
-        this.DoChilds(_childs, null);
+        this.DoChilds(_childs);
     }
 
     internal ComboBox? GetComboBox() {

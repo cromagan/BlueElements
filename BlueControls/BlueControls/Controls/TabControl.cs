@@ -26,7 +26,7 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-public class TabControl : AbstractTabControl, IAcceptRowKey, IControlAcceptRow {
+public class TabControl : AbstractTabControl, IControlAcceptRow {
 
     #region Constructors
 
@@ -46,6 +46,9 @@ public class TabControl : AbstractTabControl, IAcceptRowKey, IControlAcceptRow {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DatabaseAbstract? Database { get; private set; }
+
+    public IControlSendRow? GetRowFrom { get; set; }
+    public RowItem? LastInputRow { get; private set; }
 
     [DefaultValue(-1)]
     public long RowKey { get; private set; } = -1;
@@ -77,7 +80,7 @@ public class TabControl : AbstractTabControl, IAcceptRowKey, IControlAcceptRow {
         foreach (var thisTab in TabPages) {
             if (thisTab is TabPage tp) {
                 foreach (var thisControl in tp.Controls) {
-                    if (thisControl is IAcceptRowKey iar and not TabControl) {
+                    if (thisControl is IControlAcceptRow iar and not TabControl) {
                         iar.SetData(Database, RowKey);
                     }
                 }

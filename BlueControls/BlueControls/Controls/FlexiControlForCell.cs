@@ -41,24 +41,22 @@ using static BlueBasics.IO;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRowKey, IDisabledReason, IHasDatabase, IControlAcceptRow {
+public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabledReason, IHasDatabase, IControlAcceptRow {
 
     #region Fields
 
     private string _columnName = string.Empty;
     private long _rowKey = -1;
-
     private ColumnItem? _tmpColumn;
     private RowItem? _tmpRow;
 
     #endregion
 
-    // Für den Designer
-
     #region Constructors
 
     public FlexiControlForCell() : this(null, string.Empty, ÜberschriftAnordnung.Über_dem_Feld, EditTypeFormula.None) { }
 
+    // Für den Designer
     public FlexiControlForCell(DatabaseAbstract? database, string column, ÜberschriftAnordnung captionPosition, EditTypeFormula editType) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
@@ -102,6 +100,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IAcceptRo
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DatabaseAbstract? Database { get; private set; }
+
+    public IControlSendRow? GetRowFrom { get; set; }
+    public RowItem? LastInputRow { get; private set; }
 
     #endregion
 

@@ -32,7 +32,7 @@ using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControlAcceptRow {
+internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControlAcceptRow, IControlRowInput, ICalculateRows {
 
     #region Fields
 
@@ -70,6 +70,9 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
     public DatabaseAbstract? FilterDefiniton { get; }
     public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, _filter, OutputDatabase);
+    public IControlSendRow? GetRowFrom { get; set; }
+    public RowItem? LastInputRow { get; private set; }
+
     public DatabaseAbstract? OutputDatabase { get; }
 
     public RowItem? Row {
@@ -78,7 +81,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
             if (IsDisposed) { return; }
             if (value == _row) { return; }
             _row = value;
-            this.DoChilds(_childs, _row?.Key);
+            this.DoChilds(_childs, _row);
         }
     }
 
@@ -89,7 +92,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
-        this.DoChilds(_childs, _row?.Key);
+        this.DoChilds(_childs, _row);
     }
 
     public void Invalidate_FilteredRows() => _filteredRows = null;

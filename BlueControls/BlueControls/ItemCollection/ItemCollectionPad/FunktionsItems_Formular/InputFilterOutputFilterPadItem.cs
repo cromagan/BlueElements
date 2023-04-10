@@ -218,9 +218,10 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
+
 
         if (!forPrinting) {
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {

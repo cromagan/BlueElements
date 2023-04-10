@@ -249,9 +249,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        if (!forPrinting) {
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-        }
+        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     protected override void OnParentChanged() {

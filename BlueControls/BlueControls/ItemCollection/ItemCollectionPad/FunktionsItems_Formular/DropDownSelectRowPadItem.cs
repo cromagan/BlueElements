@@ -218,9 +218,10 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, _itemAccepts.InputColorIdGet());
 
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+       
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Zeilenauswahl aus: " + OutputDatabase.Caption;
@@ -234,8 +235,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
 
-        RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
     }
 
     protected override void OnParentChanged() {

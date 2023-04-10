@@ -101,14 +101,11 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
     public Control CreateControl(ConnectedFormulaView parent) {
-        //var con = new FlexiControlRowSelector(Database, FilterDefiniton, _überschrift, _anzeige) {
-        //    EditType = _bearbeitung,
-        //    CaptionPosition = CaptionPosition,
-        //    Name = DefaultItemToControlName()
-        //};
-        //return con;
-        Develop.DebugPrint_NichtImplementiert();
-        return new Control();
+        var con = new FilterChangeControl();
+
+        con.DoInputSettings(parent, this);
+        con.DoOutputSettings(parent, this);
+        return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {
@@ -154,8 +151,9 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId);
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", -1);
+
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Filterconverter: " + OutputDatabase.Caption;
@@ -166,7 +164,8 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
             }
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
+        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", -1);
+
     }
 
     protected override void OnParentChanged() {

@@ -43,7 +43,7 @@ namespace BlueControls.ItemCollection;
 /// Altes Element, Filter und Zeilenauswahl in einem
 /// </summary>
 [Obsolete]
-public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemSendRow {
+public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemSendRow, IItemRowInput {
 
     #region Fields
 
@@ -299,9 +299,8 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
+            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId);
-
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", -1);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "ALT: eine Zeile aus " + OutputDatabase.Caption;
@@ -315,7 +314,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
+        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", -1);
     }
 
     protected override void OnParentChanged() {

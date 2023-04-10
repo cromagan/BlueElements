@@ -35,7 +35,7 @@ using static BlueControls.ConnectedFormula.ConnectedFormula;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAcceptRowKey, IHasDatabase, IControlAcceptRow {
+public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHasDatabase, IControlAcceptRow {
 
     #region Fields
 
@@ -70,6 +70,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DatabaseAbstract? Database { get; private set; }
+
+    public IControlSendRow? GetRowFrom { get; set; }
+    public RowItem? LastInputRow { get; private set; }
 
     [DefaultValue("Head")]
     public string Page {
@@ -295,7 +298,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IAc
         foreach (var thisIt in CFormula.PadData) {
             if (thisIt is IItemToControl ripi && ripi.IsVisibleOnPage(Page)) {
                 var c = SearchOrGenerate(ripi);
-                if (c is IAcceptRowKey fcfc) {
+                if (c is IControlAcceptRow fcfc) {
                     fcfc.SetData(Database, RowKey);
                 }
             }

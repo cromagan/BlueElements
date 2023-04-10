@@ -25,6 +25,7 @@ using BlueBasics.MultiUserFile;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
+using BlueDatabase;
 using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
@@ -183,7 +184,20 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        EditBoxRow_NEW.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", CFormula, true);
+
+        DatabaseAbstract? db = null;
+        foreach (var thisItem in CFormula.PadData) {
+            if (thisItem is IItemRowInput iri) {
+                db = iri.OutputDatabase;
+            }
+        }
+
+        RowItem? r = null;
+        if (db != null) {
+            r = db.Row.First();
+        }
+
+        EditBoxRow.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", CFormula, r, true);
     }
 
     private void btnZeileAnlegen_Click(object sender, System.EventArgs e) {

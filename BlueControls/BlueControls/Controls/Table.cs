@@ -55,7 +55,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptFilter, IControlSendRow {
+public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptFilter, IControlSendRow, ICalculateRows {
 
     #region Fields
 
@@ -656,7 +656,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
-        this.DoChilds(_childs, CursorPosRow?.Row?.Key);
+        this.DoChilds(_childs, CursorPosRow?.Row);
     }
 
     public void CollapesAll() {

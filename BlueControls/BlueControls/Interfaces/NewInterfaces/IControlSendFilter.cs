@@ -36,20 +36,15 @@ public static class IControlSendFilterExtension {
 
     #region Methods
 
-    public static void DoChilds(this IControlSendFilter item, List<IControlAcceptSomething> childs, long? rowkey) {
+    public static void DoChilds(this IControlSendFilter item, List<IControlAcceptSomething> childs) {
         //var r = db?.Row.SearchByKey(rowkey);
         //r?.CheckRowDataIfNeeded();
 
         //foreach (var thischild in childs) {
         //    var did = false;
 
-        //    if (!did && thischild is IAcceptRowKey fcfc) {
+        //    if (!did && thischild is IControlAcceptRow fcfc) {
         //        fcfc.SetData(db, rowkey);
-        //        did = true;
-        //    }
-
-        //    if (!did && thischild is IAcceptVariableList rv) {
-        //        _ = rv.ParseVariables(r?.LastCheckedEventArgs?.Variables);
         //        did = true;
         //    }
 
