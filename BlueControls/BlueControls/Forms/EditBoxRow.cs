@@ -33,8 +33,11 @@ public partial class EditBoxRow : DialogWithOkAndCancel {
         formToEdit.ConnectedFormula = cf;
 
         if (row != null) {
-            //formToEdit.GetConnectedFormulaFromDatabase(row.Database);
-            formToEdit.SetData(row.Database, row.Key);
+            if (cf == null) {
+                formToEdit.GetConnectedFormulaFromDatabase(row?.Database);
+            }
+
+            formToEdit.SetData(row?.Database, row?.Key);
         }
 
         Setup(txt, formToEdit, formToEdit.MinimumSize.Width + 50);
@@ -44,8 +47,28 @@ public partial class EditBoxRow : DialogWithOkAndCancel {
 
     #region Methods
 
+    public static void Show(string txt, RowItem? row, bool isDialog) {
+        EditBoxRow mb = new(txt, null, row);
+        if (isDialog) {
+            _ = mb.ShowDialog();
+            mb.Dispose();
+        } else {
+            mb.Show();
+        }
+    }
+
     public static void Show(string txt, ConnectedFormula.ConnectedFormula? cf, RowItem? row, bool isDialog) {
         EditBoxRow mb = new(txt, cf, row);
+        if (isDialog) {
+            _ = mb.ShowDialog();
+            mb.Dispose();
+        } else {
+            mb.Show();
+        }
+    }
+
+    public static void Show(string txt, ConnectedFormula.ConnectedFormula? cf, bool isDialog) {
+        EditBoxRow mb = new(txt, cf, null);
         if (isDialog) {
             _ = mb.ShowDialog();
             mb.Dispose();

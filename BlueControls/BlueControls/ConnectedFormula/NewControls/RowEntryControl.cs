@@ -60,6 +60,9 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
     }
 
     public void SetData(DatabaseAbstract? database, long? rowkey) {
+
+        if(OutputDatabase== null) { return; }
+
         if (OutputDatabase != database) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
         }

@@ -950,7 +950,7 @@ public abstract class SqlBackAbstract {
 
             foreach (var thist in tbl) {
                 var ntc = "BAK_" + thist.ToUpper() + "_";
-                var l = new BackupVerwalter(3, 3);
+                var l = new BackupVerwalter(3, 1);
                 foreach (var thisat in alltb) {
                     if (thisat.StartsWith(ntc)) {
                         if (DateTimeTryParse(thisat.TrimStart(ntc), out var dt)) {

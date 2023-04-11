@@ -1270,7 +1270,22 @@ public partial class TableView : FormWithStatusBar {
 
         var s = (List<object>)e.TabPage.Tag;
 
-        var db = DatabaseAbstract.GetById((ConnectionInfo)s[0], Table.Database_NeedPassword, DefaultUserGroup);
+        var ci = (ConnectionInfo)s[0];
+
+
+        #region Status-Meldung updaten?
+        var maybeok = false;
+        foreach (var thisdb in DatabaseAbstract.AllFiles) {
+            if (thisdb.TableName.Equals(ci.TableName, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
+        }
+
+        if (!maybeok) {
+            FormWithStatusBar.UpdateStatusBar(FehlerArt.Info, "Lade Datenbank " + ci.TableName, true);
+        }
+        #endregion
+
+
+        var db = DatabaseAbstract.GetById(ci, Table.Database_NeedPassword, DefaultUserGroup);
 
         if (db is Database bdb) {
             if (!string.IsNullOrEmpty(bdb.Filename)) {
