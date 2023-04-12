@@ -62,25 +62,10 @@ internal class Method_BackupControl : Method {
             return new DoItFeedback(infos.Data, "Dateipfad existiert nicht.");
         }
 
-        var fix = Directory.GetFiles(filn, ((VariableString)attvar.Attributes[1]).ValueString, SearchOption.TopDirectoryOnly);
-
-        if (fix.Length == 0) { return DoItFeedback.Null(); }
-        try {
-            var bvw = new BackupVerwalter(2, 20);
-
-            foreach (var thisF in fix) {
-                var fi = new FileInfo(thisF);
-                bvw.AddData(fi.LastWriteTimeUtc, thisF);
-            }
-
-            foreach (var thisF in bvw.Deleteable) {
-                IO.DeleteFile(thisF, false);
-            }
-
-            return DoItFeedback.Null();
-        } catch {
-            return new DoItFeedback(infos.Data, "Fehler beim Ausführen");
-        }
+        var bvw = new BackupVerwalter(2, 20);
+        var m = bvw.CleanUpDirectory(filn, ((VariableString)attvar.Attributes[1]).ValueString);
+        if (string.IsNullOrEmpty(m)) { return DoItFeedback.Null(); }
+        return new DoItFeedback(infos.Data, "Fehler beim Ausführen");
     }
 
     #endregion

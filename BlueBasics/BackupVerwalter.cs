@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 
 namespace BlueBasics;
 
@@ -63,6 +64,35 @@ public class BackupVerwalter {
         if (_data.ContainsKey(d)) { return; }
         _data.Add(d, file.ToUpper());
         _deletable = null;
+    }
+
+    /// <summary>
+    /// Macht eine Reinigung des Verzeichnisses -a usschlaggebend ist LastWriteTimeUtc
+    /// </summary>
+    /// <param name="path">Das Verzeichnis, das bereinigt werden soll</param>
+    /// <param name="search">DEr Dateipattern, nach dem gesucht werden soll z.b. table_20*.mdb</param>
+    /// <returns></returns>
+    public string CleanUpDirectory(string path, string search) {
+        if (string.IsNullOrEmpty(path)) { return "Kein Verzeichniss angebeben."; }
+        if (string.IsNullOrEmpty(search)) { return "Kein Suchpattern angebeben."; }
+
+        var fix = Directory.GetFiles(path, search, SearchOption.TopDirectoryOnly);
+
+        if (fix.Length == 0) { return string.Empty; }
+        try {
+            foreach (var thisF in fix) {
+                var fi = new FileInfo(thisF);
+                AddData(fi.LastWriteTimeUtc, thisF);
+            }
+
+            foreach (var thisF in Deleteable) {
+                IO.DeleteFile(thisF, false);
+            }
+
+            return string.Empty;
+        } catch {
+            return "Fehler beim Ausführen";
+        }
     }
 
     private void CalculateDeleteable(int multi, int maxfiles) {

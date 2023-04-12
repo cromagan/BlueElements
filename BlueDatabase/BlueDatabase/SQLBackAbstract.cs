@@ -161,6 +161,27 @@ public abstract class SqlBackAbstract {
         return ExecuteCommand(comm, false);
     }
 
+    public string BackupSysStyle(string pathadditionalcsv) {
+        if (string.IsNullOrEmpty(pathadditionalcsv)) { return "Kein Verzeichniss angebeben."; }
+
+        var d = DateTime.UtcNow.ToString(Constants.Format_Date10);
+
+        var file = pathadditionalcsv.CheckPath() + "SYS_STYLE_" + d + ".csv";
+        if (IO.FileExists(file)) { return "Datei existiert bereits"; }
+
+        try {
+            var dt = Fill_Table("SELECT * FROM " + SysStyle);
+            if (dt != null) {
+                dt.WriteToCsvFile(file);
+            }
+
+            var bvw = new BackupVerwalter(2, 20);
+            return bvw.CleanUpDirectory(pathadditionalcsv.CheckPath(), "SYS_STYLE_*.csv");
+        } catch {
+            return "Allgemeiner Fehler";
+        }
+    }
+
     public void ChangeDataType(string tablename, string column, int charlenght, bool allowSystemTableNames) {
         //https://stackoverflow.com/questions/10321775/changing-the-data-type-of-a-column-in-oracle
 
