@@ -41,6 +41,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     private bool _disposing;
     private FilterCollection? _filter = null;
     private List<RowItem>? _filteredRows;
+    private IControlSendRow? _getRowFrom = null;
     private RowItem? _row;
 
     #endregion
@@ -70,7 +71,20 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
     public DatabaseAbstract? FilterDefiniton { get; }
     public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, _filter, OutputDatabase);
-    public IControlSendRow? GetRowFrom { get; set; }
+
+    public IControlSendRow? GetRowFrom {
+        get => _getRowFrom;
+        set {
+            if (_getRowFrom == value) { return; }
+            if (_getRowFrom != null) {
+                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
+            }
+
+            _getRowFrom = value;
+            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
+        }
+    }
+
     public RowItem? LastInputRow { get; private set; }
 
     public DatabaseAbstract? OutputDatabase { get; }
@@ -193,6 +207,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
                 #endregion
 
+                Invalidate_FilteredRows();
+
                 //#region Zeile(n) ermitteln und Script löschen
 
                 //_filteredRows = FilteredRows
@@ -247,8 +263,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
         #region Zeilen erzeugen
 
-        if (_filteredRows != null) {
-            foreach (var thisR in _filteredRows) {
+        if (FilteredRows != null) {
+            foreach (var thisR in FilteredRows) {
                 if (cb?.Item?[thisR.Key.ToString()] == null) {
                     var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
                     _ = cb?.Item?.Add(tmpQuickInfo, thisR.Key.ToString());

@@ -144,7 +144,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             x += 1;
             if (x > 99999) { Develop.DebugPrint(FehlerArt.Fehler, "Unique ID konnte nicht erzeugt werden"); }
 
-            var unique = ("X" + DateTime.Now.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
+            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             var ok = true;
 
             foreach (var thisfile in DatabaseAbstract.AllFiles) {

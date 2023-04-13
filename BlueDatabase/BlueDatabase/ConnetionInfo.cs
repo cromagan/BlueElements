@@ -174,7 +174,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
 
     /// <summary>
     /// Eine Kennung, die von von DatabaseAbstract abgeleiten Klassen erkannt werden kann.
-    /// Enthänt nur eine Wert wie z.B. DatabaseSQL.
+    /// Enthält nur einen Wert wie z.B. DatabaseSQL.
     /// Um eine Datenbank wieder zu finden, muss uniqueID verwendet werden.
     /// </summary>
     public string DatabaseID { get; } = string.Empty;
@@ -197,7 +197,8 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
     /// Die Tabelle, um die es geht.
     /// </summary>
     public string TableName {
-        get => _tablename; set {
+        get => _tablename;
+        set {
             if (!SqlBackAbstract.IsValidTableName(value, false)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + value);
             }

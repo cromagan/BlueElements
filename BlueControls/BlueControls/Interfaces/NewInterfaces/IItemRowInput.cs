@@ -22,6 +22,9 @@ using System.Collections.Generic;
 
 namespace BlueControls.Interfaces;
 
+/// <summary>
+/// Das Steuerelement, das die Eingangszeile eine Formulars empfangen kann
+/// </summary>
 public interface IItemRowInput : IItemSendRow {
 }
 

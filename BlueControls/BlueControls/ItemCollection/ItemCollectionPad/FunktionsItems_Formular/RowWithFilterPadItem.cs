@@ -451,7 +451,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
     }
 
     private DatabaseAbstract GenerateFilterDatabase() {
-        Database x = new(false, "Filterdatabase_" + KeyName, DatabaseAbstract.Administrator);
+        Database x = new(false, DatabaseAbstract.UniqueKeyValue(), DatabaseAbstract.Administrator);
         x.DropMessages = false;
 
         var sp = x.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.TextOptions);

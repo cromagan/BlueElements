@@ -68,7 +68,11 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         _sql = sql.OtherTable(tablename);
 
-        _tablename = tablename;
+        _tablename = SqlBackAbstract.MakeValidTableName(tablename);
+
+        if (!SqlBackAbstract.IsValidTableName(tablename, false)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+        }
 
         Initialize();
         LoadFromSqlBack();

@@ -32,12 +32,27 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
 
     private readonly List<IControlAcceptSomething> _childs = new();
 
+    private IControlSendRow? _getRowFrom = null;
+
     #endregion
 
     #region Properties
 
     public FilterItem Filter { get; }
-    public IControlSendRow? GetRowFrom { get; set; }
+
+    public IControlSendRow? GetRowFrom {
+        get => _getRowFrom;
+        set {
+            if (_getRowFrom == value) { return; }
+            if (_getRowFrom != null) {
+                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
+            }
+
+            _getRowFrom = value;
+            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
+        }
+    }
+
     public RowItem? LastInputRow { get; private set; }
     public DatabaseAbstract? OutputDatabase { get; }
 

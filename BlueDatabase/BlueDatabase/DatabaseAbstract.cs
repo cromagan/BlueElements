@@ -610,6 +610,27 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return null;
     }
 
+    public static string UniqueKeyValue() {
+        var x = 9999;
+        do {
+            x += 1;
+            if (x > 99999) { Develop.DebugPrint(FehlerArt.Fehler, "Unique ID konnte nicht erzeugt werden"); }
+
+            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + " _.");
+            var ok = true;
+
+            if (SqlBackAbstract.IsValidTableName(unique, false)) {
+                foreach (var thisfile in DatabaseAbstract.AllFiles) {
+                    if (string.Equals(unique, thisfile.TableName)) { ok = false; break; }
+                }
+            } else {
+                ok = false;
+            }
+
+            if (ok) { return unique; }
+        } while (true);
+    }
+
     /// <summary>
     /// Der komplette Pfad mit abschlieﬂenden \
     /// </summary>

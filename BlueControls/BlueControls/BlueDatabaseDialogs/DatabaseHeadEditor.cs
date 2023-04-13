@@ -241,7 +241,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
     }
 
     private void GenerateUndoTabelle() {
-        Database x = new(false, "Undo " + Database.ConnectionData.TableName, string.Empty);
+        Database x = new(false, DatabaseAbstract.UniqueKeyValue(), string.Empty);
         _ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
         _ = x.Column.GenerateAndAdd("db", "Herkunft", ColumnFormatHolder.Text);

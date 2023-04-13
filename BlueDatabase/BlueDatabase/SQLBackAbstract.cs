@@ -250,7 +250,7 @@ public abstract class SqlBackAbstract {
     }
 
     /// <summary>
-    /// Gibt die Spaltenname in Grosschreibung zurück
+    /// Gibt die Spaltennamen in Grosschreibung zurück
     /// </summary>
     /// <returns></returns>
     public abstract List<string>? GetColumnNames(string tablename);

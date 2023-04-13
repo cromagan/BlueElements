@@ -46,6 +46,7 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
     #region Fields
 
     private string _columnName = string.Empty;
+    private IControlSendRow? _getRowFrom = null;
     private long _rowKey = -1;
     private ColumnItem? _tmpColumn;
     private RowItem? _tmpRow;
@@ -101,7 +102,19 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DatabaseAbstract? Database { get; private set; }
 
-    public IControlSendRow? GetRowFrom { get; set; }
+    public IControlSendRow? GetRowFrom {
+        get => _getRowFrom;
+        set {
+            if (_getRowFrom == value) { return; }
+            if (_getRowFrom != null) {
+                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
+            }
+
+            _getRowFrom = value;
+            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
+        }
+    }
+
     public RowItem? LastInputRow { get; private set; }
 
     #endregion

@@ -20,6 +20,7 @@
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
@@ -27,6 +28,12 @@ using BlueDatabase;
 namespace BlueControls.Controls;
 
 public class TabControl : AbstractTabControl, IControlAcceptRow {
+
+    #region Fields
+
+    private IControlSendRow? _getRowFrom = null;
+
+    #endregion
 
     #region Constructors
 
@@ -47,7 +54,19 @@ public class TabControl : AbstractTabControl, IControlAcceptRow {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DatabaseAbstract? Database { get; private set; }
 
-    public IControlSendRow? GetRowFrom { get; set; }
+    public IControlSendRow? GetRowFrom {
+        get => _getRowFrom;
+        set {
+            if (_getRowFrom == value) { return; }
+            if (_getRowFrom != null) {
+                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
+            }
+
+            _getRowFrom = value;
+            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
+        }
+    }
+
     public RowItem? LastInputRow { get; private set; }
 
     [DefaultValue(-1)]

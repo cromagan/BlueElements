@@ -32,6 +32,8 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
 
     private readonly List<IControlAcceptSomething> _childs = new();
 
+    private IControlSendRow? _getRowFrom = null;
+
     #endregion
 
     #region Constructors
@@ -44,7 +46,18 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
 
     #region Properties
 
-    public IControlSendRow? GetRowFrom { get; set; }
+    public IControlSendRow? GetRowFrom {
+        get => _getRowFrom;
+        set {
+            if (_getRowFrom == value) { return; }
+            if (_getRowFrom != null) {
+                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
+            }
+
+            _getRowFrom = value;
+            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
+        }
+    }
 
     public RowItem? LastInputRow { get; private set; }
     public DatabaseAbstract? OutputDatabase { get; }
@@ -60,11 +73,11 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
     }
 
     public void SetData(DatabaseAbstract? database, long? rowkey) {
-
-        if(OutputDatabase== null) { return; }
+        //if(OutputDatabase== null) { return; }
 
         if (OutputDatabase != database) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
+            return;
+            //            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
         }
 
         var r = database?.Row.SearchByKey(rowkey);

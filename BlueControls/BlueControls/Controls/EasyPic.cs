@@ -46,6 +46,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     private Bitmap? _bitmap;
     private string _filename = string.Empty;
+    private IControlSendRow? _getRowFrom = null;
     private string _originalText = string.Empty;
     private int _panelMoveDirection;
 
@@ -89,7 +90,19 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    public IControlSendRow? GetRowFrom { get; set; }
+    public IControlSendRow? GetRowFrom {
+        get => _getRowFrom;
+        set {
+            if (_getRowFrom == value) { return; }
+            if (_getRowFrom != null) {
+                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
+            }
+
+            _getRowFrom = value;
+            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
+        }
+    }
+
     public RowItem? LastInputRow { get; private set; }
 
     public string OriginalText {

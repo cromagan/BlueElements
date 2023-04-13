@@ -40,6 +40,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
     #region Fields
 
     private bool _generated;
+    private IControlSendRow? _getRowFrom = null;
     private string _pageToShow = "Head";
     private RowItem? _tmpShowingRow;
 
@@ -71,7 +72,19 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DatabaseAbstract? Database { get; private set; }
 
-    public IControlSendRow? GetRowFrom { get; set; }
+    public IControlSendRow? GetRowFrom {
+        get => _getRowFrom;
+        set {
+            if (_getRowFrom == value) { return; }
+            if (_getRowFrom != null) {
+                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
+            }
+
+            _getRowFrom = value;
+            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
+        }
+    }
+
     public RowItem? LastInputRow { get; private set; }
 
     [DefaultValue("Head")]
@@ -296,9 +309,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         if (CFormula == null || CFormula.PadData == null) { return; }
 
         foreach (var thisIt in CFormula.PadData) {
-            if (thisIt is IItemToControl ripi && ripi.IsVisibleOnPage(Page)) {
+            if (thisIt is IItemRowInput ripi && ripi.IsVisibleOnPage(Page)) {
                 var c = SearchOrGenerate(ripi);
-                if (c is IControlAcceptRow fcfc) {
+                if (c is IControlRowInput fcfc) {
                     fcfc.SetData(Database, RowKey);
                 }
             }

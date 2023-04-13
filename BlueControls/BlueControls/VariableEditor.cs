@@ -125,7 +125,7 @@ public partial class VariableEditor : UserControl {
     }
 
     private void GenerateVariableTable() {
-        Database x = new(false, "Script_Variablen", DatabaseAbstract.Administrator);
+        Database x = new(false, DatabaseAbstract.UniqueKeyValue(), DatabaseAbstract.Administrator);
         x.DropMessages = false;
         var na = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         _ = x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
