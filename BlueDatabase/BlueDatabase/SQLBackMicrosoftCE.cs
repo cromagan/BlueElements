@@ -160,10 +160,10 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
 
     public override string VarChar(int lenght) => "VARCHAR(" + lenght + ")";
 
-    protected override List<string> AllTables() {
+    protected override List<string>? AllTables() {
         List<string> tables = new();
 
-        _ = OpenConnection();
+        if (Connection == null || !OpenConnection()) { return null; }
 
         var dt = Connection.GetSchema("Tables");
         foreach (DataRow row in dt.Rows) {
@@ -220,12 +220,8 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
             return "Tabellenname ungültig:" + tablename;
         }
 
-
-
         return ExecuteCommand("DROP TABLE IF EXISTS " + tablename, false);
     }
-
-
 
     #endregion
 }

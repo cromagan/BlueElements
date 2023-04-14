@@ -70,7 +70,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         _tablename = SqlBackAbstract.MakeValidTableName(tablename);
 
-        if (!SqlBackAbstract.IsValidTableName(tablename, false)) {
+        if (!SqlBackAbstract.IsValidTableName(_tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
         }
 
@@ -108,7 +108,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (sql == null) { return null; }
 
         var at = sql.Tables();
-        if (!at.Contains(ci.TableName)) { return null; }
+        if (at == null || !at.Contains(ci.TableName)) { return null; }
         return new DatabaseSqlLite(ci, userGroup);
     }
 
@@ -122,8 +122,12 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
 
         var tb = _sql?.Tables();
-
         var l = new List<ConnectionInfo>();
+
+        if (tb == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Verbindung zur Datenbank gescheitert.");
+            return l;
+        }
 
         if (tb != null)
             foreach (var thistb in tb) {

@@ -515,6 +515,10 @@ public abstract class SqlBackAbstract {
         }
 
         var x = AllTables();
+        if (x == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Verbindung zur Datenbank gescheitert.");
+            return;
+        }
 
         #region Main
 
@@ -531,9 +535,9 @@ public abstract class SqlBackAbstract {
 
         if (!x.Contains(SysStyle)) {
             _ = CreateTable(SysStyle, new List<string> { "TABLENAME", "COLUMNNAME", "TYPE", "PART" }, true);
-            ChangeDataType(tablename.ToUpper(), "COLUMNNAME", 128, true);
-            ChangeDataType(tablename.ToUpper(), "TABLENAME", 128, true);
-            ChangeDataType(tablename.ToUpper(), "PART", 3, true);
+            ChangeDataType(SysStyle, "COLUMNNAME", 128, true);
+            ChangeDataType(SysStyle, "TABLENAME", 128, true);
+            ChangeDataType(SysStyle, "PART", 3, true);
         }
 
         var colStyle = GetColumnNames(SysStyle);
@@ -541,7 +545,7 @@ public abstract class SqlBackAbstract {
 
         if (!colStyle.Contains("VALUE")) {
             AddColumn(SysStyle, "VALUE", VarChar4000, true, true);
-            ChangeDataType(tablename.ToUpper(), "VALUE", 255, true);
+            ChangeDataType(SysStyle, "VALUE", 255, true);
         }
 
         #endregion
@@ -733,8 +737,10 @@ public abstract class SqlBackAbstract {
     /// Gibt alle verfügbaren Tabellen - außer die Systemtabellen - zurück
     /// </summary>
     /// <returns></returns>
-    public List<string> Tables() {
+    public List<string>? Tables() {
         var l = AllTables();
+
+        if (l == null) { return null; }
 
         //_ = l.Remove(SysStyle);
         //_ = l.Remove(SysUndo);
@@ -931,7 +937,7 @@ public abstract class SqlBackAbstract {
     /// Gibt alle verfügbaren Tabellen - einschließlich der Systemtabellen - zurück
     /// </summary>
     /// <returns></returns>
-    protected abstract List<string> AllTables();
+    protected abstract List<string>? AllTables();
 
     protected abstract string CreateTable(string tablename, bool allowSystemTableNames);
 
@@ -947,9 +953,19 @@ public abstract class SqlBackAbstract {
 
         try {
             var tbl = Tables();
+            if (tbl == null) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Verbindung zur Datenbank gescheitert.");
+                return;
+            }
+
             tbl.Add(SysStyle);
 
             var alltb = AllTables();
+
+            if (alltb == null) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Verbindung zur Datenbank gescheitert.");
+                return;
+            }
 
             #region Kopie des aktuellen Standes erstellen
 

@@ -60,7 +60,7 @@ public sealed class Database : DatabaseAbstract {
 
         _tablename = SqlBackAbstract.MakeValidTableName(tablename);
 
-        if (!SqlBackAbstract.IsValidTableName(tablename, false)) {
+        if (!SqlBackAbstract.IsValidTableName(_tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
         }
 

@@ -1006,7 +1006,11 @@ public partial class TableView : FormWithStatusBar {
         string m;
 
         if (sc.NeedRow) {
-            m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
+            if (MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
+                m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
+            } else {
+                m = "Durch Benutzer abgebrochen";
+            }
         } else {
             //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
             var s = Table.Database.ExecuteScript(sc, sc.ChangeValues, null);
@@ -1272,8 +1276,8 @@ public partial class TableView : FormWithStatusBar {
 
         var ci = (ConnectionInfo)s[0];
 
-
         #region Status-Meldung updaten?
+
         var maybeok = false;
         foreach (var thisdb in DatabaseAbstract.AllFiles) {
             if (thisdb.TableName.Equals(ci.TableName, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
@@ -1282,8 +1286,8 @@ public partial class TableView : FormWithStatusBar {
         if (!maybeok) {
             FormWithStatusBar.UpdateStatusBar(FehlerArt.Info, "Lade Datenbank " + ci.TableName, true);
         }
-        #endregion
 
+        #endregion
 
         var db = DatabaseAbstract.GetById(ci, Table.Database_NeedPassword, DefaultUserGroup);
 
