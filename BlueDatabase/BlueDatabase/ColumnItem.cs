@@ -1075,6 +1075,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         //if (Format == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return 15; }
         var m = 0;
 
+        Database.RefreshColumnsData(this);
+
         foreach (var thisRow in Database.Row) {
             var t = thisRow.CellGetString(this);
             m = Math.Max(m, t.StringtoUtf8().Length);

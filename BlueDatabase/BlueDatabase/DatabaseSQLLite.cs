@@ -240,6 +240,12 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     internal void GetColumnAttributesColumn(ColumnItem column, SqlBackAbstract sql) {
         var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), column.Name);
+
+        if (l == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
+            return;
+        }
+
         if (l != null && l.Count > 0) {
             foreach (var thisstyle in l) {
                 _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
@@ -264,9 +270,13 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return base.SetValueInternal(type, value, columnName, rowkey, isLoading);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) =>
-        //var ck = Column.Exists(columnName)?.Key ?? -1;
-        _ = _sql?.AddUndo(tableName, comand, columnName, rowKey, previousValue, changedTo, UserName, comment);
+    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
+        var err = _sql?.AddUndo(tableName, comand, columnName, rowKey, previousValue, changedTo, UserName, comment);
+        if (!string.IsNullOrEmpty(err)) {
+            Develop.CheckStackForOverflow();
+            AddUndo(tableName, comand, columnName, rowKey, previousValue, changedTo, userName, comment);
+        }
+    }
 
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
@@ -507,6 +517,12 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             #region Datenbank Eigenschaften laden
 
             var l = _sql?.GetStyleDataAll(TableName, "~DATABASE~");
+
+            if (l == null) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
+                return;
+            }
+
             if (l != null && l.Count > 0) {
                 foreach (var thisstyle in l) {
                     _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);

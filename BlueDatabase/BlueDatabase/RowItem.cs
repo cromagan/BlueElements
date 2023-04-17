@@ -205,7 +205,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return vars;
     }
 
-    public string CellFirstString() => Database?.Cell.GetString(Database.Column.First, this) ?? string.Empty;
+    public string CellFirstString() {
+        var fc = Database?.Column.First;
+        if (fc == null) { return string.Empty; }
+
+        return CellGetString(fc);
+    }
 
     public bool CellGetBoolean(string columnName) => Database?.Cell.GetBoolean(Database?.Column[columnName], this) ?? default;
 

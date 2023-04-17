@@ -253,11 +253,6 @@ public sealed class Database : DatabaseAbstract {
 
         ColumnItem? column = null;
         RowItem? row = null;
-
-        //long colKey = -1;
-        //long rowKey = -1;
-        //string columname = string.Empty;
-
         var columnUsed = new List<ColumnItem>();
 
         works?.Clear();
@@ -266,7 +261,7 @@ public sealed class Database : DatabaseAbstract {
             if (pointer >= data.Length) { break; }
 
             Parse(data, ref pointer, out var art, out var rowKey, out var inhalt, out var columname);
-            //Console.WriteLine(art);
+
             if (!art.IsObsolete()) {
 
                 #region Zeile suchen oder erstellen
@@ -935,92 +930,4 @@ public sealed class Database : DatabaseAbstract {
     }
 
     #endregion
-
-    //private void ChangeWorkItems(ItemState oldState, ItemState newState) {
-    //    foreach (var thisWork in Works) {
-    //        if (thisWork != null) {
-    //            if (thisWork.State == oldState) { thisWork.State = newState; }
-    //        }
-    //    }
-    //}
-
-    //private void ExecutePending() {
-    //    if (!_muf.IsLoading) { Develop.DebugPrint(FehlerArt.Fehler, "Nur während des Parsens möglich"); }
-
-    //    var e2 = new MultiUserFileHasPendingChangesEventArgs();
-    //    HasPendingChanges(null, e2);
-
-    //    if (!e2.HasPendingChanges) { return; }
-    //    // Erst die Neuen Zeilen / Spalten alle neutralisieren
-    //    //var dummy = -1000;
-    //    //foreach (var ThisPending in Works) {
-    //    //    if (ThisPending.State == enItemState.Pending) {
-    //    //        //if (ThisPending.Comand == enDatabaseDataType.dummyComand_AddRow) {
-    //    //        //    dummy--;
-    //    //        //    ChangeRowKeyInPending(ThisPending.RowKey, dummy);
-    //    //        //}
-    //    //        //if (ThisPending.Comand == enDatabaseDataType.AddColumnKeyInfo) {
-    //    //        //    dummy--;
-    //    //        //    ChangeColumnKeyInPending(ThisPending.ColKey, dummy);
-    //    //        //}
-    //    //    }
-    //    //}
-    //    //// Dann den neuen Zeilen / Spalten Tatsächlich eine neue ID zuweisen
-    //    //foreach (var ThisPending in Works) {
-    //    //    if (ThisPending.State == enItemState.Pending) {
-    //    //        switch (ThisPending.Comand) {
-    //    //            //case enDatabaseDataType.dummyComand_AddRow when _JoinTyp == enJoinTyp.Intelligent_zusammenfassen: {
-    //    //            //        var Value = SearchKeyValueInPendingsOf(ThisPending.RowKey);
-    //    //            //        var fRow = Row[Value];
-    //    //            //        if (!string.IsNullOrEmpty(Value) && fRow != null) {
-    //    //            //            ChangeRowKeyInPending(ThisPending.RowKey, fRow.Key);
-    //    //            //        } else {
-    //    //            //            ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
-    //    //            //        }
-    //    //            //        break;
-    //    //            //    }
-    //    //            //case enDatabaseDataType.dummyComand_AddRow:
-    //    //            //    ChangeRowKeyInPending(ThisPending.RowKey, Row.NextRowKey());
-    //    //            //    break;
-
-    //    //            //case enDatabaseDataType.AddColumnKeyInfo:
-    //    //            //    ChangeColumnKeyInPending(ThisPending.ColKey, Column.NextColumnKey);
-    //    //            //    break;
-    //    //        }
-    //    //    }
-    //    //}
-    //    // Und nun alles ausführen!
-    //    foreach (var thisPending in Works.Where(thisPending => thisPending.State == ItemState.Pending)) {
-    //        if (thisPending.Comand == DatabaseDataType.ColumnName) {
-    //            thisPending.ChangedTo = Column.Freename(thisPending.ChangedTo);
-    //        }
-    //        ExecutePending(thisPending);
-    //    }
-    //}
-
-    //private void ExecutePending(WorkItem thisPendingItem) {
-    //    if (thisPendingItem.State == ItemState.Pending) {
-    //        //RowItem? row = null;
-    //        //if (thisPendingItem.RowKey > -1) {
-    //        //    row = Row.SearchByKey(thisPendingItem.RowKey);
-    //        //    if (row == null) {
-    //        //        if (thisPendingItem.Comand != DatabaseDataType.Comand_AddRow && thisPendingItem.User != UserName) {
-    //        //            Develop.DebugPrint("Pending verworfen, Zeile gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString(false));
-    //        //            return;
-    //        //        }
-    //        //    }
-    //        //}
-    //        //ColumnItem? col = null;
-    //        //if (thisPendingItem.ColKey > -1) {
-    //        //    col = Column.SearchByKey(thisPendingItem.ColKey);
-    //        //    if (col == null) {
-    //        //        //if (thisPendingItem.Comand != DatabaseDataType.AddColumnKeyInfo && thisPendingItem.User != UserName) {
-    //        //        Develop.DebugPrint("Pending verworfen, Spalte gelöscht.<br>" + ConnectionData.TableName + "<br>" + thisPendingItem.ToString(false));
-    //        //        return;
-    //        //        //}
-    //        //    }
-    //        //}
-    //        SetValueInternal(thisPendingItem.Comand, thisPendingItem.ChangedTo, thisPendingItem.ColKey, thisPendingItem.RowKey, 0, 0, true);
-    //    }
-    //}
 }

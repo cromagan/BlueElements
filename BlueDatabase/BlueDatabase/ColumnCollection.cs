@@ -93,7 +93,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 return null;
             }
 
-            return Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.Name.StartsWith("SYS_"))?.Column;
+            var l = Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.Name.StartsWith("SYS_"))?.Column;
+            if (l != null) { return l; }
+
+            return Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null)?.Column;
         }
     }
 

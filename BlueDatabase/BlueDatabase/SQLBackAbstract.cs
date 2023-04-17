@@ -137,7 +137,7 @@ public abstract class SqlBackAbstract {
     }
 
     public string AddUndo(string tablename, DatabaseDataType comand, string? columname, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
-        if (!OpenConnection() || Connection == null) { return "Verbindung fehlgeschlagen"; }
+        if (!OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
         //var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
         var rk = rowKey is not null and > -1 ? rowKey.ToString() : string.Empty;
@@ -229,7 +229,7 @@ public abstract class SqlBackAbstract {
     public DataTable? Fill_Table(string commandtext) {
         PauseSystem();
 
-        if (!OpenConnection() || Connection == null) { return null; }
+        if (Connection == null || !OpenConnection()) { return null; }
 
         try {
             lock (_fill) {
@@ -298,11 +298,11 @@ public abstract class SqlBackAbstract {
     /// <param name="tablename"></param>
     /// <param name="columnName"></param>
     /// <returns></returns>
-    public Dictionary<string, string> GetStyleDataAll(string tablename, string columnName) {
+    public Dictionary<string, string>? GetStyleDataAll(string tablename, string columnName) {
         try {
             var l = new Dictionary<string, string>();
 
-            if (!OpenConnection() || Connection == null) { return l; }
+            if (!OpenConnection()) { return null; }
 
             using var q = Connection.CreateCommand();
 
@@ -389,7 +389,7 @@ public abstract class SqlBackAbstract {
             var db = row[0]?.Database;
             if (db == null || db.IsDisposed) { return "Datenbank verworfen"; }
 
-            if (!OpenConnection() || Connection == null) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
+            if (!OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
             //lock (_getRow) {
             var com = new StringBuilder();
@@ -423,7 +423,7 @@ public abstract class SqlBackAbstract {
                 }
             }
 
-            if (!OpenConnection() || Connection == null) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
+            if (!OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
             var dt = Fill_Table(com.ToString());
 
@@ -657,6 +657,10 @@ public abstract class SqlBackAbstract {
     /// <param name="rowkey"></param>
     /// <returns></returns>
     public string SetValueInternal(string tablename, DatabaseDataType type, string value, string? columname, long? rowkey) {
+        if (!IsValidTableName(tablename, false)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+            return "Tabellenname ungültig: " + tablename;
+        }
 
         #region Ignorieren
 
@@ -716,7 +720,7 @@ public abstract class SqlBackAbstract {
                     return RemoveColumn(tablename, columname, false);
 
                 case DatabaseDataType.Comand_RemoveRow:
-                    return RemoveRow(tablename, LongParse(value));
+                    return RemoveRow(tablename, LongParse(value), false);
 
                 case DatabaseDataType.Comand_AddRow:
                     return AddRow(tablename, LongParse(value));
@@ -1011,7 +1015,7 @@ public abstract class SqlBackAbstract {
     //internal string? GetLastColumnName(string tablename, long key) {
     //    if (!OpenConnection()) { return null; }
     protected string ExecuteCommand(string commandtext, bool abort) {
-        if (!OpenConnection() || Connection == null) { return "Verbindung konnte nicht geöffnet werden"; }
+        if (Connection == null || !OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
         using var command = Connection.CreateCommand();
         command.CommandText = commandtext;
@@ -1075,7 +1079,7 @@ public abstract class SqlBackAbstract {
     }
 
     private string ExecuteCommand(IDbCommand command, bool abort) {
-        if (!OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
+        if (Connection == null || !OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
 
         try {
             _ = command.ExecuteNonQuery();
@@ -1164,8 +1168,13 @@ public abstract class SqlBackAbstract {
         return string.Empty;
     }
 
-    private string RemoveRow(string tablename, long key) {
-        var b = ExecuteCommand("DELETE FROM  " + tablename.ToUpper() + " WHERE RK = " + Dbval(key.ToString()), true);
+    private string RemoveRow(string tablename, long key, bool allowSystemTableNames) {
+        if (!IsValidTableName(tablename, allowSystemTableNames)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+            return "Tabellenname ungültig: " + tablename;
+        }
+
+        var b = ExecuteCommand("DELETE FROM " + tablename.ToUpper() + " WHERE RK = " + Dbval(key.ToString()), true);
         if (!string.IsNullOrEmpty(b)) { return "Löschen fehgeschlagen: " + b; }
         return string.Empty;
     }

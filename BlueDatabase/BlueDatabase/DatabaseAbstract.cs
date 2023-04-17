@@ -1712,15 +1712,28 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                     if (c == null) { return string.Empty; }
                     return Column.SetValueInternal(type, isLoading, c.Name);
 
-                //case DatabaseDataType.Comand_AddColumnByKey:
-                //    return Column.SetValueInternal(type, LongParse(value), isLoading, string.Empty);
-
                 case DatabaseDataType.Comand_AddColumnByName:
-                    return Column.SetValueInternal(type, isLoading, value);
+                    var f2 = Column.SetValueInternal(type, isLoading, value);
 
-                case DatabaseDataType.Comand_AddRow:
+                    if (!isLoading) {
+                        var thisColumn = Column.Exists(value);
+                        if (thisColumn != null) { thisColumn.IsInCache = DateTime.UtcNow; }
+                    }
+
+                    return f2;
+
                 case DatabaseDataType.Comand_RemoveRow:
                     return Row.SetValueInternal(type, rowkey, isLoading);
+
+                case DatabaseDataType.Comand_AddRow:
+                    var f1 = Row.SetValueInternal(type, rowkey, isLoading);
+
+                    if (!isLoading) {
+                        var thisRow = Row.SearchByKey(rowkey);
+                        if (thisRow != null) { thisRow.IsInCache = DateTime.UtcNow; }
+                    }
+
+                    return f1;
 
                 default:
                     if (LoadedVersion == DatabaseVersion) {
