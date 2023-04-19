@@ -367,6 +367,11 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
     }
 
     private void Database_CellValueChanged(object sender, CellEventArgs e) {
+        if (InvokeRequired) {
+            _ = Invoke(new Action(() => Database_CellValueChanged(sender, e)));
+            return;
+        }
+
         var (column, row) = GetTmpVariables();
 
         if (e.Row != row) { return; }

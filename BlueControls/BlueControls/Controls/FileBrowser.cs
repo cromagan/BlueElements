@@ -651,7 +651,10 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
         ÖffnePfad(txbPfad.Text);
     }
 
-    private void Watcher_Changed(object sender, FileSystemEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
+    private void Watcher_Changed(object sender, FileSystemEventArgs e) {
+        if (e.Name.Equals("Thumbs.db", StringComparison.OrdinalIgnoreCase)) { return; }
+        txbPfad_Enter(null, System.EventArgs.Empty);
+    }
 
     private void Watcher_Created(object sender, FileSystemEventArgs e) => txbPfad_Enter(null, System.EventArgs.Empty);
 

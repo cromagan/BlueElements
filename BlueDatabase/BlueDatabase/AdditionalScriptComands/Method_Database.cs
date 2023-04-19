@@ -39,6 +39,9 @@ public abstract class Method_Database : Method {
     protected ColumnItem? Column(List<Variable>? variables, string name) => MyDatabase(variables)?.Column.Exists(name);
 
     protected DatabaseAbstract? DatabaseOf(List<Variable>? variables, string tableName) {
+
+        if (!SqlBackAbstract.IsValidTableName(tableName, false)) { return null; }
+
         if (variables != null) {
             var db = MyDatabase(variables)?.ConnectionDataOfOtherTable(tableName, false);
             return DatabaseAbstract.GetById(db, null, string.Empty);
