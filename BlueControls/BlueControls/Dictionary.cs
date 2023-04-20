@@ -47,24 +47,34 @@ internal static class Dictionary {
         return _dictWords != null;
     }
 
+    /// <summary>
+    /// Ist das Dictionary nicht geladen, wird True zurück gegeben
+    /// </summary>
+    /// <param name="word"></param>
+    /// <returns></returns>
     public static bool IsWordOk(string word) {
-        if (!DictionaryRunning(false)) { return true; }
+        if (!DictionaryRunning(false) || _dictWords?.Column.First is not ColumnItem fc) { return true; }
         if (string.IsNullOrEmpty(word)) { return true; }
         if (word.Length == 1) { return true; }
         if (word.IsNumeral()) { return true; }
         if (Constants.Char_Numerals.Contains(word.Substring(0, 1))) { return true; }// z.B. 00 oder 1b oder 2L
-        if (word != word.ToLower() && word != word.ToUpper() && word != word.Substring(0, 1).ToUpper() + word.Substring(1).ToLower()) { return false; }
+
+        if (word != word.ToLower() &&
+            word != word.ToUpper() &&
+            word != word.ToTitleCase()) { return false; }
+
         if (word == word.ToLower()) {
-            // Wenn ein Wort klein geschrieben ist, mu0ß auch das kleingeschriebene in der Datenbank sein!
-            return _dictWords.Row[new FilterItem(_dictWords.Column.First, FilterType.Istgleich, word)] != null;
+            // Wenn ein Wort klein geschrieben ist, muss auch das kleingeschriebene in der Datenbank sein!
+            return _dictWords.Row[new FilterItem(fc, FilterType.Istgleich, word)] != null;
         }
+
         return _dictWords.Row[word] != null;
     }
 
     public static bool IsWriteable() => _dictWords is Database db && !string.IsNullOrEmpty(db.Filename);
 
     public static List<string>? SimilarTo(string word) {
-        if (IsWordOk(word)) { return null; }
+        if (IsWordOk(word) || _dictWords == null) { return null; }
         List<string> l = new();
         foreach (var thisRowItem in _dictWords.Row) {
             if (thisRowItem != null) {
@@ -132,6 +142,7 @@ internal static class Dictionary {
     }
 
     public static void WordAdd(string wort) {
+        if (_dictWords == null) { return; }
         if (_dictWords.Row[wort] != null) { _ = _dictWords.Row.Remove(_dictWords.Row[wort], "Remove Dictionary word for Upadte"); }
         _ = _dictWords.Row.GenerateAndAdd(wort, "Add Word (after deleting)");
     }

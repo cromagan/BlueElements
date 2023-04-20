@@ -427,7 +427,7 @@ public abstract class SqlBackAbstract {
 
             var dt = Fill_Table(com.ToString());
 
-            if (dt == null) { return "Keine gültige Rückgabe erhalten"; }
+            if (dt == null) { return "Keine gültige Rückgabe erhalten: \r\n" + com.ToString(); }
 
             foreach (var thisRow in dt.Rows) {
                 var reader = (DataRow)thisRow;

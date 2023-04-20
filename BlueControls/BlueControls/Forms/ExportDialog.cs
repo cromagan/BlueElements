@@ -100,8 +100,10 @@ public sealed partial class ExportDialog : IHasDatabase {
         }
         if (!addDiskLayouts) { return; }
         List<string> path = new();
-        if (database != null && !database.IsDisposed) { path.Add(database.DefaultLayoutPath()); }
-        if (!string.IsNullOrEmpty(database?.AdditionalFilesPfadWhole())) { path.Add(database.AdditionalFilesPfadWhole()); }
+        if (database != null && !database.IsDisposed) {
+            path.Add(database.DefaultLayoutPath());
+            if (!string.IsNullOrEmpty(database.AdditionalFilesPfadWhole())) { path.Add(database.AdditionalFilesPfadWhole()); }
+        }
         foreach (var thisP in path) {
             if (DirectoryExists(thisP)) {
                 var e = Directory.GetFiles(thisP);

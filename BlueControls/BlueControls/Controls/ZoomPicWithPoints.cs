@@ -47,7 +47,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
-    private readonly List<PointM?> _points = new();
+    private readonly List<PointM> _points = new();
     private Helpers _helper = Helpers.Ohne;
     private Orientation _mittelLinie = Orientation.Ohne;
     private bool _pointAdding;

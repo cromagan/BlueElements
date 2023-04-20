@@ -28,24 +28,24 @@ public abstract class FixedRectanglePadItem : BasicPadItem {
 
     protected Size Size = Size.Empty;
 
-    private readonly PointM? _pl;
+    private readonly PointM _pl;
 
     /// <summary>
     /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
     /// </summary>
-    private readonly PointM? _pLo;
+    private readonly PointM _pLo;
 
-    private readonly PointM? _pLu;
+    private readonly PointM _pLu;
 
-    private readonly PointM? _po;
+    private readonly PointM _po;
 
-    private readonly PointM? _pr;
+    private readonly PointM _pr;
 
-    private readonly PointM? _pRo;
+    private readonly PointM _pRo;
 
-    private readonly PointM? _pRu;
+    private readonly PointM _pRu;
 
-    private readonly PointM? _pu;
+    private readonly PointM _pu;
 
     #endregion
 

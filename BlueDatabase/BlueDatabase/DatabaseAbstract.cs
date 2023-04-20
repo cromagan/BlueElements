@@ -1078,6 +1078,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                         break;
                     }
                 }
+                if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, string.Empty); }
             }
 
             if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Kein Skriptname angekommen", false, "Allgemein"); }

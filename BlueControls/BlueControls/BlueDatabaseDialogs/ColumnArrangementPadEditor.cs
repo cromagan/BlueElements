@@ -338,8 +338,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
                 #region Code für Ansicht 0
 
-                var col = thisColumnViewCollection[thisColumnViewCollection.Count - 1].Column;
-                if (!col.IsSystemColumn() &&
+                var col = thisColumnViewCollection[thisColumnViewCollection.Count - 1]?.Column;
+                if (col != null && !col.IsSystemColumn() &&
                     MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
                         "Ja", "Nein") == 0) {
                     Database.Column.Remove(col, "Benutzer löscht im ColArrangement Editor");
@@ -408,7 +408,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void ShowOrder() {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (Pad?.Item == null) { return; }
 
         if (Generating || Fixing > 0) { Develop.DebugPrint("Generating falsch!"); }
@@ -425,8 +425,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         var x = 0f;
         foreach (var thisc in ca) {
-            if (thisc?.Column != null) {
-                var it = new ColumnPadItem(thisc?.Column);
+            if (thisc?.Column is ColumnItem c) {
+                var it = new ColumnPadItem(c);
                 Pad.Item.Add(it);
                 it.SetLeftTopPoint(x, 0);
                 x = it.UsedArea.Right;
@@ -441,7 +441,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         #region Im zweiten Durchlauf ermitteln, welche Verknüpfungen es gibt
 
         var dbColumnCombi = new List<string>();
-        foreach (var thisc in Database?.Column) {
+        foreach (var thisc in db.Column) {
             if (thisc.LinkedDatabase != null) {
                 var dbN = thisc.LinkedDatabase.ConnectionData.TableName + "|" + thisc.LinkedCellFilter.JoinWithCr();
                 _ = dbColumnCombi.AddIfNotExists(dbN);
@@ -453,42 +453,44 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var kx = 0f;
         foreach (var thisCombi in dbColumnCombi) {
             foreach (var thisc in ca) {
-                var it = Pad.Item[thisc?.Column?.Database?.TableName + "|" + thisc?.Column?.Name] as ColumnPadItem;
+                if (thisc?.Column is ColumnItem c) {
+                    var it = Pad.Item[c.Database?.TableName + "|" + c.Name] as ColumnPadItem;
 
-                if (thisc?.Column?.LinkedDatabase != null) {
-                    // String als Namen als eindeutige Kennung
-                    var toCheckCombi = thisc.Column.LinkedDatabase.ConnectionData.TableName + "|" + thisc.Column.LinkedCellFilter.JoinWithCr();
+                    if (c.LinkedDatabase != null) {
+                        // String als Namen als eindeutige Kennung
+                        var toCheckCombi = c.LinkedDatabase.ConnectionData.TableName + "|" + c.LinkedCellFilter.JoinWithCr();
 
-                    if (toCheckCombi == thisCombi) {
-                        if (Pad.Item[toCheckCombi] is not GenericPadItem databItem) {
-                            var nam = thisc.Column.LinkedDatabase.ConnectionData.TableName;
-                            databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
-                            Pad.Item.Add(databItem);
-                            databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width), 600);
-                            kx = databItem.UsedArea.Right;
-                        }
+                        if (toCheckCombi == thisCombi) {
+                            if (Pad.Item[toCheckCombi] is not GenericPadItem databItem) {
+                                var nam = c.LinkedDatabase.ConnectionData.TableName;
+                                databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
+                                Pad.Item.Add(databItem);
+                                databItem.SetLeftTopPoint(Math.Max(kx, it.UsedArea.Left - databItem.UsedArea.Width), 600);
+                                kx = databItem.UsedArea.Right;
+                            }
 
-                        foreach (var thisitem in thisc.Column.LinkedCellFilter) {
-                            var tmp = thisitem.SplitBy("|");
+                            foreach (var thisitem in c.LinkedCellFilter) {
+                                var tmp = thisitem.SplitBy("|");
 
-                            foreach (var thisc2 in thisc?.Column?.Database?.Column) {
-                                if (tmp[2].Contains("~" + thisc2.Name + "~")) {
-                                    var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Database.TableName + "|" + thisc2.Name];
-                                    _ = Pad.Item.Connections.AddIfNotExists(new ItemConnection(rkcolit, ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
+                                foreach (var thisc2 in c.Database?.Column) {
+                                    if (tmp[2].Contains("~" + thisc2.Name + "~")) {
+                                        var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Database.TableName + "|" + thisc2.Name];
+                                        _ = Pad.Item.Connections.AddIfNotExists(new ItemConnection(rkcolit, ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
+                                    }
                                 }
                             }
-                        }
 
-                        var c2 = thisc.Column.LinkedDatabase.Column.Exists(thisc.Column.LinkedCell_ColumnNameOfLinkedDatabase);
-                        if (c2 != null) {
-                            var it2 = new ColumnPadItem(c2);
-                            Pad.Item.Add(it2);
-                            it2.SetLeftTopPoint(kx, 600);
-                            Pad.Item.Connections.Add(new ItemConnection(it2, ConnectionType.Top, false, it, ConnectionType.Bottom, true, false));
-                            kx = it2.UsedArea.Right;
+                            var c2 = c.LinkedDatabase.Column.Exists(c.LinkedCell_ColumnNameOfLinkedDatabase);
+                            if (c2 != null) {
+                                var it2 = new ColumnPadItem(c2);
+                                Pad.Item.Add(it2);
+                                it2.SetLeftTopPoint(kx, 600);
+                                Pad.Item.Connections.Add(new ItemConnection(it2, ConnectionType.Top, false, it, ConnectionType.Bottom, true, false));
+                                kx = it2.UsedArea.Right;
 
-                            // und noch die Datenbank auf die Spalte zeigen lassem
-                            _ = Pad.Item.Connections.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
+                                // und noch die Datenbank auf die Spalte zeigen lassem
+                                _ = Pad.Item.Connections.AddIfNotExists(new ItemConnection(databItem, ConnectionType.Bottom, false, it2, ConnectionType.Bottom, false, false));
+                            }
                         }
                     }
                 }

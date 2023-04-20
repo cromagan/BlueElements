@@ -521,7 +521,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             // Und-Flag Ermitteln --------------------------------------------
             var und = typ.HasFlag(FilterType.UND);
             if (und) { typ ^= FilterType.UND; }
-            if (filter.SearchValue == null || filter.SearchValue.Count < 2) {
+            if (filter.SearchValue.Count < 2) {
                 oder = true;
                 und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
             }
@@ -697,7 +697,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public List<string> ValuesReadable(ColumnItem? column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style);
+    public List<string> ValuesReadable(ColumnItem column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style);
 
     internal static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
         List<RowItem?> allRows = new();
@@ -843,7 +843,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var checkValue = string.Empty;
         if (ContainsKey(cellKey)) { checkValue = this[cellKey].Value; }
         if (checkValue != value) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Nachprüfung fehlgeschlagen");
+            Develop.DebugPrint(FehlerArt.Fehler, "Nachprüfung fehlgeschlagen:\r\n" + checkValue + "\r\n" + value);
             return;
         }
 

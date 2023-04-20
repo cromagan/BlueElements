@@ -41,20 +41,20 @@ public class DimensionPadItem : BasicPadItem {
     /// <summary>
     /// Dieser Punkt ist sichtbar und kann verschoben werden.
     /// </summary>
-    private readonly PointM? _point1 = new(null, "Punkt 1", 0, 0);
+    private readonly PointM _point1 = new(null, "Punkt 1", 0, 0);
 
     /// <summary>
     /// Dieser Punkt ist sichtbar und kann verschoben werden.
     /// </summary>
-    private readonly PointM? _point2 = new(null, "Punkt 2", 0, 0);
+    private readonly PointM _point2 = new(null, "Punkt 2", 0, 0);
 
-    private readonly PointM? _schnittPunkt1 = new(null, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
-    private readonly PointM? _schnittPunkt2 = new(null, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
+    private readonly PointM _schnittPunkt1 = new(null, "Schnittpunkt 1, Zeigt der Pfeil hin", 0, 0);
+    private readonly PointM _schnittPunkt2 = new(null, "Schnittpunkt 2, Zeigt der Pfeil hin", 0, 0);
 
     /// <summary>
     /// Dieser Punkt ist sichtbar und kann verschoben werden.
     /// </summary>
-    private readonly PointM? _textPoint = new(null, "Mitte Text", 0, 0);
+    private readonly PointM _textPoint = new(null, "Mitte Text", 0, 0);
 
     private float _länge;
     private string _textOben = string.Empty;
@@ -246,8 +246,8 @@ public class DimensionPadItem : BasicPadItem {
 
     protected override RectangleF CalculateUsedArea() {
         if (Stil == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
-        var geszoom = Parent.SheetStyleScale * Skalierung;
-        var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
+        var geszoom = Parent?.SheetStyleScale * Skalierung ?? Skalierung;
+        var f = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
         var sz1 = BlueFont.MeasureString(Angezeigter_Text_Oben(), f.Font(geszoom));
         var sz2 = BlueFont.MeasureString(Text_Unten, f.Font(geszoom));
         var maxrad = Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height));
@@ -263,8 +263,8 @@ public class DimensionPadItem : BasicPadItem {
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (Stil != PadStyles.Undefiniert) {
-            var geszoom = Parent.SheetStyleScale * Skalierung * zoom;
-            var f = Skin.GetBlueFont(Stil, Parent.SheetStyle);
+            var geszoom = Parent?.SheetStyleScale * Skalierung * zoom ?? zoom;
+            var f = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
             var pfeilG = f.Font(geszoom).Size * 0.8f;
             var pen2 = f.Pen(zoom);
 

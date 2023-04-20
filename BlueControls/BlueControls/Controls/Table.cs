@@ -352,6 +352,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static int CalculateColumnContentWidth(Table? table, ColumnItem column, BlueFont? cellFont, int pix16) {
         if (column.UnsavedContentWidth > 0) { return column.UnsavedContentWidth; }
 
+        if (column.Database == null) { return 16; }
+
         column.RefreshColumnsData();
 
         var newContentWidth = 16; // Wert muss gesetzt werden, dass er am ende auch gespeichert wird
@@ -360,8 +362,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             // Beim Button reicht eine Abfrage mit Row null
             newContentWidth = Cell_ContentSize(table, column, null, cellFont, pix16).Width;
         } else {
-            var locker = new object();
-
             _ = Parallel.ForEach(column.Database.Row, thisRowItem => {
                 //var originalText = thisRowItem.CellGetString(column);
 
@@ -370,9 +370,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                     var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
 
-                    lock (locker) {
-                        newContentWidth = Math.Max(newContentWidth, wx);
-                    }
+                    newContentWidth = Math.Max(newContentWidth, wx);
                 }
             });
         }
