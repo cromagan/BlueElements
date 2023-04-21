@@ -44,7 +44,6 @@ namespace BlueControls.Forms {
             this.btnRegisterKarte = new BlueControls.Controls.Button();
             this.btnTabControlAdd = new BlueControls.Controls.Button();
             this.groupBox1 = new BlueControls.Controls.GroupBox();
-            this.btnZeileHinzu = new BlueControls.Controls.Button();
             this.tabFile = new System.Windows.Forms.TabPage();
             this.grpDatei = new BlueControls.Controls.GroupBox();
             this.btnSpeichern = new BlueControls.Controls.Button();
@@ -310,7 +309,6 @@ namespace BlueControls.Forms {
             this.groupBox1.Controls.Add(this.btnFilterConverter);
             this.groupBox1.Controls.Add(this.btnBenutzerFilterWahl);
             this.groupBox1.Controls.Add(this.btnZeileZuFilter);
-            this.groupBox1.Controls.Add(this.btnZeileHinzu);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
@@ -319,18 +317,6 @@ namespace BlueControls.Forms {
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Zeilen-Berechnung";
-            // 
-            // btnZeileHinzu
-            // 
-            this.btnZeileHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnZeileHinzu.ImageCode = "Trichter|16|||||||||Zeile";
-            this.btnZeileHinzu.Location = new System.Drawing.Point(0, 2);
-            this.btnZeileHinzu.Name = "btnZeileHinzu";
-            this.btnZeileHinzu.QuickInfo = resources.GetString("btnZeileHinzu.QuickInfo");
-            this.btnZeileHinzu.Size = new System.Drawing.Size(64, 66);
-            this.btnZeileHinzu.TabIndex = 0;
-            this.btnZeileHinzu.Text = "ALT Zeile+ Filterung";
-            this.btnZeileHinzu.Click += new System.EventHandler(this.btnZeileHinzu_Click);
             // 
             // tabFile
             // 
@@ -536,7 +522,6 @@ namespace BlueControls.Forms {
 
         private TabPage tabEditorStd;
         private GroupBox grpFelder;
-        private Button btnZeileHinzu;
         private Button btnFeldHinzu;
         private GroupBox grpVorschau;
         private Button btnPfeileAusblenden;

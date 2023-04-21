@@ -83,7 +83,7 @@ public class ItemAcceptFilter : ItemAcceptSomething {
 
     #region Fields
 
-    public readonly List<string> _getFilterFromKeys = new List<string>();
+    public readonly List<string> _getFilterFromKeys = new();
     private ReadOnlyCollection<IItemSendFilter>? _getFilterFrom;
 
     #endregion

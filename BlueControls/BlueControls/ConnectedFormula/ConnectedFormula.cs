@@ -92,9 +92,11 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         _saved = true;
 
-        _padData.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
-        _padData.GridShow = 0.5f;
-        _padData.GridSnap = 0.5f;
+        if (_padData != null) {
+            _padData.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
+            _padData.GridShow = 0.5f;
+            _padData.GridSnap = 0.5f;
+        }
     }
 
     #endregion
@@ -239,7 +241,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             }
 
             if (found != null) {
-                found.SetCoordinates(new RectangleF(PadData.SheetSizeInPix.Width / 2 - 150, -30, 300, 30), true);
+                found.SetCoordinates(new RectangleF((PadData.SheetSizeInPix.Width / 2) - 150, -30, 300, 30), true);
                 found.Page = thisP;
                 found.Bei_Export_sichtbar = false;
             }
@@ -394,18 +396,18 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         _saving = true;
         //PadData.Sort();
 
-        _id = -1;
+        //_id = -1;
 
         _databaseFiles.Clear();
 
-        foreach (var thisit in PadData) {
-            if (thisit is RowWithFilterPadItem rwf) {
-                if (rwf.OutputDatabase != null) {
-                    _ = _databaseFiles.AddIfNotExists(rwf.OutputDatabase.ConnectionData.UniqueID);
-                    _id = Math.Max(_id, rwf.InputColorId);
-                }
-            }
-        }
+        //foreach (var thisit in PadData) {
+        //    if (thisit is IItemSendRow rwf) {
+        //        if (rwf.OutputDatabase != null) {
+        //            _ = _databaseFiles.AddIfNotExists(rwf.OutputDatabase.ConnectionData.UniqueID);
+        //            _id = Math.Max(_id, rwf.InputColorId);
+        //        }
+        //    }
+        //}
         _saving = false;
 
         #endregion
@@ -420,7 +422,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         t.Add("LastUsedID=" + _id);
         t.Add("DatabaseFiles=" + _databaseFiles.JoinWithCr().ToNonCritical());
         t.Add("NotAllowedChilds=" + _notAllowedChilds.JoinWithCr().ToNonCritical());
-        t.Add("PadItemData=" + PadData.ToString().ToNonCritical());
+
+        if (PadData != null) {
+            t.Add("PadItemData=" + PadData.ToString().ToNonCritical());
+        }
 
         e.Data = ("{" + t.JoinWith(", ").TrimEnd(", ") + "}").WIN1252_toByte();
     }

@@ -494,7 +494,7 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
         if (row == null) { return; }
         if (Marker.CancellationPending) { return; }
 
-        var col = Database.Column.First;
+        var col = Database.Column.First();
         if (col == null) { return; }
 
         List<string> names = new();

@@ -35,9 +35,7 @@ public partial class VariableEditor : UserControl {
 
     #region Constructors
 
-    public VariableEditor() {
-        InitializeComponent();
-    }
+    public VariableEditor() => InitializeComponent();
 
     #endregion
 

@@ -64,9 +64,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     #region Constructors
 
-    protected BasicPadItem(string internalname) : base(internalname) {
-        MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
-    }
+    protected BasicPadItem(string internalname) : base(internalname) => MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
 
     #endregion
 

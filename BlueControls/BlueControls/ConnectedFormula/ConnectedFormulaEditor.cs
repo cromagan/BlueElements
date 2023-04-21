@@ -186,12 +186,14 @@ public partial class ConnectedFormulaEditor : PadEditor {
         MultiUserFile.SaveAll(false);
 
         DatabaseAbstract? db = null;
-        foreach (var thisItem in CFormula.PadData) {
-            if (thisItem is IItemRowInput iri) {
-                db = iri.OutputDatabase;
+
+        if (CFormula?.PadData != null) {
+            foreach (var thisItem in CFormula.PadData) {
+                if (thisItem is IItemRowInput iri) {
+                    db = iri.OutputDatabase;
+                }
             }
         }
-
         RowItem? r = null;
         if (db != null) {
             r = db.Row.First();
@@ -203,12 +205,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void btnZeileAnlegen_Click(object sender, System.EventArgs e) {
         var x = new AddRowPaditem(string.Empty);
         Pad.AddCentered(x);
-    }
-
-    private void btnZeileHinzu_Click(object sender, System.EventArgs e) {
-        var it = new RowWithFilterPadItem(string.Empty);
-        Pad.AddCentered(it);
-        ChooseDatabaseAndId(it);
     }
 
     private void btnZeileZuFilter_Click(object sender, System.EventArgs e) {

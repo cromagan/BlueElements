@@ -25,6 +25,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using BlueBasics;
@@ -994,7 +995,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             vars.Add(new VariableDatabase("Database", this, true, true, "Die Datenbank, die zu dem Skript gehört"));
             vars.Add(new VariableString("Tablename", TableName, true, false, "Der aktuelle Tabellenname."));
             vars.Add(new VariableFloat("Rows", Row.Count, true, false, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
-            vars.Add(new VariableString("NameOfFirstColumn", Column.First?.Name ?? string.Empty, true, false, "Der Name der ersten Spalte"));
+            vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.Name ?? string.Empty, true, false, "Der Name der ersten Spalte"));
             vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(EventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
             if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
                 vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));

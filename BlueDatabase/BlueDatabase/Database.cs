@@ -41,6 +41,8 @@ public sealed class Database : DatabaseAbstract {
 
     private readonly string _tablename = string.Empty;
 
+    private bool _isIn_Save = false;
+
     #endregion
 
     #region Constructors
@@ -706,27 +708,16 @@ public sealed class Database : DatabaseAbstract {
     }
 
     public override bool Save() {
-        if (ReadOnly) { return false; }
-        if (string.IsNullOrEmpty(Filename)) { return false; }
+        //if (InvokeRequired) {
+        //    return (bool)Invoke(new Func<bool>(Save));
+        //}
 
-        if (!HasPendingChanges) { return false; }
+        if (_isIn_Save) { return false; }
 
-        var tmpFileName = WriteTempFileToDisk();
-
-        if (string.IsNullOrEmpty(tmpFileName)) { return false; }
-
-        if (FileExists(Backupdateiname())) {
-            if (!DeleteFile(Backupdateiname(), false)) { return false; }
-        }
-
-        // Haupt-Datei wird zum Backup umbenannt
-        if (!MoveFile(Filename, Backupdateiname(), false)) { return false; }
-
-        // --- TmpFile wird zum Haupt ---
-        _ = MoveFile(tmpFileName, Filename, true);
-
-        HasPendingChanges = false;
-        return true;
+        _isIn_Save = true;
+        var v = SaveInternal();
+        _isIn_Save = false;
+        return v;
     }
 
     public void SaveAsAndChangeTo(string newFileName) {
@@ -817,24 +808,22 @@ public sealed class Database : DatabaseAbstract {
 
     protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) => Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
 
-    //protected override void Dispose(bool disposing) {
-    //    //_muf?.Dispose();
-    //    //Works?.Dispose();
-    //    base.Dispose(disposing);
-    //}
-
     protected override void Initialize() {
         base.Initialize();
         Works.Clear();
     }
 
+    //protected override void Dispose(bool disposing) {
+    //    //_muf?.Dispose();
+    //    //Works?.Dispose();
+    //    base.Dispose(disposing);
+    //}
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
-
-    //private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 
     //protected override string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
     private static int NummerCode3(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
 
+    //private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
     private static long NummerCode7(IReadOnlyList<byte> b, int pointer) {
         long nu = 0;
         for (var n = 0; n < 7; n++) {
@@ -909,6 +898,36 @@ public sealed class Database : DatabaseAbstract {
             bLoaded = MultiUserFile.UnzipIt(bLoaded);
         }
         return bLoaded;
+    }
+
+    private bool SaveInternal() {
+        if (ReadOnly) { return false; }
+        if (string.IsNullOrEmpty(Filename)) { return false; }
+
+        if (!HasPendingChanges) { return false; }
+
+        var tmpFileName = WriteTempFileToDisk();
+
+        if (string.IsNullOrEmpty(tmpFileName)) { return false; }
+
+        if (FileExists(Backupdateiname())) {
+            if (!DeleteFile(Backupdateiname(), false)) { return false; }
+        }
+
+        // Haupt-Datei wird zum Backup umbenannt
+        if (!MoveFile(Filename, Backupdateiname(), false)) { return false; }
+
+        if (FileExists(Filename)) {
+            // Paralleler Prozess hat gespeichert?!?
+            _ = DeleteFile(tmpFileName, false);
+            return false;
+        }
+
+        // --- TmpFile wird zum Haupt ---
+        _ = MoveFile(tmpFileName, Filename, true);
+
+        HasPendingChanges = false;
+        return true;
     }
 
     private string WriteTempFileToDisk() {

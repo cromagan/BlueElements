@@ -47,9 +47,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public AddRowPaditem(string keyname, string toParse) : this(keyname) => Parse(toParse);
 
-    public AddRowPaditem(string intern) : base(intern) {
-        _itemAccepts = new();
-    }
+    public AddRowPaditem(string intern) : base(intern) => _itemAccepts = new();
 
     #endregion
 

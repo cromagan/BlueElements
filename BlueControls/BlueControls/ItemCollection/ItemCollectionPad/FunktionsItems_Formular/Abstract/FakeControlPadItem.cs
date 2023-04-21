@@ -42,7 +42,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     #region Fields
 
-    public static BlueFont? CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
+    public static BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
     public List<string> VisibleFor = new();
 
@@ -191,6 +191,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     }
 
     public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition, int breiteInspalten) {
+        if (Parent == null) { return; }
+
         var x = UsedArea;
         x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
         x.X = (x.Width * (aufXPosition - 1)) + (MmToPixel(0.5f, 300) * (aufXPosition - 1));
@@ -223,12 +225,13 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     private List<string> Permission_AllUsed() {
         var l = new List<string>();
-        foreach (var thisIt in Parent) {
-            if (thisIt is FakeControlPadItem csi) {
-                l.AddRange(csi.VisibleFor);
+        if (Parent != null) {
+            foreach (var thisIt in Parent) {
+                if (thisIt is FakeControlPadItem csi) {
+                    l.AddRange(csi.VisibleFor);
+                }
             }
         }
-
         l.Add(DatabaseAbstract.Everybody);
         l.Add("#User: " + Generic.UserName());
 

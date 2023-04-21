@@ -303,7 +303,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {
         if (_tableView?.Database == null || _tableView.Database.IsDisposed) { return; }
 
-        if (_tableView.Database.Column.First is not ColumnItem co) { return; }
+        if (_tableView.Database.Column.First() is not ColumnItem co) { return; }
 
         List<FilterItem> fl = new() { new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
@@ -355,7 +355,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     private void DoÄhnlich() {
         if (_tableView?.Database == null || _tableView.Database.Column.Count == 0) { return; }
 
-        var col = _tableView.Database.Column.First;
+        var col = _tableView.Database.Column.First();
 
         if (col == null) { return; } // Neue Datenbank?
 

@@ -51,7 +51,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
         Caption = string.IsNullOrEmpty(caption) ? "Wählen:" : caption;
         _showformat = showFormat;
 
-        if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First is ColumnItem fc) {
+        if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First() is ColumnItem fc) {
             _showformat = "~" + fc.Name + "~";
         }
 
@@ -68,7 +68,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     public DatabaseAbstract? OutputDatabase { get; }
 
-    public ReadOnlyCollection<IControlSendFilter> ParentSender => new ReadOnlyCollection<IControlSendFilter>(_parentSender);
+    public ReadOnlyCollection<IControlSendFilter> ParentSender => new(_parentSender);
 
     public RowItem? Row {
         get => IsDisposed ? null : _row;

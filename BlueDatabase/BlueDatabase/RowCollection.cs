@@ -105,8 +105,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public RowItem? this[string primärSchlüssel] {
         get {
-            if (Database?.Column.First != null) {
-                return this[new FilterItem(Database.Column.First,
+            if (Database?.Column.First() is ColumnItem c) {
+                return this[new FilterItem(c,
                     FilterType.Istgleich_GroßKleinEgal | FilterType.MultiRowIgnorieren,
                     primärSchlüssel)];
             }
@@ -456,7 +456,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (!string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
-            item.CellSet(db.Column.First, valueOfCellInFirstColumn);
+            item.CellSet(db.Column.First(), valueOfCellInFirstColumn);
         }
 
         if (runScriptOfNewRow) {

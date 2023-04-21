@@ -910,13 +910,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _infoCaption.BringToFront();
             return;
         }
+
         if (string.IsNullOrEmpty(txt) && _infoCaption == null) { return; }
+
         if (string.IsNullOrEmpty(txt)) {
-            //Controls.Remove(_InfoCaption);
-            //_InfoCaption.Click -= _InfoCaption_Click;
-            //_InfoCaption?.Dispose();
-            //_InfoCaption = null;
-            _infoCaption.Visible = false;
+            if (_infoCaption != null) { _infoCaption.Visible = false; }
         } else {
             _infoCaption = new Caption {
                 Name = "Info",
@@ -969,20 +967,24 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             case ÜberschriftAnordnung.Links_neben_Dem_Feld:
-                control.Left = Math.Max(_controlX, _captionObject.Width);
-                control.Top = 0;
-                control.Width = Width - control.Left;
-                control.Height = Height;
-                //if (_captionObject.Width < 4) { Develop.DebugPrint("Caption Width zu klein"); }
+                if (_captionObject != null) {
+                    control.Left = Math.Max(_controlX, _captionObject.Width);
+                    control.Top = 0;
+                    control.Width = Width - control.Left;
+                    control.Height = Height;
+                    //if (_captionObject.Width < 4) { Develop.DebugPrint("Caption Width zu klein"); }
+                }
                 break;
 
             case ÜberschriftAnordnung.Über_dem_Feld:
             case ÜberschriftAnordnung.Ohne_mit_Abstand:
-                control.Left = 0;
-                control.Top = _captionObject.Height;
-                control.Width = Width;
-                control.Height = Height - _captionObject.Height;
-                //if ( _captionObject.Height < 4) { Develop.DebugPrint("Caption Height zu klein"); }
+                if (_captionObject != null) {
+                    control.Left = 0;
+                    control.Top = _captionObject.Height;
+                    control.Width = Width;
+                    control.Height = Height - _captionObject.Height;
+                    //if ( _captionObject.Height < 4) { Develop.DebugPrint("Caption Height zu klein"); }
+                }
                 break;
 
             default:

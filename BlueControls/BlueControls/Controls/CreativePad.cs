@@ -124,7 +124,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ItemCollectionPad Item {
+    public ItemCollectionPad? Item {
         get => _item;
         set {
             if (_item == value) { return; }

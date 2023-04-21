@@ -59,9 +59,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     #region Constructors
 
-    public EditFieldPadItem(string internalname) : base(internalname) {
-        _itemAccepts = new();
-    }
+    public EditFieldPadItem(string internalname) : base(internalname) => _itemAccepts = new();
 
     #endregion
 

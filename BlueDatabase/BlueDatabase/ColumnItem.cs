@@ -1471,7 +1471,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// <summary>
     /// Der Invalidate, der am meisten invalidiert: Alle temporären Variablen und auch jede Zell-Größe der Spalte.
     /// </summary>
-    public bool IsFirst() => Database?.Column.First == this;
+    public bool IsFirst() => Database?.Column.First() == this;
 
     public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 

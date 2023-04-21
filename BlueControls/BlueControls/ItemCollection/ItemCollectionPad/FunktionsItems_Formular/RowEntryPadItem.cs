@@ -99,7 +99,7 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         var c = Skin.IDColor(colorId);
         var c2 = c.Darken(0.4);
 
-        gr.TranslateTransform(p.X + s2 / 2, p.Y - s * 0.35f);
+        gr.TranslateTransform(p.X + (s2 / 2), p.Y - (s * 0.35f));
 
         gr.RotateTransform(90);
 
@@ -107,12 +107,12 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         gr.DrawPath(new Pen(c2, 1 * zoom), pa);
 
         gr.RotateTransform(-90);
-        gr.TranslateTransform(-p.X - s2 / 2, -p.Y + s * 0.35f);
+        gr.TranslateTransform(-p.X - (s2 / 2), -p.Y + (s * 0.35f));
 
         if (!string.IsNullOrEmpty(symbol)) {
             var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
             var sy = QuickImage.Get(co);
-            gr.DrawImage(sy, p.X - sy.Width / 2, p.Y - s * 0.15f);
+            gr.DrawImage(sy, p.X - (sy.Width / 2), p.Y - (s * 0.15f));
         }
     }
 
@@ -127,7 +127,7 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         var c = Skin.IDColor(colorId);
         var c2 = c.Darken(0.4);
 
-        gr.TranslateTransform(p.X + s2 / 2, p.Y - s * 0.45f);
+        gr.TranslateTransform(p.X + (s2 / 2), p.Y - (s * 0.45f));
 
         gr.RotateTransform(90);
         gr.FillPath(new SolidBrush(c), pa);
@@ -135,13 +135,13 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
         gr.RotateTransform(-90);
 
-        gr.TranslateTransform(-p.X - s2 / 2, -p.Y + s * 0.45f);
+        gr.TranslateTransform(-p.X - (s2 / 2), -p.Y + (s * 0.45f));
 
         if (!string.IsNullOrEmpty(symbol)) {
             var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
 
             var sy = QuickImage.Get(co);
-            gr.DrawImage(sy, p.X - sy.Width / 2, p.Y + s * 0.02f);
+            gr.DrawImage(sy, p.X - (sy.Width / 2), p.Y + (s * 0.02f));
         }
     }
 

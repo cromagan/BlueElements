@@ -149,7 +149,7 @@ public class VariableBool : Variable {
 
             // V2 braucht nicht peprüft werden, muss ja eh der gleiche TYpe wie V1 sein
             if (v1 != null) {
-                if (v1.MyClassId != v2.MyClassId) { return null; }// return new DoItFeedback(infos.LogData, s, "Typen unterschiedlich: " + txt);
+                if (v1.MyClassId != v2?.MyClassId) { return null; }// return new DoItFeedback(infos.LogData, s, "Typen unterschiedlich: " + txt);
 
                 if (!v1.ToStringPossible) { return null; }// return new DoItFeedback(infos.LogData, s, "Datentyp nicht zum Vergleichen geeignet: " + txt);
             } else {
@@ -161,11 +161,13 @@ public class VariableBool : Variable {
             var replacer = "false";
             switch (check) {
                 case "==": {
+                        if (v1 == null || v2 == null) { return null; }
                         if (v1.ValueForReplace == v2.ValueForReplace) { replacer = "true"; }
                         break;
                     }
 
                 case "!=": {
+                        if (v1 == null || v2 == null) { return null; }
                         if (v1.ValueForReplace != v2.ValueForReplace) { replacer = "true"; }
                         break;
                     }

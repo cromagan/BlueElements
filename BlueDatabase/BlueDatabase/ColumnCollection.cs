@@ -84,22 +84,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    /// </summary>
     //    /// <returns></returns>
 
-    public ColumnItem? First {
-        get {
-            if (Database == null || Database.IsDisposed) { return null; }
-
-            if (Database.ColumnArrangements[0].Count != Database.Column.Count()) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
-                return null;
-            }
-
-            var l = Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.Name.StartsWith("SYS_"))?.Column;
-            if (l != null) { return l; }
-
-            return Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null)?.Column;
-        }
-    }
-
     public bool IsDisposed { get; private set; }
 
     public ColumnItem? SysChapter { get; private set; }
@@ -126,6 +110,65 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #endregion
 
+    #region Indexers
+
+    public ColumnItem? this[string columnName] {
+        get {
+            var colum = Exists(columnName);
+            if (colum is null) { Database?.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
+            return colum;
+        }
+    }
+
+    #endregion
+
+    #region Methods
+
+    public string Add(ColumnItem column) {
+        foreach (var thisc in this) {
+            if (thisc.Name.Equals(column.Name, StringComparison.OrdinalIgnoreCase)) { return "Hinzufügen fehlgeschlagen."; }
+        }
+
+        if (!_internal.TryAdd(column.Name, column)) { return "Hinzufügen fehlgeschlagen."; }
+        OnColumnAdded(new ColumnEventArgs(column));
+        return string.Empty;
+    }
+
+    public void Dispose() {
+        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    //    foreach (var thisKey in keys) {
+    //        Remove(thisKey, comment);
+    //    }
+    //}
+    public ColumnItem? Exists(string? columnName) {
+        if (Database == null || Database.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
+        try {
+            columnName = columnName.ToUpper();
+            return _internal.ContainsKey(columnName) ? _internal[columnName] : null;
+        } catch {
+            return Exists(columnName);
+        }
+    }
+
+    public ColumnItem? First() {
+        // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
+        if (Database == null || Database.IsDisposed) { return null; }
+
+        if (Database.ColumnArrangements[0].Count != Database.Column.Count()) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
+            return null;
+        }
+
+        var l = Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.Name.StartsWith("SYS_"))?.Column;
+        if (l != null) { return l; }
+
+        return Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null)?.Column;
+    }
+
     //public ColumnItem? this[int index] {
     //    get {
     //        if (Database == null || Database.IsDisposed) { return null; }
@@ -145,19 +188,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //        return null;
     //    }
     //}
-
-    #region Indexers
-
-    public ColumnItem? this[string columnName] {
-        get {
-            var colum = Exists(columnName);
-            if (colum is null) { Database?.DevelopWarnung("Spalte nicht gefunden: " + columnName); }
-            return colum;
-        }
-    }
-
-    #endregion
-
     //public static string ChangeKeysInString(string originalString, int oldKey, int newKey) {
     //    var o = ParsableColumnKey(oldKey);
     //    if (!originalString.Contains(o)) { return originalString; }
@@ -176,43 +206,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    }
     //    return originalString;
     //}
-
-    #region Methods
-
-    public string Add(ColumnItem column) {
-        foreach (var thisc in this) {
-            if (thisc.Name.Equals(column.Name, StringComparison.OrdinalIgnoreCase)) { return "Hinzufügen fehlgeschlagen."; }
-        }
-
-        if (!_internal.TryAdd(column.Name, column)) { return "Hinzufügen fehlgeschlagen."; }
-        OnColumnAdded(new ColumnEventArgs(column));
-        return string.Empty;
-    }
-
     //public void Clear(string comment) {
     //    var name = (from thiscolumnitem in _internal.Values where thiscolumnitem != null select thiscolumnitem.Key).Select(dummy => dummy).ToList();
-
-    //    foreach (var thisKey in keys) {
-    //        Remove(thisKey, comment);
-    //    }
-    //}
-
-    public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    public ColumnItem? Exists(string? columnName) {
-        if (Database == null || Database.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
-        try {
-            columnName = columnName.ToUpper();
-            return _internal.ContainsKey(columnName) ? _internal[columnName] : null;
-        } catch {
-            return Exists(columnName);
-        }
-    }
-
     public string Freename(string preferedName) {
         preferedName = preferedName.ReduceToChars(Constants.AllowedCharsVariableName);
         if (string.IsNullOrEmpty(preferedName)) { preferedName = "NewColumn"; }

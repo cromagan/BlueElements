@@ -206,7 +206,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public string CellFirstString() {
-        var fc = Database?.Column.First;
+        var fc = Database?.Column.First();
         if (fc == null) { return string.Empty; }
 
         return CellGetString(fc);
@@ -295,7 +295,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var sef = ExecuteScript(EventTypes.prepare_formula, string.Empty, false, false, true, 0);
 
-        LastCheckedMessage = "<b><u>" + CellGetString(Database.Column.First) + "</b></u><br><br>";
+        LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
 
         List<string> cols = new();
 

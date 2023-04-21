@@ -289,7 +289,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
         try {
             var result = new List<string>();
 
-            result.ParseableAdd("Database", Database);
+            //result.ParseableAdd("Database", Database);
             result.ParseableAdd("Name", Name);
             result.ParseableAdd("Script", Script);
             result.ParseableAdd("ManualExecutable", ManualExecutable);

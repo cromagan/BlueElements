@@ -38,9 +38,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
 
     #region Constructors
 
-    public RowEntryControl(DatabaseAbstract database) : base() {
-        OutputDatabase = database;
-    }
+    public RowEntryControl(DatabaseAbstract database) : base() => OutputDatabase = database;
 
     #endregion
 

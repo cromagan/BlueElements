@@ -53,9 +53,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     #region Constructors
 
-    public VariableFieldPadItem(string internalname) : base(internalname) {
-        _itemAccepts = new();
-    }
+    public VariableFieldPadItem(string internalname) : base(internalname) => _itemAccepts = new();
 
     #endregion
 

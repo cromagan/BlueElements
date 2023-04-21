@@ -41,13 +41,13 @@ internal sealed partial class ColumnEditor {
     #region Fields
 
     private readonly Table? _table;
-    private ColumnItem? _column;
+    private ColumnItem _column;
 
     #endregion
 
     #region Constructors
 
-    public ColumnEditor(ColumnItem? column, Table? table) : base() {
+    public ColumnEditor(ColumnItem column, Table? table) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         _table = table;
@@ -195,13 +195,13 @@ internal sealed partial class ColumnEditor {
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (_column?.Database == null || _column.Database.IsDisposed) { return; }
         if (!AllOk()) { return; }
-        Column_DatenAuslesen(_table.CurrentArrangement[_column].NextVisible().Column);
+        Column_DatenAuslesen(_table?.CurrentArrangement[_column]?.NextVisible()?.Column);
     }
 
     private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
         if (_column?.Database == null || _column.Database.IsDisposed) { return; }
         if (!AllOk()) { return; }
-        Column_DatenAuslesen(_table.CurrentArrangement[_column].PreviewsVisible().Column);
+        Column_DatenAuslesen(_table?.CurrentArrangement[_column]?.PreviewsVisible()?.Column);
     }
 
     private void ButtonCheck() {
@@ -276,7 +276,7 @@ internal sealed partial class ColumnEditor {
 
     private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();
 
-    private void Column_DatenAuslesen(ColumnItem? fromColumn) {
+    private void Column_DatenAuslesen(ColumnItem fromColumn) {
         capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, fromColumn.Database.TableName);
 
         _column = fromColumn;

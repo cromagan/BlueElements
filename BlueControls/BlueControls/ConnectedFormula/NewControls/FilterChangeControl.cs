@@ -24,7 +24,7 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class FilterChangeControl : BlueControls.Controls.GenericControl, IControlAcceptFilter, IControlSendFilter {
+internal class FilterChangeControl : GenericControl, IControlAcceptFilter, IControlSendFilter {
 
     #region Fields
 

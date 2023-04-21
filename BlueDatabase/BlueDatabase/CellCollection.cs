@@ -249,6 +249,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         //var skriptgesteuert = column.LinkedCell_RowKeyIsInColumn == -9999 && column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert;
 
+        if (row != null) {
+            if (!repairLinkedValue && row.LastCheckedEventArgs == null) {
+                //row.CheckRowDataIfNeeded();
+                repairLinkedValue = true;
+            }
+        }
+
         if (repairLinkedValue) { return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists); }
 
         var key = column.Database?.Cell.GetStringBehindLinkedValue(column, row);
@@ -701,9 +708,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
         List<RowItem?> allRows = new();
-        if (row?.Database?.Column.First == null || row.Database.IsDisposed) { return allRows; }
+        if (row?.Database?.Column.First() == null || row.Database.IsDisposed) { return allRows; }
 
-        var names = row.Database.Column.First.GetUcaseNamesSortedByLenght();
+        var names = row.Database.Column.First().GetUcaseNamesSortedByLenght();
         var relationTextLine = completeRelationText.ToUpper().SplitAndCutByCr();
         foreach (var thisTextLine in relationTextLine) {
             var tmp = thisTextLine;
@@ -1035,7 +1042,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var dbtmp = Database;
         if (dbtmp == null || dbtmp.IsDisposed) { return completeRelationText; }
 
-        var c = dbtmp.Column.First;
+        var c = dbtmp.Column.First();
         if (c == null) { return completeRelationText; }
 
         var names = c.GetUcaseNamesSortedByLenght();

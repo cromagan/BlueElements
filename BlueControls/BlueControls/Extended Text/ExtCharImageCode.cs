@@ -48,6 +48,8 @@ internal class ExtCharImageCode : ExtChar {
         var drawX = (int)((Pos.X * zoom) + posModificator.X);
         var drawY = (int)((Pos.Y * zoom) + posModificator.Y);
 
+        if (_qi == null) { return; }
+
         try {
             if (Math.Abs(zoom - 1) < 0.001) {
                 gr.DrawImage(_qi, drawX, drawY);
@@ -57,7 +59,10 @@ internal class ExtCharImageCode : ExtChar {
         } catch { }
     }
 
-    public override string HtmlText() => "<IMAGECODE=" + _qi.Code + ">";
+    public override string HtmlText() {
+        if (_qi == null) { return string.Empty; }
+        return "<IMAGECODE=" + _qi.Code + ">";
+    }
 
     public override bool IsLineBreak() => false;
 
