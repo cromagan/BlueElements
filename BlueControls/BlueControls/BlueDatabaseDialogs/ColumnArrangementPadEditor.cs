@@ -198,7 +198,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (newc == null) { return; }
 
         if (vorlage != null) {
-            newc.CloneFrom(vorlage, false);
+            newc.CloneFrom(vorlage, false, true);
             if (mitDaten) {
                 foreach (var thisR in Database.Row) {
                     thisR.CellSet(newc, thisR.CellGetString(vorlage));

@@ -646,5 +646,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return false;
     }
 
-    #endregion
-}
+
+    internal bool NeedDataCheck() {
+        if (Database == null || Database.IsDisposed) { return false; }
+        return Database.Row.NeedDataCheck(Key);
+    }
+
+
+        #endregion
+    }

@@ -21,6 +21,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using BlueBasics;
@@ -37,6 +38,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Fields
 
     private readonly ConcurrentDictionary<long, RowItem> _internal = new();
+    private readonly List<long> _pendingChangedBackgroundRow = new();
+    private readonly List<long> _pendingChangedRows = new();
+    private readonly List<BackgroundWorker> _pendingworker = new();
+    private bool _executingbackgroundworks;
+    private bool _executingchangedrows;
     private bool _throwEvents = true;
 
     #endregion
@@ -95,12 +101,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #endregion
 
-    /// <summary>
-    /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
-    /// </summary>
-    /// <param name="primärSchlüssel">Der Primärschlüssel, nach dem gesucht werden soll. Groß/Kleinschreibung wird ignoriert.</param>
-    /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
-
     #region Indexers
 
     public RowItem? this[string primärSchlüssel] {
@@ -114,6 +114,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
+    /// <summary>
+    /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
+    /// </summary>
+    /// <param name="primärSchlüssel">Der Primärschlüssel, nach dem gesucht werden soll. Groß/Kleinschreibung wird ignoriert.</param>
+    /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
     public RowItem? this[params FilterItem[] filter] {
         get {
             //if (filter == null || filter.Length == 0) {
@@ -130,11 +135,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     #endregion
-
-    /// <summary>
-    /// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Datenbanken einzigartig ist.
-    /// </summary>
-    /// <returns></returns>
 
     #region Methods
 
@@ -156,6 +156,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         } while (true);
     }
 
+    public void AddRowWithChangedValue(long rowkey) => _ = _pendingChangedRows.AddIfNotExists(rowkey);
+
+    /// <summary>
+    /// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Datenbanken einzigartig ist.
+    /// </summary>
+    /// <returns></returns>
     public List<RowData> AllRows() {
         var sortedRows = new List<RowData>();
         foreach (var thisRowItem in this) {
@@ -165,12 +171,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
         return sortedRows;
     }
-
-    /// <summary>
-    /// Gibt die mit dieser Kombination sichtbaren Zeilen zurück. Ohne Sortierung. Jede Zeile kann maximal einmal vorkommen.
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <returns></returns>
 
     public List<RowItem> CalculateFilteredRows(ICollection<FilterItem>? filter) {
         if (Database == null || Database.IsDisposed) { return new List<RowItem>(); }
@@ -196,6 +196,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return l;
     }
 
+    /// <summary>
+    /// Gibt die mit dieser Kombination sichtbaren Zeilen zurück. Ohne Sortierung. Jede Zeile kann maximal einmal vorkommen.
+    /// </summary>
+    /// <param name="filter"></param>
+    /// <returns></returns>
     public List<RowData> CalculateSortedRows(ICollection<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 
     public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
@@ -323,37 +328,55 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         GC.SuppressFinalize(this);
     }
 
-    //public string DoLinkedDatabase(List<RowItem> row) {
-    //    if (row.Count == 0) { return string.Empty; }
+    public void ExecuteExtraThread() {
+        if (_pendingChangedBackgroundRow.Count == 0) { return; }
+        if (_executingbackgroundworks) { return; }
+        _executingbackgroundworks = true;
 
-    //    if (Database is not DatabaseAbstract db) { return "Verlinkung zur Datenbank fehlhlerhaft"; }
-    //    if (db.IsDisposed) { return "Datenbank verworfen"; }
+        var ok = false;
 
-    //    List<DatabaseAbstract> done = new();
+        foreach (var thiss in Database.EventScript) {
+            if (thiss.EventTypes.HasFlag(EventTypes.value_changed_extra_thread)) {
+                if (thiss.IsOk()) {
+                    ok = true; break;
+                }
+            }
+        }
 
-    //    foreach (var thisColumn in Database.Column) {
-    //        if (thisColumn.LinkedDatabase is DatabaseAbstract dbl) {
-    //            if (!done.Contains(dbl)) {
-    //                done.Add(dbl);
+        if (!ok) {
+            _pendingChangedBackgroundRow.Clear();
+            _executingbackgroundworks = false;
+            return;
+        }
 
-    //                var key = new List<long>();
+        try {
+            while (_pendingworker.Count < 5) {
+                if (IsDisposed) { break; }
+                if (Database.ReadOnly) { break; }
+                if (!Database.LogUndo) { break; }
+                if (_pendingChangedBackgroundRow.Count == 0) { break; }
 
-    //                foreach (var thisRow in row) {
-    //                    var s = Database.Cell.GetStringBehindLinkedValue(thisColumn, thisRow);
+                var key = _pendingChangedBackgroundRow.First();
+                _ = _pendingChangedBackgroundRow.Remove(key);
 
-    //                    if (LongTryParse(s, out var v)) { key.Add(v); }
-    //                }
+                var r = SearchByKey(key);
 
-    //                var x = dbl.RefreshRowData(key, false, null);
-    //                if (!string.IsNullOrEmpty(x.Item2)) {
-    //                    Database.OnDropMessage(FehlerArt.Fehler, x.Item2);
-    //                    return x.Item2;
-    //                }
-    //            }
-    //        }
-    //    }
-    //    return string.Empty;
-    //}
+                if (r != null) {
+                    var l = new BackgroundWorker();
+                    l.WorkerReportsProgress = true;
+                    l.RunWorkerCompleted += PendingWorker_RunWorkerCompleted;
+                    l.DoWork += PendingWorker_DoWork;
+
+                    _pendingworker.Add(l);
+                    l.RunWorkerAsync(key);
+
+                    Database.OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + r.CellFirstString());
+                }
+            }
+        } catch { }
+
+        _executingbackgroundworks = false;
+    }
 
     public string ExecuteScript(EventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem>? pinned, bool fullCheck, bool changevalues) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
@@ -384,6 +407,44 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return string.Empty;
     }
 
+    public void ExecuteValueChanged() {
+        if (_pendingChangedRows.Count == 0) { return; }
+        if (_executingchangedrows) { return; }
+        _executingchangedrows = true;
+
+        while (_pendingChangedRows.Count > 0) {
+            if (IsDisposed) { return; }
+
+            try {
+                var key = _pendingChangedRows[0];
+
+                var r = SearchByKey(key);
+                _pendingChangedRows.RemoveAt(0);
+
+                if (r != null) {
+                    _ = r.ExecuteScript(EventTypes.value_changed, string.Empty, true, true, true, 2);
+                    r.InvalidateCheckData();
+                    r.CheckRowDataIfNeeded();
+                }
+
+                _ = _pendingChangedRows.Remove(key); // Evtl.duch das Script erneut hinzugekommen.
+                _pendingChangedBackgroundRow.Add(key);
+            } catch { }
+        }
+
+        _executingchangedrows = false;
+    }
+
+    //                var x = dbl.RefreshRowData(key, false, null);
+    //                if (!string.IsNullOrEmpty(x.Item2)) {
+    //                    Database.OnDropMessage(FehlerArt.Fehler, x.Item2);
+    //                    return x.Item2;
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return string.Empty;
+    //}
     /// <summary>
     /// Füllt die Liste row auf, bis sie 100 Einträge enthält.
     /// </summary>
@@ -416,8 +477,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return false;
     }
 
+    //                    if (LongTryParse(s, out var v)) { key.Add(v); }
+    //                }
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null && !thisRowItem.IsDisposed);
 
+    //                foreach (var thisRow in row) {
+    //                    var s = Database.Cell.GetStringBehindLinkedValue(thisColumn, thisRow);
     /// <summary>
     ///
     /// </summary>
@@ -466,6 +531,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return item;
     }
 
+    //                var key = new List<long>();
     /// <summary>
     /// Erstellt eine neue Spalte mit den aus den Filterkriterien. nur Fiter IstGleich wird unterstützt.
     /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
@@ -505,13 +571,27 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return row;
     }
 
+    //    foreach (var thisColumn in Database.Column) {
+    //        if (thisColumn.LinkedDatabase is DatabaseAbstract dbl) {
+    //            if (!done.Contains(dbl)) {
+    //                done.Add(dbl);
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) => GenerateAndAdd(NextRowKey(), valueOfCellInFirstColumn, true, true, comment);
 
+    //    List<DatabaseAbstract> done = new();
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
+    //    if (Database is not DatabaseAbstract db) { return "Verlinkung zur Datenbank fehlhlerhaft"; }
+    //    if (db.IsDisposed) { return "Datenbank verworfen"; }
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
 
+    public bool HasPendingWorker() {
+        if (_pendingworker.Count > 0) { return true; }
+        return false;
+    }
+
+    //public string DoLinkedDatabase(List<RowItem> row) {
+    //    if (row.Count == 0) { return string.Empty; }
     public void InvalidateAllCheckData() {
         foreach (var thisRow in this) {
             thisRow.InvalidateCheckData();
@@ -775,6 +855,20 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (!_throwEvents) { return; }
         RowRemoved?.Invoke(this, System.EventArgs.Empty);
     }
+
+    private void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
+        var rk = (long)e.Argument;
+
+        var r = SearchByKey(rk);
+        if (r == null) { return; }
+
+        _ = r.ExecuteScript(EventTypes.value_changed_extra_thread, string.Empty, false, false, false, 5);
+    }
+
+    private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => _pendingworker.Remove((BackgroundWorker)sender);
+    internal bool NeedDataCheck(long key) => _pendingChangedRows.Contains(key);
+
+
 
     #endregion
 }

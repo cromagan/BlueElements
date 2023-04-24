@@ -60,9 +60,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private readonly List<string> _datenbankAdmin = new();
     private readonly List<EventScript> _eventScript = new();
     private readonly LayoutCollection _layouts = new();
-    private readonly List<long> _pendingbackgroundworks = new();
-    private readonly List<long> _pendingchangedrows = new();
-    private readonly List<BackgroundWorker> _pendingworker = new();
+
     private readonly List<string> _permissionGroupsNewRow = new();
     private readonly List<string> _tags = new();
     private readonly List<VariableString> _variables = new();
@@ -74,8 +72,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private string _createDate = string.Empty;
     private string _creator = string.Empty;
     private string _eventScriptTmp = string.Empty;
-    private bool _executingbackgroundworks;
-    private bool _executingchangedrows;
+
     private double _globalScale;
     private string _globalShowPass = string.Empty;
     private string _scripterror = string.Empty;
@@ -651,8 +648,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return string.Empty;
     }
 
-    public void AddRowWithChangedValue(long rowkey) => _ = _pendingchangedrows.AddIfNotExists(rowkey);
-
     public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
 
     /// <summary>
@@ -744,9 +739,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo, bool tagsToo) {
         _ = sourceDatabase.Save();
-        sourceDatabase.SetReadOnly();
 
-        Column.CloneFrom(sourceDatabase);
+        Column.CloneFrom(sourceDatabase, cellDataToo);
 
         if (cellDataToo) { Row.CloneFrom(sourceDatabase); }
 
@@ -886,7 +880,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; }
 
         if (mode.HasFlag(BlueBasics.Enums.ErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.ErrorReason.Save)) {
-            if (_pendingworker.Count > 0) { return "Es müssen noch Daten überprüft werden."; }
+            if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
         }
 
         return IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))
@@ -910,56 +904,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
-    }
-
-    public void ExecuteExtraThread() {
-        if (_pendingbackgroundworks.Count == 0) { return; }
-        if (_executingbackgroundworks) { return; }
-        _executingbackgroundworks = true;
-
-        var ok = false;
-
-        foreach (var thiss in EventScript) {
-            if (thiss.EventTypes.HasFlag(EventTypes.value_changed_extra_thread)) {
-                if (thiss.IsOk()) {
-                    ok = true; break;
-                }
-            }
-        }
-
-        if (!ok) {
-            _pendingbackgroundworks.Clear();
-            _executingbackgroundworks = false;
-            return;
-        }
-
-        try {
-            while (_pendingworker.Count < 5) {
-                if (IsDisposed) { break; }
-                if (ReadOnly) { break; }
-                if (!LogUndo) { break; }
-                if (_pendingbackgroundworks.Count == 0) { break; }
-
-                var key = _pendingbackgroundworks.First();
-                _ = _pendingbackgroundworks.Remove(key);
-
-                var r = Row.SearchByKey(key);
-
-                if (r != null) {
-                    var l = new BackgroundWorker();
-                    l.WorkerReportsProgress = true;
-                    l.RunWorkerCompleted += PendingWorker_RunWorkerCompleted;
-                    l.DoWork += PendingWorker_DoWork;
-
-                    _pendingworker.Add(l);
-                    l.RunWorkerAsync(key);
-
-                    OnDropMessage(FehlerArt.Info, "Hintergrund-Skript wird ausgeführt: " + r.CellFirstString());
-                }
-            }
-        } catch { }
-
-        _executingbackgroundworks = false;
     }
 
     public ScriptEndedFeedback ExecuteScript(EventScript s, bool changevalues, RowItem? row) {
@@ -1101,34 +1045,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             Develop.CheckStackForOverflow();
             return ExecuteScript(eventname, scriptname, changevalues, row);
         }
-    }
-
-    public void ExecuteValueChanged() {
-        if (_pendingchangedrows.Count == 0) { return; }
-        if (_executingchangedrows) { return; }
-        _executingchangedrows = true;
-
-        while (_pendingchangedrows.Count > 0) {
-            if (IsDisposed) { return; }
-
-            try {
-                var key = _pendingchangedrows[0];
-
-                var r = Row.SearchByKey(key);
-                _pendingchangedrows.RemoveAt(0);
-
-                if (r != null) {
-                    _ = r.ExecuteScript(EventTypes.value_changed, string.Empty, true, true, true, 2);
-                    r.InvalidateCheckData();
-                    r.CheckRowDataIfNeeded();
-                }
-
-                _ = _pendingchangedrows.Remove(key); // Evtl.duch das Script erneut hinzugekommen.
-                _pendingbackgroundworks.Add(key);
-            } catch { }
-        }
-
-        _executingchangedrows = false;
     }
 
     public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>
@@ -1981,12 +1897,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private void Checker_Tick(object state) {
         if (IsDisposed) { return; }
 
-        ExecuteValueChanged();
+        Row.ExecuteValueChanged();
 
         if (ReadOnly) { return; }
         if (!LogUndo) { return; }
 
-        ExecuteExtraThread();
+        Row.ExecuteExtraThread();
 
         _checkerTickCount++;
         if (_checkerTickCount < 0) { return; }
@@ -2014,17 +1930,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         if (IsDisposed) { return; }
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
-
-    private void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
-        var rk = (long)e.Argument;
-
-        var r = Row.SearchByKey(rk);
-        if (r == null) { return; }
-
-        _ = r.ExecuteScript(EventTypes.value_changed_extra_thread, string.Empty, false, false, false, 5);
-    }
-
-    private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => _pendingworker.Remove((BackgroundWorker)sender);
 
     private bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
         var tmpName = UserName.ToUpper();

@@ -150,6 +150,23 @@ public static class VariableExtensions {
     /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <returns></returns>
+    public static string GetString(this ICollection<VariableString> vars, string name) {
+        var v = vars.Get(name);
+
+        if (v is not VariableString vf) {
+            //Develop.DebugPrint("Falscher Datentyp");
+            return string.Empty;
+        }
+
+        return vf.ValueString;
+    }
+
+    /// <summary>
+    /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
+    /// </summary>
+    /// <param name="vars"></param>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public static string GetString(this ICollection<Variable> vars, string name) {
         var v = vars.Get(name);
 
@@ -196,6 +213,29 @@ public static class VariableExtensions {
     /// <param name="name"></param>
     /// <param name="value"></param>
     public static void Set(this ICollection<Variable> vars, string name, string value) {
+        var v = vars.Get(name);
+        if (v == null) {
+            v = new VariableString(name, string.Empty, false, false, string.Empty);
+            vars.Add(v);
+        }
+
+        if (v is not VariableString vf) {
+            Develop.DebugPrint(FehlerArt.Warnung, "Variablentyp falsch");
+            return;
+        }
+
+        vf.ReadOnly = false; // sonst werden keine Daten geschrieben
+        vf.ValueString = value;
+        vf.ReadOnly = true;
+    }
+
+    /// <summary>
+    /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
+    /// </summary>
+    /// <param name="vars"></param>
+    /// <param name="name"></param>
+    /// <param name="value"></param>
+    public static void Set(this ICollection<VariableString> vars, string name, string value) {
         var v = vars.Get(name);
         if (v == null) {
             v = new VariableString(name, string.Empty, false, false, string.Empty);

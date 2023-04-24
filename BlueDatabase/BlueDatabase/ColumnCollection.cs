@@ -475,7 +475,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return true;
     }
 
-    internal void CloneFrom(DatabaseAbstract sourceDatabase) {
+    internal void CloneFrom(DatabaseAbstract sourceDatabase, bool changeWidth) {
         // Spalten, die zu viel sind, löschen
         var names = new List<ColumnItem>();
         foreach (var thisColumn in this) {
@@ -492,7 +492,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 GenerateAndAdd(thisColumn.Name, thisColumn.Caption, thisColumn.Suffix, null, thisColumn.Quickinfo);
 
             if (l != null) {
-                l.CloneFrom(thisColumn, true);
+                l.CloneFrom(thisColumn, true, changeWidth);
 
                 if (l.Name != thisColumn.Name) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Name nicht korrekt!");

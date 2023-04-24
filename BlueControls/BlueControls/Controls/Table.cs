@@ -458,7 +458,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         //Database.Cell.Set(column, row, v[0].Substring(5), false);
         //_ = row.ExecuteScript(EventTypes.value_changedx, string.Empty, true, true, true, 5);
         //row.Database?.AddBackgroundWork(row);
-        row.Database?.ExecuteValueChanged();
+        row.Database?.Row.ExecuteValueChanged();
     }
 
     public static void Draw_FormatedText(Graphics gr, string text, ColumnItem? column, Rectangle fitInRect, Design design, States state, ShortenStyle style, BildTextVerhalten bildTextverhalten) {

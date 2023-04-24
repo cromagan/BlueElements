@@ -1115,7 +1115,13 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
+    public void CloneFrom(ColumnItem source, bool nameAndKeyToo, bool changeWidth) {
+
+        if(source.Database != null && !source.Database.ReadOnly) {
+            source.Repair();
+        }
+
+
         if (nameAndKeyToo) {
             Name = source.Name;
             //Database?.ChangeData(DatabaseDataType.ColumnKey, this, null, this.Key.ToString(false), source.Key.ToString(false));
@@ -1137,8 +1143,11 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         Tags = source.Tags;
         AdminInfo = source.AdminInfo;
         //TimeCode = source.TimeCode;
-        UnsavedContentWidth = source.UnsavedContentWidth;
-        ContentWidth = source.ContentWidth;
+        if (changeWidth) {
+            UnsavedContentWidth = source.UnsavedContentWidth;
+            ContentWidth = source.ContentWidth;
+        }
+
         FilterOptions = source.FilterOptions;
         IgnoreAtRowFilter = source.IgnoreAtRowFilter;
         DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
@@ -1793,7 +1802,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _behaviorOfImageAndText = BildTextVerhalten.Interpretiere_Bool;
                 _maxTextLenght = 1;
                 _dropdownWerteAndererZellenAnzeigen = false;
-                _adminInfo = "Diese Spalte kann nur über ein Skript bearbeitet werden,\r\nmit dem Befehl SetError";
+                _adminInfo = "Diese Spalte kann nur über ein Skript bearbeitet<br>werden, mit dem Befehl 'SetError'";
 
                 if (setOpticalToo) {
                     ForeColor = Color.FromArgb(128, 0, 0);
@@ -2431,7 +2440,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 Invalidate_ContentWidth();
                 Database.Cell.OnCellValueChanged(new CellEventArgs(this, thisRow));
                 //_ = thisRow.ExecuteScript(EventTypes.value_changedx, string.Empty, true, false, true, 5);
-                thisRow.Database?.AddRowWithChangedValue(thisRow.Key);
+                thisRow.Database?.Row.AddRowWithChangedValue(thisRow.Key);
             }
         }
     }

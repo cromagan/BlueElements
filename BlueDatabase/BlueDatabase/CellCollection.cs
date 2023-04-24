@@ -240,7 +240,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <returns></returns>
 
     public static (ColumnItem? column, RowItem? row, string info) LinkedCellData(ColumnItem? column, RowItem? row, bool repairLinkedValue, bool addRowIfNotExists) {
-        if (column == null) { return (null, null, "Interner Spaltenfehler."); }
+        if (column?.Database == null || column.Database.IsDisposed) { return (null, null, "Interner Spaltenfehler."); }
 
         if (column.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank) { return (null, null, "Format ist nicht LinkedCell."); }
 
@@ -250,9 +250,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         //var skriptgesteuert = column.LinkedCell_RowKeyIsInColumn == -9999 && column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert;
 
         if (row != null) {
-            if (!repairLinkedValue && row.LastCheckedEventArgs == null) {
+            if (!repairLinkedValue && row.NeedDataCheck()) {
                 //row.CheckRowDataIfNeeded();
-                repairLinkedValue = true;
+                //repairLinkedValue = true;
             }
         }
 
@@ -699,7 +699,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (!isLoading) {
-            Database?.AddRowWithChangedValue(rowkey);
+            if (colum)
+                Database?.Row.AddRowWithChangedValue(rowkey);
         }
         return string.Empty;
     }
