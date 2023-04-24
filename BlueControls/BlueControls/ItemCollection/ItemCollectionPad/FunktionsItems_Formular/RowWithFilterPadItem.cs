@@ -226,9 +226,9 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
                 FilterDatabaseUpdate();
                 _ = FilterDefiniton.Import(value.FromNonCritical(), true, false, ";", false, false, false);
                 var exi = FilterDefiniton.Column.Exists("SuchSym");
-                if (exi != null) {
-                    _ = FilterDefiniton.Column.Remove("SuchSym", "Veraltete Spalte");
-                }
+                //if (exi != null) {
+                //    _ = FilterDefiniton.Column.Remove("SuchSym", "Veraltete Spalte");
+                //}
                 //foreach (var thisRow in FilterDefiniton.Row) {
                 //    var n = thisRow.CellGetString("Spalte");
                 //    if (n.IsLong()) {

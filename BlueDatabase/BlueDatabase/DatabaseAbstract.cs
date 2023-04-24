@@ -660,10 +660,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
     /// <param name="comment"></param>
-    public string ChangeData(DatabaseDataType comand, string? columnname, long? rowkey, string previousValue, string changedTo, string comment) {
+    public string ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var f = SetValueInternal(comand, changedTo, columnname, rowkey, false);
+        var f = SetValueInternal(comand, changedTo, column, row, false);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -679,7 +679,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         if (LogUndo) {
-            AddUndo(TableName, comand, columnname, rowkey, previousValue, changedTo, UserName, comment);
+            AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName, comment);
         }
 
         //if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
@@ -822,6 +822,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (thisLayout.Contains(column.Name.ToUpper())) { layout = true; }
         }
         if (layout) { t += " - Layouts<br>"; }
+
+        if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
+
         var l = column.Contents();
         if (l.Count > 0) {
             t += "<br><br><b>Zusatz-Info:</b><br>";
@@ -1600,27 +1603,26 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     /// <param name="rowkey"></param>
     /// <param name="isLoading"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    internal virtual string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, bool isLoading) {
+    internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
 
         if (type.IsCellValue()) {
-            if (columnName == null || rowkey == null) {
+            if (column == null || row == null) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte/Zeile ist null! " + type);
                 return "Wert nicht gesetzt!";
             }
 
-            return Cell.SetValueInternal(columnName, (long)rowkey, value, isLoading);
+            return Cell.SetValueInternal(column, row, value, isLoading);
         }
 
         if (type.IsColumnTag()) {
-            var c = Column.Exists(columnName);
-            if (c == null) {
+            if (column == null) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
                 return "Wert nicht gesetzt!";
             }
-            return c.SetValueInternal(type, value, isLoading);
+            return column.SetValueInternal(type, value, isLoading);
         }
 
         if (type.IsCommand()) {
@@ -1641,13 +1643,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                     return f2;
 
                 case DatabaseDataType.Comand_RemoveRow:
-                    return Row.SetValueInternal(type, rowkey, isLoading);
+                    return Row.SetValueInternal(type, row?.Key, row, isLoading);
 
                 case DatabaseDataType.Comand_AddRow:
-                    var f1 = Row.SetValueInternal(type, rowkey, isLoading);
+                    var rk = LongParse(value);
+                    var f1 = Row.SetValueInternal(type, rk, null, isLoading);
 
                     if (!isLoading) {
-                        var thisRow = Row.SearchByKey(rowkey);
+                        var thisRow = Row.SearchByKey(rk);
                         if (thisRow != null) { thisRow.IsInCache = DateTime.UtcNow; }
                     }
 
@@ -1821,7 +1824,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return string.Empty;
     }
 
-    protected abstract void AddUndo(string tableName, DatabaseDataType comand, string? columnname, long? rowKey, string previousValue, string changedTo, string userName, string comment);
+    protected abstract void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment);
 
     protected void CreateWatcher() {
         if (!ReadOnly) {

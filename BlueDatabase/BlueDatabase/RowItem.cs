@@ -337,7 +337,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisColumn in Database.Column) {
             var value = sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.Name], source);
 
-            _ = Database.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn.Name, Key, string.Empty, value, string.Empty);
+            _ = Database.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, string.Empty);
 
             //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.Name], source), false);
         }
@@ -537,6 +537,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
     }
 
+    internal bool NeedDataCheck() {
+        if (Database == null || Database.IsDisposed) { return false; }
+        return Database.Row.NeedDataCheck(Key);
+    }
+
     internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
     internal void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
@@ -594,7 +599,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         // checkPerformed geht von Dateisystemfehlern aus
 
-        // Dann die Abschlieﬂenden Korrekturen vornehmen
+        // Dann die abschlieﬂenden Korrekturen vornehmen
         foreach (var thisColum in Database.Column) {
             if (thisColum != null) {
                 if (fullCheck) {
@@ -646,12 +651,5 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return false;
     }
 
-
-    internal bool NeedDataCheck() {
-        if (Database == null || Database.IsDisposed) { return false; }
-        return Database.Row.NeedDataCheck(Key);
-    }
-
-
-        #endregion
-    }
+    #endregion
+}

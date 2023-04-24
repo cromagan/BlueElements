@@ -271,7 +271,7 @@ public sealed class Database : DatabaseAbstract {
                 if (rowKey > -1) {
                     row = db.Row.SearchByKey(rowKey);
                     if (row == null) {
-                        _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, true);
+                        _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, null, true);
                         row = db.Row.SearchByKey(rowKey);
                     }
                     if (row == null) {
@@ -334,7 +334,7 @@ public sealed class Database : DatabaseAbstract {
 
                 #endregion
 
-                var fehler = db.SetValueInternal(art, inhalt, column?.Name, row?.Key, true);
+                var fehler = db.SetValueInternal(art, inhalt, column, row, true);
 
                 if (art == DatabaseDataType.EOF) { break; }
 
@@ -354,7 +354,7 @@ public sealed class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Name, thisColumn.Name, null, true);
+                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Name, thisColumn, null, true);
             }
         }
 
@@ -785,10 +785,10 @@ public sealed class Database : DatabaseAbstract {
         list.AddRange(b);
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnname, long? rowkey, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var r = base.SetValueInternal(type, value, columnname, rowkey, isLoading);
+        var r = base.SetValueInternal(type, value, column, row, isLoading);
 
         if (type == DatabaseDataType.UndoInOne) {
             Works.Clear();
@@ -806,7 +806,7 @@ public sealed class Database : DatabaseAbstract {
         return r;
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) => Works.Add(new WorkItem(comand, columnName, rowKey, previousValue, changedTo, userName));
+    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) => Works.Add(new WorkItem(comand, column, row, previousValue, changedTo, userName));
 
     protected override void Initialize() {
         base.Initialize();

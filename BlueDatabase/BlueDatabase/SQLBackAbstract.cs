@@ -358,7 +358,7 @@ public abstract class SqlBackAbstract {
 
             foreach (var thisRow in dt.Rows) {
                 var rk = LongParse(((DataRow)thisRow)[0].ToString());
-                _ = row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, true);
+                _ = row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, true);
                 //var r = row.GenerateAndAdd(rk, string.Empty, false, false);
             }
 
@@ -438,7 +438,7 @@ public abstract class SqlBackAbstract {
                     for (var z = 1; z < dt.Columns.Count; z++) {
                         var cx = db.Column.Exists(dt.Columns[z].ColumnName);
                         if (cx != null) {
-                            _ = db.Cell.SetValueInternal(cx.Name, r.Key, reader[z].ToString(), true);
+                            _ = db.Cell.SetValueInternal(cx, r, reader[z].ToString(), true);
                         }
                     }
 
@@ -901,7 +901,7 @@ public abstract class SqlBackAbstract {
                 var row = db.Row.SearchByKey(rk);
 
                 if (row == null) {
-                    _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, true);
+                    _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, true);
                     row = db.Row.SearchByKey(rk);
                 }
 
@@ -909,7 +909,7 @@ public abstract class SqlBackAbstract {
 
                 if (row != null) {
                     for (var z = 1; z < dt.Columns.Count; z++) {
-                        _ = db.Cell.SetValueInternal(columnsToLoad[z - 1].Name, row.Key, reader[z].ToString(), true);
+                        _ = db.Cell.SetValueInternal(columnsToLoad[z - 1], row, reader[z].ToString(), true);
                     }
                 }
             }

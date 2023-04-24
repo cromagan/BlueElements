@@ -501,7 +501,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
             return null;
         }
-        _ = db.ChangeData(DatabaseDataType.Comand_AddRow, null, key, string.Empty, key.ToString(), comment);
+        _ = db.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key.ToString(), comment);
         item = SearchByKey(key);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
@@ -598,7 +598,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    public bool Remove(long key, string comment) => string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, key, string.Empty, key.ToString(), comment));
+    public bool Remove(long key, string comment) {
+        var r = SearchByKey(key);
+
+        if (r == null) { return false; }
+        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, r, string.Empty, key.ToString(), comment));
+    }
 
     public bool Remove(FilterItem filter, List<RowItem>? pinned, string comment) {
         FilterCollection nf = new(Database) { filter };
@@ -688,6 +693,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
+    internal bool NeedDataCheck(long key) => _pendingChangedRows.Contains(key);
+
     //        default:
     //            if (type.ToString(false) == ((int)type).ToString(false)) {
     //                Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
@@ -724,30 +731,30 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
-    internal string SetValueInternal(DatabaseDataType type, long? key, bool isLoading) {
-        if (key is null or < 0) { return "Schlüsselfehler"; }
+    internal string SetValueInternal(DatabaseDataType type, long? rowkey, RowItem? row, bool isLoading) {
+        if (rowkey is null or < 0) { return "Schlüsselfehler"; }
 
         var db = Database;
         if (db == null || db.IsDisposed) { return "Datenbank verworfen"; }
 
         if (type == DatabaseDataType.Comand_AddRow) {
-            var c = new RowItem(db, (long)key);
+            var c = new RowItem(db, (long)rowkey);
 
             return Add(c);
         }
 
         if (type == DatabaseDataType.Comand_RemoveRow) {
-            var row = SearchByKey(key);
+            //var row = SearchByKey(key);
             if (row == null) { return "Zeile nicht vorhanden"; }
 
             OnRowRemoving(new RowEventArgs(row));
             foreach (var thisColumnItem in db.Column) {
                 if (thisColumnItem != null) {
-                    db.Cell.Delete(thisColumnItem, (long)key);
+                    db.Cell.Delete(thisColumnItem, row.Key);
                 }
             }
 
-            if (!_internal.TryRemove((long)key, out _)) { return "Löschen nicht erfolgreich"; }
+            if (!_internal.TryRemove(row.Key, out _)) { return "Löschen nicht erfolgreich"; }
             OnRowRemoved();
             return string.Empty;
         }
@@ -866,9 +873,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => _pendingworker.Remove((BackgroundWorker)sender);
-    internal bool NeedDataCheck(long key) => _pendingChangedRows.Contains(key);
-
-
 
     #endregion
 }

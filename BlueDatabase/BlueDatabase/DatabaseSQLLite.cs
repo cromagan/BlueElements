@@ -256,25 +256,26 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, string? columnName, long? rowkey, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
 
         if (!isLoading && !ReadOnly) {
-            var c = Column.Exists(columnName);
-
-            _ = _sql?.SetValueInternal(TableName, type, value, c?.Name, rowkey);
+            _ = _sql?.SetValueInternal(TableName, type, value, column?.Name, row?.Key);
         }
 
-        return base.SetValueInternal(type, value, columnName, rowkey, isLoading);
+        return base.SetValueInternal(type, value, column, row, isLoading);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, string? columnName, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
-        var err = _sql?.AddUndo(tableName, comand, columnName, rowKey, previousValue, changedTo, UserName, comment);
+    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) {
+        var columnName = column?.Name ?? string.Empty;
+        var rowkey = row?.Key ?? -1;
+
+        var err = _sql?.AddUndo(tableName, comand, columnName, rowkey, previousValue, changedTo, UserName, comment);
         if (!string.IsNullOrEmpty(err)) {
             Develop.CheckStackForOverflow();
-            AddUndo(tableName, comand, columnName, rowKey, previousValue, changedTo, userName, comment);
+            AddUndo(tableName, comand, column, row, previousValue, changedTo, userName, comment);
         }
     }
 
@@ -388,12 +389,13 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                                 break;
 
                             case DatabaseDataType.Comand_AddRow:
-                                _ = Row.SetValueInternal(t, LongParse(rowkey), true);
+                                _ = Row.SetValueInternal(t, LongParse(rowkey), null, true);
                                 _ = rk.AddIfNotExists(LongParse(rowkey)); // Nachher auch laden
                                 break;
 
                             case DatabaseDataType.Comand_RemoveRow:
-                                _ = Row.SetValueInternal(t, LongParse(rowkey), true);
+                                var r = Row.SearchByKey(LongParse(rowkey));
+                                _ = Row.SetValueInternal(t, r?.Key, r, true);
                                 break;
 
                             default:
@@ -435,7 +437,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                         var c = Column.Exists(columnname);
                         if (c != null) {
                             var v = _sql?.GetStyleData(tablename, comand, c.Name);
-                            if (v != null) { _ = SetValueInternal(t, v, c.Name, null, true); }
+                            if (v != null) { _ = SetValueInternal(t, v, c, null, true); }
                         }
 
                         #endregion

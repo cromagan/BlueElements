@@ -320,7 +320,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     /// <summary>
-    /// Rechnet Cellbezüge und besondere Spalten neu durch, falls sich der Wert geändert hat.
+    /// Rechnet Zellbezüge und besondere Spalten neu durch, falls sich der Wert geändert hat.
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
@@ -342,7 +342,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         switch (column.Format) {
             case DataFormat.RelationText:
-
                 if (doAlways || currentValue != previewsValue) {
                     RepairRelationText(column, row, previewsValue);
                     //SetSameValueOfKey(column, row, currentValue);
@@ -357,10 +356,18 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (!doAlways && currentValue == previewsValue) { return; }
+       //column.CheckIfIAmAKeyColumn();
 
-        //if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
-        //    SetSameValueOfKey(column, row, currentValue);
-        //}
+        if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
+            foreach (var thisC in dbtmp.Column) {
+                if (thisC.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+                    _ = LinkedCellData(thisC, row, true, false);
+                }
+            }
+
+            //SetSameValueOfKey(column, row, currentValue);
+        }
+
         if (column.IsFirst()) {
             foreach (var thisColumnItem in dbtmp.Column) {
                 if (thisColumnItem != null) {
@@ -673,11 +680,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         _ = Sizes.TryAdd(key, contentSize);
     }
 
-    public string SetValueInternal(string columnName, long rowkey, string value, bool isLoading) {
-        if (rowkey < 0) { return "Row konnte nicht generiert werden."; }
-        if (string.IsNullOrEmpty(columnName)) { return "Column konnte nicht generiert werden."; }
+    public string SetValueInternal(ColumnItem column, RowItem row, string value, bool isLoading) {
+        if (row is null) { return "Row konnte nicht generiert werden."; }
+        if (column is null) { return "Column konnte nicht generiert werden."; }
 
-        var cellKey = KeyOfCell(columnName, rowkey);
+        var cellKey = KeyOfCell(column, row);
 
         if (ContainsKey(cellKey)) {
             var c = this[cellKey];
@@ -686,21 +693,25 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (string.IsNullOrEmpty(value)) {
                 if (!TryRemove(cellKey, out _)) {
                     Develop.CheckStackForOverflow();
-                    return SetValueInternal(columnName, rowkey, value, isLoading);
+                    return SetValueInternal(column, row, value, isLoading);
                 }
             }
         } else {
             if (!string.IsNullOrEmpty(value)) {
                 if (!TryAdd(cellKey, new CellItem(value))) {
                     Develop.CheckStackForOverflow();
-                    return SetValueInternal(columnName, rowkey, value, isLoading);
+                    return SetValueInternal(column, row, value, isLoading);
                 }
             }
         }
 
         if (!isLoading) {
-            if (colum)
-                Database?.Row.AddRowWithChangedValue(rowkey);
+            if (column.ScriptType != ScriptType.Nicht_vorhanden) {
+                Database?.Row.AddRowWithChangedValue(row.Key);
+            }
+            //if (!row.NeedDataCheck()) {
+            //    DoSpecialFormats(column, row);
+            //}
         }
         return string.Empty;
     }
@@ -839,7 +850,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
         if (value == oldValue) { return; }
 
-        var message = dbtmp.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Name, row.Key, oldValue, value, string.Empty);
+        var message = dbtmp.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, string.Empty);
 
         if (!string.IsNullOrEmpty(message)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Wert nicht gesetzt: " + message);
@@ -895,7 +906,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
         if (value == oldval) { return; }
-        _ = Database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column.Name, row.Key, oldval, value, "SystemSet");
+        _ = Database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldval, value, "SystemSet");
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {
