@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueBasics;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -29,8 +30,8 @@ public class Method_CellSetRow : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal, RowVar };
-    public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn der Wert erfolgreich gesetzt wurde.";
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, StringVal, RowVar };
+    public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
@@ -63,9 +64,13 @@ public class Method_CellSetRow : Method_Database {
             return new DoItFeedback(infos.Data, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
         }
 
-        row.CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-        return row.CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+        var value = string.Empty;
+        if (attvar.Attributes[0] is VariableString vs) { value = vs.ValueString; }
+        if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
+
+        row.CellSet(columnToSet, value);
+        return row.CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 
     #endregion

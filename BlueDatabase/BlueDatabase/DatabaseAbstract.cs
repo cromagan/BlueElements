@@ -357,7 +357,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             if (_variableTmp == l.ToString(true)) { return; }
             _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, l.ToString(true), string.Empty);
-            OnViewChanged();
+            //OnViewChanged();
         }
     }
 
@@ -784,7 +784,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         //Export = sourceDatabase.Export;
 
         EventScript = sourceDatabase.EventScript;
-        Variables = sourceDatabase.Variables;
+
+        if(tagsToo) {
+            Variables = sourceDatabase.Variables;
+        }
+
+
         //Events = sourceDatabase.Events;
 
         UndoCount = sourceDatabase.UndoCount;

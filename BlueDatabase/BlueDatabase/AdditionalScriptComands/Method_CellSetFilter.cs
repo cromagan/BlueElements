@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueBasics;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -29,8 +30,8 @@ public class Method_CellSetFilter : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal, FilterVar };
-    public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und setzt den Wert. Ein Filter kann mit dem Befehl 'Filter' erstellt werden. Gibt TRUE zurück, wenn der Wert erfolgreich gesetzt wurde.";
+    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, StringVal, FilterVar };
+    public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und setzt den Wert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
@@ -69,9 +70,14 @@ public class Method_CellSetFilter : Method_Database {
             return new DoItFeedback(infos.Data, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
         }
 
-        r[0].CellSet(columnToSet, ((VariableString)attvar.Attributes[0]).ValueString);
 
-        return r[0].CellGetString(columnToSet) == ((VariableString)attvar.Attributes[0]).ValueString ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+        var value = string.Empty;
+        if(attvar.Attributes[0] is VariableString vs) { value = vs.ValueString; }
+        if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
+
+        r[0].CellSet(columnToSet, value);
+
+        return r[0].CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 
     #endregion
