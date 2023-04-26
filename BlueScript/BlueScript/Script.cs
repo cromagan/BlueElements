@@ -41,7 +41,7 @@ public class Script {
 
     #region Constructors
 
-    public Script(List<Variable>? variablen, string additionalFilesPath, bool changevalues, MethodType allowedMethods) {
+    public Script(List<Variable>? variablen, string additionalFilesPath, bool changevalues, MethodType allowedMethods, string attributes) {
         Comands ??= GetInstaceOfType<Method>();
         if (VarTypes == null) {
             VarTypes = GetInstaceOfType<Variable>("NAME");
@@ -54,6 +54,8 @@ public class Script {
         AllowedMethods = allowedMethods;
 
         AdditionalFilesPath = (additionalFilesPath.Trim("\\") + "\\").CheckPath();
+
+        Attributes = attributes;
     }
 
     #endregion
@@ -67,6 +69,7 @@ public class Script {
     public string AdditionalFilesPath { get; }
 
     public MethodType AllowedMethods { get; }
+    public string Attributes { get; private set; }
     public bool BreakFired { get; set; }
     public bool ChangeValues { get; }
     public bool EndScript { get; set; }

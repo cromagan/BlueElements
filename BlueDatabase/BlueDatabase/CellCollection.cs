@@ -356,7 +356,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (!doAlways && currentValue == previewsValue) { return; }
-       //column.CheckIfIAmAKeyColumn();
+        //column.CheckIfIAmAKeyColumn();
 
         if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) {
             foreach (var thisC in dbtmp.Column) {
@@ -478,8 +478,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (column.IsInCache == null) {
                 var x = Database.RefreshRowData(row, false, null);
-                if (!string.IsNullOrEmpty(x.Item2)) {
-                    Database.OnDropMessage(FehlerArt.Fehler, x.Item2);
+                if (!string.IsNullOrEmpty(x.errormessage)) {
+                    Database.OnDropMessage(FehlerArt.Fehler, x.errormessage);
                 }
             }
 

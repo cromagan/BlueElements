@@ -190,7 +190,7 @@ internal sealed partial class ColumnEditor {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column.Database.Column_UsedIn(_column));
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column.Useage());
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (_column?.Database == null || _column.Database.IsDisposed) { return; }

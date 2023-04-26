@@ -605,6 +605,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public bool IsDisposed { get; private set; }
+
     public string KeyName { get; private set; }
 
     public ColumnLineStyle LineLeft {
@@ -1190,18 +1191,17 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public List<string> Contents() => Contents(null as FilterCollection, null);
 
+    public List<string> Contents(FilterItem filter, List<RowItem>? pinned) {
+        var x = new FilterCollection(filter.Database) { filter };
+        return Contents(x, pinned);
+    }
+
     //public List<string> Contents(List<FilterItem>? filter, List<RowItem?>? pinned) {
     //    if (filter == null || filter.Count == 0) { return Contents(); }
     //    //var ficol = new FilterCollection(filter[0].Database);
     //    //ficol.AddRange(filter);
     //    return Contents(filter, pinned);
     //}
-
-    public List<string> Contents(FilterItem filter, List<RowItem>? pinned) {
-        var x = new FilterCollection(filter.Database) { filter };
-        return Contents(x, pinned);
-    }
-
     public List<string> Contents(List<RowItem?>? pinned) {
         List<string> list = new();
 
@@ -1672,7 +1672,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
             ResetSystemToDefault(false);
             CheckIfIAmAKeyColumn();
-
         } catch (Exception ex) {
             Develop.DebugPrint("Reparatur der Spalte fehlgeschlagen: " + Name, ex);
         }
@@ -1991,6 +1990,46 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         return Name + " -> " + Caption;
     }
 
+    public string Useage() {
+        if (Database is null || Database.IsDisposed) { return string.Empty; }
+
+        var t = "<b><u>Verwendung von " + ReadableText() + "</b></u><br>";
+        if (IsSystemColumn()) {
+            t += " - Systemspalte<br>";
+        }
+
+        if (Database.SortDefinition?.Columns.Contains(this) ?? false) { t += " - Sortierung<br>"; }
+        //var view = false;
+        //foreach (var thisView in OldFormulaViews) {
+        //    if (thisView[column] != null) { view = true; }
+        //}
+        //if (view) { t += " - Formular-Ansichten<br>"; }
+        var cola = false;
+        var first = true;
+        foreach (var thisView in Database.ColumnArrangements) {
+            if (!first && thisView[this] != null) { cola = true; }
+            first = false;
+        }
+        if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
+        if (UsedInScript()) { t += " - Regeln-Skript<br>"; }
+        if (Database.ZeilenQuickInfo.ToUpper().Contains(Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
+        if (_tags.JoinWithCr().ToUpper().Contains(Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
+        var layout = false;
+        foreach (var thisLayout in Database.Layouts) {
+            if (thisLayout.Contains(Name.ToUpper())) { layout = true; }
+        }
+        if (layout) { t += " - Layouts<br>"; }
+
+        if (!string.IsNullOrEmpty(Am_A_Key_For_Other_Column)) { t += Am_A_Key_For_Other_Column; }
+
+        var l = Contents();
+        if (l.Count > 0) {
+            t += "<br><br><b>Zusatz-Info:</b><br>";
+            t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
+        }
+        return t;
+    }
+
     //        case FormatHolder.TextMitFormatierung:
     //            SetFormatForTextMitFormatierung();
     //            break;
@@ -2108,6 +2147,19 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             _linkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
             _linkedDatabase.Disposing -= _TMP_LinkedDatabase_Disposing;
             _linkedDatabase = null;
+        }
+    }
+
+    internal void Optimize() {
+        if (!IsSystemColumn()) {
+            // Maximale Text-Länge beeinflusst stark die Ladezeit vom Server
+            var l = CalculatePreveredMaxTextLenght(1.2f);
+            if (l < MaxTextLenght) { MaxTextLenght = l; }
+
+            // ScriptType beeinflusst, ob eine Zeile neu durchgerechnet werden muss nach einer Änderung dieser Zelle
+            if (!UsedInScript()) {
+                ScriptType = ScriptType.Nicht_vorhanden;
+            }
         }
     }
 
@@ -2512,32 +2564,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    //public void SetFormat(VarType format) {
-    //    switch (format) {
-    //        case FormatHolder.Text:
-    //            SetFormatForText();
-    //            break;
-
-    //        case FormatHolder.Date:
-    //            SetFormatForDate();
-    //            break;
-
-    //        case FormatHolder.DateTime:
-    //            SetFormatForDateTime(true);
-    //            break;
-
-    //        case FormatHolder.Email:
-    //            SetFormatForEmail();
-    //            break;
-
-    //        case FormatHolder.Float:
-    //            SetFormatForFloat();
-    //            break;
-
-    //        case FormatHolder.FloatPositive:
-    //            SetFormatForFloatPositive();
-    //            break;
-
     //        case FormatHolder.Integer:
     //            SetFormatForInteger();
     //            break;
@@ -2616,5 +2642,47 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         return txt;
     }
 
+    /// <summary>
+    /// CallByFileName aufrufe werden nicht geprüft
+    /// </summary>
+    /// <returns></returns>
+    private bool UsedInScript() {
+        if (Database == null || Database.IsDisposed) { return false; }
+
+        foreach (var thiss in Database.EventScript) {
+            if (thiss.ChangeValues) {
+                if (thiss.Script.ContainsWord(Name, RegexOptions.IgnoreCase)) { return true; }
+            }
+        }
+
+        return false;
+    }
+
     #endregion
+
+    //public void SetFormat(VarType format) {
+    //    switch (format) {
+    //        case FormatHolder.Text:
+    //            SetFormatForText();
+    //            break;
+
+    //        case FormatHolder.Date:
+    //            SetFormatForDate();
+    //            break;
+
+    //        case FormatHolder.DateTime:
+    //            SetFormatForDateTime(true);
+    //            break;
+
+    //        case FormatHolder.Email:
+    //            SetFormatForEmail();
+    //            break;
+
+    //        case FormatHolder.Float:
+    //            SetFormatForFloat();
+    //            break;
+
+    //        case FormatHolder.FloatPositive:
+    //            SetFormatForFloatPositive();
+    //            break;
 }

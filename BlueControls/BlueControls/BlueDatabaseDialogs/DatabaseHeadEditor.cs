@@ -207,6 +207,8 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
 
     private void btnClipboard_Click(object sender, System.EventArgs e) => Generic.CopytoClipboard(tblUndo.Export_CSV(FirstRow.ColumnCaption));
 
+    private void btnOptimize_Click(object sender, System.EventArgs e) => Database?.Optimize();
+
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSave.Enabled = false;
 

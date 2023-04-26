@@ -615,6 +615,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="BlueDatabaseDialogs\DatabaseHeadEditor.resx">
+      <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\DatabaseScriptEditor.resx">
       <DependentUpon>DatabaseScriptEditor.cs</DependentUpon>
       <SubType>Designer</SubType>

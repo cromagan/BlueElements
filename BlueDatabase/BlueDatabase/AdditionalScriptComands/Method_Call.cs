@@ -60,8 +60,12 @@ internal class Method_Call : Method_Database {
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var sc = db.EventScript.Get(vs.ValueString);
-
         if (sc == null) { return new DoItFeedback(infos.Data, "Skript nicht vorhanden: " + vs.ValueString); }
+
+        if (sc.Attributes() != s.Attributes && s.Attributes != "*") {
+            return new DoItFeedback(infos.Data, "Aufzurufendes Skript hat andere Bedingungen.");
+        }
+
         var f = Script.ReduceText(sc.Script);
 
         var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, "Subroutinen-Aufruf [" + vs.ValueString + "]", f, ((VariableBool)attvar.Attributes[1]).ValueBool, 0, vs.ValueString);

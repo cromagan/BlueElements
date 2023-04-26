@@ -687,7 +687,7 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public override (bool, string) RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows) {
+    public override (bool didreload, string errormessage) RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows) {
         if (row == null || row.Count == 0) { return (false, string.Empty); }
 
         foreach (var thisrow in row) {

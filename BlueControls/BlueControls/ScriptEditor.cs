@@ -165,7 +165,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         OnExecuteScript(ex);
 
         if (ex.Feedback == null) {
-            var s = new Script(null, string.Empty, true, MethodType.Standard);
+            var s = new Script(null, string.Empty, true, MethodType.Standard, "*");
             ex.Feedback = s.Parse(0, "Main");
         }
 

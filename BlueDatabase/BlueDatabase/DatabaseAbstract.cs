@@ -785,57 +785,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         EventScript = sourceDatabase.EventScript;
 
-        if(tagsToo) {
+        if (tagsToo) {
             Variables = sourceDatabase.Variables;
         }
-
 
         //Events = sourceDatabase.Events;
 
         UndoCount = sourceDatabase.UndoCount;
-    }
-
-    /// <summary>
-    /// Einstellungen der Quell-Datenbank auf diese hier übertragen
-    /// </summary>
-    public string Column_UsedIn(ColumnItem? column) {
-        if (column == null) { return string.Empty; }
-
-        var t = "<b><u>Verwendung von " + column.ReadableText() + "</b></u><br>";
-        if (column.IsSystemColumn()) {
-            t += " - Systemspalte<br>";
-        }
-
-        if (SortDefinition?.Columns.Contains(column) ?? false) { t += " - Sortierung<br>"; }
-        //var view = false;
-        //foreach (var thisView in OldFormulaViews) {
-        //    if (thisView[column] != null) { view = true; }
-        //}
-        //if (view) { t += " - Formular-Ansichten<br>"; }
-        var cola = false;
-        var first = true;
-        foreach (var thisView in _columnArrangements) {
-            if (!first && thisView[column] != null) { cola = true; }
-            first = false;
-        }
-        if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
-        //if (RulesScript.ToUpper().Contains(column.Name.ToUpper())) { t += " - Regeln-Skript<br>"; }
-        if (ZeilenQuickInfo.ToUpper().Contains(column.Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
-        if (_tags.JoinWithCr().ToUpper().Contains(column.Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
-        var layout = false;
-        foreach (var thisLayout in _layouts) {
-            if (thisLayout.Contains(column.Name.ToUpper())) { layout = true; }
-        }
-        if (layout) { t += " - Layouts<br>"; }
-
-        if (!string.IsNullOrEmpty(column.Am_A_Key_For_Other_Column)) { t += column.Am_A_Key_For_Other_Column; }
-
-        var l = column.Contents();
-        if (l.Count > 0) {
-            t += "<br><br><b>Zusatz-Info:</b><br>";
-            t = t + " - Befüllt mit " + l.Count + " verschiedenen Werten";
-        }
-        return t;
     }
 
     public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists);
@@ -977,7 +933,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             #region Script ausführen
 
-            Script sc = new(vars, AdditionalFilesPfadWhole(), changevalues, allowedMethods) {
+            Script sc = new(vars, AdditionalFilesPfadWhole(), changevalues, allowedMethods, s.Attributes()) {
                 ScriptText = s.Script
             };
             var scf = sc.Parse(0, s.Name);
@@ -1056,8 +1012,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>
-            //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
+                //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+                Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
     public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, List<RowData>? sortedRows) {
         columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
@@ -1098,8 +1054,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         var x = RefreshRowData(sortedRows, false);
-        if (!string.IsNullOrEmpty(x.Item2)) {
-            OnDropMessage(FehlerArt.Fehler, x.Item2);
+        if (!string.IsNullOrEmpty(x.errormessage)) {
+            OnDropMessage(FehlerArt.Fehler, x.errormessage);
         }
 
         foreach (var thisRow in sortedRows) {
@@ -1150,8 +1106,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         da.RowEnd();
         var x = RefreshRowData(sortedRows, false);
-        if (!string.IsNullOrEmpty(x.Item2)) {
-            OnDropMessage(FehlerArt.Fehler, x.Item2);
+        if (!string.IsNullOrEmpty(x.errormessage)) {
+            OnDropMessage(FehlerArt.Fehler, x.errormessage);
         }
 
         foreach (var thisRow in sortedRows) {
@@ -1413,6 +1369,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
+    public void Optimize() {
+        foreach (var thisColumn in Column) {
+            thisColumn.Optimize();
+        }
+    }
+
     //public void InvalidateExports(string layoutId) {
     //    if (ReadOnly) { return; }
     public List<string> Permission_AllUsed(bool cellLevel) {
@@ -1476,7 +1438,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    public (bool, string) RefreshRowData(List<RowData> rowdata, bool refreshAlways) {
+    public (bool didreload, string errormessage) RefreshRowData(List<RowData> rowdata, bool refreshAlways) {
         if (rowdata.Count == 0) { return (false, string.Empty); }
 
         var r = new List<RowItem>();
@@ -1486,9 +1448,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return RefreshRowData(r, refreshAlways, null);
     }
 
-    public abstract (bool, string) RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows);
+    public abstract (bool didreload, string errormessage) RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows);
 
-    public (bool, string) RefreshRowData(List<long> keys, bool refreshAlways, List<RowItem>? sortedRows) {
+    public (bool didreload, string errormessage) RefreshRowData(List<long> keys, bool refreshAlways, List<RowItem>? sortedRows) {
         if (keys.Count == 0) { return (false, string.Empty); }
 
         var r = new List<RowItem>();
@@ -1499,7 +1461,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return RefreshRowData(r, refreshAlways, sortedRows);
     }
 
-    public (bool, string) RefreshRowData(RowItem row, bool refreshAlways, List<RowItem>? sortedRows) => RefreshRowData(new List<RowItem> { row }, refreshAlways, sortedRows);
+    public (bool didreload, string errormessage) RefreshRowData(RowItem row, bool refreshAlways, List<RowItem>? sortedRows) => RefreshRowData(new List<RowItem> { row }, refreshAlways, sortedRows);
 
     public virtual void RepairAfterParse() {
         Column.Repair();

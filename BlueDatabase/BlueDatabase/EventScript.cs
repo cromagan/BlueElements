@@ -25,6 +25,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using BlueScript;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -301,6 +302,13 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
         } catch {
             return ToString();
         }
+    }
+
+    internal string Attributes() {
+        var s = string.Empty;
+        if (NeedRow) { s += "NeedRow"; }
+        if (ChangeValues) { s += "ChangeValues"; }
+        return s;
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();

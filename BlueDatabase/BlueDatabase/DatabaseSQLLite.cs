@@ -200,7 +200,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     //    LoadFromSQLBack();
     //}
 
-    public override (bool, string) RefreshRowData(List<RowItem> rows, bool refreshAlways, List<RowItem>? sortedRows) {
+    public override (bool didreload, string errormessage) RefreshRowData(List<RowItem> rows, bool refreshAlways, List<RowItem>? sortedRows) {
         if (rows == null || rows.Count == 0) { return (false, string.Empty); }
 
         var l = new List<RowItem>();
@@ -446,8 +446,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             }
 
             var x = RefreshRowData(rk, true, null);
-            if (!string.IsNullOrEmpty(x.Item2)) {
-                OnDropMessage(FehlerArt.Fehler, x.Item2);
+            if (!string.IsNullOrEmpty(x.errormessage)) {
+                OnDropMessage(FehlerArt.Fehler, x.errormessage);
             }
         } catch {
             DoLastChanges(data);

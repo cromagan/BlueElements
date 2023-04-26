@@ -1261,9 +1261,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var count = 0;
             do {
                 count++;
-                if (count > 10) {
+                if (count > 20) {
                     DrawWaitScreen(gr);
-                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Fehler, "Datenbank-laden nach 10 Versuchen aufgegeben", true);
+                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Fehler, "Datenbank-laden nach 20 Versuchen aufgegeben", true);
                     return;
                 }
 
@@ -1297,13 +1297,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     }
                 }
 
-                var x = Database.RefreshRowData(rowsToRefreh, false, sortedRows);
+                (bool didreload, string errormessage) = Database.RefreshRowData(rowsToRefreh, false, sortedRows);
 
-                if (!string.IsNullOrEmpty(x.Item2)) {
-                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Fehler, x.Item2, true);
+                if (!string.IsNullOrEmpty(errormessage)) {
+                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Fehler, errormessage, true);
                 }
 
-                if (!x.Item1) { break; }
+                if (!didreload) { break; }
                 Invalidate_SortedRowData();
             } while (true);
 
