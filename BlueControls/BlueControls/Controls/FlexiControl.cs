@@ -346,7 +346,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public void DeleteValue() => ValueSet(string.Empty, true, true);
 
-    public bool ParseVariables(List<Variable>? list) {
+    public bool ParseVariables(VariableCollection list) {
         var ct = string.Empty;
 
         if (list != null) {

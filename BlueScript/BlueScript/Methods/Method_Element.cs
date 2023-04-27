@@ -44,7 +44,7 @@ internal class Method_Element : Method {
 
     #region Methods
 
-    public override List<string> Comand(List<Variable>? currentvariables) => new() { "element" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "element" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
@@ -52,7 +52,7 @@ internal class Method_Element : Method {
         var i = ((VariableFloat)attvar.Attributes[1]).ValueInt;
         var list = ((VariableListString)attvar.Attributes[0]).ValueList;
         if (i < 0 || i >= list.Count) {
-            return new DoItFeedback(infos.Data, "Element nicht in Liste");
+            return new DoItFeedback(infos.Data, "Element '" + i + "' nicht in der Liste vorhanden");
         }
 
         return new DoItFeedback(list[i]);

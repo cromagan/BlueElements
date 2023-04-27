@@ -114,6 +114,9 @@ public partial class TableView : FormWithStatusBar {
     public static void CheckDatabase(object? sender, System.EventArgs e) {
         if (sender is DatabaseAbstract database && !database.ReadOnly) {
             if (database.IsAdministrator()) {
+
+                #region Spalten reparieren
+
                 foreach (var thisColumnItem in database.Column) {
                     while (!thisColumnItem.IsOk()) {
                         DebugPrint(FehlerArt.Info,
@@ -127,6 +130,19 @@ public partial class TableView : FormWithStatusBar {
                         OpenColumnEditor(thisColumnItem, null);
                     }
                 }
+
+                #endregion
+
+                #region Skripte Reparieren
+
+                while (!string.IsNullOrEmpty(database.CheckScriptError())) {
+                    MessageBox.Show(
+                    "Die Skripte enthalten einen Fehler:<br>" + database.CheckScriptError() +
+                    "<br><br>Bitte reparieren.", ImageCode.Information, "OK");
+                    OpenScriptEditor(database);
+                }
+
+                #endregion
             }
         }
     }
@@ -236,6 +252,13 @@ public partial class TableView : FormWithStatusBar {
     //    //l.Sort();
     //    return l;
     //}
+
+    public static void OpenScriptEditor(DatabaseAbstract? db) {
+        if (db == null || db.IsDisposed) { return; }
+
+        var se = new DatabaseScriptEditor(db);
+        _ = se.ShowDialog();
+    }
 
     public void ResetDatabaseSettings() {
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
@@ -863,10 +886,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
-        if (Table?.Database == null || Table.Database.IsDisposed) { return; }
-
-        var se = new DatabaseScriptEditor(Table.Database);
-        _ = se.ShowDialog();
+        OpenScriptEditor(Table.Database);
         UpdateScripts(Table.Database);
     }
 

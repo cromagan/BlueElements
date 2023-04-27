@@ -2643,16 +2643,14 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     /// <summary>
-    /// CallByFileName aufrufe werden nicht geprüft
+    /// CallByFileName Aufrufe werden nicht geprüft
     /// </summary>
     /// <returns></returns>
     private bool UsedInScript() {
         if (Database == null || Database.IsDisposed) { return false; }
 
         foreach (var thiss in Database.EventScript) {
-            if (thiss.ChangeValues) {
-                if (thiss.Script.ContainsWord(Name, RegexOptions.IgnoreCase)) { return true; }
-            }
+            if (thiss.Script.ContainsWord(Name, RegexOptions.IgnoreCase)) { return true; }
         }
 
         return false;

@@ -34,7 +34,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.eventScriptEditor = new BlueControls.ScriptEditor();
             this.panel1 = new System.Windows.Forms.Panel();
             this.grpZeile = new BlueControls.Controls.GroupBox();
-            this.capAnmerkung = new BlueControls.Controls.Caption();
             this.cpZeile = new BlueControls.Controls.Caption();
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.grpEigenschaften = new BlueControls.Controls.GroupBox();
@@ -56,6 +55,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts = new BlueControls.Controls.ListBox();
             this.tabVariablen = new System.Windows.Forms.TabPage();
             this.variableEditor = new BlueControls.VariableEditor();
+            this.chkChangeValuesInTest = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.tabScripts.SuspendLayout();
@@ -81,6 +81,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.GlobalTab.Controls.Add(this.tabScripts);
             this.GlobalTab.Controls.Add(this.tabVariablen);
             this.GlobalTab.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.GlobalTab.GetRowFrom = null;
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
@@ -131,7 +132,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpZeile
             // 
             this.grpZeile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpZeile.Controls.Add(this.capAnmerkung);
+            this.grpZeile.Controls.Add(this.chkChangeValuesInTest);
             this.grpZeile.Controls.Add(this.cpZeile);
             this.grpZeile.Controls.Add(this.txbTestZeile);
             this.grpZeile.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -141,14 +142,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpZeile.TabIndex = 8;
             this.grpZeile.TabStop = false;
             this.grpZeile.Text = "Zeile";
-            // 
-            // capAnmerkung
-            // 
-            this.capAnmerkung.CausesValidation = false;
-            this.capAnmerkung.Location = new System.Drawing.Point(112, 40);
-            this.capAnmerkung.Name = "capAnmerkung";
-            this.capAnmerkung.Size = new System.Drawing.Size(256, 22);
-            this.capAnmerkung.Text = "<i>Tests im Skript Editor ändern keine Werte!";
             // 
             // cpZeile
             // 
@@ -398,6 +391,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.variableEditor.Size = new System.Drawing.Size(1283, 618);
             this.variableEditor.TabIndex = 0;
             // 
+            // chkChangeValuesInTest
+            // 
+            this.chkChangeValuesInTest.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.chkChangeValuesInTest.Location = new System.Drawing.Point(112, 40);
+            this.chkChangeValuesInTest.Name = "chkChangeValuesInTest";
+            this.chkChangeValuesInTest.QuickInfo = "<i>Tests im Skript Editor ändern keine Werte,\r\naußer dieses Häkchen ist gesetzt.";
+            this.chkChangeValuesInTest.Size = new System.Drawing.Size(376, 24);
+            this.chkChangeValuesInTest.TabIndex = 15;
+            this.chkChangeValuesInTest.Text = "<Imagecode=Warnung|16>Skript darf auch im Test Werte der Datenbank verändern";
+            // 
             // DatabaseScriptEditor
             // 
             this.ClientSize = new System.Drawing.Size(1297, 677);
@@ -441,7 +444,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capName;
         private TextBox txbTestZeile;
         private GroupBox grpZeile;
-        private Caption capAnmerkung;
         private Caption cpZeile;
         private Button chkAuslöser_valuechangedThread;
         private Panel panel1;
@@ -449,5 +451,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button chkAuslöser_databaseloaded;
         private Button chkAuslöser_export;
         private Button btnSpaltenuebersicht;
+        private Button chkChangeValuesInTest;
     }
 }

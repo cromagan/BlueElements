@@ -74,6 +74,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private BlueFont? _chapterFont;
     private BlueFont? _columnFilterFont;
     private BlueFont? _columnFont;
+    private DateTime? _databaseDrawError = null;
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
     private FilterCollection? _filter;
     private List<RowItem>? _filteredRows;
@@ -719,6 +720,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         ShowWaitScreen = true;
         Refresh(); // um die Uhr anzuzeigen
         Database = value;
+        _databaseDrawError = null;
         InitializeSkin(); // Neue Schriftgrößen
         if (Database != null && !Database.IsDisposed) {
             Database.Cell.CellValueChanged += _Database_CellValueChanged;
@@ -1232,6 +1234,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return;
         }
 
+        if (_databaseDrawError is DateTime dt) {
+            if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 60) {
+                DrawWaitScreen(gr);
+                return;
+            }
+            _databaseDrawError = null;
+        }
+
         _tmpCursorRect = Rectangle.Empty;
 
         // Listboxen bekommen keinen Focus, also Tabellen auch nicht. Basta.
@@ -1261,9 +1271,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var count = 0;
             do {
                 count++;
-                if (count > 20) {
+                if (count > 10) {
                     DrawWaitScreen(gr);
-                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Fehler, "Datenbank-laden nach 20 Versuchen aufgegeben", true);
+                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Fehler, "Datenbank-laden nach 10 Versuchen aufgegeben", true);
+                    _databaseDrawError = DateTime.UtcNow;
                     return;
                 }
 
@@ -1300,7 +1311,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 (bool didreload, string errormessage) = Database.RefreshRowData(rowsToRefreh, false, sortedRows);
 
                 if (!string.IsNullOrEmpty(errormessage)) {
-                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Fehler, errormessage, true);
+                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Warnung, errormessage, true);
                 }
 
                 if (!didreload) { break; }

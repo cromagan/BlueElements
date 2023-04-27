@@ -44,7 +44,7 @@ internal class Method_Var : Method {
 
     #region Methods
 
-    public override List<string> Comand(List<Variable>? currentvariables) => new() { "var" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "var" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.Data, "Kein Text angekommen."); }

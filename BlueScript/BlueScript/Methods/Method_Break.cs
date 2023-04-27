@@ -45,7 +45,7 @@ internal class Method_Break : Method {
 
     #region Methods
 
-    public override List<string> Comand(List<Variable>? currentvariables) => new() { "break" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "break" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         if (s.Sub < 1) { return new DoItFeedback(infos.Data, "Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }

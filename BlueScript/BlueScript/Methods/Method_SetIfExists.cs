@@ -44,7 +44,7 @@ internal class Method_SetIfExists : Method {
 
     #region Methods
 
-    public override List<string> Comand(List<Variable>? currentvariables) => new() { "SetIfExists" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "SetIfExists" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);

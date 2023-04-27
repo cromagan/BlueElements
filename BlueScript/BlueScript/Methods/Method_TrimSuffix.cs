@@ -45,7 +45,7 @@ internal class Method_TrimSuffix : Method {
 
     #region Methods
 
-    public override List<string> Comand(List<Variable>? currentvariables) => new() { "trimsuffix" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "trimsuffix" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);

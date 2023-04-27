@@ -27,7 +27,7 @@ public class ScriptEndedFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(List<Variable> variables, List<string> protocol, bool allOk) {
+    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk) {
         Variables = variables;
         GiveItAnotherTry = false;
         Protocol = protocol;
@@ -65,7 +65,7 @@ public class ScriptEndedFeedback {
 
     public string ProtocolText { get; }
 
-    public List<Variable>? Variables { get; }
+    public VariableCollection Variables { get; }
 
     #endregion
 

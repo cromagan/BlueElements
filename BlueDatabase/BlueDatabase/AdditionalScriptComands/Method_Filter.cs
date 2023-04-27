@@ -46,7 +46,7 @@ public class Method_Filter : Method_Database {
 
     #region Methods
 
-    public static List<FilterItem>? ObjectToFilter(List<Variable>? attributes, int ab) {
+    public static List<FilterItem>? ObjectToFilter(VariableCollection attributes, int ab) {
         if (attributes == null) { return null; }
 
         var allFi = new List<FilterItem>();
@@ -67,7 +67,7 @@ public class Method_Filter : Method_Database {
         return allFi.Count < 1 ? null : allFi;
     }
 
-    public override List<string> Comand(List<Variable> currentvariables) => new() { "filter" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "filter" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);

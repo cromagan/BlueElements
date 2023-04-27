@@ -99,6 +99,9 @@ public partial class MessageBox : Form {
                 Generic.Pause(0.1, true);
             }
         }
+
+        if (mb._pressed == null) { return -1; }
+
         return IntParse(mb._pressed.Name);
     }
 
@@ -148,6 +151,11 @@ public partial class MessageBox : Form {
 
                     case "anpinnen":
                         b.ImageCode = "Pinnadel|16";
+                        w = 4;
+                        break;
+
+                    case "fortfahren":
+                        b.ImageCode = "Abspielen|16";
                         w = 4;
                         break;
 

@@ -47,12 +47,12 @@ public partial class VariableEditor : UserControl {
 
     #region Methods
 
-    public List<Variable> GetVariables() {
+    public VariableCollection GetVariables() {
         if (!Editabe) {
             Develop.DebugPrint_NichtImplementiert();
             // Bei Editable TRUE sind es nur string variablen
         }
-        var list = new List<Variable>();
+        var list = new VariableCollection();
 
         foreach (var thisr in filterVariablen.Table.Database.Row) {
             var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, false,
@@ -73,17 +73,16 @@ public partial class VariableEditor : UserControl {
         return tableVariablen.Database.Row[variable.Name];
     }
 
-    public void WriteVariablesToTable(IList<VariableString>? variables) {
-        if (variables == null) { return; }
+    public void WriteVariablesToTable(IReadOnlyCollection<Variable> variables) {
+        var l = new VariableCollection();
 
-        var l = new List<Variable>();
-        foreach (var thisv in variables) {
-            l.Add(thisv);
+        foreach (var v in variables) {
+            l.Add(v);
         }
         WriteVariablesToTable(l);
     }
 
-    public void WriteVariablesToTable(IList<Variable>? variables) {
+    public void WriteVariablesToTable(VariableCollection? variables) {
         if (!_inited) {
             _inited = true;
             GenerateVariableTable();

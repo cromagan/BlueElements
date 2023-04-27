@@ -63,7 +63,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     private readonly List<string> _permissionGroupsNewRow = new();
     private readonly List<string> _tags = new();
-    private readonly List<VariableString> _variables = new();
+    private readonly List<Variable> _variables = new();
     private string _additionalFilesPfad = string.Empty;
     private string _cachePfad = string.Empty;
     private string _caption = string.Empty;
@@ -75,7 +75,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     private double _globalScale;
     private string _globalShowPass = string.Empty;
-    private string _scripterror = string.Empty;
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -348,11 +347,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public string UserGroup { get; set; }
     public string UserName { get; } = Generic.UserName().ToUpper();
 
-    public ReadOnlyCollection<VariableString> Variables {
+    public VariableCollection Variables {
         get => new(_variables);
         set {
             var l = new List<VariableString>();
-            l.AddRange(value);
+            l.AddRange(value.ToListVariableString());
             l.Sort();
 
             if (_variableTmp == l.ToString(true)) { return; }
@@ -687,54 +686,46 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return string.Empty;
     }
 
-    public void CheckScriptError() {
-        _scripterror = string.Empty;
-
+    public string CheckScriptError() {
         List<string> names = new();
         EventTypes types = 0;
 
         foreach (var thissc in _eventScript) {
             if (!thissc.IsOk()) {
-                _scripterror = thissc.Name + ": " + thissc.ErrorReason();
+                return thissc.Name + ": " + thissc.ErrorReason();
             }
 
             if (names.Contains(thissc.Name, false)) {
-                _scripterror = "Skriptname '" + thissc.Name + "' mehrfach vorhanden";
-                return;
+                return "Skriptname '" + thissc.Name + "' mehrfach vorhanden";
             }
 
             if (thissc.EventTypes.HasFlag(EventTypes.export) && types.HasFlag(EventTypes.export)) {
-                _scripterror = "Skript 'Export' mehrfach vorhanden";
-                return;
+                return "Skript 'Export' mehrfach vorhanden";
             }
 
             if (thissc.EventTypes.HasFlag(EventTypes.database_loaded) && types.HasFlag(EventTypes.database_loaded)) {
-                _scripterror = "Skript 'Datenank geladen' mehrfach vorhanden";
-                return;
+                return "Skript 'Datenank geladen' mehrfach vorhanden";
             }
 
             if (thissc.EventTypes.HasFlag(EventTypes.prepare_formula) && types.HasFlag(EventTypes.prepare_formula)) {
-                _scripterror = "Skript 'Formular Vorbereitung' mehrfach vorhanden";
-                return;
+                return "Skript 'Formular Vorbereitung' mehrfach vorhanden";
             }
 
             if (thissc.EventTypes.HasFlag(EventTypes.value_changed_extra_thread) && types.HasFlag(EventTypes.value_changed_extra_thread)) {
-                _scripterror = "Skript 'Wert geändert Extra Thread' mehrfach vorhanden";
-                return;
+                return "Skript 'Wert geändert Extra Thread' mehrfach vorhanden";
             }
 
             if (thissc.EventTypes.HasFlag(EventTypes.new_row) && types.HasFlag(EventTypes.new_row)) {
-                _scripterror = "Skript 'Neue Zeile' mehrfach vorhanden";
-                return;
+                return "Skript 'Neue Zeile' mehrfach vorhanden";
             }
 
             if (thissc.EventTypes.HasFlag(EventTypes.value_changed) && types.HasFlag(EventTypes.value_changed)) {
-                _scripterror = "Skript 'Wert geändert' mehrfach vorhanden";
-                return;
+                return "Skript 'Wert geändert' mehrfach vorhanden";
             }
 
             types |= thissc.EventTypes;
         }
+        return string.Empty;
     }
 
     public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo, bool tagsToo) {
@@ -873,13 +864,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     public ScriptEndedFeedback ExecuteScript(EventScript s, bool changevalues, RowItem? row) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, s.Name); }
 
-        if (!string.IsNullOrEmpty(_scripterror)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + _scripterror, false, "Allgemein"); }
+        var sce = CheckScriptError();
+        if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, "Allgemein"); }
 
         try {
 
             #region Variablen für Skript erstellen
 
-            List<Variable> vars = new();
+            VariableCollection vars = new();
 
             if (row != null) {
                 foreach (var thisCol in Column) {
@@ -891,7 +883,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 vars.Add(new VariableRowItem("RowKey", row, true, true, "Die aktuelle Zeile, die ausgeführt wird."));
             }
 
-            foreach (var thisvar in Variables) {
+            foreach (var thisvar in Variables.ToListVariableString()) {
                 var v = new VariableString("DB_" + thisvar.Name, thisvar.ValueString, false, false,
                     "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
                 vars.Add(v);
@@ -1202,7 +1194,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             //#region Das Skript berechnen
 
             //if (!string.IsNullOrEmpty(scriptnameeverychangedrow)) {
-            //    var vars = new List<Variable> {
+            //    var vars = new VariableCollection {
             //        new VariableString("Row", ein[z], false, false, "Der Original-Text. Dieser kann (und soll) manipuliert werden."),
             //        new VariableBool("IsCaption", spalteZuordnen && z == 0, true, false, "Wenn TRUE, ist das die erste Zeile, die Überschriften enthält."),
             //        new VariableString("Seperator", splitChar, true, false, "Das Trennzeichen")
@@ -1497,9 +1489,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         if (!isLoading) { Variables_Changed(); }
     }
 
-    public void WriteBackDbVariables(List<Variable> vars) {
+    public void WriteBackDbVariables(VariableCollection vars) {
         var vaa = new List<VariableString>();
-        vaa.AddRange(Variables);
+        vaa.AddRange(Variables.ToListVariableString());
 
         foreach (var thisvar in vaa) {
             var v = vars.Get("DB_" + thisvar.Name);
@@ -1510,7 +1502,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 thisvar.ReadOnly = true; // weil kein OnChanged vorhanden ist
             }
         }
-        Variables = new ReadOnlyCollection<VariableString>(vaa);
+        Variables = new VariableCollection(vaa);
     }
 
     internal void DevelopWarnung(string t) {
@@ -1969,7 +1961,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         } catch { }
     }
 
-    private void Variables_Changed() => Variables = new ReadOnlyCollection<VariableString>(_variables);
+    private void Variables_Changed() => Variables = new VariableCollection(_variables);
 
     #endregion
 }

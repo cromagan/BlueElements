@@ -47,7 +47,7 @@ internal class Method_End : Method {
 
     #region Methods
 
-    public override List<string> Comand(List<Variable>? currentvariables) => new() { "end" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "end" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         s.EndScript = true;

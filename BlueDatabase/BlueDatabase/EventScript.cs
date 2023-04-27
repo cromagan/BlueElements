@@ -175,8 +175,8 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
 
         if (_eventTypes.HasFlag(EventTypes.prepare_formula)) {
             if (_changeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
-            if (!_needRow) { return "Routinen,  die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
-            if (_executable) { return "Routinen,  die das Formular vorbereiten, können nicht so von außerhalb benutzt werden."; }
+            if (!_needRow) { return "Routinen, die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
+            if (_executable) { return "Routinen, die das Formular vorbereiten, können nicht so von außerhalb benutzt werden."; }
         }
 
         if (_eventTypes.HasFlag(EventTypes.export)) {
@@ -191,10 +191,12 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
 
         if (_eventTypes.HasFlag(EventTypes.value_changed)) {
             if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
+            if (!_changeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen"; }
         }
 
         if (_eventTypes.HasFlag(EventTypes.new_row)) {
             if (!_needRow) { return "Routinen, die neue Zeilen überwachen, müssen sich auf Zeilen beziehen."; }
+            if (!_changeValues) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen"; }
         }
 
         if (_eventTypes.HasFlag(EventTypes.database_loaded)) {

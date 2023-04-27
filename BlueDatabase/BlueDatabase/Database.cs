@@ -509,7 +509,7 @@ public sealed class Database : DatabaseAbstract {
             //SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
             SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));
             //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
-            SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToString(true));
+            SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
 
             // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
             // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.

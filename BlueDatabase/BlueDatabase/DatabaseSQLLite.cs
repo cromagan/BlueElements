@@ -331,7 +331,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return oo;
     }
 
-    private void DoLastChanges(List<(string tablename, string comand, string columnname, string rowkey, DateTime timecode)>? data) {
+    private void DoLastChanges(List<(string tablename, string comand, string columnname, string rowkey, string newValue, DateTime timecode)>? data) {
         if (data == null) { return; }
         if (IsDisposed) { return; }
 
@@ -343,7 +343,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         try {
             var rk = new List<long>();
 
-            foreach (var (tablename, comand, columnname, rowkey, timecode) in data) {
+            foreach (var (tablename, comand, columnname, rowkey, newvalue, timecode) in data) {
                 if (TableName == tablename && timecode > IsInCache) {
                     _ = Enum.TryParse(comand, out DatabaseDataType t);
 
@@ -381,16 +381,16 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                             //    break;
 
                             case DatabaseDataType.Comand_AddColumnByName:
-                                _ = Column.SetValueInternal(t, true, columnname);
-                                var c2 = Column.Exists(columnname);
+                                _ = Column.SetValueInternal(t, true, newvalue); // ColumName kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Spalte bekannt ist und nicht gespeichert wird
+                                var c2 = Column.Exists(newvalue);
                                 //var columnname = _sql.GetLastColumnName(TableName, c.Key);
                                 //_ = SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
                                 c2?.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
                                 break;
 
                             case DatabaseDataType.Comand_AddRow:
-                                _ = Row.SetValueInternal(t, LongParse(rowkey), null, true);
-                                _ = rk.AddIfNotExists(LongParse(rowkey)); // Nachher auch laden
+                                _ = Row.SetValueInternal(t, LongParse(newvalue), null, true); // RowKey kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Zeile bekannt ist und nicht gespeichert wird
+                                _ = rk.AddIfNotExists(LongParse(newvalue)); // Nachher auch laden
                                 break;
 
                             case DatabaseDataType.Comand_RemoveRow:

@@ -99,7 +99,7 @@ internal class Method_BerechneVariable : Method {
         return vari.GetValueFrom(attvar.Attributes[0], infos.Data);
     }
 
-    public override List<string> Comand(List<Variable> currentvariables) => currentvariables.AllNames();
+    public override List<string> Comand(VariableCollection? currentvariables) => currentvariables?.AllNames() ?? new List<string>();
 
     /// <summary>
     /// Berechnet z.B.   X = 5;

@@ -20,7 +20,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows.Forms;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -115,7 +114,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     #region Methods
 
-    protected override void OnFormClosing(FormClosingEventArgs e) {
+    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         base.OnFormClosing(e);
         if (Database == null || Database.IsDisposed) { return; }
 
@@ -227,7 +226,12 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 return;
             }
         }
-        e.Feedback = Database?.ExecuteScript(_item, false, r);
+
+        if (chkChangeValuesInTest.Checked) {
+            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", BlueBasics.Enums.ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
+        }
+
+        e.Feedback = Database?.ExecuteScript(_item, chkChangeValuesInTest.Checked, r);
     }
 
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
@@ -320,7 +324,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             }
         }
 
-        Database.Variables = new ReadOnlyCollection<VariableString>(l2);
+        Database.Variables = new VariableCollection(l2);
     }
 
     #endregion

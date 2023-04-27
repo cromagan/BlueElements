@@ -113,7 +113,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Methods
 
-    public static List<Variable>? CellToVariable(ColumnItem? column, RowItem? row) {
+    public static VariableCollection CellToVariable(ColumnItem? column, RowItem? row) {
         if (column == null || row == null) { return null; }
         if (!column.Format.CanBeCheckedByRules()) { return null; }
         if (!column.SaveContent) { return null; }
@@ -133,7 +133,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var wert = row.CellGetString(column);
         var qi = "Spalte: " + column.ReadableText();
 
-        var vars = new List<Variable>();
+        var vars = new VariableCollection();
 
         //switch (column.Format) {
         //    //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
@@ -492,7 +492,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return erg;
     }
 
-    public void VariableToCell(ColumnItem? column, ICollection<Variable> vars) {
+    public void VariableToCell(ColumnItem? column, VariableCollection vars) {
         if (Database == null || Database.IsDisposed || Database.ReadOnly || column == null) { return; }
 
         var columnVar = vars.Get(column.Name);

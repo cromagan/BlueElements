@@ -36,9 +36,9 @@ public abstract class Method_Database : Method {
 
     #region Methods
 
-    protected ColumnItem? Column(List<Variable>? variables, string name) => MyDatabase(variables)?.Column.Exists(name);
+    protected ColumnItem? Column(VariableCollection variables, string name) => MyDatabase(variables)?.Column.Exists(name);
 
-    protected DatabaseAbstract? DatabaseOf(List<Variable>? variables, string tableName) {
+    protected DatabaseAbstract? DatabaseOf(VariableCollection variables, string tableName) {
 
         if (!SqlBackAbstract.IsValidTableName(tableName, false)) { return null; }
 
@@ -50,7 +50,7 @@ public abstract class Method_Database : Method {
         return null;
     }
 
-    protected DatabaseAbstract? MyDatabase(List<Variable>? variables) {
+    protected DatabaseAbstract? MyDatabase(VariableCollection variables) {
         if (variables != null) {
             var f = variables.GetSystem("Database");
             if (f is VariableDatabase db) { return db.Database; }
@@ -58,7 +58,7 @@ public abstract class Method_Database : Method {
         return null;
     }
 
-    protected RowItem? MyRow(List<Variable>? variables) {
+    protected RowItem? MyRow(VariableCollection variables) {
         if (variables != null) {
             var f = variables.GetSystem("RowKey");
             if (f is VariableRowItem db) { return db.RowItem; }

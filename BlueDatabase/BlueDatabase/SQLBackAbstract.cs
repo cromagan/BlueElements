@@ -406,9 +406,16 @@ public abstract class SqlBackAbstract {
                 }
             }
 
-            if (count == 0) { return string.Empty; }
-
             _ = db.Row.FillUp100(row, sortedRows);
+
+            if (count == 0) {
+                // Alle spalten im Speicher, also alle Zeilen auch als OK marieren
+                foreach (var thisRow in row) {
+                    thisRow.IsInCache = DateTime.UtcNow;
+                }
+
+                return string.Empty;
+            }
 
             com.Append(" FROM " + tablename.ToUpper());
 
@@ -428,6 +435,7 @@ public abstract class SqlBackAbstract {
             var dt = Fill_Table(com.ToString());
 
             if (dt == null) { return "Keine gültige Rückgabe erhalten: \r\n" + com.ToString(); }
+            if(dt.Rows.Count != row.Count) { return "Rückgabefehler, Zeilen ungleich: \r\n" + com.ToString(); }
 
             foreach (var thisRow in dt.Rows) {
                 var reader = (DataRow)thisRow;
@@ -777,14 +785,14 @@ public abstract class SqlBackAbstract {
     /// <param name="fromDate"></param>
     /// <param name="toDate"></param>
     /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
-    internal List<(string tablename, string comand, string columname, string rowkey, DateTime timecode)>? GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate) {
+    internal List<(string tablename, string comand, string columnname, string rowkey, string newValue, DateTime timecode)>? GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate) {
         if (!OpenConnection()) { return null; }
 
         try {
             lock (_getChanges) {
                 //using var q = _connection.CreateCommand();
 
-                var commandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, TIMECODEUTC from " + SysUndo + " ";
+                var commandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, CHANGEDTO, TIMECODEUTC from " + SysUndo + " ";
 
                 // nur bestimmte Tabellen
                 commandText += "WHERE (";
@@ -800,7 +808,7 @@ public abstract class SqlBackAbstract {
                 // Sortierung nach Tabellen
                 commandText += " ORDER BY TIMECODEUTC ASC";
 
-                var fb = new List<(string tablename, string comand, string columnname, string rowid, DateTime timecode)>();
+                var fb = new List<(string tablename, string comand, string columnname, string rowkey, string newValue, DateTime timecode)>();
 
                 var dt = Fill_Table(commandText);
 
@@ -812,7 +820,7 @@ public abstract class SqlBackAbstract {
 
                 foreach (var thisRow in dt.Rows) {
                     var reader = (DataRow)thisRow;
-                    fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString(), DateTimeParse(reader[4].ToString())));
+                    fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString(), reader[4].ToString(), DateTimeParse(reader[5].ToString())));
                 }
 
                 //CloseConnection();

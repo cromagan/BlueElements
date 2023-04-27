@@ -152,7 +152,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
 
     public void ParentPath() => btnZurück_Click(null, System.EventArgs.Empty);
 
-    public bool ParseVariables(List<Variable>? list) {
+    public bool ParseVariables(VariableCollection list) {
         if (IsDisposed) { return false; }
 
         var ct = string.Empty;

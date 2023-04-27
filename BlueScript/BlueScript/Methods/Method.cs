@@ -197,7 +197,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     public static SplittedAttributesFeedback SplitAttributeToVars(Script s, string attributText, List<List<string>> types, bool endlessArgs, LogData ld) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
-                ? new SplittedAttributesFeedback(new List<Variable>())
+                ? new SplittedAttributesFeedback(new VariableCollection())
                 : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
         }
 
@@ -207,7 +207,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
         //  Variablen und Routinen ersetzen
-        List<Variable> feedbackVariables = new();
+        VariableCollection feedbackVariables = new();
         for (var n = 0; n < attributes.Count; n++) {
             //var lb = attributes[n].Count(c => c == '¶'); // Zeilenzähler weitersetzen
             attributes[n] = attributes[n].RemoveChars("¶"); // Zeilenzähler entfernen
@@ -292,7 +292,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return new CanDoFeedback(scriptText, pos, "Kann nicht geparst werden", false, ld);
     }
 
-    public abstract List<string> Comand(List<Variable> currentvariables);
+    public abstract List<string> Comand(VariableCollection? currentvariables);
 
     public abstract DoItFeedback DoIt(Script s, CanDoFeedback infos);
 

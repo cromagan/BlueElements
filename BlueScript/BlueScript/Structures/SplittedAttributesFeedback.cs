@@ -25,14 +25,14 @@ public readonly struct SplittedAttributesFeedback {
 
     #region Constructors
 
-    public SplittedAttributesFeedback(List<Variable> atts) {
+    public SplittedAttributesFeedback(VariableCollection atts) {
         Attributes = atts;
         ErrorMessage = string.Empty;
         FehlerTyp = ScriptIssueType.ohne;
     }
 
     public SplittedAttributesFeedback(ScriptIssueType type, string error) {
-        Attributes = new List<Variable>();
+        Attributes = new VariableCollection();
         ErrorMessage = error;
         FehlerTyp = type;
     }
@@ -41,7 +41,7 @@ public readonly struct SplittedAttributesFeedback {
 
     #region Properties
 
-    public List<Variable> Attributes { get; }
+    public VariableCollection Attributes { get; }
 
     public string ErrorMessage { get; }
 

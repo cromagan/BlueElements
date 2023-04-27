@@ -41,7 +41,7 @@ public class Script {
 
     #region Constructors
 
-    public Script(List<Variable>? variablen, string additionalFilesPath, bool changevalues, MethodType allowedMethods, string attributes) {
+    public Script(VariableCollection variablen, string additionalFilesPath, bool changevalues, MethodType allowedMethods, string attributes) {
         Comands ??= GetInstaceOfType<Method>();
         if (VarTypes == null) {
             VarTypes = GetInstaceOfType<Variable>("NAME");
@@ -76,7 +76,7 @@ public class Script {
     public string ReducedScriptText { get; private set; }
     public string ScriptText { get; set; } = string.Empty;
     public int Sub { get; set; }
-    public List<Variable> Variables { get; }
+    public VariableCollection Variables { get; }
 
     #endregion
 

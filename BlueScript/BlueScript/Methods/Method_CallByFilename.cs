@@ -70,7 +70,7 @@ public class Method_CallByFilename : Method {
                 return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
             }
         } else {
-            var tmpv = new List<Variable>();
+            var tmpv = new VariableCollection();
             tmpv.AddRange(s.Variables);
 
             var scx = s.Parse(reducedscripttext, lineadd, subname);
@@ -90,7 +90,7 @@ public class Method_CallByFilename : Method {
         return DoItFeedback.Null();
     }
 
-    public override List<string> Comand(List<Variable> currentvariables) => new() { "callbyfilename" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "callbyfilename" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
@@ -117,7 +117,6 @@ public class Method_CallByFilename : Method {
         s.BreakFired = false;
         s.EndScript = false;
         return v;
-
     }
 
     #endregion
