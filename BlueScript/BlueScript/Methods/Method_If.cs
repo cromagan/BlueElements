@@ -83,7 +83,7 @@ internal class Method_If : Method {
         return null;
     }
 
-    public override List<string> Comand(List<Variable>? currentvariables) => new() { "if" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "if" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
