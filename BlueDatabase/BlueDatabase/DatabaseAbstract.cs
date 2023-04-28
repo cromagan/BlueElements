@@ -688,7 +688,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public string CheckScriptError() {
         List<string> names = new();
-        EventTypes types = 0;
 
         foreach (var thissc in _eventScript) {
             if (!thissc.IsOk()) {
@@ -698,33 +697,33 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (names.Contains(thissc.Name, false)) {
                 return "Skriptname '" + thissc.Name + "' mehrfach vorhanden";
             }
-
-            if (thissc.EventTypes.HasFlag(EventTypes.export) && types.HasFlag(EventTypes.export)) {
-                return "Skript 'Export' mehrfach vorhanden";
-            }
-
-            if (thissc.EventTypes.HasFlag(EventTypes.database_loaded) && types.HasFlag(EventTypes.database_loaded)) {
-                return "Skript 'Datenank geladen' mehrfach vorhanden";
-            }
-
-            if (thissc.EventTypes.HasFlag(EventTypes.prepare_formula) && types.HasFlag(EventTypes.prepare_formula)) {
-                return "Skript 'Formular Vorbereitung' mehrfach vorhanden";
-            }
-
-            if (thissc.EventTypes.HasFlag(EventTypes.value_changed_extra_thread) && types.HasFlag(EventTypes.value_changed_extra_thread)) {
-                return "Skript 'Wert geändert Extra Thread' mehrfach vorhanden";
-            }
-
-            if (thissc.EventTypes.HasFlag(EventTypes.new_row) && types.HasFlag(EventTypes.new_row)) {
-                return "Skript 'Neue Zeile' mehrfach vorhanden";
-            }
-
-            if (thissc.EventTypes.HasFlag(EventTypes.value_changed) && types.HasFlag(EventTypes.value_changed)) {
-                return "Skript 'Wert geändert' mehrfach vorhanden";
-            }
-
-            types |= thissc.EventTypes;
         }
+
+        var l = EventScript;
+        if (l.Get(EventTypes.export).Count > 1) {
+            return "Skript 'Export' mehrfach vorhanden";
+        }
+
+        if (l.Get(EventTypes.database_loaded).Count > 1) {
+            return "Skript 'Datenank geladen' mehrfach vorhanden";
+        }
+
+        if (l.Get(EventTypes.prepare_formula).Count > 1) {
+            return "Skript 'Formular Vorbereitung' mehrfach vorhanden";
+        }
+
+        if (l.Get(EventTypes.value_changed_extra_thread).Count > 1) {
+            return "Skript 'Wert geändert Extra Thread' mehrfach vorhanden";
+        }
+
+        if (l.Get(EventTypes.new_row).Count > 1) {
+            return "Skript 'Neue Zeile' mehrfach vorhanden";
+        }
+
+        if (l.Get(EventTypes.value_changed).Count > 1) {
+            return "Skript 'Wert geändert' mehrfach vorhanden";
+        }
+
         return string.Empty;
     }
 
@@ -973,12 +972,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, "Allgemein"); }
 
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
-                foreach (var thisEvent in EventScript) {
-                    if (thisEvent != null && thisEvent.EventTypes.HasFlag(eventname)) {
-                        scriptname = thisEvent.Name;
-                        break;
-                    }
-                }
+                var l = EventScript.Get((EventTypes)eventname);
+                if (l.Count == 1) { scriptname = l[0].Name; }
                 if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, string.Empty); }
             }
 

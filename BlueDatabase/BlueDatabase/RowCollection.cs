@@ -330,18 +330,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public void ExecuteExtraThread() {
         if (_pendingChangedBackgroundRow.Count == 0) { return; }
+        if (Database == null || Database.IsDisposed) { return; }
         if (_executingbackgroundworks) { return; }
         _executingbackgroundworks = true;
 
+        var ev = Database.EventScript.Get(EventTypes.value_changed_extra_thread);
         var ok = false;
-
-        foreach (var thiss in Database.EventScript) {
-            if (thiss.EventTypes.HasFlag(EventTypes.value_changed_extra_thread)) {
-                if (thiss.IsOk()) {
-                    ok = true; break;
-                }
-            }
-        }
+        if (ev.Count == 1) { ok = ev[0].IsOk(); }
 
         if (!ok) {
             _pendingChangedBackgroundRow.Clear();

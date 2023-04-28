@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -29,6 +30,23 @@ using BlueScript;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
+
+public static class EventScriptExtension {
+
+    #region Methods
+
+    public static List<EventScript> Get(this ReadOnlyCollection<EventScript> scripts, EventTypes type) {
+        var l = new List<EventScript>();
+
+        foreach (var thisScript in scripts) {
+            if (thisScript.EventTypes.HasFlag(type)) { l.Add(thisScript); }
+        }
+
+        return l;
+    }
+
+    #endregion
+}
 
 public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase, IComparable {
 

@@ -1273,7 +1273,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 count++;
                 if (count > 10) {
                     DrawWaitScreen(gr);
-                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Fehler, "Datenbank-laden nach 10 Versuchen aufgegeben", true);
+                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Warnung, "Datenbank-laden nach 10 Versuchen aufgegeben", true);
                     _databaseDrawError = DateTime.UtcNow;
                     return;
                 }

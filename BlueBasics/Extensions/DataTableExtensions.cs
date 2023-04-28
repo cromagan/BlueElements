@@ -28,19 +28,21 @@ public static partial class Extensions {
     #region Methods
 
     public static void WriteToCsvFile(this DataTable dataTable, string filePath) {
-        StringBuilder sb = new StringBuilder();
+        try {
+            StringBuilder sb = new StringBuilder();
 
-        IEnumerable<string> columnNames = dataTable.Columns.Cast<DataColumn>().
-                                          Select(column => column.ColumnName);
-        sb.AppendLine(string.Join(",", columnNames));
+            IEnumerable<string> columnNames = dataTable.Columns.Cast<DataColumn>().
+                                              Select(column => column.ColumnName);
+            sb.AppendLine(string.Join(",", columnNames));
 
-        foreach (DataRow row in dataTable.Rows) {
-            IEnumerable<string> fields = row.ItemArray.Select(field =>
-              string.Concat("\"", field.ToString().Replace("\"", "\"\""), "\""));
-            sb.AppendLine(string.Join(",", fields));
-        }
+            foreach (DataRow row in dataTable.Rows) {
+                IEnumerable<string> fields = row.ItemArray.Select(field =>
+                  string.Concat("\"", field.ToString().Replace("\"", "\"\""), "\""));
+                sb.AppendLine(string.Join(",", fields));
+            }
 
-        File.WriteAllText(filePath, sb.ToString());
+            File.WriteAllText(filePath, sb.ToString());
+        } catch { }
     }
 
     #endregion
