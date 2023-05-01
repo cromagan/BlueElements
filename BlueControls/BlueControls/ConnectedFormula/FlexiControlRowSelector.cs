@@ -32,6 +32,10 @@ using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
 
+/// <summary>
+/// Altes Element, Filter und Zeilenauswahl in einem
+/// </summary>
+[Obsolete]
 internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControlAcceptRow, IControlRowInput, ICalculateRows {
 
     #region Fields

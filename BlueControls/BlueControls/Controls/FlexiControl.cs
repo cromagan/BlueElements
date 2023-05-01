@@ -98,7 +98,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <param name="captionText"></param>
     public FlexiControl(string captionText) : base(false, false) {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        _editType = EditTypeFormula.None;
+        _editType = EditTypeFormula.nur_als_Text_anzeigen;
         _caption = captionText;
         _captionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
         var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(Design.Caption, States.Standard).Font());

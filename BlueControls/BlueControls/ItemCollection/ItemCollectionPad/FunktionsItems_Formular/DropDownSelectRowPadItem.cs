@@ -34,25 +34,15 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-/// <summary>
-/// Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen EINE zu wählen.
-/// Per Dropwdown menü
-/// </summary>
-
 public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow {
 
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-
     private readonly ItemSendRow _itemSends;
-
     private string _anzeige = string.Empty;
-
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-
     private string _überschrift = string.Empty;
-
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -102,6 +92,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         set => _itemSends.ChildIdsSet(value, this);
     }
 
+    public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit,\r\naus dem daraus resultierenden Zeilen EINE per Dropdownmenu zu wählen.";
+
     public ReadOnlyCollection<string>? GetFilterFromKeys {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
@@ -145,8 +137,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             CaptionPosition = CaptionPosition,
         };
 
-        con.DoInputSettings(parent, this);
         con.DoOutputSettings(parent, this);
+        con.DoInputSettings(parent, this);
 
         return con;
     }
@@ -154,10 +146,19 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
         l.AddRange(_itemAccepts.GetStyleOptions(this));
-        l.AddRange(_itemSends.GetStyleOptions(this));
-
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(_itemSends.GetStyleOptions(this));
+        l.Add(new FlexiControl());
+        l.Add(new FlexiControl("Einstellungen:"));
+        l.Add(new FlexiControlForProperty<string>(() => Überschrift));
+        l.Add(new FlexiControlForProperty<string>(() => Anzeige));
+
+        var u = new ItemCollectionList.ItemCollectionList(false);
+        u.AddRange(typeof(ÜberschriftAnordnung));
+        l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
+
+        //l.Add(new FlexiControl());
+        //l.AddRange(base.GetStyleOptions());
         return l;
     }
 
@@ -221,8 +222,6 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, _itemAccepts.InputColorIdGet());
 
-       
-
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Zeilenauswahl aus: " + OutputDatabase.Caption;
 
@@ -236,7 +235,6 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-
     }
 
     protected override void OnParentChanged() {

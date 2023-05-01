@@ -77,6 +77,12 @@ public class ItemAcceptSomething {
 
     protected List<GenericControl> GetStyleOptions(IItemAcceptSomething item) {
         var l = new List<GenericControl>();
+
+
+       l.Add(new FlexiControl("Eingang:"));
+
+
+
         //l.AddRange(base.GetStyleOptions(this));
         return l;
     }

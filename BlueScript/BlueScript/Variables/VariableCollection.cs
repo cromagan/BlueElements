@@ -21,13 +21,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueScript.Methods;
-using BlueScript.Structures;
-using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
 

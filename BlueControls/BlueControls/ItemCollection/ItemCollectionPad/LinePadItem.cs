@@ -67,7 +67,7 @@ public class LinePadItem : BasicPadItem {
     #region Properties
 
     public static string ClassId => "LINE";
-
+    public override string Description => "Eine einfache Linie";
     public ConectorStyle Linien_Verhalten { get; set; }
 
     protected override int SaveOrder => 999;
@@ -81,9 +81,15 @@ public class LinePadItem : BasicPadItem {
         if (_point1.X == 0d && _point2.X == 0d && _point1.Y == 0d && _point2.Y == 0d) { return false; }
         if (_tempPoints != null && _tempPoints.Count == 0) { CalcTempPoints(); }
         if (_tempPoints != null && _tempPoints.Count == 0) { return false; }
-        for (var z = 0; z <= _tempPoints.Count - 2; z++) {
-            if (value.DistanzZuStrecke(_tempPoints[z], _tempPoints[z + 1]) < ne) { return true; }
+
+        if (_tempPoints != null) {
+            for (var z = 0; z <= _tempPoints.Count - 2; z++) {
+                if (value.DistanzZuStrecke(_tempPoints[z], _tempPoints[z + 1]) < ne) {
+                    return true;
+                }
+            }
         }
+
         return false;
     }
 

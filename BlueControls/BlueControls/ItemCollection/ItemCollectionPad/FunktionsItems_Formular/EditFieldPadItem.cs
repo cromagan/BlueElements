@@ -46,13 +46,9 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
-
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-
     private ColumnItem? _column;
-
     private string _columnName = string.Empty;
-
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -91,6 +87,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             OnChanged();
         }
     }
+
+    public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
 
     public EditTypeFormula EditType {
         get => _bearbeitung;
@@ -205,8 +203,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
         l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
 
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        //l.Add(new FlexiControl());
+        //l.AddRange(base.GetStyleOptions());
         return l;
     }
 

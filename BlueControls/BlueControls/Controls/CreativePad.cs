@@ -422,7 +422,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                     return;
                 }
             }
-            _lastQuickInfo = HotItem != null && e.Button == MouseButtons.None ? HotItem.QuickInfo : string.Empty;
+
+            _lastQuickInfo = string.Empty;
+            if (HotItem != null && e.Button == MouseButtons.None) {
+                if (!string.IsNullOrEmpty(HotItem.QuickInfo)) {
+                    _lastQuickInfo = HotItem.QuickInfo + "<hr>" + HotItem.Description;
+                } else {
+                    _lastQuickInfo = HotItem.Description;
+                }
+            }
         }
         if (e.Button == MouseButtons.Left) {
             _lastQuickInfo = string.Empty;

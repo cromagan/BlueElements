@@ -28,16 +28,11 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
-/// <summary>
-/// Erzeut ein EasyPic
-/// Standard-Bearbeitungs-Feld
-/// </summary>
 public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow {
 
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
-
     private string _bild_Dateiname = string.Empty;
 
     #endregion
@@ -66,6 +61,8 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
             OnChanged();
         }
     }
+
+    public override string Description => "Dieses Element erzeugt eine Bild-Steuerelement,\r\nwelches dann auch bearbeitet werden kann.";
 
     public IItemSendRow? GetRowFrom {
         get => _itemAccepts.GetRowFromGet(this);
@@ -98,8 +95,8 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         l.AddRange(_itemAccepts.GetStyleOptions(this));
         l.Add(new FlexiControlForProperty<string>(() => Bild_Dateiname));
 
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        //l.Add(new FlexiControl());
+        //l.AddRange(base.GetStyleOptions());
         return l;
     }
 
@@ -130,7 +127,6 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);
-   
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");

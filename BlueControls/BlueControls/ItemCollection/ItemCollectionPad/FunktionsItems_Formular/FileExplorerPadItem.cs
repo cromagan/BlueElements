@@ -28,20 +28,13 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
-/// <summary>
-/// Erzeut ein File-Explorer-Element
-/// Standard-Bearbeitungs-Feld
-/// </summary>
 public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
-
-    private bool _bei_Bedarf_erzeugen;
-
-    private bool _leere_Ordner_löschen;
-
+    private bool _bei_Bedarf_Erzeugen;
+    private bool _leere_Ordner_Löschen;
     private string _pfad = string.Empty;
 
     #endregion
@@ -61,15 +54,17 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     [Description("Ob das Verzeichniss bei Bedarf erzeugt werden soll.")]
     public bool Bei_Bedarf_erzeugen {
-        get => _bei_Bedarf_erzeugen;
+        get => _bei_Bedarf_Erzeugen;
 
         set {
-            if (value == _bei_Bedarf_erzeugen) { return; }
-            _bei_Bedarf_erzeugen = value;
+            if (value == _bei_Bedarf_Erzeugen) { return; }
+            _bei_Bedarf_Erzeugen = value;
             this.RaiseVersion();
             OnChanged();
         }
     }
+
+    public override string Description => "Dieses Element erzeugt eine File-Explorer-Steuerelement,\r\nwmit welchem interagiert werden kann.";
 
     public IItemSendRow? GetRowFrom {
         get => _itemAccepts.GetRowFromGet(this);
@@ -83,11 +78,11 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
     public bool Leere_Ordner_löschen {
-        get => _leere_Ordner_löschen;
+        get => _leere_Ordner_Löschen;
 
         set {
-            if (value == _leere_Ordner_löschen) { return; }
-            _leere_Ordner_löschen = value;
+            if (value == _leere_Ordner_Löschen) { return; }
+            _leere_Ordner_Löschen = value;
             this.RaiseVersion();
             OnChanged();
         }
@@ -114,8 +109,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FileBrowser {
             OriginalText = Pfad,
-            CreateDir = _bei_Bedarf_erzeugen,
-            DeleteDir = _leere_Ordner_löschen
+            CreateDir = _bei_Bedarf_Erzeugen,
+            DeleteDir = _leere_Ordner_Löschen
         };
         con.DoInputSettings(parent, this);
         //con.DoOutputSettings(this);
@@ -131,8 +126,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         l.Add(new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen));
         l.Add(new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen));
 
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        //l.Add(new FlexiControl());
+        //l.AddRange(base.GetStyleOptions());
         return l;
     }
 
@@ -146,11 +141,11 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
                 return true;
 
             case "createdir":
-                _bei_Bedarf_erzeugen = value.FromPlusMinus();
+                _bei_Bedarf_Erzeugen = value.FromPlusMinus();
                 return true;
 
             case "deletedir":
-                _leere_Ordner_löschen = value.FromPlusMinus();
+                _leere_Ordner_Löschen = value.FromPlusMinus();
                 return true;
         }
         return false;
@@ -162,8 +157,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         result.AddRange(_itemAccepts.ParsableTags());
 
         result.ParseableAdd("Pfad", _pfad);
-        result.ParseableAdd("CreateDir", _bei_Bedarf_erzeugen);
-        result.ParseableAdd("DeleteDir", _leere_Ordner_löschen);
+        result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
+        result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
         return result.Parseable(base.ToString());
     }
 
@@ -173,7 +168,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, id);
-
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\");

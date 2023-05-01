@@ -88,6 +88,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         }
     }
 
+    public abstract string Description { get; }
+
     /// <summary>
     /// Wird ein Element gelöscht, das diese Feld befüllt hat, werden automatisch alle andern Elemente mit der selben Gruppe gelöscht.
     /// </summary>

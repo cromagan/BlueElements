@@ -145,6 +145,7 @@
     <Compile Include="ConnectedFormula\NewControls\ButtonAddRow.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Enums\FilterTypeRowInputItem.cs" />
     <Compile Include="FormManager.cs" />
     <Compile Include="Forms\FormWithStatusBar.cs">
       <SubType>Form</SubType>

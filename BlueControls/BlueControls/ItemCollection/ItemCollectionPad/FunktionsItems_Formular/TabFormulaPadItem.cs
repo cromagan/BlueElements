@@ -45,7 +45,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     #region Fields
 
     private readonly List<string> _childs = new();
-
     private readonly ItemAcceptRow _itemAccepts;
 
     #endregion
@@ -76,6 +75,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     /// Wird benötigt bei ToString - um die eigenen Ansichten wieder zu finden.
     /// </summary>
     public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
+
+    public override string Description => "Dieses Element erzeugt ein Tab-Control, dass weitere Unterformulare enthalten kann.\r\nEs kann eine Zeile empfangen, welche an die Unterformulare weitergegeben wird.";
 
     public IItemSendRow? GetRowFrom {
         get => _itemAccepts.GetRowFromGet(this);
@@ -172,8 +173,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         l.AddRange(_itemAccepts.GetStyleOptions(this));
         l.Add(Childs());
 
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        //l.Add(new FlexiControl());
+        //l.AddRange(base.GetStyleOptions());
         return l;
     }
 

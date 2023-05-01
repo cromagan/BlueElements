@@ -34,6 +34,7 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
     #region Properties
 
     public static string ClassId => "Physics-Object";
+    public override string Description => "Ein Element, das Physicaleische Eigenschaften hat. Nicht fertiggestellt.";
     public List<Kraft> Kraft { get; } = new();
     protected override int SaveOrder => 999;
 

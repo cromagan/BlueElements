@@ -40,13 +40,9 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
-
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-
     private string _überschrift = string.Empty;
-
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
-
     private string _variable = string.Empty;
 
     #endregion
@@ -70,6 +66,8 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
             this.RaiseVersion();
         }
     }
+
+    public override string Description => "Dieses Element erzeugt eine Steuerelement,\r\ndas eine vom Skript berechnete Variable anzeigen kann.";
 
     public IItemSendRow? GetRowFrom {
         get => _itemAccepts.GetRowFromGet(this);

@@ -15,15 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
+namespace BlueControls.Enums;
 
-namespace BlueControls.Interfaces;
-
-public interface IControlRowInput : IControlSendSomething, IControlAcceptRow {
-}
-
-public static class IControlRowInputInputExtension {
-}
-
-public class ControlRowInput {
+public enum FilterTypeRowInputItem {
+    Ist = 0,
+    Ist_eines_der_Wörter = 1
 }

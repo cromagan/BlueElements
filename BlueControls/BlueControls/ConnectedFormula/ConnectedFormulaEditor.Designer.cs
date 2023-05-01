@@ -435,6 +435,7 @@ namespace BlueControls.Forms {
             this.btnZeileZuFilter.Size = new System.Drawing.Size(64, 66);
             this.btnZeileZuFilter.TabIndex = 1;
             this.btnZeileZuFilter.Text = "Zeile zu Filter";
+            this.btnZeileZuFilter.QuickInfo = "Dieses Element kann eine Zeile empfangen, auf dessen Zellen zugreifen,<br>und einen neuen Filter für eine andere Datenbank zurück geben.<br>Unsichtbares Element, es wird nicht angezeigt.";
             this.btnZeileZuFilter.Click += new System.EventHandler(this.btnZeileZuFilter_Click);
             // 
             // btnBenutzerFilterWahl
@@ -445,7 +446,7 @@ namespace BlueControls.Forms {
             this.btnBenutzerFilterWahl.Name = "btnBenutzerFilterWahl";
             this.btnBenutzerFilterWahl.Size = new System.Drawing.Size(64, 66);
             this.btnBenutzerFilterWahl.TabIndex = 2;
-            this.btnBenutzerFilterWahl.Text = "Benuter-Filter Wahl";
+            this.btnBenutzerFilterWahl.Text = "Benutzer-Filter Wahl";
             this.btnBenutzerFilterWahl.Click += new System.EventHandler(this.btnBenutzerFilterWahl_Click);
             // 
             // btnFilterConverter
@@ -468,6 +469,7 @@ namespace BlueControls.Forms {
             this.btnDropdownmenu.Size = new System.Drawing.Size(64, 66);
             this.btnDropdownmenu.TabIndex = 4;
             this.btnDropdownmenu.Text = "Auswahlfeld";
+            this.btnDropdownmenu.QuickInfo = "Dieses Element stellt eine Wahlmöglichkeit für den Benutzer dar.<br>Es zeigt die aktuellen Zeilen einer Datenbank in einer Dropdown-List an, aus der der Benutzer wählen kann.<br>Es kann Vorfilterungen empfangen, um die Werte einzuschränken.";
             this.btnDropdownmenu.Click += new System.EventHandler(this.btnDropdownmenu_Click);
             // 
             // btnTable

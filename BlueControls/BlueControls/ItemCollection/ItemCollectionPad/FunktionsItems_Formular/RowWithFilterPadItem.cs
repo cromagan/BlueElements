@@ -48,13 +48,9 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
     #region Fields
 
     private readonly ItemSendRow _itemSends;
-
     private string _anzeige = string.Empty;
-
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-
     private string _überschrift = string.Empty;
-
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -108,6 +104,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
         set => _itemSends.ChildIdsSet(value, this);
     }
 
+    public override string Description => "Veraltetes Steuerelement und wird bald entfernt";
     public DatabaseAbstract FilterDefiniton { get; }
 
     public override int InputColorId {
@@ -206,8 +203,8 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
         l.Add(new FlexiControlForDelegate(Filter_hinzufügen, "Filter hinzufügen", ImageCode.PlusZeichen));
         l.Add(FilterTable());
 
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        //l.Add(new FlexiControl());
+        //l.AddRange(base.GetStyleOptions());
 
         return l;
     }

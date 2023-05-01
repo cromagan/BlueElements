@@ -30,10 +30,6 @@ using BlueControls.Interfaces;
 
 namespace BlueControls.ItemCollection;
 
-/// <summary>
-/// Dieses Element ist ein Button. Dieser kann Filter empfangen und mit diesen Filtern eine neue Zeile anlegen
-/// </summary>
-
 public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter {
 
     #region Fields
@@ -64,6 +60,8 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
             OnChanged();
         }
     }
+
+    public override string Description => "Dieses Element wird als Knopf mit einem Pluszeichen dargstellt.<br>Das Elemenz kann Filter empfangen und mit diesen Filtern eine neue Zeile anlegen";
 
     public ReadOnlyCollection<string>? GetFilterFromKeys {
         get => _itemAccepts.GetFilterFromKeysGet();

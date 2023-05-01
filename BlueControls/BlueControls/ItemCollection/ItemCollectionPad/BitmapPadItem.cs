@@ -71,9 +71,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     public static string ClassId => "IMAGE";
     public SizeModes Bild_Modus { get; set; }
-
     public Bitmap? Bitmap { get; set; }
-
+    public override string Description => "Bild-Element";
     public bool Hintergrund_Weiß_Füllen { get; set; }
 
     [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]

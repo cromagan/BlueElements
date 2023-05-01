@@ -42,13 +42,9 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-
     private readonly ItemSendFilter _itemSends;
-
     private string _anzeige = string.Empty;
-
     private string _überschrift = string.Empty;
-
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -98,6 +94,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         set => _itemSends.ChildIdsSet(value, this);
     }
 
+    public override string Description => "Dieses Element kann Filter empfangen - um eine Vorauswahl der verfügbaren Filterelement darzustallen.\r\nAnschließend kann mit den übrig gebliebenen Werten ein neuer Filter erzeugt werden, den der Benutzer auswählen kann.";
+
     public ReadOnlyCollection<string>? GetFilterFromKeys {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
@@ -142,8 +140,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
             //Name = DefaultItemToControlName()
         };
         //return con;
-        con.DoInputSettings(parent, this);
         con.DoOutputSettings(parent, this);
+        con.DoInputSettings(parent, this);
 
         return con;
     }
@@ -218,8 +216,6 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-
-
         if (!forPrinting) {
             RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId);

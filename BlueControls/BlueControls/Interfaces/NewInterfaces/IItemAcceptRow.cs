@@ -148,6 +148,7 @@ public class ItemAcceptRow : ItemAcceptSomething {
         l.AddRange(base.GetStyleOptions(item));
 
         l.Add(new FlexiControlForDelegate(item.Datenquelle_wählen, "Datenquelle wählen", ImageCode.Zeile));
+        //l.Add(new FlexiControl());
 
         return l;
     }

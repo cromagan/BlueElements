@@ -30,18 +30,11 @@ using BlueDatabase;
 
 namespace BlueControls.ItemCollection;
 
-/// <summary>
-/// Dieses Element kann Filter empfangen, und per Skript einen komplett anderen filter ausgeben.
-/// Wir verwenden, wenn z.b. Zwei Werte gefiltert werden, aber in Wirklichkeit ein komplett anderer filter verwendet werden soll
-/// Unsichtbares element, wird nicht angezeigt
-/// </summary>
-
 public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
 
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-
     private readonly ItemSendFilter _itemSends;
 
     #endregion
@@ -71,6 +64,8 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
     }
+
+    public override string Description => "Dieses Element kann Filter empfangen, und per Skript einen komplett anderen Filter ausgeben.\r\nWird verwendet, wenn z.b. Zwei Werte gefiltert werden, aber in Wirklichkeit ein komplett anderer Filter verwendet werden soll.\r\nUnsichtbares element, wird nicht angezeigt.";
 
     public ReadOnlyCollection<string>? GetFilterFromKeys {
         get => _itemAccepts.GetFilterFromKeysGet();
@@ -103,8 +98,8 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
     public Control CreateControl(ConnectedFormulaView parent) {
         var con = new FilterChangeControl();
 
-        con.DoInputSettings(parent, this);
         con.DoOutputSettings(parent, this);
+        con.DoInputSettings(parent, this);
         return con;
     }
 
@@ -154,7 +149,6 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
             RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId);
 
-
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Filterconverter: " + OutputDatabase.Caption;
 
@@ -165,7 +159,6 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", -1);
-
     }
 
     protected override void OnParentChanged() {

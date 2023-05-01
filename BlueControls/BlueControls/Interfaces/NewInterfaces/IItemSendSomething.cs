@@ -199,9 +199,16 @@ public class ItemSendSomething {
     }
 
     protected List<GenericControl> GetStyleOptions(IItemSendSomething item) {
-        var l = new List<GenericControl> {
-            new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank)
-        };
+
+
+
+
+        var l = new List<GenericControl>();
+        l.Add(new FlexiControl("Ausgang:"));
+
+
+        l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
+
 
         if (item.OutputDatabase == null || item.OutputDatabase.IsDisposed) { return l; }
 

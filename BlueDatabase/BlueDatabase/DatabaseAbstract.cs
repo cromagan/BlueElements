@@ -25,7 +25,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using BlueBasics;
@@ -654,8 +653,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     /// Der Wert wird intern fest verankert - bei ReadOnly werden aber weitere Schritte ignoriert.
     /// </summary>
     /// <param name="comand"></param>
-    /// <param name="columnname"></param>
-    /// <param name="rowkey"></param>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
     /// <param name="comment"></param>
@@ -1040,9 +1039,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 break;
         }
 
-        var x = RefreshRowData(sortedRows, false);
-        if (!string.IsNullOrEmpty(x.errormessage)) {
-            OnDropMessage(FehlerArt.Fehler, x.errormessage);
+        var (_, errormessage) = RefreshRowData(sortedRows, false);
+        if (!string.IsNullOrEmpty(errormessage)) {
+            OnDropMessage(FehlerArt.Fehler, errormessage);
         }
 
         foreach (var thisRow in sortedRows) {
@@ -1092,9 +1091,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         da.RowEnd();
-        var x = RefreshRowData(sortedRows, false);
-        if (!string.IsNullOrEmpty(x.errormessage)) {
-            OnDropMessage(FehlerArt.Fehler, x.errormessage);
+        var (_, errormessage) = RefreshRowData(sortedRows, false);
+        if (!string.IsNullOrEmpty(errormessage)) {
+            OnDropMessage(FehlerArt.Fehler, errormessage);
         }
 
         foreach (var thisRow in sortedRows) {
@@ -1553,8 +1552,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     /// </summary>
     /// <param name="type"></param>
     /// <param name="value"></param>
-    /// <param name="columnName"></param>
-    /// <param name="rowkey"></param>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
     /// <param name="isLoading"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {

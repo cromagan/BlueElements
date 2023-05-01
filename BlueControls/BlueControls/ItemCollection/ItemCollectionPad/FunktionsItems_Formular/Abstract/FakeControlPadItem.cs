@@ -36,14 +36,14 @@ namespace BlueControls.ItemCollection;
 /// <summary>
 /// Standard für Objekte, die einen Datenbank/Zeilenbezug haben.
 /// Stellt auch alle Methode breit, zum Einrichten der Breite und Benutzer-Sichtbarkeiten.
-/// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet
+/// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
 /// </summary>
+
 public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToControl, IItemAcceptSomething {
 
     #region Fields
 
     public static BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
-
     public List<string> VisibleFor = new();
 
     #endregion

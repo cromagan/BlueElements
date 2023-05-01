@@ -31,12 +31,6 @@ using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection;
 
-/// <summary>
-/// Diese Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element
-/// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf
-/// Unsichtbares Element, wird nicht angezeigt
-/// </summary>
-
 public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemSendRow, IItemRowInput {
 
     #region Fields
@@ -70,6 +64,7 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         set => _itemSends.ChildIdsSet(value, this);
     }
 
+    public override string Description => " Diese Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element.\r\nHat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.\r\n Unsichtbares Element, wird nicht angezeigt.";
     public int InputColorId { get; set; }
 
     public int OutputColorId {

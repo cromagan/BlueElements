@@ -25,9 +25,10 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
@@ -41,8 +42,13 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
-
     private readonly ItemSendFilter _itemSends;
+
+    private string _eigangsWertSpalte = string.Empty;
+
+    private string _filterSpalte = string.Empty;
+
+    private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist;
 
     #endregion
 
@@ -70,6 +76,41 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     public ReadOnlyCollection<string>? ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
+    }
+
+    public override string Description => "Dieses Element kann eine Zeile empfangen und einen Filter\r\nfür eine andere Datenbank erstellen und diesen abgeben.\r\nUnsichtbares Element, wird nicht angezeigt";
+
+    public string EigangsWertSpalte {
+        get => _eigangsWertSpalte;
+        set {
+            if (value == _eigangsWertSpalte) { return; }
+            _eigangsWertSpalte = value;
+            this.RaiseVersion();
+            this.DoChilds();
+            this.OnChanged();
+        }
+    }
+
+    public FilterTypeRowInputItem Filter {
+        get => _filtertype;
+        set {
+            if (value == _filtertype) { return; }
+            _filtertype = value;
+            this.RaiseVersion();
+            this.DoChilds();
+            this.OnChanged();
+        }
+    }
+
+    public string FilterSpalte {
+        get => _filterSpalte;
+        set {
+            if (value == _filterSpalte) { return; }
+            _filterSpalte = value;
+            this.RaiseVersion();
+            this.DoChilds();
+            this.OnChanged();
+        }
     }
 
     public IItemSendRow? GetRowFrom {
@@ -102,24 +143,37 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     public Control CreateControl(ConnectedFormulaView parent) {
         var con = new InputRowOutputFilterControl();
-        con.DoInputSettings(parent, this);
         con.DoOutputSettings(parent, this);
+        con.DoInputSettings(parent, this);
+
         return con;
     }
 
     public override List<GenericControl> GetStyleOptions() {
-        var l = base.GetStyleOptions();
-
-        var u = new ItemCollectionList.ItemCollectionList(false);
+        var l = new List<GenericControl>();
 
         l.AddRange(_itemAccepts.GetStyleOptions(this));
+
+        var inr = _itemAccepts.GetRowFromGet(this);
+        if (inr?.OutputDatabase is Database dbin) {
+            var ic = new ItemCollectionList.ItemCollectionList(true);
+            ic.AddRange(dbin.Column, true);
+            l.Add(new FlexiControlForProperty<string>(() => EigangsWertSpalte, ic));
+
+            var ic2 = new ItemCollectionList.ItemCollectionList(true);
+            ic2.AddRange(typeof(FilterTypeRowInputItem));
+            l.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
+        }
+
+        l.Add(new FlexiControl());
         l.AddRange(_itemSends.GetStyleOptions(this));
 
-        l.Add(new FlexiControl());
-        u.AddRange(typeof(ÜberschriftAnordnung));
-
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        var outdb = _itemSends.OutputDatabaseGet();
+        if (outdb is Database) {
+            var ic = new ItemCollectionList.ItemCollectionList(true);
+            ic.AddRange(outdb.Column, true);
+            l.Add(new FlexiControlForProperty<string>(() => _filterSpalte, ic));
+        }
 
         return l;
     }
@@ -132,16 +186,32 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
             case "id":
                 //ColorId = IntParse(value);
                 return true;
+
+            case "inputcolumn":
+                _eigangsWertSpalte = value;
+                return true;
+
+            case "outputcolumn":
+                _filterSpalte = value;
+                return true;
+
+            case "filter":
+                _filtertype = (FilterTypeRowInputItem)IntParse(value);
+                return true;
         }
         return false;
+
+        //result.ParseableAdd("InputColumn", _eigangsWertSpalte);
+        //result.ParseableAdd("OutputColumn", _filterSpalte);
+        //result.ParseableAdd("Filter", _filtertype);
     }
 
     public string ReadableText() {
         if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-            return "eine Zeile aus: " + OutputDatabase.Caption;
+            return "Neuer Filter: " + OutputDatabase.Caption;
         }
 
-        return "Zeile einer Datenbank";
+        return "Neuer Filter einer Datenbank";
     }
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
@@ -152,15 +222,18 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
         var result = new List<string>();
         result.AddRange(_itemAccepts.ParsableTags());
         result.AddRange(_itemSends.ParsableTags());
+
+        result.ParseableAdd("InputColumn", _eigangsWertSpalte);
+        result.ParseableAdd("OutputColumn", _filterSpalte);
+        result.ParseableAdd("Filter", _filtertype);
+
         return result.Parseable(base.ToString());
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-
             RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, _itemAccepts.InputColorIdGet());
- 
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Filtergenerator für " + OutputDatabase.Caption;
@@ -174,8 +247,6 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
             RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
         }
-
-
     }
 
     protected override void OnParentChanged() {

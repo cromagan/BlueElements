@@ -40,7 +40,6 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-
     private readonly ItemSendRow _itemSends;
 
     #endregion
@@ -70,6 +69,8 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
     }
+
+    public override string Description => "Darstellung einer Datenbank.\r\nKann Vorfilter empfangen und eine Zeile weitergeben.";
 
     public ReadOnlyCollection<string>? GetFilterFromKeys {
         get => _itemAccepts.GetFilterFromKeysGet();
@@ -101,8 +102,8 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new Table();
-        con.DoInputSettings(parent, this);
         con.DoOutputSettings(parent, this);
+        con.DoInputSettings(parent, this);
         return con;
     }
 
@@ -152,8 +153,6 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
             RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId);
 
-        
-
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Tabellenansicht " + OutputDatabase.Caption;
 
@@ -165,7 +164,6 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-
     }
 
     protected override void OnParentChanged() {

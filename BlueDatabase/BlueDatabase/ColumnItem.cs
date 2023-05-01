@@ -31,10 +31,8 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Tab;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
