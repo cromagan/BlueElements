@@ -108,7 +108,7 @@ public class DimensionPadItem : BasicPadItem {
     #region Properties
 
     public static string ClassId => "DIMENSION";
-    public override string Description => "Eine einfache Bemaßung";
+    public override string Description => string.Empty;
     public float Länge_In_Mm => (float)Math.Round(PixelToMm(_länge, ItemCollectionPad.Dpi), Nachkommastellen);
 
     public int Nachkommastellen { get; set; }

@@ -125,7 +125,8 @@ public partial class TableView : FormWithStatusBar {
                             "\r\nGroup: " + database.UserGroup + "\r\nAdmins: " +
                             database.DatenbankAdmin.JoinWith(";"));
                         MessageBox.Show(
-                            "Die folgende Spalte enthält einen Fehler:<br>" + thisColumnItem.ErrorReason() +
+                             "<b>Datenbank:" + database.TableName + "\r\nSpalte:" + thisColumnItem.Name +
+                            "<br></b>Die folgende Spalte enthält einen Fehler:<br>" + thisColumnItem.ErrorReason() +
                             "<br><br>Bitte reparieren.", ImageCode.Information, "OK");
                         OpenColumnEditor(thisColumnItem, null);
                     }
@@ -137,7 +138,8 @@ public partial class TableView : FormWithStatusBar {
 
                 while (!string.IsNullOrEmpty(database.CheckScriptError())) {
                     MessageBox.Show(
-                    "Die Skripte enthalten einen Fehler:<br>" + database.CheckScriptError() +
+                    "<b>Datenbank:" + database.TableName +
+                    "<br></b>Die Skripte enthalten einen Fehler:<br>" + database.CheckScriptError() +
                     "<br><br>Bitte reparieren.", ImageCode.Information, "OK");
                     OpenScriptEditor(database);
                 }

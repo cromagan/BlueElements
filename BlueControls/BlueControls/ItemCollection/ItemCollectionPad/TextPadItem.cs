@@ -84,7 +84,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
         }
     }
 
-    public override string Description => "Einfache Text-Element";
+    public override string Description => string.Empty;
 
     //http://www.kurztutorial.info/programme/punkt-mm/rechner.html
     // Dim Ausgleich As float = MmToPixel(1 / 72 * 25.4, 300)

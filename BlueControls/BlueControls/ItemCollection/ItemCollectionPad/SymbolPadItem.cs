@@ -47,7 +47,7 @@ public class SymbolPadItem : RectanglePadItem {
     #region Properties
 
     public static string ClassId => "Symbol";
-    public override string Description => "Ein Element, dass ein Symbol darstellen kann.";
+    public override string Description => string.Empty;
     public Color Hintergrundfarbe { get; set; }
     public float Randdicke { get; set; }
     public Color Randfarbe { get; set; }

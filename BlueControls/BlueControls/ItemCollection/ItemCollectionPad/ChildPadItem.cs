@@ -63,7 +63,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     #region Properties
 
     public static string ClassId => "CHILDPAD";
-    public override string Description => "Ein Element, dass einen Text darstellen kann.";
+    public override string Description => string.Empty;
 
     [Description("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.")]
     public List<string> Eingebettete_Ansichten { get; set; }

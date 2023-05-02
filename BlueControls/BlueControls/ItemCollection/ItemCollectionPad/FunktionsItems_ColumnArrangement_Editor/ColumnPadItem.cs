@@ -61,7 +61,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         }
     }
 
-    public override string Description => "Sinnbildliche Darstellung einer Spalte";
+    public override string Description => string.Empty;
     public string Interner_Name => Column == null ? "?" : Column.Name;
 
     /// <summary>

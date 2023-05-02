@@ -435,7 +435,7 @@ public abstract class SqlBackAbstract {
             var dt = Fill_Table(com.ToString());
 
             if (dt == null) { return "Keine gültige Rückgabe erhalten: \r\n" + com.ToString(); }
-            if(dt.Rows.Count != row.Count) { return "Rückgabefehler, Zeilen ungleich: \r\n" + com.ToString(); }
+            //if(dt.Rows.Count != row.Count) { return "Rückgabefehler, Zeilen ungleich"; }
 
             foreach (var thisRow in dt.Rows) {
                 var reader = (DataRow)thisRow;
@@ -1104,51 +1104,32 @@ public abstract class SqlBackAbstract {
         }
     }
 
-    private string? GetCellValue(string tablename, string columnname, long rowkey) {
+    private (string? value, string error) GetCellValue(string tablename, string columnname, long rowkey) {
         try {
             if (!IsValidTableName(tablename, false)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
 
-                return "Tabellenname ungültig: " + tablename;
+                return (null, "Tabellenname ungültig: " + tablename);
             }
 
-            if (Connection == null) { return null; }
+            if (Connection == null) { return (null, "Keine Verbindung vorhanden"); }
 
-            if (!OpenConnection()) { return null; }
-
-            //using var q = _connection.CreateCommand();
+            if (!OpenConnection()) { return (null, "Verbindung konnte nicht geöffnet werden"); }
 
             var comm = @"select " + columnname.ToUpper() + " from " + tablename.ToUpper() + " " +
                                    "where RK = " + Dbval(rowkey);
 
-            ////command.AddParameterWithValue("" + DBVAL(columnName.ToUpper()) , column.Name.ToUpper());
-            //command.AddParameterWithValue("" + DBVAL(row.Key)", row.Key.ToString(false));
-
             var dt = Fill_Table(comm);
 
-            if (dt == null || dt.Rows.Count == 0) { return string.Empty; }
+            if (dt == null) { return (null, "Fehlerhafte Rückgabe"); }
+
+            if (dt.Rows.Count == 0) { return (null, string.Empty); }
             if (dt.Rows.Count > 1) {
                 // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
                 Develop.DebugPrint(columnname + " doppelt in " + tablename.ToUpper() + " vorhanden!");
             }
 
-            return dt.Rows[0][0].ToString();
-            //using var reader = q.ExecuteReader();
-            //if (reader.Read()) {
-            //    // you may want to check if value is NULL: reader.IsDBNull(0)
-            //    var value = reader[0].ToString(false);
-
-            //    if (reader.Read()) {
-            //        // Doppelter Wert?!?Ersten Wert zurückgeben, um unendliche erweiterungen zu erhindern
-            //        Develop.DebugPrint(columnname + " doppelt in " + tablename.ToUpper() + " vorhanden!");
-            //    }
-
-            //    CloseConnection();
-            //return value;
-            //}
-
-            //CloseConnection();    // Nix vorhanden!
-            //return null;
+            return (dt.Rows[0][0].ToString(), string.Empty);
         } catch {
             _ = CloseConnection();
             Develop.CheckStackForOverflow();
@@ -1203,13 +1184,15 @@ public abstract class SqlBackAbstract {
             return "Tabellenname ungültig: " + tablename;
         }
 
-        var isVal = GetCellValue(tablename, columnname, rowkey);
+        (string? value, string error) = GetCellValue(tablename, columnname, rowkey);
+
+        if (!string.IsNullOrEmpty(error)) { return error; }
 
         string cmdString;
 
-        if (isVal is null) {
+        if (value is null) {
             cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + columnname.ToUpper() + " ) VALUES (" + Dbval(rowkey) + ", " + Dbval(newValue) + " )";
-        } else if (isVal != newValue) {
+        } else if (value != newValue) {
             cmdString = "UPDATE " + tablename.ToUpper() + " SET " + columnname.ToUpper() + " = " + Dbval(newValue) + " WHERE RK = " + Dbval(rowkey);
         } else {
             return string.Empty;

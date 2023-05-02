@@ -50,7 +50,7 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
     #region Properties
 
     public static string ClassId => "GenericPadItem";
-    public override string Description => "Einfach Anzeige mit Text";
+    public override string Description => string.Empty;
     protected override int SaveOrder => 999;
 
     #endregion

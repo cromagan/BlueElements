@@ -69,7 +69,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public static string ClassId => "ROW";
     public DatabaseAbstract? Database { get; private set; }
-    public override string Description => "Ein Element, das eine Zeile darstellen kann.\r\nDazu muss ein Layout angegeben werden, dass das Aussehen definiert.";
+    public override string Description => string.Empty;
 
     /// <summary>
     /// Namen so lassen, wegen Kontextmenu

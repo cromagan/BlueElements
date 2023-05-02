@@ -67,7 +67,7 @@ public class LinePadItem : BasicPadItem {
     #region Properties
 
     public static string ClassId => "LINE";
-    public override string Description => "Eine einfache Linie";
+    public override string Description => string.Empty;
     public ConectorStyle Linien_Verhalten { get; set; }
 
     protected override int SaveOrder => 999;
