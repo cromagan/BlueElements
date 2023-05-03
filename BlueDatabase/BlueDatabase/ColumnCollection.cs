@@ -158,7 +158,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
         if (Database == null || Database.IsDisposed) { return null; }
 
-        if (Database.ColumnArrangements[0].Count != Database.Column.Count()) {
+        if (Database.ColumnArrangements.Count < 1 || Database.ColumnArrangements[0].Count != Database.Column.Count()) {
             Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
             return null;
         }

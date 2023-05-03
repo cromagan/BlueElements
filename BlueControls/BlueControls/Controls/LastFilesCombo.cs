@@ -174,7 +174,13 @@ public sealed class LastFilesCombo : ComboBox {
     }
 
     private void SaveSettingsToDisk() {
-        if (CanWriteInDirectory(SettingsFileName().FilePath())) {
+        var pf = SettingsFileName().FilePath();
+
+        if (!DirectoryExists(pf)) {
+            _ = Directory.CreateDirectory(pf);
+        }
+
+        if (CanWriteInDirectory(pf)) {
             _settings.Save(SettingsFileName(), Encoding.UTF8, false);
         }
     }

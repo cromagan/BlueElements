@@ -1238,6 +1238,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
                 var col = Column.Exists(zeil[0][spaltNo]);
                 if (col == null) {
+                    if (!ColumnItem.IsValidColumnName(zeil[0][spaltNo])) {
+                        OnDropMessage(FehlerArt.Warnung, "Abbruch,<br>ungültiger Spaltenname.");
+                        return "Abbruch,<br>ungültiger Spaltenname.";
+                    }
+
                     col = Column.GenerateAndAdd(zeil[0][spaltNo]);
                     if (col != null) {
                         col.Caption = zeil[0][spaltNo];
