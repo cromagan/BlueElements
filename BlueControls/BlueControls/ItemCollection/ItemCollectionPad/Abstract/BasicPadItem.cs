@@ -68,12 +68,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? ParentChanged;
-
-    #endregion
-
     #region Properties
 
     public List<FlexiControl>? AdditionalStyleOptions { get; set; } = null;
@@ -121,7 +115,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         set {
             if (_parent == null || _parent == value) {
                 _parent = value;
-                OnParentChanged();
+                //OnParentChanged();
                 return;
             }
 
@@ -486,6 +480,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         return x;
     }
 
+    internal virtual void AddedToCollection() { }
+
     internal void AddLineStyleOption(List<GenericControl> l) {
         if (_parent == null) { return; }
         l.Add(new FlexiControlForProperty<PadStyles>(() => Stil, Skin.GetRahmenArt(_parent.SheetStyle, true)));
@@ -554,8 +550,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         sizeOfParentControl.Width == 0 ||
         sizeOfParentControl.Height == 0 ||
         drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
-
-    protected virtual void OnParentChanged() => ParentChanged?.Invoke(this, System.EventArgs.Empty);
 
     protected virtual void ParseFinished() { }
 

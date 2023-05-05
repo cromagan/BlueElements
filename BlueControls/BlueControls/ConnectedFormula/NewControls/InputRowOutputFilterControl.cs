@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
@@ -31,13 +32,34 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
 
     private readonly List<IControlAcceptSomething> _childs = new();
 
+    private readonly ColumnItem? _inputcolumn = null;
+    private readonly ColumnItem? _outputcolumn = null;
+    private readonly FilterTypeRowInputItem _type;
+    private FilterItem? _filter = null;
     private IControlSendRow? _getRowFrom = null;
+
+    #endregion
+
+    #region Constructors
+
+    public InputRowOutputFilterControl(ColumnItem? inputcolumn, ColumnItem? outputcolumn, FilterTypeRowInputItem type) {
+        _inputcolumn = inputcolumn;
+        _outputcolumn = outputcolumn;
+        _type = type;
+    }
 
     #endregion
 
     #region Properties
 
-    public FilterItem Filter { get; }
+    public FilterItem? Filter {
+        get => _filter;
+        set {
+            if (_filter?.Equals(value) ?? false) { return; }
+            _filter = value;
+            this.DoChilds(_childs);
+        }
+    }
 
     public IControlSendRow? GetRowFrom {
         get => _getRowFrom;
@@ -53,7 +75,7 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
     }
 
     public RowItem? LastInputRow { get; private set; }
-    public DatabaseAbstract? OutputDatabase { get; }
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 
@@ -66,19 +88,24 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
     }
 
     public void SetData(DatabaseAbstract? database, long? rowkey) {
-        if (OutputDatabase != database) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
-        }
+        //if (OutputDatabase != database) {
+        //    Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
+        //}
 
-        Develop.DebugPrint_NichtImplementiert();
+        //Develop.DebugPrint_NichtImplementiert();
 
-        var nr = OutputDatabase?.Row.SearchByKey(rowkey);
+        var nr = database?.Row.SearchByKey(rowkey);
         if (nr == LastInputRow) { return; }
 
         LastInputRow = nr;
         LastInputRow?.CheckRowDataIfNeeded();
 
-        this.DoChilds(_childs);
+        if (LastInputRow == null || _inputcolumn == null || _outputcolumn == null) {
+            Filter = new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Fehler, string.Empty);
+        }
+
+        q
+        Filter = null;
     }
 
     #endregion

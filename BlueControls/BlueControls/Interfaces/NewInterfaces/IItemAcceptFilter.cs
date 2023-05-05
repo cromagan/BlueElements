@@ -90,7 +90,7 @@ public class ItemAcceptFilter : ItemAcceptSomething {
 
     #region Methods
 
-    public void DoCreativePadParentChanged(IItemAcceptFilter item) {
+    public void DoCreativePadAddedToCollection(IItemAcceptFilter item) {
         var l = GetFilterFromGet(item);
 
         foreach (var thiss in l) {

@@ -58,7 +58,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
     #region Properties
 
     public FilterItem? Filter { get; }
-    public DatabaseAbstract? OutputDatabase { get; }
+    public DatabaseAbstract? OutputDatabase { get; set; }
     public ReadOnlyCollection<IControlSendFilter> ParentSender => new(_parentSender);
 
     #endregion

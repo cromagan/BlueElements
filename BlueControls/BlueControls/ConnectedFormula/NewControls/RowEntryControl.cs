@@ -56,7 +56,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
     }
 
     public RowItem? LastInputRow { get; private set; }
-    public DatabaseAbstract? OutputDatabase { get; }
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 

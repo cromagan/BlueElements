@@ -144,6 +144,13 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         return result.Parseable(base.ToString());
     }
 
+    internal override void AddedToCollection() {
+        base.AddedToCollection();
+        _itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
@@ -159,13 +166,6 @@ public class ScriptChangeFilterPadItem : RectanglePadItemWithVersion, IReadableT
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", -1);
-    }
-
-    protected override void OnParentChanged() {
-        base.OnParentChanged();
-        _itemSends.DoCreativePadParentChanged(this);
-        _itemAccepts.DoCreativePadParentChanged(this);
-        //RepairConnections();
     }
 
     protected override void ParseFinished() {

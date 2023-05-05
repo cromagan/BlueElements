@@ -131,6 +131,13 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         return result.Parseable(base.ToString());
     }
 
+    internal override void AddedToCollection() {
+        base.AddedToCollection();
+        //_itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             var db = _itemAccepts.InputDatabase(this);
@@ -147,13 +154,6 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-    }
-
-    protected override void OnParentChanged() {
-        base.OnParentChanged();
-        //_itemSends.DoCreativePadParentChanged(this);
-        _itemAccepts.DoCreativePadParentChanged(this);
-        //RepairConnections();
     }
 
     protected override void ParseFinished() {

@@ -61,7 +61,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     public InputRowOutputFilterPadItem(string intern, DatabaseAbstract? db) : base(intern) {
         _itemAccepts = new();
         _itemSends = new();
-
+        Bei_Export_sichtbar = false;
         OutputDatabase = db;
     }
 
@@ -142,7 +142,9 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
     public Control CreateControl(ConnectedFormulaView parent) {
-        var con = new InputRowOutputFilterControl();
+        var i = _itemAccepts.InputDatabase(this)?.Column.Exists(_eigangsWertSpalte);
+        var o = OutputDatabase?.Column.Exists(_filterSpalte);
+        var con = new InputRowOutputFilterControl(i, o, _filtertype);
         con.DoOutputSettings(parent, this);
         con.DoInputSettings(parent, this);
 
@@ -230,10 +232,17 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
         return result.Parseable(base.ToString());
     }
 
+    internal override void AddedToCollection() {
+        base.AddedToCollection();
+        _itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, _itemAccepts.InputColorIdGet());
+            DrawColorScheme(gr, positionModified, zoom, -1);
 
             if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
                 var txt = "Filtergenerator für " + OutputDatabase.Caption;
@@ -247,13 +256,6 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
             RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
         }
-    }
-
-    protected override void OnParentChanged() {
-        base.OnParentChanged();
-        _itemSends.DoCreativePadParentChanged(this);
-        _itemAccepts.DoCreativePadParentChanged(this);
-        //RepairConnections();
     }
 
     protected override void ParseFinished() {

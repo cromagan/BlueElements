@@ -1192,6 +1192,7 @@ public abstract class SqlBackAbstract {
 
         if (value is null) {
             cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + columnname.ToUpper() + " ) VALUES (" + Dbval(rowkey) + ", " + Dbval(newValue) + " )";
+            Develop.DebugPrint(FehlerArt.Warnung, "Insert-Befehl: " + cmdString);
         } else if (value != newValue) {
             cmdString = "UPDATE " + tablename.ToUpper() + " SET " + columnname.ToUpper() + " = " + Dbval(newValue) + " WHERE RK = " + Dbval(rowkey);
         } else {

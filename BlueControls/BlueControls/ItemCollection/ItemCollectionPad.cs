@@ -26,6 +26,7 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Data;
 using System.Windows.Forms;
 using BlueBasics;
@@ -389,6 +390,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
         IsSaved = false;
         OnItemAdded(item);
+        item.AddedToCollection();
         item.Changed += Item_Changed;
         //item.CompareKeyChanged += Item_CompareKeyChangedChanged;
         //item.CheckedChanged += Item_CheckedChanged;
@@ -698,9 +700,9 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         var usedids = new List<int>();
 
         foreach (var thisIt in this) {
-            if (thisIt != null && thisIt is IItemSendSomething hci && thisIt.IsVisibleOnPage(page))
-
+            if (thisIt != null && thisIt is IItemSendSomething hci && thisIt.IsVisibleOnPage(page)) {
                 usedids.Add(hci.OutputColorId);
+            }
         }
 
         for (var c = 0; c < 9999; c++) {

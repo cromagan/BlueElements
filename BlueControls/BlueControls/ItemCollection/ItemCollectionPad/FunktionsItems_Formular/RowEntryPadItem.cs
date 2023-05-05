@@ -190,6 +190,13 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         return result.Parseable(base.ToString());
     }
 
+    internal override void AddedToCollection() {
+        base.AddedToCollection();
+        _itemSends.DoCreativePadAddedToCollection(this);
+        //_itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
@@ -205,13 +212,6 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
-    }
-
-    protected override void OnParentChanged() {
-        base.OnParentChanged();
-        _itemSends.DoCreativePadParentChanged(this);
-        //_itemAccepts.DoCreativePadParentChanged(this);
-        //RepairConnections();
     }
 
     protected override void ParseFinished() {

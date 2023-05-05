@@ -216,6 +216,13 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return result.Parseable(base.ToString());
     }
 
+    internal override void AddedToCollection() {
+        base.AddedToCollection();
+        //_itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     protected override void Dispose(bool disposing) {
         if (disposing) {
             if (CFormula != null) {
@@ -251,13 +258,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-    }
-
-    protected override void OnParentChanged() {
-        base.OnParentChanged();
-        //_itemSends.DoCreativePadParentChanged(this);
-        _itemAccepts.DoCreativePadParentChanged(this);
-        //RepairConnections();
     }
 
     protected override void ParseFinished() {

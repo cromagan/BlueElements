@@ -59,6 +59,7 @@ public static class IControlSendFilterExtension {
 
     public static void DoOutputSettings(this IControlSendFilter dest, ConnectedFormulaView parent, IItemSendFilter source) {
         dest.Name = source.DefaultItemToControlName();
+        dest.OutputDatabase = source.OutputDatabase;
     }
 
     #endregion

@@ -162,6 +162,13 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         return result.Parseable(base.ToString());
     }
 
+    internal override void AddedToCollection() {
+        base.AddedToCollection();
+        //_itemSends.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
+        //RepairConnections();
+    }
+
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         var id = -1;
         if (GetRowFrom != null) { id = GetRowFrom.OutputColorId; }
@@ -174,13 +181,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-    }
-
-    protected override void OnParentChanged() {
-        base.OnParentChanged();
-        //_itemSends.DoCreativePadParentChanged(this);
-        _itemAccepts.DoCreativePadParentChanged(this);
-        //RepairConnections();
     }
 
     protected override void ParseFinished() {

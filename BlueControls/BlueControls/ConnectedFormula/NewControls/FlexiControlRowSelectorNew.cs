@@ -66,7 +66,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), this.InputDatabase());
 
-    public DatabaseAbstract? OutputDatabase { get; }
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     public ReadOnlyCollection<IControlSendFilter> ParentSender => new(_parentSender);
 

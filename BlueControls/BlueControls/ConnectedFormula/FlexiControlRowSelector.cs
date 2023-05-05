@@ -91,7 +91,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
     public RowItem? LastInputRow { get; private set; }
 
-    public DatabaseAbstract? OutputDatabase { get; }
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     public RowItem? Row {
         get => IsDisposed ? null : _row;

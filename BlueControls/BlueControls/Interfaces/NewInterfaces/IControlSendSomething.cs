@@ -28,7 +28,7 @@ public interface IControlSendSomething {
     //public ReadOnlyCollection<IControlSendSomething> Childs { get; }
     public string Name { get; set; }
 
-    public DatabaseAbstract? OutputDatabase { get; }
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 

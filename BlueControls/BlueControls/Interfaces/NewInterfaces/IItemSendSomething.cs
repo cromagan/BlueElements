@@ -123,7 +123,7 @@ public class ItemSendSomething {
         item.OnChanged();
     }
 
-    public void DoCreativePadParentChanged(IItemSendSomething item) {
+    public void DoCreativePadAddedToCollection(IItemSendSomething item) {
         if (item.Parent != null) {
             item.OutputColorId = -1;
             item.OutputColorId = item.Parent.GetFreeColorId(item.Page);
@@ -199,16 +199,10 @@ public class ItemSendSomething {
     }
 
     protected List<GenericControl> GetStyleOptions(IItemSendSomething item) {
-
-
-
-
         var l = new List<GenericControl>();
         l.Add(new FlexiControl("Ausgang:"));
 
-
         l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
-
 
         if (item.OutputDatabase == null || item.OutputDatabase.IsDisposed) { return l; }
 

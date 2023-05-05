@@ -148,15 +148,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
 
     public bool Exists(FilterItem filterItem) {
         foreach (var thisFilter in this) {
-            if (thisFilter.FilterType == filterItem.FilterType) {
-                if (thisFilter.Column == filterItem.Column) {
-                    if (thisFilter.Herkunft == filterItem.Herkunft) {
-                        if (thisFilter.SearchValue.JoinWithCr() == filterItem.SearchValue.JoinWithCr()) {
-                            return true;
-                        }
-                    }
-                }
-            }
+            if (filterItem.Equals(thisFilter)) { return true; }
         }
         return false;
     }

@@ -89,7 +89,7 @@ public class ItemAcceptRow : ItemAcceptSomething {
 
     #region Methods
 
-    public void DoCreativePadParentChanged(IItemAcceptRow item) {
+    public void DoCreativePadAddedToCollection(IItemAcceptRow item) {
         GetRowFromGet(item)?.DoChilds();
         item.OnChanged();
     }

@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -178,6 +179,22 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
             Database = null;
         }
+    }
+
+    public bool Equals(FilterItem? thisFilter) {
+        if (thisFilter == null) { return false; }
+
+        if (thisFilter.FilterType == FilterType) {
+            if (thisFilter.Column == Column) {
+                if (thisFilter.Herkunft == Herkunft) {
+                    if (thisFilter.SearchValue.JoinWithCr() == SearchValue.JoinWithCr()) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     public string ErrorReason() {
