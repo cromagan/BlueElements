@@ -48,7 +48,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     private string _filterSpalte = string.Empty;
 
-    private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist;
+    private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_GrossKleinEgal;
 
     #endregion
 

@@ -48,6 +48,12 @@ public static partial class Extensions {
 
     #region Methods
 
+    /// <summary>
+    /// Gibt eine Liste aller erkannten Wörter des Textes zurück.
+    /// Mit Doppeleten und unsortiert.
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
     public static List<string> AllWords(this string input) {
         input = " " + input + " ";
         var position = 0;
@@ -57,9 +63,7 @@ public static partial class Extensions {
             position++;
             if (position >= input.Length) { return l; }
 
-            if (!input[position].IsWordSeperator()) {
-                continue;
-            }
+            if (!input[position].IsWordSeperator()) { continue; }
 
             if (position > lastSeperator + 1) {
                 l.Add(input.Substring(lastSeperator + 1, position - lastSeperator - 1));

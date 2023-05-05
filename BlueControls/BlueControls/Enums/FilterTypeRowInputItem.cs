@@ -18,6 +18,7 @@
 namespace BlueControls.Enums;
 
 public enum FilterTypeRowInputItem {
-    Ist = 0,
-    Ist_eines_der_Wörter = 1
+    Ist_GrossKleinEgal = 0,
+    Ist_genau = 100,
+    Ist_eines_der_Wörter_GrossKleinEgal = 200
 }

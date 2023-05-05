@@ -19,7 +19,6 @@
 
 using System.Collections.Generic;
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
@@ -88,24 +87,53 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
     }
 
     public void SetData(DatabaseAbstract? database, long? rowkey) {
-        //if (OutputDatabase != database) {
-        //    Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
-        //}
+        if (database == null || _inputcolumn == null || _outputcolumn == null) {
+            Filter = new FilterItem();
+            return;
+        }
 
-        //Develop.DebugPrint_NichtImplementiert();
-
-        var nr = database?.Row.SearchByKey(rowkey);
+        var nr = database.Row.SearchByKey(rowkey);
         if (nr == LastInputRow) { return; }
 
         LastInputRow = nr;
         LastInputRow?.CheckRowDataIfNeeded();
 
-        if (LastInputRow == null || _inputcolumn == null || _outputcolumn == null) {
-            Filter = new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Fehler, string.Empty);
+        if (LastInputRow == null) {
+            Filter = new FilterItem();
+            return;
         }
 
-        q
-        Filter = null;
+        switch (_type) {
+            case FilterTypeRowInputItem.Ist_GrossKleinEgal:
+                Filter = new FilterItem(database, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, LastInputRow.CellGetString(_outputcolumn));
+                return;
+
+            case FilterTypeRowInputItem.Ist_genau:
+                Filter = new FilterItem(database, BlueDatabase.Enums.FilterType.Istgleich, LastInputRow.CellGetString(_outputcolumn));
+                return;
+
+            case FilterTypeRowInputItem.Ist_eines_der_Wörter_GrossKleinEgal:
+                var list = LastInputRow.CellGetString(_inputcolumn).HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
+                Filter = new FilterItem(database, BlueDatabase.Enums.FilterType.Istgleich_ODER_GroßKleinEgal, list);
+
+                //List<string> names = new();
+                //names.AddRange(_outputcolumn.GetUcaseNamesSortedByLenght());
+
+                //var tmpvalue = LastInputRow.CellGetString(_outputcolumn);
+
+                //foreach (var thisWord in names) {
+                //    var fo = tmpvalue.IndexOfWord(thisWord, 0, RegexOptions.IgnoreCase);
+                //    if (fo > -1) {
+                //        value.Add(thisWord);
+                //    }
+                //}
+                return;
+
+            default:
+                Develop.DebugPrint(_type);
+                Filter = new FilterItem();
+                return;
+        }
     }
 
     #endregion

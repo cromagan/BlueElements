@@ -21,7 +21,6 @@ namespace BlueDatabase.Enums;
 
 [Flags]
 public enum FilterType {
-    Fehler = -1,
 
     // Filterarten allgemein -------------------------------------------------------
     KeinFilter = 0,
@@ -30,6 +29,8 @@ public enum FilterType {
 
     //  ZUR INFO:  Ungleich = 2
     Instr = 4,
+
+    AlwaysFalse = 8,
 
     //  Tendiert_Zu = 8
     //  EigenschaftTendenz = 8,

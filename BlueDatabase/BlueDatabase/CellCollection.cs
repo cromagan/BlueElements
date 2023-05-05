@@ -477,9 +477,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var cellKey = KeyOfCell(column, row);
 
             if (column.IsInCache == null) {
-                var x = Database.RefreshRowData(row, false, null);
-                if (!string.IsNullOrEmpty(x.errormessage)) {
-                    Database.OnDropMessage(FehlerArt.Fehler, x.errormessage);
+                var (_, errormessage) = Database.RefreshRowData(row, false, null);
+                if (!string.IsNullOrEmpty(errormessage)) {
+                    Database.OnDropMessage(FehlerArt.Fehler, errormessage);
                 }
             }
 
@@ -916,12 +916,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             filterValue = filterValue.ToUpper();
             typ ^= FilterType.GroﬂKleinEgal;
         }
+
         switch (typ) {
             case FilterType.Istgleich:
-                return Convert.ToBoolean(istValue == filterValue);
+                return istValue == filterValue;
 
             case (FilterType)2: // Ungleich
-                return Convert.ToBoolean(istValue != filterValue);
+                return istValue != filterValue;
 
             case FilterType.Instr:
                 return istValue.Contains(filterValue);
@@ -950,10 +951,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             case FilterType.BeginntMit:
                 return istValue.StartsWith(filterValue);
 
-            default: {
-                    Develop.DebugPrint(typ);
-                    return false;
-                }
+            case FilterType.AlwaysFalse:
+                return false;
+
+            default:
+                Develop.DebugPrint(typ);
+                return false;
         }
     }
 

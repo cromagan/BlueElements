@@ -20,6 +20,8 @@
 using BlueControls.Controls;
 using BlueDatabase;
 using System.Collections.Generic;
+using BlueBasics;
+using BlueBasics.Enums;
 
 namespace BlueControls.Interfaces;
 
@@ -40,21 +42,24 @@ public static class IControlSendFilterExtension {
         //var r = db?.Row.SearchByKey(rowkey);
         //r?.CheckRowDataIfNeeded();
 
-        //foreach (var thischild in childs) {
-        //    var did = false;
+        foreach (var thischild in childs) {
+            var did = false;
 
-        //    if (!did && thischild is IControlAcceptRow fcfc) {
-        //        fcfc.SetData(db, rowkey);
-        //        did = true;
-        //    }
+            if (!did && thischild is ICalculateRows fcfc) {
+                fcfc.Invalidate_FilteredRows();
+                did = true;
+            }
 
-        //    if (thischild is IDisabledReason id) {
-        //        if (!did) {
-        //            id.DeleteValue();
-        //            id.DisabledReason = "Keine Befüllmethode bekannt.";
-        //        }
-        //    }
-        //}
+            if (thischild is IDisabledReason id) {
+                if (!did) {
+                    id.DeleteValue();
+                    id.DisabledReason = "Keine Befüllmethode bekannt.";
+                    did = true;
+                }
+            }
+
+            if (!did) { Develop.DebugPrint(FehlerArt.Warnung, "Typ unbekannt"); }
+        }
     }
 
     public static void DoOutputSettings(this IControlSendFilter dest, ConnectedFormulaView parent, IItemSendFilter source) {

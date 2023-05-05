@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Runtime.CompilerServices;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -63,6 +62,17 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         _column?.RefreshColumnsData();
     }
 
+    /// <summary>
+    /// Ein AlwaysFalse Filter
+    /// </summary>
+    public FilterItem() {
+        Database = null;
+        _filterType = FilterType.AlwaysFalse;
+        _column = null;
+        KeyName = string.Empty;
+        SearchValue = new ReadOnlyCollection<string>(new List<string>());
+    }
+
     public FilterItem(DatabaseAbstract database, string filterCode) {
         Database = database;
         if (Database != null && !Database.IsDisposed) {
@@ -78,7 +88,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     }
 
     /// <summary>
-    /// Bei diesem Construktor mus der Tag database vorkommen!
+    /// Bei diesem Construktor muss der Tag 'Database' vorkommen!
     /// </summary>
     /// <param name="filterCode"></param>
 
@@ -93,7 +103,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string> { searchValue }, tag) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, List<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
+    public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
     public FilterItem(ColumnItem column, FilterType filterType, IList<string>? searchValue, string herkunft) {
         KeyName = Generic.UniqueInternal();

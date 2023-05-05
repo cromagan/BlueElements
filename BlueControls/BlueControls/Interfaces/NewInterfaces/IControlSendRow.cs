@@ -54,8 +54,11 @@ public static class IControlSendRowExtension {
                 if (!did) {
                     id.DeleteValue();
                     id.DisabledReason = "Keine Befüllmethode bekannt.";
+                    did = true;
                 }
             }
+
+            if (!did) { Develop.DebugPrint(FehlerArt.Warnung, "Typ unbekannt"); }
         }
     }
 
