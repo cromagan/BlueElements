@@ -22,8 +22,10 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
+using BlueDatabase;
 using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
@@ -33,6 +35,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
+
     private string _bild_Dateiname = string.Empty;
 
     #endregion
@@ -74,6 +77,8 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         set => _itemAccepts.InputColorIdSet(this, value);
     }
 
+    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+
     protected override int SaveOrder => 4;
 
     #endregion
@@ -88,6 +93,16 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         con.DoInputSettings(parent, this);
         //con.DoOutputSettings(this);
         return con;
+    }
+
+    public override string ErrorReason() {
+        if (InputDatabase == null || InputDatabase.IsDisposed) {
+            return "Quelle fehlt";
+        }
+        //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
+        //    return "Ziel fehlt";
+        //}
+        return string.Empty;
     }
 
     public override List<GenericControl> GetStyleOptions() {
@@ -112,6 +127,24 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         return false;
     }
 
+    public override string ReadableText() {
+        var txt = "Bild: ";
+
+        if (IsOk() && InputDatabase != null) {
+            return txt + InputDatabase.Caption;
+        }
+
+        return txt + ErrorReason();
+    }
+
+    public override QuickImage? SymbolForReadableText() {
+        if (IsOk()) {
+            return QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IDColor(InputColorId));
+        }
+
+        return QuickImage.Get(ImageCode.Warnung, 16);
+    }
+
     public override string ToString() {
         var result = new List<string>();
 
@@ -132,7 +165,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         if (GetRowFrom != null) { id = GetRowFrom.OutputColorId; }
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, id);
+            DrawColorScheme(gr, positionModified, zoom, id, true, true);
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");

@@ -22,8 +22,10 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
+using BlueDatabase;
 using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
@@ -33,8 +35,11 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
+
     private bool _bei_Bedarf_Erzeugen;
+
     private bool _leere_Ordner_Löschen;
+
     private string _pfad = string.Empty;
 
     #endregion
@@ -75,6 +80,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         get => _itemAccepts.InputColorIdGet();
         set => _itemAccepts.InputColorIdSet(this, value);
     }
+
+    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
     public bool Leere_Ordner_löschen {
@@ -118,6 +125,16 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         return con;
     }
 
+    public override string ErrorReason() {
+        if (InputDatabase == null || InputDatabase.IsDisposed) {
+            return "Quelle fehlt";
+        }
+        //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
+        //    return "Ziel fehlt";
+        //}
+        return string.Empty;
+    }
+
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
         l.AddRange(_itemAccepts.GetStyleOptions(this));
@@ -151,6 +168,24 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         return false;
     }
 
+    public override string ReadableText() {
+        var txt = "Dateisystem: ";
+
+        if (IsOk() && InputDatabase != null) {
+            return txt + InputDatabase.Caption;
+        }
+
+        return txt + ErrorReason();
+    }
+
+    public override QuickImage? SymbolForReadableText() {
+        if (IsOk()) {
+            return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IDColor(InputColorId));
+        }
+
+        return QuickImage.Get(ImageCode.Warnung, 16);
+    }
+
     public override string ToString() {
         var result = new List<string>();
 
@@ -174,7 +209,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         if (GetRowFrom != null) { id = GetRowFrom.OutputColorId; }
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, id);
+            DrawColorScheme(gr, positionModified, zoom, id, true, true);
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\");

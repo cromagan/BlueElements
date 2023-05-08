@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
@@ -39,11 +40,12 @@ namespace BlueControls.ItemCollection;
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
 /// </summary>
 
-public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToControl, IItemAcceptSomething {
+public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToControl, IItemAcceptSomething, IReadableText, IErrorCheckable {
 
     #region Fields
 
     public static BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
+
     public List<string> VisibleFor = new();
 
     #endregion
@@ -82,6 +84,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     }
 
     public abstract int InputColorId { get; set; }
+
+    public abstract DatabaseAbstract? InputDatabase { get; }
 
     public string Sichtbarkeit {
         get => string.Empty;
@@ -173,6 +177,10 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     public abstract Control? CreateControl(ConnectedFormulaView parent);
 
+    public abstract string ErrorReason();
+
+    public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
@@ -190,6 +198,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         return false;
     }
 
+    public abstract string ReadableText();
+
     public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition, int breiteInspalten) {
         if (Parent == null) { return; }
 
@@ -198,6 +208,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         x.X = (x.Width * (aufXPosition - 1)) + (MmToPixel(0.5f, 300) * (aufXPosition - 1));
         SetCoordinates(x, true);
     }
+
+    public abstract QuickImage? SymbolForReadableText();
 
     public override string ToString() {
         var result = new List<string>();
@@ -221,6 +233,27 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         if (VisibleFor.Contains("#USER: " + myName, false)) { return true; }
         if (VisibleFor.Contains("#USER:" + myName, false)) { return true; }
         return false;
+    }
+
+    protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, int id, bool drawSymbol, bool drawText) {
+        gr.FillRectangle(Brushes.White, drawingCoordinates);
+
+        var w = zoom * 2;
+
+        var tmp = drawingCoordinates;
+        tmp.Inflate(-w, -w);
+
+        gr.DrawRectangle(new Pen(Skin.IDColor(id), w * 2), tmp);
+
+        gr.DrawRectangle(new Pen(Color.Black, zoom), drawingCoordinates);
+
+        if (drawSymbol && drawText) {
+            Skin.Draw_FormatedText(gr, ReadableText(), SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+        } else if (drawSymbol) {
+            Skin.Draw_FormatedText(gr, string.Empty, SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+        } else if (drawText) {
+            Skin.Draw_FormatedText(gr, ReadableText(), null, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+        }
     }
 
     private List<string> Permission_AllUsed() {

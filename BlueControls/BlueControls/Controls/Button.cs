@@ -180,14 +180,16 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
         if (par is PartentType.Slider) { _buttonStyle = ButtonStyle.SliderButton; }
     }
 
-    internal static void DrawButton(Control control, Graphics gr, Design buttontype, States state, QuickImage? pic, Alignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
+    internal static void DrawButton(Control? control, Graphics gr, Design buttontype, States state, QuickImage? pic, Alignment align, bool picHeight44, ExtText etxt, string text, Rectangle displayRectangle, bool translate) {
         var design = Skin.DesignOf(buttontype, state);
         Skin.Draw_Back(gr, design, displayRectangle, control, true);
         Skin.Draw_Border(gr, design, displayRectangle);
 
-        picHeight44 = picHeight44 && control.Height >= 40 && pic != null;
+        if (control != null) {
+            picHeight44 = picHeight44 && control.Height >= 40 && pic != null;
+        }
 
-        if (picHeight44 && pic != null) {
+        if (picHeight44 && pic != null && control != null) {
             // Großes Bild per automatik generieren und Zeichnen
             //if (pic.Width != -1 || pic.Height != -1) { Develop.DebugPrint("Bei Bildcode " + pic + " die Größenangabe entfernen, da es ein grosses Bild wird!"); }
             //var Zoom = Math.Min((control.Width - 6) / (double)pic.Width, 28 / (double)pic.Height);

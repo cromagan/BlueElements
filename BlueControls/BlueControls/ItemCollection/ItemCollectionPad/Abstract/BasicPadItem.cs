@@ -509,19 +509,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         }
     }
 
-    protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, int id) {
-        gr.FillRectangle(Brushes.White, drawingCoordinates);
-
-        var w = zoom * 2;
-
-        var tmp = drawingCoordinates;
-        tmp.Inflate(-w, -w);
-
-        gr.DrawRectangle(new Pen(Skin.IDColor(id), w * 2), tmp);
-
-        gr.DrawRectangle(new Pen(Color.Black, zoom), drawingCoordinates);
-    }
-
     protected virtual void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         try {
             if (!forPrinting) {

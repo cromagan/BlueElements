@@ -26,6 +26,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
+using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 
@@ -40,9 +41,13 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
+
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
+
     private string _überschrift = string.Empty;
+
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+
     private string _variable = string.Empty;
 
     #endregion
@@ -78,6 +83,8 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         get => _itemAccepts.InputColorIdGet();
         set => _itemAccepts.InputColorIdSet(this, value);
     }
+
+    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public string Überschrift {
         get => _überschrift;
@@ -115,6 +122,16 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         con.DoInputSettings(parent, this);
         //con.DoOutputSettings(parent, this);
         return con;
+    }
+
+    public override string ErrorReason() {
+        if (InputDatabase == null || InputDatabase.IsDisposed) {
+            return "Quelle fehlt";
+        }
+        //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
+        //    return "Ziel fehlt";
+        //}
+        return string.Empty;
     }
 
     public override List<GenericControl> GetStyleOptions() {
@@ -159,12 +176,22 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         return false;
     }
 
-    public string ReadableText() => "Wert aus: " + Überschrift;
+    public override string ReadableText() {
+        var txt = "Variablenansicht: ";
 
-    public QuickImage? SymbolForReadableText() {
-        if (GetRowFrom == null) { return null; }
+        if (IsOk() && InputDatabase != null) {
+            return txt + InputDatabase.Caption;
+        }
 
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.OutputColorId));
+        return txt + ErrorReason();
+    }
+
+    public override QuickImage? SymbolForReadableText() {
+        if (IsOk()) {
+            return QuickImage.Get(ImageCode.Variable, 16, Color.Transparent, Skin.IDColor(InputColorId));
+        }
+
+        return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
     public override string ToString() {
@@ -191,7 +218,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         if (GetRowFrom != null) { id = GetRowFrom.OutputColorId; }
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, id);
+            DrawColorScheme(gr, positionModified, zoom, id, true, true);
         }
 
         if (GetRowFrom == null) {

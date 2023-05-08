@@ -46,9 +46,13 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
+
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
+
     private ColumnItem? _column;
+
     private string _columnName = string.Empty;
+
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -109,6 +113,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         get => _itemAccepts.InputColorIdGet();
         set => _itemAccepts.InputColorIdSet(this, value);
     }
+
+    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public string Interner_Name {
         get {
@@ -184,6 +190,16 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         //return cy;
     }
 
+    public override string ErrorReason() {
+        if (InputDatabase == null || InputDatabase.IsDisposed) {
+            return "Quelle fehlt";
+        }
+        //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
+        //    return "Ziel fehlt";
+        //}
+        return string.Empty;
+    }
+
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
 
@@ -233,18 +249,14 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         return false;
     }
 
-    public string ReadableText() {
-        if (Column != null) {
-            return "Wert aus: " + Column.ReadableText();
+    public override string ReadableText() {
+        var txt = "Wert aus: ";
 
-            //if (Genau_eine_Zeile) {
-            //    return "(eine) Zeile aus: " + Database.Caption;
-            //} else {
-            //    return "Zeilen aus: " + Database.Caption;
-            //}
+        if (IsOk() && Column != null) {
+            return txt + Column.Caption;
         }
 
-        return "Wert einer Spalte";
+        return txt + ErrorReason();
     }
 
     public void Spalte_bearbeiten() {
@@ -283,10 +295,12 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         OnChanged();
     }
 
-    public QuickImage? SymbolForReadableText() {
-        if (GetRowFrom == null) { return null; }
+    public override QuickImage? SymbolForReadableText() {
+        if (IsOk()) {
+            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IDColor(InputColorId));
+        }
 
-        return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IDColor(GetRowFrom.OutputColorId));
+        return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
     public override string ToString() {
@@ -309,12 +323,10 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
 
-        if (GetRowFrom == null) {
-            Skin.Draw_FormatedText(gr, "Datenquelle fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
-        } else if (Column == null) {
+        if (Column == null) {
             Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
         } else {
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column.ReadableText() + ":");

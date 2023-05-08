@@ -283,7 +283,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         set {
             if (Database == null || Database.IsDisposed) { return; }
             Database.PowerEdit = value;
-            Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
+            Invalidate_sortedRowDatax(); // Neue Zeilen können nun erlaubt sein
         }
     }
 
@@ -663,7 +663,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (Database != null && !Database.IsDisposed && Database?.Column?.SysChapter != null) {
             _collapsed.AddRange(Database.Column.SysChapter.Contents());
         }
-        Invalidate_SortedRowData();
+        Invalidate_sortedRowDatax();
     }
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
@@ -906,7 +906,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void ExpandAll() {
         _collapsed.Clear();
         CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
-        Invalidate_SortedRowData();
+        Invalidate_sortedRowDatax();
     }
 
     public string Export_CSV(FirstRow firstRow) => Database == null ? string.Empty : Database.Export_CSV(firstRow, CurrentArrangement, SortedRows());
@@ -982,7 +982,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _filteredRows = null;
         ////CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
         Invalidate_Filterinfo();
-        Invalidate_SortedRowData();
+        Invalidate_sortedRowDatax();
     }
 
     public void Invalidate_HeadSize() {
@@ -1017,19 +1017,19 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         PinnedRows.Clear();
         PinnedRows.AddRange(rows);
-        Invalidate_SortedRowData();
+        Invalidate_sortedRowDatax();
         OnPinnedChanged();
     }
 
     public void PinAdd(RowItem? row) {
         PinnedRows.Add(row);
-        Invalidate_SortedRowData();
+        Invalidate_sortedRowDatax();
         OnPinnedChanged();
     }
 
     public void PinRemove(RowItem? row) {
         _ = PinnedRows.Remove(row);
-        Invalidate_SortedRowData();
+        Invalidate_sortedRowDatax();
         OnPinnedChanged();
     }
 
@@ -1069,13 +1069,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (Database == null || Database.IsDisposed) {
                 sortedRowDataNew = new List<RowData?>();
             } else {
-                sortedRowDataNew =
-                    Database.Row.CalculateSortedRows(FilteredRows, SortUsed(), PinnedRows, _sortedRowData);
+                sortedRowDataNew = Database.Row.CalculateSortedRows(FilteredRows, SortUsed(), PinnedRows, _sortedRowData);
             }
 
             if (_sortedRowData != null && !_sortedRowData.IsDifferentTo(sortedRowDataNew)) { return _sortedRowData; }
 
-            _sortedRowData = new List<RowData>();
+            var sortedRowDataTmp = new List<RowData>();
 
             foreach (var thisRow in sortedRowDataNew) {
                 var thisRowData = thisRow;
@@ -1109,20 +1108,20 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 thisRowData.Expanded = expanded;
                 if (thisRowData.Expanded) {
                     thisRowData.DrawHeight = Row_DrawHeight(thisRowData.Row, displayR);
-                    if (_sortedRowData == null) {
-                        // Folgender Fall: Die Row height reparirt die LinkedCell.
-                        // Dadruch wird eine Zelle geändert. Das wiederrum kann _SortedRowData auf null setzen..
-                        return null;
-                    }
+                    //if (_sortedRowDatax == null) {
+                    //    // Folgender Fall: Die Row height reparirt die LinkedCell.
+                    //    // Dadruch wird eine Zelle geändert. Das wiederrum kann _sortedRowDatax auf null setzen..
+                    //    return null;
+                    //}
                     maxY += thisRowData.DrawHeight;
                 }
 
                 #endregion
 
-                _sortedRowData.Add(thisRowData);
+                sortedRowDataTmp.Add(thisRowData);
             }
 
-            if (CursorPosRow?.Row != null && !_sortedRowData.Contains(CursorPosRow)) { CursorPos_Reset(); }
+            if (CursorPosRow?.Row != null && !sortedRowDataTmp.Contains(CursorPosRow)) { CursorPos_Reset(); }
             _mouseOverRow = null;
 
             #region Slider berechnen
@@ -1130,6 +1129,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             SliderSchaltenSenk(displayR, maxY);
 
             #endregion
+
+            _sortedRowData = sortedRowDataTmp;
 
             //         _ = EnsureVisible(CursorPosColumn, CursorPosRow);
             // EnsureVisible macht probleme, wenn mit der Maus auf ein linked Cell gezogen wird und eine andere Cell
@@ -1139,8 +1140,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             return SortedRows(); // Rekursiver aufruf. Manchmal funktiniert OnRowsSorted nicht...
         } catch {
-            // Komisch, manchmal wird die Variable _SortedRowData verworfen.
-            Invalidate_SortedRowData();
+            // Komisch, manchmal wird die Variable _sortedRowDatax verworfen.
+            Invalidate_sortedRowDatax();
             return SortedRows();
         }
     }
@@ -1315,7 +1316,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
 
                 if (!didreload) { break; }
-                Invalidate_SortedRowData();
+                Invalidate_sortedRowDatax();
             } while (true);
 
             switch (_design) {
@@ -1570,7 +1571,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     } else {
                         _collapsed.Add(rc);
                     }
-                    Invalidate_SortedRowData();
+                    Invalidate_sortedRowDatax();
                 }
             }
             _ = EnsureVisible(_mouseOverColumn, _mouseOverRow);
@@ -1726,7 +1727,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             CurrentArrangement?.Invalidate_DrawWithOfAllItems();
             _isinSizeChanged = false;
         }
-        Invalidate_SortedRowData(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
+        Invalidate_sortedRowDatax(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
@@ -1886,7 +1887,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Invalidate_FilteredRows();
             }
         }
-        Invalidate_SortedRowData(); // Zeichenhöhe kann sich ändern...
+        Invalidate_sortedRowDatax(); // Zeichenhöhe kann sich ändern...
 
         Invalidate_DrawWidth(e.Column);
 
@@ -1899,7 +1900,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Invalidate_HeadSize();
 
         // kümmert sich _Database_CellValueChanged darum
-        //   Invalidate_SortedRowData();
+        //   Invalidate_sortedRowDatax();
     }
 
     private void _Database_DatabaseLoaded(object sender, System.EventArgs e) {
@@ -1943,7 +1944,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void _Database_RowRemoved(object sender, System.EventArgs e) => Invalidate_FilteredRows();
 
-    private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
+    private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_sortedRowDatax();
 
     private void _Database_StoreView(object sender, System.EventArgs e) =>
             //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
@@ -3039,7 +3040,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void Invalidate_SortedRowData() {
+    private void Invalidate_sortedRowDatax() {
         _sortedRowData = null;
         Invalidate();
     }
@@ -3122,7 +3123,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnViewChanged() {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
-        Invalidate_SortedRowData(); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
+        Invalidate_sortedRowDatax(); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
     }
 
     private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
@@ -3236,7 +3237,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         SliderY.Minimum = 0;
         SliderY.Maximum = Math.Max(maxY - displayR.Height + 1 + HeadSize(), 0);
         SliderY.LargeChange = displayR.Height - HeadSize();
-        SliderY.Enabled = Convert.ToBoolean(SliderY.Maximum > 0);
+        SliderY.Enabled = SliderY.Maximum > 0;
     }
 
     private void SliderSchaltenWaage(Rectangle displayR, int maxX) {

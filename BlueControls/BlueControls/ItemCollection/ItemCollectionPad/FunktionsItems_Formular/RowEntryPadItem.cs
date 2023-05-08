@@ -31,7 +31,7 @@ using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection;
 
-public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemSendRow, IItemRowInput {
+public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemSendRow, IItemRowInput {
 
     #region Fields
 
@@ -65,7 +65,8 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
     }
 
     public override string Description => " Diese Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element.\r\nHat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.\r\n Unsichtbares Element, wird nicht angezeigt.";
-    public int InputColorId { get; set; }
+    public override int InputColorId { get; set; }
+    public override DatabaseAbstract? InputDatabase => OutputDatabase;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -142,11 +143,21 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
-    public Control CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new RowEntryControl(OutputDatabase);
         //con.DoInputSettings(parent, this);
         con.DoOutputSettings(parent, this);
         return con;
+    }
+
+    public override string ErrorReason() {
+        if (InputDatabase == null || InputDatabase.IsDisposed) {
+            return "Quelle fehlt";
+        }
+        if (OutputDatabase == null || OutputDatabase.IsDisposed) {
+            return "Ziel fehlt";
+        }
+        return string.Empty;
     }
 
     public override List<GenericControl> GetStyleOptions() {
@@ -172,17 +183,25 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
         return false;
     }
 
-    public string ReadableText() {
-        if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-            return "Eingangs-Zeile der Datenbank: " + OutputDatabase.Caption;
+    public override string ReadableText() {
+        var txt = "Eingangs-Zeile: ";
+
+        if (IsOk() && InputDatabase != null) {
+            return txt + InputDatabase.Caption;
         }
 
-        return "Eingangs-Zeile einer Datenbank";
+        return txt + ErrorReason();
     }
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(InputColorId));
+    public override QuickImage? SymbolForReadableText() {
+        if (IsOk()) {
+            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IDColor(InputColorId));
+        }
+
+        return QuickImage.Get(ImageCode.Warnung, 16);
+    }
 
     public override string ToString() {
         var result = new List<string>();
@@ -200,13 +219,7 @@ public class RowEntryPadItem : RectanglePadItemWithVersion, IReadableText, IItem
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-            DrawColorScheme(gr, positionModified, zoom, InputColorId);
-
-            if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-                Skin.Draw_FormatedText(gr, "Eingangszeile: " + OutputDatabase.Caption, QuickImage.Get(ImageCode.Datenbank, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
-            } else {
-                Skin.Draw_FormatedText(gr, "Eingangszeile: Bezug fehlt", QuickImage.Get(ImageCode.Datenbank, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
-            }
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

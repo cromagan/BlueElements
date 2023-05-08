@@ -26,7 +26,12 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
+using BlueDatabase;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Windows.Forms.AxHost;
 
 namespace BlueControls.ItemCollection;
 
@@ -36,6 +41,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     private readonly ItemAcceptFilter _itemAccepts;
     private string _anzeige = string.Empty;
+    private ExtText? _eTxt;
 
     #endregion
 
@@ -73,6 +79,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         set => _itemAccepts.InputColorIdSet(this, value);
     }
 
+    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
     protected override int SaveOrder => 1;
 
     #endregion
@@ -86,6 +93,16 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         //con.DoOutputSettings(this);
 
         return con;
+    }
+
+    public override string ErrorReason() {
+        if (InputDatabase == null || InputDatabase.IsDisposed) {
+            return "Quelle fehlt";
+        }
+        //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
+        //    return "Ziel fehlt";
+        //}
+        return string.Empty;
     }
 
     public override List<GenericControl> GetStyleOptions() {
@@ -110,17 +127,23 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         return false;
     }
 
-    public string ReadableText() {
-        var db = _itemAccepts.InputDatabase(this);
+    public override string ReadableText() {
+        var txt = "Neue Zeile anlegen: ";
 
-        if (db != null && !db.IsDisposed) {
-            return "Neue Zeile anlegen in: " + db.Caption;
+        if (IsOk() && InputDatabase != null) {
+            return txt + InputDatabase.Caption;
         }
 
-        return "Neue Zeile anlegen einer Datenbank";
+        return txt + ErrorReason();
     }
 
-    public QuickImage? SymbolForReadableText() => null;
+    public override QuickImage? SymbolForReadableText() {
+        if (IsOk()) {
+            return QuickImage.Get(ImageCode.PlusZeichen, 16, Color.Transparent, Skin.IDColor(InputColorId));
+        }
+
+        return QuickImage.Get(ImageCode.Warnung, 16);
+    }
 
     public override string ToString() {
         var result = new List<string>();
@@ -140,18 +163,11 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            var db = _itemAccepts.InputDatabase(this);
-
-            DrawColorScheme(gr, positionModified, zoom, -1);
-
-            if (db != null && !db.IsDisposed) {
-                var txt = "Neue Zeile anlegen Zeile in " + db.Caption;
-
-                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
-            } else {
-                Skin.Draw_FormatedText(gr, "Bezug fehlt", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
-            }
+            DrawColorScheme(gr, positionModified, zoom, -1, true, true);
         }
+
+        _eTxt ??= new ExtText(Design.Button, States.Standard);
+        Controls.Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(ImageCode.PlusZeichen), Alignment.Top_HorizontalCenter, false, _eTxt, "xxx", positionModified.ToRect(), false);
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }

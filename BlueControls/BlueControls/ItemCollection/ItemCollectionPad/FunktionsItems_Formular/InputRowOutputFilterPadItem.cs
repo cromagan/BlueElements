@@ -37,17 +37,14 @@ namespace BlueControls.ItemCollection;
 /// Unsichtbares Element, wird nicht angezeigt
 /// </summary>
 
-public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadableText, IItemToControl, IItemAcceptRow, IItemSendFilter {
+public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptRow, IItemSendFilter {
 
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
     private readonly ItemSendFilter _itemSends;
-
     private string _eigangsWertSpalte = string.Empty;
-
     private string _filterSpalte = string.Empty;
-
     private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_GrossKleinEgal;
 
     #endregion
@@ -118,10 +115,12 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
         set => _itemAccepts.GetRowFromSet(value, this);
     }
 
-    public int InputColorId {
+    public override int InputColorId {
         get => _itemAccepts.InputColorIdGet();
         set => _itemAccepts.InputColorIdSet(this, value);
     }
+
+    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -141,7 +140,7 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
-    public Control CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         var i = _itemAccepts.InputDatabase(this)?.Column.Exists(_eigangsWertSpalte);
         var o = OutputDatabase?.Column.Exists(_filterSpalte);
         var con = new InputRowOutputFilterControl(i, o, _filtertype);
@@ -149,6 +148,16 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
         con.DoInputSettings(parent, this);
 
         return con;
+    }
+
+    public override string ErrorReason() {
+        if (InputDatabase == null || InputDatabase.IsDisposed) {
+            return "Quelle fehlt";
+        }
+        if (OutputDatabase == null || OutputDatabase.IsDisposed) {
+            return "Ziel fehlt";
+        }
+        return string.Empty;
     }
 
     public override List<GenericControl> GetStyleOptions() {
@@ -208,17 +217,25 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
         //result.ParseableAdd("Filter", _filtertype);
     }
 
-    public string ReadableText() {
-        if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-            return "Neuer Filter: " + OutputDatabase.Caption;
+    public override string ReadableText() {
+        var txt = "Filter aus Zeile: ";
+
+        if (IsOk() && OutputDatabase != null) {
+            return txt + OutputDatabase.Caption;
         }
 
-        return "Neuer Filter einer Datenbank";
+        return txt + ErrorReason();
     }
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(InputColorId));
+    public override QuickImage? SymbolForReadableText() {
+        if (IsOk()) {
+            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IDColor(InputColorId));
+        }
+
+        return QuickImage.Get(ImageCode.Warnung, 16);
+    }
 
     public override string ToString() {
         var result = new List<string>();
@@ -242,18 +259,8 @@ public class InputRowOutputFilterPadItem : RectanglePadItemWithVersion, IReadabl
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, -1);
-
-            if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-                var txt = "Filtergenerator für " + OutputDatabase.Caption;
-
-                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
-            } else {
-                Skin.Draw_FormatedText(gr, "Filtergenerator", QuickImage.Get(ImageCode.Zeile, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
-            }
-
+            DrawColorScheme(gr, positionModified, zoom, -1, true, true);
             base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-
             RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
         }
     }

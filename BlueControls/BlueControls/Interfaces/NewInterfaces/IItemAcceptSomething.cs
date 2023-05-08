@@ -20,6 +20,7 @@
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.ItemCollection;
+using BlueDatabase;
 using System.Collections.Generic;
 
 namespace BlueControls.Interfaces;
@@ -32,7 +33,7 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
     #region Properties
 
     int InputColorId { get; set; }
-
+    public DatabaseAbstract? InputDatabase { get; }
     public string Page { get; }
     public ItemCollectionPad? Parent { get; }
 
@@ -78,10 +79,7 @@ public class ItemAcceptSomething {
     protected List<GenericControl> GetStyleOptions(IItemAcceptSomething item) {
         var l = new List<GenericControl>();
 
-
-       l.Add(new FlexiControl("Eingang:"));
-
-
+        l.Add(new FlexiControl("Eingang:"));
 
         //l.AddRange(base.GetStyleOptions(this));
         return l;

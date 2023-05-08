@@ -42,9 +42,13 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
+
     private readonly ItemSendFilter _itemSends;
+
     private string _anzeige = string.Empty;
+
     private string _überschrift = string.Empty;
+
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -106,6 +110,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         set => _itemAccepts.InputColorIdSet(this, value);
     }
 
+    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
         set => _itemSends.OutputColorIdSet(value, this);
@@ -144,6 +150,16 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         con.DoInputSettings(parent, this);
 
         return con;
+    }
+
+    public override string ErrorReason() {
+        if (InputDatabase == null || InputDatabase.IsDisposed) {
+            return "Quelle fehlt";
+        }
+        if (OutputDatabase == null || OutputDatabase.IsDisposed) {
+            return "Ziel fehlt";
+        }
+        return string.Empty;
     }
 
     public override List<GenericControl> GetStyleOptions() {
@@ -191,17 +207,25 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         return false;
     }
 
-    public string ReadableText() {
-        if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-            return "eine Zeile aus: " + OutputDatabase.Caption;
+    public override string ReadableText() {
+        var txt = "Filter: ";
+
+        if (IsOk() && OutputDatabase != null) {
+            return txt + OutputDatabase.Caption;
         }
 
-        return "Zeile einer Datenbank";
+        return txt + ErrorReason();
     }
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Kreis, 10, Color.Transparent, Skin.IDColor(InputColorId));
+    public override QuickImage? SymbolForReadableText() {
+        if (IsOk()) {
+            return QuickImage.Get(ImageCode.Trichter, 16, Color.Transparent, Skin.IDColor(InputColorId));
+        }
+
+        return QuickImage.Get(ImageCode.Warnung, 16);
+    }
 
     public override string ToString() {
         var result = new List<string>();
@@ -225,17 +249,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, InputColorId);
-
-            if (OutputDatabase != null && !OutputDatabase.IsDisposed) {
-                var txt = "Filter der Datenbank " + OutputDatabase.Caption;
-
-                Skin.Draw_FormatedText(gr, txt, QuickImage.Get(ImageCode.Trichter, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
-            } else {
-                Skin.Draw_FormatedText(gr, "Filter", QuickImage.Get(ImageCode.Trichter, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnFont?.Scale(zoom), false);
-            }
-        } else {
-            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

@@ -379,6 +379,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var rows = CalculateVisibleRows(filter, pinned);
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
+
+        Database.RefreshRowData(rows, false, null);
+
+
         var txt = "Skript wird ausgeführt: " + scriptname;
 
         Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, 0, rows.Count, true, false));

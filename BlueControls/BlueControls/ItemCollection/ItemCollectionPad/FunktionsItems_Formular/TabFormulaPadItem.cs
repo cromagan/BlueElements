@@ -32,6 +32,7 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
+using BlueDatabase;
 using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
 
@@ -88,6 +89,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         set => _itemAccepts.InputColorIdSet(this, value);
     }
 
+    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
     protected override int SaveOrder => 1000;
 
     #endregion
@@ -168,6 +170,16 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         #endregion
     }
 
+    public override string ErrorReason() {
+        if (InputDatabase == null || InputDatabase.IsDisposed) {
+            return "Quelle fehlt";
+        }
+        //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
+        //    return "Ziel fehlt";
+        //}
+        return string.Empty;
+    }
+
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
         l.AddRange(_itemAccepts.GetStyleOptions(this));
@@ -205,6 +217,24 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                 return true;
         }
         return false;
+    }
+
+    public override string ReadableText() {
+        var txt = "Formulare: ";
+
+        if (IsOk() && InputDatabase != null) {
+            return txt + InputDatabase.Caption;
+        }
+
+        return txt + ErrorReason();
+    }
+
+    public override QuickImage? SymbolForReadableText() {
+        if (IsOk()) {
+            return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IDColor(InputColorId));
+        }
+
+        return QuickImage.Get(ImageCode.Warnung, 16);
     }
 
     public override string ToString() {
