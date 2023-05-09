@@ -252,9 +252,7 @@ public class BitmapExt : IDisposableExtended {
                 }
             }
         }
-        bool IsWhite(int x, int y) {
-            return x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
-        }
+        bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
     }
 
     public static Bitmap? AutoCrop(Bitmap? pic, double minBrightness) {

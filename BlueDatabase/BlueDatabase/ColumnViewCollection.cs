@@ -321,7 +321,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         if (string.IsNullOrEmpty(Name)) { Name = "Ansicht " + number; }
     }
 
-    protected void Dispose(bool disposing) {
+    public void Dispose(bool disposing) {
         IsDisposed = true;
         //PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
         //PermissionGroups_Show.Clear();

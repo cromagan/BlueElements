@@ -136,7 +136,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     protected override void OnShown(System.EventArgs e) => variableEditor.WriteVariablesToTable(Database?.Variables);
 
-    protected void OpenAdditionalFileFolder() {
+    public void OpenAdditionalFileFolder() {
         //Todo: Implementieren
         if (Database == null || Database.IsDisposed) {
             return;

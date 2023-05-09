@@ -115,13 +115,13 @@ public sealed class QuickImage : IReadableText, IStringable {
     public int DrehWinkel { get; }
     public ImageCodeEffect Effekt { get; } = ImageCodeEffect.Ohne;
     public string Färbung { get; } = string.Empty;
-    public new int Height { get; private set; }
+    public int Height { get; private set; }
     public int Helligkeit { get; }
     public bool IsError { get; private set; }
     public string Name { get; } = string.Empty;
     public int Sättigung { get; }
     public int Transparenz { get; }
-    public new int Width { get; private set; }
+    public int Width { get; private set; }
     public string Zweitsymbol { get; } = string.Empty;
 
     #endregion
