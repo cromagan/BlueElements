@@ -69,6 +69,10 @@ public class Method_CellSetRow : Method_Database {
         if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
         if (attvar.Attributes[0] is VariableFloat vf) { value = vf.ValueForReplace; }
 
+
+        value = columnToSet.AutoCorrect(value, true);
+
+
         row.CellSet(columnToSet, value);
         return row.CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }

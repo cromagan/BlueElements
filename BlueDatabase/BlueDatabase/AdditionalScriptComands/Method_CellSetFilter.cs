@@ -75,6 +75,8 @@ public class Method_CellSetFilter : Method_Database {
         if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
         if (attvar.Attributes[0] is VariableFloat vf) { value = vf.ValueForReplace; }
 
+        value = columnToSet.AutoCorrect(value, true);
+
         r[0].CellSet(columnToSet, value);
 
         return r[0].CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
