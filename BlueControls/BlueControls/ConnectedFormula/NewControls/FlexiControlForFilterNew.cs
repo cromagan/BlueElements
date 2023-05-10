@@ -59,7 +59,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
 
     public FilterItem? Filter { get; }
     public DatabaseAbstract? OutputDatabase { get; set; }
-    public ReadOnlyCollection<IControlSendFilter> ParentSender => new(_parentSender);
+    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
 
     #endregion
 

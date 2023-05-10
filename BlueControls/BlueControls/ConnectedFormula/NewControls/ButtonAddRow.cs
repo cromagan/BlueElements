@@ -28,7 +28,7 @@ internal class ButtonAddRow : Button, IControlAcceptFilter, ICalculateRows {
 
     #region Fields
 
-    private readonly List<IControlSendFilter> _parentSender = new();
+    private readonly List<IControlSendFilter> _getFilterFrom = new();
     private List<RowItem>? _filteredRows;
 
     #endregion
@@ -36,7 +36,7 @@ internal class ButtonAddRow : Button, IControlAcceptFilter, ICalculateRows {
     #region Properties
 
     public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), this.InputDatabase());
-    public ReadOnlyCollection<IControlSendFilter> ParentSender => new(_parentSender);
+    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
 
     #endregion
 
@@ -44,7 +44,7 @@ internal class ButtonAddRow : Button, IControlAcceptFilter, ICalculateRows {
 
     public void AddParentSender(IControlSendFilter item) {
         Invalidate_FilteredRows();
-        _parentSender.Add(item);
+        _getFilterFrom.Add(item);
     }
 
     public void Invalidate_FilteredRows() => _filteredRows = null;

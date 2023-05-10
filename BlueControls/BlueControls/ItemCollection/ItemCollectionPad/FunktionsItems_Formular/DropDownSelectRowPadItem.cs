@@ -99,17 +99,14 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit,\r\naus dem daraus resultierenden Zeilen EINE per Dropdownmenu zu wählen.";
 
-    public ReadOnlyCollection<string>? GetFilterFromKeys {
+    public ReadOnlyCollection<string>? GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public override int InputColorId {
-        get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(this, value);
-    }
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -137,6 +134,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     #region Methods
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
+
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlRowSelectorNew(OutputDatabase, _überschrift, _anzeige) {
@@ -174,8 +173,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
 
-        //l.Add(new FlexiControl());
-        //l.AddRange(base.GetStyleOptions());
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 
@@ -222,7 +221,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -251,14 +250,14 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, _itemAccepts.InputColorIdGet(), true, true);
+            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         } else {
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     protected override void ParseFinished() {

@@ -81,7 +81,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
         set {
             if (_getRowFrom == value) { return; }
             if (_getRowFrom != null) {
-                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
+                DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
             }
 
             _getRowFrom = value;

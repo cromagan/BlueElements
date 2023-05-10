@@ -80,7 +80,7 @@ public static class ItemSendSomethingExtension {
                 var item2 = item.Parent[thisChild];
 
                 if (item2 is IItemAcceptSomething ias) {
-                    ias.InputColorId = item.OutputColorId;
+                    ias.CalculateInputColorIds();
                 }
             }
         }
@@ -194,7 +194,8 @@ public class ItemSendSomething {
         var l = new List<string>();
         l.AddRange(_childIds);
         l.Remove(remove.KeyName);
-        remove.InputColorId = -1;
+
+        remove.CalculateInputColorIds();
         ChildIdsSet(new ReadOnlyCollection<string>(l), item);
     }
 

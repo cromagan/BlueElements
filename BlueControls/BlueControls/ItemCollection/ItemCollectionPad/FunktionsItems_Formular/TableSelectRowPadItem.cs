@@ -73,17 +73,14 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public override string Description => "Darstellung einer Datenbank.\r\nKann Vorfilter empfangen und eine Zeile weitergeben.";
 
-    public ReadOnlyCollection<string>? GetFilterFromKeys {
+    public ReadOnlyCollection<string>? GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public override int InputColorId {
-        get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(this, value);
-    }
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -102,6 +99,8 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     #region Methods
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
+
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new Table();
@@ -156,7 +155,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Datenbank, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.Datenbank, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -178,12 +177,12 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
+            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     protected override void ParseFinished() {

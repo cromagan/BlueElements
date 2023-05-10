@@ -1257,7 +1257,14 @@ public static class Skin {
         return rahms;
     }
 
-    public static Color IDColor(int id) {
+    public static Color IdColor(List<int>? id) {
+        if (id == null || id.Count == 0) {
+            return IdColor(-1);
+        }
+        return IdColor(id[0]);
+    }
+
+    public static Color IdColor(int id) {
         if (id < 0) { return Color.White; }
 
         switch (id % 10) {

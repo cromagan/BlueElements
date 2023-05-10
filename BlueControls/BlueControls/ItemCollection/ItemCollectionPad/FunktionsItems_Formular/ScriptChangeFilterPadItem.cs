@@ -67,17 +67,14 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     public override string Description => "Dieses Element kann Filter empfangen, und per Skript einen komplett anderen Filter ausgeben.\r\nWird verwendet, wenn z.b. Zwei Werte gefiltert werden, aber in Wirklichkeit ein komplett anderer Filter verwendet werden soll.\r\nUnsichtbares element, wird nicht angezeigt.";
 
-    public ReadOnlyCollection<string>? GetFilterFromKeys {
+    public ReadOnlyCollection<string>? GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public override int InputColorId {
-        get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(this, value);
-    }
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -96,6 +93,8 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
     #region Methods
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
+
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FilterChangeControl();
@@ -151,7 +150,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Skript, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.Skript, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -173,11 +172,11 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
+            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", -1);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", null);
     }
 
     protected override void ParseFinished() {

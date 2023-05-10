@@ -46,6 +46,18 @@ public static class ItemAcceptRowExtensions {
 
     #region Methods
 
+    public static List<int> CalculateColorIds(this IItemAcceptRow item) {
+        var l = new List<int>();
+
+        if (item.GetRowFrom is IItemSendRow i) {
+            l.Add(i.OutputColorId);
+        }
+
+        if (l.Count == 0) { l.Add(-1); }
+
+        return l;
+    }
+
     [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
     public static void Datenquelle_wählen(this IItemAcceptRow item) {
         if (item.Parent is null) { return; }
@@ -83,11 +95,22 @@ public class ItemAcceptRow : ItemAcceptSomething {
 
     private string? _getValueFromkey;
 
+    private List<int> _inputColorId = new();
+
     private IItemSendRow? _tmpgetValueFrom;
 
     #endregion
 
     #region Methods
+
+    public void CalculateInputColorIds(IItemAcceptRow item) {
+        var nl = item.CalculateColorIds();
+
+        if (nl.IsDifferentTo(_inputColorId)) {
+            _inputColorId = nl;
+            item.OnChanged();
+        }
+    }
 
     public void DoCreativePadAddedToCollection(IItemAcceptRow item) {
         GetRowFromGet(item)?.DoChilds();
@@ -114,6 +137,13 @@ public class ItemAcceptRow : ItemAcceptSomething {
 
         item.RaiseVersion();
         item.OnChanged();
+    }
+
+    public List<int> InputColorIdGet(IItemAcceptRow item) {
+        if (_inputColorId.Count == 0) {
+            this.CalculateInputColorIds(item);
+        }
+        return _inputColorId;
     }
 
     public DatabaseAbstract? InputDatabase(IItemAcceptRow item) => GetRowFromGet(item)?.OutputDatabase;

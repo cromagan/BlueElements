@@ -115,12 +115,9 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         set => _itemAccepts.GetRowFromSet(value, this);
     }
 
-    public override int InputColorId {
-        get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(this, value);
-    }
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -139,6 +136,8 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
     #region Methods
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
+
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var i = _itemAccepts.InputDatabase(this)?.Column.Exists(_eigangsWertSpalte);
@@ -186,6 +185,9 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
             l.Add(new FlexiControlForProperty<string>(() => _filterSpalte, ic));
         }
 
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
+
         return l;
     }
 
@@ -231,7 +233,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -258,10 +260,10 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, -1, true, true);
+            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
+            DrawColorScheme(gr, positionModified, zoom, null, true, true);
             base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-            RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+            DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
         }
     }
 

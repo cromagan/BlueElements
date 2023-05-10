@@ -68,7 +68,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     public DatabaseAbstract? OutputDatabase { get; set; }
 
-    public ReadOnlyCollection<IControlSendFilter> ParentSender => new(_parentSender);
+    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
 
     public RowItem? Row {
         get => IsDisposed ? null : _row;

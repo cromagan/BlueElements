@@ -27,6 +27,7 @@ using System.Collections.ObjectModel;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueBasics.Enums;
 using System.ComponentModel;
+using BlueDatabase.AdditionalScriptComands;
 
 namespace BlueControls.Interfaces;
 
@@ -37,7 +38,10 @@ public interface IItemAcceptFilter : IItemAcceptSomething {
 
     #region Properties
 
-    public ReadOnlyCollection<string>? GetFilterFromKeys { get; set; }
+    /// <summary>
+    /// Enthält die Schlüssel der Items
+    /// </summary>
+    public ReadOnlyCollection<string>? GetFilterFrom { get; set; }
 
     #endregion
 }
@@ -45,6 +49,22 @@ public interface IItemAcceptFilter : IItemAcceptSomething {
 public static class ItemAcceptFilterExtensions {
 
     #region Methods
+
+    public static List<int> CalculateColorIds(this IItemAcceptFilter item) {
+        var l = new List<int>();
+
+        if (item.GetFilterFrom == null) {
+            foreach (var thisID in item.GetFilterFrom) {
+                if (item.Parent[thisID] is IItemSendFilter i) {
+                    l.Add(i.OutputColorId);
+                }
+            }
+        }
+
+        if (l.Count == 0) { l.Add(-1); }
+
+        return l;
+    }
 
     [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
     public static void Datenquelle_hinzufügen(this IItemAcceptFilter item) {
@@ -67,9 +87,9 @@ public static class ItemAcceptFilterExtensions {
 
         if (t is IItemSendFilter rfp2) {
             var l = new List<string>();
-            if (item.GetFilterFromKeys != null) { l.AddRange(item.GetFilterFromKeys); }
+            if (item.GetFilterFrom != null) { l.AddRange(item.GetFilterFrom); }
             l.Add(rfp2.KeyName);
-            item.GetFilterFromKeys = new ReadOnlyCollection<string>(l);
+            item.GetFilterFrom = new ReadOnlyCollection<string>(l);
 
             //_getFilterFrom = null;
             //_getFilterFromKeys.AddIfNotExists(rfp2.KeyName);
@@ -84,11 +104,23 @@ public class ItemAcceptFilter : ItemAcceptSomething {
     #region Fields
 
     public readonly List<string> _getFilterFromKeys = new();
+
     private ReadOnlyCollection<IItemSendFilter>? _getFilterFrom;
+
+    private List<int> _inputColorId = new();
 
     #endregion
 
     #region Methods
+
+    public void CalculateInputColorIds(IItemAcceptFilter item) {
+        var nl = item.CalculateColorIds();
+
+        if (nl.IsDifferentTo(_inputColorId)) {
+            _inputColorId = nl;
+            item.OnChanged();
+        }
+    }
 
     public void DoCreativePadAddedToCollection(IItemAcceptFilter item) {
         var l = GetFilterFromGet(item);
@@ -142,6 +174,13 @@ public class ItemAcceptFilter : ItemAcceptSomething {
             item.RaiseVersion();
             item.OnChanged();
         }
+    }
+
+    public List<int> InputColorIdGet(IItemAcceptFilter item) {
+        if (_inputColorId.Count == 0) {
+            this.CalculateInputColorIds(item);
+        }
+        return _inputColorId;
     }
 
     public DatabaseAbstract? InputDatabase(IItemAcceptFilter item) {

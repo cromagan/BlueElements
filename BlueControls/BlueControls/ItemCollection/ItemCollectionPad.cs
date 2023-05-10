@@ -102,7 +102,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(RowItem r, int index) : this(r.Database.Layouts[index], string.Empty) {
+    public ItemCollectionPad(RowItem r, int index) : this(r.Database?.Layouts[index], string.Empty) {
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
         _ = ResetVariables();
         ParseVariable(r);
@@ -110,8 +110,13 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(string toParse, string useThisKeyName) : this() {
-        if (string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="toParse"></param>
+    /// <param name="useThisKeyName">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
+    public ItemCollectionPad(string? toParse, string useThisKeyName) : this() {
+        if (toParse == null || string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }
         if (toParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
         KeyName = useThisKeyName;
         foreach (var pair in toParse.GetAllTags()) {
@@ -216,11 +221,6 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
     #region Destructors
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="toParse"></param>
-    /// <param name="useThisId">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
     ~ItemCollectionPad() {
         Dispose(false);
     }
@@ -680,11 +680,10 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         var tmp = result.Parseable();
 
         result.Clear();
-        foreach (var thisitem in this) {
-            foreach (var thisCon in Connections) {
-                if (thisCon.Item1 != null && thisCon.Item2 != null) {
-                    result.ParseableAdd("Connection", thisCon.ToString());
-                }
+
+        foreach (var thisCon in Connections) {
+            if (thisCon?.Item1 != null && thisCon?.Item2 != null) {
+                result.ParseableAdd("Connection", thisCon.ToString());
             }
         }
 

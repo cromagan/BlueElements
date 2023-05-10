@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -31,6 +32,7 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection;
 
@@ -40,7 +42,7 @@ namespace BlueControls.ItemCollection;
 /// Nur Tabs, die ein solches Objekt haben, werden als anzeigewürdig gewertet.
 /// </summary>
 
-public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToControl, IItemAcceptSomething, IReadableText, IErrorCheckable {
+public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToControl, IHasKeyName, IChangedFeedback, IHasVersion, IReadableText, IErrorCheckable {
 
     #region Fields
 
@@ -56,79 +58,11 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     #endregion
 
+    //public abstract int InputColorId { get; set; }
+
+    //public abstract DatabaseAbstract? InputDatabase { get; }
+
     #region Properties
-
-    public string Breite_berechnen {
-        get => string.Empty;
-        set {
-            var li = new ItemCollectionList.ItemCollectionList(true);
-            for (var br = 1; br <= 20; br++) {
-                _ = li.Add(br + " Spalte(n)", br.ToString(), true, br.ToString(Constants.Format_Integer3) + Constants.FirstSortChar);
-
-                for (var pos = 1; pos <= br; pos++) {
-                    _ = li.Add(br + " Spalte(n) - Position: " + pos, br + ";" + pos, false, br.ToString(Constants.Format_Integer3) + Constants.SecondSortChar + pos.ToString(Constants.Format_Integer3));
-                }
-            }
-
-            var x2 = InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, AddType.None, true);
-
-            if (x2 == null || x2.Count != 1) { return; }
-
-            var doit = x2[0].SplitBy(";");
-
-            var anzbr = IntParse(doit[0]);
-            var npos = IntParse(doit[1]);
-            SetXPosition(anzbr, npos, 1);
-            this.RaiseVersion();
-        }
-    }
-
-    public abstract int InputColorId { get; set; }
-
-    public abstract DatabaseAbstract? InputDatabase { get; }
-
-    public string Sichtbarkeit {
-        get => string.Empty;
-        set {
-            ItemCollectionList.ItemCollectionList aa = new(true);
-            aa.AddRange(Permission_AllUsed());
-
-            if (aa[DatabaseAbstract.Administrator] == null) { _ = aa.Add(DatabaseAbstract.Administrator); }
-            //aa.Sort();
-            aa.CheckBehavior = CheckBehavior.MultiSelection;
-            aa.Check(VisibleFor, true);
-            var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:", aa, AddType.Text, true);
-            if (b == null) { return; }
-            VisibleFor.Clear();
-
-            VisibleFor.AddRange(b.ToArray());
-
-            if (VisibleFor.Count > 1 && VisibleFor.Contains(DatabaseAbstract.Everybody, false)) {
-                VisibleFor.Clear();
-                VisibleFor.Add(DatabaseAbstract.Everybody);
-            }
-
-            if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Administrator); }
-            this.RaiseVersion();
-            OnChanged();
-        }
-    }
-
-    public string Standardhöhe_setzen {
-        get => string.Empty;
-        set {
-            var x = UsedArea;
-
-            var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
-            var he1 = MmToPixel(1, 300);
-            x.Height = (int)(x.Height / he) * he;
-            x.Height = (int)((x.Height / he1) + 0.99) * he1;
-
-            if (x.Height < he) { x.Height = he; }
-            this.RaiseVersion();
-            SetCoordinates(x, true);
-        }
-    }
 
     protected override int SaveOrder => 3;
 
@@ -136,7 +70,211 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     #region Methods
 
-    public static void DrawFakeControl(Graphics gr, RectangleF positionModified, float zoom, ÜberschriftAnordnung captionPosition, string captiontxt) {
+    public void Breite_berechnen() {
+        var li = new ItemCollectionList.ItemCollectionList(true);
+        for (var br = 1; br <= 20; br++) {
+            _ = li.Add(br + " Spalte(n)", br.ToString(), true, br.ToString(Constants.Format_Integer3) + Constants.FirstSortChar);
+
+            for (var pos = 1; pos <= br; pos++) {
+                _ = li.Add(br + " Spalte(n) - Position: " + pos, br + ";" + pos, false, br.ToString(Constants.Format_Integer3) + Constants.SecondSortChar + pos.ToString(Constants.Format_Integer3));
+            }
+        }
+
+        var x2 = InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, AddType.None, true);
+
+        if (x2 == null || x2.Count != 1) { return; }
+
+        var doit = x2[0].SplitBy(";");
+
+        var anzbr = IntParse(doit[0]);
+        var npos = IntParse(doit[1]);
+        SetXPosition(anzbr, npos, 1);
+        this.RaiseVersion();
+    }
+
+    public abstract Control? CreateControl(ConnectedFormulaView parent);
+
+    public abstract string ErrorReason();
+
+    public override List<GenericControl> GetStyleOptions() {
+        List<GenericControl> l = new();
+
+        l.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
+        l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
+
+        l.Add(new FlexiControlForDelegate(Sichtbarkeit, "Sichtbarkeit", ImageCode.Schild));
+
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
+        return l;
+    }
+
+    public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
+
+    public override bool ParseThis(string tag, string value) {
+        if (base.ParseThis(tag, value)) { return true; }
+        switch (tag) {
+            case "visiblefor":
+                value = value.Replace("\r", "|");
+
+                var tmp = value.FromNonCritical().SplitBy("|");
+                VisibleFor.Clear();
+                foreach (var thiss in tmp) {
+                    VisibleFor.Add(thiss.FromNonCritical());
+                }
+                if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Everybody); }
+                return true;
+        }
+        return false;
+    }
+
+    public abstract string ReadableText();
+
+    public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition, int breiteInspalten) {
+        if (Parent == null) { return; }
+
+        var x = UsedArea;
+        x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
+        x.X = (x.Width * (aufXPosition - 1)) + (MmToPixel(0.5f, 300) * (aufXPosition - 1));
+        SetCoordinates(x, true);
+    }
+
+    public void Sichtbarkeit() {
+        ItemCollectionList.ItemCollectionList aa = new(true);
+        aa.AddRange(Permission_AllUsed());
+
+        if (aa[DatabaseAbstract.Administrator] == null) { _ = aa.Add(DatabaseAbstract.Administrator); }
+        //aa.Sort();
+        aa.CheckBehavior = CheckBehavior.MultiSelection;
+        aa.Check(VisibleFor, true);
+        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:", aa, AddType.Text, true);
+        if (b == null) { return; }
+        VisibleFor.Clear();
+
+        VisibleFor.AddRange(b.ToArray());
+
+        if (VisibleFor.Count > 1 && VisibleFor.Contains(DatabaseAbstract.Everybody, false)) {
+            VisibleFor.Clear();
+            VisibleFor.Add(DatabaseAbstract.Everybody);
+        }
+
+        if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Administrator); }
+        this.RaiseVersion();
+        OnChanged();
+    }
+
+    public void Standardhöhe_setzen() {
+        var x = UsedArea;
+
+        var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
+        var he1 = MmToPixel(1, 300);
+        x.Height = (int)(x.Height / he) * he;
+        x.Height = (int)((x.Height / he1) + 0.99) * he1;
+
+        if (x.Height < he) { x.Height = he; }
+        this.RaiseVersion();
+        SetCoordinates(x, true);
+    }
+
+    public abstract QuickImage? SymbolForReadableText();
+
+    public override string ToString() {
+        var result = new List<string>();
+
+        if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Everybody); }
+
+        result.ParseableAdd("VisibleFor", VisibleFor);
+
+        return result.Parseable(base.ToString());
+    }
+
+    internal bool IsVisibleForMe(string? myGroup, string? myName) {
+        if (myGroup == null || myName == null) { return false; }
+
+        if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains(DatabaseAbstract.Everybody, false)) { return true; }
+
+        if (myGroup.Equals(DatabaseAbstract.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
+
+        if (VisibleFor.Contains(myGroup, false)) { return true; }
+
+        if (VisibleFor.Contains("#USER: " + myName, false)) { return true; }
+        if (VisibleFor.Contains("#USER:" + myName, false)) { return true; }
+        return false;
+    }
+
+    protected static void DrawArrow(Graphics gr, RectangleF positionModified, float zoom, string symbol, int colorId, Alignment al, float valueArrow, float valueSymbol, float xmod) {
+        var p = positionModified.PointOf(al);
+        var width = (int)(zoom * 12);
+        var height = (int)(zoom * 25);
+        var pa = Poly_Arrow(new Rectangle(0, 0, width, height));
+
+        var c = Skin.IdColor(colorId);
+        var c2 = c.Darken(0.4);
+
+        gr.TranslateTransform(p.X + (width / 2) + xmod, p.Y - valueArrow);
+
+        gr.RotateTransform(90);
+
+        gr.FillPath(new SolidBrush(c), pa);
+        gr.DrawPath(new Pen(c2, 1 * zoom), pa);
+
+        gr.RotateTransform(-90);
+        gr.TranslateTransform(-p.X - (width / 2) - xmod, -p.Y + valueArrow);
+
+        if (!string.IsNullOrEmpty(symbol)) {
+            var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
+            var sy = QuickImage.Get(co);
+            gr.DrawImage(sy, p.X - (sy.Width / 2) + xmod, p.Y - valueSymbol);
+        }
+    }
+
+    protected void DrawArrorInput(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, string symbol, List<int>? colorId) {
+        if (forPrinting) { return; }
+
+        var arrowY = (int)(zoom * 12) * 0.35f;
+        var symbolY = (int)(zoom * 12) * 0.35f;
+
+        var width = (int)(zoom * 12);
+
+        colorId ??= new List<int> { -1 };
+
+        var start = (colorId.Count * width / 2);
+
+        for (var pos = 0; pos < colorId.Count; pos++) {
+            DrawArrow(gr, positionModified, zoom, symbol, colorId[pos], Alignment.Top_HorizontalCenter, arrowY, symbolY, start);
+            start += width;
+        }
+    }
+
+    protected void DrawArrowOutput(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, string symbol, int colorId) {
+        if (forPrinting) { return; }
+        var arrowY = (int)(zoom * 12) * 0.45f;
+        var symbolY = (int)(zoom * 12) * 0.02f;
+        DrawArrow(gr, positionModified, zoom, symbol, colorId, Alignment.Bottom_HorizontalCenter, arrowY, symbolY, 0);
+    }
+
+    protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, List<int>? id, bool drawSymbol, bool drawText) {
+        gr.FillRectangle(Brushes.White, drawingCoordinates);
+
+        var w = zoom * 2;
+
+        var tmp = drawingCoordinates;
+        tmp.Inflate(-w, -w);
+
+        gr.DrawRectangle(new Pen(Skin.IdColor(id), w * 2), tmp);
+
+        gr.DrawRectangle(new Pen(Color.Black, zoom), drawingCoordinates);
+
+        if (drawSymbol && drawText) {
+            Skin.Draw_FormatedText(gr, ReadableText(), SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+        } else if (drawSymbol) {
+            Skin.Draw_FormatedText(gr, string.Empty, SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+        } else if (drawText) {
+            Skin.Draw_FormatedText(gr, ReadableText(), null, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+        }
+    }
+
+    protected void DrawFakeControl(Graphics gr, RectangleF positionModified, float zoom, ÜberschriftAnordnung captionPosition, string captiontxt) {
         Point cap;
         var uc = positionModified.ToRect();
 
@@ -172,87 +310,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
         if (uc.Width > 0 && uc.Height > 0) {
             gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
-        }
-    }
-
-    public abstract Control? CreateControl(ConnectedFormulaView parent);
-
-    public abstract string ErrorReason();
-
-    public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
-
-    public override bool ParseThis(string tag, string value) {
-        if (base.ParseThis(tag, value)) { return true; }
-        switch (tag) {
-            case "visiblefor":
-                value = value.Replace("\r", "|");
-
-                var tmp = value.FromNonCritical().SplitBy("|");
-                VisibleFor.Clear();
-                foreach (var thiss in tmp) {
-                    VisibleFor.Add(thiss.FromNonCritical());
-                }
-                if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Everybody); }
-                return true;
-        }
-        return false;
-    }
-
-    public abstract string ReadableText();
-
-    public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition, int breiteInspalten) {
-        if (Parent == null) { return; }
-
-        var x = UsedArea;
-        x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
-        x.X = (x.Width * (aufXPosition - 1)) + (MmToPixel(0.5f, 300) * (aufXPosition - 1));
-        SetCoordinates(x, true);
-    }
-
-    public abstract QuickImage? SymbolForReadableText();
-
-    public override string ToString() {
-        var result = new List<string>();
-
-        if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Everybody); }
-
-        result.ParseableAdd("VisibleFor", VisibleFor);
-
-        return result.Parseable(base.ToString());
-    }
-
-    internal bool IsVisibleForMe(string? myGroup, string? myName) {
-        if (myGroup == null || myName == null) { return false; }
-
-        if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains(DatabaseAbstract.Everybody, false)) { return true; }
-
-        if (myGroup.Equals(DatabaseAbstract.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
-
-        if (VisibleFor.Contains(myGroup, false)) { return true; }
-
-        if (VisibleFor.Contains("#USER: " + myName, false)) { return true; }
-        if (VisibleFor.Contains("#USER:" + myName, false)) { return true; }
-        return false;
-    }
-
-    protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, int id, bool drawSymbol, bool drawText) {
-        gr.FillRectangle(Brushes.White, drawingCoordinates);
-
-        var w = zoom * 2;
-
-        var tmp = drawingCoordinates;
-        tmp.Inflate(-w, -w);
-
-        gr.DrawRectangle(new Pen(Skin.IDColor(id), w * 2), tmp);
-
-        gr.DrawRectangle(new Pen(Color.Black, zoom), drawingCoordinates);
-
-        if (drawSymbol && drawText) {
-            Skin.Draw_FormatedText(gr, ReadableText(), SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
-        } else if (drawSymbol) {
-            Skin.Draw_FormatedText(gr, string.Empty, SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
-        } else if (drawText) {
-            Skin.Draw_FormatedText(gr, ReadableText(), null, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
         }
     }
 

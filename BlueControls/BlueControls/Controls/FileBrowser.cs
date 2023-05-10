@@ -85,7 +85,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
         set {
             if (_getRowFrom == value) { return; }
             if (_getRowFrom != null) {
-                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
+                Develop.DebugPrint(FehlerArt.Fehler, "Änderung nicht erlaubt");
             }
 
             _getRowFrom = value;

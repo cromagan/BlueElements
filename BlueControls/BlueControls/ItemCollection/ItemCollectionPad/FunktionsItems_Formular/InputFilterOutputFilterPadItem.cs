@@ -100,17 +100,14 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     public override string Description => "Dieses Element kann Filter empfangen - um eine Vorauswahl der verfügbaren Filterelement darzustallen.\r\nAnschließend kann mit den übrig gebliebenen Werten ein neuer Filter erzeugt werden, den der Benutzer auswählen kann.";
 
-    public ReadOnlyCollection<string>? GetFilterFromKeys {
+    public ReadOnlyCollection<string>? GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public override int InputColorId {
-        get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(this, value);
-    }
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -138,6 +135,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     #region Methods
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
+
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlForFilterNew(OutputDatabase) {
@@ -221,7 +220,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Trichter, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.Trichter, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -248,12 +247,12 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
+            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", InputColorId);
     }
 
     protected override void ParseFinished() {

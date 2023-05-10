@@ -616,7 +616,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             var ok = true;
 
             if (SqlBackAbstract.IsValidTableName(unique, false)) {
-                foreach (var thisfile in DatabaseAbstract.AllFiles) {
+                foreach (var thisfile in AllFiles) {
                     if (string.Equals(unique, thisfile.TableName)) { ok = false; break; }
                 }
             } else {

@@ -65,8 +65,17 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     public override string Description => " Diese Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element.\r\nHat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.\r\n Unsichtbares Element, wird nicht angezeigt.";
-    public override int InputColorId { get; set; }
-    public override DatabaseAbstract? InputDatabase => OutputDatabase;
+
+    /// <summary>
+    /// Dummy
+    /// </summary>
+    public List<int> InputColorId {
+        get => new() { OutputColorId };
+
+        set { }
+    }
+
+    public DatabaseAbstract? InputDatabase => OutputDatabase;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -83,63 +92,6 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     #endregion
 
     #region Methods
-
-    public static void DrawInputArrow(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, string symbol, int colorId) {
-        if (forPrinting) { return; }
-
-        var p = positionModified.PointOf(Alignment.Top_HorizontalCenter);
-        var s = (int)(zoom * 12);
-        var s2 = (int)(zoom * 25);
-        var pa = Poly_Arrow(new Rectangle(0, 0, s, s2));
-
-        var c = Skin.IDColor(colorId);
-        var c2 = c.Darken(0.4);
-
-        gr.TranslateTransform(p.X + (s2 / 2), p.Y - (s * 0.35f));
-
-        gr.RotateTransform(90);
-
-        gr.FillPath(new SolidBrush(c), pa);
-        gr.DrawPath(new Pen(c2, 1 * zoom), pa);
-
-        gr.RotateTransform(-90);
-        gr.TranslateTransform(-p.X - (s2 / 2), -p.Y + (s * 0.35f));
-
-        if (!string.IsNullOrEmpty(symbol)) {
-            var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
-            var sy = QuickImage.Get(co);
-            gr.DrawImage(sy, p.X - (sy.Width / 2), p.Y - (s * 0.15f));
-        }
-    }
-
-    public static void DrawOutputArrow(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, string symbol, int colorId) {
-        if (forPrinting) { return; }
-
-        var p = positionModified.PointOf(Alignment.Bottom_HorizontalCenter);
-        var s = (int)(zoom * 12);
-        var s2 = (int)(zoom * 25);
-        var pa = Poly_Arrow(new Rectangle(0, 0, s, s2));
-
-        var c = Skin.IDColor(colorId);
-        var c2 = c.Darken(0.4);
-
-        gr.TranslateTransform(p.X + (s2 / 2), p.Y - (s * 0.45f));
-
-        gr.RotateTransform(90);
-        gr.FillPath(new SolidBrush(c), pa);
-        gr.DrawPath(new Pen(c2, 1 * zoom), pa);
-
-        gr.RotateTransform(-90);
-
-        gr.TranslateTransform(-p.X - (s2 / 2), -p.Y + (s * 0.45f));
-
-        if (!string.IsNullOrEmpty(symbol)) {
-            var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
-
-            var sy = QuickImage.Get(co);
-            gr.DrawImage(sy, p.X - (sy.Width / 2), p.Y + (s * 0.02f));
-        }
-    }
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
@@ -165,8 +117,8 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
         l.AddRange(_itemSends.GetStyleOptions(this));
 
-        //l.Add(new FlexiControl());
-        //l.AddRange(base.GetStyleOptions());
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
 
         return l;
     }
@@ -197,7 +149,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(OutputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -217,14 +169,17 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
+        // Die Eigangszeile ist immer vom übergeordenetem Formular und wird einfach weitergegeben.
+        // Deswegen ist InputColorID nur Fake
+
         if (!forPrinting) {
-            DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     protected override void ParseFinished() {

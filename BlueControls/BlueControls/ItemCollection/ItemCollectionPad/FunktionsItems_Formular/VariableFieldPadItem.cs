@@ -79,12 +79,9 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         set => _itemAccepts.GetRowFromSet(value, this);
     }
 
-    public override int InputColorId {
-        get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(this, value);
-    }
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public string Überschrift {
         get => _überschrift;
@@ -110,6 +107,8 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     #endregion
 
     #region Methods
+
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlVariable {
@@ -188,7 +187,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Variable, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.Variable, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -214,11 +213,10 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.OutputColorId; }
+        //var id = GetRowFrom?.OutputColorId ?? -1;
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, id, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
 
         if (GetRowFrom == null) {
@@ -229,7 +227,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", id);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     protected override void ParseFinished() {

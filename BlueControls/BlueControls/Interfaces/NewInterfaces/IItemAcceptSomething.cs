@@ -22,6 +22,8 @@ using BlueControls.Controls;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
+using BlueBasics;
+using System.Collections.ObjectModel;
 
 namespace BlueControls.Interfaces;
 
@@ -32,32 +34,32 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
 
     #region Properties
 
-    int InputColorId { get; set; }
+    List<int> InputColorId { get; }
+
     public DatabaseAbstract? InputDatabase { get; }
+
     public string Page { get; }
+
     public ItemCollectionPad? Parent { get; }
-
-    #endregion
-}
-
-public class ItemAcceptSomething {
-
-    #region Fields
-
-    private int _inputColorId = -1;
 
     #endregion
 
     #region Methods
 
-    public int InputColorIdGet() => _inputColorId;
+    public void CalculateInputColorIds();
 
-    public void InputColorIdSet(IItemAcceptSomething item, int value) {
-        if (_inputColorId == value) { return; }
+    #endregion
+}
 
-        _inputColorId = value;
-        item.OnChanged();
-    }
+public class ItemAcceptSomething {
+    //public void InputColorIdSet(IItemAcceptSomething item, List<int> value) {
+    //    if (!_inputColorId.IsDifferentTo(value)) { return; }
+
+    //    _inputColorId = value;
+    //    item.OnChanged();
+    //}
+
+    #region Methods
 
     public virtual List<string> ParsableTags() {
         var result = new List<string>();

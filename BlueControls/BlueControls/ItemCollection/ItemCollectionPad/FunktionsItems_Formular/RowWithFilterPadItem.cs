@@ -107,12 +107,9 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
     public override string Description => "Veraltetes Steuerelement und wird bald entfernt";
     public DatabaseAbstract FilterDefiniton { get; }
 
-    public override int InputColorId {
-        get;
-        set;
-    }
+    public List<int> InputColorId { get; set; } // Dummy
 
-    public override DatabaseAbstract? InputDatabase => null;
+    public DatabaseAbstract? InputDatabase => null;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -215,8 +212,8 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
         l.Add(new FlexiControlForDelegate(Filter_hinzufügen, "Filter hinzufügen", ImageCode.PlusZeichen));
         l.Add(FilterTable());
 
-        //l.Add(new FlexiControl());
-        //l.AddRange(base.GetStyleOptions());
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
 
         return l;
     }
@@ -284,7 +281,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.PlusZeichen, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.PlusZeichen, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -323,14 +320,14 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            RowEntryPadItem.DrawOutputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
+            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         } else {
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", -1);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", null);
     }
 
     protected override void ParseFinished() {

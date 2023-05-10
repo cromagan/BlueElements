@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueControls.Controls;
 using BlueDatabase;
 using System.Collections.ObjectModel;
@@ -27,7 +28,7 @@ public interface IControlAcceptFilter : IControlAcceptSomething {
 
     #region Properties
 
-    public ReadOnlyCollection<IControlSendFilter> ParentSender { get; }
+    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom { get; }
 
     #endregion
 
@@ -45,8 +46,8 @@ public static class IControlAcceptFilterExtension {
     public static void DoInputSettings(this IControlAcceptFilter dest, ConnectedFormulaView parent, IItemAcceptFilter source) {
         dest.Name = source.DefaultItemToControlName();
 
-        if (source.GetFilterFromKeys != null) {
-            foreach (var thisKey in source.GetFilterFromKeys) {
+        if (source.GetFilterFrom != null) {
+            foreach (var thisKey in source.GetFilterFrom) {
                 var it = source.Parent[thisKey];
 
                 if (it is IItemToControl itc) {
@@ -65,7 +66,7 @@ public static class IControlAcceptFilterExtension {
 
         var x = new FilterCollection(db);
 
-        foreach (var thiss in item.ParentSender) {
+        foreach (var thiss in item.GetFilterFrom) {
             if (thiss.Filter is FilterItem f) {
                 x.Add(f);
             }
@@ -75,8 +76,8 @@ public static class IControlAcceptFilterExtension {
     }
 
     public static DatabaseAbstract? InputDatabase(this IControlAcceptFilter item) {
-        if (item.ParentSender == null || item.ParentSender.Count == 0) { return null; }
-        return item.ParentSender[0].OutputDatabase;
+        if (item.GetFilterFrom == null || item.GetFilterFrom.Count == 0) { return null; }
+        return item.GetFilterFrom[0].OutputDatabase;
     }
 
     #endregion

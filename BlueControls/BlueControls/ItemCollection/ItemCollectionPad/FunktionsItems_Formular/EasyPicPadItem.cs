@@ -72,18 +72,17 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         set => _itemAccepts.GetRowFromSet(value, this);
     }
 
-    public override int InputColorId {
-        get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(this, value);
-    }
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     protected override int SaveOrder => 4;
 
     #endregion
 
     #region Methods
+
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new EasyPic {
@@ -110,8 +109,8 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         l.AddRange(_itemAccepts.GetStyleOptions(this));
         l.Add(new FlexiControlForProperty<string>(() => Bild_Dateiname));
 
-        //l.Add(new FlexiControl());
-        //l.AddRange(base.GetStyleOptions());
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 
@@ -139,7 +138,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -161,17 +160,16 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.OutputColorId; }
+        //var id = GetRowFrom?.OutputColorId ?? - 1;
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, id, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     protected override void ParseFinished() {

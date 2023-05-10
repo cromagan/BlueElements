@@ -274,7 +274,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public DatabaseAbstract? OutputDatabase { get => Database; set => Database = value; }
 
-    public ReadOnlyCollection<IControlSendFilter> ParentSender => new(_parentSender);
+    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
 
     public List<RowItem> PinnedRows { get; } = new();
 

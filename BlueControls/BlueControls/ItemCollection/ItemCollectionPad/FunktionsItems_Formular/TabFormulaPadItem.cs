@@ -84,17 +84,17 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         set => _itemAccepts.GetRowFromSet(value, this);
     }
 
-    public override int InputColorId {
-        get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(this, value);
-    }
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+
     protected override int SaveOrder => 1000;
 
     #endregion
 
     #region Methods
+
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new TabControl();
@@ -185,8 +185,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         l.AddRange(_itemAccepts.GetStyleOptions(this));
         l.Add(Childs());
 
-        //l.Add(new FlexiControl());
-        //l.AddRange(base.GetStyleOptions());
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 
@@ -231,7 +231,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -287,7 +287,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     protected override void ParseFinished() {

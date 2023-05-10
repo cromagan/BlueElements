@@ -76,12 +76,9 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         set => _itemAccepts.GetRowFromSet(value, this);
     }
 
-    public override int InputColorId {
-        get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(this, value);
-    }
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
     public bool Leere_Ordner_löschen {
@@ -113,6 +110,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     #region Methods
 
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
+
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FileBrowser {
             OriginalText = Pfad,
@@ -143,8 +142,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         l.Add(new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen));
         l.Add(new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen));
 
-        //l.Add(new FlexiControl());
-        //l.AddRange(base.GetStyleOptions());
+        l.Add(new FlexiControl());
+        l.AddRange(base.GetStyleOptions());
         return l;
     }
 
@@ -180,7 +179,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -205,17 +204,16 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        var id = -1;
-        if (GetRowFrom != null) { id = GetRowFrom.OutputColorId; }
+        //var id = GetRowFrom?.OutputColorId ?? -1;
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, id, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\");
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        RowEntryPadItem.DrawInputArrow(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
     protected override void ParseFinished() {

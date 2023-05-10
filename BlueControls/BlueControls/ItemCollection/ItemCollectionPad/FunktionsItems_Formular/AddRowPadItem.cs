@@ -69,22 +69,22 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public override string Description => "Dieses Element wird als Knopf mit einem Pluszeichen dargstellt.<br>Das Elemenz kann Filter empfangen und mit diesen Filtern eine neue Zeile anlegen";
 
-    public ReadOnlyCollection<string>? GetFilterFromKeys {
+    public ReadOnlyCollection<string>? GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public override int InputColorId {
-        get => _itemAccepts.InputColorIdGet();
-        set => _itemAccepts.InputColorIdSet(this, value);
-    }
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public override DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+
     protected override int SaveOrder => 1;
 
     #endregion
 
     #region Methods
+
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new ButtonAddRow();
@@ -139,7 +139,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.PlusZeichen, 16, Color.Transparent, Skin.IDColor(InputColorId));
+            return QuickImage.Get(ImageCode.PlusZeichen, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -163,7 +163,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, -1, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
         }
 
         _eTxt ??= new ExtText(Design.Button, States.Standard);

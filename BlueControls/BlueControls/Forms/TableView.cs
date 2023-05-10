@@ -1306,7 +1306,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (!maybeok) {
-            FormWithStatusBar.UpdateStatusBar(FehlerArt.Info, "Lade Datenbank " + ci.TableName, true);
+            UpdateStatusBar(FehlerArt.Info, "Lade Datenbank " + ci.TableName, true);
         }
 
         #endregion
