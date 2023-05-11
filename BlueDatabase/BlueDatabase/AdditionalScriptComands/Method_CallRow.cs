@@ -68,12 +68,12 @@ public class Method_CallRow : Method {
             return new DoItFeedback(infos.Data, "Zeile nicht gefunden");
         }
 
-        var vs = (VariableString)attvar.Attributes[0];
+        var vs = attvar.ValueString(0);
         s.Sub++;
-        var s2 = row.ExecuteScript(null, vs.ValueString, false, false, s.ChangeValues, 0);
+        var s2 = row.ExecuteScript(null, vs, false, false, s.ChangeValues, 0);
         if (!s2.AllOk) {
             infos.Data.Protocol.AddRange(s2.Protocol);
-            return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs.ValueString + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");
+            return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");
         }
         s.Sub--;
         s.BreakFired = false;

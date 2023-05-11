@@ -96,24 +96,24 @@ public class Method_CallByFilename : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var vs = (VariableString)attvar.Attributes[0];
+        var vs = attvar.ValueString(0);
         string f;
 
         try {
-            if (FileExists(vs.ValueString)) {
-                f = File.ReadAllText(vs.ValueString, Encoding.UTF8);
-            } else if (FileExists(s.AdditionalFilesPath + vs.ValueString)) {
-                f = File.ReadAllText(s.AdditionalFilesPath + vs.ValueString, Encoding.UTF8);
+            if (FileExists(vs)) {
+                f = File.ReadAllText(vs, Encoding.UTF8);
+            } else if (FileExists(s.AdditionalFilesPath + vs)) {
+                f = File.ReadAllText(s.AdditionalFilesPath + vs, Encoding.UTF8);
             } else {
-                return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + vs.ValueString);
+                return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + vs);
             }
         } catch {
-            return new DoItFeedback(infos.Data, "Fehler beim Lesen der Datei: " + vs.ValueString);
+            return new DoItFeedback(infos.Data, "Fehler beim Lesen der Datei: " + vs);
         }
 
         f = Script.ReduceText(f);
 
-        var v = CallSub(s, infos, "Datei-Subroutinen-Aufruf [" + vs.ValueString + "]", f, ((VariableBool)attvar.Attributes[1]).ValueBool, 0, vs.ValueString.FileNameWithSuffix());
+        var v = CallSub(s, infos, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBool(1), 0, vs.FileNameWithSuffix());
         s.BreakFired = false;
         s.EndScript = false;
         return v;

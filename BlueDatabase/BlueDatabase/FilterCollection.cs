@@ -29,7 +29,7 @@ using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
-public sealed class FilterCollection : ObservableCollection<FilterItem>, IParseable, IHasDatabase, IDisposableExtended {
+public sealed class FilterCollection : ObservableCollection<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IChangedFeedback {
 
     #region Constructors
 

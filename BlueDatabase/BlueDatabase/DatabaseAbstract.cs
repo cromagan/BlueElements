@@ -1536,10 +1536,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         for (var z = 0; z < Math.Max(2, x.Count); z++) {
             if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
-            x[z].Repair(z);
+            ColumnViewCollection.Repair(x[z], z);
         }
 
-        ColumnArrangements = new ReadOnlyCollection<ColumnViewCollection>(x);
+        ColumnArrangements = x.AsReadOnly();
     }
 
     internal void RepairViews() {
@@ -1883,7 +1883,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = new ReadOnlyCollection<EventScript>(_eventScript);
+    private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
 
     private void OnDisposing() => Disposing?.Invoke(this, System.EventArgs.Empty);
 

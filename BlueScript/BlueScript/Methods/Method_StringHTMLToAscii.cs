@@ -49,7 +49,7 @@ internal class Method_StringHTMLToAscii : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
-        return string.IsNullOrEmpty(attvar.ErrorMessage) ? new DoItFeedback(infos.Data, ((VariableString)attvar.Attributes[0]).ValueString.HtmlSpecialToNormalChar(((VariableBool)attvar.Attributes[1]).ValueBool))
+        return string.IsNullOrEmpty(attvar.ErrorMessage) ? new DoItFeedback(infos.Data, attvar.ValueString(0).HtmlSpecialToNormalChar(attvar.ValueBool(1)))
             : DoItFeedback.AttributFehler(infos.Data, this, attvar);
     }
 

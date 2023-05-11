@@ -24,7 +24,7 @@ using BlueBasics.Interfaces;
 
 namespace BlueBasics;
 
-public abstract class ParsebleItem : IHasKeyName, IParseable {
+public abstract class ParsebleItem : IHasKeyName, IParseable, IChangedFeedback {
 
     #region Fields
 

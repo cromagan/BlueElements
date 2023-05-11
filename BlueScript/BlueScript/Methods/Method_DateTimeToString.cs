@@ -50,19 +50,19 @@ internal class Method_DateTimeToString : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        //var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
+        //var ok = DateTimeTryParse(attvar.ReadableText(0), out var d);
         //if (!ok) {
-        //    return new DoItFeedback(infos.LogData, s, "Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
+        //    return new DoItFeedback(infos.LogData, s, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
         //}
-        //if (string.IsNullOrEmpty(d.ToString(attvar.Attributes[1].ReadableText))) {
+        //if (string.IsNullOrEmpty(d.ToString(attvar.ReadableText(1)))) {
         //    return new DoItFeedback(infos.LogData, s, "Kein Unwandlungs-String erhalten.");
         //}
-        var d = ((VariableDateTime)attvar.Attributes[0]).ValueDate;
+        var d = attvar.ValueDate(0);
 
         try {
-            return new DoItFeedback(d.ToString(attvar.Attributes[1].ReadableText));
+            return new DoItFeedback(d.ToString(attvar.ReadableText(1)));
         } catch {
-            return new DoItFeedback(infos.Data, "Der Umwandlungs-String '" + attvar.Attributes[1].ReadableText + "' ist fehlerhaft.");
+            return new DoItFeedback(infos.Data, "Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.");
         }
     }
 

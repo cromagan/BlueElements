@@ -73,15 +73,15 @@ public class Method_CallFilter : Method {
         var r = allFi[0].Database.Row.CalculateFilteredRows(allFi);
         if (r == null || r.Count == 0) { return DoItFeedback.Null(); }
 
-        var vs = (VariableString)attvar.Attributes[0];
+        var vs = attvar.ValueString(0);
 
         foreach (var thisR in r) {
             if (r != null) {
                 s.Sub++;
-                var s2 = thisR.ExecuteScript(null, vs.ValueString, false, true, s.ChangeValues, 0);
+                var s2 = thisR.ExecuteScript(null, vs, false, true, s.ChangeValues, 0);
                 if (!s2.AllOk) {
                     infos.Data.Protocol.AddRange(s2.Protocol);
-                    return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs.ValueString + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen");
+                    return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen");
                 }
                 s.Sub--;
             }

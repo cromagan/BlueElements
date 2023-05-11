@@ -897,7 +897,7 @@ public partial class TableView : FormWithStatusBar {
         _ = x.ShowDialog();
 
         var car = Table?.Database?.ColumnArrangements.CloneWithClones();
-        car[0].ShowAllColumns();
+        ColumnViewCollection.ShowAllColumns(car[0]);
         Table.Database.ColumnArrangements = new(car);
 
         Table.Invalidate_HeadSize();

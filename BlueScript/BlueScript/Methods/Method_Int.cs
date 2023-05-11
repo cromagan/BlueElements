@@ -50,7 +50,7 @@ internal class Method_Int : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
             ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
-            : new DoItFeedback(((VariableFloat)attvar.Attributes[0]).ValueInt);
+            : new DoItFeedback(attvar.ValueInt(0));
     }
 
     #endregion

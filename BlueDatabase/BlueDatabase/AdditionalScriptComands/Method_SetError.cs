@@ -67,7 +67,7 @@ public class Method_SetError : Method_Database {
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(s.Variables, attvar.Attributes[z].Name);
             if (column == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.Attributes[z].Name); }
-            r.LastCheckedRowFeedback.Add(attvar.Attributes[z].Name.ToUpper() + "|" + ((VariableString)attvar.Attributes[0]).ValueString);
+            r.LastCheckedRowFeedback.Add(attvar.Attributes[z].Name.ToUpper() + "|" + attvar.ValueString(0));
         }
 
         return DoItFeedback.Null();

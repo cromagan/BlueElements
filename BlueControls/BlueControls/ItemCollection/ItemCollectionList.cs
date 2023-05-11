@@ -872,7 +872,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
 
         if (_autoSort) { l.Sort(); }
 
-        _itemOrder = new ReadOnlyCollection<BasicListItem>(l);
+        _itemOrder = l.AsReadOnly();
     }
 
     //protected override void OnItemAdded(BasicListItem item) {

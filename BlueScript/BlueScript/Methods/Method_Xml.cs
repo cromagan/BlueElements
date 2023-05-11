@@ -55,7 +55,7 @@ public class Method_Xml : Method {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         try {
-            var x = XDocument.Parse(((VariableString)attvar.Attributes[0]).ValueString);
+            var x = XDocument.Parse(attvar.ValueString(0));
             return new DoItFeedback(new VariableXml(x));
         } catch (Exception e) {
             return new DoItFeedback(infos.Data, "XML-Parsen fehlgeschlagen: " + e.Message);

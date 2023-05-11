@@ -52,9 +52,9 @@ internal class Method_MoveDirectory : Method {
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var sop = ((VariableString)attvar.Attributes[0]).ValueString;
+        var sop = attvar.ValueString(0);
         if (!DirectoryExists(sop)) { return new DoItFeedback(infos.Data, "Quell-Verzeichnis existiert nicht."); }
-        var dep = ((VariableString)attvar.Attributes[1]).ValueString;
+        var dep = attvar.ValueString(1);
 
         if (DirectoryExists(dep)) { return new DoItFeedback(infos.Data, "Ziel-Verzeichnis existiert bereits."); }
 

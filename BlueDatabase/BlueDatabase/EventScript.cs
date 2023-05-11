@@ -47,7 +47,7 @@ public static class EventScriptExtension {
     #endregion
 }
 
-public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase, IComparable {
+public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase, IComparable, IChangedFeedback {
 
     #region Fields
 

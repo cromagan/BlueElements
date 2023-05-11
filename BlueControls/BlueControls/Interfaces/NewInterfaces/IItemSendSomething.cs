@@ -108,7 +108,7 @@ public class ItemSendSomething {
         if (item.ChildIds != null) { l.AddRange(item.ChildIds); }
         l.Add(add.KeyName);
 
-        ChildIdsSet(new ReadOnlyCollection<string>(l), item);
+        ChildIdsSet(l.AsReadOnly(), item);
     }
 
     public ReadOnlyCollection<string> ChildIdsGet() => new(_childIds);
@@ -196,7 +196,7 @@ public class ItemSendSomething {
         l.Remove(remove.KeyName);
 
         remove.CalculateInputColorIds();
-        ChildIdsSet(new ReadOnlyCollection<string>(l), item);
+        ChildIdsSet(l.AsReadOnly(), item);
     }
 
     protected List<GenericControl> GetStyleOptions(IItemSendSomething item) {

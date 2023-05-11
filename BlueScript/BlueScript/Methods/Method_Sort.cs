@@ -52,10 +52,10 @@ internal class Method_Sort : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos.Data); }
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
-        var x = ((VariableListString)attvar.Attributes[0]).ValueList;
-        if (((VariableBool)attvar.Attributes[1]).ValueBool) {
+        var x = attvar.ValueListString(0);
+        if (attvar.ValueBool(1)) {
             x = x.SortedDistinctList();
         } else {
             x.Sort();

@@ -32,6 +32,7 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -67,9 +68,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     #region Properties
 
-    public ColumnViewCollection? CurrentArrangement => Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= _arrangement
+    public ColumnViewCollection? CloneOfCurrentArrangement => Database?.ColumnArrangements == null || Database.ColumnArrangements.Count <= _arrangement
         ? null
-        : Database.ColumnArrangements[_arrangement];
+        : (ColumnViewCollection)Database.ColumnArrangements[_arrangement].Clone();
 
     public DatabaseAbstract? Database { get; }
 
@@ -85,39 +86,43 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
         if (Database == null || _arrangement < 2 || _arrangement >= Database.ColumnArrangements.Count) { return; }
 
-        var ca = CurrentArrangement;
+        var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
         if (MessageBox.Show("Anordung <b>'" + ca.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         var car = Database.ColumnArrangements.CloneWithClones();
         car.RemoveAt(_arrangement);
-        Database.ColumnArrangements = new ReadOnlyCollection<ColumnViewCollection>(car);
+        Database.ColumnArrangements = car.AsReadOnly();
         _arrangement = 1;
         UpdateCombobox();
         ShowOrder();
     }
 
     private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
-        var ca = CurrentArrangement;
+        var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
         if (MessageBox.Show("Alle Spalten anzeigen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-        ca.ShowAllColumns();
+        ColumnViewCollection.ShowAllColumns(ca);
+
+        Change(_arrangement, ca);
         ShowOrder();
     }
 
     private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-        var ca = CurrentArrangement;
+        var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
         var n = InputBox.Show("Umbenennen:", ca.Name, FormatHolder.Text);
-        if (!string.IsNullOrEmpty(n)) { ca.Name = n; }
+        if (string.IsNullOrEmpty(n)) { return; }
+
+        Change(_arrangement, ca);
         UpdateCombobox();
     }
 
     private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
         if (Database == null || Database.IsDisposed) { return; }
-        var ca = CurrentArrangement;
+        var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
         ItemCollectionList aa = new(true);
@@ -128,14 +133,17 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, AddType.Text, true);
         if (b == null) { return; }
         if (_arrangement == 1) { b.Add(DatabaseAbstract.Everybody); }
-        ca.PermissionGroups_Show = new ReadOnlyCollection<string>(b);
+        ca.PermissionGroups_Show = b.AsReadOnly();
+        Change(_arrangement, ca);
     }
 
     private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {
         if (Database == null || Database.IsDisposed) { return; }
 
+        var ca = CloneOfCurrentArrangement;
+
         var mitVorlage = false;
-        if (_arrangement > 0 && CurrentArrangement != null) {
+        if (_arrangement > 0 && ca != null) {
             mitVorlage = MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0;
         }
 
@@ -145,8 +153,6 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (car.Count < 1) {
             car.Add(new ColumnViewCollection(Database, string.Empty, string.Empty));
         }
-
-        var ca = CurrentArrangement;
 
         string newname;
         if (mitVorlage && ca != null) {
@@ -159,7 +165,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
             car.Add(new ColumnViewCollection(Database, string.Empty, newname));
         }
 
-        Database.ColumnArrangements = new ReadOnlyCollection<ColumnViewCollection>(car);
+        Database.ColumnArrangements = car.AsReadOnly();
         _arrangement = car.Count - 1;
         UpdateCombobox();
 
@@ -212,7 +218,12 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         }
         Database.Column.Repair();
 
-        if (_arrangement > 0 && CurrentArrangement != null) { CurrentArrangement.Add(newc, false); }
+        var ca = CloneOfCurrentArrangement;
+
+        if (_arrangement > 0 && ca != null) {
+            ca.Add(newc, false);
+            Change(_arrangement, ca);
+        }
 
         Database.RepairAfterParse();
         ShowOrder();
@@ -221,7 +232,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
         if (Database == null || Database.IsDisposed) { return; }
 
-        var ca = CurrentArrangement;
+        var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
         ItemCollectionList ic = new(true);
@@ -236,11 +247,17 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, AddType.None, true);
         if (r == null || r.Count == 0) { return; }
         ca.Add(Database.Column.Exists(r[0]), false);
+        Change(_arrangement, ca);
         ShowOrder();
     }
 
     private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) {
-        CurrentArrangement?.HideSystemColumns();
+        var ca = CloneOfCurrentArrangement;
+        if (ca == null) { return; }
+
+        ColumnViewCollection.HideSystemColumns(ca);
+        Change(_arrangement, ca);
+
         ShowOrder();
     }
 
@@ -253,6 +270,12 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         _arrangement = tmporder;
         ShowOrder();
+    }
+
+    private void Change(int no, ColumnViewCollection cv) {
+        var car = Database.ColumnArrangements.CloneWithClones();
+        car[no] = cv;
+        Database.ColumnArrangements = car.AsReadOnly();
     }
 
     /// <summary>
@@ -352,7 +375,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         Fixing--;
 
-        Database.ColumnArrangements = new ReadOnlyCollection<ColumnViewCollection>(cloneOfColumnArrangements);
+        Database.ColumnArrangements = cloneOfColumnArrangements.AsReadOnly();
 
         if (did) {
             Database?.RepairAfterParse();
@@ -366,10 +389,10 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (e.Item is ColumnPadItem cpi) {
             cpi.AdditionalStyleOptions = null;
 
-            var c = CurrentArrangement;
+            var ca = CloneOfCurrentArrangement;
 
-            if (c != null && cpi.Column?.Database == Database && _arrangement > 0) {
-                var oo = c[cpi.Column];
+            if (ca != null && cpi.Column?.Database == Database && _arrangement > 0) {
+                var oo = ca[cpi.Column];
 
                 if (oo != null) {
                     cpi.AdditionalStyleOptions = new List<FlexiControl> {
@@ -418,7 +441,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         ColumnPadItem? anyitem = null;
 
-        var ca = CurrentArrangement;
+        var ca = CloneOfCurrentArrangement;
         if (ca == null) { Generating = false; return; }
 
         #region Erst alle Spalten der eigenen Datenbank erzeugen, um später verweisen zu können

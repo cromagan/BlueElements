@@ -51,18 +51,18 @@ internal class Method_Remove : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos.Data); }
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
-        var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
+        var tmpList = attvar.ValueListString(0);
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableString vs) {
-                tmpList!.RemoveString(vs.ValueString, ((VariableBool)attvar.Attributes[1]).ValueBool);
+                tmpList!.RemoveString(vs.ValueString, attvar.ValueBool(1));
             }
             if (attvar.Attributes[z] is VariableListString vl) {
-                tmpList.RemoveString(vl.ValueList, ((VariableBool)attvar.Attributes[1]).ValueBool);
+                tmpList.RemoveString(vl.ValueList, attvar.ValueBool(1));
             }
         }
-        ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
+ ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
         return DoItFeedback.Null();
     }
 

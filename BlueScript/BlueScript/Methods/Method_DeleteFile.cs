@@ -53,7 +53,7 @@ internal class Method_DeleteFile : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var filn = ((VariableString)attvar.Attributes[0]).ValueString;
+        var filn = attvar.ValueString(0);
 
         if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
 

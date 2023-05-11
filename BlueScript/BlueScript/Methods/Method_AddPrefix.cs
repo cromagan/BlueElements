@@ -50,12 +50,12 @@ internal class Method_AddPrefix : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos.Data); }
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
-        var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
+        var tmp = attvar.ValueListString(0);
 
         for (var z = 0; z < tmp.Count; z++) {
-            tmp[z] = attvar.Attributes[1].ReadableText + tmp[z];
+            tmp[z] = attvar.ReadableText(1) + tmp[z];
         }
 
         ((VariableListString)attvar.Attributes[0]).ValueList = tmp;

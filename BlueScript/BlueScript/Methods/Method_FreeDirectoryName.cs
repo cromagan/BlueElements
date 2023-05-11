@@ -53,7 +53,7 @@ internal class Method_FreeDirectoryName : Method {
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var pf = ((VariableString)attvar.Attributes[0]).ValueString;
+        var pf = attvar.ValueString(0);
 
         if (!DirectoryExists(pf)) {
             return new DoItFeedback(infos.Data, "Verzeichnis existiert nicht");

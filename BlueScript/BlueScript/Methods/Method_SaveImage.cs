@@ -63,7 +63,7 @@ internal class Method_SaveImage : Method {
 
         #region  Dateinamen ermitteln (filn)
 
-        var filn = ((VariableString)attvar.Attributes[0]).ValueString;
+        var filn = attvar.ValueString(0);
         if (string.IsNullOrEmpty(filn)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
 
         if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
@@ -79,7 +79,7 @@ internal class Method_SaveImage : Method {
 
         //if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Bild Speichern im Testmodus deaktiviert."); }
 
-        switch (((VariableString)attvar.Attributes[1]).ValueString.ToUpper()) {
+        switch (attvar.ValueString(1).ToUpper()) {
             case "PNG":
                 img.Save(filn, ImageFormat.Png);
 

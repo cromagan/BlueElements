@@ -248,7 +248,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
             l.AddRange(CFormula.NotAllowedChilds);
             l.AddRange(notAllowedchilds);
 
-            CFormula.NotAllowedChilds = new ReadOnlyCollection<string>(l);
+            CFormula.NotAllowedChilds = l.AsReadOnly();
         }
 
         Pad.Item = CFormula?.PadData;

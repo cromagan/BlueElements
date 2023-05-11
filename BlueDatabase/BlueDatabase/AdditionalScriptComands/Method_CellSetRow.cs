@@ -54,8 +54,8 @@ public class Method_CellSetRow : Method_Database {
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
         if (row?.Database is null || row.Database.IsDisposed) { return new DoItFeedback(infos.Data, "Fehler in der Zeile"); }
 
-        var columnToSet = row.Database.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[1]).ValueString); }
+        var columnToSet = row.Database.Column.Exists(attvar.ValueString(1));
+        if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueString(1)); }
 
         if (row?.Database?.ReadOnly ?? true) { return new DoItFeedback(infos.Data, "Datenbank schreibgeschützt."); }
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
@@ -69,9 +69,7 @@ public class Method_CellSetRow : Method_Database {
         if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
         if (attvar.Attributes[0] is VariableFloat vf) { value = vf.ValueForReplace; }
 
-
         value = columnToSet.AutoCorrect(value, true);
-
 
         row.CellSet(columnToSet, value);
         return row.CellGetString(columnToSet) == value ? DoItFeedback.Wahr() : DoItFeedback.Falsch();

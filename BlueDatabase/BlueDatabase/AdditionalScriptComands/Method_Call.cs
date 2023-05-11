@@ -54,13 +54,13 @@ internal class Method_Call : Method_Database {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var vs = (VariableString)attvar.Attributes[0];
+        var vs = attvar.ValueString(0);
 
         var db = MyDatabase(s.Variables);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
-        var sc = db.EventScript.Get(vs.ValueString);
-        if (sc == null) { return new DoItFeedback(infos.Data, "Skript nicht vorhanden: " + vs.ValueString); }
+        var sc = db.EventScript.Get(vs);
+        if (sc == null) { return new DoItFeedback(infos.Data, "Skript nicht vorhanden: " + vs); }
 
         if (sc.Attributes() != s.Attributes && s.Attributes != "*") {
             return new DoItFeedback(infos.Data, "Aufzurufendes Skript hat andere Bedingungen.");
@@ -68,7 +68,7 @@ internal class Method_Call : Method_Database {
 
         var f = Script.ReduceText(sc.Script);
 
-        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, "Subroutinen-Aufruf [" + vs.ValueString + "]", f, ((VariableBool)attvar.Attributes[1]).ValueBool, 0, vs.ValueString);
+        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBool(1), 0, vs);
         s.BreakFired = false;
         s.EndScript = false;
 

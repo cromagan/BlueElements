@@ -49,14 +49,14 @@ internal class Method_Substring : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        var st = ((VariableFloat)attvar.Attributes[1]).ValueInt;
-        var en = ((VariableFloat)attvar.Attributes[2]).ValueInt;
+        var st = attvar.ValueInt(1);
+        var en = attvar.ValueInt(2);
         if (st < 0) {
             en += st;
             st = 0;
         }
 
-        var t = ((VariableString)attvar.Attributes[0]).ValueString;
+        var t = attvar.ValueString(0);
 
         if (st > t.Length) {
             return DoItFeedback.Null();

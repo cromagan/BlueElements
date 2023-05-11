@@ -50,12 +50,12 @@ internal class Method_StartsWith : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (((VariableBool)attvar.Attributes[1]).ValueBool) {
-                if (((VariableString)attvar.Attributes[0]).ValueString.StartsWith(((VariableString)attvar.Attributes[z]).ValueString)) {
+            if (attvar.ValueBool(1)) {
+                if (attvar.ValueString(0).StartsWith(attvar.ValueString(z))) {
                     return DoItFeedback.Wahr();
                 }
             } else {
-                if (((VariableString)attvar.Attributes[0]).ValueString.ToLower().StartsWith(((VariableString)attvar.Attributes[z]).ValueString.ToLower())) {
+                if (attvar.ValueString(0).ToLower().StartsWith(attvar.ValueString(z).ToLower())) {
                     return DoItFeedback.Wahr();
                 }
             }

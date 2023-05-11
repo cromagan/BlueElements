@@ -26,7 +26,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public class WorkItem : IParseable {
+public class WorkItem : IParseable, IChangedFeedback {
 
     #region Fields
 

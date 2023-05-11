@@ -50,9 +50,9 @@ internal class Method_Add : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos.Data); }
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
-        var tmpList = ((VariableListString)attvar.Attributes[0]).ValueList;
+        var tmpList = attvar.ValueListString(0);
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableString vs) {
                 tmpList.Add(vs.ValueString);

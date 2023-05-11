@@ -34,9 +34,9 @@ public class Method_StringToDateTime : Method {
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
-        var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
+        var ok = DateTimeTryParse(attvar.ReadableText(0), out var d);
         if (!ok) {
-            return new DoItFeedback(infos.Data, "Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
+            return new DoItFeedback(infos.Data, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
         }
         return new DoItFeedback(d);
     }

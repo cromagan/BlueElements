@@ -56,17 +56,17 @@ public class Method_AddRow : Method_Database {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var db = DatabaseOf(s.Variables, ((VariableString)attvar.Attributes[0]).ValueString);
-        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
+        var db = DatabaseOf(s.Variables, attvar.ValueString(0));
+        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueString(0) + "' nicht gefunden"); }
 
         if (db?.ReadOnly ?? true) { return new DoItFeedback(infos.Data, "Datenbank schreibgeschützt."); }
 
-        if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[1]).ValueString)) { return new DoItFeedback(infos.Data, "KeyValue muss einen Wert enthalten."); }
-        //var r = db.Row[((VariableString)attvar.Attributes[1]).ValueString];
+        if (string.IsNullOrEmpty(attvar.ValueString(1))) { return new DoItFeedback(infos.Data, "KeyValue muss einen Wert enthalten."); }
+        //var r = db.Row[attvar.ValueString(1)];
 
-        //if (r != null && !((VariableBool)attvar.Attributes[2]).ValueBool) { return Method_Row?.RowToObject(r); }
+        //if (r != null && !(attvar.ValueBool(2)) { return Method_Row?.RowToObject(r); }
 
-        if (((VariableBool)attvar.Attributes[2]).ValueBool) {
+        if (attvar.ValueBool(2)) {
             StackTrace stackTrace = new();
 
             if (stackTrace.FrameCount > 400) {
@@ -76,7 +76,7 @@ public class Method_AddRow : Method_Database {
 
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
 
-        var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), ((VariableString)attvar.Attributes[1]).ValueString, ((VariableBool)attvar.Attributes[2]).ValueBool, true, "Script Command: Add Row");
+        var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), attvar.ValueString(1), attvar.ValueBool(2), true, "Script Command: Add Row");
 
         return Method_Row.RowToObjectFeedback(r);
     }

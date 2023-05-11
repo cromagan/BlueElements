@@ -50,7 +50,7 @@ internal class Method_StringAsciiToHTML : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
-            : new DoItFeedback(((VariableString)attvar.Attributes[0]).ValueString.CreateHtmlCodes(!((VariableBool)attvar.Attributes[1]).ValueBool));
+            : new DoItFeedback(attvar.ValueString(0).CreateHtmlCodes(!attvar.ValueBool(1)));
     }
 
     #endregion

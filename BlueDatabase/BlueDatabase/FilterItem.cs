@@ -29,7 +29,7 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IReadableTextWithChanging, ICanBeEmpty, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtended {
+public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IReadableTextWithChanging, ICanBeEmpty, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtended, IChangedFeedback {
 
     #region Fields
 
@@ -56,7 +56,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         if (searchValue != null && searchValue.Count > 0) {
             SearchValue = new ReadOnlyCollection<string>(searchValue);
         } else {
-            SearchValue = new ReadOnlyCollection<string>(new List<string>());
+            SearchValue = new List<string>().AsReadOnly();
         }
 
         _column?.RefreshColumnsData();
@@ -70,7 +70,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         _filterType = FilterType.AlwaysFalse;
         _column = null;
         KeyName = string.Empty;
-        SearchValue = new ReadOnlyCollection<string>(new List<string>());
+        SearchValue = new List<string>().AsReadOnly();
     }
 
     public FilterItem(DatabaseAbstract database, string filterCode) {
@@ -80,7 +80,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         }
         KeyName = Generic.UniqueInternal();
 
-        SearchValue = new ReadOnlyCollection<string>(new List<string>());
+        SearchValue = new List<string>().AsReadOnly();
 
         Parse(filterCode);
 
@@ -94,7 +94,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public FilterItem(string filterCode) {
         KeyName = Generic.UniqueInternal();
-        SearchValue = new ReadOnlyCollection<string>(new List<string>());
+        SearchValue = new List<string>().AsReadOnly();
         Parse(filterCode);
         _column?.RefreshColumnsData();
     }
@@ -117,7 +117,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         if (searchValue != null && searchValue.Count > 0) {
             SearchValue = new ReadOnlyCollection<string>(searchValue);
         } else {
-            SearchValue = new ReadOnlyCollection<string>(new List<string>());
+            SearchValue = new List<string>().AsReadOnly();
         }
     }
 
@@ -168,14 +168,14 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         var l = new List<string>();
         l.AddRange(searchvalue);
 
-        SearchValue = new ReadOnlyCollection<string>(l.SortedDistinctList());
+        SearchValue = l.SortedDistinctList().AsReadOnly();
 
         _filterType = type;
         OnChanged();
     }
 
     public void Changeto(FilterType type, string searchvalue) {
-        SearchValue = new ReadOnlyCollection<string>(new List<string> { searchvalue });
+        SearchValue = new List<string> { searchvalue }.AsReadOnly();
 
         _filterType = type;
         OnChanged();
@@ -269,7 +269,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                     }
 
                     l.Add(pair.Value.FromNonCritical());
-                    SearchValue = new ReadOnlyCollection<string>(l);
+                    SearchValue = l.AsReadOnly();
                     break;
 
                 case "herkunft":

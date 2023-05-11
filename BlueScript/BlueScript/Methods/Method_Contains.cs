@@ -65,7 +65,7 @@ internal class Method_Contains : Method {
 
         if (attvar.Attributes[0] is VariableListString vl) {
             var x = vl.ValueList;
-            if (wordlist.Any(thisW => x.Contains(thisW, ((VariableBool)attvar.Attributes[1]).ValueBool))) {
+            if (wordlist.Any(thisW => x.Contains(thisW, attvar.ValueBool(1)))) {
                 return DoItFeedback.Wahr();
             }
             return DoItFeedback.Falsch();
@@ -73,7 +73,7 @@ internal class Method_Contains : Method {
 
         if (attvar.Attributes[0] is VariableString vs) {
             foreach (var thisW in wordlist) {
-                if (((VariableBool)attvar.Attributes[1]).ValueBool) {
+                if (attvar.ValueBool(1)) {
                     if (vs.ValueString.Contains(thisW)) {
                         return DoItFeedback.Wahr();
                     }

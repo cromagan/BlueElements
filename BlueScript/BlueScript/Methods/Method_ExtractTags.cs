@@ -63,7 +63,7 @@ internal class Method_ExtractTags : Method {
         if (attvar.Attributes[0] is VariableListString vl) { tags.AddRange(vl.ValueList); }
 
         foreach (var thisw in tags) {
-            var x = thisw.SplitBy(((VariableString)attvar.Attributes[1]).ValueString);
+            var x = thisw.SplitBy(attvar.ValueString(1));
 
             if (x.Length == 2) {
                 var vn = x[0].ToLower().ReduceToChars(Constants.AllowedCharsVariableName);

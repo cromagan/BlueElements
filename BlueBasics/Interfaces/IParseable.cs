@@ -17,7 +17,7 @@
 
 namespace BlueBasics.Interfaces;
 
-public interface IParseable : IChangedFeedback, IStringable {
+public interface IParseable : IStringable {
 
     #region Methods
 

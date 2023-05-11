@@ -28,7 +28,7 @@ using BlueBasics.Interfaces;
 
 namespace BlueDatabase;
 
-public sealed class RowSortDefinition : IParseable {
+public sealed class RowSortDefinition : IParseable, IChangedFeedback {
 
     #region Fields
 

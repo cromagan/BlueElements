@@ -51,8 +51,8 @@ internal class Method_SetClipboard : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var vs = (VariableString)attvar.Attributes[0];
-        _ = CopytoClipboard(vs.ValueString);
+        var vs = attvar.ValueString(0);
+        _ = CopytoClipboard(vs);
 
         return DoItFeedback.Null();
     }

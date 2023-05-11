@@ -50,10 +50,10 @@ internal class Method_Round : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        var n = (int)((VariableFloat)attvar.Attributes[1]).ValueNum;
+        var n = (int)attvar.ValueNum(1);
         if (n < 0) { n = 0; }
         if (n > 10) { n = 10; }
-        var val = Math.Round(((VariableFloat)attvar.Attributes[0]).ValueNum, n);
+        var val = Math.Round(attvar.ValueNum(0), n);
         return new DoItFeedback(val);
     }
 

@@ -29,7 +29,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueScript.Variables;
 
-public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneable, IHasKeyName {
+public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneable, IHasKeyName, IChangedFeedback {
 
     #region Fields
 

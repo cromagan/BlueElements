@@ -270,9 +270,9 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         x.RepairAfterParse();
 
         var car = x.ColumnArrangements.CloneWithClones();
-        car[1].ShowAllColumns();
-        car[1].Hide("hidden");
-        car[1].HideSystemColumns();
+        ColumnViewCollection.ShowAllColumns(car[1]);
+        ColumnViewCollection.Hide("hidden", car[1]);
+        ColumnViewCollection.HideSystemColumns(car[1]);
 
         x.ColumnArrangements = new(car);
 

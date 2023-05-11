@@ -33,7 +33,7 @@ using static BlueBasics.Geometry;
 
 namespace BlueControls;
 
-public sealed class PointM : IMoveable, IHasKeyName, IParseable {
+public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedback {
 
     #region Fields
 

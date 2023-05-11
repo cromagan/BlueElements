@@ -49,8 +49,8 @@ internal class Method_Element : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        var i = ((VariableFloat)attvar.Attributes[1]).ValueInt;
-        var list = ((VariableListString)attvar.Attributes[0]).ValueList;
+        var i = attvar.ValueInt(1);
+        var list = attvar.ValueListString(0);
         if (i < 0 || i >= list.Count) {
             return new DoItFeedback(infos.Data, "Element '" + i + "' nicht in der Liste vorhanden");
         }

@@ -50,7 +50,7 @@ internal class Method_Exception : Method {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen."); }
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen.")
-            : new DoItFeedback(infos.Data, "Abbruch durch Exception-Befehl: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            : new DoItFeedback(infos.Data, "Abbruch durch Exception-Befehl: " + attvar.ValueString(0));
     }
 
     #endregion

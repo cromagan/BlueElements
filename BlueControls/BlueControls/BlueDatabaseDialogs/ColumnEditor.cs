@@ -465,7 +465,7 @@ internal sealed partial class ColumnEditor {
         _column.FilterOptions = tmpf;
         _column.IgnoreAtRowFilter = btnZeilenFilterIgnorieren.Checked;
         _column.PermissionGroupsChangeCell = new(lbxCellEditor.Item.ToListOfString());
-        _column.DropDownItems = new ReadOnlyCollection<string>(tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList());
+        _column.DropDownItems = tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList().AsReadOnly();
         _column.OpticalReplace = new(txbReplacer.Text.SplitAndCutByCrToList());
         _column.AfterEditAutoReplace = new(txbAutoReplace.Text.SplitAndCutByCrToList());
 
@@ -549,8 +549,8 @@ internal sealed partial class ColumnEditor {
                 }
             }
 
-            b.DropDownItems = new ReadOnlyCollection<string>(dd);
-            b.OpticalReplace = new(or);
+            b.DropDownItems = dd.AsReadOnly();
+            b.OpticalReplace = or.AsReadOnly();
 
             db.RepairAfterParse();
             var car = db.ColumnArrangements.CloneWithClones();
@@ -562,7 +562,7 @@ internal sealed partial class ColumnEditor {
             //car[1].Hide("visible");
             //car[1].HideSystemColumns();
 
-            db.ColumnArrangements = new ReadOnlyCollection<ColumnViewCollection>(car);
+            db.ColumnArrangements = car.AsReadOnly();
 
             db.SortDefinition = new RowSortDefinition(db, "Spalte", false);
             tblFilterliste.DatabaseSet(db, string.Empty);
@@ -570,7 +570,7 @@ internal sealed partial class ColumnEditor {
 
             var t = db.Tags.Clone();
             t.TagSet("Filename", linkdb.ConnectionData.UniqueID);
-            db.Tags = new ReadOnlyCollection<string>(t);
+            db.Tags = t.AsReadOnly();
 
             tblFilterliste.Filter.Add(vis, FilterType.Istgleich, "+");
         }

@@ -51,12 +51,12 @@ internal class Method_Join : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        //if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)) { return DoItFeedback.Null(infos, s, line); }
+        //if (string.IsNullOrEmpty(attvar.ValueString(0))) { return DoItFeedback.Null(infos, s, line); }
 
-        var tmp = ((VariableListString)attvar.Attributes[0]).ValueList;
+        var tmp = attvar.ValueListString(0);
         //tmp = tmp.Substring(0, tmp.Length - 1); // Listen mit Einträgen haben zur Erkennung immer noch einen zusätzlichen Zeilenumbruch
 
-        return new DoItFeedback(tmp.JoinWith(((VariableString)attvar.Attributes[1]).ValueString));
+        return new DoItFeedback(tmp.JoinWith(attvar.ValueString(1)));
     }
 
     #endregion

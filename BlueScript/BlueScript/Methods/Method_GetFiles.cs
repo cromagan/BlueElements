@@ -53,13 +53,13 @@ internal class Method_GetFiles : Method {
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var pf = ((VariableString)attvar.Attributes[0]).ValueString;
+        var pf = attvar.ValueString(0);
 
         if (!DirectoryExists(pf)) {
             return new DoItFeedback(infos.Data, "Verzeichnis existiert nicht");
         }
 
-        return new DoItFeedback(Directory.GetFiles(pf, ((VariableString)attvar.Attributes[1]).ValueString));
+        return new DoItFeedback(Directory.GetFiles(pf, attvar.ValueString(1)));
     }
 
     #endregion

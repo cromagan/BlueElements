@@ -50,7 +50,7 @@ internal class Method_SetIfHasValue : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos.Data); }
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableUnknown) { continue; }
@@ -72,7 +72,6 @@ internal class Method_SetIfHasValue : Method {
                     break;
 
                 case VariableBool vs:
-
                     ((VariableBool)attvar.Attributes[0]).ValueBool = vs.ValueBool;
                     return DoItFeedback.Null();
 

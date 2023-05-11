@@ -73,7 +73,7 @@ internal class Method_IsNullOrZero : Method {
         //        return DoItFeedback.Wahr(line);
         //    }
         //} else {
-        //    if (string.IsNullOrEmpty(((VariableString)attvar.Attributes[0]).ValueString)) {
+        //    if (string.IsNullOrEmpty(attvar.ValueString(0))) {
         //        return DoItFeedback.Wahr(line);
         //    } else {
         //        if (attvar.Attributes[0].Type is VariableDataType.Null or VariableDataType.Error
@@ -83,7 +83,7 @@ internal class Method_IsNullOrZero : Method {
         //            if (attvar.Attributes[0] is not VariableFloat) {
         //                return new DoItFeedback(infos.LogData, s, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
         //            } else {
-        //                if (((VariableFloat)attvar.Attributes[0]).ValueNum == 0) {
+        //                if (attvar.ValueNum(0) == 0) {
         //                    return DoItFeedback.Wahr(line);
         //                } else {
         //                    return DoItFeedback.Falsch(line);

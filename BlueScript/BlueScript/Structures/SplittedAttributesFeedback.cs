@@ -17,6 +17,8 @@
 
 using BlueScript.Enums;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
 
 namespace BlueScript.Structures;
 
@@ -45,6 +47,66 @@ public readonly struct SplittedAttributesFeedback {
     public string ErrorMessage { get; }
 
     public ScriptIssueType FehlerTyp { get; }
+
+    #endregion
+
+    #region Methods
+
+    public string ReadableText(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
+
+        if (Attributes[varno] is Variable vs) { return vs.ReadableText; }
+        return string.Empty;
+    }
+
+    public bool ReadOnly(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return true; }
+
+        if (Attributes[varno] is Variable vs) { return vs.ReadOnly; }
+        return true;
+    }
+
+    public bool ValueBool(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return false; }
+
+        if (Attributes[varno] is VariableBool vs) { return vs.ValueBool; }
+        return false;
+    }
+
+    public DateTime ValueDate(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return default; }
+
+        if (Attributes[varno] is VariableDateTime vs) { return vs.ValueDate; }
+        return default;
+    }
+
+    public int ValueInt(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return 0; }
+
+        if (Attributes[varno] is VariableFloat vs) { return vs.ValueInt; }
+        return 0;
+    }
+
+    public List<string> ValueListString(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return new(); }
+
+        if (Attributes[varno] is VariableListString vs) { return vs.ValueList; }
+        return new();
+    }
+
+    public double ValueNum(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return 0; }
+
+        if (Attributes[varno] is VariableFloat vs) { return vs.ValueNum; }
+        return 0;
+    }
+
+    public string ValueString(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
+
+        if (Attributes[varno] is VariableString vs) { return vs.ValueString; }
+        return string.Empty;
+    }
 
     #endregion
 }

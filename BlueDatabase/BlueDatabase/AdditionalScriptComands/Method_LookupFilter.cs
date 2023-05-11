@@ -58,29 +58,29 @@ public class Method_LookupFilter : Method {
 
         if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
-        var returncolumn = allFi[0].Database.Column.Exists(((VariableString)attvar.Attributes[0]).ValueString);
-        if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString); }
+        var returncolumn = allFi[0].Database.Column.Exists(attvar.ValueString(0));
+        if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueString(0)); }
 
         var l = new List<string>();
 
         var r = RowCollection.MatchesTo(allFi);
         if (r.Count == 0) {
-            l.Add(((VariableString)attvar.Attributes[1]).ValueString);
+            l.Add(attvar.ValueString(1));
             return new DoItFeedback(l);
         }
         if (r.Count > 1) {
-            l.Add(((VariableString)attvar.Attributes[2]).ValueString);
+            l.Add(attvar.ValueString(2));
             return new DoItFeedback(l);
         }
 
         var v = RowItem.CellToVariable(returncolumn, r[0]);
-        if (v == null || v.Count != 1) { return new DoItFeedback(infos.Data, "Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[4]).ValueString); }
+        if (v == null || v.Count != 1) { return new DoItFeedback(infos.Data, "Wert konnte nicht erzeugt werden: " + attvar.ValueString(4)); }
 
         if (v[0] is VariableListString vl) {
             l.AddRange(vl.ValueList);
         } else if (v[0] is VariableString vs) {
             var w = vs.ValueString;
-            if(!string.IsNullOrEmpty(w)) { l.Add(w); }
+            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
         } else {
             return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");
         }

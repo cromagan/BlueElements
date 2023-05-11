@@ -57,8 +57,8 @@ public class Method_ContentsFilter : Method {
 
         if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
-        var returncolumn = allFi[0].Database.Column.Exists(attvar.Attributes[0].ReadableText);
-        if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.Attributes[0].ReadableText); }
+        var returncolumn = allFi[0].Database.Column.Exists(attvar.ReadableText(0));
+        if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ReadableText(0)); }
         var x = returncolumn.Contents(allFi, null);
         return new DoItFeedback(x);
     }

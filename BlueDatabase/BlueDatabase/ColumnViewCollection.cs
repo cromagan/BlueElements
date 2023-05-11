@@ -52,11 +52,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? Changed;
-
-    #endregion
+    //public event EventHandler? Changed;
 
     #region Properties
 
@@ -70,7 +66,6 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         set {
             if (_name == value) { return; }
             _name = value;
-            OnChanged();
         }
     }
 
@@ -82,7 +77,6 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
             if (l.IsDifferentTo(_permissionGroups_Show)) {
                 _permissionGroups_Show.Clear();
                 _permissionGroups_Show.AddRange(l);
-                OnChanged();
             }
         }
     }
@@ -103,6 +97,87 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
 
     #region Methods
 
+    /// <summary>
+    /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
+    /// </summary>
+    /// <param name="ca"></param>
+    public static void Hide(string columnName, ColumnViewCollection ca) {
+        foreach (var thisViewItem in ca) {
+            if (thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.OrdinalIgnoreCase))) {
+                ca.Remove(thisViewItem);
+                Hide(columnName, ca);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
+    /// </summary>
+    /// <param name="ca"></param>
+    public static void HideSystemColumns(ColumnViewCollection ca) {
+        foreach (var thisViewItem in ca) {
+            if (thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.IsSystemColumn())) {
+                ca.Remove(thisViewItem);
+                HideSystemColumns(ca);
+                return;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
+    /// </summary>
+    /// <param name="ca"></param>
+    public static void Repair(ColumnViewCollection ca, int number) {
+        if (ca.Database == null || ca.Database.IsDisposed) { return; }
+
+        #region Ungültige Spalten entfernen
+
+        for (var z = 0; z < ca.Count; z++) {
+            if (ca[z].Column == null || !ca.Database.Column.Contains(ca[z]?.Column)) {
+                ca[z] = null;
+            }
+        }
+        _ = ca.RemoveNull();
+
+        #endregion
+
+        var tmp = ca.PermissionGroups_Show.SortedDistinctList();
+        tmp.RemoveString(DatabaseAbstract.Administrator, false);
+        tmp.RemoveNullOrEmpty();
+
+        switch (number) {
+            case 0:
+                if (string.IsNullOrEmpty(ca.Name)) { ca.Name = "Alle Spalten"; }
+                ShowAllColumns(ca);
+                break;
+
+            case 1:
+                if (string.IsNullOrEmpty(ca.Name)) { ca.Name = "Standard"; }
+                _ = tmp.AddIfNotExists(DatabaseAbstract.Everybody);
+                break;
+        }
+
+        ca.PermissionGroups_Show = new ReadOnlyCollection<string>(tmp);
+
+        if (string.IsNullOrEmpty(ca.Name)) { ca.Name = "Ansicht " + number; }
+    }
+
+    /// <summary>
+    /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
+    /// </summary>
+    /// <param name="ca"></param>
+    public static void ShowAllColumns(ColumnViewCollection ca) {
+        if (ca.Database == null || ca.Database.IsDisposed) { return; }
+
+        foreach (var thisColumn in ca.Database.Column) {
+            if (ca[thisColumn] == null) {
+                ca.Add(new ColumnViewItem(thisColumn, ViewType.Column, ca));
+            }
+        }
+    }
+
     public void Add(ColumnItem? column, bool permanent) {
         if (column == null) { return; }
 
@@ -111,33 +186,17 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
             : new ColumnViewItem(column, ViewType.Column, this));
     }
 
-    public new void Add(ColumnViewItem item) {
-        base.Add(item);
-        OnChanged();
-    }
-
     public object Clone() => new ColumnViewCollection(Database, ToString());
 
     public void Dispose() => Dispose(true);
 
-    public void Hide(string columnName) {
-        foreach (var thisViewItem in this) {
-            if (thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.OrdinalIgnoreCase))) {
-                Remove(thisViewItem);
-                Hide(columnName);
-                return;
-            }
-        }
-    }
-
-    public void HideSystemColumns() {
-        foreach (var thisViewItem in this) {
-            if (thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.IsSystemColumn())) {
-                Remove(thisViewItem);
-                HideSystemColumns();
-                return;
-            }
-        }
+    public void Dispose(bool disposing) {
+        IsDisposed = true;
+        //PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
+        //PermissionGroups_Show.Clear();
+        if (Database != null) { Database.Disposing += Database_Disposing; }
+        Database = null;
+        //base.Dispose(disposing);
     }
 
     public void Invalidate_DrawWithOfAllItems() {
@@ -176,8 +235,6 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
             if (this[viewItemNo] != null && this[viewItemNo].Column != null) { return this[viewItemNo]; }
         } while (true);
     }
-
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void Parse(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
@@ -223,21 +280,6 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         } while (true);
     }
 
-    public new void Remove(ColumnViewItem item) {
-        _ = base.Remove(item);
-        OnChanged();
-    }
-
-    public void ShowAllColumns() {
-        if (Database == null || Database.IsDisposed) { return; }
-
-        foreach (var thisColumn in Database.Column) {
-            if (this[thisColumn] == null) {
-                Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
-            }
-        }
-    }
-
     public void ShowColumns(params string[] columnnames) {
         if (Database == null || Database.IsDisposed) { return; }
 
@@ -256,7 +298,6 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         (base[index1], base[index2]) = (base[index2], base[index1]);
 
         if (base[index2].ViewType != ViewType.PermanentColumn) { base[index1].ViewType = ViewType.Column; }
-        OnChanged();
     }
 
     //public void Swap(ColumnViewItem? viewItem1, ColumnViewItem? viewItem2) {
@@ -284,50 +325,6 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
             }
         }
         return result + "}";
-    }
-
-    internal void Repair(int number) {
-        if (Database == null || Database.IsDisposed) { return; }
-
-        #region Ungültige Spalten entfernen
-
-        for (var z = 0; z < Count; z++) {
-            if (this[z].Column == null || !Database.Column.Contains(this[z]?.Column)) {
-                this[z] = null;
-            }
-        }
-        _ = this.RemoveNull();
-
-        #endregion
-
-        var tmp = PermissionGroups_Show.SortedDistinctList();
-        tmp.RemoveString(DatabaseAbstract.Administrator, false);
-        tmp.RemoveNullOrEmpty();
-
-        switch (number) {
-            case 0:
-                if (string.IsNullOrEmpty(Name)) { Name = "Alle Spalten"; }
-                ShowAllColumns();
-                break;
-
-            case 1:
-                if (string.IsNullOrEmpty(Name)) { Name = "Standard"; }
-                _ = tmp.AddIfNotExists(DatabaseAbstract.Everybody);
-                break;
-        }
-
-        PermissionGroups_Show = new ReadOnlyCollection<string>(tmp);
-
-        if (string.IsNullOrEmpty(Name)) { Name = "Ansicht " + number; }
-    }
-
-    public void Dispose(bool disposing) {
-        IsDisposed = true;
-        //PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
-        //PermissionGroups_Show.Clear();
-        if (Database != null) { Database.Disposing += Database_Disposing; }
-        Database = null;
-        //base.Dispose(disposing);
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();

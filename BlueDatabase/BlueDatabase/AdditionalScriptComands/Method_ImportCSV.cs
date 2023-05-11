@@ -50,8 +50,8 @@ internal class Method_ImportCSV : Method_Database {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var txt = ((VariableString)attvar.Attributes[0]).ValueString;
-        var sep = ((VariableString)attvar.Attributes[1]).ValueString;
+        var txt = attvar.ValueString(0);
+        var sep = attvar.ValueString(1);
 
         var db = MyDatabase(s.Variables);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }

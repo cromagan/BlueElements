@@ -53,7 +53,7 @@ internal class Method_DirectoryCreate : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var p = ((VariableString)attvar.Attributes[0]).ValueString.TrimEnd("\\");
+        var p = attvar.ValueString(0).TrimEnd("\\");
 
         if (DirectoryExists(p)) { return DoItFeedback.Wahr(); }
 

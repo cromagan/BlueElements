@@ -89,7 +89,7 @@ public static class ItemAcceptFilterExtensions {
             var l = new List<string>();
             if (item.GetFilterFrom != null) { l.AddRange(item.GetFilterFrom); }
             l.Add(rfp2.KeyName);
-            item.GetFilterFrom = new ReadOnlyCollection<string>(l);
+            item.GetFilterFrom = l.AsReadOnly();
 
             //_getFilterFrom = null;
             //_getFilterFromKeys.AddIfNotExists(rfp2.KeyName);

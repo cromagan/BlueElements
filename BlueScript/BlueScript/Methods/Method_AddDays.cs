@@ -50,12 +50,12 @@ internal class Method_AddDays : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        // var ok = DateTimeTryParse(attvar.Attributes[0].ReadableText, out var d);
+        // var ok = DateTimeTryParse(attvar.ReadableText(0), out var d);
         //if (!ok) {
-        //    return new DoItFeedback(infos.LogData, s, "Der Wert '" + attvar.Attributes[0].ReadableText + "' wurde nicht als Zeitformat erkannt.");
+        //    return new DoItFeedback(infos.LogData, s, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
         //}
-        var d = ((VariableDateTime)attvar.Attributes[0]).ValueDate;
-        d = d.AddDays(((VariableFloat)attvar.Attributes[1]).ValueNum);
+        var d = attvar.ValueDate(0);
+        d = d.AddDays(attvar.ValueNum(1));
         return new DoItFeedback(d);
     }
 

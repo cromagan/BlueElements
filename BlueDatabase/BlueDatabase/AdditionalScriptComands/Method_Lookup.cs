@@ -55,31 +55,31 @@ public class Method_Lookup : Method_Database {
             return DoItFeedback.AttributFehler(infos.Data, this, attvar);
         }
 
-        var db = DatabaseOf(s.Variables, ((VariableString)attvar.Attributes[0]).ValueString);
+        var db = DatabaseOf(s.Variables, attvar.ValueString(0));
         if (db == null) {
-            return new DoItFeedback(infos.Data, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden");
+            return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueString(0) + "' nicht gefunden");
         }
 
-        var c = db.Column.Exists(((VariableString)attvar.Attributes[2]).ValueString);
+        var c = db.Column.Exists(attvar.ValueString(2));
         if (c == null) {
-            return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + ((VariableString)attvar.Attributes[2]).ValueString);
+            return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueString(2));
         }
 
-        var r = RowCollection.MatchesTo(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, ((VariableString)attvar.Attributes[1]).ValueString));
+        var r = RowCollection.MatchesTo(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, attvar.ValueString(1)));
         var l = new List<string>();
 
         if (r.Count == 0) {
-            l.Add(((VariableString)attvar.Attributes[3]).ValueString);
+            l.Add(attvar.ValueString(3));
             return new DoItFeedback(l);
         }
         if (r.Count > 1) {
-            l.Add(((VariableString)attvar.Attributes[4]).ValueString);
+            l.Add(attvar.ValueString(4));
             return new DoItFeedback(l);
         }
 
         var v = RowItem.CellToVariable(c, r[0]);
         if (v == null || v.Count != 1) {
-            return new DoItFeedback(infos.Data, "Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[2]).ValueString);
+            return new DoItFeedback(infos.Data, "Wert konnte nicht erzeugt werden: " + attvar.ValueString(2));
         }
 
         if (v[0] is VariableListString vl) {

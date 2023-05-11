@@ -50,14 +50,14 @@ internal class Method_TrimStart : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        var val = ((VariableString)attvar.Attributes[0]).ValueString;
+        var val = attvar.ValueString(0);
 
         string txt;
 
         do {
             txt = val;
             for (var z = 1; z < attvar.Attributes.Count; z++) {
-                val = val.TrimStart(((VariableString)attvar.Attributes[z]).ValueString);
+                val = val.TrimStart(attvar.ValueString(z));
             }
         } while (txt != val);
 

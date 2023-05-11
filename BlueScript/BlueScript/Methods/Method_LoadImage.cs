@@ -56,21 +56,21 @@ internal class Method_LoadImage : Method {
         // Da es keine Möglichit gibt, eine Bild Variable (außerhalb eines If) zu deklarieren,
         // darf diese Routine nicht fehlschlagen.
 
-        //if (((VariableString)attvar.Attributes[0]).ValueString.FileType() != FileFormat.Image) {
-        //    return new DoItFeedback(infos.Data, "Datei ist kein Bildformat: " + ((VariableString)attvar.Attributes[0]).ValueString);
+        //if (attvar.ValueString(0).FileType() != FileFormat.Image) {
+        //    return new DoItFeedback(infos.Data, "Datei ist kein Bildformat: " + attvar.ValueString(0));
         //}
 
-        //if (!IO.FileExists(((VariableString)attvar.Attributes[0]).ValueString)) {
-        //    return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+        //if (!IO.FileExists(attvar.ValueString(0))) {
+        //    return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + attvar.ValueString(0));
         //}
 
         try {
             Generic.CollectGarbage();
-            var bmp = (Bitmap)Image_FromFile(((VariableString)attvar.Attributes[0]).ValueString)!;
+            var bmp = (Bitmap)Image_FromFile(attvar.ValueString(0))!;
             return new DoItFeedback(bmp);
         } catch {
             return new DoItFeedback(null as Bitmap);
-            //return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + ((VariableString)attvar.Attributes[0]).ValueString);
+            //return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + attvar.ValueString(0));
         }
     }
 

@@ -73,20 +73,20 @@ public class Method_Filter : Method_Database {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var db = DatabaseOf(s.Variables, ((VariableString)attvar.Attributes[0]).ValueString);
-        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + ((VariableString)attvar.Attributes[0]).ValueString + "' nicht gefunden"); }
+        var db = DatabaseOf(s.Variables, attvar.ValueString(0));
+        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueString(0) + "' nicht gefunden"); }
 
         #region Spalte ermitteln
 
-        var filterColumn = db.Column.Exists(((VariableString)attvar.Attributes[1]).ValueString);
-        if (filterColumn == null) { return new DoItFeedback(infos.Data, "Spalte '" + ((VariableString)attvar.Attributes[1]).ValueString + "' in Ziel-Datenbank nicht gefunden"); }
+        var filterColumn = db.Column.Exists(attvar.ValueString(1));
+        if (filterColumn == null) { return new DoItFeedback(infos.Data, "Spalte '" + attvar.ValueString(1) + "' in Ziel-Datenbank nicht gefunden"); }
 
         #endregion
 
         #region Typ ermitteln
 
         FilterType filtertype;
-        switch (((VariableString)attvar.Attributes[2]).ValueString.ToLower()) {
+        switch (attvar.ValueString(2).ToLower()) {
             case "is":
                 filtertype = FilterType.Istgleich_GroßKleinEgal;
                 break;
@@ -96,12 +96,12 @@ public class Method_Filter : Method_Database {
                 break;
 
             default:
-                return new DoItFeedback(infos.Data, "Filtertype unbekannt: " + ((VariableString)attvar.Attributes[2]).ValueString);
+                return new DoItFeedback(infos.Data, "Filtertype unbekannt: " + attvar.ValueString(2));
         }
 
         #endregion
 
-        var fii = new FilterItem(filterColumn, filtertype, ((VariableString)attvar.Attributes[3]).ValueString);
+        var fii = new FilterItem(filterColumn, filtertype, attvar.ValueString(3));
         return new DoItFeedback(new VariableFilterItem(fii));
     }
 

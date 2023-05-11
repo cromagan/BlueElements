@@ -51,7 +51,7 @@ internal class Method_CountString : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
             ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
-            : new DoItFeedback(attvar.Attributes[0].ReadableText.CountString(attvar.Attributes[1].ReadableText));
+            : new DoItFeedback(attvar.ReadableText(0).CountString(attvar.ReadableText(1)));
     }
 
     #endregion

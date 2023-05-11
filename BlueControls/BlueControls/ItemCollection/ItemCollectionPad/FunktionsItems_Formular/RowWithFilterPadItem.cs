@@ -364,7 +364,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
                     or2.Add(thisc.Name + "|" + thisc.ReadableText());
                 }
                 hs.OpticalReplace = new(or2);
-                hs.DropDownItems = new ReadOnlyCollection<string>(OutputDatabase.Column.ToListOfString());
+                hs.DropDownItems = OutputDatabase.Column.ToListOfString().AsReadOnly();
             } else {
                 hs.OpticalReplace = new(Array.Empty<string>());
                 hs.DropDownItems = new(Array.Empty<string>());
@@ -405,7 +405,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
         //    EventTypes = EventTypes.value_changedx | EventTypes.new_row
         //};
         //eves.Add(l);
-        //FilterDefiniton.EventScript = new ReadOnlyCollection<EventScript>(eves);
+        //FilterDefiniton.EventScript = eves.AsReadOnly();
 
         //#endregion
 

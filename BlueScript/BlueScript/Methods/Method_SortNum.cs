@@ -51,11 +51,11 @@ internal class Method_SortNum : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (attvar.Attributes[0].ReadOnly) { return DoItFeedback.Schreibgschützt(infos.Data); }
+        if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
         var nums = new List<double>();
-        foreach (var txt in ((VariableListString)attvar.Attributes[0]).ValueList) {
-            nums.Add(txt.IsNumeral() ? DoubleParse(txt) : ((VariableFloat)attvar.Attributes[1]).ValueNum);
+        foreach (var txt in attvar.ValueListString(0)) {
+            nums.Add(txt.IsNumeral() ? DoubleParse(txt) : attvar.ValueNum(1));
         }
 
         nums.Sort();
