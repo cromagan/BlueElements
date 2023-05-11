@@ -39,15 +39,10 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-
     private readonly ItemSendRow _itemSends;
-
     private string _anzeige = string.Empty;
-
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-
     private string _überschrift = string.Empty;
-
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -99,14 +94,14 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit,\r\naus dem daraus resultierenden Zeilen EINE per Dropdownmenu zu wählen.";
 
-    public ReadOnlyCollection<string>? GetFilterFrom {
+    public ReadOnlyCollection<string> GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public bool OnlyOneInputDatabase => true;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -251,12 +246,14 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false);
+            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
+
         } else {
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }
 
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, true);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 

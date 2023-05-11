@@ -40,7 +40,6 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-
     private readonly ItemSendRow _itemSends;
 
     #endregion
@@ -73,14 +72,14 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public override string Description => "Darstellung einer Datenbank.\r\nKann Vorfilter empfangen und eine Zeile weitergeben.";
 
-    public ReadOnlyCollection<string>? GetFilterFrom {
+    public ReadOnlyCollection<string> GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public bool OnlyOneInputDatabase => true;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();

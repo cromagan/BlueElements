@@ -107,6 +107,7 @@ public class ItemSendSomething {
         var l = new List<string>();
         if (item.ChildIds != null) { l.AddRange(item.ChildIds); }
         l.Add(add.KeyName);
+        l = l.SortedDistinctList();
 
         ChildIdsSet(l.AsReadOnly(), item);
     }
@@ -195,8 +196,9 @@ public class ItemSendSomething {
         l.AddRange(_childIds);
         l.Remove(remove.KeyName);
 
-        remove.CalculateInputColorIds();
+
         ChildIdsSet(l.AsReadOnly(), item);
+        remove.CalculateInputColorIds();
     }
 
     protected List<GenericControl> GetStyleOptions(IItemSendSomething item) {

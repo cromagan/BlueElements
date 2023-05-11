@@ -62,7 +62,7 @@ public static class ItemAcceptRowExtensions {
     public static void Datenquelle_wählen(this IItemAcceptRow item) {
         if (item.Parent is null) { return; }
 
-        var x = new ItemCollectionList(true);
+        var x = new ItemCollectionList(false);
         foreach (var thisR in item.Parent) {
             if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendRow rfp) {
                 _ = x.Add(rfp);

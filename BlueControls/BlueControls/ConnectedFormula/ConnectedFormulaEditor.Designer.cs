@@ -429,12 +429,12 @@ namespace BlueControls.Forms {
             // btnZeileZuFilter
             // 
             this.btnZeileZuFilter.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnZeileZuFilter.ImageCode = "Trichter|16";
+            this.btnZeileZuFilter.ImageCode = "Zeile|16";
             this.btnZeileZuFilter.Location = new System.Drawing.Point(64, 2);
             this.btnZeileZuFilter.Name = "btnZeileZuFilter";
             this.btnZeileZuFilter.Size = new System.Drawing.Size(64, 66);
             this.btnZeileZuFilter.TabIndex = 1;
-            this.btnZeileZuFilter.Text = "Zeile zu Filter";
+            this.btnZeileZuFilter.Text = "Filter aus Zeile";
             this.btnZeileZuFilter.QuickInfo = "Dieses Element kann eine Zeile empfangen, auf dessen Zellen zugreifen,<br>und einen neuen Filter für eine andere Datenbank zurück geben.<br>Unsichtbares Element, es wird nicht angezeigt.";
             this.btnZeileZuFilter.Click += new System.EventHandler(this.btnZeileZuFilter_Click);
             // 

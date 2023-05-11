@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using BlueBasics;
 using BlueControls.Controls;
@@ -27,7 +28,10 @@ using System.Collections.ObjectModel;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueBasics.Enums;
 using System.ComponentModel;
+using BlueBasics.Interfaces;
 using BlueDatabase.AdditionalScriptComands;
+using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueControls.Interfaces;
 
@@ -41,7 +45,12 @@ public interface IItemAcceptFilter : IItemAcceptSomething {
     /// <summary>
     /// Enthält die Schlüssel der Items
     /// </summary>
-    public ReadOnlyCollection<string>? GetFilterFrom { get; set; }
+    public ReadOnlyCollection<string> GetFilterFrom { get; set; }
+
+    /// <summary>
+    /// Ob alle EingangsFilter der gleichen Datenbank entsprechen müssen
+    /// </summary>
+    public bool OnlyOneInputDatabase { get; }
 
     #endregion
 }
@@ -53,7 +62,7 @@ public static class ItemAcceptFilterExtensions {
     public static List<int> CalculateColorIds(this IItemAcceptFilter item) {
         var l = new List<int>();
 
-        if (item.GetFilterFrom == null) {
+        if (item.GetFilterFrom != null) {
             foreach (var thisID in item.GetFilterFrom) {
                 if (item.Parent[thisID] is IItemSendFilter i) {
                     l.Add(i.OutputColorId);
@@ -66,33 +75,82 @@ public static class ItemAcceptFilterExtensions {
         return l;
     }
 
+    public static void Datenquellen_bearbeiten_DifferenteDatabase(this IItemAcceptFilter item) => item.Datenquellen_bearbeiten(false);
+
+    public static void Datenquellen_bearbeiten_SameDatabase(this IItemAcceptFilter item) => item.Datenquellen_bearbeiten(true);
+
     [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
-    public static void Datenquelle_hinzufügen(this IItemAcceptFilter item) {
+    private static void Datenquellen_bearbeiten(this IItemAcceptFilter item, bool sameDatabase) {
         if (item.Parent is null) { return; }
 
-        var x = new ItemCollectionList(true);
-        foreach (var thisR in item.Parent) {
-            if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
-                _ = x.Add(rfp);
+        DatabaseAbstract matchDB = null;
+
+        if (sameDatabase && item.GetFilterFrom.Count > 0) {
+            if (item.Parent[item.GetFilterFrom[0]] is IItemSendSomething ir) {
+                matchDB = ir.OutputDatabase;
             }
         }
 
-        _ = x.Add("<Abbruch>");
+        var x = new ItemCollectionList(false);
 
-        var it = InputBoxListBoxStyle.Show("Quelle hinzufügen:", x, AddType.None, true);
+        // Die Items, die man noch wählen könnte
+        foreach (var thisR in item.Parent) {
+            if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
+                if (!item.GetFilterFrom.Contains(rfp.KeyName)) {
+                    if (matchDB == null || matchDB == rfp.OutputDatabase) {
+                        _ = x.Add("Hinzu: " + rfp.ReadableText(), "+|" + rfp.KeyName, rfp.SymbolForReadableText(), true, "1");
+                    }
+                }
+            }
+        }
 
-        if (it == null || it.Count != 1) { return; }
+        // Die Items, die entfernt werden können
+        if (item.GetFilterFrom.Count > 0) {
+            x.AddSeparator();
 
-        var t = item.Parent[it[0]];
+            foreach (var thisIt in item.GetFilterFrom) {
+                var name = thisIt;
+                var im = QuickImage.Get(ImageCode.Warnung, 16);
 
-        if (t is IItemSendFilter rfp2) {
+                if (item.Parent[name] is IReadableText ir) {
+                    name = ir.ReadableText();
+                    im = ir.SymbolForReadableText();
+                }
+
+                _ = x.Add("Entf.: " + name, "-|" + thisIt, im, true, "3");
+            }
+        }
+
+        x.AddSeparator();
+        _ = x.Add(ContextMenuComands.Abbruch);
+
+        var it = InputBoxListBoxStyle.Show("Aktion wählen:", x, AddType.None, true);
+
+        if (it == null || it.Count != 1) {
+            return;
+        }
+
+        var ak = it[0].SplitBy("|");
+        if (ak.Length != 2) { return; }
+
+        if (ak[0] == "+") {
+            var t = item.Parent[ak[1]];
+
+            if (t is IItemSendFilter rfp2) {
+                var l = new List<string>();
+                l.AddRange(item.GetFilterFrom);
+                l.Add(rfp2.KeyName);
+                l = l.SortedDistinctList();
+                item.GetFilterFrom = l.AsReadOnly();
+            }
+        }
+
+        if (ak[0] == "-") {
             var l = new List<string>();
-            if (item.GetFilterFrom != null) { l.AddRange(item.GetFilterFrom); }
-            l.Add(rfp2.KeyName);
+            l.AddRange(item.GetFilterFrom);
+            l.Remove(ak[1]);
+            l = l.SortedDistinctList();
             item.GetFilterFrom = l.AsReadOnly();
-
-            //_getFilterFrom = null;
-            //_getFilterFromKeys.AddIfNotExists(rfp2.KeyName);
         }
     }
 
@@ -150,30 +208,33 @@ public class ItemAcceptFilter : ItemAcceptSomething {
     public ReadOnlyCollection<string> GetFilterFromKeysGet() => new(_getFilterFromKeys);
 
     public void GetFilterFromKeysSet(ICollection<string>? value, IItemAcceptFilter item) {
-        {
-            if (!_getFilterFromKeys.IsDifferentTo(value)) { return; }
+        if (!_getFilterFromKeys.IsDifferentTo(value)) { return; }
 
-            var g = GetFilterFromGet(item);
+        var g = GetFilterFromGet(item);
 
-            foreach (var thisItem in g) {
-                thisItem.RemoveChild(item);
-            }
-
-            _getFilterFrom = null;
-            _getFilterFromKeys.Clear();
-
-            if (value != null) {
-                _getFilterFromKeys.AddRange(value);
-            }
-
-            g = GetFilterFromGet(item);
-            foreach (var thisItem in g) {
-                thisItem.AddChild(item);
-            }
-
-            item.RaiseVersion();
-            item.OnChanged();
+        // Zuerst die gaanzen Verknüpfungen auflösen.
+        foreach (var thisItem in g) {
+            thisItem.RemoveChild(item);
         }
+
+        // Dann die Collection leeren
+        _getFilterFrom = null;
+        _getFilterFromKeys.Clear();
+
+        // Die Collection befüllen
+        if (value != null) {
+            _getFilterFromKeys.AddRange(value);
+        }
+
+        // Und den Eltern bescheid geben, dass ein neues Kind da ist
+        g = GetFilterFromGet(item);
+        foreach (var thisItem in g) {
+            thisItem.AddChild(item);
+        }
+
+        item.CalculateInputColorIds();
+        item.RaiseVersion();
+        item.OnChanged();
     }
 
     public List<int> InputColorIdGet(IItemAcceptFilter item) {
@@ -220,7 +281,11 @@ public class ItemAcceptFilter : ItemAcceptSomething {
         var l = new List<GenericControl>();
         l.AddRange(base.GetStyleOptions(item));
 
-        l.Add(new FlexiControlForDelegate(item.Datenquelle_hinzufügen, "Datenquelle hinzufügen", ImageCode.Trichter));
+        if (item.OnlyOneInputDatabase) {
+            l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten_SameDatabase, "Datenquellen bearbeiten", ImageCode.Trichter));
+        } else {
+            l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten_DifferenteDatabase, "Datenquellen bearbeiten", ImageCode.Trichter));
+        }
 
         return l;
     }

@@ -204,14 +204,19 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     protected static void DrawArrow(Graphics gr, RectangleF positionModified, float zoom, string symbol, int colorId, Alignment al, float valueArrow, float valueSymbol, float xmod) {
         var p = positionModified.PointOf(al);
-        var width = (int)(zoom * 12);
-        var height = (int)(zoom * 25);
-        var pa = Poly_Arrow(new Rectangle(0, 0, width, height));
+        var width = (int)(zoom * 25);
+        var height = (int)(zoom * 12);
+        var pa = Poly_Arrow(new Rectangle(0, -(width / 2), height, width));
 
         var c = Skin.IdColor(colorId);
         var c2 = c.Darken(0.4);
 
-        gr.TranslateTransform(p.X + (width / 2) + xmod, p.Y - valueArrow);
+        gr.TranslateTransform(p.X + xmod, p.Y - valueArrow);
+
+        //Info: das ergibt zwei übernanderliegenede Ellipsen
+        //gr.DrawEllipse(Pens.MediumSeaGreen, new Rectangle(-20,-10,40,20));
+        //gr.RotateTransform(90);
+        //gr.DrawEllipse(Pens.MediumSeaGreen, new Rectangle(-10, -20, 20, 40));
 
         gr.RotateTransform(90);
 
@@ -219,7 +224,12 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         gr.DrawPath(new Pen(c2, 1 * zoom), pa);
 
         gr.RotateTransform(-90);
-        gr.TranslateTransform(-p.X - (width / 2) - xmod, -p.Y + valueArrow);
+        gr.TranslateTransform(-p.X - xmod, -p.Y + valueArrow);
+
+        //var x = QuickImage.GenerateCode("Pfeil_Unten", (int)(10 * zoom), (int)(10 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 100, 100, 0, 0, symbol);
+
+        //var sy2 = QuickImage.Get(x);
+        //gr.DrawImage(sy2, p.X - (sy2.Width / 2) + xmod, p.Y - valueSymbol);
 
         if (!string.IsNullOrEmpty(symbol)) {
             var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
@@ -234,11 +244,13 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         var arrowY = (int)(zoom * 12) * 0.35f;
         var symbolY = (int)(zoom * 12) * 0.35f;
 
-        var width = (int)(zoom * 12);
+        var width = (int)(zoom * 25);
 
-        colorId ??= new List<int> { -1 };
+        colorId ??= new List<int>();
 
-        var start = (colorId.Count * width / 2);
+        if (colorId.Count == 0) { colorId.Add(-1); }
+
+        var start = -((colorId.Count - 1) * width / 2);
 
         for (var pos = 0; pos < colorId.Count; pos++) {
             DrawArrow(gr, positionModified, zoom, symbol, colorId[pos], Alignment.Top_HorizontalCenter, arrowY, symbolY, start);
@@ -256,19 +268,21 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, List<int>? id, bool drawSymbol, bool drawText) {
         gr.FillRectangle(Brushes.White, drawingCoordinates);
 
-        var w = zoom * 2;
+        var w = zoom * 3;
 
         var tmp = drawingCoordinates;
         tmp.Inflate(-w, -w);
 
-        gr.DrawRectangle(new Pen(Skin.IdColor(id), w * 2), tmp);
+        gr.DrawRectangle(new Pen(Skin.IdColor(id).Brighten(0.9), w * 2), tmp);
 
-        gr.DrawRectangle(new Pen(Color.Black, zoom), drawingCoordinates);
+        gr.DrawRectangle(new Pen(Skin.IdColor(id).Brighten(0.6), zoom), drawingCoordinates);
 
         if (drawSymbol && drawText) {
-            Skin.Draw_FormatedText(gr, ReadableText(), SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+            var v2 = SymbolForReadableText().Scale(zoom);
+            Skin.Draw_FormatedText(gr, ReadableText(), v2, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
         } else if (drawSymbol) {
-            Skin.Draw_FormatedText(gr, string.Empty, SymbolForReadableText(), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+            var v2 = SymbolForReadableText().Scale(zoom);
+            Skin.Draw_FormatedText(gr, string.Empty, v2, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
         } else if (drawText) {
             Skin.Draw_FormatedText(gr, ReadableText(), null, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
         }

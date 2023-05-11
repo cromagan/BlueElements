@@ -42,13 +42,9 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     #region Fields
 
     private readonly ItemAcceptFilter _itemAccepts;
-
     private readonly ItemSendFilter _itemSends;
-
     private string _anzeige = string.Empty;
-
     private string _überschrift = string.Empty;
-
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -100,14 +96,14 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     public override string Description => "Dieses Element kann Filter empfangen - um eine Vorauswahl der verfügbaren Filterelement darzustallen.\r\nAnschließend kann mit den übrig gebliebenen Werten ein neuer Filter erzeugt werden, den der Benutzer auswählen kann.";
 
-    public ReadOnlyCollection<string>? GetFilterFrom {
+    public ReadOnlyCollection<string> GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public bool OnlyOneInputDatabase => true;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();

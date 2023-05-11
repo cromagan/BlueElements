@@ -289,6 +289,14 @@ public sealed class QuickImage : IReadableText, IStringable {
 
     public string ReadableText() => string.Empty;
 
+    public QuickImage Scale(double zoom) {
+        if (Math.Abs(zoom - 1f) < 0.001) { return this; }
+
+        zoom = Math.Max(zoom, 0.001);
+
+        return Get(GenerateCode(Name, (int)(Width * zoom), (int)(Height * zoom), Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol));
+    }
+
     public QuickImage? SymbolForReadableText() => this;
 
     /// <summary>

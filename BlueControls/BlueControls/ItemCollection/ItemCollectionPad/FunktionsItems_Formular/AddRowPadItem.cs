@@ -67,15 +67,14 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public override string Description => "Dieses Element wird als Knopf mit einem Pluszeichen dargstellt.<br>Das Elemenz kann Filter empfangen und mit diesen Filtern eine neue Zeile anlegen";
 
-    public ReadOnlyCollection<string>? GetFilterFrom {
+    public ReadOnlyCollection<string> GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
-
+    public bool OnlyOneInputDatabase => true;
     protected override int SaveOrder => 1;
 
     #endregion

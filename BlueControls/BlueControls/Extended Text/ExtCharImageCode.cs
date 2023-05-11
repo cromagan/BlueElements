@@ -54,7 +54,7 @@ internal class ExtCharImageCode : ExtChar {
             if (Math.Abs(zoom - 1) < 0.001) {
                 gr.DrawImage(_qi, drawX, drawY);
             } else {
-                gr.DrawImage(QuickImage.Get(_qi.Name, (int)(_qi.Width * zoom)), drawX, drawY);
+                gr.DrawImage(_qi.Scale(zoom), drawX, drawY);
             }
         } catch { }
     }
