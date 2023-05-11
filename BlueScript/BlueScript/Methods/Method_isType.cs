@@ -52,7 +52,7 @@ internal class Method_IsType : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (string.Equals(attvar.Attributes[1].ReadableText, attvar.Attributes[0].MyClassId, StringComparison.OrdinalIgnoreCase)) {
+        if (string.Equals(attvar.ReadableText(1), attvar.Attributes[0].MyClassId, StringComparison.OrdinalIgnoreCase)) {
             return DoItFeedback.Wahr();
         }
         return DoItFeedback.Falsch();
