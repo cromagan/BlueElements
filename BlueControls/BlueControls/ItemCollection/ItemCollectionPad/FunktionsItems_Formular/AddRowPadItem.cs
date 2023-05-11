@@ -30,8 +30,6 @@ using BlueControls.Enums;
 using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using static System.Net.Mime.MediaTypeNames;
-using static System.Windows.Forms.AxHost;
 
 namespace BlueControls.ItemCollection;
 

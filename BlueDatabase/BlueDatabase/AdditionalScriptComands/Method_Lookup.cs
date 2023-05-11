@@ -31,7 +31,7 @@ public class Method_Lookup : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal, StringVal, StringVal };
-    public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.";
+    public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück.\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
@@ -66,21 +66,15 @@ public class Method_Lookup : Method_Database {
         }
 
         var r = RowCollection.MatchesTo(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, ((VariableString)attvar.Attributes[1]).ValueString));
+        var l = new List<string>();
 
-        if (r == null || r.Count == 0) {
-            if (attvar.Attributes.Count > 3) {
-                return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[3]).ValueString });
-            }
-
-            return DoItFeedback.Null();
+        if (r.Count == 0) {
+            l.Add(((VariableString)attvar.Attributes[3]).ValueString);
+            return new DoItFeedback(l);
         }
-
         if (r.Count > 1) {
-            if (attvar.Attributes.Count > 4) {
-                return new DoItFeedback(new List<string> { ((VariableString)attvar.Attributes[4]).ValueString });
-            }
-
-            return DoItFeedback.Null();
+            l.Add(((VariableString)attvar.Attributes[4]).ValueString);
+            return new DoItFeedback(l);
         }
 
         var v = RowItem.CellToVariable(c, r[0]);
@@ -88,15 +82,16 @@ public class Method_Lookup : Method_Database {
             return new DoItFeedback(infos.Data, "Wert konnte nicht erzeugt werden: " + ((VariableString)attvar.Attributes[2]).ValueString);
         }
 
-        if (v[0] is VariableListString vl) { return new DoItFeedback(vl.ValueList); }
+        if (v[0] is VariableListString vl) {
+            l.AddRange(vl.ValueList);
+        } else if (v[0] is VariableString vs) {
+            var w = vs.ValueString;
+            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
+        } else {
+            return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");
+        }
 
-        return new DoItFeedback(new List<string> { v[0].ReadableText });
-        //return new DoItFeedback(infos.LogData, s, new List<string>{kv[0].ReadableText
-
-        //return new DoItFeedback(infos.LogData, s, v[0]);
-        //return v[0].Type != VariableDataType.List
-        //    ? new DoItFeedback(infos.LogData, s, v[0].ValueString + "\r", VariableDataType.List)
-        //    : new DoItFeedback(infos.LogData, s, v[0].ValueString, VariableDataType.List);
+        return new DoItFeedback(l);
     }
 
     #endregion

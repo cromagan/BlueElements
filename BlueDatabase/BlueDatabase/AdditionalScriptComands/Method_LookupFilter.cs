@@ -32,7 +32,7 @@ public class Method_LookupFilter : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal, FilterVar };
-    public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück. Wird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben. Ist der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben. Ein Filter kann mit dem Befehl 'Filter' erstellt werden.";
+    public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
@@ -79,12 +79,11 @@ public class Method_LookupFilter : Method {
         if (v[0] is VariableListString vl) {
             l.AddRange(vl.ValueList);
         } else if (v[0] is VariableString vs) {
-            l.Add(vs.ValueString);
+            var w = vs.ValueString;
+            if(!string.IsNullOrEmpty(w)) { l.Add(w); }
         } else {
             return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");
         }
-
-        //  l.GenerateAndAdd(((VariableString)attvar.Attributes[2]).ValueString);
 
         return new DoItFeedback(l);
     }
