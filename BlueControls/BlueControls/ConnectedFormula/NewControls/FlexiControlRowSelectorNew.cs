@@ -66,9 +66,8 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), this.InputDatabase());
 
-    public DatabaseAbstract? OutputDatabase { get; set; }
-
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     public RowItem? Row {
         get => IsDisposed ? null : _row;
@@ -99,6 +98,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     public void SetData(DatabaseAbstract? otherdatabase, long? rowkey) {
         if (_disposing || IsDisposed) { return; }
+        BlueBasics.Develop.DebugPrint_NichtImplementiert();
 
         //if (FilterDefiniton == null || FilterDefiniton.IsDisposed) { return; }
 

@@ -122,7 +122,9 @@ public sealed class LastFilesCombo : ComboBox {
 
     protected override void OnItemClicked(BasicListItemEventArgs e) {
         base.OnItemClicked(e);
-        var t = (List<string>)e.Item.Tag;
+
+        if (e.Item.Tag is not List<string> t) { return; }
+
         AddFileName(e.Item.KeyName, t[0]);
     }
 

@@ -231,6 +231,8 @@ public abstract class SqlBackAbstract {
 
         if (Connection == null || !OpenConnection()) { return null; }
 
+        Develop.CheckStackForOverflow();
+
         try {
             lock (_fill) {
                 var tbl = new DataTable();

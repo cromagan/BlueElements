@@ -864,8 +864,9 @@ public sealed class MultiUserFile : IDisposableExtended {
         OnSavedToDisk();
         IsSaving = false;
         return string.Empty;
+
         string Feedback(string txt) {
-            _ = DeleteFile(tmpFileName, false);
+            if (tmpFileName != null) { _ = DeleteFile(tmpFileName, false); }
             //Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br>Grund:<br>" + txt);
             RepairOldBlockFiles();
             return txt;
@@ -927,14 +928,16 @@ public sealed class MultiUserFile : IDisposableExtended {
     private (string TMPFileName, string FileInfoBeforeSaving, byte[]? DataUncompressed) WriteTempFileToDisk(bool iAmThePureBinSaver) {
         string fileInfoBeforeSaving;
         string tmpFileName;
-        byte[] dataUncompressed;
+        byte[]? dataUncompressed;
         var count = 0;
+
         if (!iAmThePureBinSaver && _pureBinSaver.IsBusy) { return (string.Empty, string.Empty, null); }
         if (_doingTempFile) {
             if (!iAmThePureBinSaver) { Develop.DebugPrint("Erstelle bereits TMP-File"); }
             return (string.Empty, string.Empty, null);
         }
         _doingTempFile = true;
+
         while (true) {
             if (!iAmThePureBinSaver) {
                 // Also, im NICHT-parallelen Prozess ist explizit der Save angestoßen worden.
@@ -946,6 +949,9 @@ public sealed class MultiUserFile : IDisposableExtended {
             if (!string.IsNullOrEmpty(f)) { _doingTempFile = false; return (string.Empty, string.Empty, null); }
             fileInfoBeforeSaving = GetFileInfo(Filename, true);
             dataUncompressed = OnToListOfByte();
+
+            if (dataUncompressed == null) { return (string.Empty, string.Empty, null); }
+
             tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName().ToUpper());
             try {
                 using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -964,6 +970,7 @@ public sealed class MultiUserFile : IDisposableExtended {
                 Pause(1, true);
             }
         }
+
         _doingTempFile = false;
         return (tmpFileName, fileInfoBeforeSaving, dataUncompressed);
     }

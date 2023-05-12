@@ -48,6 +48,8 @@ public partial class Tool_Eraser : GenericTool {
         }
 
         var pic = OnNeedCurrentPic();
+        if (pic == null) { return; }
+
         Point p1, p2;
         if (e.Current.Button == MouseButtons.Left && e.MouseDown != null) {
             p1 = new Point(Math.Min(e.Current.TrimmedX, e.MouseDown.TrimmedX), Math.Min(e.Current.TrimmedY, e.MouseDown.TrimmedY));
@@ -103,6 +105,8 @@ public partial class Tool_Eraser : GenericTool {
 
         if (Razi.Checked) { return; }
         var pic = OnNeedCurrentPic();
+        if (pic == null) { return; }
+
         if (Eleminate.Checked) {
             if (e.Current.IsInPic) {
                 var cc = pic.GetPixel(e.Current.X, e.Current.Y);

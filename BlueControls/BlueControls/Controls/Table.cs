@@ -272,10 +272,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
-    public DatabaseAbstract? OutputDatabase { get => Database; set => Database = value; }
-
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
-
+    public DatabaseAbstract? OutputDatabase { get => Database; set => Database = value; }
     public List<RowItem> PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
@@ -488,13 +486,20 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public static void SearchNextText(string searchTxt, Table tableView, ColumnItem? column, RowData? row, out ColumnItem? foundColumn, out RowData? foundRow, bool vereinfachteSuche) {
+        if (tableView.Database is not DatabaseAbstract db) {
+            MessageBox.Show("Datenbank-Fehler.", ImageCode.Information, "OK");
+            foundColumn = null;
+            foundRow = null;
+            return;
+        }
+
         searchTxt = searchTxt.Trim();
         var ca = tableView.CurrentArrangement;
         if (tableView.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
-            ca = tableView.Database.ColumnArrangements[0];
+            ca = db.ColumnArrangements[0];
         }
         row ??= tableView.View_RowLast();
-        column ??= tableView.Database.Column.SysLocked;
+        column ??= db.Column.SysLocked;
         var rowsChecked = 0;
         if (string.IsNullOrEmpty(searchTxt)) {
             MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
@@ -503,7 +508,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return;
         }
         do {
-            column = tableView.Design == BlueTableAppearance.OnlyMainColumnWithoutHead ? tableView.Database.ColumnArrangements[0].NextVisible(column) : ca.NextVisible(column);
+            column = tableView.Design == BlueTableAppearance.OnlyMainColumnWithoutHead ? db.ColumnArrangements[0].NextVisible(column) : ca.NextVisible(column);
             if (column == null) {
                 column = ca[0].Column;
                 if (rowsChecked > tableView.Database.Row.Count() + 1) {

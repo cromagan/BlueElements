@@ -41,14 +41,24 @@ public sealed class SystemInputHook {
 
     private int _mouseLastY;
 
-    [AccessedThroughProperty(nameof(Tim))]
-    private Timer? _tim;
+    private Timer _tim;
 
     #endregion
 
     #region Constructors
 
-    public SystemInputHook() => Initialize();
+    public SystemInputHook() {
+        _tim = new Timer {
+            Interval = 1,
+            Enabled = false
+        };
+        _tim.Tick += Tim_Tick;
+        _mouseIsPressing = false;
+        _mouseLastX = 0;
+        _mouseLastY = 0;
+        _keyIsPressing = false;
+        _keyLastKey = 0;
+    }
 
     #endregion
 
@@ -63,26 +73,6 @@ public sealed class SystemInputHook {
     public event EventHandler<MouseEventArgs>? MouseMove;
 
     public event EventHandler<MouseEventArgs>? MouseUp;
-
-    #endregion
-
-    #region Properties
-
-    private Timer Tim {
-        [DebuggerNonUserCode]
-        get => _tim;
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        [DebuggerNonUserCode]
-        set {
-            if (_tim != null) {
-                _tim.Tick -= Tim_Tick;
-            }
-            _tim = value;
-            if (value != null) {
-                _tim.Tick += Tim_Tick;
-            }
-        }
-    }
 
     #endregion
 
@@ -313,7 +303,7 @@ public sealed class SystemInputHook {
     }
 
     public void InstallHook() {
-        Tim.Enabled = true;
+        _tim.Enabled = true;
         _mouseIsPressing = false;
         _mouseLastX = -1;
         _mouseLastY = -1;
@@ -322,22 +312,10 @@ public sealed class SystemInputHook {
         _keyLastKey = 0;
     }
 
-    public void RemoveHook() => Tim.Enabled = false;
+    public void RemoveHook() => _tim.Enabled = false;
 
     [DllImport("user32.dll", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     private static extern short GetAsyncKeyState(Keys nVirtKey);
-
-    private void Initialize() {
-        Tim = new Timer {
-            Interval = 1,
-            Enabled = false
-        };
-        _mouseIsPressing = false;
-        _mouseLastX = 0;
-        _mouseLastY = 0;
-        _keyIsPressing = false;
-        _keyLastKey = 0;
-    }
 
     private void OnKeyDown(KeyEventArgs e) => KeyDown?.Invoke(this, e);
 
@@ -350,10 +328,10 @@ public sealed class SystemInputHook {
     private void OnMouseUp(MouseEventArgs e) => MouseUp?.Invoke(this, e);
 
     private void Tim_Tick(object? sender, System.EventArgs? e) {
-        Tim.Enabled = false;
+        _tim.Enabled = false;
         DoMouse();
         DoKeyboard();
-        Tim.Enabled = true;
+        _tim.Enabled = true;
     }
 
     #endregion

@@ -84,13 +84,13 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     #region Methods
 
     private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
-        if (Database == null || _arrangement < 2 || _arrangement >= Database.ColumnArrangements.Count) { return; }
+        if (Database is not DatabaseAbstract db || _arrangement < 2 || _arrangement >= db.ColumnArrangements.Count) { return; }
 
         var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
         if (MessageBox.Show("Anordung <b>'" + ca.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-        var car = Database.ColumnArrangements.CloneWithClones();
+        var car = db.ColumnArrangements.CloneWithClones();
         car.RemoveAt(_arrangement);
         Database.ColumnArrangements = car.AsReadOnly();
         _arrangement = 1;

@@ -87,7 +87,11 @@ public sealed partial class Import : IHasDatabase {
             MessageBox.Show("Bitte Trennzeichen angeben.", ImageCode.Information, "OK");
             return;
         }
-        var m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false);
+        var m = "Datenbank-Fehler";
+
+        if (Database != null && !Database.IsDisposed) {
+            m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false);
+        }
 
         if (!string.IsNullOrEmpty(m)) {
             MessageBox.Show(m, ImageCode.Information, "OK");

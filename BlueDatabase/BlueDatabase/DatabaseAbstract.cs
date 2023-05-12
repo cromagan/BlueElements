@@ -1618,7 +1618,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                     if (LoadedVersion == DatabaseVersion) {
                         SetReadOnly();
                         if (!ReadOnly) {
-                            Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData.ToString);
+                            Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData.ToString());
                         }
                     }
                     return "Befehl unbekannt.";
@@ -1773,7 +1773,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 if (LoadedVersion == DatabaseVersion) {
                     SetReadOnly();
                     if (!ReadOnly) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData.ToString);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData.ToString());
                     }
                 }
 

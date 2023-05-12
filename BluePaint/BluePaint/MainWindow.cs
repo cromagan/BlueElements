@@ -78,7 +78,7 @@ public partial class MainWindow {
         }
         if (_currentTool != null) {
             _currentTool.OnToolChanging();
-            _currentTool?.Dispose();
+            _currentTool.Dispose();
             Split.Panel1.Controls.Remove(_currentTool);
             _currentTool.ZoomFit -= CurrentTool_ZoomFit;
             _currentTool.HideMainWindow -= CurrentTool_HideMainWindow;
@@ -323,25 +323,31 @@ public partial class MainWindow {
             btnSaveAs_Click(null, System.EventArgs.Empty);
             return;
         }
+
+        if (P.Bmp is not Bitmap bmp) { return; }
+
         try {
             switch (_filename.FileSuffix().ToUpper()) {
                 case "JPG":
-                    P.Bmp.Save(_filename, ImageFormat.Jpeg);
+                    bmp.Save(_filename, ImageFormat.Jpeg);
                     _isSaved = true;
                     break;
 
                 case "BMP":
-                    P.Bmp.Save(_filename, ImageFormat.Bmp);
+                    bmp.Save(_filename, ImageFormat.Bmp);
                     _isSaved = true;
                     break;
 
                 case "PNG":
-                    P.Bmp.Save(_filename, ImageFormat.Png);
+                    bmp.Save(_filename, ImageFormat.Png);
+                    _isSaved = true;
+                    break;
+
+                default:
+                    bmp.Save(_filename);
                     _isSaved = true;
                     break;
             }
-            P.Bmp.Save(_filename);
-            _isSaved = true;
         } catch {
             _isSaved = false;
         }

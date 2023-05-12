@@ -87,7 +87,7 @@ public static partial class Extensions {
         }
     }
 
-    public static List<T> CloneWithClones<T>(this ICollection<T?>? l) where T : ICloneable {
+    public static List<T> CloneWithClones<T>(this ICollection<T>? l) where T : ICloneable {
         var l2 = new List<T>();
 
         if (l == null) { return l2; }
@@ -246,7 +246,8 @@ public static partial class Extensions {
         var did = false;
         var z = 0;
         while (z < l.Count) {
-            if (l[z] == null || l[z].Equals(default(T))) {
+            var x = l[z];
+            if (x == null || x.Equals(default(T))) {
                 l.RemoveAt(z);
                 did = true;
             } else {

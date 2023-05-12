@@ -38,9 +38,8 @@ internal class FilterChangeControl : GenericControl, IControlAcceptFilter, ICont
 
     public FilterItem Filter { get; }
 
-    public DatabaseAbstract? OutputDatabase { get; set; }
-
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 
