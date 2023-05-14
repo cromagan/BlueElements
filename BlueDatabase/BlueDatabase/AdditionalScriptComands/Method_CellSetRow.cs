@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -57,7 +58,8 @@ public class Method_CellSetRow : Method_Database {
         var columnToSet = row.Database.Column.Exists(attvar.ValueString(1));
         if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueString(1)); }
 
-        if (row?.Database?.ReadOnly ?? true) { return new DoItFeedback(infos.Data, "Datenbank schreibgeschützt."); }
+        var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReason.EditAcut, false, false);
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
 
         if (row == MyRow(s.Variables)) {

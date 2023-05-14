@@ -124,7 +124,7 @@ internal sealed class QuickPic : Panel {
             var w = Enum.GetName(z.GetType(), z);
             if (!string.IsNullOrEmpty(w)) { _ = LB.Items.Add(w); }
         }
-        QuickImage l = new(qicode, true);
+        QuickImage l = new(qicode);
         PicName.Text = l.Name;
         Färb.Text = l.Färbung;
         grün.Text = l.ChangeGreenTo;

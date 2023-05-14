@@ -279,7 +279,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.PlusZeichen, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
@@ -321,7 +321,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         } else {
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }

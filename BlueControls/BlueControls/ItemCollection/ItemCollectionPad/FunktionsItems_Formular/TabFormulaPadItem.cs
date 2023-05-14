@@ -229,7 +229,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return txt + ErrorReason();
     }
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
@@ -262,8 +262,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        //DrawColorScheme(gr, positionModified, zoom, Id);
 
+        DrawColorScheme(gr, positionModified, zoom, null, false, false, false);
         var headh = 25 * zoom;
         var headb = 70 * zoom;
 
@@ -285,6 +285,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
         Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
 
+        DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false, true);
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);

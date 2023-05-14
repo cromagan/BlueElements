@@ -214,9 +214,9 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(InputColorId));
+            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -246,9 +246,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false);
+            DrawColorScheme(gr, positionModified, zoom, null, true, false, false);
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
-
         } else {
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }

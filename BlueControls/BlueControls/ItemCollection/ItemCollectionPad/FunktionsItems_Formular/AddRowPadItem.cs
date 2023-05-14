@@ -134,7 +134,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         return txt + ErrorReason();
     }
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.PlusZeichen, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
@@ -160,7 +160,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
         _eTxt ??= new ExtText(Design.Button, States.Standard);

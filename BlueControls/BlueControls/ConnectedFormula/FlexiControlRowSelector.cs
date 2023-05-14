@@ -40,7 +40,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
     #region Fields
 
-    private readonly List<IControlAcceptSomething> _childs = new();
+    private readonly List<IControlAcceptRow> _childs = new();
     private readonly string _showformat;
     private bool _disposing;
     private FilterCollection? _filter = null;
@@ -74,6 +74,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     #region Properties
 
     public DatabaseAbstract? FilterDefiniton { get; }
+
     public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, _filter, OutputDatabase);
 
     public IControlSendRow? GetRowFrom {
@@ -107,13 +108,17 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
     #region Methods
 
-    public void ChildAdd(IControlAcceptSomething c) {
+    public void ChildAdd(IControlAcceptRow c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
         this.DoChilds(_childs, _row);
     }
 
+    public void FilterChanged() => Invalidate_FilteredRows();
+
     public void Invalidate_FilteredRows() => _filteredRows = null;
+
+    public void Invalidate_Filters() => _filteredRows = null;
 
     public void SetData(DatabaseAbstract? otherdatabase, long? rowkey) {
         if (_disposing || IsDisposed) { return; }
@@ -168,13 +173,10 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
                 #region Value ermitteln
 
-                var calcrows = false;
-
                 List<string> value = new();
 
                 if (otherdatabase?.Row.SearchByKey(rowkey) is RowItem r) {
                     r.CheckRowDataIfNeeded();
-                    calcrows = true;
 
                     var tmpvalue = thisR.CellGetString("suchtxt");
 
@@ -196,7 +198,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
                         }
 
                         if (value.Count == 0) {
-                            calcrows = false;
+                            var calcrows = false;
                         }
                     } else {
                         value.Add(tmpvalue); // Immer hinzufügen. Es gibt Einträge, wo der erste Befüllt ist, und der Zweite leer sein kann.
@@ -211,7 +213,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
                 #endregion
 
-                Invalidate_FilteredRows();
+                Invalidate_Filters();
 
                 //#region Zeile(n) ermitteln und Script löschen
 

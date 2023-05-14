@@ -136,7 +136,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         return txt + ErrorReason();
     }
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
@@ -163,7 +163,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         //var id = GetRowFrom?.OutputColorId ?? - 1;
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");

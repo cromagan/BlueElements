@@ -148,7 +148,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Skript, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
@@ -173,7 +173,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", null);

@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -113,6 +114,14 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     #region Methods
 
+    public void OpenAdditionalFileFolder() {
+        //Todo: Implementieren
+        if (Database == null || Database.IsDisposed) {
+            return;
+        }
+        if (DirectoryExists(Database.AdditionalFilesPfadWhole())) { _ = ExecuteFile(Database.AdditionalFilesPfadWhole()); }
+    }
+
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         base.OnFormClosing(e);
         if (Database == null || Database.IsDisposed) { return; }
@@ -135,14 +144,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     protected override void OnShown(System.EventArgs e) => variableEditor.WriteVariablesToTable(Database?.Variables);
-
-    public void OpenAdditionalFileFolder() {
-        //Todo: Implementieren
-        if (Database == null || Database.IsDisposed) {
-            return;
-        }
-        if (DirectoryExists(Database.AdditionalFilesPfadWhole())) { _ = ExecuteFile(Database.AdditionalFilesPfadWhole()); }
-    }
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSave.Enabled = false;
@@ -250,7 +251,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             Item = null;
             return;
         }
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) {
+        if (TableView.ErrorMessage(Database, EditableErrorReason.EditNormaly)) {
             Item = null;
             return;
         }
@@ -301,7 +302,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void WriteInfosBack() {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; } // Disposed
+        if (TableView.ErrorMessage(Database, EditableErrorReason.EditNormaly) || Database == null) { return; }
 
         if (_item != null) {
             _item.Script = eventScriptEditor.ScriptText;

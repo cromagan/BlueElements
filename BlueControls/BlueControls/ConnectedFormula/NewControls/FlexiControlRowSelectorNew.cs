@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq.Expressions;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
@@ -33,11 +34,16 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     #region Fields
 
-    private readonly List<IControlAcceptSomething> _childs = new();
+    private readonly List<IControlAcceptRow> _childs = new();
+
     private readonly List<IControlSendFilter> _parentSender = new();
+
     private readonly string _showformat;
+
     private bool _disposing;
+
     private List<RowItem>? _filteredRows;
+
     private RowItem? _row;
 
     #endregion
@@ -54,10 +60,6 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
         if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First() is ColumnItem fc) {
             _showformat = "~" + fc.Name + "~";
         }
-
-        OutputDatabase = database;
-
-        SetData(database, null);
     }
 
     #endregion
@@ -67,6 +69,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
     public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), this.InputDatabase());
 
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
+
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     public RowItem? Row {
@@ -85,124 +88,134 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     public void AddParentSender(IControlSendFilter item) {
         _parentSender.Add(item);
-        Invalidate_FilteredRows();
+        Invalidate_Filters();
     }
 
-    public void ChildAdd(IControlAcceptSomething c) {
+    public void ChildAdd(IControlAcceptRow c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
         this.DoChilds(_childs, _row);
     }
 
+    public void FilterFromParentsChanged() => Invalidate_FilteredRows();
+
     public void Invalidate_FilteredRows() => _filteredRows = null;
 
-    public void SetData(DatabaseAbstract? otherdatabase, long? rowkey) {
-        if (_disposing || IsDisposed) { return; }
-        BlueBasics.Develop.DebugPrint_NichtImplementiert();
+    public void Invalidate_Filters() => _filteredRows = null;
 
-        //if (FilterDefiniton == null || FilterDefiniton.IsDisposed) { return; }
+    //public void SetData(DatabaseAbstract? database, long? rowkey) {
+    //    if (_disposing || IsDisposed) { return; }
 
-        //if (FilterDefiniton.Row.Count > 0) {
-        //    #region Filter erstellen
+    //    if (OutputDatabase != database) {
+    //        return;
+    //        //            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
+    //    }
 
-        //    var f = new FilterCollection(OutputDatabase);
+    //    BlueBasics.Develop.DebugPrint_NichtImplementiert();
 
-        //    foreach (var thisR in FilterDefiniton.Row) {
-        //        #region Column ermitteln
+    //    //if (FilterDefiniton == null || FilterDefiniton.IsDisposed) { return; }
 
-        //        var column = OutputDatabase?.Column.Exists(thisR.CellGetString("Spalte"));
-        //        if (column == null) {
-        //            return;
-        //        }
+    //    //if (FilterDefiniton.Row.Count > 0) {
+    //    //    #region Filter erstellen
 
-        //        #endregion
+    //    //    var f = new FilterCollection(OutputDatabase);
 
-        //        #region Type ermitteln
+    //    //    foreach (var thisR in FilterDefiniton.Row) {
+    //    //        #region Column ermitteln
 
-        //        var onlyifhasvalue = false;
-        //        var word = false;
+    //    //        var column = OutputDatabase?.Column.Exists(thisR.CellGetString("Spalte"));
+    //    //        if (column == null) {
+    //    //            return;
+    //    //        }
 
-        //        FilterType ft;
-        //        switch (thisR.CellGetString("Filterart").ToLower()) {
-        //            case "=":
-        //                ft = FilterType.Istgleich_GroßKleinEgal;
-        //                break;
+    //    //        #endregion
 
-        //            case "=!empty":
-        //                ft = FilterType.Istgleich_GroßKleinEgal;
-        //                onlyifhasvalue = true;
-        //                break;
+    //    //        #region Type ermitteln
 
-        //            case "=word":
-        //                ft = FilterType.Istgleich_ODER_GroßKleinEgal;
-        //                word = true;
-        //                break;
+    //    //        var onlyifhasvalue = false;
+    //    //        var word = false;
 
-        //            default:
-        //                ft = FilterType.Istgleich_GroßKleinEgal;
-        //                DebugPrint("Filter " + thisR.CellGetInteger("Filterart") + " nicht definiert.");
-        //                break;
-        //        }
+    //    //        FilterType ft;
+    //    //        switch (thisR.CellGetString("Filterart").ToLower()) {
+    //    //            case "=":
+    //    //                ft = FilterType.Istgleich_GroßKleinEgal;
+    //    //                break;
 
-        //        #endregion
+    //    //            case "=!empty":
+    //    //                ft = FilterType.Istgleich_GroßKleinEgal;
+    //    //                onlyifhasvalue = true;
+    //    //                break;
 
-        //        #region Value ermitteln
+    //    //            case "=word":
+    //    //                ft = FilterType.Istgleich_ODER_GroßKleinEgal;
+    //    //                word = true;
+    //    //                break;
 
-        //        var calcrows = false;
+    //    //            default:
+    //    //                ft = FilterType.Istgleich_GroßKleinEgal;
+    //    //                DebugPrint("Filter " + thisR.CellGetInteger("Filterart") + " nicht definiert.");
+    //    //                break;
+    //    //        }
 
-        //        List<string> value = new();
+    //    //        #endregion
 
-        //        if (otherdatabase?.Row.SearchByKey(rowkey) is RowItem r) {
-        //            r.CheckRowDataIfNeeded();
-        //            calcrows = true;
+    //    //        #region Value ermitteln
 
-        //            var tmpvalue = thisR.CellGetString("suchtxt");
+    //    //        var calcrows = false;
 
-        //            if (tmpvalue.Equals("#first", StringComparison.OrdinalIgnoreCase)) {
-        //                tmpvalue = r.CellFirstString();
-        //            } else {
-        //                tmpvalue = r.ReplaceVariables(tmpvalue, false, false);
-        //            }
+    //    //        List<string> value = new();
 
-        //            if (word) {
-        //                List<string> names = new();
-        //                names.AddRange(column.GetUcaseNamesSortedByLenght());
+    //    //        if (otherdatabase?.Row.SearchByKey(rowkey) is RowItem r) {
+    //    //            r.CheckRowDataIfNeeded();
+    //    //            calcrows = true;
 
-        //                foreach (var thisWord in names) {
-        //                    var fo = tmpvalue.IndexOfWord(thisWord, 0, RegexOptions.IgnoreCase);
-        //                    if (fo > -1) {
-        //                        value.Add(thisWord);
-        //                    }
-        //                }
+    //    //            var tmpvalue = thisR.CellGetString("suchtxt");
 
-        //                if (value.Count == 0) {
-        //                    calcrows = false;
-        //                }
-        //            } else {
-        //                value.Add(tmpvalue); // Immer hinzufügen. Es gibt Einträge, wo der erste Befüllt ist, und der Zweite leer sein kann.
-        //            }
-        //        }
+    //    //            if (tmpvalue.Equals("#first", StringComparison.OrdinalIgnoreCase)) {
+    //    //                tmpvalue = r.CellFirstString();
+    //    //            } else {
+    //    //                tmpvalue = r.ReplaceVariables(tmpvalue, false, false);
+    //    //            }
 
-        //        #endregion
+    //    //            if (word) {
+    //    //                List<string> names = new();
+    //    //                names.AddRange(column.GetUcaseNamesSortedByLenght());
 
-        //        if (value.Count > 0 || !onlyifhasvalue) {
-        //            f.Add(new FilterItem(column, ft, value));
-        //        }
+    //    //                foreach (var thisWord in names) {
+    //    //                    var fo = tmpvalue.IndexOfWord(thisWord, 0, RegexOptions.IgnoreCase);
+    //    //                    if (fo > -1) {
+    //    //                        value.Add(thisWord);
+    //    //                    }
+    //    //                }
 
-        //        #endregion
+    //    //                if (value.Count == 0) {
+    //    //                    calcrows = false;
+    //    //                }
+    //    //            } else {
+    //    //                value.Add(tmpvalue); // Immer hinzufügen. Es gibt Einträge, wo der erste Befüllt ist, und der Zweite leer sein kann.
+    //    //            }
+    //    //        }
 
-        //        #region Zeile(n) ermitteln und Script löschen
+    //    //        #endregion
 
-        //        _rows = calcrows ? OutputDatabase?.Row.CalculateFilteredRows(f) : null;
+    //    //        if (value.Count > 0 || !onlyifhasvalue) {
+    //    //            f.Add(new FilterItem(column, ft, value));
+    //    //        }
 
-        //        #endregion
-        //    }
+    //    //        #endregion
 
-        //    if (_disposing || IsDisposed) { return; } // Multitasking...
-        //}
+    //    //        #region Zeile(n) ermitteln und Script löschen
 
-        UpdateMyCollection();
-    }
+    //    //        _rows = calcrows ? OutputDatabase?.Row.CalculateFilteredRows(f) : null;
+
+    //    //        #endregion
+    //    //    }
+
+    //    //    if (_disposing || IsDisposed) { return; } // Multitasking...
+    //    //}
+
+    //    UpdateMyCollection();
+    //}
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);

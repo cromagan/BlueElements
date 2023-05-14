@@ -258,7 +258,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
             foreach (var thisV in _parent.Connections) {
                 if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
-                    if (thisV != null && _parent.Contains(thisV.Item2) && thisV.Item2 != this) {
+                    if (_parent.Contains(thisV.Item2) && thisV.Item2 != this) {
                         if (thisV.Item2.Bei_Export_sichtbar) {
                             var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).ZoomAndMove(zoom, shiftX, shiftY);
                             var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).ZoomAndMove(zoom, shiftX, shiftY);
@@ -527,7 +527,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
             if (!_beiExportSichtbar) {
                 var q = QuickImage.Get("Drucker|16||1");
-                if (q != null) { gr.DrawImage(q, positionModified.X, positionModified.Y); }
+                gr.DrawImage(q, positionModified.X, positionModified.Y);
             }
         } catch { }
     }
@@ -539,8 +539,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
 
     protected virtual void ParseFinished() { }
-
-    private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 
     private void MovablePoint_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {

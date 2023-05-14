@@ -185,7 +185,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         return txt + ErrorReason();
     }
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Variable, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
@@ -216,7 +216,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         //var id = GetRowFrom?.OutputColorId ?? -1;
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
         if (GetRowFrom == null) {

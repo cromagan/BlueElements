@@ -29,7 +29,7 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
 
     #region Fields
 
-    private readonly List<IControlAcceptSomething> _childs = new();
+    private readonly List<IControlAcceptFilter> _childs = new();
 
     private readonly ColumnItem? _inputcolumn = null;
     private readonly ColumnItem? _outputcolumn = null;
@@ -80,7 +80,7 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
 
     #region Methods
 
-    public void ChildAdd(IControlAcceptSomething c) {
+    public void ChildAdd(IControlAcceptFilter c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
         this.DoChilds(_childs);

@@ -177,7 +177,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         return txt + ErrorReason();
     }
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
@@ -207,7 +207,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         //var id = GetRowFrom?.OutputColorId ?? -1;
 
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\");

@@ -64,7 +64,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
     public static readonly int RowCaptionSizeY = 50;
-    private readonly List<IControlAcceptSomething> _childs = new();
+    private readonly List<IControlAcceptRow> _childs = new();
     private readonly List<string> _collapsed = new();
     private readonly object _lockUserAction = new();
     private readonly List<IControlSendFilter> _parentSender = new();
@@ -281,7 +281,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         set {
             if (Database == null || Database.IsDisposed) { return; }
             Database.PowerEdit = value;
-            Invalidate_sortedRowDatax(); // Neue Zeilen können nun erlaubt sein
+            Invalidate_sortedRowData(); // Neue Zeilen können nun erlaubt sein
         }
     }
 
@@ -657,7 +657,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (CursorPosRow?.Row != null && CursorPosRow?.Row.Database != Database) { CursorPosRow = null; }
     }
 
-    public void ChildAdd(IControlAcceptSomething c) {
+    public void ChildAdd(IControlAcceptRow c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
         this.DoChilds(_childs, CursorPosRow?.Row);
@@ -668,7 +668,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (Database != null && !Database.IsDisposed && Database?.Column?.SysChapter != null) {
             _collapsed.AddRange(Database.Column.SysChapter.Contents());
         }
-        Invalidate_sortedRowDatax();
+        Invalidate_sortedRowData();
     }
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
@@ -911,7 +911,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void ExpandAll() {
         _collapsed.Clear();
         CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
-        Invalidate_sortedRowDatax();
+        Invalidate_sortedRowData();
     }
 
     public string Export_CSV(FirstRow firstRow) => Database == null ? string.Empty : Database.Export_CSV(firstRow, CurrentArrangement, SortedRows());
@@ -926,6 +926,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (Database == null || Database.IsDisposed) { return; }
         if (string.IsNullOrEmpty(filename)) { filename = TempFile(string.Empty, string.Empty, "html"); }
         Database.Export_HTML(filename, CurrentArrangement, SortedRows(), execute);
+    }
+
+    public void FilterFromParentsChanged() {
+        Invalidate_FilteredRows();
     }
 
     /// <summary>
@@ -987,7 +991,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _filteredRows = null;
         ////CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
         Invalidate_Filterinfo();
-        Invalidate_sortedRowDatax();
+        Invalidate_sortedRowData();
     }
 
     public void Invalidate_HeadSize() {
@@ -1002,7 +1006,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void OpenSearchAndReplace() {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
+        if (TableView.ErrorMessage(Database, EditableErrorReason.EditGeneral) || Database == null) { return; }
 
         if (!Database.IsAdministrator()) { return; }
 
@@ -1022,19 +1026,21 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         PinnedRows.Clear();
         PinnedRows.AddRange(rows);
-        Invalidate_sortedRowDatax();
+        Invalidate_sortedRowData();
         OnPinnedChanged();
     }
 
     public void PinAdd(RowItem? row) {
+        if (row == null) { return; }
         PinnedRows.Add(row);
-        Invalidate_sortedRowDatax();
+        Invalidate_sortedRowData();
         OnPinnedChanged();
     }
 
     public void PinRemove(RowItem? row) {
+        if (row == null) { return; }
         _ = PinnedRows.Remove(row);
-        Invalidate_sortedRowDatax();
+        Invalidate_sortedRowData();
         OnPinnedChanged();
     }
 
@@ -1146,7 +1152,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return SortedRows(); // Rekursiver aufruf. Manchmal funktiniert OnRowsSorted nicht...
         } catch {
             // Komisch, manchmal wird die Variable _sortedRowDatax verworfen.
-            Invalidate_sortedRowDatax();
+            Invalidate_sortedRowData();
             return SortedRows();
         }
     }
@@ -1321,7 +1327,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
 
                 if (!didreload) { break; }
-                Invalidate_sortedRowDatax();
+                Invalidate_sortedRowData();
             } while (true);
 
             switch (_design) {
@@ -1417,7 +1423,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             switch (e.KeyCode) {
                 case Keys.Oemcomma: // normales ,
                     if (e.Modifiers == Keys.Control) {
-                        var lp = CellCollection.ErrorReason(CursorPosColumn, CursorPosRow?.Row, ErrorReason.EditGeneral);
+                        var lp = CellCollection.EditableErrorReason(CursorPosColumn, CursorPosRow?.Row, EditableErrorReason.EditGeneral, true, false);
                         Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
                         if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
                         if (string.IsNullOrEmpty(lp) && newRow?.Row != null) {
@@ -1435,7 +1441,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                             _isinKeyDown = false;
                             return;
                         }
-                        var l2 = CellCollection.ErrorReason(CursorPosColumn, CursorPosRow?.Row, ErrorReason.EditGeneral);
+                        var l2 = CellCollection.EditableErrorReason(CursorPosColumn, CursorPosRow?.Row, EditableErrorReason.EditGeneral, true, false);
                         if (string.IsNullOrEmpty(l2)) {
                             UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow?.Row, CursorPosRow?.Chapter, true);
                         } else {
@@ -1449,7 +1455,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         _isinKeyDown = false;
                         return;
                     }
-                    var l = CellCollection.ErrorReason(CursorPosColumn, CursorPosRow?.Row, ErrorReason.EditGeneral);
+                    var l = CellCollection.EditableErrorReason(CursorPosColumn, CursorPosRow?.Row, EditableErrorReason.EditGeneral, true, false);
                     if (string.IsNullOrEmpty(l)) {
                         UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow?.Row, CursorPosRow?.Chapter, true);
                     } else {
@@ -1536,7 +1542,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                                 _isinKeyDown = false;
                                 return;
                             }
-                            var l2 = CellCollection.ErrorReason(CursorPosColumn, CursorPosRow?.Row, ErrorReason.EditAcut);
+                            var l2 = CellCollection.EditableErrorReason(CursorPosColumn, CursorPosRow?.Row, EditableErrorReason.EditAcut, true, false);
                             if (string.IsNullOrEmpty(l2)) {
                                 UserEdited(this, ntxt, CursorPosColumn, CursorPosRow?.Row, CursorPosRow?.Chapter, true);
                             } else {
@@ -1576,7 +1582,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     } else {
                         _collapsed.Add(rc);
                     }
-                    Invalidate_sortedRowDatax();
+                    Invalidate_sortedRowData();
                 }
             }
             _ = EnsureVisible(_mouseOverColumn, _mouseOverRow);
@@ -1732,7 +1738,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             CurrentArrangement?.Invalidate_DrawWithOfAllItems();
             _isinSizeChanged = false;
         }
-        Invalidate_sortedRowDatax(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
+        Invalidate_sortedRowData(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
@@ -1848,7 +1854,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (string.IsNullOrEmpty(cancelReason)) {
             if (row == null) {
-                var f = CellCollection.ErrorReason(column.Database.Column.First(), null, ErrorReason.EditGeneral);
+                var f = CellCollection.EditableErrorReason(column.Database.Column.First(), null, EditableErrorReason.EditGeneral, true, false);
                 if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
                 row = column.Database.Row.GenerateAndAdd(newValue, "Neue Zeile über Tabellen-Ansicht");
                 if (table.Database == column.Database) {
@@ -1864,7 +1870,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     table.CursorPos_Set(table?.View_ColumnFirst(), rd, true);
                 }
             } else {
-                var f = CellCollection.ErrorReason(column, row, ErrorReason.EditGeneral);
+                var f = CellCollection.EditableErrorReason(column, row, EditableErrorReason.EditGeneral, true, false);
                 if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
                 row.CellSet(column, newValue);
             }
@@ -1892,7 +1898,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Invalidate_FilteredRows();
             }
         }
-        Invalidate_sortedRowDatax(); // Zeichenhöhe kann sich ändern...
+        Invalidate_sortedRowData(); // Zeichenhöhe kann sich ändern...
 
         Invalidate_DrawWidth(e.Column);
 
@@ -1949,7 +1955,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void _Database_RowRemoved(object sender, System.EventArgs e) => Invalidate_FilteredRows();
 
-    private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_sortedRowDatax();
+    private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_sortedRowData();
 
     private void _Database_StoreView(object sender, System.EventArgs e) =>
             //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
@@ -2138,14 +2144,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         ColumnItem? contentHolderCellColumn;
         RowItem? contentHolderCellRow;
 
-        //if (Database.ReloadNeeded) { Database.Load_Reload(); }
-
-        var f = Database.ErrorReason(ErrorReason.EditGeneral);
+        var f = CellCollection.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, EditableErrorReason.EditGeneral, true, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
         if (cellInThisDatabaseColumn == null) { return; }// Klick ins Leere
 
-        var viewItem = CurrentArrangement[cellInThisDatabaseColumn];
-        if (viewItem == null) {
+        if (CurrentArrangement is not ColumnViewCollection ca || ca[cellInThisDatabaseColumn] is not ColumnViewItem viewItem) {
             NotEditableInfo("Ansicht veraltet");
             return;
         }
@@ -2153,7 +2156,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (cellInThisDatabaseColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             (contentHolderCellColumn, contentHolderCellRow, var info) = CellCollection.LinkedCellData(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, true, true);
             if (contentHolderCellColumn == null || contentHolderCellRow == null) {
-                NotEditableInfo("In verknüpfter Datenbank nicht vorhanden:\r\n" + info);
+                NotEditableInfo("In verknüpfter Datenbank nicht vorhanden:\r\n" + info); // Doppelte Prüfung
                 return;
             }
         } else {
@@ -2161,16 +2164,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             contentHolderCellRow = cellInThisDatabaseRow?.Row;
         }
 
-        if (!contentHolderCellColumn.DropdownBearbeitungErlaubt) { withDropDown = false; }
-        var dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, withDropDown);
-        if (dia == EditTypeTable.None) {
-            NotEditableInfo("Diese Spalte kann generell nicht bearbeitet werden.");
-            return;
-        }
-        if (!CellCollection.UserEditPossible(contentHolderCellColumn, contentHolderCellRow, ErrorReason.EditGeneral)) {
-            NotEditableInfo(CellCollection.ErrorReason(contentHolderCellColumn, contentHolderCellRow, ErrorReason.EditGeneral));
-            return;
-        }
         if (cellInThisDatabaseRow != null) {
             if (!EnsureVisible(cellInThisDatabaseColumn, cellInThisDatabaseRow)) {
                 NotEditableInfo("Zelle konnte nicht angezeigt werden.");
@@ -2210,6 +2203,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             NotEditableInfo(cancel);
             return;
         }
+
+        var dia = ColumnItem.UserEditDialogTypeInTable(contentHolderCellColumn, withDropDown);
+
         switch (dia) {
             case EditTypeTable.Textfeld:
                 _ = Cell_Edit_TextBox(cellInThisDatabaseColumn, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
@@ -3045,7 +3041,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void Invalidate_sortedRowDatax() {
+    private void Invalidate_sortedRowData() {
         _sortedRowData = null;
         Invalidate();
     }
@@ -3128,7 +3124,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnViewChanged() {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
-        Invalidate_sortedRowDatax(); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
+        Invalidate_sortedRowData(); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
     }
 
     private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
@@ -3285,7 +3281,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
 
-        return CellCollection.UserEditPossible(fc, null, ErrorReason.EditNormaly);
+        return string.IsNullOrEmpty(CellCollection.EditableErrorReason(fc, null, EditableErrorReason.EditNormaly, true, true));
     }
 
     #endregion

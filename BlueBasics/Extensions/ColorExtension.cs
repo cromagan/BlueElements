@@ -156,6 +156,8 @@ public static partial class Extensions {
 
     public static bool IsNearWhite(this Color col, double minBrightness) => col.ToArgb() == -1 || col.A == 0 || col.GetBrightness() >= minBrightness;
 
+    public static Color MakeTransparent(this Color color, byte alpha) => Color.FromArgb(alpha, color.R, color.G, color.B);
+
     public static Color MixColor(this Color color1, Color color2, double color1Prozent) {
         if (color1Prozent > 1) { color1Prozent = 1; }
         if (color1Prozent < 0) { color1Prozent = 0; }

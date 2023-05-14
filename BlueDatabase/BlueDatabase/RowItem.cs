@@ -386,7 +386,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="eventname"></param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", false, "Allgemein"); }
+        var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReason.EditAcut);
+        if (string.IsNullOrEmpty(m) || Database == null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
+
         var t = DateTime.Now;
         do {
             var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, changevalues);
@@ -493,7 +495,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly || column == null) { return; }
+        var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReason.EditAcut);
+        if (string.IsNullOrEmpty(m) || Database == null || column == null) { return; }
 
         var columnVar = vars.Get(column.Name);
         if (columnVar == null || columnVar.ReadOnly) { return; }
@@ -572,9 +575,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     private ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich, da die Datenbank schreibgeschützt ist", false, "Allgemein"); }
+        var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReason.EditAcut);
+        if (string.IsNullOrEmpty(m) || Database == null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
 
-        var feh = Database.ErrorReason(ErrorReason.EditAcut);
+        var feh = Database.EditableErrorReason(EditableErrorReason.EditAcut);
         if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true, "Allgemein"); }
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln

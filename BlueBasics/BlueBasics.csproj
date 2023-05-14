@@ -109,7 +109,7 @@
     <Compile Include="FormatHolder.cs" />
     <Compile Include="ImageMatrix.cs" />
     <Compile Include="Enums\BlurType.cs" />
-    <Compile Include="Enums\ErrorReason.cs" />
+    <Compile Include="Enums\EditableErrorReason.cs" />
     <Compile Include="EventArgs\NeedImageEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />
     <Compile Include="Cryptogaphy.cs" />

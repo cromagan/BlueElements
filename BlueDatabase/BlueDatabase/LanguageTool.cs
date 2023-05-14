@@ -19,8 +19,10 @@
 
 using System;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using BlueScript.Structures;
 
 namespace BlueDatabase;
 
@@ -103,7 +105,8 @@ public static class LanguageTool {
             txt = txt.Replace("\r\n", "\r");
             var r = Translation.Row[txt];
             if (r == null) {
-                if (Translation.ReadOnly) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
+                var m = Translation.EditableErrorReason(EditableErrorReason.EditAcut);
+                if (!string.IsNullOrEmpty(m)) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
                 if (!mustTranslate) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
                 r = Translation.Row.GenerateAndAdd(txt, "Missing translation");
                 if (r == null) { return args.GetUpperBound(0) < 0 ? txt : string.Format(txt, args); }

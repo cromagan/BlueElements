@@ -37,7 +37,7 @@ public sealed class QuickImage : IReadableText, IStringable {
 
     private static readonly ConcurrentDictionary<string, QuickImage> Pics = new();
 
-    private Bitmap? _bitmap;
+    private readonly Bitmap _bitmap;
 
     #endregion
 
@@ -46,7 +46,7 @@ public sealed class QuickImage : IReadableText, IStringable {
     /// <summary>
     /// QuickImages werden immer in den Speicher für spätere Zugriffe aufgenommen!
     /// </summary>
-    public QuickImage(string imageCode, bool generate) : base() {
+    public QuickImage(string imageCode) : base() {
         var w = (imageCode + "||||||||||").Split('|');
         Name = w[0];
         var width = -1;
@@ -70,14 +70,18 @@ public sealed class QuickImage : IReadableText, IStringable {
         //Code = GenerateCode(Name, width, height, Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol);
         Code = imageCode;
 
-        if (generate) { Generate(); }
+        (_bitmap, IsError) = Generate();
     }
 
     /// <summary>
     /// QuickImages werden immer in den Speicher für spätere Zugriffe aufgenommen!
     /// </summary>
     public QuickImage(string imagecode, Bitmap? bmp) {
-        if (string.IsNullOrEmpty(imagecode)) { return; }
+        if (string.IsNullOrEmpty(imagecode)) {
+            _bitmap = GenerateErrorImage(5, 5);
+            IsError = true;
+            return;
+        }
 
         if (Exists(imagecode)) { Develop.DebugPrint(FehlerArt.Warnung, "Doppeltes Bild:" + imagecode); }
         if (imagecode.Contains("|")) { Develop.DebugPrint(FehlerArt.Warnung, "Fehlerhafter Name:" + imagecode); }
@@ -94,7 +98,8 @@ public sealed class QuickImage : IReadableText, IStringable {
         _ = Pics.TryAdd(Code, this);
 
         if (bmp == null) {
-            GenerateErrorImage();
+            _bitmap = GenerateErrorImage(Width, Height);
+            IsError = true;
         } else {
             _bitmap = bmp.CloneFromBitmap();
         }
@@ -230,16 +235,24 @@ public sealed class QuickImage : IReadableText, IStringable {
         return c.ToString().TrimEnd('|');
     }
 
+    public static Bitmap GenerateErrorImage(int width, int height) {
+        var bmp = new Bitmap(width, height);
+
+        using var gr = Graphics.FromImage(bmp);
+        gr.Clear(Color.Black);
+        gr.DrawLine(new Pen(Color.Red, 3), 0, 0, width - 1, height - 1);
+        gr.DrawLine(new Pen(Color.Red, 3), width - 1, 0, 0, height - 1);
+        return bmp;
+    }
+
     public static QuickImage Get(QuickImage imageCode, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? imageCode
-        : Get(GenerateCode(imageCode.Name, imageCode.Width, imageCode.Height, imageCode.Effekt | additionalState, imageCode.Färbung, imageCode.ChangeGreenTo, imageCode.Sättigung, imageCode.Helligkeit, imageCode.DrehWinkel, imageCode.Transparenz, imageCode.Zweitsymbol));
+            : Get(GenerateCode(imageCode.Name, imageCode.Width, imageCode.Height, imageCode.Effekt | additionalState, imageCode.Färbung, imageCode.ChangeGreenTo, imageCode.Sättigung, imageCode.Helligkeit, imageCode.DrehWinkel, imageCode.Transparenz, imageCode.Zweitsymbol));
 
     public static QuickImage Get(string imageCode) {
         //if (imageCode == null || string.IsNullOrWhiteSpace(imageCode)) { return null; }
 
-        QuickImage x;
-
         if (Pics.TryGetValue(imageCode, out var p)) { return p; }
-        x = new QuickImage(imageCode, false);
+        var x = new QuickImage(imageCode);
 
         if (Pics.Count == 0) {
             System.Windows.Data.BindingOperations.EnableCollectionSynchronization(Pics, new object());
@@ -270,20 +283,9 @@ public sealed class QuickImage : IReadableText, IStringable {
 
     public static QuickImage Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
 
-    public static implicit operator Bitmap?(QuickImage? p) => p?._bitmap;
+    public static implicit operator Bitmap(QuickImage p) => p._bitmap;
 
     public string CompareKey() => ToString();
-
-    public void GenerateErrorImage() {
-        IsError = true;
-
-        _bitmap = new Bitmap(Width, Height);
-
-        using var gr = Graphics.FromImage(_bitmap);
-        gr.Clear(Color.Black);
-        gr.DrawLine(new Pen(Color.Red, 3), 0, 0, Width - 1, Height - 1);
-        gr.DrawLine(new Pen(Color.Red, 3), Width - 1, 0, 0, Height - 1);
-    }
 
     public void OnNeedImage(NeedImageEventArgs e) => NeedImage?.Invoke(this, e);
 
@@ -297,7 +299,7 @@ public sealed class QuickImage : IReadableText, IStringable {
         return Get(GenerateCode(Name, (int)(Width * zoom), (int)(Height * zoom), Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol));
     }
 
-    public QuickImage? SymbolForReadableText() => this;
+    public QuickImage SymbolForReadableText() => this;
 
     /// <summary>
     /// Gibt den ImageCode zurück
@@ -324,14 +326,13 @@ public sealed class QuickImage : IReadableText, IStringable {
         }
     }
 
-    private void Generate() {
+    private (Bitmap bmp, bool isError) Generate() {
         var bmpOri = GetBitmap(Name);
 
         #region Fehlerhaftes Bild erzeugen
 
         if (bmpOri == null) {
-            GenerateErrorImage();
-            return;
+            return (GenerateErrorImage(Width, Height), true);
         }
 
         #endregion
@@ -339,8 +340,7 @@ public sealed class QuickImage : IReadableText, IStringable {
         #region Bild ohne besonderen Effekte, schnell abhandeln
 
         if (Effekt == ImageCodeEffect.Ohne && string.IsNullOrEmpty(ChangeGreenTo) && string.IsNullOrEmpty(Färbung) && Sättigung == 100 && Helligkeit == 100 && Transparenz == 100 && string.IsNullOrEmpty(Zweitsymbol)) {
-            _bitmap = bmpOri.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
-            return;
+            return (bmpOri.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false), false);
         }
 
         #endregion
@@ -431,7 +431,7 @@ public sealed class QuickImage : IReadableText, IStringable {
 
         #endregion
 
-        _bitmap = bmpTmp.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
+        return (bmpTmp.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false), false);
     }
 
     private Bitmap? GetBitmap(string tmpname) {

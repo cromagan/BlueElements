@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using BlueBasics;
 using BlueControls.Controls;
@@ -29,9 +28,6 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueBasics.Enums;
 using System.ComponentModel;
 using BlueBasics.Interfaces;
-using BlueDatabase.AdditionalScriptComands;
-using BlueScript.Structures;
-using BlueScript.Variables;
 
 namespace BlueControls.Interfaces;
 

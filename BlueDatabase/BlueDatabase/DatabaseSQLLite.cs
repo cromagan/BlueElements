@@ -60,7 +60,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     public DatabaseSqlLite(ConnectionInfo ci, string userGroup) : this(((DatabaseSqlLite?)ci.Provider)?._sql, false, ci.TableName, userGroup) { }
 
-    public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnly, string tablename, string userGroup) : base(readOnly, userGroup) {
+    public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnlyx, string tablename, string userGroup) : base(readOnlyx, userGroup) {
         if (sql == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL-Verbindung übergeben: " + tablename);
             return;
@@ -164,6 +164,19 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return null;
     }
 
+    public override string EditableErrorReason(EditableErrorReason mode) {
+        var m = base.EditableErrorReason(mode);
+        if (!string.IsNullOrEmpty(m)) { return m; }
+
+        if (_sql == null) { return "Keine SQL-Verbindung vorhanden"; }
+
+        if (mode is BlueBasics.Enums.EditableErrorReason.OnlyRead or BlueBasics.Enums.EditableErrorReason.Load) { return string.Empty; }
+
+        if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Immer abfragen, da Änderungen direkt gespeichert werden
+
+        return string.Empty;
+    }
+
     public override void RefreshColumnsData(List<ColumnItem>? columns) {
         if (columns == null || columns.Count == 0) { return; }
 
@@ -261,21 +274,27 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         if (type.IsObsolete()) { return string.Empty; }
 
-        if (!isLoading && !ReadOnly) {
+        if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
+
+        if (!isLoading) {
             _ = _sql?.SetValueInternal(TableName, type, value, column?.Name, row?.Key);
         }
 
         return base.SetValueInternal(type, value, column, row, isLoading);
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) {
+    protected override void AddUndo(string tableName, DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) {
+        if (IsDisposed) { return; }
+        if (type.IsObsolete()) { return; }
+        if (ReadOnly) { return; } // Sicherheitshalber!
+
         var columnName = column?.Name ?? string.Empty;
         var rowkey = row?.Key ?? -1;
 
-        var err = _sql?.AddUndo(tableName, comand, columnName, rowkey, previousValue, changedTo, UserName, comment);
+        var err = _sql?.AddUndo(tableName, type, columnName, rowkey, previousValue, changedTo, UserName, comment);
         if (!string.IsNullOrEmpty(err)) {
             Develop.CheckStackForOverflow();
-            AddUndo(tableName, comand, column, row, previousValue, changedTo, userName, comment);
+            AddUndo(tableName, type, column, row, previousValue, changedTo, userName, comment);
         }
     }
 
@@ -445,9 +464,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 }
             }
 
-            var x = RefreshRowData(rk, true, null);
-            if (!string.IsNullOrEmpty(x.errormessage)) {
-                OnDropMessage(FehlerArt.Fehler, x.errormessage);
+            var (_, errormessage) = RefreshRowData(rk, true, null);
+            if (!string.IsNullOrEmpty(errormessage)) {
+                OnDropMessage(FehlerArt.Fehler, errormessage);
             }
         } catch {
             DoLastChanges(data);

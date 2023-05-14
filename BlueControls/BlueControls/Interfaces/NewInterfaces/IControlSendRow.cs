@@ -27,13 +27,19 @@ using BlueDatabase;
 namespace BlueControls.Interfaces;
 
 public interface IControlSendRow : IControlSendSomething, IDisposableExtended {
+
+    #region Methods
+
+    public void ChildAdd(IControlAcceptRow c);
+
+    #endregion
 }
 
 public static class IControlSendRowExtension {
 
     #region Methods
 
-    public static void DoChilds(this IControlSendRow item, List<IControlAcceptSomething> childs, RowItem? row) {
+    public static void DoChilds(this IControlSendRow item, List<IControlAcceptRow> childs, RowItem? row) {
         if (row != null && row.Database != item.OutputDatabase) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
             row = null;
@@ -42,28 +48,24 @@ public static class IControlSendRowExtension {
         row?.CheckRowDataIfNeeded();
 
         foreach (var thischild in childs) {
-            var did = false;
+            thischild.GetRowFrom = item;
+            thischild.SetData(item.OutputDatabase, row?.Key);
 
-            if (!did && thischild is IControlAcceptRow fcfc) {
-                fcfc.GetRowFrom = item;
-                fcfc.SetData(item.OutputDatabase, row?.Key);
-                did = true;
-            }
+            //if (thischild is IDisabledReason id) {
+            //    if (!did) {
+            //        id.DeleteValue();
+            //        id.DisabledReason = "Keine Befüllmethode bekannt.";
+            //        did = true;
+            //    }
+            //}
 
-            if (thischild is IDisabledReason id) {
-                if (!did) {
-                    id.DeleteValue();
-                    id.DisabledReason = "Keine Befüllmethode bekannt.";
-                    did = true;
-                }
-            }
-
-            if (!did) { Develop.DebugPrint(FehlerArt.Warnung, "Typ unbekannt"); }
+            //if (!did) { Develop.DebugPrint(FehlerArt.Warnung, "Typ unbekannt"); }
         }
     }
 
     public static void DoOutputSettings(this IControlSendRow dest, ConnectedFormulaView parent, IItemSendRow source) {
         dest.Name = source.DefaultItemToControlName();
+        dest.OutputDatabase = source.OutputDatabase;
     }
 
     #endregion

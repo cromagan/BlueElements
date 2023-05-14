@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -99,13 +98,17 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
 
-        l.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
-        l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
+        if (Bei_Export_sichtbar) {
 
-        l.Add(new FlexiControlForDelegate(Sichtbarkeit, "Sichtbarkeit", ImageCode.Schild));
+            l.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
+            l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+            l.Add(new FlexiControlForDelegate(Sichtbarkeit, "Sichtbarkeit", ImageCode.Schild));
+
+        }
+
+        //l.Add(new FlexiControl());
+        //l.AddRange(base.GetStyleOptions());
         return l;
     }
 
@@ -176,7 +179,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         SetCoordinates(x, true);
     }
 
-    public abstract QuickImage? SymbolForReadableText();
+    public abstract QuickImage SymbolForReadableText();
 
     public override string ToString() {
         var result = new List<string>();
@@ -265,17 +268,31 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         DrawArrow(gr, positionModified, zoom, symbol, colorId, Alignment.Bottom_HorizontalCenter, arrowY, symbolY, 0);
     }
 
-    protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, List<int>? id, bool drawSymbol, bool drawText) {
-        gr.FillRectangle(Brushes.White, drawingCoordinates);
+    protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, List<int>? id, bool drawSymbol, bool drawText, bool transparent) {
+        if (!transparent) {
+            gr.FillRectangle(Brushes.White, drawingCoordinates);
+        }
 
         var w = zoom * 3;
 
         var tmp = drawingCoordinates;
         tmp.Inflate(-w, -w);
 
-        gr.DrawRectangle(new Pen(Skin.IdColor(id).Brighten(0.9), w * 2), tmp);
+        var c = Skin.IdColor(id);
+        var c2 = c;
 
-        gr.DrawRectangle(new Pen(Skin.IdColor(id).Brighten(0.6), zoom), drawingCoordinates);
+        if (c.IsNearWhite(0.99)) {
+            c2 = Color.Gray;
+        }
+
+
+        if (transparent) {
+            gr.DrawRectangle(new Pen(c.Brighten(0.9).MakeTransparent(128), w * 2), tmp);
+            gr.DrawRectangle(new Pen(c2.Brighten(0.6).MakeTransparent(128), zoom), drawingCoordinates);
+        } else {
+            gr.DrawRectangle(new Pen(c.Brighten(0.9), w * 2), tmp);
+            gr.DrawRectangle(new Pen(c2.Brighten(0.6), zoom), drawingCoordinates);
+        }
 
         if (drawSymbol && drawText) {
             var v2 = SymbolForReadableText().Scale(zoom);

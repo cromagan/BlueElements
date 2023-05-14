@@ -294,7 +294,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         OnChanged();
     }
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
@@ -322,7 +322,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false, false);
         }
 
         if (Column == null) {

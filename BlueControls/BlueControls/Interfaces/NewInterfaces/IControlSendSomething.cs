@@ -31,12 +31,6 @@ public interface IControlSendSomething {
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
-
-    #region Methods
-
-    public void ChildAdd(IControlAcceptSomething c);
-
-    #endregion
 }
 
 public static class IControlSendSomethingExtension {

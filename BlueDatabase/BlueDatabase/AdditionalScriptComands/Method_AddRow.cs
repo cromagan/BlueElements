@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using BlueBasics.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -59,7 +60,8 @@ public class Method_AddRow : Method_Database {
         var db = DatabaseOf(s.Variables, attvar.ValueString(0));
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueString(0) + "' nicht gefunden"); }
 
-        if (db?.ReadOnly ?? true) { return new DoItFeedback(infos.Data, "Datenbank schreibgeschützt."); }
+        var m = db.EditableErrorReason(EditableErrorReason.EditAcut);
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
 
         if (string.IsNullOrEmpty(attvar.ValueString(1))) { return new DoItFeedback(infos.Data, "KeyValue muss einen Wert enthalten."); }
         //var r = db.Row[attvar.ValueString(1)];

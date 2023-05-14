@@ -41,6 +41,10 @@ public sealed class Database : DatabaseAbstract {
 
     private readonly string _tablename = string.Empty;
 
+    private string _canWriteError = string.Empty;
+    private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
+    private string _editNormalyError = string.Empty;
+    private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private bool _isIn_Save = false;
 
     #endregion
@@ -55,7 +59,7 @@ public sealed class Database : DatabaseAbstract {
 
     public Database(string filename, bool readOnly, bool create, NeedPassword? needPassword, string userGroup) : this(null, filename, readOnly, create, filename.FileNameWithoutSuffix(), needPassword, userGroup) { }
 
-    private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword, string userGroup) : base(readOnly, userGroup) {
+    private Database(Stream? stream, string filename, bool readOnlyx, bool create, string tablename, NeedPassword? needPassword, string userGroup) : base(readOnlyx, userGroup) {
         //Develop.StartService();
 
         Works = new List<WorkItem>();
@@ -612,6 +616,61 @@ public sealed class Database : DatabaseAbstract {
         return new ConnectionInfo(SqlBackAbstract.MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
     }
 
+    public override string EditableErrorReason(EditableErrorReason mode) {
+        var m = base.EditableErrorReason(mode);
+        if (!string.IsNullOrEmpty(m)) { return m; }
+
+        //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
+        if (mode.HasFlag(BlueBasics.Enums.EditableErrorReason.Load) || mode.HasFlag(BlueBasics.Enums.EditableErrorReason.LoadForCheckingOnly)) {
+            if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
+        }
+
+        //----------Alle Edits und Save ------------------------------------------------------------------------
+        //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
+        //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
+        if (CheckForLastError(ref _editNormalyNextCheckUtc, ref _editNormalyError)) { return _editNormalyError; }
+        if (!string.IsNullOrEmpty(Filename)) {
+            if (!CanWriteInDirectory(Filename.FilePath())) {
+                _editNormalyError = "Sie haben im Verzeichnis der Datei keine Schreibrechte.";
+                return _editNormalyError;
+            }
+        }
+
+        //---------- Save ------------------------------------------------------------------------------------------
+        if (mode.HasFlag(BlueBasics.Enums.EditableErrorReason.Save)) {
+            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+            if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
+            if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
+            if (CheckForLastError(ref _canWriteNextCheckUtc, ref _canWriteError) && !string.IsNullOrEmpty(_canWriteError)) {
+                return _canWriteError;
+            }
+
+            try {
+                FileInfo f2 = new(Filename);
+                if (DateTime.UtcNow.Subtract(f2.LastWriteTimeUtc).TotalSeconds < 5) {
+                    _canWriteError = "Anderer Speichervorgang noch nicht abgeschlossen.";
+                    return _canWriteError;
+                }
+            } catch {
+                _canWriteError = "Dateizugriffsfehler.";
+                return _canWriteError;
+            }
+            if (!CanWrite(Filename, 0.5)) {
+                _canWriteError = "Windows blockiert die Datei.";
+                return _canWriteError;
+            }
+        }
+        return string.Empty;
+
+        // Gibt true zurück, wenn die letzte Prüfung noch gülig ist
+        static bool CheckForLastError(ref DateTime nextCheckUtc, ref string lastMessage) {
+            if (DateTime.UtcNow.Subtract(nextCheckUtc).TotalSeconds < 0) { return true; }
+            lastMessage = string.Empty;
+            nextCheckUtc = DateTime.UtcNow.AddSeconds(5);
+            return false;
+        }
+    }
+
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
@@ -640,7 +699,7 @@ public sealed class Database : DatabaseAbstract {
         //LoadingEventArgs ec = new(_initialLoadDone);
         OnLoading();
 
-        var bLoaded = LoadBytesFromDisk(BlueBasics.Enums.ErrorReason.Load);
+        var bLoaded = LoadBytesFromDisk(BlueBasics.Enums.EditableErrorReason.Load);
         if (bLoaded == null) { return; }
 
         Parse(bLoaded, this, Works, needPassword);
@@ -708,10 +767,6 @@ public sealed class Database : DatabaseAbstract {
     }
 
     public override bool Save() {
-        //if (InvokeRequired) {
-        //    return (bool)Invoke(new Func<bool>(Save));
-        //}
-
         if (_isIn_Save) { return false; }
 
         _isIn_Save = true;
@@ -799,14 +854,20 @@ public sealed class Database : DatabaseAbstract {
             }
         }
 
-        if (!isLoading && !ReadOnly) {
+        if (!isLoading) {
             HasPendingChanges = true;
         }
 
         return r;
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) => Works.Add(new WorkItem(comand, column, row, previousValue, changedTo, userName));
+    protected override void AddUndo(string tableName, DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) {
+        if (IsDisposed) { return; }
+        if (type.IsObsolete()) { return; }
+        // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
+
+        Works.Add(new WorkItem(type, column, row, previousValue, changedTo, userName));
+    }
 
     protected override void Initialize() {
         base.Initialize();
@@ -864,12 +925,12 @@ public sealed class Database : DatabaseAbstract {
     /// </summary>
     /// <param name="checkmode"></param>
     /// <returns></returns>
-    private byte[]? LoadBytesFromDisk(ErrorReason checkmode) {
+    private byte[]? LoadBytesFromDisk(EditableErrorReason checkmode) {
         var startTime = DateTime.UtcNow;
         byte[] bLoaded;
         while (true) {
             try {
-                var f = ErrorReason(checkmode);
+                var f = EditableErrorReason(checkmode);
                 if (string.IsNullOrEmpty(f)) {
                     //var tmpLastSaveCode1 = GetFileInfo(Filename, true);
                     bLoaded = File.ReadAllBytes(Filename);
@@ -901,7 +962,9 @@ public sealed class Database : DatabaseAbstract {
     }
 
     private bool SaveInternal() {
-        if (ReadOnly) { return false; }
+        var m = EditableErrorReason(BlueBasics.Enums.EditableErrorReason.Save);
+        if (!string.IsNullOrEmpty(m)) { return false; }
+
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
         if (!HasPendingChanges) { return false; }
@@ -931,7 +994,7 @@ public sealed class Database : DatabaseAbstract {
     }
 
     private string WriteTempFileToDisk() {
-        var f = ErrorReason(BlueBasics.Enums.ErrorReason.Save);
+        var f = EditableErrorReason(BlueBasics.Enums.EditableErrorReason.Save);
         if (!string.IsNullOrEmpty(f)) { return string.Empty; }
 
         var dataUncompressed = ToListOfByte(this, Works, 5000)?.ToArray();

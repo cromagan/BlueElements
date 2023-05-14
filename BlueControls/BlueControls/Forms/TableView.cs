@@ -112,7 +112,7 @@ public partial class TableView : FormWithStatusBar {
     #region Methods
 
     public static void CheckDatabase(object? sender, System.EventArgs e) {
-        if (sender is DatabaseAbstract database && !database.ReadOnly) {
+        if (sender is DatabaseAbstract database && string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(database, EditableErrorReason.EditAcut))) {
             if (database.IsAdministrator()) {
 
                 #region Spalten reparieren
@@ -147,6 +147,14 @@ public partial class TableView : FormWithStatusBar {
                 #endregion
             }
         }
+    }
+
+    public static bool ErrorMessage(DatabaseAbstract? database, EditableErrorReason mode) {
+        var m = DatabaseAbstract.EditableErrorReason(database, mode);
+        if (string.IsNullOrEmpty(m)) { return true; }
+
+        MessageBox.Show("Aktion nicht möglich:<br>" + m);
+        return false;
     }
 
     public static void OpenColumnEditor(ColumnItem? column, RowItem? row, Table? tableview) {
@@ -207,7 +215,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     public static void OpenLayoutEditor(DatabaseAbstract db, string layoutToOpen) {
-        var x = db.ErrorReason(ErrorReason.EditNormaly);
+        var x = db.EditableErrorReason(EditableErrorReason.EditNormaly);
         if (!string.IsNullOrEmpty(x)) {
             MessageBox.Show(x);
             return;
@@ -534,7 +542,7 @@ public partial class TableView : FormWithStatusBar {
 
         tbl.Database.Cell.DataOfCellKey(cellKey, out var column, out var row);
 
-        var editable = string.IsNullOrEmpty(CellCollection.ErrorReason(column, row, ErrorReason.EditNormaly));
+        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReason.EditNormaly, true, false));
 
         if (_ansicht != Ansicht.Überschriften_und_Formular) {
             _ = e.UserMenu.Add("Info", true);
@@ -588,7 +596,7 @@ public partial class TableView : FormWithStatusBar {
             valueCol0 = row.CellFirstString();
         }
 
-        var editable = string.IsNullOrEmpty(CellCollection.ErrorReason(column, row, ErrorReason.EditAcut));
+        //var editable = string.IsNullOrEmpty(CellCollection.ErrorReason(column, row, ErrorReason.EditAcut));
 
         var ev = (e.ClickedComand + "|").SplitAndCutBy("|");
 
@@ -622,17 +630,12 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "ZeileLöschen":
-                if (tbl.Database.ReadOnly) {
-                    return;
-                }
 
-                if (!tbl.Database.IsAdministrator()) {
-                    return;
-                }
+                if (TableView.ErrorMessage(tbl.Database, EditableErrorReason.EditGeneral)) { return; }
 
-                if (row == null) {
-                    return;
-                }
+                if (!tbl.Database.IsAdministrator()) { return; }
+
+                if (row == null) { return; }
 
                 if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja",
                         "Nein") == 0) {
@@ -642,7 +645,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "ContentDelete":
-                if (!editable) { return; }
+                if (TableView.ErrorMessage(tbl.Database, EditableErrorReason.EditGeneral)) { return; }
 
                 tbl.Database.Cell.Delete(column, row.Key);
                 break;
@@ -688,7 +691,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "VorherigenInhaltWiederherstellen":
-                if (!editable) { return; }
+                if (TableView.ErrorMessage(tbl.Database, EditableErrorReason.EditGeneral)) { return; }
 
                 Table.DoUndo(column, row);
                 break;
@@ -1069,7 +1072,9 @@ public partial class TableView : FormWithStatusBar {
             return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
         }
 
-        if (Table.Design != BlueTableAppearance.Standard || !Table.Enabled || Table.Database.ReadOnly) {
+        var m = DatabaseAbstract.EditableErrorReason(Table.Database, BlueBasics.Enums.EditableErrorReason.EditGeneral);
+
+        if (Table.Design != BlueTableAppearance.Standard || !Table.Enabled || !string.IsNullOrEmpty(m)) {
             enTabellenAnsicht = false;
         }
 

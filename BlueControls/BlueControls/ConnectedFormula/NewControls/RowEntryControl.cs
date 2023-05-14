@@ -28,7 +28,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
 
     #region Fields
 
-    private readonly List<IControlAcceptSomething> _childs = new();
+    private readonly List<IControlAcceptRow> _childs = new();
 
     private IControlSendRow? _getRowFrom = null;
 
@@ -62,7 +62,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
 
     #region Methods
 
-    public void ChildAdd(IControlAcceptSomething c) {
+    public void ChildAdd(IControlAcceptRow c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
         this.DoChilds(_childs, LastInputRow);

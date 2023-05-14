@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueBasics.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -55,7 +56,10 @@ internal class Method_ImportCSV : Method_Database {
 
         var db = MyDatabase(s.Variables);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
-        if (db?.ReadOnly ?? true) { return new DoItFeedback(infos.Data, "Datenbank schreibgeschützt."); }
+
+        var m = db.EditableErrorReason(EditableErrorReason.EditAcut);
+        if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
+
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Import im Testmodus deaktiviert."); }
 
         var sx = db?.Import(txt, true, true, sep, false, false, true);

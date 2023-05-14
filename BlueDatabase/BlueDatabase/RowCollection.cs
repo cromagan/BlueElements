@@ -346,8 +346,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         try {
             while (_pendingworker.Count < 5) {
-                if (IsDisposed) { break; }
-                if (Database.ReadOnly) { break; }
+                if (Database == null || Database.IsDisposed || IsDisposed) { break; }
                 if (!Database.LogUndo) { break; }
                 if (_pendingChangedBackgroundRow.Count == 0) { break; }
 
@@ -374,14 +373,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public string ExecuteScript(EventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem>? pinned, bool fullCheck, bool changevalues) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return "Datenbank schreibgeschützt."; }
+        var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReason.EditGeneral);
+        if (string.IsNullOrEmpty(m) || Database == null) { return m; }
 
         var rows = CalculateVisibleRows(filter, pinned);
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
-
         Database.RefreshRowData(rows, false, null);
-
 
         var txt = "Skript wird ausgeführt: " + scriptname;
 

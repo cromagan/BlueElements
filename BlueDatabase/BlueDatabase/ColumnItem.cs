@@ -1099,9 +1099,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo, bool changeWidth) {
-        if (source.Database != null && !source.Database.ReadOnly) {
-            source.Repair();
-        }
+        if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReason.EditAcut))) { return; }
+
+        if (source.Database != null) { source.Repair(); }
 
         if (nameAndKeyToo) {
             Name = source.Name;
@@ -1533,8 +1533,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public void Repair() {
+        if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReason.EditAcut)) || Database == null) { return; }
+
         if (Database == null || Database.IsDisposed) { return; }
-        if (Database.ReadOnly) { return; }
+
         // Unbekannt = -1,
         // Nothing = 0,
         //    Text = 1,
@@ -1731,9 +1733,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             case "SYS_DATECREATED":
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
-                if (Database != null && !Database.ReadOnly) {
-                    this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-                }
+
+                this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+
                 if (setOpticalToo) {
                     Caption = "Erstell-Datum";
                     ForeColor = Color.FromArgb(0, 0, 128);
@@ -1747,9 +1749,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 _showUndo = false;
-                if (Database != null && !Database.ReadOnly) {
-                    this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-                }
+
+                this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+
                 _textBearbeitungErlaubt = false;
                 _spellCheckingEnabled = false;
                 _dropdownBearbeitungErlaubt = false;

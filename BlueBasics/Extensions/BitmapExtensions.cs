@@ -31,24 +31,16 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static Bitmap? CloneFromBitmap(this Bitmap? bmp) {
-        if (bmp == null) { return null; }
-
-        var tim = DateTime.Now;
-
-        do {
-            try { // wird an anderer stelle verwendet
-                var bitmap = new Bitmap(bmp.Width, bmp.Height);
-                using var gr = Graphics.FromImage(bitmap);
-                gr.DrawImage(bmp, new Rectangle(0, 0, bmp.Width, bmp.Height));
-                return bitmap;
-            } catch (Exception ex) {
-                if (DateTime.Now.Subtract(tim).TotalSeconds > 5) {
-                    Develop.DebugPrint("Bild konnte nicht geklont werden", ex);
-                    return null;
-                }
-            }
-        } while (true);
+    public static Bitmap CloneFromBitmap(this Bitmap bmp) {
+        try { // wird an anderer stelle verwendet
+            var bitmap = new Bitmap(bmp.Width, bmp.Height);
+            using var gr = Graphics.FromImage(bitmap);
+            gr.DrawImage(bmp, new Rectangle(0, 0, bmp.Width, bmp.Height));
+            return bitmap;
+        } catch {
+            Develop.CheckStackForOverflow();
+            return bmp.CloneFromBitmap();
+        }
     }
 
     public static Bitmap? GetEmmbedBitmap(Assembly assembly, string name) {
@@ -90,78 +82,85 @@ public static partial class Extensions {
         }
     }
 
-    public static Bitmap? Resize(this Bitmap? bmp, int width, int height, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
-        if (bmp == null) { return null; }
-        if (width < 1 && height < 1) { return null; }
+    public static Bitmap Resize(this Bitmap bmp, int maxwidth, int maxheight, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
         if (collectGarbage) { Generic.CollectGarbage(); }
-        if (width < 1) { width = 1; }
-        if (height < 1) { height = 1; }
-        var scale = Math.Min(width / (double)bmp.Width, height / (double)bmp.Height);
+        if (maxwidth < 1) { maxwidth = 1; }
+        if (maxheight < 1) { maxheight = 1; }
+
+        var calcwidth = maxwidth;
+        var calcheight = maxheight;
 
         switch (sizeMode) {
             case SizeModes.EmptySpace:
-                break;
-
             case SizeModes.BildAbschneiden:
+                var scale3 = Math.Min(maxwidth / (double)bmp.Width, maxheight / (double)bmp.Height);
+                calcwidth = (int)(scale3 * bmp.Width);
+                calcheight = (int)(scale3 * bmp.Height);
                 break;
 
             case SizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
-                // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                width = (int)(scale * bmp.Width);
-                height = (int)(scale * bmp.Height);
+                var scale1 = Math.Min(maxwidth / (double)bmp.Width, maxheight / (double)bmp.Height);
+                maxwidth = (int)(scale1 * bmp.Width);
+                maxheight = (int)(scale1 * bmp.Height);
                 break;
 
             case SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
-                // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                if (scale >= 1) { return bmp; }
-                width = (int)(scale * bmp.Width);
-                height = (int)(scale * bmp.Height);
+                var scale2 = Math.Min(maxwidth / (double)bmp.Width, maxheight / (double)bmp.Height);
+                if (scale2 >= 1) { scale2 = 1; }
+                maxwidth = (int)(scale2 * bmp.Width);
+                maxheight = (int)(scale2 * bmp.Height);
                 break;
 
             case SizeModes.Verzerren:
-                scale = 1; // Dummy setzen
+                calcwidth = maxwidth;
+                calcheight = maxheight;
                 break;
 
             default:
                 Develop.DebugPrint(sizeMode);
-                return null;
+                calcwidth = maxwidth;
+                calcheight = maxheight;
+                break;
         }
-        var nw = (int)(bmp.Width * scale);
-        var nh = (int)(bmp.Height * scale);
-        if (sizeMode == SizeModes.Verzerren) {
-            nw = width;
-            nh = height;
+
+        // Um abstürzte zu vermeiden, einen Faktor berechnen
+        Bitmap tmp;
+
+        if (bmp.Width > 20000 && calcwidth < 4000) {
+            tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
+        } else if (bmp.Width > 15000 && calcwidth < 4000) {
+            tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
+        } else if (bmp.Width > 10000 && calcwidth < 2500) {
+            tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
+        } else if (bmp.Width > 8000 && calcwidth < 2000) {
+            tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
+        } else {
+            tmp = bmp;
         }
 
         try {
-            Bitmap imageResize = new(width, height); // Kein Format32bppPArgb --> Fehler
+            Bitmap imageResize = new(maxwidth, maxheight); // Kein Format32bppPArgb --> Fehler
             using var gr = Graphics.FromImage(imageResize);
             gr.InterpolationMode = interpolationMode;
             gr.PixelOffsetMode = PixelOffsetMode.Half;
             // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
-            if (bmp.Width > 20000 && nw < 4000) {
-                var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else if (bmp.Width > 15000 && nw < 4000) {
-                var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else if (bmp.Width > 10000 && nw < 2500) {
-                var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else if (bmp.Width > 8000 && nw < 2000) {
-                var tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else {
-                gr.DrawImage(bmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            }
 
+            gr.DrawImage(tmp, (int)((maxwidth - calcwidth) / 2.0), (int)((maxheight - calcheight) / 2.0), calcwidth, calcheight);
             return imageResize;
         } catch {
-            if (!collectGarbage) { Generic.CollectGarbage(); }
-            return sizeMode == SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern
-                ? (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero)
-                : null;
         }
+
+        try {
+            if (!collectGarbage) { Generic.CollectGarbage(); }
+
+            if (sizeMode == SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern) {
+                return (Bitmap)bmp.GetThumbnailImage(calcwidth, calcheight, null, IntPtr.Zero);
+            }
+        } catch { }
+
+        Develop.CheckStackForOverflow();
+        // Mit den modifizierten Werten nochmal probieren...
+        return tmp.Resize(maxheight, maxheight, sizeMode, interpolationMode, true);
     }
 
     #endregion

@@ -25,6 +25,7 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -328,7 +329,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
     }
 
     private void WriteInfosBack() {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; } // Disposed
+        if (TableView.ErrorMessage(Database, EditableErrorReason.EditAcut) || Database == null) { return; }
 
         //eventScriptEditor.WriteScriptBack();
         Database.GlobalShowPass = txbKennwort.Text;

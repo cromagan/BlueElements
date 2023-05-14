@@ -27,7 +27,6 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueDatabase;
-using static BlueBasics.Polygons;
 
 namespace BlueControls.ItemCollection;
 
@@ -147,9 +146,9 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
-            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(OutputColorId));
+            return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -174,7 +173,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
         if (!forPrinting) {
             DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

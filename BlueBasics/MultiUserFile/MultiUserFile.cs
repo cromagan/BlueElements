@@ -256,19 +256,19 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
     }
 
-    public string ErrorReason(ErrorReason mode) {
+    public string EditableErrorReason(EditableErrorReason mode) {
         if (IsDisposed) { return "Daten verworfen."; }
 
-        if (mode == Enums.ErrorReason.OnlyRead) { return string.Empty; }
+        if (mode == Enums.EditableErrorReason.OnlyRead) { return string.Empty; }
 
         //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
-        if (mode is Enums.ErrorReason.Load or Enums.ErrorReason.LoadForCheckingOnly) {
+        if (mode is Enums.EditableErrorReason.Load or Enums.EditableErrorReason.LoadForCheckingOnly) {
             if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
             var sec = AgeOfBlockDatei;
             if (sec is >= 0 and < 10) { return "Ein anderer Computer speichert gerade Daten ab."; }
         }
 
-        if (mode == Enums.ErrorReason.Load) {
+        if (mode == Enums.EditableErrorReason.Load) {
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 0.1) { return "Aktuell werden vom Benutzer Daten bearbeitet."; }  // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (_pureBinSaver.IsBusy) { return "Aktuell werden im Hintergrund Daten gespeichert."; }
             return string.Empty;
@@ -286,7 +286,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
 
         //----------EditAcut, EditGeneral ----------------------------------------------------------------------
-        if (mode.HasFlag(Enums.ErrorReason.EditAcut) || mode.HasFlag(Enums.ErrorReason.EditGeneral)) {
+        if (mode.HasFlag(Enums.EditableErrorReason.EditAcut) || mode.HasFlag(Enums.EditableErrorReason.EditGeneral)) {
             if (AgeOfBlockDatei > 60) {
                 _editNormalyError = "Eine Blockdatei ist anscheinend dauerhaft vorhanden. Administrator verständigen.";
                 return _editNormalyError;
@@ -299,12 +299,12 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
 
         //----------EditGeneral, Save------------------------------------------------------------------------------------------
-        if (mode.HasFlag(Enums.ErrorReason.EditGeneral) || mode.HasFlag(Enums.ErrorReason.Save)) {
+        if (mode.HasFlag(Enums.EditableErrorReason.EditGeneral) || mode.HasFlag(Enums.EditableErrorReason.Save)) {
             if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
         }
 
         //---------- Save ------------------------------------------------------------------------------------------
-        if (mode.HasFlag(Enums.ErrorReason.Save)) {
+        if (mode.HasFlag(Enums.EditableErrorReason.Save)) {
             if (IsLoading) { return "Speichern aktuell nicht möglich, da gerade Daten geladen werden."; }
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
@@ -400,7 +400,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
                 OnLoading(System.EventArgs.Empty);
 
-                var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(Enums.ErrorReason.Load);
+                var (bLoaded, tmpLastSaveCode) = LoadBytesFromDisk(Enums.EditableErrorReason.Load);
                 if (bLoaded == null) { return false; }
 
                 OnParseExternal(bLoaded);
@@ -527,8 +527,8 @@ public sealed class MultiUserFile : IDisposableExtended {
     }
 
     public void WaitEditable() {
-        while (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditAcut))) {
-            if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.EditNormaly))) { return; }// Nur anzeige-Dateien sind immer Schreibgeschützt
+        while (!string.IsNullOrEmpty(EditableErrorReason(Enums.EditableErrorReason.EditAcut))) {
+            if (!string.IsNullOrEmpty(EditableErrorReason(Enums.EditableErrorReason.EditNormaly))) { return; }// Nur anzeige-Dateien sind immer Schreibgeschützt
             Pause(0.2, true);
         }
     }
@@ -595,14 +595,14 @@ public sealed class MultiUserFile : IDisposableExtended {
         var mustReload = ReloadNeeded;
 
         if (mustReload && mustSave) {
-            if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Load))) { return; }
+            if (!string.IsNullOrEmpty(EditableErrorReason(Enums.EditableErrorReason.Load))) { return; }
             // Checker_Tick_count nicht auf 0 setzen, dass der Saver noch stimmt.
             _ = Load_Reload();
             return;
         }
 
         if (mustSave && _checkerTickCount > countSave) {
-            if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Save))) { return; }
+            if (!string.IsNullOrEmpty(EditableErrorReason(Enums.EditableErrorReason.Save))) { return; }
             if (!_pureBinSaver.IsBusy) { _pureBinSaver.RunWorkerAsync(); } // Eigentlich sollte diese Abfrage überflüssig sein. Ist sie aber nicht
             _checkerTickCount = 0;
             return;
@@ -611,7 +611,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         // Überhaupt nix besonderes. Ab und zu mal Reloaden
         if (mustReload && _checkerTickCount > ReloadDelaySecond) {
             RepairOldBlockFiles();
-            if (!string.IsNullOrEmpty(ErrorReason(Enums.ErrorReason.Load))) { return; }
+            if (!string.IsNullOrEmpty(EditableErrorReason(Enums.EditableErrorReason.Load))) { return; }
             _ = Load_Reload();
             _checkerTickCount = 0;
         }
@@ -677,14 +677,14 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// </summary>
     /// <param name="checkmode"></param>
     /// <returns></returns>
-    private (byte[]? data, string fileinfo) LoadBytesFromDisk(ErrorReason checkmode) {
+    private (byte[]? data, string fileinfo) LoadBytesFromDisk(EditableErrorReason checkmode) {
         string tmpLastSaveCode2;
         var startTime = DateTime.UtcNow;
         byte[] bLoaded;
         while (true) {
             try {
                 if (_initialLoadDone && !ReloadNeeded) { return (null, string.Empty); } // Problem hat sich aufgelöst
-                var f = ErrorReason(checkmode);
+                var f = EditableErrorReason(checkmode);
                 if (string.IsNullOrEmpty(f)) {
                     var tmpLastSaveCode1 = GetFileInfo(Filename, true);
                     bLoaded = File.ReadAllBytes(Filename);
@@ -804,7 +804,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             savedDataUncompressed == null || savedDataUncompressed.Count == 0) { return Feedback("Keine Daten angekommen."); }
         if (!fromParallelProzess && _pureBinSaver.IsBusy) { return Feedback("Anderer interner binärer Speichervorgang noch nicht abgeschlossen."); }
         if (fromParallelProzess && IsInSaveingLoop) { return Feedback("Anderer manuell ausgelöster binärer Speichervorgang noch nicht abgeschlossen."); }
-        var f = ErrorReason(Enums.ErrorReason.Save);
+        var f = EditableErrorReason(Enums.EditableErrorReason.Save);
         if (!string.IsNullOrEmpty(f)) { return Feedback("Fehler: " + f); }
         if (string.IsNullOrEmpty(Filename)) { return Feedback("Kein Dateiname angegeben"); }
         if (IsSaving) { return Feedback("Speichervorgang von verschiedenen Routinen aufgerufen."); }
@@ -849,7 +849,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
 
         // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
-        var (data, fileinfo) = LoadBytesFromDisk(Enums.ErrorReason.LoadForCheckingOnly);
+        var (data, fileinfo) = LoadBytesFromDisk(Enums.EditableErrorReason.LoadForCheckingOnly);
         if (data == null || !savedDataUncompressed.SequenceEqual(data)) {
             // OK, es sind andere Daten auf der Festplatte?!? Seltsam, zählt als sozusagen ungespeichter und ungeladen.
             _checkedAndReloadNeed = true;
@@ -864,9 +864,8 @@ public sealed class MultiUserFile : IDisposableExtended {
         OnSavedToDisk();
         IsSaving = false;
         return string.Empty;
-
         string Feedback(string txt) {
-            if (tmpFileName != null) { _ = DeleteFile(tmpFileName, false); }
+            _ = DeleteFile(tmpFileName, false);
             //Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br>Grund:<br>" + txt);
             RepairOldBlockFiles();
             return txt;
@@ -928,16 +927,14 @@ public sealed class MultiUserFile : IDisposableExtended {
     private (string TMPFileName, string FileInfoBeforeSaving, byte[]? DataUncompressed) WriteTempFileToDisk(bool iAmThePureBinSaver) {
         string fileInfoBeforeSaving;
         string tmpFileName;
-        byte[]? dataUncompressed;
+        byte[] dataUncompressed;
         var count = 0;
-
         if (!iAmThePureBinSaver && _pureBinSaver.IsBusy) { return (string.Empty, string.Empty, null); }
         if (_doingTempFile) {
             if (!iAmThePureBinSaver) { Develop.DebugPrint("Erstelle bereits TMP-File"); }
             return (string.Empty, string.Empty, null);
         }
         _doingTempFile = true;
-
         while (true) {
             if (!iAmThePureBinSaver) {
                 // Also, im NICHT-parallelen Prozess ist explizit der Save angestoßen worden.
@@ -945,13 +942,10 @@ public sealed class MultiUserFile : IDisposableExtended {
                 // Problem: Wenn die ganze Save-Routine in einem Parallelen-Thread ist
                 Develop.LastUserActionUtc = new DateTime(1900, 1, 1);
             }
-            var f = ErrorReason(Enums.ErrorReason.Save);
+            var f = EditableErrorReason(Enums.EditableErrorReason.Save);
             if (!string.IsNullOrEmpty(f)) { _doingTempFile = false; return (string.Empty, string.Empty, null); }
             fileInfoBeforeSaving = GetFileInfo(Filename, true);
             dataUncompressed = OnToListOfByte();
-
-            if (dataUncompressed == null) { return (string.Empty, string.Empty, null); }
-
             tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName().ToUpper());
             try {
                 using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -970,7 +964,6 @@ public sealed class MultiUserFile : IDisposableExtended {
                 Pause(1, true);
             }
         }
-
         _doingTempFile = false;
         return (tmpFileName, fileInfoBeforeSaving, dataUncompressed);
     }

@@ -35,6 +35,8 @@ public interface IControlAcceptFilter : IControlAcceptSomething {
 
     public void AddParentSender(IControlSendFilter item);
 
+    public void FilterFromParentsChanged();
+
     #endregion
 }
 
@@ -58,6 +60,8 @@ public static class IControlAcceptFilterExtension {
                 }
             }
         }
+
+        dest.FilterFromParentsChanged();
     }
 
     public static FilterCollection? FilterOfSender(this IControlAcceptFilter item) {

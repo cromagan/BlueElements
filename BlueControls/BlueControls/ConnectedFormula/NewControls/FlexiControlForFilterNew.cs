@@ -31,11 +31,10 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilter, IControlSendFilter {
-    //public FlexiControlForFilter() : this(null, null) { }
 
     #region Fields
 
-    private readonly List<IControlAcceptSomething> _childs = new();
+    private readonly List<IControlAcceptFilter> _childs = new();
 
     private readonly List<IControlSendFilter> _parentSender = new();
 
@@ -58,23 +57,28 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
     #region Properties
 
     public FilterItem? Filter { get; }
-    public DatabaseAbstract? OutputDatabase { get; set; }
+
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
+
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 
     #region Methods
 
     public void AddParentSender(IControlSendFilter item) {
-        //Invalidate_FilteredRows();
+        //Invalidate_Filters();
         _parentSender.Add(item);
     }
 
-    public void ChildAdd(IControlAcceptSomething c) {
+    public void ChildAdd(IControlAcceptFilter c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
         this.DoChilds(_childs);
     }
+
+    //public FlexiControlForFilter() : this(null, null) { }
+    public void FilterFromParentsChanged() { }
 
     internal ComboBox? GetComboBox() {
         foreach (var thisc in Controls) {

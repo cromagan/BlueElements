@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
@@ -32,7 +31,6 @@ using BlueControls.Forms;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using MessageBox = BlueControls.Forms.MessageBox;
@@ -50,8 +48,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     #region Constructors
 
     public ColumnArrangementPadEditor(DatabaseAbstract? database) : this() {
-        if (database == null || database.IsDisposed || database.ReadOnly) {
-            MessageBox.Show("Datenbank schreibgeschützt.", ImageCode.Information, "OK");
+        var m = DatabaseAbstract.EditableErrorReason(database, EditableErrorReason.EditGeneral);
+        if (!string.IsNullOrEmpty(m)) {
+            MessageBox.Show(m, ImageCode.Information, "OK");
             Close();
             return;
         }
@@ -173,7 +172,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
-        if (Database == null || Database.IsDisposed || Database.ReadOnly) { return; }
+        if (TableView.ErrorMessage(Database, EditableErrorReason.EditAcut) || Database == null) { return; }
 
         ColumnItem? vorlage = null;
         if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.Column?.Database == Database) {

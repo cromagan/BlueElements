@@ -32,33 +32,40 @@ public interface IControlSendFilter : IControlSendSomething {
     public FilterItem? Filter { get; }
 
     #endregion
+
+    #region Methods
+
+    public void ChildAdd(IControlAcceptFilter c);
+
+    #endregion
 }
 
 public static class IControlSendFilterExtension {
 
     #region Methods
 
-    public static void DoChilds(this IControlSendFilter item, List<IControlAcceptSomething> childs) {
+    public static void DoChilds(this IControlSendFilter item, List<IControlAcceptFilter> childs) {
         //var r = db?.Row.SearchByKey(rowkey);
         //r?.CheckRowDataIfNeeded();
 
         foreach (var thischild in childs) {
-            var did = false;
+            thischild.FilterFromParentsChanged();
+            //var did = false;
 
-            if (!did && thischild is ICalculateRows fcfc) {
-                fcfc.Invalidate_FilteredRows();
-                did = true;
-            }
+            //if (!did && thischild is ICalculateRows fcfc) {
+            //    fcfc.Invalidate_FilteredRows();
+            //    did = true;
+            //}
 
-            if (thischild is IDisabledReason id) {
-                if (!did) {
-                    id.DeleteValue();
-                    id.DisabledReason = "Keine Befüllmethode bekannt.";
-                    did = true;
-                }
-            }
+            //if (thischild is IDisabledReason id) {
+            //    if (!did) {
+            //        id.DeleteValue();
+            //        id.DisabledReason = "Keine Befüllmethode bekannt.";
+            //        did = true;
+            //    }
+            //}
 
-            if (!did) { Develop.DebugPrint(FehlerArt.Warnung, "Typ unbekannt"); }
+            //if (!did) { Develop.DebugPrint(FehlerArt.Warnung, "Typ unbekannt"); }
         }
     }
 

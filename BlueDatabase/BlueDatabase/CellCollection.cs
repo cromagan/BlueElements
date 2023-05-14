@@ -96,69 +96,99 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     //    return rows.Count == 0 ? string.Empty : rows[0].CellGetString(column);
     //}
 
+    #region Methods
+
     /// <summary>
     /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
-    /// Optional zusätzlich mit den Dateirechten.
     /// </summary>
     /// <param name="row"></param>
     /// <param name="column"></param>
     /// <param name="mode"></param>
+    /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei Internen Prozessen angeben.</param>
+    /// <param name="checkEditmode">Ob gewünscht wird, das die intern Programmierte Routine geprüft werden soll. Nur in Datenbankansicht empfohlen.</param>
     /// <returns></returns>
+    public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReason mode, bool checkUserRights, bool checkEditmode) {
+        if (mode == BlueBasics.Enums.EditableErrorReason.OnlyRead) {
+            return string.Empty;
+        }
 
-    #region Methods
+        if (column?.Database == null) {
+            return LanguageTool.DoTranslate("Es ist keine Spalte ausgewählt.");
+        }
 
-    public static string ErrorReason(ColumnItem? column, RowItem? row, ErrorReason mode) {
-        if (mode == BlueBasics.Enums.ErrorReason.OnlyRead) { return string.Empty; }
-        if (column?.Database == null) { return LanguageTool.DoTranslate("Es ist keine Spalte ausgewählt."); }
-        if (column.Database.IsDisposed) { return LanguageTool.DoTranslate("Datenbank verworfen"); }
+        if (column.Database.IsDisposed) {
+            return LanguageTool.DoTranslate("Datenbank verworfen");
+        }
 
-        var tmpf = column.Database.ErrorReason(mode);
-        if (!string.IsNullOrEmpty(tmpf)) { return LanguageTool.DoTranslate(tmpf); }
-        if (!column.SaveContent) { return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert."); }
+        var tmpf = column.Database.EditableErrorReason(mode);
+        if (!string.IsNullOrEmpty(tmpf)) {
+            return LanguageTool.DoTranslate(tmpf);
+        }
+
+        if (!column.SaveContent) {
+            return LanguageTool.DoTranslate("Der Spalteninhalt wird nicht gespeichert.");
+        }
 
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            var (lcolumn, lrow, info) = LinkedCellData(column, row, true, mode == BlueBasics.Enums.ErrorReason.EditAcut);
+            var (lcolumn, lrow, info) = LinkedCellData(column, row, true, mode == BlueBasics.Enums.EditableErrorReason.EditAcut);
 
-            if (!string.IsNullOrEmpty(info)) { return LanguageTool.DoTranslate(info); }
+            if (!string.IsNullOrEmpty(info)) {
+                return LanguageTool.DoTranslate(info);
+            }
 
             if (lcolumn != null && lrow != null) {
-                if (lcolumn.Database == null || lcolumn.Database.IsDisposed) { return LanguageTool.DoTranslate("Verknüpfte Datenbank verworfen."); }
+                if (lcolumn.Database == null || lcolumn.Database.IsDisposed) {
+                    return LanguageTool.DoTranslate("Verknüpfte Datenbank verworfen.");
+                }
 
                 lcolumn.Database.PowerEdit = column.Database.PowerEdit;
-                var tmp = ErrorReason(lcolumn, lrow, mode);
+                var tmp = EditableErrorReason(lcolumn, lrow, mode, checkUserRights, checkEditmode);
                 return string.IsNullOrEmpty(tmp)
                     ? string.Empty
                     : LanguageTool.DoTranslate("Die verlinkte Zelle kann nicht bearbeitet werden: ") + tmp;
             }
+
             return LanguageTool.DoTranslate("Allgemeiner Fehler.");
         }
 
         if (row != null) {
-            if (row.Database != column.Database) { return LanguageTool.DoTranslate("Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft."); }
+            if (row.Database != column.Database) {
+                return LanguageTool.DoTranslate("Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft.");
+            }
 
             if (column.Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds < 0) {
                 column.Database.RefreshColumnsData(column.Database.Column.SysLocked);
-                if (column != column.Database.Column.SysLocked && row.CellGetBoolean(column.Database.Column.SysLocked) && !column.EditAllowedDespiteLock) { return LanguageTool.DoTranslate("Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden."); }
+                if (column != column.Database.Column.SysLocked && row.CellGetBoolean(column.Database.Column.SysLocked) && !column.EditAllowedDespiteLock) {
+                    return LanguageTool.DoTranslate("Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.");
+                }
             }
         } else {
             //Auf neue Zeile wird geprüft
-            if (!column.IsFirst()) { return LanguageTool.DoTranslate("Neue Zeilen müssen mit der ersten Spalte beginnen."); }
+            if (!column.IsFirst()) {
+                return LanguageTool.DoTranslate("Neue Zeilen müssen mit der ersten Spalte beginnen.");
+            }
         }
+
+        if (checkEditmode) {
+            var withDropDown = column.MultiLine;
+            if (!column.DropdownBearbeitungErlaubt) {
+                withDropDown = false;
+            }
+
+            if (ColumnItem.UserEditDialogTypeInTable(column.Format, false, true, withDropDown) == EditTypeTable.None) {
+                return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für den Typ des Spalteninhalts '" + column.Format + "' definiert.";
+            }
+        }
+
+        if (checkUserRights) { return string.Empty; }
+
         if (!column.TextBearbeitungErlaubt && !column.DropdownBearbeitungErlaubt) {
             return LanguageTool.DoTranslate("Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.");
         }
-        if (ColumnItem.UserEditDialogTypeInTable(column.Format, false, true, column.MultiLine) == EditTypeTable.None) {
-            return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für den Typ des Spalteninhalts '" + column.Format + "' definiert.";
-        }
-        //foreach (var ThisRule in Column.Database.Rules) {
-        //    if (ThisRule != null) {
-        //        if (ThisRule.WillAlwaysCellOverride(Column)) { return LanguageTool.DoTranslate("Diese Zelle wird von automatischen Regeln befüllt."); }
-        //        if (ThisRule.BlockEditing(Column, Row)) { return LanguageTool.DoTranslate("Eine Regel sperrt diese Zelle."); }
-        //    }
-        //}
+
         return !column.Database.PermissionCheck(column.PermissionGroupsChangeCell, row)
-            ? LanguageTool.DoTranslate("Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.")
-            : string.Empty;
+                ? LanguageTool.DoTranslate("Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.")
+                : string.Empty;
     }
 
     public static (List<FilterItem>? filter, string info) GetFilterFromLinkedCellData(DatabaseAbstract? linkedDatabase, ColumnItem column, RowItem? row) {
@@ -279,17 +309,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         //return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists);
     }
-
-    /// <summary>
-    ///  Gibt zurück, ob die Zelle bearbeitet werden kann.
-    ///  Optional zusätzlich mit den Dateirechten.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="mode"></param>
-    /// <returns></returns>
-
-    public static bool UserEditPossible(ColumnItem? column, RowItem? row, ErrorReason mode) => string.IsNullOrEmpty(ErrorReason(column, row, mode));
 
     public void DataOfCellKey(string cellKey, out ColumnItem? column, out RowItem? row) {
         if (string.IsNullOrEmpty(cellKey)) {

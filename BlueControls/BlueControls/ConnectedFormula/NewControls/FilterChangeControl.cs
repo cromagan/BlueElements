@@ -28,7 +28,7 @@ internal class FilterChangeControl : GenericControl, IControlAcceptFilter, ICont
 
     #region Fields
 
-    private readonly List<IControlAcceptSomething> _childs = new();
+    private readonly List<IControlAcceptFilter> _childs = new();
 
     private readonly List<IControlSendFilter> _parentSender = new();
 
@@ -46,15 +46,17 @@ internal class FilterChangeControl : GenericControl, IControlAcceptFilter, ICont
     #region Methods
 
     public void AddParentSender(IControlSendFilter item) {
-        //Invalidate_FilteredRows();
+        //Invalidate_Filters();
         _parentSender.Add(item);
     }
 
-    public void ChildAdd(IControlAcceptSomething c) {
+    public void ChildAdd(IControlAcceptFilter c) {
         if (IsDisposed) { return; }
         _childs.Add(c);
         this.DoChilds(_childs);
     }
+
+    public void FilterFromParentsChanged() { }
 
     #endregion
 }

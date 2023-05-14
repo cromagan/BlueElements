@@ -231,7 +231,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
         }
@@ -261,7 +261,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, null, true, true);
+            DrawColorScheme(gr, positionModified, zoom, null, true, true, false);
             base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
             DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
         }
