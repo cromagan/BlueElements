@@ -186,7 +186,12 @@ public class ItemAcceptFilter : ItemAcceptSomething {
     }
 
     public ReadOnlyCollection<IItemSendFilter> GetFilterFromGet(IItemAcceptFilter item) {
-        if (_getFilterFrom == null) {
+        if (item.Parent == null) {
+            Develop.DebugPrint(FehlerArt.Warnung, "Parent nicht initialisiert!");
+            return new ReadOnlyCollection<IItemSendFilter>(new List<IItemSendFilter>());
+        }
+
+        if (_getFilterFrom == null || _getFilterFrom.Count != _getFilterFromKeys.Count) {
             var l = new List<IItemSendFilter>();
 
             foreach (var thisk in _getFilterFromKeys) {

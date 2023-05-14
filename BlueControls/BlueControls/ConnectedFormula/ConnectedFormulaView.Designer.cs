@@ -15,13 +15,13 @@ namespace BlueControls.Controls {
         protected override void Dispose(bool disposing) {
 
             if(disposing) {
-                SetData(null,null);
-                ConnectedFormula = null;
+                //SetData(null,null);
+                DoFormulaDatabaseAndRow(null, null, -1, string.Empty);
             }
 
 
             if (disposing && (components != null)) {
-                ConnectedFormula = null;
+                DoFormulaDatabaseAndRow(null, null, -1, string.Empty);
                 components?.Dispose();
             }
             base.Dispose(disposing);

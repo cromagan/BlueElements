@@ -1943,9 +1943,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //        case FormatHolder.Bit:
     //            SetFormatForBit();
     //            break;
-    public QuickImage? SymbolForReadableText() {
-        if (IsDisposed) { return null; }
-        if (Database == null || Database.IsDisposed) { return null; }
+    public QuickImage SymbolForReadableText() {
+        if (IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
+        if (Database == null || Database.IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
 
         if (this == Database.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
 
@@ -1979,7 +1979,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                            QuickImage.Get(ImageCode.Textfeld);
         }
 
-        return null;
+        return QuickImage.Get(ImageCode.Warnung);
     }
 
     //        case FormatHolder.Url:

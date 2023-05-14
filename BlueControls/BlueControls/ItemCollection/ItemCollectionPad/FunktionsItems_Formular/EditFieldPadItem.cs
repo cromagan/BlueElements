@@ -193,6 +193,11 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         if (InputDatabase == null || InputDatabase.IsDisposed) {
             return "Quelle fehlt";
         }
+
+        if (Column == null || Column.IsDisposed) {
+            return "Spalte fehlt";
+        }
+
         //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
         //    return "Ziel fehlt";
         //}
@@ -295,8 +300,10 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public override QuickImage SymbolForReadableText() {
-        if (IsOk()) {
-            return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(InputColorId));
+        if (IsOk() && Column != null) {
+            return Column.SymbolForReadableText();
+
+            //return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 
         return QuickImage.Get(ImageCode.Warnung, 16);
@@ -325,10 +332,14 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false, false);
         }
 
-        if (Column == null) {
-            Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
-        } else {
-            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column.ReadableText() + ":");
+        //if (Column == null) {
+        //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
+        //} else {
+        DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column?.ReadableText() + ":");
+        //}
+
+        if (!forPrinting) {
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

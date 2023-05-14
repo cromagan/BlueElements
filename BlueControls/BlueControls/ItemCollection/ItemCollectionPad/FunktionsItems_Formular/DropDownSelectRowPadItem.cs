@@ -246,8 +246,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
-            DrawColorScheme(gr, positionModified, zoom, null, true, false, false);
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
+            DrawColorScheme(gr, positionModified, zoom, null, true, true, true);
         } else {
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
         }

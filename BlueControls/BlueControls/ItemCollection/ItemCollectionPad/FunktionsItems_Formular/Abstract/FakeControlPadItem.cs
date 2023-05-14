@@ -57,10 +57,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     #endregion
 
-    //public abstract int InputColorId { get; set; }
-
-    //public abstract DatabaseAbstract? InputDatabase { get; }
-
     #region Properties
 
     protected override int SaveOrder => 3;
@@ -69,6 +65,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     #region Methods
 
+    //public abstract DatabaseAbstract? InputDatabase { get; }
     public void Breite_berechnen() {
         var li = new ItemCollectionList.ItemCollectionList(true);
         for (var br = 1; br <= 20; br++) {
@@ -91,6 +88,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         this.RaiseVersion();
     }
 
+    //public abstract int InputColorId { get; set; }
     public abstract Control? CreateControl(ConnectedFormulaView parent);
 
     public abstract string ErrorReason();
@@ -99,12 +97,10 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         List<GenericControl> l = new();
 
         if (Bei_Export_sichtbar) {
-
             l.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
             l.Add(new FlexiControlForDelegate(Standardhöhe_setzen, "Standardhöhe setzen", ImageCode.Zeile));
 
             l.Add(new FlexiControlForDelegate(Sichtbarkeit, "Sichtbarkeit", ImageCode.Schild));
-
         }
 
         //l.Add(new FlexiControl());
@@ -113,6 +109,11 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     }
 
     public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
+
+    public override void OnChanged() {
+        base.OnChanged();
+        this.RaiseVersion();
+    }
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
@@ -192,7 +193,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     }
 
     internal bool IsVisibleForMe(string? myGroup, string? myName) {
-        if (myGroup == null || myName == null) { return false; }
+        if (myGroup == null || myName == null) { return true; }
 
         if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains(DatabaseAbstract.Everybody, false)) { return true; }
 
@@ -283,11 +284,14 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
         if (c.IsNearWhite(0.99)) {
             c2 = Color.Gray;
+            c = Color.Transparent;
         }
 
-
         if (transparent) {
-            gr.DrawRectangle(new Pen(c.Brighten(0.9).MakeTransparent(128), w * 2), tmp);
+            if (c.A > 128) {
+                gr.DrawRectangle(new Pen(c.Brighten(0.9).MakeTransparent(128), w * 2), tmp);
+            }
+
             gr.DrawRectangle(new Pen(c2.Brighten(0.6).MakeTransparent(128), zoom), drawingCoordinates);
         } else {
             gr.DrawRectangle(new Pen(c.Brighten(0.9), w * 2), tmp);
@@ -296,12 +300,12 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
         if (drawSymbol && drawText) {
             var v2 = SymbolForReadableText().Scale(zoom);
-            Skin.Draw_FormatedText(gr, ReadableText(), v2, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+            Skin.Draw_FormatedText(gr, ReadableText(), v2, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
         } else if (drawSymbol) {
             var v2 = SymbolForReadableText().Scale(zoom);
-            Skin.Draw_FormatedText(gr, string.Empty, v2, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+            Skin.Draw_FormatedText(gr, string.Empty, v2, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
         } else if (drawText) {
-            Skin.Draw_FormatedText(gr, ReadableText(), null, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), ColumnFont?.Scale(zoom), false);
+            Skin.Draw_FormatedText(gr, ReadableText(), null, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
         }
     }
 
@@ -340,6 +344,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         }
 
         if (uc.Width > 0 && uc.Height > 0) {
+            gr.FillRectangle(Brushes.LightGray, uc);
             gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
         }
     }

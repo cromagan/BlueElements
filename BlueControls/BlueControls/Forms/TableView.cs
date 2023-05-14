@@ -407,7 +407,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (Table.Database != database) {
-            Formula.ConnectedFormula = null;
+            Formula.DoFormulaDatabaseAndRow(null, null, -1, string.Empty);
         }
 
         FilterLeiste.Table = Table;
@@ -469,7 +469,7 @@ public partial class TableView : FormWithStatusBar {
             if (Formula.Width < 30 || Formula.Height < 10) { return; }
 
             Formula.GetConnectedFormulaFromDatabase(r?.Database);
-            Formula.SetData(r?.Database, r?.Key ?? -1);
+            Formula.DoFormulaDatabaseAndRow(Formula.ConnectedFormula, r?.Database, r?.Key ?? -1, Formula.Page);
         }
     }
 

@@ -173,7 +173,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         if (rowkey == _rowKey && database == Database) { return; }
         FillCellNow();
 
-        if (Database != null) {
+        var change = Database != database;
+
+        if (Database != null && change) {
             Database.Cell.CellValueChanged -= Database_CellValueChanged;
             Database.Row.RowRemoving -= Row_RowRemoving;
             Database.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
@@ -189,7 +191,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
         UpdateColumnData();
 
-        if (Database != null) {
+        if (Database != null && change) {
             Database.Cell.CellValueChanged += Database_CellValueChanged;
             Database.Row.RowRemoving += Row_RowRemoving;
             Database.Column.ColumnInternalChanged += Column_ItemInternalChanged;

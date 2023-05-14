@@ -947,7 +947,6 @@ namespace BlueControls.Forms {
             // 
             // Formula
             // 
-            this.Formula.ConnectedFormula = null;
             this.Formula.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Formula.Location = new System.Drawing.Point(0, 0);
             this.Formula.Name = "Formula";

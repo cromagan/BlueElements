@@ -387,6 +387,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
         _saved = false;
+        OnChanged();
     }
 
     private void ToListOfByte(object sender, MultiUserToListEventArgs e) {

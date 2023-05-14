@@ -80,7 +80,7 @@ public class TabControl : AbstractTabControl, IControlAcceptRow {
         if (database != Database && rowkey == RowKey) { return; }
         Database = database;
         RowKey = rowkey ?? -1;
-        DoDatabaseAction();
+        DoTabChilds();
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
@@ -95,12 +95,18 @@ public class TabControl : AbstractTabControl, IControlAcceptRow {
 
     protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.TabStrip_Back);
 
-    private void DoDatabaseAction() {
+    private void DoTabChilds() {
+        // Dieses DoChilds unterscheidet sich von IControlSend:
+        // Da das TabControl kein Send - Control an sich ist, aber trotzdem die Tabs befüllen muss
         foreach (var thisTab in TabPages) {
             if (thisTab is TabPage tp) {
                 foreach (var thisControl in tp.Controls) {
-                    if (thisControl is IControlAcceptRow iar and not TabControl) {
-                        iar.SetData(Database, RowKey);
+                    if (thisControl is ConnectedFormulaView cfw) {
+                        foreach (var thisControl2 in cfw.Controls) {
+                            if (thisControl2 is IControlRowInput iar) {
+                                iar.SetData(Database, RowKey);
+                            }
+                        }
                     }
                 }
             }

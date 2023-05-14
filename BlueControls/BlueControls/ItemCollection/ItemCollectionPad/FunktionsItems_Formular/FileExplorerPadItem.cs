@@ -212,6 +212,11 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
 
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\");
 
+        if (!forPrinting) {
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);
+        }
+
+
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }

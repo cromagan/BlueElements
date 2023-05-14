@@ -149,7 +149,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
                         var cc = new ConnectedFormulaView(pg);
                         t.Controls.Add(cc);
-                        cc.ConnectedFormula = cf;
+                        cc.DoFormulaDatabaseAndRow(cf, null, -1, pg);
                         cc.Dock = DockStyle.Fill;
                     }
                 } else {
@@ -262,7 +262,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-
         DrawColorScheme(gr, positionModified, zoom, null, false, false, false);
         var headh = 25 * zoom;
         var headb = 70 * zoom;
@@ -283,9 +282,12 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         gr.DrawRectangle(new Pen(Color.Black, zoom), body);
 
         //Skin.Draw_FormatedText(gr, _text, QuickImage.Get(ImageCode.Textfeld, (int)(zoom * 16)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), ColumnPadItem.ColumnFont.Scale(zoom), false);
-        Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
+        //Skin.Draw_FormatedText(gr, "Register-\r\nkarten", null, Alignment.Horizontal_Vertical_Center, body.ToRect(), ColumnFont?.Scale(zoom), false);
 
-        DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false, true);
+        if (!forPrinting) {
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);
+        }
+
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
