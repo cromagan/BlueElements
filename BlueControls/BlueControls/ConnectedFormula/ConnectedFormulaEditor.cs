@@ -52,45 +52,59 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     #region Methods
 
+    private void AddCentered(FakeControlPadItem x) {
+        var l = Pad.LastClickedItem;
+
+        if (l is IItemSendRow isr && x is IItemAcceptRow iar) {
+            iar.GetRowFrom = isr;
+        }
+
+        if (l is IItemSendFilter isf && x is IItemAcceptFilter iaf) {
+            iaf.GetFilterFrom = (new List<string>() { l.KeyName }).AsReadOnly();
+        }
+
+        Pad.AddCentered(x);
+
+        if (x is IItemAcceptRow iar2 && iar2.GetRowFrom == null) {
+            iar2.Datenquelle_wählen();
+        }
+
+        if (x is IItemAcceptFilter iaf2 && iaf2.GetFilterFrom.Count == null) {
+            iaf2.Datenquellen_bearbeiten_DifferenteDatabase();
+        }
+
+        if (x is IItemSendRow isr2) {
+            isr2.Datenbank_wählen();
+        }
+
+        if (x is IItemSendFilter isf2) {
+            isf2.Datenbank_wählen();
+        }
+    }
+
     private void btnBenutzerFilterWahl_Click(object sender, System.EventArgs e) {
         var x = new InputFilterOutputFilterPadItem(string.Empty);
-        Pad.AddCentered(x);
+        AddCentered(x);
     }
 
     private void btnBild_Click(object sender, System.EventArgs e) {
-        //var l = Pad.LastClickedItem;
-
         var x = new EasyPicPadItem(string.Empty);
-
-        Pad.AddCentered(x);
+        AddCentered(x);
     }
 
     private void btnDropdownmenu_Click(object sender, System.EventArgs e) {
         var x = new DropDownSelectRowPadItem(string.Empty);
-        Pad.AddCentered(x);
+        AddCentered(x);
     }
 
     private void btnFeldHinzu_Click(object sender, System.EventArgs e) {
-        //var l = Pad.LastClickedItem;
-
         var x = new EditFieldPadItem(string.Empty);
-        Pad.AddCentered(x);
-
-        //if (l is ICalculateRowsItemLevel ri) {
-        //    x.GetRowFrom = ri;
-        //}
-        //if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
-        //    x.GetRowFrom = efi.GetRowFrom;
-        //}
-
-        //if (x.GetRowFrom != null && x.GetRowFrom.OutputDatabase != null) {
-        //    x.Spalte_wählen = string.Empty; // Dummy setzen
-        //}
+        AddCentered(x);
     }
 
     private void btnFilterConverter_Click(object sender, System.EventArgs e) {
         var x = new ScriptChangeFilterPadItem(string.Empty);
-        Pad.AddCentered(x);
+        AddCentered(x);
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs? e) {
@@ -141,6 +155,8 @@ public partial class ConnectedFormulaEditor : PadEditor {
         Pad.Item.Add(it);
         CFormula.Repair();
 
+        it.Datenbank_wählen();
+
         //it.Bei_Export_sichtbar = false;
 
         //Pad.AddCentered(it);
@@ -156,28 +172,18 @@ public partial class ConnectedFormulaEditor : PadEditor {
         var x = new TabFormulaPadItem(string.Empty, CFormula) {
             Bei_Export_sichtbar = true
         };
-        Pad.AddCentered(x);
+        AddCentered(x);
     }
 
     private void btnTable_Click(object sender, System.EventArgs e) {
         var x = new TabFormulaPadItem(string.Empty);
-        Pad.AddCentered(x);
+        AddCentered(x);
     }
 
     private void btnVariable_Click(object sender, System.EventArgs e) {
-        //var l = Pad.LastClickedItem;
-
         var x = new VariableFieldPadItem(string.Empty);
 
-        //if (l is ICalculateRowsItemLevel ri) {
-        //    x.GetRowFrom = ri;
-        //}
-
-        //if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
-        //    x.GetRowFrom = efi.GetRowFrom;
-        //}
-
-        Pad.AddCentered(x);
+        AddCentered(x);
     }
 
     private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
@@ -204,12 +210,12 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnZeileAnlegen_Click(object sender, System.EventArgs e) {
         var x = new AddRowPaditem(string.Empty);
-        Pad.AddCentered(x);
+        AddCentered(x);
     }
 
     private void btnZeileZuFilter_Click(object sender, System.EventArgs e) {
         var x = new InputRowOutputFilterPadItem(string.Empty);
-        Pad.AddCentered(x);
+        AddCentered(x);
     }
 
     private void CheckButtons() { }
@@ -255,18 +261,9 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {
-        //var l = Pad.LastClickedItem;
-
         var x = new FileExplorerPadItem(string.Empty);
 
-        //if (l is ICalculateRowsItemLevel ri) {
-        //    x.GetRowFrom = ri;
-        //}
-        //if (l is FakeControlAcceptRowPadItem efi && efi.GetRowFrom != null) {
-        //    x.GetRowFrom = efi.GetRowFrom;
-        //}
-
-        Pad.AddCentered(x);
+        AddCentered(x);
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);

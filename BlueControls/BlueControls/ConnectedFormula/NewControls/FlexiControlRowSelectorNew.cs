@@ -19,8 +19,9 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq.Expressions;
+using System.Drawing;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
@@ -233,6 +234,13 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
         }
     }
 
+    protected override void DrawControl(Graphics gr, States state) {
+        if (_filteredRows == null) {
+            UpdateMyCollection();
+        }
+        base.DrawControl(gr, state);
+    }
+
     protected override void OnValueChanged() {
         base.OnValueChanged();
         Row = string.IsNullOrEmpty(Value) ? null : OutputDatabase?.Row.SearchByKey(LongParse(Value));
@@ -258,8 +266,9 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
         #region Zeilen erzeugen
 
-        if (_filteredRows != null) {
-            foreach (var thisR in _filteredRows) {
+        var f = FilteredRows;
+        if (f != null) {
+            foreach (var thisR in f) {
                 if (cb?.Item?[thisR.Key.ToString()] == null) {
                     var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
                     _ = cb?.Item?.Add(tmpQuickInfo, thisR.Key.ToString());

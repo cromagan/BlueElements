@@ -102,6 +102,7 @@ public class TabControl : AbstractTabControl, IControlAcceptRow {
             if (thisTab is TabPage tp) {
                 foreach (var thisControl in tp.Controls) {
                     if (thisControl is ConnectedFormulaView cfw) {
+                        cfw.GenerateView();
                         foreach (var thisControl2 in cfw.Controls) {
                             if (thisControl2 is IControlRowInput iar) {
                                 iar.SetData(Database, RowKey);

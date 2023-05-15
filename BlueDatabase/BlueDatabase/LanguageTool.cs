@@ -22,7 +22,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using BlueScript.Structures;
 
 namespace BlueDatabase;
 

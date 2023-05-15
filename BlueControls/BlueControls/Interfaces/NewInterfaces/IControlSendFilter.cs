@@ -20,8 +20,6 @@
 using BlueControls.Controls;
 using BlueDatabase;
 using System.Collections.Generic;
-using BlueBasics;
-using BlueBasics.Enums;
 
 namespace BlueControls.Interfaces;
 
@@ -29,6 +27,9 @@ public interface IControlSendFilter : IControlSendSomething {
 
     #region Properties
 
+    /// <summary>
+    /// Diese Routine muss bei einer Änderng DoChilds auslösen
+    /// </summary>
     public FilterItem? Filter { get; }
 
     #endregion

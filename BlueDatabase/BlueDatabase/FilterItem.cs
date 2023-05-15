@@ -290,6 +290,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public string ReadableText() {
         if (_filterType == FilterType.KeinFilter) { return "Filter ohne Funktion"; }
+        if (_column == null && SearchValue.Count == 0) { return "#### Filter-Fehler ####"; }
+        if (_column == null && SearchValue.Count == 1 && string.IsNullOrEmpty(SearchValue[0])) { return "#### Filter-Fehler ####"; }
+
         if (_column == null) { return "Zeilen-Filter"; }
         var nam = _column.ReadableText();
         if (SearchValue == null || SearchValue.Count < 1) { return "#### Filter-Fehler ####"; }

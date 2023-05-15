@@ -39,21 +39,28 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
 
     #region Fields
 
+    private readonly string _pageToShow = "Head";
     private ConnectedFormula.ConnectedFormula? _connectedFormula;
     private bool _generated;
     private IControlSendRow? _getRowFrom = null;
-    private string _pageToShow = "Head";
     private RowItem? _tmpShowingRow;
+
+    private string _userGroup = string.Empty;
+
+    private string _userName = string.Empty;
 
     #endregion
 
     #region Constructors
 
-    public ConnectedFormulaView() : this("Head") { }
+    public ConnectedFormulaView() : this("Head", string.Empty, DatabaseAbstract.Administrator) { }
 
-    public ConnectedFormulaView(string page) {
+    public ConnectedFormulaView(string page, string username, string usergroup) {
         InitializeComponent();
-        DoFormulaDatabaseAndRow(null, null, -1, page);
+        _pageToShow = page;
+        _userName = username;
+        _userGroup = usergroup;
+        DoFormulaDatabaseAndRow(null, null, -1);
     }
 
     #endregion
@@ -84,11 +91,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
     //    }
     //}
 
-    [DefaultValue("Head")]
-    public string Page {
-        get => _pageToShow;
-        set => DoFormulaDatabaseAndRow(ConnectedFormula, Database, RowKey, value);
-    }
+    public string Page => _pageToShow;
 
     [DefaultValue(-1)]
     public long RowKey { get; private set; } = -1;
@@ -104,21 +107,36 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         }
     }
 
+    public string UserGroup {
+        get => _userGroup;
+        set {
+            if (_userGroup.Equals(value, StringComparison.OrdinalIgnoreCase)) { return; }
+            _userGroup = value;
+            InvalidateView();
+        }
+    }
+
+    public string UserName {
+        get => _userName;
+        set {
+            if (_userName.Equals(value, StringComparison.OrdinalIgnoreCase)) { return; }
+            _userName = value;
+            InvalidateView();
+        }
+    }
+
     #endregion
 
     #region Methods
 
-    public void DoFormulaDatabaseAndRow(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database, long rowKey, string page) {
+    public void DoFormulaDatabaseAndRow(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database, long rowKey) {
         if (IsDisposed) { return; }
-
-        if (string.IsNullOrEmpty(page)) { page = "Head"; }
 
         var oldf = _connectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
 
         if (oldf == cf &&
             Database == database &&
-            RowKey == rowKey &&
-            _pageToShow.Equals(page, StringComparison.OrdinalIgnoreCase)) { return; }
+            RowKey == rowKey) { return; }
 
         SuspendLayout();
 
@@ -153,8 +171,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
             }
         }
 
-        _pageToShow = page;
-
         if (rowKey != -1 && Database != null && cf != null) {
             RowKey = rowKey;
             _tmpShowingRow = Database?.Row.SearchByKey(RowKey);
@@ -167,14 +183,66 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         Invalidate();
     }
 
+    public void GenerateView() {
+        if (_generated) { return; }
+
+        var unused = new List<Control>();
+        foreach (var thisco in Controls) {
+            if (thisco is Control c) {
+                unused.Add(c);
+            }
+        }
+
+        if (_connectedFormula != null && _connectedFormula.PadData != null) {
+            //if (Visible || Controls.Count > 0) {
+            var addfactor = Size.Width / _connectedFormula.PadData.SheetSizeInPix.Width;
+
+            foreach (var thisit in _connectedFormula.PadData) {
+                if (thisit.IsVisibleOnPage(_pageToShow) && thisit is IItemToControl thisitco) {
+                    var o = SearchOrGenerate(thisitco);
+
+                    if (o is Control c) {
+                        _ = unused.Remove(c);
+
+                        if (thisit is FakeControlPadItem cspi) {
+                            c.Visible = cspi.IsVisibleForMe(UserName, UserGroup);
+                        } else {
+                            c.Visible = true;
+                        }
+
+                        var ua = thisit.UsedArea;
+                        c.Left = (int)(ua.Left * addfactor);
+                        c.Top = (int)(ua.Top / Umrechnungsfaktor2);
+                        c.Width = (int)(ua.Width * addfactor);
+                        c.Height = (int)(ua.Height / Umrechnungsfaktor2);
+
+                        if (thisit is TabFormulaPadItem c3) {
+                            c3.CreateTabs((TabControl)c, UserName, UserGroup);
+                        }
+                    }
+                }
+            }
+            _generated = true;
+            //}
+        }
+
+        foreach (var thisc in unused) {
+            Controls.Remove(thisc);
+            thisc?.Dispose();
+        }
+    }
+
     public void GetConnectedFormulaFromDatabase(DatabaseAbstract? database) {
         if (database != null && !database.IsDisposed) {
             var f = database.FormulaFileName();
 
+            UserName = database.UserName;
+            UserGroup = database.UserGroup;
+
             if (f != null) {
                 var tmpFormula = GetByFilename(f);
                 if (tmpFormula != null) {
-                    DoFormulaDatabaseAndRow(tmpFormula, database, -1, "Head");
+                    DoFormulaDatabaseAndRow(tmpFormula, database, -1);
                     return;
                 }
             }
@@ -236,56 +304,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
 
     private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
 
-    private void _Database_Disposing(object sender, System.EventArgs e) => DoFormulaDatabaseAndRow(ConnectedFormula, null, -1, Page);
-
-    private void GenerateView() {
-        if (_generated) { return; }
-
-        var unused = new List<Control>();
-        foreach (var thisco in Controls) {
-            if (thisco is Control c) {
-                unused.Add(c);
-            }
-        }
-
-        if (_connectedFormula != null && _connectedFormula.PadData != null) {
-            if (Visible || Controls.Count > 0) {
-                var addfactor = Size.Width / _connectedFormula.PadData.SheetSizeInPix.Width;
-
-                foreach (var thisit in _connectedFormula.PadData) {
-                    if (thisit.IsVisibleOnPage(_pageToShow) && thisit is IItemToControl thisitco) {
-                        var o = SearchOrGenerate(thisitco);
-
-                        if (o is Control c) {
-                            _ = unused.Remove(c);
-
-                            if (thisit is FakeControlPadItem cspi) {
-                                c.Visible = cspi.IsVisibleForMe(Database?.UserGroup, Database?.UserName);
-                            } else {
-                                c.Visible = true;
-                            }
-
-                            var ua = thisit.UsedArea;
-                            c.Left = (int)(ua.Left * addfactor);
-                            c.Top = (int)(ua.Top / Umrechnungsfaktor2);
-                            c.Width = (int)(ua.Width * addfactor);
-                            c.Height = (int)(ua.Height / Umrechnungsfaktor2);
-
-                            if (thisit is TabFormulaPadItem c3) {
-                                c3.CreateTabs((TabControl)c, Database?.UserGroup, Database?.UserName);
-                            }
-                        }
-                    }
-                }
-                _generated = true;
-            }
-        }
-
-        foreach (var thisc in unused) {
-            Controls.Remove(thisc);
-            thisc?.Dispose();
-        }
-    }
+    private void _Database_Disposing(object sender, System.EventArgs e) => DoFormulaDatabaseAndRow(ConnectedFormula, null, -1);
 
     private void RemoveRow() {
         RowKey = -1;
@@ -295,7 +314,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (e.Row != null && RowKey == e.Row.Key) {
-            DoFormulaDatabaseAndRow(ConnectedFormula, Database, -1, Page);
+            DoFormulaDatabaseAndRow(ConnectedFormula, Database, -1);
         }
     }
 

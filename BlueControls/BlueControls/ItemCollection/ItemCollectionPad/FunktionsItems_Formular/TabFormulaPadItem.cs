@@ -104,7 +104,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return con;
     }
 
-    public void CreateTabs(TabControl c3, string? myGroup, string? myName) {
+    public void CreateTabs(TabControl c3, string myName, string myGroup) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -117,6 +117,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
             string pg;
             string pgvis;
 
+            #region Connected Formuala (cf)  ermitteln und evtl. von festplatte laden
+
             if (thisc.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
                 cf = ConnectedFormula.ConnectedFormula.GetByFilename(thisc);
                 pg = "Head";
@@ -126,6 +128,10 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                 pg = thisc;
                 pgvis = thisc;
             }
+
+            #endregion
+
+            #region Prüfen, ob der Tab schon vorhanden ist (existsTab)
 
             TabPage? existTab = null;
 
@@ -138,22 +144,53 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                 }
             }
 
+            #endregion
+
             if (cf != null) {
-                if (cf.HasVisibleItemsForMe(pgvis, myGroup, myName)) {
+                if (cf.HasVisibleItemsForMe(pgvis, myName, myGroup)) {
+                    ConnectedFormulaView? cc = null;
+
                     if (existTab == null) {
+
+                        #region Neuen Tab und ConnectedFormulaView (cc) erstellen
+
                         var t = new TabPage {
                             Name = thisc.FileNameWithoutSuffix(),
                             Text = thisc.FileNameWithoutSuffix()
                         };
                         c3.TabPages.Add(t);
 
-                        var cc = new ConnectedFormulaView(pg);
+                        cc = new ConnectedFormulaView(pg, myName, myGroup);
                         t.Controls.Add(cc);
-                        cc.DoFormulaDatabaseAndRow(cf, null, -1, pg);
+                        cc.DoFormulaDatabaseAndRow(cf, null, -1);
                         cc.Dock = DockStyle.Fill;
+                        cc.GenerateView();
+
+                        #endregion
+                    } else {
+
+                        #region ConnectedFormulaView (cc) im Tab Suchen
+
+                        foreach (var thisControl in existTab.Controls) {
+                            if (thisControl is ConnectedFormulaView cctmp) {
+                                cc = cctmp; break;
+                            }
+                        }
+
+                        #endregion
+                    }
+
+                    #endregion Die Werte in ConnectedFormulaView richtig stellen
+
+                    if (cc != null) {
+                        cc.UserGroup = myGroup;
+                        cc.UserName = myName;
                     }
                 } else {
                     if (existTab != null) {
+
+                        #region Tab löschen
+
                         foreach (var thisC in existTab.Controls) {
                             if (thisC is IDisposable c) {
                                 c.Dispose();
@@ -162,12 +199,12 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
                         c3.TabPages.Remove(existTab);
                         existTab.Dispose();
+
+                        #endregion
                     }
                 }
             }
         }
-
-        #endregion
     }
 
     public override string ErrorReason() {

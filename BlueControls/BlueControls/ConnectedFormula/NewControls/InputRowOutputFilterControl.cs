@@ -18,7 +18,9 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Drawing;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
@@ -45,6 +47,7 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
         _inputcolumn = inputcolumn;
         _outputcolumn = outputcolumn;
         _type = type;
+        //Visible = false;
     }
 
     #endregion
@@ -57,6 +60,7 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
             if (_filter?.Equals(value) ?? false) { return; }
             _filter = value;
             this.DoChilds(_childs);
+            Invalidate();
         }
     }
 
@@ -105,16 +109,16 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
 
         switch (_type) {
             case FilterTypeRowInputItem.Ist_GrossKleinEgal:
-                Filter = new FilterItem(database, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, LastInputRow.CellGetString(_outputcolumn));
+                Filter = new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, LastInputRow.CellGetString(_inputcolumn));
                 return;
 
             case FilterTypeRowInputItem.Ist_genau:
-                Filter = new FilterItem(database, BlueDatabase.Enums.FilterType.Istgleich, LastInputRow.CellGetString(_outputcolumn));
+                Filter = new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich, LastInputRow.CellGetString(_inputcolumn));
                 return;
 
             case FilterTypeRowInputItem.Ist_eines_der_Wörter_GrossKleinEgal:
                 var list = LastInputRow.CellGetString(_inputcolumn).HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
-                Filter = new FilterItem(database, BlueDatabase.Enums.FilterType.Istgleich_ODER_GroßKleinEgal, list);
+                Filter = new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_ODER_GroßKleinEgal, list);
 
                 //List<string> names = new();
                 //names.AddRange(_outputcolumn.GetUcaseNamesSortedByLenght());
@@ -134,6 +138,17 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
                 Filter = new FilterItem();
                 return;
         }
+    }
+
+    /// <summary>
+    /// Dummy, für Designer
+    /// </summary>
+    /// <param name="gr"></param>
+    /// <param name="state"></param>
+    protected override void DrawControl(Graphics gr, States state) {
+        if (gr == null || _filter == null) { return; }
+        Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+        Skin.Draw_FormatedText(gr, "Filter: " + _filter.ReadableText(), Design.Caption, state, _filter.SymbolForReadableText(), Alignment.Top_Left, new Rectangle(), null, false, false);
     }
 
     #endregion

@@ -192,8 +192,10 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         return result.Parseable(base.ToString());
     }
 
-    internal bool IsVisibleForMe(string? myGroup, string? myName) {
-        if (myGroup == null || myName == null) { return true; }
+    internal bool IsVisibleForMe(string myName, string myGroup) {
+        //if(!Bei_Export_sichtbar ) { return false; }
+
+        if (string.IsNullOrEmpty(myGroup) || string.IsNullOrEmpty(myName)) { return true; }
 
         if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains(DatabaseAbstract.Everybody, false)) { return true; }
 

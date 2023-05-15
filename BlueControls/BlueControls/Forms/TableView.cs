@@ -149,12 +149,18 @@ public partial class TableView : FormWithStatusBar {
         }
     }
 
+    /// <summary>
+    /// Gibt TRUE zuück, wenn eine Fehlernachricht angezeigt wurde.
+    /// </summary>
+    /// <param name="database"></param>
+    /// <param name="mode"></param>
+    /// <returns></returns>
     public static bool ErrorMessage(DatabaseAbstract? database, EditableErrorReason mode) {
         var m = DatabaseAbstract.EditableErrorReason(database, mode);
-        if (string.IsNullOrEmpty(m)) { return true; }
+        if (string.IsNullOrEmpty(m)) { return false; }
 
         MessageBox.Show("Aktion nicht möglich:<br>" + m);
-        return false;
+        return true;
     }
 
     public static void OpenColumnEditor(ColumnItem? column, RowItem? row, Table? tableview) {
@@ -407,7 +413,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (Table.Database != database) {
-            Formula.DoFormulaDatabaseAndRow(null, null, -1, string.Empty);
+            Formula.DoFormulaDatabaseAndRow(null, null, -1);
         }
 
         FilterLeiste.Table = Table;
@@ -469,7 +475,7 @@ public partial class TableView : FormWithStatusBar {
             if (Formula.Width < 30 || Formula.Height < 10) { return; }
 
             Formula.GetConnectedFormulaFromDatabase(r?.Database);
-            Formula.DoFormulaDatabaseAndRow(Formula.ConnectedFormula, r?.Database, r?.Key ?? -1, Formula.Page);
+            Formula.DoFormulaDatabaseAndRow(Formula.ConnectedFormula, r?.Database, r?.Key ?? -1);
         }
     }
 

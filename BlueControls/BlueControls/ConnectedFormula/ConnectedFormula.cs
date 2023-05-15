@@ -255,11 +255,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     /// Zeilenselectionen werden dabei ignoriert.
     /// </summary>
     /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
-    /// <param name="myGroup"></param>
     /// <param name="myName"></param>
+    /// <param name="myGroup"></param>
     /// <returns></returns>
-    /// <exception cref="NotImplementedException"></exception>
-    internal bool HasVisibleItemsForMe(string page, string? myGroup, string? myName) {
+    internal bool HasVisibleItemsForMe(string page, string myName, string myGroup) {
         if (_padData == null) { return false; }
 
         foreach (var thisItem in _padData) {
@@ -267,7 +266,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                 string.IsNullOrEmpty(thisItem.Page) ||
                 page.Equals(thisItem.Page, StringComparison.OrdinalIgnoreCase)) {
                 if (thisItem is FakeControlPadItem cspi) {
-                    if (cspi.IsVisibleForMe(myGroup, myName)) { return true; }
+                    if (cspi.IsVisibleForMe(myName, myGroup)) { return true; }
                 }
             }
         }

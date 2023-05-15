@@ -538,7 +538,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         Invalidate();
 
         var it = (BasicPadItem)e.Item;
-        it.Page = CurrentPage;
+
+        if (string.IsNullOrEmpty(it.Page)) { it.Page = CurrentPage; }
 
         OnItemAdded(e);
     }
