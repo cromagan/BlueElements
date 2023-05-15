@@ -268,6 +268,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
         #region Zeilen erzeugen
 
+   
         var f = FilteredRows;
         if (f != null) {
             foreach (var thisR in f) {

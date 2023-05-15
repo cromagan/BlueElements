@@ -178,13 +178,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (ColumnItem.UserEditDialogTypeInTable(column.Format, false, true, withDropDown) == EditTypeTable.None) {
                 return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für den Typ des Spalteninhalts '" + column.Format + "' definiert.";
             }
+
+            if (!column.TextBearbeitungErlaubt && !column.DropdownBearbeitungErlaubt) {
+                return LanguageTool.DoTranslate("Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.");
+            }
         }
 
-        if (checkUserRights) { return string.Empty; }
-
-        if (!column.TextBearbeitungErlaubt && !column.DropdownBearbeitungErlaubt) {
-            return LanguageTool.DoTranslate("Die Inhalte dieser Spalte können nicht manuell bearbeitet werden, da keine Bearbeitungsmethode erlaubt ist.");
-        }
+        if (!checkUserRights) { return string.Empty; }
 
         return !column.Database.PermissionCheck(column.PermissionGroupsChangeCell, row)
                 ? LanguageTool.DoTranslate("Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.")

@@ -347,7 +347,7 @@ public static partial class Extensions {
         tXt = tXt.Replace("&oslash;", "ø");
         tXt = tXt.Replace("&bull;", "•");
         if (!ignoreBr) {
-            tXt = tXt.Replace("<br>", "\r");
+            tXt = tXt.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         }
         tXt = tXt.Replace("<", ((char)1020).ToString());
         tXt = tXt.Replace(">", ((char)1021).ToString());
