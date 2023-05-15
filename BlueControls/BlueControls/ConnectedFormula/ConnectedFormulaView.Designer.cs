@@ -16,12 +16,12 @@ namespace BlueControls.Controls {
 
             if(disposing) {
                 //SetData(null,null);
-                DoFormulaDatabaseAndRow(null, null, -1);
+                SetData(null, null, -1);
             }
 
 
             if (disposing && (components != null)) {
-                DoFormulaDatabaseAndRow(null, null, -1);
+                SetData(null, null, -1);
                 components?.Dispose();
             }
             base.Dispose(disposing);
