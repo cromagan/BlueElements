@@ -177,7 +177,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         return txt + ErrorReason();
     }
 
-    public override QuickImage SymbolForReadableText() {
+    public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
@@ -215,7 +215,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);
         }
-
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);

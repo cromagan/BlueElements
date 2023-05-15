@@ -180,7 +180,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         SetCoordinates(x, true);
     }
 
-    public abstract QuickImage SymbolForReadableText();
+    public abstract QuickImage? SymbolForReadableText();
 
     public override string ToString() {
         var result = new List<string>();
@@ -301,11 +301,9 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         }
 
         if (drawSymbol && drawText) {
-            var v2 = SymbolForReadableText().Scale(zoom);
-            Skin.Draw_FormatedText(gr, ReadableText(), v2, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
+            Skin.Draw_FormatedText(gr, ReadableText(), SymbolForReadableText()?.Scale(zoom), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
         } else if (drawSymbol) {
-            var v2 = SymbolForReadableText().Scale(zoom);
-            Skin.Draw_FormatedText(gr, string.Empty, v2, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
+            Skin.Draw_FormatedText(gr, string.Empty, SymbolForReadableText()?.Scale(zoom), Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
         } else if (drawText) {
             Skin.Draw_FormatedText(gr, ReadableText(), null, Alignment.Horizontal_Vertical_Center, drawingCoordinates.ToRect(), null, true, ColumnFont?.Scale(zoom), false);
         }

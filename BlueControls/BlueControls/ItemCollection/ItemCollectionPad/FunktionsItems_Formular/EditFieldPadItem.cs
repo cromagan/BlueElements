@@ -299,7 +299,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         OnChanged();
     }
 
-    public override QuickImage SymbolForReadableText() {
+    public override QuickImage? SymbolForReadableText() {
         if (IsOk() && Column != null) {
             return Column.SymbolForReadableText();
 

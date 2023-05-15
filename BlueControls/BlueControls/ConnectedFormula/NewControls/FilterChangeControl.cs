@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using BlueBasics;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
@@ -30,7 +31,7 @@ internal class FilterChangeControl : GenericControl, IControlAcceptFilter, ICont
 
     private readonly List<IControlAcceptFilter> _childs = new();
 
-    private readonly List<IControlSendFilter> _parentSender = new();
+    private readonly List<IControlSendFilter> _getFilterFrom = new();
 
     #endregion
 
@@ -38,21 +39,22 @@ internal class FilterChangeControl : GenericControl, IControlAcceptFilter, ICont
 
     public FilterItem Filter { get; }
 
-    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
+    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 
     #region Methods
 
-    public void AddParentSender(IControlSendFilter item) {
-        //Invalidate_Filters();
-        _parentSender.Add(item);
+    public void AddGetFilterFrom(IControlSendFilter item) {
+        _getFilterFrom.AddIfNotExists(item);
+        FilterFromParentsChanged();
+        item.ChildAdd(this);
     }
 
     public void ChildAdd(IControlAcceptFilter c) {
         if (IsDisposed) { return; }
-        _childs.Add(c);
+        _childs.AddIfNotExists(c);
         this.DoChilds(_childs);
     }
 

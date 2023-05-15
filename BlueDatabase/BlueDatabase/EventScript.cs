@@ -282,7 +282,7 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
         return Name;
     }
 
-    public QuickImage SymbolForReadableText() {
+    public QuickImage? SymbolForReadableText() {
         if (!IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
 
         var symb = ImageCode.Formel;

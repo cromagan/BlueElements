@@ -33,7 +33,7 @@ public interface IControlAcceptFilter : IControlAcceptSomething {
 
     #region Methods
 
-    public void AddParentSender(IControlSendFilter item);
+    public void AddGetFilterFrom(IControlSendFilter item);
 
     public void FilterFromParentsChanged();
 
@@ -47,16 +47,14 @@ public static class IControlAcceptFilterExtension {
     public static void DoInputSettings(this IControlAcceptFilter dest, ConnectedFormulaView parent, IItemAcceptFilter source) {
         dest.Name = source.DefaultItemToControlName();
 
-        if (source.GetFilterFrom != null) {
-            foreach (var thisKey in source.GetFilterFrom) {
-                var it = source.Parent[thisKey];
+        foreach (var thisKey in source.GetFilterFrom) {
+            var it = source.Parent[thisKey];
 
-                if (it is IItemToControl itc) {
-                    var ff = parent.SearchOrGenerate(itc);
+            if (it is IItemToControl itc) {
+                var ff = parent.SearchOrGenerate(itc);
 
-                    if (ff is IControlSendFilter ffx) {
-                        dest.AddParentSender(ffx);
-                    }
+                if (ff is IControlSendFilter ffx) {
+                    dest.AddGetFilterFrom(ffx);
                 }
             }
         }

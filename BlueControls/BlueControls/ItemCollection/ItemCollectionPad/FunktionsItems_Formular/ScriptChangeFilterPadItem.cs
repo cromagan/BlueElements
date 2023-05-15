@@ -148,7 +148,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage SymbolForReadableText() {
+    public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Skript, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }

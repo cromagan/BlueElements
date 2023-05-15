@@ -66,8 +66,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly int RowCaptionSizeY = 50;
     private readonly List<IControlAcceptRow> _childs = new();
     private readonly List<string> _collapsed = new();
+    private readonly List<IControlSendFilter> _getFilterFrom = new();
     private readonly object _lockUserAction = new();
-    private readonly List<IControlSendFilter> _parentSender = new();
     private int _arrangementNr = 1;
     private AutoFilter? _autoFilter;
     private BlueFont? _cellFont;
@@ -272,7 +272,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
-    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
+    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
     public DatabaseAbstract? OutputDatabase { get => Database; set => Database = value; }
     public List<RowItem> PinnedRows { get; } = new();
 
@@ -639,9 +639,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public void AddParentSender(IControlSendFilter item) {
-        _parentSender.Add(item);
-        Invalidate_FilteredRows();
+    public void AddGetFilterFrom(IControlSendFilter item) {
+        _getFilterFrom.AddIfNotExists(item);
+        FilterFromParentsChanged();
+        item.ChildAdd(this);
     }
 
     public void CheckView() {
@@ -659,7 +660,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void ChildAdd(IControlAcceptRow c) {
         if (IsDisposed) { return; }
-        _childs.Add(c);
+        _childs.AddIfNotExists(c);
         this.DoChilds(_childs, CursorPosRow?.Row);
     }
 

@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
+using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -37,11 +38,9 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     private readonly List<IControlAcceptRow> _childs = new();
 
-    private readonly List<IControlSendFilter> _parentSender = new();
+    private readonly List<IControlSendFilter> _getFilterFrom = new();
 
     private readonly string _showformat;
-
-    private bool _disposing;
 
     private List<RowItem>? _filteredRows;
 
@@ -69,7 +68,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), this.InputDatabase());
 
-    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
+    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
 
     public DatabaseAbstract? OutputDatabase { get; set; }
 
@@ -87,22 +86,25 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     #region Methods
 
-    public void AddParentSender(IControlSendFilter item) {
-        _parentSender.Add(item);
-        Invalidate_Filters();
+    public void AddGetFilterFrom(IControlSendFilter item) {
+        _getFilterFrom.AddIfNotExists(item);
+        FilterFromParentsChanged();
+        item.ChildAdd(this);
     }
 
     public void ChildAdd(IControlAcceptRow c) {
         if (IsDisposed) { return; }
-        _childs.Add(c);
+        _childs.AddIfNotExists(c);
         this.DoChilds(_childs, _row);
     }
 
     public void FilterFromParentsChanged() => Invalidate_FilteredRows();
 
-    public void Invalidate_FilteredRows() => _filteredRows = null;
-
-    public void Invalidate_Filters() => _filteredRows = null;
+    public void Invalidate_FilteredRows() {
+        if (IsDisposed) { return; }
+        _filteredRows = null;
+        Invalidate();
+    }
 
     //public void SetData(DatabaseAbstract? database, long? rowkey) {
     //    if (_disposing || IsDisposed) { return; }
@@ -222,12 +224,12 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
         base.Dispose(disposing);
 
         if (disposing) {
-            _disposing = true;
+            //_disposing = true;
             Row = null;
 
             Tag = null;
 
-            _disposing = true;
+            //_disposing = true;
             _childs.Clear();
 
             _filteredRows = null;

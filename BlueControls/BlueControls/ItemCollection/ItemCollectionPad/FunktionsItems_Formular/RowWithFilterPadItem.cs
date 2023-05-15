@@ -279,7 +279,7 @@ public class RowWithFilterPadItem : FakeControlPadItem, IReadableText, IItemToCo
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage SymbolForReadableText() {
+    public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.PlusZeichen, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }

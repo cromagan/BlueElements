@@ -1949,8 +1949,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             }
             //OnDropMessage(FehlerArt.Info, "Bild '" + e.Name + "' im Verzeihniss der Zusatzdateien nicht gefunden.");
 
-            var l = new List<string>();
-            l.Save(fullhashname, Encoding.UTF8, false);
+            #region   Datei nicht vorhanden, dann einen Dummy speichern
+
+            if (!string.IsNullOrWhiteSpace(CachePfad)) {
+                var l = new List<string>();
+                l.Save(fullhashname, Encoding.UTF8, false);
+            }
+
+            #endregion
         } catch { }
     }
 

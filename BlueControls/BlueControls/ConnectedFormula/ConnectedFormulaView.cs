@@ -69,24 +69,18 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         //set => SetData(value, Database, RowKey, Page);
     }
 
+    public new ControlCollection Controls {
+        get {
+            GenerateView();
+            return base.Controls;
+        }
+    }
+
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DatabaseAbstract? Database { get; private set; }
-
-    //public IControlSendRow? GetRowFrom {
-    //    get => _getRowFrom;
-    //    set {
-    //        if (_getRowFrom == value) { return; }
-    //        if (_getRowFrom != null) {
-    //            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
-    //        }
-
-    //        _getRowFrom = value;
-    //        if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
-    //    }
-    //}
 
     public string Page { get; } = "Head";
 
@@ -130,14 +124,14 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         if (_generated) { return; }
 
         var unused = new List<Control>();
-        foreach (var thisco in Controls) {
+        foreach (var thisco in base.Controls) {
             if (thisco is Control c) {
                 unused.Add(c);
             }
         }
 
         if (ConnectedFormula != null && ConnectedFormula.PadData != null) {
-            //if (Visible || Controls.Count > 0) {
+            //if (Visible || base.Controls.Count > 0) {
             var addfactor = Size.Width / ConnectedFormula.PadData.SheetSizeInPix.Width;
 
             foreach (var thisit in ConnectedFormula.PadData) {
@@ -170,7 +164,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         }
 
         foreach (var thisc in unused) {
-            Controls.Remove(thisc);
+            base.Controls.Remove(thisc);
             thisc?.Dispose();
         }
     }
@@ -179,15 +173,20 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         if (database != null && !database.IsDisposed) {
             var f = database.FormulaFileName();
 
+            var rk = RowKey;
+            if (Database != database) {
+                rk = -1;
+            }
+
             UserName = database.UserName;
             UserGroup = database.UserGroup;
 
             if (f != null) {
                 var tmpFormula = GetByFilename(f);
-                if (tmpFormula != null) {
-                    SetData(tmpFormula, database, -1);
-                    return;
+                if (tmpFormula != ConnectedFormula) {
+                    SetData(tmpFormula, database, rk);
                 }
+                return;
             }
         }
 
@@ -202,7 +201,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
     public Control? SearchOrGenerate(IItemToControl? thisit) {
         if (thisit == null) { return null; }
 
-        foreach (var thisC in Controls) {
+        foreach (var thisC in base.Controls) {
             if (thisC is Control cx && cx.Name is string sx && sx == thisit.DefaultItemToControlName()) { return cx; }
         }
 
@@ -212,7 +211,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
             return null;
         }
 
-        Controls.Add(c);
+        base.Controls.Add(c);
         return c;
     }
 

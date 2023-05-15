@@ -86,7 +86,7 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
 
     public void ChildAdd(IControlAcceptFilter c) {
         if (IsDisposed) { return; }
-        _childs.Add(c);
+        _childs.AddIfNotExists(c);
         this.DoChilds(_childs);
     }
 

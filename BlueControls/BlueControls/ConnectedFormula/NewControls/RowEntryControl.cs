@@ -64,7 +64,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
 
     public void ChildAdd(IControlAcceptRow c) {
         if (IsDisposed) { return; }
-        _childs.Add(c);
+        _childs.AddIfNotExists(c);
         this.DoChilds(_childs, LastInputRow);
     }
 

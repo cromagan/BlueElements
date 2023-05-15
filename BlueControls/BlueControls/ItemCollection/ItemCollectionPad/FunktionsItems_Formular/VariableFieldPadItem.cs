@@ -185,7 +185,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         return txt + ErrorReason();
     }
 
-    public override QuickImage SymbolForReadableText() {
+    public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Variable, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }

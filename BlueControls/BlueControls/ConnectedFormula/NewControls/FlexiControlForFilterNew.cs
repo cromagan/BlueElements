@@ -22,6 +22,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
@@ -36,7 +37,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
 
     private readonly List<IControlAcceptFilter> _childs = new();
 
-    private readonly List<IControlSendFilter> _parentSender = new();
+    private readonly List<IControlSendFilter> _getFilterFrom = new();
 
     #endregion
 
@@ -58,7 +59,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
 
     public FilterItem? Filter { get; }
 
-    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_parentSender);
+    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
 
     public DatabaseAbstract? OutputDatabase { get; set; }
 
@@ -66,14 +67,15 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
 
     #region Methods
 
-    public void AddParentSender(IControlSendFilter item) {
-        //Invalidate_Filters();
-        _parentSender.Add(item);
+    public void AddGetFilterFrom(IControlSendFilter item) {
+        _getFilterFrom.AddIfNotExists(item);
+        FilterFromParentsChanged();
+        item.ChildAdd(this);
     }
 
     public void ChildAdd(IControlAcceptFilter c) {
         if (IsDisposed) { return; }
-        _childs.Add(c);
+        _childs.AddIfNotExists(c);
         this.DoChilds(_childs);
     }
 

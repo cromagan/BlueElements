@@ -179,7 +179,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public bool ParseVariables(VariableCollection list) {
+    public bool ParseVariables(VariableCollection? list) {
         if (IsDisposed) { return false; }
 
         var ct = string.Empty;

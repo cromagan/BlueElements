@@ -387,7 +387,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReason.EditAcut);
-        if (string.IsNullOrEmpty(m) || Database == null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
+        if (!string.IsNullOrEmpty(m) || Database == null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
 
         var t = DateTime.Now;
         do {
@@ -576,7 +576,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues) {
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReason.EditAcut);
-        if (string.IsNullOrEmpty(m) || Database == null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
+        if (!string.IsNullOrEmpty(m) || Database == null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
 
         var feh = Database.EditableErrorReason(EditableErrorReason.EditAcut);
         if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true, "Allgemein"); }

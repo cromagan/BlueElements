@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using BlueBasics;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
@@ -44,9 +45,10 @@ internal class ButtonAddRow : Button, IControlAcceptFilter, ICalculateRows {
 
     #region Methods
 
-    public void AddParentSender(IControlSendFilter item) {
+    public void AddGetFilterFrom(IControlSendFilter item) {
+        _getFilterFrom.AddIfNotExists(item);
         FilterFromParentsChanged();
-        _getFilterFrom.Add(item);
+        item.ChildAdd(this);
     }
 
     public void FilterFromParentsChanged() => Invalidate_FilteredRows();

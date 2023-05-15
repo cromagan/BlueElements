@@ -246,7 +246,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                 var tmp = value.FromNonCritical().SplitBy("|");
                 _childs.Clear();
                 foreach (var thiss in tmp) {
-                    _childs.Add(thiss.FromNonCritical());
+                    _childs.AddIfNotExists(thiss.FromNonCritical());
                 }
                 return true;
 
@@ -266,7 +266,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return txt + ErrorReason();
     }
 
-    public override QuickImage SymbolForReadableText() {
+    public override QuickImage? SymbolForReadableText() {
         if (IsOk()) {
             return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
