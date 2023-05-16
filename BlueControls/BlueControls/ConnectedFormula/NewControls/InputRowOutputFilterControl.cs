@@ -33,11 +33,11 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
 
     private readonly List<IControlAcceptFilter> _childs = new();
 
-    private readonly ColumnItem? _inputcolumn = null;
-    private readonly ColumnItem? _outputcolumn = null;
+    private readonly ColumnItem? _inputcolumn;
+    private readonly ColumnItem? _outputcolumn;
     private readonly FilterTypeRowInputItem _type;
-    private FilterItem? _filter = null;
-    private IControlSendRow? _getRowFrom = null;
+    private FilterItem? _filter;
+    private IControlSendRow? _getRowFrom;
 
     #endregion
 

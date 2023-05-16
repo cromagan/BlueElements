@@ -74,7 +74,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private BlueFont? _chapterFont;
     private BlueFont? _columnFilterFont;
     private BlueFont? _columnFont;
-    private DateTime? _databaseDrawError = null;
+    private DateTime? _databaseDrawError;
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
     private FilterCollection? _filter;
     private List<RowItem>? _filteredRows;
@@ -498,8 +498,16 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (tableView.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
             ca = db.ColumnArrangements[0];
         }
+
+        if (ca == null) {
+            MessageBox.Show("Datenbank-Ansichts-Fehler.", ImageCode.Information, "OK");
+            foundColumn = null;
+            foundRow = null;
+            return;
+        }
+
         row ??= tableView.View_RowLast();
-        column ??= db.Column.SysLocked;
+        column ??= ca.Last()?.Column;
         var rowsChecked = 0;
         if (string.IsNullOrEmpty(searchTxt)) {
             MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
@@ -507,10 +515,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             foundRow = null;
             return;
         }
+
         do {
-            column = tableView.Design == BlueTableAppearance.OnlyMainColumnWithoutHead ? db.ColumnArrangements[0].NextVisible(column) : ca.NextVisible(column);
+            column = tableView.Design == BlueTableAppearance.OnlyMainColumnWithoutHead ?
+                        db.ColumnArrangements[0].NextVisible(column) :
+                        ca.NextVisible(column);
+
             if (column == null) {
-                column = ca[0].Column;
+                column = ca.First()?.Column;
                 if (rowsChecked > tableView.Database.Row.Count() + 1) {
                     foundColumn = null;
                     foundRow = null;
@@ -1180,7 +1192,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public RowData? View_RowFirst() {
         if (Database == null || Database.IsDisposed) { return null; }
         var s = SortedRows();
-        return s == null || s.Count == 0 ? null : SortedRows()[0];
+        return s == null || s.Count == 0 ? null : SortedRows()?[0];
     }
 
     public RowData? View_RowLast() => Database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[SortedRows().Count - 1];
@@ -2465,10 +2477,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private ColumnItem? ColumnOnCoordinate(int xpos) {
         if (Database == null || Database.ColumnArrangements.Count - 1 < _arrangementNr) { return null; }
-        var cua = CurrentArrangement;
-        if (cua == null) { return null; }
+        var ca = CurrentArrangement;
+        if (ca == null) { return null; }
 
-        foreach (var thisViewItem in cua) {
+        foreach (var thisViewItem in ca) {
             if (thisViewItem?.Column != null) {
                 if (xpos >= thisViewItem.OrderTmpSpalteX1 && xpos <= thisViewItem.OrderTmpSpalteX1 + Column_DrawWidth(thisViewItem, DisplayRectangleWithoutSlider())) {
                     return thisViewItem.Column;
@@ -2483,9 +2495,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             // Kommt vor, dass spontan doch geparsed wird...
             if (Database?.ColumnArrangements == null || _arrangementNr >= Database.ColumnArrangements.Count) { return false; }
 
-            var cua = CurrentArrangement;
-            if (cua == null) { return false; }
-            foreach (var thisViewItem in cua) {
+            var ca = CurrentArrangement;
+            if (ca == null) { return false; }
+            foreach (var thisViewItem in ca) {
                 if (thisViewItem != null) {
                     thisViewItem.OrderTmpSpalteX1 = null;
                 }
@@ -2499,7 +2511,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var maxX = 0;
             var displayR = DisplayRectangleWithoutSlider();
             // Spalten berechnen
-            foreach (var thisViewItem in cua) {
+            foreach (var thisViewItem in ca) {
                 if (thisViewItem?.Column != null) {
                     if (thisViewItem.ViewType != ViewType.PermanentColumn) { wdh = false; }
                     if (wdh) {

@@ -70,7 +70,7 @@ public class BackupVerwalter {
     /// Macht eine Reinigung des Verzeichnisses -a usschlaggebend ist LastWriteTimeUtc
     /// </summary>
     /// <param name="path">Das Verzeichnis, das bereinigt werden soll</param>
-    /// <param name="search">DEr Dateipattern, nach dem gesucht werden soll z.b. table_20*.mdb</param>
+    /// <param name="search">Der Dateipattern, nach dem gesucht werden soll z.b. table_20*.bdb</param>
     /// <returns></returns>
     public string CleanUpDirectory(string path, string search) {
         if (string.IsNullOrEmpty(path)) { return "Kein Verzeichniss angebeben."; }

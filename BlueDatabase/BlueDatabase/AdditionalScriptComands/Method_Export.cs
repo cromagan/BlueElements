@@ -34,7 +34,7 @@ internal class Method_Export : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal, FilterVar };
-    public override string Description => "Exportiert die Datenbank im angegeben Format. Achtung, bei MDB wird immer die gesamte Datenbank exportiert und die angegebenen Attribute ingnoriert.";
+    public override string Description => "Exportiert die Datenbank im angegeben Format. Achtung, bei BDB wird immer die gesamte Datenbank exportiert und die angegebenen Attribute ingnoriert.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
@@ -42,7 +42,7 @@ internal class Method_Export : Method_Database {
     public override string Returns => string.Empty;
 
     public override string StartSequence => "(";
-    public override string Syntax => "Export(Filename, HTML/CSV/MDB, AnsichtName, Filter, ...);";
+    public override string Syntax => "Export(Filename, HTML/CSV/BDB, AnsichtName, Filter, ...);";
 
     #endregion
 
@@ -105,7 +105,8 @@ internal class Method_Export : Method_Database {
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
 
         switch (attvar.ValueString(1).ToUpper()) {
-            case "MDB": {
+            case "MDB":
+            case "BDB": {
                     var bytes = Database.ToListOfByte(db, null, 100);
 
                     if (bytes == null) {

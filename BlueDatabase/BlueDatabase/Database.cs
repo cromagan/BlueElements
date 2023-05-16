@@ -45,7 +45,7 @@ public sealed class Database : DatabaseAbstract {
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _editNormalyError = string.Empty;
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
-    private bool _isIn_Save = false;
+    private bool _isIn_Save;
 
     #endregion
 
@@ -597,7 +597,7 @@ public sealed class Database : DatabaseAbstract {
         //    }
         //}
 
-        var nn = Directory.GetFiles(Filename.FilePath(), "*.mdb", SearchOption.AllDirectories);
+        var nn = Directory.GetFiles(Filename.FilePath(), "*.bdb|*.mdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
         foreach (var thisn in nn) {
             var t = ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false);
@@ -609,7 +609,7 @@ public sealed class Database : DatabaseAbstract {
     public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
         if (string.IsNullOrEmpty(Filename)) { return null; }
 
-        var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mdb";
+        var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".bdb";
 
         if (checkExists && !File.Exists(f)) { return null; }
 

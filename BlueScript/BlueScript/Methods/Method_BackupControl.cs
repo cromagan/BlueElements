@@ -41,7 +41,7 @@ internal class Method_BackupControl : Method {
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "BackupControl(filepath, \"table_20*.mdb\");";
+    public override string Syntax => "BackupControl(filepath, \"table_20*.bdb\");";
 
     #endregion
 

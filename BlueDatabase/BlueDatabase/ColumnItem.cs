@@ -2541,7 +2541,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (Database == null || Database.IsDisposed) { return; }
 
         if (!_linkedDatabaseFile.Contains("|") && !_linkedDatabaseFile.IsFormat(FormatHolder.FilepathAndName)) {
-            _linkedDatabaseFile = _linkedDatabaseFile.ToUpper().TrimEnd(".MDB");
+            _linkedDatabaseFile = _linkedDatabaseFile.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB");
             _linkedDatabaseFile = SqlBackAbstract.MakeValidTableName(_linkedDatabaseFile);
         }
 

@@ -458,7 +458,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 return thisFile;
             }
 
-            if (d.AdditionalData.ToLower().EndsWith(".mdb")) {
+            if (d.AdditionalData.ToLower().EndsWith(".mdb") || d.AdditionalData.ToLower().EndsWith(".bdb")) {
                 if (d.AdditionalData.Equals(ci.AdditionalData, StringComparison.OrdinalIgnoreCase)) {
                     return thisFile; // Multiuser - nicht multiuser konflikt
                 }
@@ -497,7 +497,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         #region Wenn die Connection einem Dateinamen entspricht, versuchen den zu laden
 
         if (FileExists(ci.AdditionalData)) {
-            if (ci.AdditionalData.FileSuffix().ToLower() == "mdb") {
+            if (ci.AdditionalData.FileSuffix().ToLower() is "mdb" or "bdb") {
                 return new Database(ci.AdditionalData, false, false, needPassword, userGroup);
             }
         }
@@ -593,7 +593,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             } while (pf != string.Empty);
         }
         var d = Generic.GetEmmbedResource(assembly, name);
-        if (d != null) { return new Database(d, name.ToUpper().TrimEnd(".MDB"), userGroup); }
+        if (d != null) { return new Database(d, name.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB"), userGroup); }
         if (fehlerAusgeben) { Develop.DebugPrint(FehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
         return null;
     }
@@ -1152,18 +1152,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     }
 
     public DatabaseAbstract? GetOtherTable(string tablename, string userGroup) {
-        //if (string.IsNullOrEmpty(tablename)) { return null; }
-
-        //var newpf = Filename.FilePath() + tablename.FileNameWithoutSuffix() + ".mdb";
-
-        //return GetById(new ConnectionInfo(tablename, null, DatabaseID, newpf);
-        //// KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
-
-        //    public override DatabaseAbstract? GetOtherTable(string tablename) {
-        //if (!SQLBackAbstract.IsValidTableName(tablename)) {
-        //    return null;
-        //}
-
         if (!SqlBackAbstract.IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Ungültiger Tabellenname: " + tablename);
             return null;

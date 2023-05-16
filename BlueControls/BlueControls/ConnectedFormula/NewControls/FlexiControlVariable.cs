@@ -46,7 +46,7 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
     #region Fields
 
     private string _columnName = string.Empty;
-    private IControlSendRow? _getRowFrom = null;
+    private IControlSendRow? _getRowFrom;
     private long _rowKey = -1;
     private ColumnItem? _tmpColumn;
     private RowItem? _tmpRow;

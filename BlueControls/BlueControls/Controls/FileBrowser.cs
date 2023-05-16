@@ -47,7 +47,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
 {
     #region Fields
 
-    private IControlSendRow? _getRowFrom = null;
+    private IControlSendRow? _getRowFrom;
     private string _lastcheck = string.Empty;
     private string _originalText = string.Empty;
     private string _sort = "Name";

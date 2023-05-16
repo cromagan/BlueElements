@@ -646,13 +646,9 @@ internal sealed partial class ColumnEditor {
         if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedDatabase.Item.Count == 0) {
             var l = DatabaseAbstract.AllAvailableTables();
 
-            //if (!string.IsNullOrEmpty(_column.Database.Filename)) {
-            //var all = Directory.GetFiles(_column.Database.Filename.FilePath(), "*.mdb", SearchOption.TopDirectoryOnly);
             foreach (var thisString in l) {
                 if (!string.Equals(thisString.UniqueID, _column.Database.ConnectionData.UniqueID, StringComparison.OrdinalIgnoreCase)) { _ = cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueID); }
             }
-            //}
-            //cbxLinkedDatabase.Item.Sort();
         }
     }
 

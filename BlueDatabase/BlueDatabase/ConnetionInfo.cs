@@ -52,7 +52,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
         #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine preveredFileFormatID zurück geben
 
         if (uniqueId.IsFormat(FormatHolder.FilepathAndName) &&
-            uniqueId.FileSuffix().ToUpper() == "MDB") {
+            uniqueId.FileSuffix().ToUpper() is "MDB" or "BDB") {
             foreach (var thisDb in alf) {
                 var d = thisDb.ConnectionData;
 
@@ -104,42 +104,6 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
         }
 
         #endregion
-
-        //if (d.DatabaseID == Database.DatabaseId) {
-        //    // Dateisystem
-        //    var dn = d.AdditionalData.FilePath() + x[0] + ".mdb";
-        //    if (System.IO.File.Exists(dn)) {
-        //        TableName = x[0].ToUpper();
-        //        Provider = thisDB;
-        //        DatabaseID = Database.DatabaseId;
-        //        AdditionalData = dn;
-        //    }
-        //}
-
-        //if (d.DatabaseID == DatabaseMultiUser.DatabaseId) {
-        //    // Dateisystem
-        //    var dn = d.AdditionalData.FilePath() + x[0] + ".mdb";
-        //    if (System.IO.File.Exists(dn)) {
-        //        TableName = x[0].ToUpper();
-        //        Provider = thisDB;
-        //        DatabaseID = DatabaseMultiUser.DatabaseId;
-        //        AdditionalData = dn;
-        //    }
-        //}
-        //var tbn = SQLBackAbstract.MakeValidTableName(uniqueID.FileNameWithoutSuffix());
-
-        //if (!SQLBackAbstract.IsValidTableName(x[0])) {
-        //    var ci = DatabaseAbstract.ProviderOf(x[0]);
-
-        //    if (ci != null) {
-        //        TableName = ci.TableName;
-        //        Provider = ci.Provider;
-        //        DatabaseID = ci.DatabaseID;
-        //        AdditionalData = ci.AdditionalData;
-        //    }
-        //}
-
-        //Develop.DebugPrint(FehlerArt.Warnung, "Datenbank konnte nicht gefunden werden: " + uniqueId);
     }
 
     public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string? additionalInfo) {
@@ -221,6 +185,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
     public string ReadableText() => TableName;
 
     public QuickImage? SymbolForReadableText() {
+        if (AdditionalData.ToLower().Contains(".bdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
         if (AdditionalData.ToLower().Contains(".mdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
         return QuickImage.Get(ImageCode.Datenbank, 16);
     }

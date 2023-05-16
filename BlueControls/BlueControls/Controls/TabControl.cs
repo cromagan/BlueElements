@@ -31,7 +31,7 @@ public class TabControl : AbstractTabControl, IControlAcceptRow {
 
     #region Fields
 
-    private IControlSendRow? _getRowFrom = null;
+    private IControlSendRow? _getRowFrom;
 
     #endregion
 

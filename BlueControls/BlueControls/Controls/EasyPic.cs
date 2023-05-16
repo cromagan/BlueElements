@@ -46,7 +46,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     private Bitmap? _bitmap;
     private string _filename = string.Empty;
-    private IControlSendRow? _getRowFrom = null;
+    private IControlSendRow? _getRowFrom;
     private string _originalText = string.Empty;
     private int _panelMoveDirection;
 

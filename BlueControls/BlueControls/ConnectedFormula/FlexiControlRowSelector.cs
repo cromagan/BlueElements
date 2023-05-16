@@ -43,9 +43,9 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     private readonly List<IControlAcceptRow> _childs = new();
     private readonly string _showformat;
     private bool _disposing;
-    private FilterCollection? _filter = null;
+    private FilterCollection? _filter;
     private List<RowItem>? _filteredRows;
-    private IControlSendRow? _getRowFrom = null;
+    private IControlSendRow? _getRowFrom;
     private RowItem? _row;
 
     #endregion

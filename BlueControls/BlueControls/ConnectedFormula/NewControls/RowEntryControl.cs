@@ -30,7 +30,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
 
     private readonly List<IControlAcceptRow> _childs = new();
 
-    private IControlSendRow? _getRowFrom = null;
+    private IControlSendRow? _getRowFrom;
 
     #endregion
 

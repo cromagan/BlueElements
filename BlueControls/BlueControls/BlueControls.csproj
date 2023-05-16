@@ -834,10 +834,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Ressourcen\Dictionary\Deutsch.MDB" />
+    <None Include="Ressourcen\Dictionary\Deutsch.BDB" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Ressourcen\Styles\Styles.MDB" />
+    <None Include="Ressourcen\Styles\Styles.BDB" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -235,40 +235,6 @@ public partial class TableView : FormWithStatusBar {
         _ = w.ShowDialog();
     }
 
-    //public static ItemCollectionList Vorgängerversionen(Database db) {
-    //    //List<string> zusatz = new();
-    //    ItemCollectionList l = new(true);
-    //    //foreach (var thisExport in db.Export) {
-    //    //    if (thisExport != null && thisExport.Typ == ExportTyp.DatenbankOriginalFormat) {
-    //    //        var lockMe = new object();
-    //    //        _ = Parallel.ForEach(thisExport.BereitsExportiert, (thisString, _) => {
-    //    //            var t = thisString.SplitAndCutBy("|");
-    //    //            if (FileExists(t[0])) {
-    //    //                var q1 = QuickImage.Get(ImageCode.Kugel, 16,
-    //    //                    Color.Red.MixColor(Color.Green,
-    //    //                        DateTime.Now.Subtract(DateTimeParse(t[1])).TotalDays / thisExport.AutoDelete),
-    //    //                    Color.Transparent);
-    //    //                lock (lockMe) {
-    //    //                    l.Add(t[1], t[0], q1, true, t[1].CompareKey(SortierTyp.Datum_Uhrzeit));
-    //    //                }
-    //    //            }
-    //    //        });
-
-    //    //        zusatz.AddRange(Directory.GetFiles(thisExport.Verzeichnis,
-    //    //            db.Filename.FileNameWithoutSuffix() + "_*.MDB"));
-    //    //    }
-    //    //}
-
-    //    //foreach (var thisString in zusatz) {
-    //    //    if (l[thisString] == null) {
-    //    //        _ = l.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(ImageCode.Warnung), true, new FileInfo(thisString).CreationTime.ToString().CompareKey(SortierTyp.Datum_Uhrzeit));
-    //    //    }
-    //    //}
-
-    //    //l.Sort();
-    //    return l;
-    //}
-
     public static void OpenScriptEditor(DatabaseAbstract? db) {
         if (db == null || db.IsDisposed) { return; }
 

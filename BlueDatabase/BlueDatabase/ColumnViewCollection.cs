@@ -30,11 +30,11 @@ using BlueDatabase.Interfaces;
 namespace BlueDatabase;
 
 public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName {
-    //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
 
     #region Fields
 
     private readonly List<string> _permissionGroups_Show = new();
+
     private string _name;
 
     #endregion
@@ -52,13 +52,13 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
 
     #endregion
 
-    //public event EventHandler? Changed;
-
     #region Properties
 
     public DatabaseAbstract? Database { get; private set; }
 
+    //public event EventHandler? Changed;
     public bool IsDisposed { get; private set; }
+
     public string KeyName => _name;
 
     public string Name {
@@ -199,10 +199,19 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         //base.Dispose(disposing);
     }
 
+    //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
+    public ColumnViewItem? First() {
+        return this.FirstOrDefault(thisViewItem => thisViewItem?.Column != null);
+    }
+
     public void Invalidate_DrawWithOfAllItems() {
         foreach (var thisViewItem in this) {
             thisViewItem?.Invalidate_DrawWidth();
         }
+    }
+
+    public ColumnViewItem? Last() {
+        return this.Last(thisViewItem => thisViewItem?.Column != null);
     }
 
     public List<ColumnItem> ListOfUsedColumn() {
@@ -300,15 +309,6 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         if (base[index2].ViewType != ViewType.PermanentColumn) { base[index1].ViewType = ViewType.Column; }
     }
 
-    //public void Swap(ColumnViewItem? viewItem1, ColumnViewItem? viewItem2) {
-    //    if (viewItem1 == null || viewItem2 == null) { return; }
-
-    //    var index1 = IndexOf(viewItem1);
-    //    var index2 = IndexOf(viewItem2);
-
-    //    Swap(index1, index2);
-    //}
-
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
         var result = "{Name=" + _name.ToNonCritical();
@@ -327,7 +327,15 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         return result + "}";
     }
 
+    //    Swap(index1, index2);
+    //}
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     #endregion
+
+    //public void Swap(ColumnViewItem? viewItem1, ColumnViewItem? viewItem2) {
+    //    if (viewItem1 == null || viewItem2 == null) { return; }
+
+    //    var index1 = IndexOf(viewItem1);
+    //    var index2 = IndexOf(viewItem2);
 }
