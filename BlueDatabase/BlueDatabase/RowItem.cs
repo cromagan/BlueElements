@@ -496,7 +496,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars) {
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReason.EditAcut);
-        if (string.IsNullOrEmpty(m) || Database == null || column == null) { return; }
+        if (!string.IsNullOrEmpty(m) || Database == null || column == null) { return; }
 
         var columnVar = vars.Get(column.Name);
         if (columnVar == null || columnVar.ReadOnly) { return; }

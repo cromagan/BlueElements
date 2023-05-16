@@ -165,7 +165,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         l.AddRange(_itemAccepts.GetStyleOptions(this));
 
         var inr = _itemAccepts.GetRowFromGet(this);
-        if (inr?.OutputDatabase is Database dbin) {
+        if (inr?.OutputDatabase is DatabaseAbstract dbin) {
             var ic = new ItemCollectionList.ItemCollectionList(true);
             ic.AddRange(dbin.Column, true);
             l.Add(new FlexiControlForProperty<string>(() => EigangsWertSpalte, ic));
@@ -179,7 +179,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         l.AddRange(_itemSends.GetStyleOptions(this));
 
         var outdb = _itemSends.OutputDatabaseGet();
-        if (outdb is Database) {
+        if (outdb is DatabaseAbstract) {
             var ic = new ItemCollectionList.ItemCollectionList(true);
             ic.AddRange(outdb.Column, true);
             l.Add(new FlexiControlForProperty<string>(() => _filterSpalte, ic));

@@ -55,6 +55,8 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void AddCentered(FakeControlPadItem x) {
         var l = Pad.LastClickedItem;
 
+        Pad.AddCentered(x);
+
         if (l is IItemSendRow isr && x is IItemAcceptRow iar) {
             iar.GetRowFrom = isr;
         }
@@ -63,7 +65,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
             iaf.GetFilterFrom = (new List<string>() { l.KeyName }).AsReadOnly();
         }
 
-        Pad.AddCentered(x);
+       
 
         if (x is IItemAcceptRow iar2 && iar2.GetRowFrom == null) {
             iar2.Datenquelle_wählen();

@@ -415,7 +415,7 @@ public static partial class Extensions {
         }
     }
 
-    public static void TagSet(this ICollection<string> col, string tagname, string value) {
+    public static void TagSet(this List<string> col, string tagname, string value) {
         var found = col.TagGetPosition(tagname);
         var n = tagname + ": " + value;
 
