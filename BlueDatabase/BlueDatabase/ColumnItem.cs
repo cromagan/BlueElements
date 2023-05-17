@@ -1076,15 +1076,29 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             m = Math.Max(m, t.StringtoUtf8().Length);
         }
 
-        if (m <= 0) {
-            return 8;
-        }
-
-        if (m == 1) {
-            return 1;
-        }
-
+        if (m <= 0) { return 8; }
+        if (m == 1) { return 1; }
         return Math.Min((int)(m * prozentZuschlag) + 1, 4000);
+    }
+
+    public int CalculatePreveredMaxTextLenght(double prozentZuschlag) {
+        if (Database == null || Database.IsDisposed) { return 0; }
+
+        ////if (Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) { return 35; }
+        ////if (Format == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return 15; }
+        var m = 0;
+
+        Database.RefreshColumnsData(this);
+
+        var l = Contents();
+
+        foreach (var thiss in l) {
+            m = Math.Max(m, thiss.Length);
+        }
+
+        if (m <= 0) { return 255; }
+        if (m == 1) { return 1; }
+        return Math.Min((int)(m * prozentZuschlag) + 1, 1000);
     }
 
     /// <summary>

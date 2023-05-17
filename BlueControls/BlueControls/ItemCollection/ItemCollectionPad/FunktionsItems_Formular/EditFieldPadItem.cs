@@ -209,7 +209,12 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
         l.AddRange(_itemAccepts.GetStyleOptions(this));
 
+        if(this.InputDatabase == null) { return l; }
+
         l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
+        
+        
+        if(Column == null || Column.IsDisposed) { return l; }
         l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
         l.Add(new FlexiControlForDelegate(Spalte_bearbeiten, "Spalte bearbeiten", ImageCode.Spalte));
 

@@ -612,10 +612,10 @@ public abstract class SqlBackAbstract {
         if (isVal == null) { return "Kein Wert angekommen!"; }
         if (isVal == newValue) { return string.Empty; }
 
-        _ = ExecuteCommand("DELETE FROM " + SysStyle +
-                       " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) +
-                       " AND COLUMNNAME = " + Dbval(columnName.ToUpper()) +
-                       " AND TYPE = " + Dbval(type.ToString()), true);
+        var com = "BEGIN DELETE FROM " + SysStyle +
+                  " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) +
+                  " AND COLUMNNAME = " + Dbval(columnName.ToUpper()) +
+                  " AND TYPE = " + Dbval(type.ToString()) + "; ";
 
         var maxPartStringLenght = Math.Min(MaxStringLenght, 500);
 
@@ -623,36 +623,25 @@ public abstract class SqlBackAbstract {
             c++;
             var tmp = utf8.CutToUtf8Length(maxPartStringLenght);
 
-            var ok2 = SetStyleData(tablename, ty, columnName, tmp, c);
-            if (!string.IsNullOrEmpty(ok2)) { ok = ok2; }
+            var cmdString = "INSERT INTO " + SysStyle + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + Dbval(tablename.ToUpper()) + ", " + Dbval(ty) + ", " + Dbval(columnName.ToUpper()) + ", " + Dbval(tmp) + ", " + Dbval(c.ToString(Constants.Format_Integer3)) + "); ";
+
+            com += cmdString;
 
             if (tmp == utf8) { break; }
 
             utf8 = utf8.Substring(tmp.Length);
         } while (true);
 
+        var ok2 = ExecuteCommand(com + "END; ", true);
+        if (string.IsNullOrEmpty(ok2)) { return "Eigenschaft nicht gesetzt: " + ok2; }
+
         if (type == DatabaseDataType.ColumnName) {
-            // Wichtig, erst den Wert seetzen, dann umbenennen! Somit wird der Wert richtig mit umbenannt
+            // Wichtig, erst den Wert setzen, dann umbenennen! Somit wird der Wert richtig mit umbenannt
             RenameColumn(tablename, columnName.ToUpper(), newValue.ToUpper(), false);
         }
         if (type == DatabaseDataType.MaxCellLenght) {
             ChangeDataType(tablename, columnName.ToUpper(), IntParse(newValue), false);
         }
-
-        //if (type == DatabaseDataType.ColumnName) {
-        //    //var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(false), columnName);
-        //    //if (!string.IsNullOrEmpty(test)) {
-        //    //    Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1!");
-        //    //}
-
-        //    //if (columnName != newValue && columnName != ColumnItem.TmpNewDummy) {
-        //    //    Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 1: " + columnName + " -> " + newValue);
-        //    //}
-        //    test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(false), newValue);
-        //    if (newValue != test) {
-        //        Develop.DebugPrint(FehlerArt.Fehler, "Fataler Namensfehler 2!");
-        //    }
-        //}
 
         return ok;
     }
@@ -1201,22 +1190,6 @@ public abstract class SqlBackAbstract {
             return string.Empty;
         }
 
-        return ExecuteCommand(cmdString, false);
-    }
-
-    /// <summary>
-    /// Gibt empty zurück, wenn alles ok ist.
-    /// Entweder der Wert gesetzt wurde oder der Wert aktuell ist.
-    /// </summary>
-    /// <param name="tablename"></param>
-    /// <param name="type"></param>
-    /// <param name="columnName"></param>
-    /// <param name="newValue"></param>
-    /// <param name="part"></param>
-    /// <returns></returns>
-    private string SetStyleData(string tablename, string type, string columnName, string newValue, int part) {
-        var cmdString = "INSERT INTO " + SysStyle + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + Dbval(tablename.ToUpper()) + ", " + Dbval(type) + ", " + Dbval(columnName.ToUpper()) + ", " + Dbval(newValue) + ", " + Dbval(part.ToString(Constants.Format_Integer3)) + ")";
-        if (!OpenConnection()) { return "Verbindung konnt nicht geöffnet werden"; }
         return ExecuteCommand(cmdString, false);
     }
 

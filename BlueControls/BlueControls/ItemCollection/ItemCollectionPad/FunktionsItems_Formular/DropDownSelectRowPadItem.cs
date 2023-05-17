@@ -133,7 +133,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControlRowSelectorNew(OutputDatabase, _überschrift, _anzeige) {
+        var con = new FlexiControlRowSelector(OutputDatabase, _überschrift, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition,
         };

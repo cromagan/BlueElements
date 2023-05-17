@@ -103,6 +103,11 @@ internal sealed partial class ColumnEditor {
         txbMaxCellLenght.Text = _column.CalculatePreveredMaxCellLenght(1.2f).ToString();
     }
 
+    private void btnMaxTextLenght_Click(object sender, System.EventArgs e) {
+        if (_column == null) { return; }
+        txbMaxTextLenght.Text = _column.CalculatePreveredMaxTextLenght(1.2f).ToString();
+    }
+
     private void btnOk_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
         Close();
@@ -446,17 +451,18 @@ internal sealed partial class ColumnEditor {
         _column.MultiLine = btnMultiline.Checked;
         _column.AfterEditQuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
         if (txbRunden.Text.IsLong()) {
-            var zahl = IntParse(txbRunden.Text);
-            if (zahl is > -1 and < 7) { _column.RoundAfterEdit = zahl; }
+            var zahl = Math.Max(IntParse(txbRunden.Text), -1);
+            zahl = Math.Min(zahl, 7);
+            _column.RoundAfterEdit = zahl;
         } else {
             _column.RoundAfterEdit = -1;
         }
 
         if (txbFixedColumnWidth.Text.IsLong()) {
-            var zahl = IntParse(txbFixedColumnWidth.Text);
-            if (zahl > 0) { _column.FixedColumnWidth = zahl; }
+            var zahl = Math.Max(IntParse(txbFixedColumnWidth.Text), 0);
+            _column.FixedColumnWidth = zahl;
         } else {
-            _column.FixedColumnWidth = -1;
+            _column.FixedColumnWidth = 0;
         }
 
         _column.AfterEditDoUCase = btnAutoEditToUpper.Checked;

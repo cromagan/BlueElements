@@ -136,7 +136,7 @@
     <Compile Include="ConnectedFormula\NewControls\FlexiControlVariable.Designer.cs">
       <DependentUpon>FlexiControlVariable.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConnectedFormula\NewControls\FlexiControlRowSelectorNew.cs">
+    <Compile Include="ConnectedFormula\NewControls\FlexiControlRowSelector.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\FlexiControlForDelegate.cs">
@@ -176,9 +176,6 @@
     </Compile>
     <Compile Include="ConnectedFormula\ConnectedFormulaView.Designer.cs">
       <DependentUpon>ConnectedFormulaView.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ConnectedFormula\FlexiControlRowSelector.cs">
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\FileBrowser.cs">
       <SubType>Component</SubType>
@@ -373,7 +370,6 @@
     <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\FileExplorerPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\EditFieldPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\RowWithFilterPadItem.cs" />
     <Compile Include="ItemCollection\ItemConnection.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Temporär\PhysicPadItem.cs" />
     <Compile Include="ItemCollection\ItemCollectionPad\Abstract\AbstractPhysicPadItem.cs" />
@@ -834,10 +830,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Ressourcen\Dictionary\Deutsch.BDB" />
+    <EmbeddedResource Include="Ressourcen\Dictionary\Deutsch.BDB" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Ressourcen\Styles\Styles.BDB" />
+    <EmbeddedResource Include="Ressourcen\Styles\Styles.BDB" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

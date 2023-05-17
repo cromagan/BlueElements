@@ -32,7 +32,7 @@ using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, IControlAcceptFilter, ICalculateRows {
+internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControlAcceptFilter, ICalculateRows {
 
     #region Fields
 
@@ -50,7 +50,7 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
     #region Constructors
 
-    public FlexiControlRowSelectorNew(DatabaseAbstract? database, string caption, string showFormat) : base() {
+    public FlexiControlRowSelector(DatabaseAbstract? database, string caption, string showFormat) : base() {
         CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
@@ -268,7 +268,6 @@ internal class FlexiControlRowSelectorNew : FlexiControl, IControlSendRow, ICont
 
         #region Zeilen erzeugen
 
-   
         var f = FilteredRows;
         if (f != null) {
             foreach (var thisR in f) {

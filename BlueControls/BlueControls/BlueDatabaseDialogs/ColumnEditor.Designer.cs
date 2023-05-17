@@ -35,6 +35,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ColumnEditor));
             this.ColorDia = new System.Windows.Forms.ColorDialog();
             this.tabAnzeige = new System.Windows.Forms.TabPage();
+            this.txbFixedColumnWidth = new BlueControls.Controls.TextBox();
+            this.capFixedColumnWidth = new BlueControls.Controls.Caption();
             this.btnSpellChecking = new BlueControls.Controls.Button();
             this.cbxTranslate = new BlueControls.Controls.ComboBox();
             this.txbBildCodeConstHeight = new BlueControls.Controls.TextBox();
@@ -87,10 +89,13 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capUserGroupEdit = new BlueControls.Controls.Caption();
             this.btnEditableDropdown = new BlueControls.Controls.Button();
             this.tabAutoBearbeitung = new System.Windows.Forms.TabPage();
+            this.btnCalculateMaxCellLenght = new BlueControls.Controls.Button();
             this.txbAutoReplace = new BlueControls.Controls.TextBox();
             this.capAutoReplace = new BlueControls.Controls.Caption();
+            this.txbMaxCellLenght = new BlueControls.Controls.TextBox();
             this.txbAutoRemove = new BlueControls.Controls.TextBox();
             this.capAutoRemove = new BlueControls.Controls.Caption();
+            this.capMaxCellLenght = new BlueControls.Controls.Caption();
             this.txbInitValue = new BlueControls.Controls.TextBox();
             this.capInitValue = new BlueControls.Controls.Caption();
             this.btnAutoEditKleineFehler = new BlueControls.Controls.Button();
@@ -135,9 +140,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnOk = new BlueControls.Controls.Button();
             this.tabControl = new BlueControls.Controls.TabControl();
             this.tabDatenFormat = new System.Windows.Forms.TabPage();
-            this.btnCalculateMaxCellLenght = new BlueControls.Controls.Button();
-            this.txbMaxCellLenght = new BlueControls.Controls.TextBox();
-            this.capMaxCellLenght = new BlueControls.Controls.Caption();
+            this.btnMaxTextLenght = new BlueControls.Controls.Button();
+            this.txbMaxTextLenght = new BlueControls.Controls.TextBox();
+            this.capMaxTextLenght = new BlueControls.Controls.Caption();
             this.grpSchnellformat = new BlueControls.Controls.GroupBox();
             this.btnSchnellText = new BlueControls.Controls.Button();
             this.btnSchnellBit = new BlueControls.Controls.Button();
@@ -158,10 +163,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.butAktuellVor = new BlueControls.Controls.Button();
             this.butAktuellZurueck = new BlueControls.Controls.Button();
             this.capTabellenname = new BlueControls.Controls.Caption();
-            this.txbFixedColumnWidth = new BlueControls.Controls.TextBox();
-            this.capFixedColumnWidth = new BlueControls.Controls.Caption();
-            this.txbMaxTextLenght = new BlueControls.Controls.TextBox();
-            this.capMaxTextLenght = new BlueControls.Controls.Caption();
             this.tabAnzeige.SuspendLayout();
             this.tabBearbeitung.SuspendLayout();
             this.grpAuswahlmenuOptionen.SuspendLayout();
@@ -223,6 +224,26 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAnzeige.Size = new System.Drawing.Size(993, 483);
             this.tabAnzeige.TabIndex = 0;
             this.tabAnzeige.Text = "Anzeige";
+            // 
+            // txbFixedColumnWidth
+            // 
+            this.txbFixedColumnWidth.AllowedChars = "0123456789|";
+            this.txbFixedColumnWidth.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbFixedColumnWidth.Location = new System.Drawing.Point(176, 136);
+            this.txbFixedColumnWidth.Name = "txbFixedColumnWidth";
+            this.txbFixedColumnWidth.QuickInfo = "Wenn ein Wert >0 eingegeben wird, \r\nwird die Spalte immer in dieser Breite angeze" +
+    "igt.";
+            this.txbFixedColumnWidth.Size = new System.Drawing.Size(96, 24);
+            this.txbFixedColumnWidth.Suffix = "Pixel";
+            this.txbFixedColumnWidth.TabIndex = 42;
+            // 
+            // capFixedColumnWidth
+            // 
+            this.capFixedColumnWidth.CausesValidation = false;
+            this.capFixedColumnWidth.Location = new System.Drawing.Point(8, 136);
+            this.capFixedColumnWidth.Name = "capFixedColumnWidth";
+            this.capFixedColumnWidth.Size = new System.Drawing.Size(160, 16);
+            this.capFixedColumnWidth.Text = "Feste Spaltenbreite:";
             // 
             // btnSpellChecking
             // 
@@ -745,6 +766,16 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAutoBearbeitung.TabIndex = 6;
             this.tabAutoBearbeitung.Text = "Auto-Bearbeitung";
             // 
+            // btnCalculateMaxCellLenght
+            // 
+            this.btnCalculateMaxCellLenght.ImageCode = "Taschenrechner|16";
+            this.btnCalculateMaxCellLenght.Location = new System.Drawing.Point(264, 136);
+            this.btnCalculateMaxCellLenght.Name = "btnCalculateMaxCellLenght";
+            this.btnCalculateMaxCellLenght.QuickInfo = "Prüft alle Zellen und berechnet die ideale\r\nmaximale Text Länge";
+            this.btnCalculateMaxCellLenght.Size = new System.Drawing.Size(40, 24);
+            this.btnCalculateMaxCellLenght.TabIndex = 46;
+            this.btnCalculateMaxCellLenght.Click += new System.EventHandler(this.btnCalculateMaxCellLenght_Click);
+            // 
             // txbAutoReplace
             // 
             this.txbAutoReplace.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -768,6 +799,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capAutoReplace.Size = new System.Drawing.Size(184, 24);
             this.capAutoReplace.Text = "Permanente Ersetzungen:";
             // 
+            // txbMaxCellLenght
+            // 
+            this.txbMaxCellLenght.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.Integer;
+            this.txbMaxCellLenght.AllowedChars = "0123456789";
+            this.txbMaxCellLenght.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbMaxCellLenght.Location = new System.Drawing.Point(168, 136);
+            this.txbMaxCellLenght.MaxTextLenght = 255;
+            this.txbMaxCellLenght.Name = "txbMaxCellLenght";
+            this.txbMaxCellLenght.QuickInfo = resources.GetString("txbMaxCellLenght.QuickInfo");
+            this.txbMaxCellLenght.Regex = "^((-?[1-9]\\d*)|0)$";
+            this.txbMaxCellLenght.Size = new System.Drawing.Size(96, 24);
+            this.txbMaxCellLenght.TabIndex = 45;
+            // 
             // txbAutoRemove
             // 
             this.txbAutoRemove.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -786,6 +830,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capAutoRemove.Name = "capAutoRemove";
             this.capAutoRemove.Size = new System.Drawing.Size(568, 16);
             this.capAutoRemove.Text = "Folgende Zeichen automatisch aus der Eingabe löschen:";
+            // 
+            // capMaxCellLenght
+            // 
+            this.capMaxCellLenght.CausesValidation = false;
+            this.capMaxCellLenght.Location = new System.Drawing.Point(8, 136);
+            this.capMaxCellLenght.Name = "capMaxCellLenght";
+            this.capMaxCellLenght.QuickInfo = "Falls mehrere Zeilen erlaubt sind, pro Zeile.\r\nAber es sind niemals mehr als 4000" +
+    " Zeichen erlaubt.\r\nDa im UTF8-Format gespeichert wird, evtl. auch weniger.";
+            this.capMaxCellLenght.Size = new System.Drawing.Size(160, 24);
+            this.capMaxCellLenght.Text = "Maximale Zellen-Kapazität:";
+            this.capMaxCellLenght.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbInitValue
             // 
@@ -1252,6 +1307,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabDatenFormat
             // 
             this.tabDatenFormat.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabDatenFormat.Controls.Add(this.btnMaxTextLenght);
             this.tabDatenFormat.Controls.Add(this.txbMaxTextLenght);
             this.tabDatenFormat.Controls.Add(this.capMaxTextLenght);
             this.tabDatenFormat.Controls.Add(this.txbAllowedChars);
@@ -1275,39 +1331,40 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabDatenFormat.TabIndex = 12;
             this.tabDatenFormat.Text = "Daten-Format";
             // 
-            // btnCalculateMaxCellLenght
+            // btnMaxTextLenght
             // 
-            this.btnCalculateMaxCellLenght.ImageCode = "Taschenrechner|16";
-            this.btnCalculateMaxCellLenght.Location = new System.Drawing.Point(264, 136);
-            this.btnCalculateMaxCellLenght.Name = "btnCalculateMaxCellLenght";
-            this.btnCalculateMaxCellLenght.QuickInfo = "Prüft alle Zellen und berechnet die ideale\r\nmaximale Text Länge";
-            this.btnCalculateMaxCellLenght.Size = new System.Drawing.Size(40, 24);
-            this.btnCalculateMaxCellLenght.TabIndex = 46;
-            this.btnCalculateMaxCellLenght.Click += new System.EventHandler(this.btnCalculateMaxCellLenght_Click);
+            this.btnMaxTextLenght.ImageCode = "Taschenrechner|16";
+            this.btnMaxTextLenght.Location = new System.Drawing.Point(816, 232);
+            this.btnMaxTextLenght.Name = "btnMaxTextLenght";
+            this.btnMaxTextLenght.QuickInfo = "Prüft alle Zellen und berechnet die ideale\r\nmaximale Text Länge";
+            this.btnMaxTextLenght.Size = new System.Drawing.Size(40, 24);
+            this.btnMaxTextLenght.TabIndex = 48;
+            this.btnMaxTextLenght.Click += new System.EventHandler(this.btnMaxTextLenght_Click);
             // 
-            // txbMaxCellLenght
+            // txbMaxTextLenght
             // 
-            this.txbMaxCellLenght.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.Integer;
-            this.txbMaxCellLenght.AllowedChars = "0123456789";
-            this.txbMaxCellLenght.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbMaxCellLenght.Location = new System.Drawing.Point(168, 136);
-            this.txbMaxCellLenght.MaxTextLenght = 255;
-            this.txbMaxCellLenght.Name = "txbMaxCellLenght";
-            this.txbMaxCellLenght.QuickInfo = resources.GetString("txbMaxCellLenght.QuickInfo");
-            this.txbMaxCellLenght.Regex = "^((-?[1-9]\\d*)|0)$";
-            this.txbMaxCellLenght.Size = new System.Drawing.Size(96, 24);
-            this.txbMaxCellLenght.TabIndex = 45;
+            this.txbMaxTextLenght.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.Integer;
+            this.txbMaxTextLenght.AllowedChars = "0123456789";
+            this.txbMaxTextLenght.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbMaxTextLenght.Location = new System.Drawing.Point(720, 232);
+            this.txbMaxTextLenght.MaxTextLenght = 255;
+            this.txbMaxTextLenght.Name = "txbMaxTextLenght";
+            this.txbMaxTextLenght.QuickInfo = resources.GetString("txbMaxTextLenght.QuickInfo");
+            this.txbMaxTextLenght.Regex = "^((-?[1-9]\\d*)|0)$";
+            this.txbMaxTextLenght.Size = new System.Drawing.Size(96, 24);
+            this.txbMaxTextLenght.TabIndex = 47;
             // 
-            // capMaxCellLenght
+            // capMaxTextLenght
             // 
-            this.capMaxCellLenght.CausesValidation = false;
-            this.capMaxCellLenght.Location = new System.Drawing.Point(8, 136);
-            this.capMaxCellLenght.Name = "capMaxCellLenght";
-            this.capMaxCellLenght.QuickInfo = "Falls mehrere Zeilen erlaubt sind, pro Zeile.\r\nAber es sind niemals mehr als 4000" +
-    " Zeichen erlaubt.\r\nDa im UTF8-Format gespeichert wird, evtl. auch weniger.";
-            this.capMaxCellLenght.Size = new System.Drawing.Size(160, 24);
-            this.capMaxCellLenght.Text = "Maximale Zellen-Kapazität:";
-            this.capMaxCellLenght.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.capMaxTextLenght.CausesValidation = false;
+            this.capMaxTextLenght.Location = new System.Drawing.Point(560, 232);
+            this.capMaxTextLenght.Name = "capMaxTextLenght";
+            this.capMaxTextLenght.QuickInfo = "Pro Zeile!\r\nEs wird wirklich die Anzahl der Zeichen gezählt.\r\nEs bezeht sich nur " +
+    "auf das Format, und es wird evtl. eine Meldung ausgegeben,\r\ndas die Eingabe nich" +
+    "t dem Format entspricht.";
+            this.capMaxTextLenght.Size = new System.Drawing.Size(160, 24);
+            this.capMaxTextLenght.Text = "Maximale Text-Länge:";
+            this.capMaxTextLenght.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // grpSchnellformat
             // 
@@ -1517,51 +1574,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.capTabellenname.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             this.capTabellenname.Translate = false;
             // 
-            // txbFixedColumnWidth
-            // 
-            this.txbFixedColumnWidth.AllowedChars = "0123456789|";
-            this.txbFixedColumnWidth.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbFixedColumnWidth.Location = new System.Drawing.Point(176, 136);
-            this.txbFixedColumnWidth.Name = "txbFixedColumnWidth";
-            this.txbFixedColumnWidth.QuickInfo = "Wenn ein Wert >0 eingegeben wird, \r\nwird die Spalte immer in dieser Breite angeze" +
-    "igt.";
-            this.txbFixedColumnWidth.Size = new System.Drawing.Size(96, 24);
-            this.txbFixedColumnWidth.Suffix = "Pixel";
-            this.txbFixedColumnWidth.TabIndex = 42;
-            // 
-            // capFixedColumnWidth
-            // 
-            this.capFixedColumnWidth.CausesValidation = false;
-            this.capFixedColumnWidth.Location = new System.Drawing.Point(8, 136);
-            this.capFixedColumnWidth.Name = "capFixedColumnWidth";
-            this.capFixedColumnWidth.Size = new System.Drawing.Size(160, 16);
-            this.capFixedColumnWidth.Text = "Breite/Höhe von Bildern:";
-            // 
-            // txbMaxTextLenght
-            // 
-            this.txbMaxTextLenght.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.Integer;
-            this.txbMaxTextLenght.AllowedChars = "0123456789";
-            this.txbMaxTextLenght.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbMaxTextLenght.Location = new System.Drawing.Point(720, 232);
-            this.txbMaxTextLenght.MaxTextLenght = 255;
-            this.txbMaxTextLenght.Name = "txbMaxTextLenght";
-            this.txbMaxTextLenght.QuickInfo = resources.GetString("txbMaxTextLenght.QuickInfo");
-            this.txbMaxTextLenght.Regex = "^((-?[1-9]\\d*)|0)$";
-            this.txbMaxTextLenght.Size = new System.Drawing.Size(96, 24);
-            this.txbMaxTextLenght.TabIndex = 47;
-            // 
-            // capMaxTextLenght
-            // 
-            this.capMaxTextLenght.CausesValidation = false;
-            this.capMaxTextLenght.Location = new System.Drawing.Point(560, 232);
-            this.capMaxTextLenght.Name = "capMaxTextLenght";
-            this.capMaxTextLenght.QuickInfo = "Pro Zeile!\r\nEs wird wirklich die Anzahl der Zeichen gezählt.\r\nEs bezeht sich nur " +
-    "auf das Format, und es wird evtl. eine Meldung ausgegeben,\r\ndas die Eingabe nich" +
-    "t dem Format entspricht.";
-            this.capMaxTextLenght.Size = new System.Drawing.Size(160, 24);
-            this.capMaxTextLenght.Text = "Maximale Text-Länge:";
-            this.capMaxTextLenght.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-            // 
             // ColumnEditor
             // 
             this.ClientSize = new System.Drawing.Size(1007, 685);
@@ -1719,5 +1731,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Caption capFixedColumnWidth;
         private TextBox txbMaxTextLenght;
         private Caption capMaxTextLenght;
+        private Button btnMaxTextLenght;
     }
 }

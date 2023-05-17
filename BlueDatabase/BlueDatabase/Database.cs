@@ -599,7 +599,7 @@ public sealed class Database : DatabaseAbstract {
         //    }
         //}
 
-        var nn = Directory.GetFiles(Filename.FilePath(), "*.bdb|*.mdb", SearchOption.AllDirectories);
+        var nn = Directory.GetFiles(Filename.FilePath(), "*.bdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
         foreach (var thisn in nn) {
             var t = ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false);
