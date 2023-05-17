@@ -171,8 +171,8 @@ public enum DatabaseDataType : byte {
 
     MaxTextLenght = 114, // co_FesteBreite = 114
 
-    // co_Bitlänge = 115
-    // co_FilterOption = 116
+    MaxCellLenght = 115,  // co_Bitlänge = 115
+    FixedColumnWidth = 116, // co_FilterOption = 116
     DropDownItems = 117,
 
     // co_SteuerelementName = 119
@@ -307,11 +307,11 @@ public enum DatabaseDataType : byte {
     //AddColumnKeyInfo = 224,
     //AddColumnNameInfo = 225,
 
-    [Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
-    Comand_AddColumn = 226,
+    //[Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
+    //Comand_AddColumn = 226,
 
-    [Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
-    Comand_AddColumnByKey = 227,
+    //[Obsolete("Nur noch Comand_AddColumnByName benutzen", false)]
+    //Comand_AddColumnByKey = 227,
 
     Comand_AddColumnByName = 228,
 

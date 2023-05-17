@@ -349,6 +349,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     #region Methods
 
     public static int CalculateColumnContentWidth(Table? table, ColumnItem column, BlueFont? cellFont, int pix16) {
+        if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
         if (column.UnsavedContentWidth > 0) { return column.UnsavedContentWidth; }
 
         if (column.Database == null) { return 16; }

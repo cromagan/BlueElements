@@ -125,6 +125,18 @@
 casesensitive&lt;br&gt;
 casesensitive oder instr ist optional</value>
   </data>
+  <data name="txbMaxCellLenght.QuickInfo" xml:space="preserve">
+    <value>Anzahl der Zeichen, die in eine Zelle geschrieben werden.
+Bei mehrzeiligen Texten entspricht das die Länge aller Zeilen addiert.
+Zeilenumbrücke zählen ebenfalls als Zeichen.
+Achtung: UTF8-Zeichen benötigen mehr Zeichen!</value>
+  </data>
+  <data name="txbMaxTextLenght.QuickInfo" xml:space="preserve">
+    <value>Anzahl der Zeichen, die in eine Zelle geschrieben werden.
+Bei mehrzeiligen Texten entspricht das die Länge aller Zeilen addiert.
+Zeilenumbrücke zählen ebenfalls als Zeichen.
+Achtung: UTF8-Zeichen benötigen mehr Zeichen!</value>
+  </data>
   <metadata name="$this.TrayHeight" type="System.Int32, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>25</value>
   </metadata>

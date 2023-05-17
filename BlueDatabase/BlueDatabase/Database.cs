@@ -395,7 +395,9 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.RoundAfterEdit, c.AfterEditRunden.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.RoundAfterEdit, c.RoundAfterEdit.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.MaxCellLenght, c.MaxCellLenght.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.FixedColumnWidth, c.FixedColumnWidth.ToString(), name);
         SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, c.AutoRemove, name);
         SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)c.FilterOptions).ToString(), name);

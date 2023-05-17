@@ -72,8 +72,8 @@ internal sealed partial class ColumnEditor {
         if (_column == null || _column.IsDisposed) {
             feh = "Spalte verworfen!";
         } else {
-            if (!tbxName.Text.StartsWith("SYS_")) {
-                if (!_column.ColumNameAllowed(tbxName.Text)) { feh = "Spaltenname nicht erlaubt!"; }
+            if (!txbName.Text.StartsWith("SYS_")) {
+                if (!_column.ColumNameAllowed(txbName.Text)) { feh = "Spaltenname nicht erlaubt!"; }
             }
         }
 
@@ -97,10 +97,10 @@ internal sealed partial class ColumnEditor {
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
     }
 
-    private void btnCalculateMaxTextLenght_Click(object sender, System.EventArgs e) {
+    private void btnCalculateMaxCellLenght_Click(object sender, System.EventArgs e) {
         if (_column == null) { return; }
 
-        tbxMaxTextLenght.Text = _column.CalculatePreveredMaxTextLenght(1.2f).ToString();
+        txbMaxCellLenght.Text = _column.CalculatePreveredMaxCellLenght(1.2f).ToString();
     }
 
     private void btnOk_Click(object sender, System.EventArgs e) {
@@ -108,7 +108,7 @@ internal sealed partial class ColumnEditor {
         Close();
     }
 
-    private void btnQI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(tbxQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + tbxAdminInfo.Text.Replace("\r", "<BR>"));
+    private void btnQI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(txbQuickinfo.Text.Replace("\r", "<BR>") + "<br><br><br>" + txbAdminInfo.Text.Replace("\r", "<BR>"));
 
     private void btnSchnellAuswahloptionen_Click(object sender, System.EventArgs e) {
         if (!AllOk()) { return; }
@@ -327,11 +327,11 @@ internal sealed partial class ColumnEditor {
             btnStandard.Enabled = true;
             capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> System Spalte";
         }
-        tbxName.Text = _column.Name;
-        tbxName.Enabled = !_column.Name.StartsWith("SYS_");
+        txbName.Text = _column.Name;
+        txbName.Enabled = !_column.Name.StartsWith("SYS_");
 
-        tbxName.AllowedChars = Constants.AllowedCharsVariableName;
-        tbxCaption.Text = _column.Caption;
+        txbName.AllowedChars = Constants.AllowedCharsVariableName;
+        txbCaption.Text = _column.Caption;
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.BackColor).ToString();
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, _column.ForeColor).ToString();
         btnMultiline.Checked = _column.MultiLine;
@@ -353,11 +353,12 @@ internal sealed partial class ColumnEditor {
         btnEditableDropdown.Checked = _column.DropdownBearbeitungErlaubt;
         btnCanBeEmpty.Checked = _column.DropdownAllesAbwählenErlaubt;
         btnAutoEditAutoSort.Checked = _column.AfterEditQuickSortRemoveDouble;
-        tbxRunden.Text = _column.AfterEditRunden is > -1 and < 7 ? _column.AfterEditRunden.ToString() : string.Empty;
+        txbRunden.Text = _column.RoundAfterEdit is > -1 and < 7 ? _column.RoundAfterEdit.ToString() : string.Empty;
+        txbFixedColumnWidth.Text = _column.FixedColumnWidth > 0 ? _column.FixedColumnWidth.ToString() : string.Empty;
         btnAutoEditToUpper.Checked = _column.AfterEditDoUCase;
         btnAutoEditKleineFehler.Checked = _column.AfterEditAutoCorrect;
-        tbxInitValue.Text = _column.CellInitValue;
-        tbxJoker.Text = _column.AutoFilterJoker;
+        txbInitValue.Text = _column.CellInitValue;
+        txbJoker.Text = _column.AutoFilterJoker;
         txbUeberschift1.Text = _column.CaptionGroup1;
         txbUeberschift2.Text = _column.CaptionGroup2;
         txbUeberschift3.Text = _column.CaptionGroup3;
@@ -367,19 +368,20 @@ internal sealed partial class ColumnEditor {
         btnFormatierungErlaubt.Checked = _column.FormatierungErlaubt;
         btnSpellChecking.Checked = _column.SpellCheckingEnabled;
         btnEinzeiligDarstellen.Checked = _column.ShowMultiLineInOneLine;
-        tbxAuswaehlbareWerte.Text = _column.DropDownItems.JoinWithCr();
+        txbAuswaehlbareWerte.Text = _column.DropDownItems.JoinWithCr();
         txbReplacer.Text = _column.OpticalReplace.JoinWithCr();
         txbAutoReplace.Text = _column.AfterEditAutoReplace.JoinWithCr();
         txbRegex.Text = _column.Regex;
         txbTags.Text = _column.Tags.JoinWithCr();
         lbxCellEditor.Item.Clear();
         lbxCellEditor.Item.AddRange(_column.PermissionGroupsChangeCell);
-        tbxAllowedChars.Text = _column.AllowedChars;
-        tbxMaxTextLenght.Text = _column.MaxTextLenght.ToString();
+        txbAllowedChars.Text = _column.AllowedChars;
+        txbMaxTextLenght.Text = _column.MaxTextLenght.ToString();
+        txbMaxCellLenght.Text = _column.MaxCellLenght.ToString();
         btnOtherValuesToo.Checked = _column.DropdownWerteAndererZellenAnzeigen;
         btnIgnoreLock.Checked = _column.EditAllowedDespiteLock;
-        tbxAdminInfo.Text = _column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-        tbxQuickinfo.Text = _column.Quickinfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+        txbAdminInfo.Text = _column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+        txbQuickinfo.Text = _column.Quickinfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         cbxEinheit.Text = _column.Suffix;
         txbBildCodeConstHeight.Text = _column.ConstantHeightOfImageCode;
         cbxBildTextVerhalten.Text = ((int)_column.BehaviorOfImageAndText).ToString();
@@ -428,14 +430,14 @@ internal sealed partial class ColumnEditor {
 
         if (_column.IsDisposed) { return; }
 
-        if (_column.ColumNameAllowed(tbxName.Text)) {
-            _column.Name = tbxName.Text;
+        if (_column.ColumNameAllowed(txbName.Text)) {
+            _column.Name = txbName.Text;
         }
 
-        _column.Caption = tbxCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
+        _column.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
         _column.Format = (DataFormat)IntParse(cbxFormat.Text);
-        _column.Quickinfo = tbxQuickinfo.Text.Replace("\r", "<BR>");
-        _column.AdminInfo = tbxAdminInfo.Text.Replace("\r", "<BR>");
+        _column.Quickinfo = txbQuickinfo.Text.Replace("\r", "<BR>");
+        _column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<BR>");
         _column.Suffix = cbxEinheit.Text;
         _column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo.FromHtmlCode();
         _column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo.FromHtmlCode();
@@ -443,15 +445,23 @@ internal sealed partial class ColumnEditor {
         _column.LineRight = (ColumnLineStyle)IntParse(cbxRandRechts.Text);
         _column.MultiLine = btnMultiline.Checked;
         _column.AfterEditQuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
-        if (tbxRunden.Text.IsLong()) {
-            var zahl = IntParse(tbxRunden.Text);
-            if (zahl is > -1 and < 7) { _column.AfterEditRunden = zahl; }
+        if (txbRunden.Text.IsLong()) {
+            var zahl = IntParse(txbRunden.Text);
+            if (zahl is > -1 and < 7) { _column.RoundAfterEdit = zahl; }
         } else {
-            _column.AfterEditRunden = -1;
+            _column.RoundAfterEdit = -1;
         }
+
+        if (txbFixedColumnWidth.Text.IsLong()) {
+            var zahl = IntParse(txbFixedColumnWidth.Text);
+            if (zahl > 0) { _column.FixedColumnWidth = zahl; }
+        } else {
+            _column.FixedColumnWidth = -1;
+        }
+
         _column.AfterEditDoUCase = btnAutoEditToUpper.Checked;
         _column.AfterEditAutoCorrect = btnAutoEditKleineFehler.Checked;
-        _column.CellInitValue = tbxInitValue.Text;
+        _column.CellInitValue = txbInitValue.Text;
         _column.ShowMultiLineInOneLine = btnEinzeiligDarstellen.Checked;
         _column.ShowUndo = btnLogUndo.Checked;
         _column.FormatierungErlaubt = btnFormatierungErlaubt.Checked;
@@ -468,11 +478,11 @@ internal sealed partial class ColumnEditor {
         _column.FilterOptions = tmpf;
         _column.IgnoreAtRowFilter = btnZeilenFilterIgnorieren.Checked;
         _column.PermissionGroupsChangeCell = new(lbxCellEditor.Item.ToListOfString());
-        _column.DropDownItems = tbxAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList().AsReadOnly();
+        _column.DropDownItems = txbAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList().AsReadOnly();
         _column.OpticalReplace = new(txbReplacer.Text.SplitAndCutByCrToList());
         _column.AfterEditAutoReplace = new(txbAutoReplace.Text.SplitAndCutByCrToList());
 
-        _column.AutoFilterJoker = tbxJoker.Text;
+        _column.AutoFilterJoker = txbJoker.Text;
         _column.CaptionGroup1 = txbUeberschift1.Text;
         _column.CaptionGroup2 = txbUeberschift2.Text;
         _column.CaptionGroup3 = txbUeberschift3.Text;
@@ -485,8 +495,9 @@ internal sealed partial class ColumnEditor {
         _column.DropdownAllesAbwählenErlaubt = btnCanBeEmpty.Checked;
         _column.DropdownWerteAndererZellenAnzeigen = btnOtherValuesToo.Checked;
         _column.EditAllowedDespiteLock = btnIgnoreLock.Checked;
-        _column.AllowedChars = tbxAllowedChars.Text;
-        _column.MaxTextLenght = IntParse(tbxMaxTextLenght.Text);
+        _column.AllowedChars = txbAllowedChars.Text;
+        _column.MaxTextLenght = IntParse(txbMaxTextLenght.Text);
+        _column.MaxCellLenght = IntParse(txbMaxCellLenght.Text);
 
         _column.ConstantHeightOfImageCode = txbBildCodeConstHeight.Text;
         _ = IntTryParse(cbxBildTextVerhalten.Text, out var imNf);

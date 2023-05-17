@@ -67,7 +67,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSortierung = new System.Windows.Forms.TabPage();
             this.tabUndo = new System.Windows.Forms.TabPage();
             this.btnClipboard = new BlueControls.Controls.Button();
-            this.tbxUndoAnzahl = new BlueControls.Controls.TextBox();
+            this.txbUndoAnzahl = new BlueControls.Controls.TextBox();
             this.capUndoAnzahl = new BlueControls.Controls.Caption();
             this.tblUndo = new BlueControls.Controls.Table();
             this.capBinInfo = new BlueControls.Controls.Caption();
@@ -439,7 +439,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.tabUndo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabUndo.Controls.Add(this.btnClipboard);
-            this.tabUndo.Controls.Add(this.tbxUndoAnzahl);
+            this.tabUndo.Controls.Add(this.txbUndoAnzahl);
             this.tabUndo.Controls.Add(this.capUndoAnzahl);
             this.tabUndo.Controls.Add(this.tblUndo);
             this.tabUndo.Location = new System.Drawing.Point(4, 25);
@@ -458,13 +458,13 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnClipboard.Text = "Clipboard";
             this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
             // 
-            // tbxUndoAnzahl
+            // txbUndoAnzahl
             // 
-            this.tbxUndoAnzahl.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.tbxUndoAnzahl.Location = new System.Drawing.Point(176, 8);
-            this.tbxUndoAnzahl.Name = "tbxUndoAnzahl";
-            this.tbxUndoAnzahl.Size = new System.Drawing.Size(88, 24);
-            this.tbxUndoAnzahl.TabIndex = 1;
+            this.txbUndoAnzahl.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbUndoAnzahl.Location = new System.Drawing.Point(176, 8);
+            this.txbUndoAnzahl.Name = "txbUndoAnzahl";
+            this.txbUndoAnzahl.Size = new System.Drawing.Size(88, 24);
+            this.txbUndoAnzahl.TabIndex = 1;
             // 
             // capUndoAnzahl
             // 
@@ -556,7 +556,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Table tblUndo;
         private Caption capNeueZeilenInfo;
         private Caption capUndoAnzahl;
-        private TextBox tbxUndoAnzahl;
+        private TextBox txbUndoAnzahl;
         private TextBox txbGlobalScale;
         private Caption caption1;
         private TabControl GlobalTab;

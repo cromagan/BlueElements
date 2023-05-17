@@ -108,7 +108,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         txbAdditionalFiles.Text = Database.AdditionalFilesPfad;
         txbStandardFormulaFile.Text = Database.StandardFormulaFile;
         txbZeilenQuickInfo.Text = Database.ZeilenQuickInfo.Replace("<br>", "\r");
-        tbxUndoAnzahl.Text = Database.UndoCount.ToString();
+        txbUndoAnzahl.Text = Database.UndoCount.ToString();
 
         PermissionGroups_NewRow.Suggestions.Clear();
         PermissionGroups_NewRow.Suggestions.AddRange(Database.Permission_AllUsed(false));
@@ -334,7 +334,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         //eventScriptEditor.WriteScriptBack();
         Database.GlobalShowPass = txbKennwort.Text;
         Database.Caption = txbCaption.Text;
-        Database.UndoCount = tbxUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(tbxUndoAnzahl.Text), 5) : 5;
+        Database.UndoCount = txbUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(txbUndoAnzahl.Text), 5) : 5;
         if (txbGlobalScale.Text.IsDouble()) {
             Database.GlobalScale = Math.Min(DoubleParse(txbGlobalScale.Text), 5);
             Database.GlobalScale = Math.Max(0.5, Database.GlobalScale);

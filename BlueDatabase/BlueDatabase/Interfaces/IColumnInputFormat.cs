@@ -65,6 +65,7 @@ public static class IColumnInputFormatExtensions {
         t.ScriptType = source.ScriptType;
         t.SortType = source.SortType;
         t.TextBearbeitungErlaubt = source.TextBearbeitungErlaubt;
+        t.MaxTextLenght = source.MaxTextLenght;
     }
 
     #endregion

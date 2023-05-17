@@ -555,7 +555,7 @@ public abstract class SqlBackAbstract {
 
         if (!colStyle.Contains("VALUE")) {
             AddColumn(SysStyle, "VALUE", VarChar4000, true, true);
-            ChangeDataType(SysStyle, "VALUE", 255, true);
+            ChangeDataType(SysStyle, "VALUE", 511, true);
         }
 
         #endregion
@@ -617,7 +617,7 @@ public abstract class SqlBackAbstract {
                        " AND COLUMNNAME = " + Dbval(columnName.ToUpper()) +
                        " AND TYPE = " + Dbval(type.ToString()), true);
 
-        var maxPartStringLenght = Math.Min(MaxStringLenght, 250);
+        var maxPartStringLenght = Math.Min(MaxStringLenght, 500);
 
         do {
             c++;
@@ -635,7 +635,7 @@ public abstract class SqlBackAbstract {
             // Wichtig, erst den Wert seetzen, dann umbenennen! Somit wird der Wert richtig mit umbenannt
             RenameColumn(tablename, columnName.ToUpper(), newValue.ToUpper(), false);
         }
-        if (type == DatabaseDataType.MaxTextLenght) {
+        if (type == DatabaseDataType.MaxCellLenght) {
             ChangeDataType(tablename, columnName.ToUpper(), IntParse(newValue), false);
         }
 
@@ -1100,7 +1100,7 @@ public abstract class SqlBackAbstract {
             }
 
             Develop.DebugPrint("Datenbank Befehl konnte nicht ausgeführt werden: " + command.CommandText, ex);
-            return "Allgemeiner Fehler beim Ausführen, siehe Protocol";
+            return "Allgemeiner Fehler beim Ausführen, siehe Protokoll";
         } finally {
             _ = CloseConnection();
         }
