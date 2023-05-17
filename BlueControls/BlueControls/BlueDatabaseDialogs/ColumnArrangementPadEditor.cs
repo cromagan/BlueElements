@@ -88,7 +88,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
-        if (MessageBox.Show("Anordung <b>'" + ca.Name + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+        if (MessageBox.Show("Anordung <b>'" + ca.KeyName + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         var car = db.ColumnArrangements.CloneWithClones();
         car.RemoveAt(_arrangement);
         Database.ColumnArrangements = car.AsReadOnly();
@@ -112,7 +112,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
-        var n = InputBox.Show("Umbenennen:", ca.Name, FormatHolder.Text);
+        var n = InputBox.Show("Umbenennen:", ca.KeyName, FormatHolder.Text);
         if (string.IsNullOrEmpty(n)) { return; }
 
         Change(_arrangement, ca);

@@ -172,7 +172,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             List<ColumnItem> columSort = new();
             ColumnViewCollection? orderArrangement = null;
             foreach (var thisArr in _tableView.Database.ColumnArrangements) {
-                if (string.Equals(thisArr.Name, AnsichtName, StringComparison.OrdinalIgnoreCase)) {
+                if (string.Equals(thisArr.KeyName, AnsichtName, StringComparison.OrdinalIgnoreCase)) {
                     orderArrangement = thisArr;
                 }
             }
@@ -473,7 +473,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         _ähnliche = null;
         if (_tableView?.Database != null && !string.IsNullOrEmpty(_ähnlicheAnsichtName)) {
             foreach (var thisArr in _tableView.Database.ColumnArrangements) {
-                if (string.Equals(thisArr.Name, _ähnlicheAnsichtName, StringComparison.OrdinalIgnoreCase)) {
+                if (string.Equals(thisArr.KeyName, _ähnlicheAnsichtName, StringComparison.OrdinalIgnoreCase)) {
                     _ähnliche = thisArr;
                 }
             }

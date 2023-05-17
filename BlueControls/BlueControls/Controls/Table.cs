@@ -641,7 +641,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         foreach (var thisArrangement in database.ColumnArrangements) {
             if (thisArrangement != null) {
                 if (columnArrangementSelector != null && database.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
-                    _ = columnArrangementSelector.Item.Add(thisArrangement.Name, database.ColumnArrangements.IndexOf(thisArrangement).ToString());
+                    _ = columnArrangementSelector.Item.Add(thisArrangement.KeyName, database.ColumnArrangements.IndexOf(thisArrangement).ToString());
                 }
             }
         }
