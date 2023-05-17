@@ -48,7 +48,7 @@ public static class IControlAcceptFilterExtension {
         dest.Name = source.DefaultItemToControlName();
 
         foreach (var thisKey in source.GetFilterFrom) {
-            var it = source.Parent[thisKey];
+            var it = source.Parent?[thisKey];
 
             if (it is IItemToControl itc) {
                 var ff = parent.SearchOrGenerate(itc);

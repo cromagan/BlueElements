@@ -322,8 +322,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         row = Database?.Row.SearchByKey(LongParse(cd[1]));
     }
 
-    public void Delete(ColumnItem column, long rowKey) {
-        var cellKey = KeyOfCell(column.Name, rowKey);
+    public void Delete(ColumnItem? column, long? rowKey) {
+        if (column == null || rowKey == null) { return; }
+
+        var cellKey = KeyOfCell(column.Name, (long)rowKey);
         if (!ContainsKey(cellKey)) { return; }
 
         if (!TryRemove(cellKey, out _)) {
@@ -741,17 +743,19 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         List<RowItem?> allRows = new();
         if (row?.Database?.Column.First() == null || row.Database.IsDisposed) { return allRows; }
 
-        var names = row.Database.Column.First().GetUcaseNamesSortedByLenght();
+        var names = row.Database.Column.First()?.GetUcaseNamesSortedByLenght();
         var relationTextLine = completeRelationText.ToUpper().SplitAndCutByCr();
         foreach (var thisTextLine in relationTextLine) {
             var tmp = thisTextLine;
             List<RowItem?> r = new();
-            for (var z = names.Count - 1; z > -1; z--) {
-                if (tmp.IndexOfWord(names[z], 0, RegexOptions.IgnoreCase) > -1) {
-                    r.Add(row.Database.Row[names[z]]);
-                    tmp = tmp.Replace(names[z], string.Empty);
+            if (names != null)
+                for (var z = names.Count - 1; z > -1; z--) {
+                    if (tmp.IndexOfWord(names[z], 0, RegexOptions.IgnoreCase) > -1) {
+                        r.Add(row.Database.Row[names[z]]);
+                        tmp = tmp.Replace(names[z], string.Empty);
+                    }
                 }
-            }
+
             if (r.Count == 1 || r.Contains(row)) { _ = allRows.AddIfNotExists(r); } // Bei mehr als einer verknüpften Reihe MUSS die die eigene Reihe dabei sein.
         }
         return allRows;

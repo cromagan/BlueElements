@@ -285,8 +285,8 @@ public static partial class Extensions {
     //        L.Remove(Item);
     //    }
     // }
-    public static void RemoveNullOrEmpty(this IList<string?>? l) {
-        if (l == null || l.Count == 0) { return; }
+    public static void RemoveNullOrEmpty(this IList<string?> l) {
+        if (l.Count == 0) { return; }
 
         var z = 0;
         while (z < l.Count) {

@@ -89,7 +89,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         }
     }
 
-    public ReadOnlyCollection<string>? ChildIds {
+    public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
     }

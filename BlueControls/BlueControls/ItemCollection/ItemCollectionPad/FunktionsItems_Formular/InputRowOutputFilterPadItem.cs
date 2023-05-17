@@ -70,7 +70,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
 
     public static string ClassId => "FI-UserSelectionFilter";
 
-    public ReadOnlyCollection<string>? ChildIds {
+    public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
     }

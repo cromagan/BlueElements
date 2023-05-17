@@ -33,7 +33,7 @@ public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangin
 
     #region Properties
 
-    public ReadOnlyCollection<string>? ChildIds { get; set; }
+    public ReadOnlyCollection<string> ChildIds { get; set; }
     int OutputColorId { get; set; }
 
     public DatabaseAbstract? OutputDatabase { get; set; }
@@ -194,8 +194,7 @@ public class ItemSendSomething {
     public void RemoveChild(IItemAcceptSomething remove, IItemSendSomething item) {
         var l = new List<string>();
         l.AddRange(_childIds);
-        l.Remove(remove.KeyName);
-
+        _ = l.Remove(remove.KeyName);
 
         ChildIdsSet(l.AsReadOnly(), item);
         remove.CalculateInputColorIds();

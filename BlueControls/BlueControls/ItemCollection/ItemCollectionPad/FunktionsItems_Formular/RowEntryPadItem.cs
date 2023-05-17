@@ -58,7 +58,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public static string ClassId => "FI-RowEntryElement";
 
-    public ReadOnlyCollection<string>? ChildIds {
+    public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
     }

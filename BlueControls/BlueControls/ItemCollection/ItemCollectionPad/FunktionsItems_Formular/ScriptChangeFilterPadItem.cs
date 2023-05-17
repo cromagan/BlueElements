@@ -60,7 +60,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     public static string ClassId => "FI-ChangeFilterWithScriptElement";
 
-    public ReadOnlyCollection<string>? ChildIds {
+    public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
     }

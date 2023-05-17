@@ -29,26 +29,27 @@ using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName {
+public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName {
 
     #region Fields
 
     private readonly List<string> _permissionGroups_Show = new();
 
-    private string _name;
-
     #endregion
 
     #region Constructors
 
-    public ColumnViewCollection(DatabaseAbstract database, string toParse) {
+    public ColumnViewCollection(DatabaseAbstract? database, string toParse) {
         Database = database;
-        Database.Disposing += Database_Disposing;
-        _name = string.Empty;
+        if (Database != null) {
+            Database.Disposing += Database_Disposing;
+        }
+
+        KeyName = string.Empty;
         Parse(toParse);
     }
 
-    public ColumnViewCollection(DatabaseAbstract database, string toParse, string newname) : this(database, toParse) => _name = newname;
+    public ColumnViewCollection(DatabaseAbstract database, string toParse, string newname) : this(database, toParse) => KeyName = newname;
 
     #endregion
 
@@ -59,15 +60,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
     //public event EventHandler? Changed;
     public bool IsDisposed { get; private set; }
 
-    public string KeyName => _name;
-
-    public string Name {
-        get => _name;
-        set {
-            if (_name == value) { return; }
-            _name = value;
-        }
-    }
+    public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> PermissionGroups_Show {
         get => new(_permissionGroups_Show);
@@ -100,11 +93,12 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
     /// <summary>
     /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
     /// </summary>
+    /// <param name="columnName"></param>
     /// <param name="ca"></param>
     public static void Hide(string columnName, ColumnViewCollection ca) {
         foreach (var thisViewItem in ca) {
             if (thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.OrdinalIgnoreCase))) {
-                ca.Remove(thisViewItem);
+                _ = ca.Remove(thisViewItem);
                 Hide(columnName, ca);
                 return;
             }
@@ -129,6 +123,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
     /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
     /// </summary>
     /// <param name="ca"></param>
+    /// <param name="number"></param>
     public static void Repair(ColumnViewCollection ca, int number) {
         if (ca.Database == null || ca.Database.IsDisposed) { return; }
 
@@ -136,10 +131,11 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
 
         for (var z = 0; z < ca.Count; z++) {
             if (ca[z].Column == null || !ca.Database.Column.Contains(ca[z]?.Column)) {
-                ca[z] = null;
+                ca.RemoveAt(z);
+                z--;
             }
         }
-        _ = ca.RemoveNull();
+        //_ = ca.RemoveNull();
 
         #endregion
 
@@ -149,19 +145,19 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
 
         switch (number) {
             case 0:
-                if (string.IsNullOrEmpty(ca.Name)) { ca.Name = "Alle Spalten"; }
+                if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Alle Spalten"; }
                 ShowAllColumns(ca);
                 break;
 
             case 1:
-                if (string.IsNullOrEmpty(ca.Name)) { ca.Name = "Standard"; }
+                if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Standard"; }
                 _ = tmp.AddIfNotExists(DatabaseAbstract.Everybody);
                 break;
         }
 
         ca.PermissionGroups_Show = new ReadOnlyCollection<string>(tmp);
 
-        if (string.IsNullOrEmpty(ca.Name)) { ca.Name = "Ansicht " + number; }
+        if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Ansicht " + number; }
     }
 
     /// <summary>
@@ -227,9 +223,9 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         var found = false;
         do {
             if (viewItemNo >= Count) { return null; }
-            if (this[viewItemNo] != null && this[viewItemNo].Column != null) {
-                if (found) { return this[viewItemNo].Column; }
-                if (this[viewItemNo].Column == column) { found = true; }
+            if (this[viewItemNo]?.Column is ColumnItem c) {
+                if (found) { return c; }
+                if (c == column) { found = true; }
             }
             viewItemNo++;
         } while (true);
@@ -241,7 +237,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         do {
             viewItemNo++;
             if (viewItemNo >= Count) { return null; }
-            if (this[viewItemNo] != null && this[viewItemNo].Column != null) { return this[viewItemNo]; }
+            if (this[viewItemNo]?.Column != null) { return this[viewItemNo]; }
         } while (true);
     }
 
@@ -249,11 +245,14 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "name":
-                    _name = pair.Value;
+                    KeyName = pair.Value;
                     break;
 
                 case "columndata":
-                    base.Add(new ColumnViewItem(Database, pair.Value, this)); // BAse, um Events zu vermeiden
+                    if (Database != null) {
+                        base.Add(new ColumnViewItem(Database, pair.Value, this)); // BAse, um Events zu vermeiden
+                    }
+
                     break;
 
                 case "permissiongroup":
@@ -272,9 +271,9 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         var found = false;
         do {
             if (viewItemNo < 0) { return null; }
-            if (this[viewItemNo] != null && this[viewItemNo].Column != null) {
-                if (found) { return this[viewItemNo].Column; }
-                if (this[viewItemNo].Column == column) { found = true; }
+            if (this[viewItemNo]?.Column is ColumnItem c) {
+                if (found) { return c; }
+                if (c == column) { found = true; }
             }
             viewItemNo--;
         } while (true);
@@ -285,7 +284,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
         do {
             viewItemNo--;
             if (viewItemNo < 0) { return null; }
-            if (this[viewItemNo] != null && this[viewItemNo].Column != null) { return this[viewItemNo]; }
+            if (this[viewItemNo]?.Column != null) { return this[viewItemNo]; }
         } while (true);
     }
 
@@ -311,7 +310,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        var result = "{Name=" + _name.ToNonCritical();
+        var result = "{Name=" + KeyName.ToNonCritical();
         foreach (var thisViewItem in this) {
             if (thisViewItem != null) {
                 result = result + ", Columndata=" + thisViewItem;
@@ -332,10 +331,4 @@ public sealed class ColumnViewCollection : List<ColumnViewItem?>, IParseable, IC
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     #endregion
-
-    //public void Swap(ColumnViewItem? viewItem1, ColumnViewItem? viewItem2) {
-    //    if (viewItem1 == null || viewItem2 == null) { return; }
-
-    //    var index1 = IndexOf(viewItem1);
-    //    var index2 = IndexOf(viewItem2);
 }

@@ -48,7 +48,7 @@ public static class IControlAcceptRowExtension {
         dest.Name = source.DefaultItemToControlName();
 
         if (source.GetRowFrom != null) {
-            var it = source.Parent[source.GetRowFrom.KeyName];
+            var it = source.Parent?[source.GetRowFrom.KeyName];
 
             if (it is IItemToControl itc) {
                 var ff = parent.SearchOrGenerate(itc);

@@ -65,7 +65,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public static string ClassId => "FI-SelectRowWithTable";
 
-    public ReadOnlyCollection<string>? ChildIds {
+    public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();
         set => _itemSends.ChildIdsSet(value, this);
     }
