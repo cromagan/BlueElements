@@ -113,7 +113,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Methods
 
-    public static VariableCollection CellToVariable(ColumnItem? column, RowItem? row) {
+    public static VariableCollection? CellToVariable(ColumnItem? column, RowItem? row) {
         if (column == null || row == null) { return null; }
         if (!column.Format.CanBeCheckedByRules()) { return null; }
         if (!column.SaveContent) { return null; }

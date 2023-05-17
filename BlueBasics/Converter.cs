@@ -149,7 +149,10 @@ public static class Converter {
                || DateTime.TryParseExact(s, Constants.Format_Date7, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, Constants.Format_Date, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
                || DateTime.TryParseExact(s, Constants.Format_Date9, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
-               || DateTime.TryParseExact(s, Constants.Format_Date10, CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
+               || DateTime.TryParseExact(s, Constants.Format_Date10, CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm", CultureInfo.InvariantCulture, DateTimeStyles.None, out result)
+               || DateTime.TryParseExact(s, "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out result);
     }
 
     /// <summary>

@@ -111,7 +111,11 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback(infos.Data, "Fehler beim Lesen der Datei: " + vs);
         }
 
-        f = Script.ReduceText(f);
+        (f, string error) = Script.ReduceText(f);
+
+        if (!string.IsNullOrEmpty(error)) {
+            return new DoItFeedback(infos.Data, "Fehler in Datei " + vs + ": " + error);
+        }
 
         var v = CallSub(s, infos, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBool(1), 0, vs.FileNameWithSuffix());
         s.BreakFired = false;

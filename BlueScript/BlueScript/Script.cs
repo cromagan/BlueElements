@@ -121,7 +121,7 @@ public class Script {
         return txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
     }
 
-    public static string ReduceText(string txt) {
+    public static (string reducedText, string error) ReduceText(string txt) {
         StringBuilder s = new();
         var gänsef = false;
         var comment = false;
@@ -143,7 +143,10 @@ public class Script {
                     break;
 
                 case "\r":
-                    if (gänsef) { _ = s.Append("\";Exception(\"Fehler mit Anführungsstrichen\");"); }
+                    if (gänsef) {
+                        var t = s.ToString();
+                        return (t, "Fehler mit Gänsefüschen in Zeile " + Line(t,pos));
+                    }
                     _ = s.Append("¶");
                     comment = false;
                     addt = false;
@@ -161,11 +164,15 @@ public class Script {
                 _ = s.Append(c);
             }
         }
-        return s.ToString();
+        return (s.ToString(), string.Empty);
     }
 
     public ScriptEndedFeedback Parse(int lineadd, string subname) {
-        ReducedScriptText = ReduceText(ScriptText);
+        (ReducedScriptText, string error) = ReduceText(ScriptText);
+
+        if (!string.IsNullOrEmpty(error)) {
+            return new ScriptEndedFeedback(error, false, subname);
+        }
         BreakFired = false;
         Sub = 0;
 

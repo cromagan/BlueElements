@@ -66,7 +66,11 @@ internal class Method_Call : Method_Database {
             return new DoItFeedback(infos.Data, "Aufzurufendes Skript hat andere Bedingungen.");
         }
 
-        var f = Script.ReduceText(sc.Script);
+        (string f, string error) = Script.ReduceText(sc.Script);
+
+        if (!string.IsNullOrEmpty(error)) {
+            return new DoItFeedback(infos.Data, "Fehler in Unter-Skript " + vs + ": " + error);
+        }
 
         var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBool(1), 0, vs);
         s.BreakFired = false;

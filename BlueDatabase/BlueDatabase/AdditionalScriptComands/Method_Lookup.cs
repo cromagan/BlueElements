@@ -31,16 +31,13 @@ public class Method_Lookup : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal, StringVal, StringVal };
-    public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück.\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.";
+    public override string Description => "Lädt eine andere Datenbank (Database), sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als Liste zurück.\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.\r\nÄhnlicher Befehl: CellGetRow";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.MyDatabaseRow | MethodType.NeedLongTime;
     public override string Returns => VariableListString.ShortName_Plain;
-
     public override string StartSequence => "(";
-
-    //public Method_Lookup(Script parent) : base(parent) { }
     public override string Syntax => "Lookup(Database, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
 
     #endregion
@@ -79,7 +76,7 @@ public class Method_Lookup : Method_Database {
 
         var v = RowItem.CellToVariable(c, r[0]);
         if (v == null || v.Count != 1) {
-            return new DoItFeedback(infos.Data, "Wert konnte nicht erzeugt werden: " + attvar.ValueString(2));
+            return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueString(2));
         }
 
         if (v[0] is VariableListString vl) {

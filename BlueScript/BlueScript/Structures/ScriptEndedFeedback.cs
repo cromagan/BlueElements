@@ -65,7 +65,7 @@ public class ScriptEndedFeedback {
 
     public string ProtocolText { get; }
 
-    public VariableCollection Variables { get; }
+    public VariableCollection? Variables { get; }
 
     #endregion
 

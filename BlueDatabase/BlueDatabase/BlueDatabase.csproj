@@ -80,6 +80,7 @@
     <Compile Include="AdditionalScriptComands\Method_Database.cs" />
     <Compile Include="AdditionalScriptComands\Method_AddRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_Export.cs" />
+    <Compile Include="AdditionalScriptComands\Method_CellGetRow.cs" />
     <Compile Include="AdditionalScriptComands\Method_WriteBackDBVariables.cs" />
     <Compile Include="AdditionalScriptComands\Method_SoftMessage.cs" />
     <Compile Include="AdditionalScriptComands\Method_Call.cs" />

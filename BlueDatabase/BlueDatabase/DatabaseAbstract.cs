@@ -874,16 +874,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (row != null) {
                 foreach (var thisCol in Column) {
                     var v = RowItem.CellToVariable(thisCol, row);
-                    if (v != null) {
-                        vars.AddRange(v);
-                    }
+                    if (v != null) { vars.AddRange(v); }
                 }
                 vars.Add(new VariableRowItem("RowKey", row, true, true, "Die aktuelle Zeile, die ausgeführt wird."));
             }
 
             foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("DB_" + thisvar.Name, thisvar.ValueString, false, false,
-                    "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
+                var v = new VariableString("DB_" + thisvar.Name, thisvar.ValueString, false, false, "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
                 vars.Add(v);
             }
 

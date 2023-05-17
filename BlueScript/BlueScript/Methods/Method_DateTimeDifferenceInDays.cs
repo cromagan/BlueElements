@@ -31,14 +31,14 @@ internal class Method_DateTimeDifferenceInDays : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { DateTimeVar, DateTimeVar };
-    public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = DateTimeString1 - DateTimeString2";
+    public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = Date1 - Date2";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "DateTimeDifferenceInDays(DateTimeString1, DateTimeString2)";
+    public override string Syntax => "DateTimeDifferenceInDays(Date1, Date2)";
 
     #endregion
 
