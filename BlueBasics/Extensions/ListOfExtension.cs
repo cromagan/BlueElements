@@ -191,9 +191,8 @@ public static partial class Extensions {
         col.Add(tagname + "=" + v.ToNonCritical());
     }
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, ICollection<IHasKeyName>? value) {
-        if (value == null || value.Count == 0) { return; }
-
+    public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value) {
+        if (value == null || !value.Any()) { return; }
         ParseableAdd(col, tagname, value.ToListOfString());
     }
 

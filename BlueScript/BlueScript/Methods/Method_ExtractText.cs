@@ -58,7 +58,7 @@ internal class Method_ExtractText : Method {
         var tags = attvar.ValueString(0).ReduceToMulti(attvar.ValueString(1), StringComparison.OrdinalIgnoreCase);
 
         if (tags == null) {
-            return new DoItFeedback(infos.Data, "Searchpattern fehlerhaft.");
+            return new DoItFeedback(infos.Data, "Nichts extrahiert - Searchpattern fehlerhaft?");
         }
 
         return new DoItFeedback(tags);

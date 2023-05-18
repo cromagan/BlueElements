@@ -288,6 +288,27 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
         } while (true);
     }
 
+    /// <summary>
+    /// Klappe alle Spalten ein, die in der ColumnListe vorhanden sind.
+    /// Alle anderen werden ausgeklappt.
+    /// </summary>
+    /// <param name="columns"></param>
+    public void Reduce(string[] columns) {
+        foreach (var thiscv in this) {
+            if (thiscv?.Column is ColumnItem ci) {
+                thiscv.TmpReduced = columns.Contains(ci.Name);
+            }
+        }
+    }
+
+    public List<ColumnItem> ReducedColumns() {
+        var x = new List<ColumnItem>();
+        foreach (var thiscol in this) {
+            if (thiscol?.Column != null && thiscol.TmpReduced) { x.Add(thiscol.Column); }
+        }
+        return x;
+    }
+
     public void ShowColumns(params string[] columnnames) {
         if (Database == null || Database.IsDisposed) { return; }
 

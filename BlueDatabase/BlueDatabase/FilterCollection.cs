@@ -164,8 +164,10 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "filter":
-                    if (Database != null && !Database.IsDisposed)
-                        AddIfNotExists(new FilterItem(Database, pair.Value));
+                    if (Database != null && !Database.IsDisposed) {
+                        AddIfNotExists(new FilterItem(Database, pair.Value.FromNonCritical()));
+                    }
+
                     break;
 
                 default:
@@ -244,7 +246,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         var l = new List<string>();
 
         foreach (var thisFilterItem in this) {
-            if (thisFilterItem != null && !thisFilterItem.IsDisposed) {
+            if (thisFilterItem != null && !thisFilterItem.IsDisposed && thisFilterItem.IsOk()) {
                 l.ParseableAdd("Filter", thisFilterItem as IStringable);
             }
         }
