@@ -92,7 +92,7 @@ public sealed class ColumnViewItem {
                     break;
             }
         }
-        //if (Column == null) { Develop.DebugPrint(FehlerArt.Warnung, "Ungültige Spalte"); }
+        //if (Column  ==null || Column .IsDisposed) { Develop.DebugPrint(FehlerArt.Warnung, "Ungültige Spalte"); }
         if (Column != null && _viewType == ViewType.None) { _viewType = ViewType.Column; }
         //if (Column != null && _viewType != ViewType.None) { Column.CheckFormulaEditType(); }
     }
@@ -167,7 +167,7 @@ public sealed class ColumnViewItem {
 
     public override string ToString() {
         var result = "{Type=" + (int)_viewType;
-        if (Column != null) { result = result + ", ColumnName=" + Column.Name; }
+        if (Column  != null && !Column .IsDisposed) { result = result + ", ColumnName=" + Column.Name; }
         //if (_spalteX1 > 0) { result = result + ", X=" + _spalteX1; }
         //if (_spalteWidth > 1) { result = result + ", Width=" + _spalteWidth; }
         //if (_spalteHeight > 1) { result = result + ", Height=" + _spalteHeight; }

@@ -76,7 +76,7 @@ public class Method_CallFilter : Method {
         var vs = attvar.ValueString(0);
 
         foreach (var thisR in r) {
-            if (r != null) {
+            if (thisR != null && !thisR.IsDisposed) {
                 s.Sub++;
                 var s2 = thisR.ExecuteScript(null, vs, false, true, s.ChangeValues, 0);
                 if (!s2.AllOk) {

@@ -173,7 +173,7 @@ public static class Export {
     //        case "000":// Spaltenname für Textersetzung
     //            if (CodeNr.Substring(0, 3) == "000") // Spaltenname für Textersetzung
     //            {
-    //                if (row != null) {
+    //                if (row != null && !row.IsDisposed) {
     //                    column = row.Database?.Column[CodeNr.Substring(3)];
     //                    if (column == null || !column.ExportableTextformatForLayout()) {
     //                        TXT = "/FehlerTS/" + Code;
@@ -192,9 +192,9 @@ public static class Export {
     //            break;
     //        case "001": // Spaltenname für Bild
     //            TextReturn = false;
-    //            if (row != null) {
+    //            if (row != null && !row.IsDisposed) {
     //                column = row.Database?.Column[CodeNr.Substring(3)];
-    //                if (column == null) {
+    //                if (Column  ==null || Column .IsDisposed) {
     //                    value = "/FehlerTS/" + Code;
     //                    Ended = true;
     //                    break;
@@ -210,7 +210,7 @@ public static class Export {
     //            if (Bmp == null) { Bmp = QuickImage.Get(ImageCode.Warnung, 32).Bmp; }
     //            break;
     //        case "003": // Spaltenname für Bedingugnen
-    //            if (row != null) {
+    //            if (row != null && !row.IsDisposed) {
     //                column = row.Database?.Column[CodeNr.Substring(3)];
     //                if (column == null || !column.ExportableTextformatForLayout()) {
     //                    TXT = "/FehlerTS/" + Code;
@@ -523,7 +523,7 @@ public static class Export {
         if (rows != null) {
             foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
             {
-                if (thisRow != null) {
+                if (thisRow != null && !thisRow .IsDisposed) {
                     var tmpBody = body;
 
                     var script = thisRow.ExecuteScript(null, scriptname, false, false, true, 0);

@@ -71,7 +71,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad.Item[what] != null) { return null; }
         var r = Database.Row[what];
-        if (r == null) {
+        if (r== null || r.IsDisposed) {
             MessageBox.Show("<b>" + what + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
             return null;
         }

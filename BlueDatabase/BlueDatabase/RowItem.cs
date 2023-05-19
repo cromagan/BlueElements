@@ -157,7 +157,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         //    //case DataFormat.Columns_für_LinkedCellDropdown:
         //    //    if (IntTryParse(wert, out var colKey)) {
         //    //        var c = column.LinkedDatabase().Column.SearchByKey(colKey);
-        //    //        if (c != null) { wert = c.Name; }
+        //    //        if (c != null && !c.IsDisposed) { wert = c.Name; }
         //    //    }
         //    //    break;
         //}

@@ -42,7 +42,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     public ColumnPadItem(ColumnItem c) : base(c.Database?.TableName + "|" + c.Name) {
         Column = c;
 
-        if (Column != null) {
+        if (Column != null && !Column.IsDisposed) {
             Column.Changed += Column_Changed;
         }
     }
@@ -76,7 +76,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
-        if (Column == null) { return l; }
+        if (Column == null || Column.IsDisposed) { return l; }
 
         l.Add(new FlexiControlForProperty<string>(() => Datenbank));
         l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
@@ -107,7 +107,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     }
 
     public void Spalte_bearbeiten() {
-        if (Column == null) { return; }
+        if (Column == null || Column.IsDisposed) { return; }
         TableView.OpenColumnEditor(Column, null, null);
     }
 
@@ -123,7 +123,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
         if (disposing) {
-            if (Column != null) {
+            if (Column != null && !Column.IsDisposed) {
                 Column.Changed -= Column_Changed;
             }
             //Column = null;
@@ -131,7 +131,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     }
 
     protected override void GeneratePic() {
-        if (Column == null) {
+        if (Column == null || Column.IsDisposed) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
@@ -162,7 +162,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         gr.DrawLine(Pens.Black, 0, 210, bmp.Width, 210);
 
         var r = Column.Database.Row.First();
-        if (r != null) {
+        if (r != null && !r.IsDisposed) {
             Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, ShortenStyle.Replaced, Column.BehaviorOfImageAndText);
         }
 

@@ -164,11 +164,11 @@ public partial class TableView : FormWithStatusBar {
     }
 
     public static void OpenColumnEditor(ColumnItem? column, RowItem? row, Table? tableview) {
-        if (column == null) {
+        if (column == null || column.IsDisposed) {
             return;
         }
 
-        if (row == null) {
+        if (row == null || row.IsDisposed) {
             OpenColumnEditor(column, tableview);
             return;
         }
@@ -204,7 +204,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     public static void OpenColumnEditor(ColumnItem? column, Table? tableview) {
-        if (column == null) { return; }
+        if (column == null || column.IsDisposed) { return; }
 
         using ColumnEditor w = new(column, tableview);
         _ = w.ShowDialog();
@@ -572,7 +572,7 @@ public partial class TableView : FormWithStatusBar {
         tbl.Database.Cell.DataOfCellKey(cellKey, out var column, out var row);
 
         var valueCol0 = string.Empty;
-        if (row != null) {
+        if (row != null && !row.IsDisposed) {
             valueCol0 = row.CellFirstString();
         }
 
@@ -590,15 +590,15 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "SpaltenSortierungAZ":
-                if (column != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.Name, false); }
+                if (column != null && !column.IsDisposed) { tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.Name, false); }
                 break;
 
             case "SpaltenSortierungZA":
-                if (column != null) { tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.Name, true); }
+                if (column != null && !column.IsDisposed) { tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.Name, true); }
                 break;
 
             case "Skript":
-                if (row != null) {
+                if (row != null && !row.IsDisposed) {
                     var t = row.ExecuteScript(null, ev[1], true, true, true, 10).Protocol.JoinWithCr();
                     if (string.IsNullOrEmpty(t)) {
                         MessageBox.Show("Skript fehlerfrei ausgeführt.", ImageCode.Häkchen, "Ok");
@@ -612,7 +612,7 @@ public partial class TableView : FormWithStatusBar {
             case "ZeileLöschen":
                 if (ErrorMessage(tbl.Database, EditableErrorReason.EditGeneral)) { return; }
                 if (!tbl.Database.IsAdministrator()) { return; }
-                if (row == null) { return; }
+                if (row == null || row.IsDisposed) { return; }
 
                 if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja",
                         "Nein") == 0) {
@@ -674,7 +674,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "Datenüberprüfung":
-                if (row != null) {
+                if (row != null && !row.IsDisposed) {
                     row.InvalidateCheckData();
                     row.CheckRowDataIfNeeded();
                     MessageBox.Show("Datenüberprüfung:\r\n" + row.LastCheckedMessage, ImageCode.HäkchenDoppelt, "Ok");

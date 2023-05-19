@@ -221,7 +221,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             }
 
             r = Database?.Row[txbTestZeile.Text];
-            if (r == null) {
+            if (r== null || r.IsDisposed) {
                 e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, "Allgemein");
                 return;
             }
@@ -288,7 +288,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         switch (e.ClickedComand.ToLower()) {
             case "spalteneigenschaftenbearbeiten":
-                if (c != null) {
+                if (c != null && !c.IsDisposed) {
                     TableView.OpenColumnEditor(c, null, null);
                 }
 

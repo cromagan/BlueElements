@@ -137,7 +137,7 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
         Columns.Clear();
         foreach (var t in names) {
             var c = Database.Column.Exists(t);
-            if (c != null) { Columns.Add(c); }
+            if (c != null && !c.IsDisposed) { Columns.Add(c); }
         }
     }
 

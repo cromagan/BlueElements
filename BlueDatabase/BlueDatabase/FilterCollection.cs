@@ -212,7 +212,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
 
     public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, string filterBy, string herkunft) {
         var column = Database?.Column.Exists(columnName);
-        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
+        if (column == null || column.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
         RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
     }
 
@@ -225,7 +225,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
 
     public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, List<string>? filterBy, string herkunft) {
         var column = Database?.Column.Exists(columnName);
-        if (column == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
+        if (column == null || column.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
         RemoveOtherAndAddIfNotExists(new(column, filterType, filterBy, herkunft));
     }
 

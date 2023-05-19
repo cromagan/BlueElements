@@ -23,6 +23,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -149,7 +150,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             foreach (var thisfile in DatabaseAbstract.AllFiles) {
                 var row = thisfile.Row[unique];
-                if (row != null) { ok = false; break; }
+                if (row != null && !row.IsDisposed) { ok = false; break; }
             }
 
             if (ok) { return unique; }
@@ -355,7 +356,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 var r = SearchByKey(key);
 
-                if (r != null) {
+                if (r != null && !r.IsDisposed) {
                     var l = new BackgroundWorker();
                     l.WorkerReportsProgress = true;
                     l.RunWorkerCompleted += PendingWorker_RunWorkerCompleted;
@@ -418,7 +419,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 var r = SearchByKey(key);
                 _pendingChangedRows.RemoveAt(0);
 
-                if (r != null) {
+                if (r != null && !r.IsDisposed) {
                     _ = r.ExecuteScript(EventTypes.value_changed, string.Empty, true, true, true, 2);
                     r.InvalidateCheckData();
                     r.CheckRowDataIfNeeded();
@@ -557,7 +558,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         var row = GenerateAndAdd(NextRowKey(), first.JoinWithCr(), false, true, comment);
 
-        if (row == null) { return null; }
+        if (row == null || row.IsDisposed) { return null; }
 
         foreach (var thisfi in fi) {
             row.CellSet(thisfi.Column, thisfi.SearchValue.ToList());
@@ -598,7 +599,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public bool Remove(long key, string comment) {
         var r = SearchByKey(key);
 
-        if (r == null) { return false; }
+        if (r == null || r.IsDisposed) { return false; }
         return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, r, string.Empty, key.ToString(), comment));
     }
 
@@ -644,9 +645,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public RowItem? SearchByKey(long? key) {
-        if (Database == null || Database.IsDisposed) { return null; }
+        if (Database == null || Database.IsDisposed || key == null || key < 0) { return null; }
         try {
-            return key != null && key > -1 && _internal.ContainsKey((long)key) ? _internal[(long)key] : null;
+            var r = _internal.ContainsKey((long)key) ? _internal[(long)key] : null;
+            if (r != null && r.IsDisposed) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Interner Zeilenfehler: " + key);
+                return null;
+            }
+
+            return r;
         } catch {
             return SearchByKey(key);
         }
@@ -742,7 +749,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (type == DatabaseDataType.Comand_RemoveRow) {
             //var row = SearchByKey(key);
-            if (row == null) { return "Zeile nicht vorhanden"; }
+            if (row == null || row.IsDisposed) { return "Zeile nicht vorhanden"; }
 
             OnRowRemoving(new RowEventArgs(row));
             foreach (var thisColumnItem in db.Column) {
@@ -864,7 +871,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var rk = (long)e.Argument;
 
         var r = SearchByKey(rk);
-        if (r == null) { return; }
+        if (r == null || r.IsDisposed) { return; }
 
         _ = r.ExecuteScript(EventTypes.value_changed_extra_thread, string.Empty, false, false, false, 5);
     }

@@ -437,8 +437,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static string Database_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, FormatHolder.Text);
 
     public static void DoUndo(ColumnItem? column, RowItem? row) {
-        if (column == null) { return; }
-        if (row == null) { return; }
+        if (column == null || column.IsDisposed) { return; }
+        if (row == null || row.IsDisposed) { return; }
         if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _) = CellCollection.LinkedCellData(column, row, true, false);
             if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
@@ -522,7 +522,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         db.ColumnArrangements[0].NextVisible(column) :
                         ca.NextVisible(column);
 
-            if (column == null) {
+            if (column == null || column.IsDisposed) {
                 column = ca.First()?.Column;
                 if (rowsChecked > tableView.Database.Row.Count() + 1) {
                     foundColumn = null;
@@ -1049,14 +1049,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void PinAdd(RowItem? row) {
-        if (row == null) { return; }
+        if (row == null || row.IsDisposed) { return; }
         PinnedRows.Add(row);
         Invalidate_sortedRowData();
         OnPinnedChanged();
     }
 
     public void PinRemove(RowItem? row) {
-        if (row == null) { return; }
+        if (row == null || row.IsDisposed) { return; }
         _ = PinnedRows.Remove(row);
         Invalidate_sortedRowData();
         OnPinnedChanged();
@@ -1830,7 +1830,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         newValue = column.AutoCorrect(newValue, false);
-        if (row != null) {
+        if (row != null && !row.IsDisposed) {
             if (newValue == row.CellGetString(column)) { return; }
         } else {
             if (string.IsNullOrEmpty(newValue)) { return; }
@@ -1848,7 +1848,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         if (string.IsNullOrEmpty(cancelReason)) {
-            if (row == null) {
+            if (row == null || row.IsDisposed) {
                 var f = CellCollection.EditableErrorReason(column.Database.Column.First(), null, EditableErrorReason.EditGeneral, true, false);
                 if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
                 row = column.Database.Row.GenerateAndAdd(newValue, "Neue Zeile über Tabellen-Ansicht");
@@ -2427,7 +2427,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private SizeF ColumnCaptionText_Size(ColumnItem? column) {
-        if (column == null) { return new SizeF(_pix16, _pix16); }
+        if (column == null || column.IsDisposed) { return new SizeF(_pix16, _pix16); }
 
         if (column.TmpCaptionTextSize.Width > 0) { return column.TmpCaptionTextSize; }
         if (_columnFont == null) { return new SizeF(_pix16, _pix16); }
@@ -2444,7 +2444,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         var wi = ColumnCaptionText_Size(column).Height + 4;
         var he = ColumnCaptionText_Size(column).Width + 3;
         //}
-        if (column != null) {
+        if (column != null && !column.IsDisposed) {
             if (!string.IsNullOrEmpty(column.CaptionGroup3)) {
                 he += ColumnCaptionSizeY * 3;
             } else if (!string.IsNullOrEmpty(column.CaptionGroup2)) {
@@ -3167,7 +3167,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     case "pin":
                         foreach (var thisk in pair.Value.FromNonCritical().SplitBy("|")) {
                             var r = db.Row.SearchByKey(LongParse(thisk));
-                            if (r != null) { PinnedRows.Add(r); }
+                            if (r != null && !r.IsDisposed) { PinnedRows.Add(r); }
                         }
 
                         break;

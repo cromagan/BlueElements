@@ -1007,7 +1007,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //    set {
     //        if (_vorschlagsColumn == value) { return; }
     public static EditTypeTable UserEditDialogTypeInTable(ColumnItem? column, bool doDropDown) {
-        if (column == null) { return EditTypeTable.None; }
+        if (column == null || column.IsDisposed) { return EditTypeTable.None; }
         return UserEditDialogTypeInTable(column.Format, doDropDown, column.TextBearbeitungErlaubt, column.MultiLine);
     }
 
@@ -1434,7 +1434,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         einzigartig = new List<string>();
         nichtEinzigartig = new List<string>();
         foreach (var thisRow in rows) {
-            if (thisRow != null) {
+            if (thisRow != null && !thisRow.IsDisposed) {
                 var tmp = MultiLine ? thisRow.CellGetList(this) : new List<string> { thisRow.CellGetString(this) };
                 foreach (var thisString in tmp) {
                     if (einzigartig.Contains(thisString)) {
@@ -1679,7 +1679,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
             if (_format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 var c = LinkedDatabase?.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
-                if (c != null) {
+                if (c != null && !c.IsDisposed) {
                     this.GetStyleFrom((IInputFormat)c);
                     BehaviorOfImageAndText = c.BehaviorOfImageAndText;
                     ScriptType = c.ScriptType; // 29.06.2022 Wieder aktivert. Grund: Plananalyse waren zwei vershieden Typen bei den Zeitn. So erschien immer automatisch eine 0 bei den Stnden, und es war nicht ersichtlich warum.

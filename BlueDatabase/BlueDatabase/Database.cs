@@ -274,11 +274,11 @@ public sealed class Database : DatabaseAbstract {
 
                 if (rowKey > -1) {
                     row = db.Row.SearchByKey(rowKey);
-                    if (row == null) {
+                    if (row == null || row.IsDisposed) {
                         _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, null, true);
                         row = db.Row.SearchByKey(rowKey);
                     }
-                    if (row == null) {
+                    if (row == null || row.IsDisposed) {
                         Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
                         db.SetReadOnly();
                         return;
@@ -292,12 +292,12 @@ public sealed class Database : DatabaseAbstract {
 
                 //if (colKey > -1 && string.IsNullOrEmpty(columname)) {
                 //    column = db.Column.SearchByKey(colKey);
-                //    if (column == null) {
+                //    if (Column  ==null || Column .IsDisposed) {
                 //        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
                 //        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByKey, true, string.Empty);
                 //        column = db.Column.SearchByKey(colKey);
                 //    }
-                //    if (column == null) {
+                //    if (Column  ==null || Column .IsDisposed) {
                 //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
                 //        db.SetReadOnly();
                 //        return;
@@ -308,12 +308,12 @@ public sealed class Database : DatabaseAbstract {
 
                 if (!string.IsNullOrEmpty(columname)) {
                     column = db.Column.Exists(columname);
-                    if (column == null) {
+                    if (column == null || column.IsDisposed) {
                         if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
                         _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, true, columname);
                         column = db.Column.Exists(columname);
                     }
-                    if (column == null) {
+                    if (column == null || column.IsDisposed) {
                         Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
                         db.SetReadOnly();
                         return;

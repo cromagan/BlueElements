@@ -53,7 +53,7 @@ internal class Method_IsDropDownItem : Method_Database {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var column = Column(s.Variables, attvar.Attributes[1].Name);
-        if (column == null) { return new DoItFeedback(infos.Data, "Spalte in Datenbank nicht gefunden"); }
+        if (column == null || column.IsDisposed) { return new DoItFeedback(infos.Data, "Spalte in Datenbank nicht gefunden"); }
 
         var tocheck = new List<string>();
         if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }

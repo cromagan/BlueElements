@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 
 namespace BlueDatabase;
 
@@ -66,7 +67,7 @@ public static class RowDrawDataExtensions {
 /// RowData kann mehrfach in einer Tabelle angezeigt werden.
 /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
 /// </summary>
-public class RowData : IComparable {
+public class RowData : IComparable, IDisposableExtended {
 
     #region Constructors
 
@@ -94,9 +95,10 @@ public class RowData : IComparable {
     public string Chapter { get; }
     public int DrawHeight { get; set; }
     public bool Expanded { get; set; }
+    public bool IsDisposed { get; private set; } = false;
     public bool MarkYellow { get; set; }
     public string PinStateSortAddition { get; set; }
-    public RowItem? Row { get; }
+    public RowItem? Row { get; private set; }
     public bool ShowCap { get; set; }
     public int Y { get; set; }
 
@@ -113,6 +115,12 @@ public class RowData : IComparable {
 
         Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");
         return 0;
+    }
+
+    public void Dispose() {
+        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
     public void GetDataFrom(RowData thisRowData) {
@@ -133,5 +141,25 @@ public class RowData : IComparable {
 
     public override string ToString() => Row == null ? Chapter + " -> null" : Chapter + " -> " + Row.CellFirstString();
 
+    protected virtual void Dispose(bool disposing) {
+        if (!IsDisposed) {
+            if (disposing) {
+                Row = null;
+                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+            }
+
+            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
+            // TODO: Große Felder auf NULL setzen
+            IsDisposed = true;
+        }
+    }
+
     #endregion
+
+    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // ~RowData()
+    // {
+    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+    //     Dispose(disposing: false);
+    // }
 }

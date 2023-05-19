@@ -507,7 +507,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         if (Marker.CancellationPending) { return; }
 
         var (_, row) = GetTmpVariables();
-        if (row == null) { return; }
+        if (row == null || row.IsDisposed) { return; }
         if (Marker.CancellationPending) { return; }
 
         var col = Database.Column.First();
@@ -624,7 +624,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
         var (column, _) = GetTmpVariables();
 
-        if (column == null) { return; }
+        if (column == null || column.IsDisposed) { return; }
         if (column.Format != DataFormat.RelationText) { return; }
         Marker.RunWorkerAsync();
     }
@@ -632,7 +632,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
     private void UpdateColumnData() {
         var (column, _) = GetTmpVariables();
 
-        if (column == null) {
+        if (column == null || column.IsDisposed) {
             if (string.IsNullOrEmpty(_columnName)) {
                 Caption = "[?]";
                 //EditType = EditTypeFormula.None;

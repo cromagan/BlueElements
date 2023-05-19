@@ -64,7 +64,7 @@ public class CellItem {
     #region Methods
 
     public static (string text, QuickImage? image) GetDrawingData(ColumnItem? column, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
-        if (column == null) { return (originalText, null); }
+        if (column == null || column.IsDisposed) { return (originalText, null); }
 
         var tmpText = ValueReadable(column, originalText, style, bildTextverhalten, true);
         var tmpImageCode = StandardImage(column, originalText, tmpText, style, bildTextverhalten);
@@ -167,7 +167,7 @@ public class CellItem {
     public static string ValueReadable(ColumnItem? column, string txt, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks) {
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
 
-        if (column == null) { return txt; }
+        if (column == null || column.IsDisposed) { return txt; }
 
         switch (column.Format) {
             case DataFormat.Text:
@@ -274,7 +274,7 @@ public class CellItem {
         // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird
         if (bildTextverhalten == BildTextVerhalten.Nur_Text) { return null; }
         if (style == ShortenStyle.HTML) { return null; }
-        if (column == null) { return null; }
+        if (column == null || column.IsDisposed) { return null; }
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, BildTextVerhalten.Nur_Text, true); }
         if (string.IsNullOrEmpty(replacedText)) { return null; }
 

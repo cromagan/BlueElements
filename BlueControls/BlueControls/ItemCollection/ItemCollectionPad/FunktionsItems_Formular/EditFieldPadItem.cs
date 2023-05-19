@@ -115,28 +115,28 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public string Interner_Name {
         get {
-            if (Column == null) { return "?"; }
+            if (Column == null || Column.IsDisposed) { return "?"; }
             return Column.Name;
         }
     }
 
     public string Spalten_AdminInfo {
         get {
-            if (Column != null) { return Column.AdminInfo; }
+            if (Column != null && !Column.IsDisposed) { return Column.AdminInfo; }
             return string.Empty;
         }
         set {
-            if (Column != null) { Column.AdminInfo = value; }
+            if (Column != null && !Column.IsDisposed) { Column.AdminInfo = value; }
         }
     }
 
     public string Spalten_QuickInfo {
         get {
-            if (Column != null) { return Column.Quickinfo; }
+            if (Column != null && !Column.IsDisposed) { return Column.Quickinfo; }
             return string.Empty;
         }
         set {
-            if (Column != null) { Column.Quickinfo = value; }
+            if (Column != null && !Column.IsDisposed) { Column.Quickinfo = value; }
         }
     }
 
@@ -148,7 +148,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     //public enSizeModes Bild_Modus { get; set; }
     public static List<BasicListItem> GetAllowedEditTypes(ColumnItem? column) {
         var l = new List<BasicListItem>();
-        if (column == null) { return l; }
+        if (column == null || column.IsDisposed) { return l; }
         var t = typeof(EditTypeFormula);
 
         foreach (int z1 in Enum.GetValues(t)) {
@@ -175,7 +175,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         return con;
 
         //var cy = new FlexiControl();
-        //if (Column == null) {
+        //if (Column  ==null || Column .IsDisposed) {
         //    cy.Caption = "?Kein Bezug?:";
         //} else {
         //    cy.Caption = Column.ReadableText() + ":";
@@ -209,12 +209,11 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
         l.AddRange(_itemAccepts.GetStyleOptions(this));
 
-        if(this.InputDatabase == null) { return l; }
+        if (this.InputDatabase == null) { return l; }
 
         l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
-        
-        
-        if(Column == null || Column.IsDisposed) { return l; }
+
+        if (Column == null || Column.IsDisposed) { return l; }
         l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
         l.Add(new FlexiControlForDelegate(Spalte_bearbeiten, "Spalte bearbeiten", ImageCode.Spalte));
 
@@ -269,7 +268,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public void Spalte_bearbeiten() {
-        if (Column == null) { return; }
+        if (Column == null || Column.IsDisposed) { return; }
         TableView.OpenColumnEditor(Column, null, null);
 
         OnChanged();
@@ -337,7 +336,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false, false);
         }
 
-        //if (Column == null) {
+        //if (Column  ==null || Column .IsDisposed) {
         //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
         //} else {
         DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column?.ReadableText() + ":");

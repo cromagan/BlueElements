@@ -183,7 +183,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         if (e == null) { return; }
         e.Clear();
         e.CheckBehavior = CheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
-        if (column == null) { return; }
+        if (column == null || column.IsDisposed) { return; }
 
         l.AddRange(column.DropDownItems);
         if (column.DropdownWerteAndererZellenAnzeigen) {
@@ -536,7 +536,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         if (list == null) { return; }
 
         foreach (var thisRow in list) {
-            if (thisRow != null) {
+            if (thisRow != null && !thisRow.IsDisposed) {
                 _ = Add(thisRow, layoutId);
             }
         }

@@ -64,7 +64,7 @@ public class Method_CallRow : Method {
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
 
-        if (row == null) {
+        if (row == null || row.IsDisposed) {
             return new DoItFeedback(infos.Data, "Zeile nicht gefunden");
         }
 

@@ -444,7 +444,7 @@ public abstract class SqlBackAbstract {
                 var rk = LongParse(reader[0].ToString());
                 var r = db.Row.SearchByKey(rk) ?? db.Row.GenerateAndAdd(rk, string.Empty, false, false, "Load row");
 
-                if (r != null) {
+                if (r != null && !r.IsDisposed) {
                     for (var z = 1; z < dt.Columns.Count; z++) {
                         var cx = db.Column.Exists(dt.Columns[z].ColumnName);
                         if (cx != null) {
@@ -899,14 +899,14 @@ public abstract class SqlBackAbstract {
                 var rk = LongParse(reader[0].ToString());
                 var row = db.Row.SearchByKey(rk);
 
-                if (row == null) {
+                if (row == null || row.IsDisposed) {
                     _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, true);
                     row = db.Row.SearchByKey(rk);
                 }
 
                 #endregion
 
-                if (row != null) {
+                if (row != null && !row.IsDisposed) {
                     for (var z = 1; z < dt.Columns.Count; z++) {
                         _ = db.Cell.SetValueInternal(columnsToLoad[z - 1], row, reader[z].ToString(), true);
                     }
@@ -1175,20 +1175,20 @@ public abstract class SqlBackAbstract {
             return "Tabellenname ungültig: " + tablename;
         }
 
-        (string? value, string error) = GetCellValue(tablename, columnname, rowkey);
+        //(string? value, string error) = GetCellValue(tablename, columnname, rowkey);
 
-        if (!string.IsNullOrEmpty(error)) { return error; }
+        //if (!string.IsNullOrEmpty(error)) { return error; }
 
         string cmdString;
 
-        if (value is null) {
-            cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + columnname.ToUpper() + " ) VALUES (" + Dbval(rowkey) + ", " + Dbval(newValue) + " )";
-            Develop.DebugPrint(FehlerArt.Warnung, "Insert-Befehl: " + cmdString);
-        } else if (value != newValue) {
+        //if (value is null) {
+        //    cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + columnname.ToUpper() + " ) VALUES (" + Dbval(rowkey) + ", " + Dbval(newValue) + " )";
+        //    Develop.DebugPrint(FehlerArt.Warnung, "Insert-Befehl: " + cmdString);
+        //} else if (value != newValue) {
             cmdString = "UPDATE " + tablename.ToUpper() + " SET " + columnname.ToUpper() + " = " + Dbval(newValue) + " WHERE RK = " + Dbval(rowkey);
-        } else {
-            return string.Empty;
-        }
+        //} else {
+        //    return string.Empty;
+        //}
 
         return ExecuteCommand(cmdString, false);
     }

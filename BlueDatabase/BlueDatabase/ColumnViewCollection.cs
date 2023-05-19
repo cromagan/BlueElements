@@ -175,7 +175,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
     }
 
     public void Add(ColumnItem? column, bool permanent) {
-        if (column == null) { return; }
+        if (column == null || column.IsDisposed) { return; }
 
         Add(permanent
             ? new ColumnViewItem(column, ViewType.PermanentColumn, this)

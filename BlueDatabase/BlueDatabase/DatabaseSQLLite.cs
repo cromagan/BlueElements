@@ -375,7 +375,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                      //    // Sonderbehandlung!
                      //    var c = Column.SearchByKey(LongParse(columnkey));
 
-                     //    if (c != null) {
+                     //    if (c != null && !c.IsDisposed) {
                      //        var newn = _sql.GetLastColumnName(tablename, c.Key);
                      //        c.Name = newn;
                      //    }
@@ -429,7 +429,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                         var c = Column.Exists(columnname);
                         var r = Row.SearchByKey(LongParse(rowkey));
-                        //if (r == null) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile nicht gefunden"); }
+                        //if (r== null || r.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile nicht gefunden"); }
                         //if (c == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht gefunden"); }
                         if (r != null && c != null) {
                             // Kann sein, dass der Bentzer hier ja schon eine Zeile oder so geklscht hat
@@ -454,7 +454,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                         #region Spalten-Styles
 
                         var c = Column.Exists(columnname);
-                        if (c != null) {
+                        if (c != null && !c.IsDisposed) {
                             var v = _sql?.GetStyleData(tablename, comand, c.Name);
                             if (v != null) { _ = SetValueInternal(t, v, c, null, true); }
                         }
@@ -516,10 +516,10 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                 foreach (var thisCol in columnsToLoad) {
                     var column = Column.Exists(thisCol);
-                    if (column == null) {
+                    if (column == null || column.IsDisposed) {
                         _ = Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, true, thisCol);
                         column = Column.Exists(thisCol);
-                        if (column == null) {
+                        if (Column == null || Column.IsDisposed) {
                             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht gefunden");
                             return;
                         }

@@ -211,7 +211,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
             var r = grpVariablen.RowOfVariable(hoveredWordnew);
 
             //foreach (var r in tableVariablen.Database.Row) {
-            if (r != null) {
+            if (r != null && !r.IsDisposed) {
                 //if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.OrdinalIgnoreCase)) {
                 var inh = r.CellGetString("Inhalt");
                 _lastVariableContent = inh;

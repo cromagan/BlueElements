@@ -666,7 +666,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.Enabled = Enabled;
         control.Item.Clear();
         control.Item.CheckBehavior = CheckBehavior.MultiSelection;
-        if (column == null) {
+        if (column == null || column.IsDisposed) {
             return;
         }
 
@@ -713,7 +713,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.Enabled = Enabled;
         control.Item.RemoveAll();
         control.Item.CheckBehavior = CheckBehavior.NoSelection;
-        if (column == null) { return; }
+        if (column == null || column.IsDisposed) { return; }
         ItemCollectionList item = new(true);
         ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
         control.SuggestionsAdd(item);
@@ -1060,7 +1060,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
     private void UpdateValueTo_Caption() {
         //if (!_IsFilling) { Develop.DebugPrint(enFehlerArt.Fehler, "Filling muss TRUE sein!"); }
-        //if (Column == null) { return; } // nur mögloch bei verbundenen Datenbanken
+        //if (Column  ==null || Column .IsDisposed) { return; } // nur mögloch bei verbundenen Datenbanken
         if (_editType != EditTypeFormula.nur_als_Text_anzeigen) { return; } // und auch dann nur als reine Text anzeige
         if (_captionObject == null) { return; }
         _captionObject.Width = Width;

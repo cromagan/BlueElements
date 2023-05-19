@@ -543,7 +543,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     }
 
     public void ParseVariable(RowItem? row) {
-        if (row == null) { return; }
+        if (row == null || row.IsDisposed) { return; }
 
         var script = row.ExecuteScript(EventTypes.export, string.Empty, false, false, true, 0);
         if (!script.AllOk || script.Variables == null) { return; }

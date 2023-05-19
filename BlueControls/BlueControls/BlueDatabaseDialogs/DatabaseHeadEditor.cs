@@ -136,7 +136,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
             r.CellSet("ColumnName", col.Name);
             r.CellSet("columnCaption", col.Caption);
         }
-        if (row != null) {
+        if (row != null && !row.IsDisposed) {
             r.CellSet("RowFirst", row.CellFirstString());
         } else if (cd[1] != "-1") {
             r.CellSet("RowFirst", "[gelöscht]");

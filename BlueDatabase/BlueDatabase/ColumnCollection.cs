@@ -148,7 +148,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (Database == null || Database.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
         try {
             columnName = columnName.ToUpper();
-            return _internal.ContainsKey(columnName) ? _internal[columnName] : null;
+            var col = _internal.ContainsKey(columnName) ? _internal[columnName] : null;
+            if (col != null && col.IsDisposed) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Interner Spaltenfehler, Spalte verworfen: " + columnName);
+                return null;
+            }
+            return col;
         } catch {
             return Exists(columnName);
         }
@@ -163,10 +168,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             return null;
         }
 
-        var l = Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.Name.StartsWith("SYS_"))?.Column;
+        var l = Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed && !thisViewItem.Column.Name.StartsWith("SYS_"))?.Column;
         if (l != null) { return l; }
 
-        return Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null)?.Column;
+        return Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed)?.Column;
     }
 
     //public ColumnItem? this[int index] {
@@ -372,7 +377,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //}
 
     public bool Remove(ColumnItem column, string comment) {
-        if (column == null) { return false; }
+        if (column == null || column.IsDisposed) { return false; }
         return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveColumn, column, null, string.Empty, column.Name, comment));
     }
 
@@ -532,7 +537,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         //if (type == DatabaseDataType.Comand_AddColumnByKey) {
         //    var c = SearchByKey(key);
-        //    if (c != null) { return "Bereits vorhanden!"; }
+        //    if (c != null && !c.IsDisposed) { return "Bereits vorhanden!"; }
 
         //    c = new ColumnItem(Database, (long)key);
         //    _ = Add(c);
@@ -547,7 +552,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         if (type == DatabaseDataType.Comand_AddColumnByName) {
             var c = Exists(name);
-            if (c != null) { return "Bereits vorhanden!"; }
+            if (c != null && !c.IsDisposed) { return "Bereits vorhanden!"; }
 
             c = new ColumnItem(Database, name);
             _ = Add(c);
@@ -602,7 +607,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (sysname == "SYS_DATECHANGED" && c == null) { c = Exists("SYS_CHANGEDATE"); }
         if (sysname == "SYS_DATECREATED" && c == null) { c = Exists("SYS_CREATEDATE"); }
 
-        if (c != null) {
+        if (c != null && !c.IsDisposed) {
             c.Name = sysname; // Wegen der Namensverbiegung oben...
             c.ResetSystemToDefault(false);
             return;

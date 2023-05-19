@@ -32,7 +32,7 @@ public partial class EditBoxRow : DialogWithOkAndCancel {
 
         formToEdit.SetData(cf, row?.Database, -1);
 
-        if (row != null) {
+        if (row != null && !row.IsDisposed) {
             if (cf == null) {
                 formToEdit.GetConnectedFormulaFromDatabase(row?.Database);
             }

@@ -86,7 +86,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public override string QuickInfo {
         get {
             var r = Row;
-            if (r == null) { return string.Empty; }
+            if (r== null || r.IsDisposed) { return string.Empty; }
             if (_lastQuickInfo == r.QuickInfo) { return _tmpQuickInfo; }
             _lastQuickInfo = r.QuickInfo;
             _tmpQuickInfo = _lastQuickInfo.Replace(r.CellFirstString(), "<b>[<imagecode=Stern|16>" + Row.CellFirstString() + "]</b>");
@@ -144,7 +144,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
             case "firstvalue":
                 var n = value.FromNonCritical();
-                if (Row != null) {
+                if (Row != null && !Row.IsDisposed) {
                     if (!string.Equals(Row.CellFirstString(), n, StringComparison.OrdinalIgnoreCase)) {
                         MessageBox.Show("<b><u>Eintrag hat sich geändert:</b></u><br><b>Von: </b> " + n + "<br><b>Nach: </b>" + Row.CellFirstString(), ImageCode.Information, "OK");
                     }

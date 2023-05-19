@@ -871,7 +871,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             VariableCollection vars = new();
 
-            if (row != null) {
+            if (row != null && !row.IsDisposed) {
                 foreach (var thisCol in Column) {
                     var v = RowItem.CellToVariable(thisCol, row);
                     if (v != null) { vars.AddRange(v); }
@@ -902,7 +902,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             var allowedMethods = MethodType.Standard | MethodType.Database;
 
-            if (row != null) { allowedMethods |= MethodType.MyDatabaseRow; }
+            if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
             if (!s.EventTypes.HasFlag(EventTypes.prepare_formula)) {
                 allowedMethods |= MethodType.IO;
                 allowedMethods |= MethodType.NeedLongTime;
@@ -930,7 +930,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             #region Variablen zurückschreiben und Special Rules ausführen
 
             if (sc.ChangeValues && changevalues && scf.AllOk) {
-                if (row != null) {
+                if (row != null && !row.IsDisposed) {
                     foreach (var thisCol in Column) {
                         row.VariableToCell(thisCol, vars);
                     }
@@ -1044,7 +1044,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         foreach (var thisRow in sortedRows) {
-            if (thisRow != null) {
+            if (thisRow != null && !thisRow.IsDisposed) {
                 for (var colNr = 0; colNr < columnList.Count; colNr++) {
                     if (columnList[colNr] != null) {
                         var tmp = Cell.GetString(columnList[colNr], thisRow?.Row);
@@ -1096,7 +1096,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         foreach (var thisRow in sortedRows) {
-            if (thisRow != null) {
+            if (thisRow != null && !thisRow.IsDisposed) {
                 da.RowBeginn();
                 foreach (var thisColumn in columnList) {
                     if (thisColumn != null) {
@@ -1562,7 +1562,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         if (type.IsColumnTag()) {
-            if (column == null) {
+            if (column == null || column.IsDisposed || Column.IsDisposed) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
                 return "Wert nicht gesetzt!";
             }
@@ -1595,7 +1595,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
                     if (!isLoading) {
                         var thisRow = Row.SearchByKey(rk);
-                        if (thisRow != null) { thisRow.IsInCache = DateTime.UtcNow; }
+                        if (thisRow != null && !thisRow.IsDisposed) { thisRow.IsInCache = DateTime.UtcNow; }
                     }
 
                     return f1;

@@ -127,7 +127,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     //    //        #region Column ermitteln
 
     //    //        var column = OutputDatabase?.Column.Exists(thisR.CellGetString("Spalte"));
-    //    //        if (column == null) {
+    //    //        if (Column  ==null || Column .IsDisposed) {
     //    //            return;
     //    //        }
 
