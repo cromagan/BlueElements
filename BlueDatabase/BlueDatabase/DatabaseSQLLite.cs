@@ -300,6 +300,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
+        if (DateTime.UtcNow.Subtract(SqlBackAbstract.LastLoadUtc).TotalSeconds < 5) { return; }
 
         if (CriticalState()) { return; }
 

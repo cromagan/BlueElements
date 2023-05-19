@@ -45,7 +45,6 @@ public abstract class SqlBackAbstract {
     protected DbConnection? Connection;
 
     private static bool _didBackup;
-    private static DateTime _lastLoadUtc = DateTime.UtcNow;
     private readonly object _fill = new();
     private readonly object _getChanges = new();
 
@@ -64,6 +63,7 @@ public abstract class SqlBackAbstract {
 
     #region Properties
 
+    public static DateTime LastLoadUtc { get; private set; } = DateTime.UtcNow;
     public bool ConnectionOk => Connection != null;
 
     public string ConnectionString { get; protected set; } = string.Empty;
@@ -241,7 +241,7 @@ public abstract class SqlBackAbstract {
                 _ = OpenConnection();
                 tbl.Load(command.ExecuteReader());
                 _ = CloseConnection();
-                _lastLoadUtc = DateTime.UtcNow;
+                LastLoadUtc = DateTime.UtcNow;
                 return tbl;
             }
         } catch {
@@ -1078,6 +1078,8 @@ public abstract class SqlBackAbstract {
     }
 
     private string ExecuteCommand(IDbCommand command, bool abort) {
+        LastLoadUtc = DateTime.UtcNow;
+
         if (Connection == null || !OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
 
         try {
@@ -1129,8 +1131,8 @@ public abstract class SqlBackAbstract {
     }
 
     private void PauseSystem() {
-        while (DateTime.UtcNow.Subtract(_lastLoadUtc).TotalMilliseconds < 1) { }
-        _lastLoadUtc = DateTime.UtcNow;
+        while (DateTime.UtcNow.Subtract(LastLoadUtc).TotalMilliseconds < 1) { }
+        LastLoadUtc = DateTime.UtcNow;
     }
 
     private string RemoveColumn(string tablename, string column, bool allowSystemTableNames) {
@@ -1185,7 +1187,7 @@ public abstract class SqlBackAbstract {
         //    cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + columnname.ToUpper() + " ) VALUES (" + Dbval(rowkey) + ", " + Dbval(newValue) + " )";
         //    Develop.DebugPrint(FehlerArt.Warnung, "Insert-Befehl: " + cmdString);
         //} else if (value != newValue) {
-            cmdString = "UPDATE " + tablename.ToUpper() + " SET " + columnname.ToUpper() + " = " + Dbval(newValue) + " WHERE RK = " + Dbval(rowkey);
+        cmdString = "UPDATE " + tablename.ToUpper() + " SET " + columnname.ToUpper() + " = " + Dbval(newValue) + " WHERE RK = " + Dbval(rowkey);
         //} else {
         //    return string.Empty;
         //}

@@ -98,7 +98,7 @@ public static class Develop {
 
     public static void CheckStackForOverflow() {
         StackTrace stackTrace = new();
-        if (stackTrace.FrameCount > 200) {
+        if (stackTrace.FrameCount > 100) {
             DebugPrint(FehlerArt.Fehler, "Stack-Overflow abgefangen!");
         }
     }
