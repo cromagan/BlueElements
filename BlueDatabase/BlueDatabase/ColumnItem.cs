@@ -1078,7 +1078,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (m <= 0) { return 8; }
         if (m == 1) { return 1; }
-        return Math.Min((int)(m * prozentZuschlag) + 1, 4000);
+        var erg = Math.Max((int)(m * prozentZuschlag) + 1, _maxTextLenght);
+        return Math.Min(erg, 4000);
     }
 
     public int CalculatePreveredMaxTextLenght(double prozentZuschlag) {
@@ -1096,7 +1097,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             m = Math.Max(m, thiss.Length);
         }
 
-        if (m <= 0) { return 255; }
+        if (m <= 0) { return 8; }
         if (m == 1) { return 1; }
         return Math.Min((int)(m * prozentZuschlag) + 1, 1000);
     }
@@ -1296,11 +1297,17 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (!IsValidColumnName(KeyName)) { return "Der Spaltenname ist ung¸ltig."; }
 
-        if (MaxCellLenght < 1) { return "Zellengrˆﬂe zu klein!"; }
-        if (MaxCellLenght > 4000) { return "Zellengrˆﬂe zu groﬂ!"; }
+        if (!IsSystemColumn()) {
+            if (_maxTextLenght == 4000) {
+                _maxTextLenght = CalculatePreveredMaxTextLenght(1.2);
+            }
 
-        if (MaxTextLenght < MaxCellLenght) { return "Maximall‰nge zu klein!"; }
-        if (MaxTextLenght > 4000) { return "Maximall‰nge zu groﬂ!"; }
+            if (_maxCellLenght < _maxTextLenght) { return "Zellengrˆﬂe zu klein!"; }
+        }
+
+        if (_maxCellLenght < 1) { return "Zellengrˆﬂe zu klein!"; }
+        if (_maxCellLenght > 4000) { return "Zellengrˆﬂe zu groﬂ!"; }
+        if (_maxTextLenght > 4000) { return "Maximall‰nge zu groﬂ!"; }
 
         if (Database.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(KeyName, thisColumn.Name, StringComparison.OrdinalIgnoreCase))) {
             return "Spalten-Name bereits vorhanden.";
@@ -1700,7 +1707,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             //    MaxTextLenght = CalculatePreveredMaxCellLenght(1f);
             //}
 
-            if (MaxTextLenght < MaxCellLenght) { MaxTextLenght = MaxCellLenght; }
+            if (MaxCellLenght < MaxTextLenght) { MaxCellLenght = MaxTextLenght; }
 
             ResetSystemToDefault(false);
             CheckIfIAmAKeyColumn();
@@ -2239,7 +2246,12 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             //    break;
 
             case DatabaseDataType.ColumnName:
+
                 var nname = newvalue.ToUpper();
+
+                if (isLoading && nname != KeyName) {
+                    return "Namen Inkonsistent: " + nname + " " + KeyName;
+                }
 
                 var ok = Database?.Column.ChangeName(KeyName, nname) ?? false;
 
@@ -2334,7 +2346,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
             case DatabaseDataType.MaxTextLenght:
                 _maxTextLenght = IntParse(newvalue);
-                _maxCellLenght = _maxTextLenght;
+                //_maxCellLenght = _maxTextLenght;
                 break;
 
             case DatabaseDataType.FilterOptions:

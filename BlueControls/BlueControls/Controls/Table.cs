@@ -76,6 +76,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private BlueFont? _columnFont;
     private DateTime? _databaseDrawError;
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
+    private bool _drawing = false;
     private FilterCollection? _filter;
     private List<RowItem>? _filteredRows;
     private int? _headSize;
@@ -1256,12 +1257,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             state ^= States.Standard_HasFocus;
         }
 
-        if (Database == null || DesignMode || ShowWaitScreen) {
+        if (Database == null || DesignMode || ShowWaitScreen || _drawing) {
             DrawWaitScreen(gr);
             return;
         }
 
         lock (_lockUserAction) {
+            _drawing = true;
             //if (_InvalidExternal) { FillExternalControls(); }
             if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
             var displayRectangleWoSlider = DisplayRectangleWithoutSlider();
@@ -1269,6 +1271,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             //gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
             if (!ComputeAllColumnPositions()) {
                 DrawWaitScreen(gr);
+                _drawing = false;
                 return;
             }
 
@@ -1282,6 +1285,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     DrawWaitScreen(gr);
                     FormWithStatusBar.UpdateStatusBar(FehlerArt.Warnung, "Datenbank-laden nach 10 Versuchen aufgegeben", true);
                     _databaseDrawError = DateTime.UtcNow;
+                    _drawing = false;
                     return;
                 }
 
@@ -1291,6 +1295,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     // Multitasking...
                     Develop.CheckStackForOverflow();
                     DrawControl(gr, state);
+                    _drawing = false;
                     return;
                 }
 
@@ -1338,6 +1343,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     Develop.DebugPrint(_design);
                     break;
             }
+            _drawing = false;
         }
     }
 
