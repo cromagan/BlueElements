@@ -420,7 +420,7 @@ public static class IO {
     public static string TempFile(string pfad, string wunschname, string suffix) {
         if (string.IsNullOrEmpty(pfad)) { pfad = Path.GetTempPath(); }
         if (string.IsNullOrEmpty(suffix)) { suffix = "tmp"; }
-        if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName() + DateTime.Now.ToString(Constants.Format_Date6); }
+        if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName + DateTime.Now.ToString(Constants.Format_Date6); }
         var z = -1;
         pfad = pfad.CheckPath();
         if (!DirectoryExists(pfad)) { _ = Directory.CreateDirectory(pfad); }

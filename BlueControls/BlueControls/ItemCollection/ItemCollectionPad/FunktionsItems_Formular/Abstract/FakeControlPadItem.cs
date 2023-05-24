@@ -32,6 +32,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Polygons;
+using static BlueBasics.Generic;
 
 namespace BlueControls.ItemCollection;
 
@@ -126,7 +127,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
                 foreach (var thiss in tmp) {
                     VisibleFor.Add(thiss.FromNonCritical());
                 }
-                if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Everybody); }
+                if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Everybody); }
                 return true;
         }
         return false;
@@ -147,7 +148,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         ItemCollectionList.ItemCollectionList aa = new(true);
         aa.AddRange(Permission_AllUsed());
 
-        if (aa[DatabaseAbstract.Administrator] == null) { _ = aa.Add(DatabaseAbstract.Administrator); }
+        if (aa[Constants.Administrator] == null) { _ = aa.Add(Constants.Administrator); }
         //aa.Sort();
         aa.CheckBehavior = CheckBehavior.MultiSelection;
         aa.Check(VisibleFor, true);
@@ -157,12 +158,12 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
         VisibleFor.AddRange(b.ToArray());
 
-        if (VisibleFor.Count > 1 && VisibleFor.Contains(DatabaseAbstract.Everybody, false)) {
+        if (VisibleFor.Count > 1 && VisibleFor.Contains(Constants.Everybody, false)) {
             VisibleFor.Clear();
-            VisibleFor.Add(DatabaseAbstract.Everybody);
+            VisibleFor.Add(Constants.Everybody);
         }
 
-        if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Administrator); }
+        if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Administrator); }
         this.RaiseVersion();
         OnChanged();
     }
@@ -185,26 +186,26 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     public override string ToString() {
         var result = new List<string>();
 
-        if (VisibleFor.Count == 0) { VisibleFor.Add(DatabaseAbstract.Everybody); }
+        if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Everybody); }
 
         result.ParseableAdd("VisibleFor", VisibleFor);
 
         return result.Parseable(base.ToString());
     }
 
-    internal bool IsVisibleForMe(string myName, string myGroup) {
+    internal bool IsVisibleForMe() {
         //if(!Bei_Export_sichtbar ) { return false; }
 
-        if (string.IsNullOrEmpty(myGroup) || string.IsNullOrEmpty(myName)) { return true; }
+        if (string.IsNullOrEmpty(UserGroup) || string.IsNullOrEmpty(UserName)) { return true; }
 
-        if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains(DatabaseAbstract.Everybody, false)) { return true; }
+        if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains(Constants.Everybody, false)) { return true; }
 
-        if (myGroup.Equals(DatabaseAbstract.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
+        if (UserGroup.Equals(Constants.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
 
-        if (VisibleFor.Contains(myGroup, false)) { return true; }
+        if (VisibleFor.Contains(UserGroup, false)) { return true; }
 
-        if (VisibleFor.Contains("#USER: " + myName, false)) { return true; }
-        if (VisibleFor.Contains("#USER:" + myName, false)) { return true; }
+        if (VisibleFor.Contains("#USER: " + UserName, false)) { return true; }
+        if (VisibleFor.Contains("#USER:" + UserName, false)) { return true; }
         return false;
     }
 
@@ -358,8 +359,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
                 }
             }
         }
-        l.Add(DatabaseAbstract.Everybody);
-        l.Add("#User: " + Generic.UserName());
+        l.Add(Constants.Everybody);
+        l.Add("#User: " + Generic.UserName);
 
         return l.SortedDistinctList();
     }

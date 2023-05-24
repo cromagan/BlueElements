@@ -44,7 +44,7 @@ public abstract class Method_Database : Method {
 
         if (variables != null) {
             var db = MyDatabase(variables)?.ConnectionDataOfOtherTable(tableName, false);
-            return DatabaseAbstract.GetById(db, null, string.Empty);
+            return DatabaseAbstract.GetById(db, null);
         }
 
         return null;

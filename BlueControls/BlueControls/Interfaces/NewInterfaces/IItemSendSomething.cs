@@ -175,7 +175,7 @@ public class ItemSendSomething {
                     na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
-                _outputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null, string.Empty);
+                _outputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null);
                 return true;
 
             case "senttochildids":

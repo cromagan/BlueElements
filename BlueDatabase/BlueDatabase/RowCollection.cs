@@ -507,7 +507,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (fullprocessing) {
-            db.Cell.SystemSet(db.Column.SysRowCreator, item, db.UserName);
+            db.Cell.SystemSet(db.Column.SysRowCreator, item, Generic.UserName);
             db.Cell.SystemSet(db.Column.SysRowCreateDate, item, DateTime.UtcNow.ToString(Constants.Format_Date5));
 
             // Dann die Inital-Werte reinschreiben

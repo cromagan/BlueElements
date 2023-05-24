@@ -122,7 +122,7 @@ public partial class VariableEditor : UserControl {
     }
 
     private void GenerateVariableTable() {
-        Database x = new(false, DatabaseAbstract.UniqueKeyValue(), DatabaseAbstract.Administrator);
+        Database x = new(false, DatabaseAbstract.UniqueKeyValue());
         x.DropMessages = false;
         var na = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         _ = x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
@@ -146,7 +146,7 @@ public partial class VariableEditor : UserControl {
                 if (thisColumn2 != null) {
                     thisColumn2.TextBearbeitungErlaubt = true;
                     thisColumn2.MultiLine = false;
-                    thisColumn2.PermissionGroupsChangeCell = new(new List<string> { DatabaseAbstract.Everybody });
+                    thisColumn2.PermissionGroupsChangeCell = new(new List<string> { Constants.Everybody });
                 }
             }
 
@@ -154,7 +154,7 @@ public partial class VariableEditor : UserControl {
             if (inh != null) { inh.Caption = "Inhalt"; }
             if (kom != null) { kom.Caption = "Kommentar"; }
 
-            x.PermissionGroupsNewRow = new(new List<string> { DatabaseAbstract.Everybody });
+            x.PermissionGroupsNewRow = new(new List<string> { Constants.Everybody });
         }
 
         x.RepairAfterParse();

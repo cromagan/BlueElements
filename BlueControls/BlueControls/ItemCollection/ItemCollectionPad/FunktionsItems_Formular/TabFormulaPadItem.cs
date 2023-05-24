@@ -104,7 +104,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return con;
     }
 
-    public void CreateTabs(TabControl c3, string myName, string myGroup) {
+    public void CreateTabs(TabControl c3) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -147,7 +147,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
             #endregion
 
             if (cf != null) {
-                if (cf.HasVisibleItemsForMe(pgvis, myName, myGroup)) {
+                if (cf.HasVisibleItemsForMe(pgvis)) {
                     ConnectedFormulaView? cc = null;
 
                     if (existTab == null) {
@@ -160,7 +160,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                         };
                         c3.TabPages.Add(t);
 
-                        cc = new ConnectedFormulaView(pg, myName, myGroup);
+                        cc = new ConnectedFormulaView(pg);
                         t.Controls.Add(cc);
                         cc.SetData(cf, null, -1);
                         cc.Dock = DockStyle.Fill;
@@ -182,10 +182,10 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
                     #endregion Die Werte in ConnectedFormulaView richtig stellen
 
-                    if (cc != null) {
-                        cc.UserGroup = myGroup;
-                        cc.UserName = myName;
-                    }
+                    //if (cc != null) {
+                    //    cc.UserGroup = myGroup;
+                    //    cc.UserName = myName;
+                    //}
                 } else {
                     if (existTab != null) {
 

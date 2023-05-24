@@ -90,7 +90,6 @@ public partial class TableView : FormWithStatusBar {
 
     #region Properties
 
-    public virtual string DefaultUserGroup { get; } = DatabaseAbstract.Administrator;
     public string PreveredDatabaseID { get; set; } = Database.DatabaseId;
 
     /// <summary>
@@ -121,8 +120,8 @@ public partial class TableView : FormWithStatusBar {
                     while (!thisColumnItem.IsOk()) {
                         DebugPrint(FehlerArt.Info,
                             "Datenbank:" + database.TableName + "\r\nSpalte:" + thisColumnItem.Name +
-                            "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + database.UserName +
-                            "\r\nGroup: " + database.UserGroup + "\r\nAdmins: " +
+                            "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + UserName +
+                            "\r\nGroup: " + UserGroup + "\r\nAdmins: " +
                             database.DatenbankAdmin.JoinWith(";"));
                         MessageBox.Show(
                              "<b>Datenbank:" + database.TableName + "\r\nSpalte:" + thisColumnItem.Name +
@@ -819,7 +818,7 @@ public partial class TableView : FormWithStatusBar {
             _ = DeleteFile(SaveTab.FileName, true);
         }
 
-        var db = new Database(false, SaveTab.FileName.FileNameWithoutSuffix(), DatabaseAbstract.Administrator);
+        var db = new Database(false, SaveTab.FileName.FileNameWithoutSuffix());
         db.SaveAsAndChangeTo(SaveTab.FileName);
         _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID));
     }
@@ -1302,7 +1301,7 @@ public partial class TableView : FormWithStatusBar {
 
         #endregion
 
-        var db = DatabaseAbstract.GetById(ci, Table.Database_NeedPassword, DefaultUserGroup);
+        var db = DatabaseAbstract.GetById(ci, Table.Database_NeedPassword);
 
         if (db is Database bdb) {
             if (!string.IsNullOrEmpty(bdb.Filename)) {

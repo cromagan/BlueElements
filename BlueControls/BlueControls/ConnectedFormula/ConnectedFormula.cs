@@ -83,7 +83,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         _muf.ToListOfByte += ToListOfByte;
         _muf.Saving += _muf_Saving;
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
-        _creator = Generic.UserName();
+        _creator = Generic.UserName;
         PadData = new ItemCollectionPad();
 
         if (FileExists(filename)) {
@@ -255,10 +255,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     /// Zeilenselectionen werden dabei ignoriert.
     /// </summary>
     /// <param name="page">Wird dieser Wert leer gelassen, wird das komplette Formular geprüft</param>
-    /// <param name="myName"></param>
-    /// <param name="myGroup"></param>
     /// <returns></returns>
-    internal bool HasVisibleItemsForMe(string page, string myName, string myGroup) {
+    internal bool HasVisibleItemsForMe(string page) {
         if (_padData == null) { return false; }
 
         foreach (var thisItem in _padData) {
@@ -266,7 +264,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                 string.IsNullOrEmpty(thisItem.Page) ||
                 page.Equals(thisItem.Page, StringComparison.OrdinalIgnoreCase)) {
                 if (thisItem is FakeControlPadItem cspi) {
-                    if (cspi.IsVisibleForMe(myName, myGroup)) { return true; }
+                    if (cspi.IsVisibleForMe()) { return true; }
                 }
             }
         }
@@ -358,7 +356,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
         foreach (var thisfile in _databaseFiles) {
-            _ = DatabaseAbstract.GetById(new ConnectionInfo(thisfile, null), null, string.Empty);
+            _ = DatabaseAbstract.GetById(new ConnectionInfo(thisfile, null), null);
         }
 
         _saved = false;

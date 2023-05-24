@@ -51,15 +51,15 @@ public sealed class Database : DatabaseAbstract {
 
     #region Constructors
 
-    public Database(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword, string userGroup) : this(ci.AdditionalData, readOnly, false, needPassword, userGroup) { }
+    public Database(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.AdditionalData, readOnly, false, needPassword) { }
 
-    public Database(Stream stream, string tablename, string userGroup) : this(stream, string.Empty, true, false, tablename, null, userGroup) { }
+    public Database(Stream stream, string tablename) : this(stream, string.Empty, true, false, tablename, null) { }
 
-    public Database(bool readOnly, string tablename, string userGroup) : this(null, string.Empty, readOnly, true, tablename, null, userGroup) { }
+    public Database(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, tablename, null) { }
 
-    public Database(string filename, bool readOnly, bool create, NeedPassword? needPassword, string userGroup) : this(null, filename, readOnly, create, filename.FileNameWithoutSuffix(), needPassword, userGroup) { }
+    public Database(string filename, bool readOnly, bool create, NeedPassword? needPassword) : this(null, filename, readOnly, create, filename.FileNameWithoutSuffix(), needPassword) { }
 
-    private Database(Stream? stream, string filename, bool readOnlyx, bool create, string tablename, NeedPassword? needPassword, string userGroup) : base(readOnlyx, userGroup) {
+    private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : base(readOnly) {
         //Develop.StartService();
 
         Works = new List<WorkItem>();
@@ -93,14 +93,14 @@ public sealed class Database : DatabaseAbstract {
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword, string userGroup) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
 
         if (!FileExists(ci.AdditionalData)) { return null; }
 
-        return new Database(ci, false, needPassword, userGroup);
+        return new Database(ci, false, needPassword);
     }
 
     public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, out long rowKey, out string value, out string colName) {
@@ -1003,7 +1003,7 @@ public sealed class Database : DatabaseAbstract {
 
         if (dataUncompressed == null) { return string.Empty; }
 
-        var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName().ToUpper());
+        var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpper());
 
         using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
         x.Write(dataUncompressed, 0, dataUncompressed.Length);

@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -42,11 +43,26 @@ public static class Generic {
 
     #region Fields
 
+    public static string UserGroup = Constants.Everybody;
+
     private static string _gotUserName = string.Empty;
 
     private static int _uniqueInternalCount;
 
     private static string _uniqueInternalLastTime = "InitialDummy";
+
+    #endregion
+
+    #region Properties
+
+    public static string UserName {
+        get {
+            if (!string.IsNullOrEmpty(_gotUserName)) { return _gotUserName; }
+            _gotUserName = WindowsIdentity.GetCurrent().Name;
+            if (_gotUserName.Contains("\\")) { _gotUserName = _gotUserName.FileNameWithSuffix(); }
+            return _gotUserName;
+        }
+    }
 
     #endregion
 
@@ -193,7 +209,7 @@ public static class Generic {
 
     public static long GetUniqueKey(int tmp, string type) {
         var x = DateTime.UtcNow.AddYears(-2020).Ticks;
-        var s = type + "\r\n" + UserName() + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
+        var s = type + "\r\n" + UserName + "\r\n" + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
         var key = x + (s.GetHashCode() * 100000000) + tmp;
         if (key < 0) { return key * -1; }
 
@@ -316,13 +332,6 @@ public static class Generic {
             _uniqueInternalLastTime = neueZeit;
         }
         return "ID_" + neueZeit + "_" + _uniqueInternalCount.ToString(Constants.Format_Integer3);
-    }
-
-    public static string UserName() {
-        if (!string.IsNullOrEmpty(_gotUserName)) { return _gotUserName; }
-        _gotUserName = WindowsIdentity.GetCurrent().Name;
-        if (_gotUserName.Contains("\\")) { _gotUserName = _gotUserName.FileNameWithSuffix(); }
-        return _gotUserName;
     }
 
     #endregion

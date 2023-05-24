@@ -42,21 +42,15 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
     private bool _generated;
     private RowItem? _tmpShowingRow;
 
-    private string _userGroup = string.Empty;
-
-    private string _userName = string.Empty;
-
     #endregion
 
     #region Constructors
 
-    public ConnectedFormulaView() : this("Head", string.Empty, DatabaseAbstract.Administrator) { }
+    public ConnectedFormulaView() : this("Head") { }
 
-    public ConnectedFormulaView(string page, string username, string usergroup) {
+    public ConnectedFormulaView(string page) {
         InitializeComponent();
         Page = page;
-        _userName = username;
-        _userGroup = usergroup;
         SetData(null, null, -1);
     }
 
@@ -98,24 +92,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         }
     }
 
-    public string UserGroup {
-        get => _userGroup;
-        set {
-            if (_userGroup.Equals(value, StringComparison.OrdinalIgnoreCase)) { return; }
-            _userGroup = value;
-            InvalidateView();
-        }
-    }
-
-    public string UserName {
-        get => _userName;
-        set {
-            if (_userName.Equals(value, StringComparison.OrdinalIgnoreCase)) { return; }
-            _userName = value;
-            InvalidateView();
-        }
-    }
-
     #endregion
 
     #region Methods
@@ -142,7 +118,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
                         _ = unused.Remove(c);
 
                         if (thisit is FakeControlPadItem cspi) {
-                            c.Visible = cspi.IsVisibleForMe(UserName, UserGroup);
+                            c.Visible = cspi.IsVisibleForMe();
                         } else {
                             c.Visible = true;
                         }
@@ -154,7 +130,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
                         c.Height = (int)(ua.Height / Umrechnungsfaktor2);
 
                         if (thisit is TabFormulaPadItem c3) {
-                            c3.CreateTabs((TabControl)c, UserName, UserGroup);
+                            c3.CreateTabs((TabControl)c);
                         }
                     }
                 }
@@ -177,9 +153,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
             if (Database != database) {
                 rk = -1;
             }
-
-            UserName = database.UserName;
-            UserGroup = database.UserGroup;
 
             if (f != null) {
                 var tmpFormula = GetByFilename(f);

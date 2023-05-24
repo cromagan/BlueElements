@@ -901,7 +901,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (changeSysColumns) {
             DoSpecialFormats(column, row, oldValue, false);
-            SystemSet(dbtmp.Column.SysRowChanger, row, dbtmp.UserName);
+            SystemSet(dbtmp.Column.SysRowChanger, row, UserName);
             SystemSet(dbtmp.Column.SysRowChangeDate, row, DateTime.UtcNow.ToString(Constants.Format_Date5));
             //column.TimeCode = tc;
         }

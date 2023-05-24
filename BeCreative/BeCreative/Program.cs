@@ -17,7 +17,7 @@ internal static class Program {
         Application.EnableVisualStyles();
 
         Develop.StartService();
-
+        Generic.UserGroup = Constants.Administrator;
         FormManager.NewModeSelectionForm = Start.NewForm;
         FormManager.ExecuteAtEnd = Start.Ende;
         FormManager.StartForm = new Start();

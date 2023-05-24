@@ -618,7 +618,7 @@ public sealed class MultiUserFile : IDisposableExtended {
     }
 
     private bool CreateBlockDatei() {
-        var tmpInhalt = UserName() + "\r\n" + DateTime.UtcNow.ToString(Constants.Format_Date5) + "\r\nThread: " + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
+        var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString(Constants.Format_Date5) + "\r\nThread: " + Thread.CurrentThread.ManagedThreadId + "\r\n" + Environment.MachineName;
         // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
         try {
             var bInhalt = tmpInhalt.UTF8_ToByte();
@@ -946,7 +946,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             if (!string.IsNullOrEmpty(f)) { _doingTempFile = false; return (string.Empty, string.Empty, null); }
             fileInfoBeforeSaving = GetFileInfo(Filename, true);
             dataUncompressed = OnToListOfByte();
-            tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName().ToUpper());
+            tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpper());
             try {
                 using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
                 x.Write(dataUncompressed, 0, dataUncompressed.Length);

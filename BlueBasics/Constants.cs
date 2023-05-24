@@ -29,6 +29,7 @@ public static class Constants {
 
     #region Fields
 
+    public const string Administrator = "#Administrator";
     public const string AllowedCharsVariableName = Char_az + Char_AZ + "_" + Char_Numerals;
 
     // public const char beTab = (char)9;
@@ -36,19 +37,27 @@ public static class Constants {
     // Macintosh(OS 9): \r, 0D, 13
     // </summary>
     // public const char beCr = (char)13;
+
+    public const string Char_az = "abcdefghijklmnopqrstuvwxyz";
+
+    public const string Char_AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+    public const string Char_Buchstaben = "abcdefghijklmnopqrstuvwxyzäöüßáéíóúâêîôûàèìòùžñ";
+
+    public const string Char_DateiSonderZeichen = "\\/:*?\"<>|\r\n";
+
+    public const string Char_Numerals = "0123456789";
+
+    public const string Char_PfadSonderZeichen = "*?\"<>|\r\n";
+
+    public const string Char_Satzzeichen = " .!,:;?";
+
     /// <summary>
     /// Unix & Mac OS X: \n, 0A, 10
     /// </summary>
     // public const char beLf = (char)10;
     //public const char beChrW1 = (char)1;
-
-    public const string Char_az = "abcdefghijklmnopqrstuvwxyz";
-    public const string Char_AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-    public const string Char_Buchstaben = "abcdefghijklmnopqrstuvwxyzäöüßáéíóúâêîôûàèìòùžñ";
-    public const string Char_DateiSonderZeichen = "\\/:*?\"<>|\r\n";
-    public const string Char_Numerals = "0123456789";
-    public const string Char_PfadSonderZeichen = "*?\"<>|\r\n";
-    public const string Char_Satzzeichen = " .!,:;?";
+    public const string Everybody = "#Everybody";
 
     /// <summary>
     /// DOS & Windows: \r\n 0D0A(hex), 13,10 (double)

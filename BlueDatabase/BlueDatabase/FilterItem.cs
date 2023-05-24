@@ -243,7 +243,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
                 case "database":
                     if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
-                    Database = DatabaseAbstract.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null, string.Empty);
+                    Database = DatabaseAbstract.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
 
                     if (Database != null && !Database.IsDisposed) { Database.Disposing += Database_Disposing; }
 

@@ -136,7 +136,7 @@ public abstract class SqlBackAbstract {
         return SetStyleData(tablename, DatabaseDataType.ColumnName, columnName.ToUpper(), columnName.ToUpper());
     }
 
-    public string AddUndo(string tablename, DatabaseDataType comand, string? columname, long? rowKey, string previousValue, string changedTo, string userName, string comment) {
+    public string AddUndo(string tablename, DatabaseDataType comand, string? columname, long? rowKey, string previousValue, string changedTo, string comment) {
         if (!OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
         //var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
@@ -150,15 +150,12 @@ public abstract class SqlBackAbstract {
              Dbval(rk) + "," +
              Dbval(previousValue) + "," +
              Dbval(changedTo) + "," +
-             Dbval(userName) + "," +
+             Dbval(Generic.UserName) + "," +
              //DBVAL(dt.ToString(Constants.Format_Date)) + "," +
              Dbval(DateTime.UtcNow) + "," +
              Dbval(comment) + ")";
 
-        using var comm = Connection.CreateCommand();
-        comm.CommandText = cmdString;
-
-        return ExecuteCommand(comm, false);
+        return ExecuteCommand(cmdString, false);
     }
 
     public string BackupSysStyle(string pathadditionalcsv) {
@@ -349,19 +346,12 @@ public abstract class SqlBackAbstract {
                 LoadAllRowKeys(tablename, row);
                 return;
             }
-            //OpenConnection();
-
-            //using var command = _connection.CreateCommand();
-            //command.CommandText = com;
-
-            //using var reader = command.ExecuteReaderAsync();
 
             _ = row.Clear("Row Keys werden neu geladen");
 
             foreach (var thisRow in dt.Rows) {
                 var rk = LongParse(((DataRow)thisRow)[0].ToString());
                 _ = row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, true);
-                //var r = row.GenerateAndAdd(rk, string.Empty, false, false);
             }
 
             _ = CloseConnection();
@@ -489,9 +479,6 @@ public abstract class SqlBackAbstract {
     //    }
     public abstract SqlBackAbstract OtherTable(string tablename);
 
-    //    while (await reader.ReadAsync()) {
-    //        var rk = LongParse(reader[0].ToString(false));
-    //        var r = row.GenerateAndAdd(rk, string.Empty, false, false);
     public void RenameColumn(string tablename, string oldname, string newname, bool allowSystemTableNames) {
         if (oldname.Equals(newname, StringComparison.OrdinalIgnoreCase)) { return; }
 
@@ -584,7 +571,6 @@ public abstract class SqlBackAbstract {
         _ = CloseConnection();
     }
 
-    //    using var reader = await command.ExecuteReaderAsync();
     /// <summary>
     /// Gibt TRUE zurück, wenn alles ok ist.
     /// Entweder der Wert gesetzt wurde, der Wert aktuell ist oder der Wert unwichtig ist.
@@ -1010,20 +996,13 @@ public abstract class SqlBackAbstract {
         } catch { }
     }
 
-    //    com = com.TrimEnd(", ");
-    //internal string? GetLastColumnName(string tablename, long key) {
-    //    if (!OpenConnection()) { return null; }
     protected string ExecuteCommand(string commandtext, bool abort) {
         if (Connection == null || !OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
-
         using var command = Connection.CreateCommand();
         command.CommandText = commandtext;
-
         return ExecuteCommand(command, abort);
     }
 
-    //        com = com + thiscolumn.Name.ToUpper() + ", ";
-    //    }
     private void AddColumn(string tablename, string column, bool nullable, bool allowSystemTableNames) => AddColumn(tablename, column, VarChar255, nullable, allowSystemTableNames);
 
     private void AddColumn(string tablename, string column, string type, bool nullable, bool allowSystemTableNames) {

@@ -58,9 +58,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Constructors
 
-    public DatabaseSqlLite(ConnectionInfo ci, string userGroup) : this(((DatabaseSqlLite?)ci.Provider)?._sql, false, ci.TableName, userGroup) { }
+    public DatabaseSqlLite(ConnectionInfo ci) : this(((DatabaseSqlLite?)ci.Provider)?._sql, false, ci.TableName) { }
 
-    public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnlyx, string tablename, string userGroup) : base(readOnlyx, userGroup) {
+    public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnly, string tablename) : base(readOnly) {
         if (sql == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL-Verbindung übergeben: " + tablename);
             return;
@@ -101,7 +101,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword, string userGroup) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         var sql = ((DatabaseSqlLite?)ci.Provider)?._sql;
@@ -109,7 +109,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         var at = sql.Tables();
         if (at == null || !at.Contains(ci.TableName)) { return null; }
-        return new DatabaseSqlLite(ci, userGroup);
+        return new DatabaseSqlLite(ci);
     }
 
     public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
@@ -291,7 +291,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         var columnName = column?.Name ?? string.Empty;
         var rowkey = row?.Key ?? -1;
 
-        var err = _sql?.AddUndo(tableName, type, columnName, rowkey, previousValue, changedTo, UserName, comment);
+        var err = _sql?.AddUndo(tableName, type, columnName, rowkey, previousValue, changedTo, comment);
         if (!string.IsNullOrEmpty(err)) {
             Develop.CheckStackForOverflow();
             AddUndo(tableName, type, column, row, previousValue, changedTo, userName, comment);
