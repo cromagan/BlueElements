@@ -26,7 +26,7 @@ using BlueBasics.Enums;
 
 namespace BlueScript.Variables;
 
-public class VariableCollection : IEnumerable<Variable>, ICloneable {
+public class VariableCollection : IEnumerable<Variable> {
 
     #region Fields
 
@@ -38,6 +38,10 @@ public class VariableCollection : IEnumerable<Variable>, ICloneable {
 
     public VariableCollection() { }
 
+    /// <summary>
+    /// Erstellt eine neue Liste aus Variablen, die ReadOnly ist
+    /// </summary>
+    /// <param name="v"></param>
     public VariableCollection(List<Variable> v) : this(v, true) { }
 
     public VariableCollection(List<Variable> v, bool creadonly) {
@@ -144,7 +148,7 @@ public class VariableCollection : IEnumerable<Variable>, ICloneable {
         return l;
     }
 
-    public object Clone() => new VariableCollection(ToList(), ReadOnly);
+    //public object Clone() => new VariableCollection(ToList(), ReadOnly);
 
     public Variable? Get(string name) {
         if (_internal == null || _internal.Count == 0) { return null; }

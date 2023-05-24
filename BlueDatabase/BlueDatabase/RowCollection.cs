@@ -175,7 +175,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public List<RowItem> CalculateFilteredRows(ICollection<FilterItem>? filter) {
         if (Database == null || Database.IsDisposed) { return new List<RowItem>(); }
-
         Database.RefreshColumnsData(filter);
 
         ConcurrentBag<RowItem> tmpVisibleRows = new();

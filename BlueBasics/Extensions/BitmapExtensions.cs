@@ -102,6 +102,8 @@ public static partial class Extensions {
                 var scale1 = Math.Min(maxwidth / (double)bmp.Width, maxheight / (double)bmp.Height);
                 maxwidth = (int)(scale1 * bmp.Width);
                 maxheight = (int)(scale1 * bmp.Height);
+                calcwidth = maxwidth;
+                calcheight = maxheight;
                 break;
 
             case SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
@@ -109,6 +111,8 @@ public static partial class Extensions {
                 if (scale2 >= 1) { scale2 = 1; }
                 maxwidth = (int)(scale2 * bmp.Width);
                 maxheight = (int)(scale2 * bmp.Height);
+                calcwidth = maxwidth;
+                calcheight = maxheight;
                 break;
 
             case SizeModes.Verzerren:

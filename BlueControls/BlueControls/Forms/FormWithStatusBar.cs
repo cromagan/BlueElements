@@ -84,13 +84,13 @@ public partial class FormWithStatusBar : Form {
 
     public bool UpdateStatus(FehlerArt type, string message, bool didAlreadyMessagebox) {
         try {
+            if (IsDisposed) { return false; }
             if (InvokeRequired) {
                 return (bool)Invoke(new Func<bool>(() => UpdateStatus(type, message, didAlreadyMessagebox)));
             }
 
             if (capStatusBar.InvokeRequired) { return false; }
 
-            if (IsDisposed) { return false; }
             _lastMessage = DateTime.UtcNow;
             timMessageClearer.Enabled = true;
 
