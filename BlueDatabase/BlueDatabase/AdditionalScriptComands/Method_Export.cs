@@ -122,7 +122,9 @@ internal class Method_Export : Method_Database {
 
             case "CSV":
                 var t = db.Export_CSV(FirstRow.ColumnInternalName, cu, r);
-                IO.WriteAllText(filn, t, Constants.Win1252, false);
+                if (!IO.WriteAllText(filn, t, Constants.Win1252, false)) {
+                    return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei.");
+                }
                 break;
 
             case "HTML":

@@ -440,7 +440,7 @@ public static class IO {
     /// <param name="contents"></param>
     /// <param name="encoding"></param>
     /// <param name="executeAfter"></param>
-    public static void WriteAllText(string filename, string contents, Encoding encoding, bool executeAfter) {
+    public static bool WriteAllText(string filename, string contents, Encoding encoding, bool executeAfter) {
         try {
             filename = filename.CheckFile();
 
@@ -449,8 +449,10 @@ public static class IO {
 
             File.WriteAllText(filename, contents, encoding);
             if (executeAfter) { _ = ExecuteFile(filename); }
+            return true;
         } catch (Exception ex) {
-            Develop.DebugPrint("Fehler beim Speichern der Datei: " + filename, ex);
+            Develop.DebugPrint(FehlerArt.Info, "Fehler beim Speichern der Datei: " + filename, ex);
+            return false;
         }
     }
 
