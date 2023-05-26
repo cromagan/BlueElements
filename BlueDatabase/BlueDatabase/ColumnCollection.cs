@@ -285,19 +285,19 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         da.CellAdd("Änderungs-Rechte");
         da.RowEnd();
         var lfdn = 0;
-        foreach (var thisColumnItem in Database.Column) {
-            if (thisColumnItem != null) {
+        foreach (var thisColumnItem in Database.ColumnArrangements[0]) {
+            if (thisColumnItem?.Column != null) {
                 lfdn++;
                 da.RowBeginn();
                 da.CellAdd(lfdn.ToString());
-                da.CellAdd(thisColumnItem.Name);
-                da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
-                da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd("/"));
-                da.CellAdd(thisColumnItem.Format.ToString());
-                da.CellAdd(thisColumnItem.Quickinfo.Replace("\r", "<br>"));
-                da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
-                da.CellAdd(thisColumnItem.Tags.JoinWith("<br>"));
-                da.CellAdd(thisColumnItem.PermissionGroupsChangeCell.JoinWith("<br>"));
+                da.CellAdd(thisColumnItem.Column.Name);
+                da.CellAdd(thisColumnItem.Column.Caption.Replace("\r", "<br>"));
+                da.CellAdd((thisColumnItem.Column.CaptionGroup1 + "/" + thisColumnItem.Column.CaptionGroup2 + "/" + thisColumnItem.Column.CaptionGroup3 + "/").TrimEnd("/"));
+                da.CellAdd(thisColumnItem.Column.Format.ToString());
+                da.CellAdd(thisColumnItem.Column.Quickinfo.Replace("\r", "<br>"));
+                da.CellAdd(thisColumnItem.Column.AdminInfo.Replace("\r", "<br>"));
+                da.CellAdd(thisColumnItem.Column.Tags.JoinWith("<br>"));
+                da.CellAdd(thisColumnItem.Column.PermissionGroupsChangeCell.JoinWith("<br>"));
                 da.RowEnd();
             }
         }
