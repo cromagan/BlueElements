@@ -33,7 +33,7 @@ using BlueDatabase;
 
 namespace BlueControls.ItemCollection;
 
-public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter {
+public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 
@@ -65,6 +65,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         }
     }
 
+    public bool AutoSizeableHeight => false;
     public override string Description => "Dieses Element wird als Knopf mit einem Pluszeichen dargstellt.<br>Das Elemenz kann Filter empfangen und mit diesen Filtern eine neue Zeile anlegen";
 
     public ReadOnlyCollection<string> GetFilterFrom {

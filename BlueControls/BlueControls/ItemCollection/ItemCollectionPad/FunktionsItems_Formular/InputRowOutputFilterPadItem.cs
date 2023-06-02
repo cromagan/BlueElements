@@ -84,7 +84,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
             _eigangsWertSpalte = value;
             this.RaiseVersion();
             this.DoChilds();
-            this.OnChanged();
+            OnChanged();
         }
     }
 
@@ -95,7 +95,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
             _filtertype = value;
             this.RaiseVersion();
             this.DoChilds();
-            this.OnChanged();
+            OnChanged();
         }
     }
 
@@ -106,7 +106,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
             _filterSpalte = value;
             this.RaiseVersion();
             this.DoChilds();
-            this.OnChanged();
+            OnChanged();
         }
     }
 

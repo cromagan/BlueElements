@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -267,7 +266,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
-
         SetInputRow();
     }
 

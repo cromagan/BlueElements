@@ -36,7 +36,7 @@ namespace BlueControls.ItemCollection;
 /// Erzeut ein Flexi-Controll, dass nur einen Wert anzeigen kann. z.B. eine Variable
 /// </summary>
 
-public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcceptRow {
+public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcceptRow, IAutosizable {
 
     #region Fields
 
@@ -61,6 +61,17 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     #region Properties
 
     public static string ClassId => "FI-VariableField";
+
+    public bool AutoSizeableHeight {
+        get {
+            if (_überschriftanordung == ÜberschriftAnordnung.Links_neben_Dem_Feld ||
+                _überschriftanordung == ÜberschriftAnordnung.Ohne_mit_Abstand ||
+                _überschriftanordung == ÜberschriftAnordnung.ohne) {
+                return UsedArea.Height > MmToPixel(2f, 300);
+            }
+            return UsedArea.Height > MmToPixel(4f, 300); ;
+        }
+    }
 
     public ÜberschriftAnordnung CaptionPosition {
         get => _überschriftanordung;

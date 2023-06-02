@@ -480,7 +480,10 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
                             gr.DrawLine(p, 0, po.Y - (int)ex, sizeOfParentControl.Width, po.Y - (int)ex);
                         }
                         ex += mo;
-                        if (po.X - ex < 0 && po.Y - ex < 0 && po.X + ex > sizeOfParentControl.Width && po.Y + ex > sizeOfParentControl.Height) {
+                        if (po.X - ex < 0 && 
+                            po.Y - ex < 0 &&
+                            po.X + ex > sizeOfParentControl.Width && 
+                            po.Y + ex > sizeOfParentControl.Height) {
                             break;
                         }
                     } while (true);

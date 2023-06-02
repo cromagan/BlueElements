@@ -28,7 +28,6 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Polygons;
@@ -360,7 +359,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
             }
         }
         l.Add(Constants.Everybody);
-        l.Add("#User: " + Generic.UserName);
+        l.Add("#User: " + UserName);
 
         return l.SortedDistinctList();
     }

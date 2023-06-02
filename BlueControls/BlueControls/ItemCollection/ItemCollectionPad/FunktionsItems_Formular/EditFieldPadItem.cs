@@ -41,7 +41,7 @@ namespace BlueControls.ItemCollection;
 /// Erzeut ein FlexiControllForCell
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptRow, IHasVersion {
+public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptRow, IHasVersion, IAutosizable {
 
     #region Fields
 
@@ -66,6 +66,17 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     #region Properties
 
     public static string ClassId => "FI-EditField";
+
+    public bool AutoSizeableHeight {
+        get {
+            if (_überschriftanordung == ÜberschriftAnordnung.Links_neben_Dem_Feld ||
+                _überschriftanordung == ÜberschriftAnordnung.Ohne_mit_Abstand ||
+                _überschriftanordung == ÜberschriftAnordnung.ohne) {
+                return UsedArea.Height > MmToPixel(2f, 300);
+            }
+            return UsedArea.Height > MmToPixel(4f, 300); ;
+        }
+    }
 
     public ÜberschriftAnordnung CaptionPosition {
         get => _überschriftanordung;
@@ -209,7 +220,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
         l.AddRange(_itemAccepts.GetStyleOptions(this));
 
-        if (this.InputDatabase == null) { return l; }
+        if (InputDatabase == null) { return l; }
 
         l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
 
@@ -300,6 +311,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         if (col == Column) { return; }
         Column = col;
         this.RaiseVersion();
+        UpdateSideOptionMenu();
         OnChanged();
     }
 

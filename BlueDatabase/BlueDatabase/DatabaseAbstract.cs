@@ -472,7 +472,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         #endregion
 
-        DatabaseTypes ??= Generic.GetEnumerableOfType<DatabaseAbstract>();
+        DatabaseTypes ??= GetEnumerableOfType<DatabaseAbstract>();
 
         #region Schauen, ob sie über den Typ definiert werden kann
 
@@ -587,7 +587,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 }
             } while (pf != string.Empty);
         }
-        var d = Generic.GetEmmbedResource(assembly, name);
+        var d = GetEmmbedResource(assembly, name);
         if (d != null) { return new Database(d, name.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB")); }
         if (fehlerAusgeben) { Develop.DebugPrint(FehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
         return null;

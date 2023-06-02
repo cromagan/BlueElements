@@ -21,12 +21,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
 using static BlueBasics.IO;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Forms;
 
@@ -65,8 +68,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
             iaf.GetFilterFrom = (new List<string>() { l.KeyName }).AsReadOnly();
         }
 
-       
-
         if (x is IItemAcceptRow iar2 && iar2.GetRowFrom == null) {
             iar2.Datenquelle_wählen();
         }
@@ -82,6 +83,28 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (x is IItemSendFilter isf2) {
             isf2.Datenbank_wählen();
         }
+    }
+
+    private void btnArbeitsbereich_Click(object sender, System.EventArgs e) {
+        if(CFormula?.PadData == null) {return;}
+
+        var oldw = CFormula.PadData.SheetSizeInMm.Width * 2;
+
+        var wi = InputBox.Show("Breite in Kästchen:", oldw.ToString(Constants.Format_Float1), FormatHolder.IntegerPositive);
+
+        if (string.IsNullOrEmpty(wi)) { return; }
+
+        var oldh = CFormula.PadData.SheetSizeInMm.Height * 2;
+
+        var he = InputBox.Show("Höhe in Kästchen:", oldh.ToString(Constants.Format_Float1), FormatHolder.IntegerPositive);
+
+        if (string.IsNullOrEmpty(wi)) { return; }
+
+        var op = MessageBox.Show("Vorhanden Steuerelemente:", ImageCode.Textfeld2, "Anpassen", "nix machen", "Abbruch");
+
+        if (op == 2) { return; }
+
+        CFormula.Resize(FloatParse(wi)/2, FloatParse(he)/2, op == 0);
     }
 
     private void btnBenutzerFilterWahl_Click(object sender, System.EventArgs e) {

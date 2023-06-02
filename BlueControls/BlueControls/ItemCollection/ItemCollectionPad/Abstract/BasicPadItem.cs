@@ -68,6 +68,12 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? DoUpdateSideOptionMenu;
+
+    #endregion
+
     #region Properties
 
     public List<FlexiControl>? AdditionalStyleOptions { get; set; } = null;
@@ -438,16 +444,6 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     /// </summary>
     public virtual void ProcessStyleChange() { }
 
-    //public void RemoveAllConnections() {
-    //    foreach (var thisCon in Parent.Connections) {
-    //        if (thisCon.Item1 == this || thisCon.Item2 == this) {
-    //            Parent.Connections.Remove(thisCon);
-    //            RemoveAllConnections();
-    //            return;
-    //        }
-    //    }
-    //}
-
     public override string ToString() {
         List<string> result = new();
 
@@ -469,6 +465,17 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
         return result.Parseable(base.ToString());
     }
 
+    public void UpdateSideOptionMenu() => OnDoUpdateSideOptionMenu();
+
+    //public void RemoveAllConnections() {
+    //    foreach (var thisCon in Parent.Connections) {
+    //        if (thisCon.Item1 == this || thisCon.Item2 == this) {
+    //            Parent.Connections.Remove(thisCon);
+    //            RemoveAllConnections();
+    //            return;
+    //        }
+    //    }
+    //}
     /// <summary>
     /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht. Zusätzlich mit dem Wert aus Padding.
     /// </summary>
@@ -563,6 +570,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
             Develop.DebugPrint_NichtImplementiert();
         }
     }
+
+    private void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 

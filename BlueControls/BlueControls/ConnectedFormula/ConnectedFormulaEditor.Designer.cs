@@ -44,6 +44,12 @@ namespace BlueControls.Forms {
             this.btnRegisterKarte = new BlueControls.Controls.Button();
             this.btnTabControlAdd = new BlueControls.Controls.Button();
             this.groupBox1 = new BlueControls.Controls.GroupBox();
+            this.btnZeileAnlegen = new BlueControls.Controls.Button();
+            this.btnTable = new BlueControls.Controls.Button();
+            this.btnDropdownmenu = new BlueControls.Controls.Button();
+            this.btnFilterConverter = new BlueControls.Controls.Button();
+            this.btnBenutzerFilterWahl = new BlueControls.Controls.Button();
+            this.btnZeileZuFilter = new BlueControls.Controls.Button();
             this.tabFile = new System.Windows.Forms.TabPage();
             this.grpDatei = new BlueControls.Controls.GroupBox();
             this.btnSpeichern = new BlueControls.Controls.Button();
@@ -54,12 +60,8 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.btnZeileZuFilter = new BlueControls.Controls.Button();
-            this.btnBenutzerFilterWahl = new BlueControls.Controls.Button();
-            this.btnFilterConverter = new BlueControls.Controls.Button();
-            this.btnDropdownmenu = new BlueControls.Controls.Button();
-            this.btnTable = new BlueControls.Controls.Button();
-            this.btnZeileAnlegen = new BlueControls.Controls.Button();
+            this.grpArbeitsbereich = new BlueControls.Controls.GroupBox();
+            this.btnArbeitsbereich = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
@@ -74,6 +76,7 @@ namespace BlueControls.Forms {
             this.groupBox1.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpDatei.SuspendLayout();
+            this.grpArbeitsbereich.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpKomponenteHinzufügen
@@ -86,7 +89,7 @@ namespace BlueControls.Forms {
             // 
             // tabHintergrund
             // 
-            this.tabHintergrund.Size = new System.Drawing.Size(966, 81);
+            this.tabHintergrund.Size = new System.Drawing.Size(1062, 81);
             // 
             // tabRightSide
             // 
@@ -108,7 +111,6 @@ namespace BlueControls.Forms {
             this.Ribbon.TabDefaultOrder = new string[] {
         "Datei",
         "Editor-Std.",
-        "Editor Neue Zeile",
         "Start"};
             this.Ribbon.Controls.SetChildIndex(this.tabFile, 0);
             this.Ribbon.Controls.SetChildIndex(this.tabEditorStd, 0);
@@ -118,11 +120,15 @@ namespace BlueControls.Forms {
             // 
             // tabStart
             // 
-            this.tabStart.Size = new System.Drawing.Size(966, 81);
+            this.tabStart.Size = new System.Drawing.Size(1062, 81);
             // 
             // tabExport
             // 
-            this.tabExport.Size = new System.Drawing.Size(966, 81);
+            this.tabExport.Size = new System.Drawing.Size(1062, 81);
+            // 
+            // grpAssistent
+            // 
+            this.grpAssistent.Visible = false;
             // 
             // btnVorschauModus
             // 
@@ -136,6 +142,7 @@ namespace BlueControls.Forms {
             // capStatusBar
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1070, 24);
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -149,6 +156,7 @@ namespace BlueControls.Forms {
             this.tabEditorStd.Controls.Add(this.grpFelder);
             this.tabEditorStd.Controls.Add(this.grpOptik);
             this.tabEditorStd.Controls.Add(this.groupBox1);
+            this.tabEditorStd.Controls.Add(this.grpArbeitsbereich);
             this.tabEditorStd.Location = new System.Drawing.Point(4, 25);
             this.tabEditorStd.Margin = new System.Windows.Forms.Padding(0);
             this.tabEditorStd.Name = "tabEditorStd";
@@ -163,7 +171,7 @@ namespace BlueControls.Forms {
             this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
             this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpVorschau.Location = new System.Drawing.Point(872, 0);
+            this.grpVorschau.Location = new System.Drawing.Point(880, 0);
             this.grpVorschau.Name = "grpVorschau";
             this.grpVorschau.Size = new System.Drawing.Size(160, 81);
             this.grpVorschau.TabIndex = 1;
@@ -202,7 +210,7 @@ namespace BlueControls.Forms {
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
             this.grpFelder.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpFelder.Location = new System.Drawing.Point(616, 0);
+            this.grpFelder.Location = new System.Drawing.Point(624, 0);
             this.grpFelder.Name = "grpFelder";
             this.grpFelder.Size = new System.Drawing.Size(256, 81);
             this.grpFelder.TabIndex = 0;
@@ -269,7 +277,7 @@ namespace BlueControls.Forms {
             this.grpOptik.Controls.Add(this.btnTabControlAdd);
             this.grpOptik.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpOptik.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpOptik.Location = new System.Drawing.Point(456, 0);
+            this.grpOptik.Location = new System.Drawing.Point(464, 0);
             this.grpOptik.Name = "grpOptik";
             this.grpOptik.Size = new System.Drawing.Size(160, 81);
             this.grpOptik.TabIndex = 2;
@@ -311,12 +319,82 @@ namespace BlueControls.Forms {
             this.groupBox1.Controls.Add(this.btnZeileZuFilter);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.groupBox1.Location = new System.Drawing.Point(0, 0);
+            this.groupBox1.Location = new System.Drawing.Point(72, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(456, 81);
+            this.groupBox1.Size = new System.Drawing.Size(392, 81);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Zeilen-Berechnung";
+            // 
+            // btnZeileAnlegen
+            // 
+            this.btnZeileAnlegen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnZeileAnlegen.ImageCode = "PlusZeichen";
+            this.btnZeileAnlegen.Location = new System.Drawing.Point(320, 2);
+            this.btnZeileAnlegen.Name = "btnZeileAnlegen";
+            this.btnZeileAnlegen.Size = new System.Drawing.Size(64, 66);
+            this.btnZeileAnlegen.TabIndex = 6;
+            this.btnZeileAnlegen.Text = "Zeile anlegen";
+            this.btnZeileAnlegen.Click += new System.EventHandler(this.btnZeileAnlegen_Click);
+            // 
+            // btnTable
+            // 
+            this.btnTable.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnTable.ImageCode = "Tabelle|16";
+            this.btnTable.Location = new System.Drawing.Point(256, 2);
+            this.btnTable.Name = "btnTable";
+            this.btnTable.Size = new System.Drawing.Size(64, 66);
+            this.btnTable.TabIndex = 5;
+            this.btnTable.Text = "Tabelle";
+            this.btnTable.Click += new System.EventHandler(this.btnTable_Click);
+            // 
+            // btnDropdownmenu
+            // 
+            this.btnDropdownmenu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnDropdownmenu.ImageCode = "Textfeld2";
+            this.btnDropdownmenu.Location = new System.Drawing.Point(192, 2);
+            this.btnDropdownmenu.Name = "btnDropdownmenu";
+            this.btnDropdownmenu.QuickInfo = resources.GetString("btnDropdownmenu.QuickInfo");
+            this.btnDropdownmenu.Size = new System.Drawing.Size(64, 66);
+            this.btnDropdownmenu.TabIndex = 4;
+            this.btnDropdownmenu.Text = "Auswahl-feld";
+            this.btnDropdownmenu.Click += new System.EventHandler(this.btnDropdownmenu_Click);
+            // 
+            // btnFilterConverter
+            // 
+            this.btnFilterConverter.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnFilterConverter.ImageCode = "Trichter|16";
+            this.btnFilterConverter.Location = new System.Drawing.Point(128, 2);
+            this.btnFilterConverter.Name = "btnFilterConverter";
+            this.btnFilterConverter.Size = new System.Drawing.Size(64, 66);
+            this.btnFilterConverter.TabIndex = 3;
+            this.btnFilterConverter.Text = "Filter Converter";
+            this.btnFilterConverter.Click += new System.EventHandler(this.btnFilterConverter_Click);
+            // 
+            // btnBenutzerFilterWahl
+            // 
+            this.btnBenutzerFilterWahl.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnBenutzerFilterWahl.ImageCode = "Trichter|16";
+            this.btnBenutzerFilterWahl.Location = new System.Drawing.Point(64, 2);
+            this.btnBenutzerFilterWahl.Name = "btnBenutzerFilterWahl";
+            this.btnBenutzerFilterWahl.Size = new System.Drawing.Size(64, 66);
+            this.btnBenutzerFilterWahl.TabIndex = 2;
+            this.btnBenutzerFilterWahl.Text = "Benutzer-Filter Wahl";
+            this.btnBenutzerFilterWahl.Click += new System.EventHandler(this.btnBenutzerFilterWahl_Click);
+            // 
+            // btnZeileZuFilter
+            // 
+            this.btnZeileZuFilter.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnZeileZuFilter.ImageCode = "Zeile|16";
+            this.btnZeileZuFilter.Location = new System.Drawing.Point(0, 2);
+            this.btnZeileZuFilter.Name = "btnZeileZuFilter";
+            this.btnZeileZuFilter.QuickInfo = "Dieses Element kann eine Zeile empfangen, auf dessen Zellen zugreifen,<br>und ein" +
+    "en neuen Filter für eine andere Datenbank zurück geben.<br>Unsichtbares Element," +
+    " es wird nicht angezeigt.";
+            this.btnZeileZuFilter.Size = new System.Drawing.Size(64, 66);
+            this.btnZeileZuFilter.TabIndex = 1;
+            this.btnZeileZuFilter.Text = "Filter aus Zeile";
+            this.btnZeileZuFilter.Click += new System.EventHandler(this.btnZeileZuFilter_Click);
             // 
             // tabFile
             // 
@@ -325,7 +403,7 @@ namespace BlueControls.Forms {
             this.tabFile.Location = new System.Drawing.Point(4, 25);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(966, 81);
+            this.tabFile.Size = new System.Drawing.Size(1062, 81);
             this.tabFile.TabIndex = 5;
             this.tabFile.Text = "Datei";
             // 
@@ -426,73 +504,30 @@ namespace BlueControls.Forms {
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Visible = false;
             // 
-            // btnZeileZuFilter
+            // grpArbeitsbereich
             // 
-            this.btnZeileZuFilter.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnZeileZuFilter.ImageCode = "Zeile|16";
-            this.btnZeileZuFilter.Location = new System.Drawing.Point(64, 2);
-            this.btnZeileZuFilter.Name = "btnZeileZuFilter";
-            this.btnZeileZuFilter.Size = new System.Drawing.Size(64, 66);
-            this.btnZeileZuFilter.TabIndex = 1;
-            this.btnZeileZuFilter.Text = "Filter aus Zeile";
-            this.btnZeileZuFilter.QuickInfo = "Dieses Element kann eine Zeile empfangen, auf dessen Zellen zugreifen,<br>und einen neuen Filter für eine andere Datenbank zurück geben.<br>Unsichtbares Element, es wird nicht angezeigt.";
-            this.btnZeileZuFilter.Click += new System.EventHandler(this.btnZeileZuFilter_Click);
+            this.grpArbeitsbereich.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpArbeitsbereich.Controls.Add(this.btnArbeitsbereich);
+            this.grpArbeitsbereich.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpArbeitsbereich.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpArbeitsbereich.Location = new System.Drawing.Point(0, 0);
+            this.grpArbeitsbereich.Name = "grpArbeitsbereich";
+            this.grpArbeitsbereich.Size = new System.Drawing.Size(72, 81);
+            this.grpArbeitsbereich.TabIndex = 4;
+            this.grpArbeitsbereich.TabStop = false;
+            this.grpArbeitsbereich.Text = "Vorschau";
             // 
-            // btnBenutzerFilterWahl
+            // btnArbeitsbereich
             // 
-            this.btnBenutzerFilterWahl.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnBenutzerFilterWahl.ImageCode = "Trichter|16";
-            this.btnBenutzerFilterWahl.Location = new System.Drawing.Point(120, 2);
-            this.btnBenutzerFilterWahl.Name = "btnBenutzerFilterWahl";
-            this.btnBenutzerFilterWahl.Size = new System.Drawing.Size(64, 66);
-            this.btnBenutzerFilterWahl.TabIndex = 2;
-            this.btnBenutzerFilterWahl.Text = "Benutzer-Filter Wahl";
-            this.btnBenutzerFilterWahl.Click += new System.EventHandler(this.btnBenutzerFilterWahl_Click);
-            // 
-            // btnFilterConverter
-            // 
-            this.btnFilterConverter.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnFilterConverter.ImageCode = "Trichter|16";
-            this.btnFilterConverter.Location = new System.Drawing.Point(184, 2);
-            this.btnFilterConverter.Name = "btnFilterConverter";
-            this.btnFilterConverter.Size = new System.Drawing.Size(64, 66);
-            this.btnFilterConverter.TabIndex = 3;
-            this.btnFilterConverter.Text = "Filter Converter";
-            this.btnFilterConverter.Click += new System.EventHandler(this.btnFilterConverter_Click);
-            // 
-            // btnDropdownmenu
-            // 
-            this.btnDropdownmenu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnDropdownmenu.ImageCode = "Textfeld2";
-            this.btnDropdownmenu.Location = new System.Drawing.Point(256, 2);
-            this.btnDropdownmenu.Name = "btnDropdownmenu";
-            this.btnDropdownmenu.Size = new System.Drawing.Size(64, 66);
-            this.btnDropdownmenu.TabIndex = 4;
-            this.btnDropdownmenu.Text = "Auswahlfeld";
-            this.btnDropdownmenu.QuickInfo = "Dieses Element stellt eine Wahlmöglichkeit für den Benutzer dar.<br>Es zeigt die aktuellen Zeilen einer Datenbank in einer Dropdown-List an, aus der der Benutzer wählen kann.<br>Es kann Vorfilterungen empfangen, um die Werte einzuschränken.";
-            this.btnDropdownmenu.Click += new System.EventHandler(this.btnDropdownmenu_Click);
-            // 
-            // btnTable
-            // 
-            this.btnTable.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnTable.ImageCode = "Tabelle|16";
-            this.btnTable.Location = new System.Drawing.Point(320, 2);
-            this.btnTable.Name = "btnTable";
-            this.btnTable.Size = new System.Drawing.Size(64, 66);
-            this.btnTable.TabIndex = 5;
-            this.btnTable.Text = "Tabelle";
-            this.btnTable.Click += new System.EventHandler(this.btnTable_Click);
-            // 
-            // btnZeileAnlegen
-            // 
-            this.btnZeileAnlegen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnZeileAnlegen.ImageCode = "PlusZeichen";
-            this.btnZeileAnlegen.Location = new System.Drawing.Point(384, 2);
-            this.btnZeileAnlegen.Name = "btnZeileAnlegen";
-            this.btnZeileAnlegen.Size = new System.Drawing.Size(64, 66);
-            this.btnZeileAnlegen.TabIndex = 6;
-            this.btnZeileAnlegen.Text = "Zeile anlegen";
-            this.btnZeileAnlegen.Click += new System.EventHandler(this.btnZeileAnlegen_Click);
+            this.btnArbeitsbereich.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Button_Big) 
+            | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnArbeitsbereich.ImageCode = "SeiteEinrichten";
+            this.btnArbeitsbereich.Location = new System.Drawing.Point(8, 2);
+            this.btnArbeitsbereich.Name = "btnArbeitsbereich";
+            this.btnArbeitsbereich.Size = new System.Drawing.Size(56, 66);
+            this.btnArbeitsbereich.TabIndex = 0;
+            this.btnArbeitsbereich.Text = "Arbeits-bereich";
+            this.btnArbeitsbereich.Click += new System.EventHandler(this.btnArbeitsbereich_Click);
             // 
             // ConnectedFormulaEditor
             // 
@@ -516,6 +551,7 @@ namespace BlueControls.Forms {
             this.groupBox1.ResumeLayout(false);
             this.tabFile.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
+            this.grpArbeitsbereich.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -551,5 +587,7 @@ namespace BlueControls.Forms {
         private Button btnFilterConverter;
         private Button btnBenutzerFilterWahl;
         private Button btnZeileZuFilter;
+        private GroupBox grpArbeitsbereich;
+        private Button btnArbeitsbereich;
     }
 }

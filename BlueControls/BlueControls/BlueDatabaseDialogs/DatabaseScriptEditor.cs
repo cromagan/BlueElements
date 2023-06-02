@@ -228,7 +228,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         }
 
         if (chkChangeValuesInTest.Checked) {
-            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", BlueBasics.Enums.ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
+            if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
         }
 
         e.Feedback = Database?.ExecuteScript(_item, chkChangeValuesInTest.Checked, r);

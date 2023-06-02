@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -27,7 +26,7 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, IControlSendFilter {
+internal class InputRowOutputFilterControl : Caption, IControlAcceptRow, IControlSendFilter {
 
     #region Fields
 
@@ -60,6 +59,13 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
             if (_filter?.Equals(value) ?? false) { return; }
             _filter = value;
             this.DoChilds(_childs);
+
+            if (_filter != null) {
+                Text = "Filter: " + _filter.ReadableText();
+            } else {
+                Text = string.Empty;
+            }
+
             Invalidate();
         }
     }
@@ -69,7 +75,7 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
         set {
             if (_getRowFrom == value) { return; }
             if (_getRowFrom != null) {
-                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
+                Develop.DebugPrint(FehlerArt.Fehler, "Änderung nicht erlaubt");
             }
 
             _getRowFrom = value;
@@ -138,17 +144,6 @@ internal class InputRowOutputFilterControl : GenericControl, IControlAcceptRow, 
                 Filter = new FilterItem();
                 return;
         }
-    }
-
-    /// <summary>
-    /// Dummy, für Designer
-    /// </summary>
-    /// <param name="gr"></param>
-    /// <param name="state"></param>
-    protected override void DrawControl(Graphics gr, States state) {
-        if (gr == null || _filter == null) { return; }
-        Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-        Skin.Draw_FormatedText(gr, "Filter: " + _filter.ReadableText(), Design.Caption, state, _filter.SymbolForReadableText(), Alignment.Top_Left, new Rectangle(), null, false, false);
     }
 
     #endregion

@@ -35,7 +35,7 @@ namespace BlueControls.ItemCollection;
 /// Per Tabellenansicht
 /// </summary>
 
-public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow {
+public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow, IAutosizable {
 
     #region Fields
 
@@ -64,6 +64,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     #region Properties
 
     public static string ClassId => "FI-SelectRowWithTable";
+    public bool AutoSizeableHeight => true;
 
     public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();

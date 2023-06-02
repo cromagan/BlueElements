@@ -65,6 +65,7 @@ namespace BlueControls.Forms {
             // Pad
             // 
             this.Pad.Size = new Size(512, 225);
+            this.Pad.ClickedItemChanging += new EventHandler(this.Pad_ClickedItemChanging);
             this.Pad.ClickedItemChanged += new EventHandler(this.Pad_ClickedItemChanged);
             this.Pad.GotNewItemCollection += new EventHandler(this.Pad_GotNewItemCollection);
             // 

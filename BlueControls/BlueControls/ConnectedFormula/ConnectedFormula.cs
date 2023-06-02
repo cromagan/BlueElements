@@ -93,7 +93,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         _saved = true;
 
         if (_padData != null) {
-            _padData.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
+            //_padData.SheetSizeInMm = new SizeF(PixelToMm(500, 300), PixelToMm(850, 300));
             _padData.GridShow = 0.5f;
             _padData.GridSnap = 0.5f;
         }
@@ -272,6 +272,18 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         return false;
     }
 
+    internal void Resize(float newwidthinmm, float newheightinmm, bool changeControls) {
+        if (PadData == null) { return; }
+
+        if (changeControls) {
+            foreach (var thisPage in PadData.AllPages()) {
+                ResizeControls(newwidthinmm, newheightinmm, thisPage);
+            }
+        }
+
+        PadData.SheetSizeInMm = new SizeF(newwidthinmm, newheightinmm);
+    }
+
     internal void SaveAsAndChangeTo(string fileName) => _muf?.SaveAsAndChangeTo(fileName);
 
     protected virtual void Dispose(bool disposing) {
@@ -385,6 +397,154 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         _saved = false;
         OnChanged();
+    }
+
+    private void ResizeControls(float newwidthinmm, float newheightinmm, string page) {
+        if (PadData == null) { return; }
+
+        var newheightiPixel = MmToPixel(newheightinmm, 300);
+        var abstand = MmToPixel(0.5f, 300);
+
+        #region Items und Daten in einer sortierene Liste ermitteln, die es betrifft (its)
+
+        List<IAutosizable> its = new();
+
+        foreach (var thisc in PadData) {
+            if (thisc.IsVisibleOnPage(page) && thisc is IAutosizable aas) {
+                its.Add(aas);
+            }
+        }
+
+        its.Sort((it1, it2) => it1.UsedArea.Y.CompareTo(it2.UsedArea.Y));
+
+        #endregion
+
+        //PadData.SheetSizeInMm = new SizeF(newwidthinmm, newheightinmm);
+        var fy = newheightinmm / PadData.SheetSizeInMm.Height;
+
+        #region Alle Items an die neue gedachte Y-Position schieben (newY)
+
+        List<float> newY = new();
+        for (var ity = 0; ity < its.Count; ity++) {
+            newY.Add(its[ity].UsedArea.Y * fy);
+        }
+
+        #endregion
+
+        #region  Alle Items von unten nach oben auf Überlappungen (auch dem Rand) prüfen.
+
+        // Alle prüfen, weil die Höhe noch unverändert ist
+
+        for (var tocheck = its.Count - 1; tocheck >= 0; tocheck--) {
+            var pos = PositioOf(tocheck);
+
+            for (var coll = its.Count - 1; coll > tocheck; coll--) {
+                var poscoll = PositioOf(coll);
+                if (pos.IntersectsWith(poscoll)) {
+                    newY[tocheck] = poscoll.Top - pos.Height;
+                }
+            }
+
+            pos = PositioOf(tocheck);
+            if (pos.Bottom > newheightiPixel) {
+                newY[tocheck] = newheightiPixel - pos.Height;
+            }
+        }
+
+        #endregion
+
+        #region  Alle UNveränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen.
+
+        // Und von oben nach unten muss sein, weil man ja oben bündig haben will
+
+        for (var tocheck = 0; tocheck < its.Count; tocheck++) {
+            if (!its[tocheck].AutoSizeableHeight) {
+                var pos = PositioOf(tocheck);
+
+                for (var coll = 0; coll < tocheck; coll++) {
+                    if (!its[tocheck].AutoSizeableHeight) {
+                        var poscoll = PositioOf(coll);
+                        if (pos.IntersectsWith(poscoll)) {
+                            newY[tocheck] = poscoll.Top + poscoll.Height;
+                        }
+                    }
+                }
+
+                pos = PositioOf(tocheck);
+                if (pos.Y < 0) {
+                    newY[tocheck] = 0;
+                }
+            }
+        }
+
+        #endregion
+
+
+        //#region  Und am Schluss die veräderlichen einpassen
+
+        //// Und von oben nach unten muss sein, weil man ja oben bündig haben will
+
+        //for (var tocheck = 0; tocheck < its.Count; tocheck++) {
+        //    if (its[tocheck].AutoSizeableHeight) {
+        //        var pos = PositioOf(tocheck);
+
+        //        for (var coll = 0; coll < tocheck; coll++) {
+        //            if (its[tocheck].AutoSizeableHeight) {
+        //                var poscoll = PositioOf(coll);
+        //                if (pos.IntersectsWith(poscoll)) {
+        //                    newY[tocheck] = poscoll.Top + poscoll.Height;
+        //                }
+        //            }
+        //        }
+
+        //        pos = PositioOf(tocheck);
+        //        if (pos.Y < 0) {
+        //            newY[tocheck] = 0;
+        //        }
+        //    }
+        //}
+
+
+
+        #region Die neue Position in die Items schreiben
+
+        for (var ite = 0; ite < its.Count; ite++) {
+            var pos = PositioOf(ite);
+            its[ite].SetCoordinates(pos.ToRect(), true);
+        }
+
+        #endregion
+
+        //#region  Alle HeightFix Items von unten nach oben auf Überlappungen (auch dem Rand) prüfen)
+
+        //for (var tocheck = its.Count; tocheck >=0; tocheck--) {
+        //    if(its[tocheck].FixHeight))
+        //    {
+        //        var pos = PositioOf(tocheck);
+
+        //    if (its[tocheck].)
+        //    }
+
+        //    //newY.Add(its[ity].UsedArea.Y * fy);
+        //}
+
+        //#endregion
+
+        //for (var t = 0; t < its.Count; t++) {
+        //    if (its[t].item.ChanChangeHeigt)
+
+        //}
+
+        RectangleF PositioOf(int no) {
+            var r = its[no].UsedArea;
+            return r with { Y = newY[no] };
+        }
+        RectangleF PositioOfWithBorder(int no) {
+            var r = its[no].UsedArea;
+            var r2 = r with { Y = newY[no] };
+            r2.Inflate(abstand / 2, abstand / 2);
+            return r2;
+        }
     }
 
     private void ToListOfByte(object sender, MultiUserToListEventArgs e) {

@@ -419,6 +419,7 @@ public static partial class Extensions {
 
     public static bool IsWordSeperator(this char value) {
         const string tr = "~|=<>+`´\r\n\t";
+        if(value == '_'){ return false;}
         return char.IsPunctuation(value) || char.IsSeparator(value) || tr.Contains(value.ToString());
     }
 

@@ -148,21 +148,23 @@ public partial class PadEditor : PadEditorReadOnly {
 
     private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) => Pad.Item.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
 
-    private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
-        // FALLS ein PadEditor doppelt offen ist, kann ein Control Element aber nur
-        // einem Parent zugeordnet werden.
-        // Deswegen müssen die Element einzigartig sein (also extra für das Menü generiert werden)
-        // Und deswegen können sie auch disposed werden.
+    private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) {
+
+        #region  SideMenu leeren
 
         foreach (var thisControl in tabElementEigenschaften.Controls) {
             if (thisControl is IDisposable d) { d?.Dispose(); }
         }
         tabElementEigenschaften.Controls.Clear();
 
+        #endregion
+
         if (Pad.LastClickedItem == null) { return; }
 
-        var flexis = Pad.LastClickedItem.GetStyleOptions();
-        if (flexis.Count == 0) { return; }
+        var flexis = Pad.LastClickedItem?.GetStyleOptions();
+        if (flexis == null || flexis.Count == 0) { return; }
+
+        #region  SideMenu erstellen
 
         var top = Skin.Padding;
         foreach (var thisFlexi in flexis) {
@@ -174,6 +176,27 @@ public partial class PadEditor : PadEditorReadOnly {
                 top = top + Skin.Padding + thisFlexi.Height;
                 thisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
             }
+        }
+
+        #endregion
+    }
+
+    private void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
+        // FALLS ein PadEditor doppelt offen ist, kann ein Control Element aber nur
+        // einem Parent zugeordnet werden.
+        // Deswegen müssen die Element einzigartig sein (also extra für das Menü generiert werden)
+        // Und deswegen können sie auch disposed werden.
+
+        if (Pad.LastClickedItem != null) {
+            Pad.LastClickedItem.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;
+        }
+
+        LastClickedItem_DoUpdateSideOptionMenu(this, System.EventArgs.Empty);
+    }
+
+    private void Pad_ClickedItemChanging(object sender, System.EventArgs e) {
+        if (Pad.LastClickedItem != null) {
+            Pad.LastClickedItem.DoUpdateSideOptionMenu -= LastClickedItem_DoUpdateSideOptionMenu;
         }
     }
 

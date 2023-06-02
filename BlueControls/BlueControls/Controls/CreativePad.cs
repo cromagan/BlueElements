@@ -51,6 +51,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     private string _currentPage = string.Empty;
     private IMouseAndKeyHandle? _givesMouseComandsTo;
     private ItemCollectionPad? _item;
+    private BasicPadItem? _lastClickedItem;
     private string _lastQuickInfo = string.Empty;
     private bool _repairPrinterDataPrepaired;
     private bool _showInPrintMode;
@@ -79,6 +80,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     public event EventHandler? Changed;
 
     public event EventHandler? ClickedItemChanged;
+
+    public event EventHandler? ClickedItemChanging;
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
@@ -146,7 +149,16 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         }
     }
 
-    public BasicPadItem? LastClickedItem { get; private set; }
+    public BasicPadItem? LastClickedItem {
+        get => _lastClickedItem;
+        private set {
+            if (_lastClickedItem != value) {
+                OnClickedItemChanging();
+                _lastClickedItem = value;
+                OnClickedItemChanged();
+            }
+        }
+    }
 
     public override string QuickInfoText => _lastQuickInfo;
 
@@ -557,7 +569,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     private void _Item_ItemRemoving(object sender, ListEventArgs e) => OnItemRemoving(e);
 
     private void CheckHotItem(MouseEventArgs? e, bool doLastClicked) {
-        var oldClicked = LastClickedItem;
         var l = HotItems(e);
         var mina = long.MaxValue;
         HotItem = null;
@@ -571,9 +582,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                 }
             }
         }
-        if (doLastClicked && HotItem != oldClicked) {
+
+        if (doLastClicked) {
             LastClickedItem = HotItem;
-            OnClickedItemChanged();
         }
     }
 
@@ -626,6 +637,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     private void OnBeginnPrint(PrintEventArgs e) => BeginnPrint?.Invoke(this, e);
 
     private void OnClickedItemChanged() => ClickedItemChanged?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnClickedItemChanging() => ClickedItemChanging?.Invoke(this, System.EventArgs.Empty);
 
     private void OnDrawModeChanged() => DrawModeChanged?.Invoke(this, System.EventArgs.Empty);
 

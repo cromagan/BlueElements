@@ -41,7 +41,7 @@ namespace BlueControls.ItemCollection;
 /// <summary>
 /// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
 /// </summary>
-public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptRow {
+public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptRow, IAutosizable {
 
     #region Fields
 
@@ -71,6 +71,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     #region Properties
 
     public static string ClassId => "FI-ChildFormula";
+    public bool AutoSizeableHeight => true;
 
     /// <summary>
     /// Wird benötigt bei ToString - um die eigenen Ansichten wieder zu finden.

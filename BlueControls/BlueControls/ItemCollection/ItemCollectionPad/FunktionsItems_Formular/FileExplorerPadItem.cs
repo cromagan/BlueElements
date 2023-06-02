@@ -30,16 +30,13 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
-public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
+public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosizable {
 
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
-
     private bool _bei_Bedarf_Erzeugen;
-
     private bool _leere_Ordner_Löschen;
-
     private string _pfad = string.Empty;
 
     #endregion
@@ -56,6 +53,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow {
     #region Properties
 
     public static string ClassId => "FI-FileExplorer";
+    public bool AutoSizeableHeight => true;
 
     [Description("Ob das Verzeichniss bei Bedarf erzeugt werden soll.")]
     public bool Bei_Bedarf_erzeugen {

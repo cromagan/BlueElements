@@ -37,7 +37,7 @@ namespace BlueControls.ItemCollection;
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
 /// </summary>
 
-public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
+public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IAutosizable {
 
     #region Fields
 
@@ -79,6 +79,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
             OnChanged();
         }
     }
+
+    public bool AutoSizeableHeight => false;
 
     public ÜberschriftAnordnung CaptionPosition {
         get => _überschriftanordung;

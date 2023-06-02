@@ -30,7 +30,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollection;
 
-public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow {
+public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow, IAutosizable {
 
     #region Fields
 
@@ -52,6 +52,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
     #region Properties
 
     public static string ClassId => "FI-EasyPic";
+    public bool AutoSizeableHeight => true;
 
     [Description("Der Datename des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Bild_Dateiname {

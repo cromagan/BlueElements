@@ -50,6 +50,8 @@ public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangin
 
     public void RemoveChild(IItemAcceptSomething remove);
 
+    public void UpdateSideOptionMenu();
+
     #endregion
 
     //public void RemoveAllConnections();
@@ -151,6 +153,7 @@ public class ItemSendSomething {
         item.RaiseVersion();
         item.DoChilds();
         item.OnChanged();
+        item.UpdateSideOptionMenu();
     }
 
     public virtual List<string> ParsableTags() {

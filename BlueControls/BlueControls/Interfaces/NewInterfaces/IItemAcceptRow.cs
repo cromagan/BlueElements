@@ -77,6 +77,8 @@ public static class ItemAcceptRowExtensions {
 
         var newGetRowFrom = item.Parent[it[0]];
 
+        if (item.GetRowFrom == newGetRowFrom) { return; }
+
         if (newGetRowFrom is IItemSendRow rfp2) {
             item.GetRowFrom = rfp2;
         } else {
@@ -84,6 +86,7 @@ public static class ItemAcceptRowExtensions {
         }
         item.RaiseVersion();
         item.OnChanged();
+        item.UpdateSideOptionMenu();
     }
 
     #endregion
@@ -137,11 +140,12 @@ public class ItemAcceptRow : ItemAcceptSomething {
 
         item.RaiseVersion();
         item.OnChanged();
+        item.UpdateSideOptionMenu();
     }
 
     public List<int> InputColorIdGet(IItemAcceptRow item) {
         if (_inputColorId.Count == 0) {
-            this.CalculateInputColorIds(item);
+            CalculateInputColorIds(item);
         }
         return _inputColorId;
     }

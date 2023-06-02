@@ -236,11 +236,12 @@ public class ItemAcceptFilter : ItemAcceptSomething {
         item.CalculateInputColorIds();
         item.RaiseVersion();
         item.OnChanged();
+        item.UpdateSideOptionMenu();
     }
 
     public List<int> InputColorIdGet(IItemAcceptFilter item) {
         if (_inputColorId.Count == 0) {
-            this.CalculateInputColorIds(item);
+            CalculateInputColorIds(item);
         }
         return _inputColorId;
     }

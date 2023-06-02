@@ -153,6 +153,7 @@
     <Compile Include="Forms\FormWithStatusBar.designer.cs">
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\NewInterfaces\IAutosizable.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemRowInput.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlRowInput.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlAcceptFilter.cs" />

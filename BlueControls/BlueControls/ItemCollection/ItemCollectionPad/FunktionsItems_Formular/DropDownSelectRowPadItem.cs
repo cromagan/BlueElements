@@ -34,7 +34,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollection;
 
-public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow {
+public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow, IAutosizable {
 
     #region Fields
 
@@ -77,6 +77,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
             OnChanged();
         }
     }
+
+    public bool AutoSizeableHeight => false;
 
     public ÜberschriftAnordnung CaptionPosition {
         get => _überschriftanordung;

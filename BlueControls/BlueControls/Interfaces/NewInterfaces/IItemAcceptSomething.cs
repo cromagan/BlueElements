@@ -46,6 +46,8 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
 
     public void CalculateInputColorIds();
 
+    public void UpdateSideOptionMenu();
+
     #endregion
 }
 
