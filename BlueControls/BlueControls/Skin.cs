@@ -1082,8 +1082,8 @@ public static class Skin {
                     Develop.DebugPrint(design.RahmenArt);
                     break;
             }
-        } catch (Exception ex) {
-            Develop.DebugPrint("Fehler beim Zeichen des Randes " + design, ex);
+        } catch {
+            //Develop.DebugPrint("Fehler beim Zeichen des Randes " + design, ex);
         }
     }
 

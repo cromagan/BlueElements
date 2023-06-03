@@ -35,6 +35,8 @@ public interface IAutosizable {
 
     #region Methods
 
+    public bool IsVisibleForMe();
+
     public void SetCoordinates(RectangleF r, bool overrideFixedSize);
 
     #endregion
@@ -44,16 +46,22 @@ public static class IAutosizableExtension {
 
     #region Fields
 
-    public static float MinHeigthToLines = MmToPixel(4f, 300);
+    public static float GridSize = 8;// PixelToMm(4f, ItemCollectionPad.Dpi);
+
+    public static float MinHeigthCapAndBox = 48;
+    public static float MinHeigthCaption = 16;
+    public static float MinHeigthTextBox = 24;
 
     #endregion
+
+    //MmToPixel(4f, ItemCollectionPad.Dpi);
 
     #region Methods
 
     public static bool CanChangeHeightTo(this IAutosizable item, float heightinPixel) {
         if (!item.AutoSizeableHeight) { return false; }
 
-        return heightinPixel > MinHeigthToLines;
+        return heightinPixel > MinHeigthCapAndBox;
     }
 
     public static bool CanScaleHeightTo(this IAutosizable item, float scale) => CanChangeHeightTo(item, item.UsedArea.Height * scale);

@@ -64,13 +64,17 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     public bool AutoSizeableHeight {
         get {
+            if (_bearbeitung == EditTypeFormula.nur_als_Text_anzeigen) {
+                return UsedArea.Height > IAutosizableExtension.MinHeigthCaption;
+            }
+
             if (_überschriftanordung is ÜberschriftAnordnung.Links_neben_Dem_Feld or
                 ÜberschriftAnordnung.Ohne_mit_Abstand or
                 ÜberschriftAnordnung.ohne) {
-                return UsedArea.Height > IAutosizableExtension.MinHeigthToLines / 2;
+                return UsedArea.Height > IAutosizableExtension.MinHeigthTextBox;
             }
 
-            return UsedArea.Height > IAutosizableExtension.MinHeigthToLines;
+            return UsedArea.Height > IAutosizableExtension.MinHeigthCapAndBox;
         }
     }
 

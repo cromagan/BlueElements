@@ -493,8 +493,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     protected override void DrawControl(Graphics gr, States state) {
         base.DrawControl(gr, state);
 
-        LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray,
-            LinearGradientMode.Vertical);
+        LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
         _ = _item?.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, _currentPage, _showInPrintMode);
 

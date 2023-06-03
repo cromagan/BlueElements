@@ -84,7 +84,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
         var anzbr = IntParse(doit[0]);
         var npos = IntParse(doit[1]);
-        SetXPosition(anzbr, npos, 1);
+        SetXPosition(anzbr, npos);
         this.RaiseVersion();
     }
 
@@ -110,6 +110,22 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
+    public bool IsVisibleForMe() {
+        //if(!Bei_Export_sichtbar ) { return false; }
+
+        if (string.IsNullOrEmpty(UserGroup) || string.IsNullOrEmpty(UserName)) { return true; }
+
+        if (VisibleFor.Count == 0 || VisibleFor.Contains(Constants.Everybody, false)) { return true; }
+
+        if (UserGroup.Equals(Constants.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
+
+        if (VisibleFor.Contains(UserGroup, false)) { return true; }
+
+        if (VisibleFor.Contains("#USER: " + UserName, false)) { return true; }
+        if (VisibleFor.Contains("#USER:" + UserName, false)) { return true; }
+        return false;
+    }
+
     public override void OnChanged() {
         base.OnChanged();
         this.RaiseVersion();
@@ -134,12 +150,12 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     public abstract string ReadableText();
 
-    public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition, int breiteInspalten) {
+    public void SetXPosition(int anzahlSpaltenImFormular, int aufXPosition) {
         if (Parent == null) { return; }
 
         var x = UsedArea;
-        x.Width = (Parent.SheetSizeInPix.Width - (MmToPixel(0.5f, 300) * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
-        x.X = (x.Width * (aufXPosition - 1)) + (MmToPixel(0.5f, 300) * (aufXPosition - 1));
+        x.Width = (Parent.SheetSizeInPix.Width - (IAutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
+        x.X = (x.Width * (aufXPosition - 1)) + (IAutosizableExtension.GridSize * (aufXPosition - 1));
         SetCoordinates(x, true);
     }
 
@@ -170,8 +186,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     public void Standardhöhe_setzen() {
         var x = UsedArea;
 
-        var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, 300);
-        var he1 = MmToPixel(1, 300);
+        var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, ItemCollectionPad.Dpi);
+        var he1 = MmToPixel(1, ItemCollectionPad.Dpi);
         x.Height = (int)(x.Height / he) * he;
         x.Height = (int)((x.Height / he1) + 0.99) * he1;
 
@@ -190,22 +206,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         result.ParseableAdd("VisibleFor", VisibleFor);
 
         return result.Parseable(base.ToString());
-    }
-
-    internal bool IsVisibleForMe() {
-        //if(!Bei_Export_sichtbar ) { return false; }
-
-        if (string.IsNullOrEmpty(UserGroup) || string.IsNullOrEmpty(UserName)) { return true; }
-
-        if (VisibleFor == null || VisibleFor.Count == 0 || VisibleFor.Contains(Constants.Everybody, false)) { return true; }
-
-        if (UserGroup.Equals(Constants.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
-
-        if (VisibleFor.Contains(UserGroup, false)) { return true; }
-
-        if (VisibleFor.Contains("#USER: " + UserName, false)) { return true; }
-        if (VisibleFor.Contains("#USER:" + UserName, false)) { return true; }
-        return false;
     }
 
     protected static void DrawArrow(Graphics gr, RectangleF positionModified, float zoom, string symbol, int colorId, Alignment al, float valueArrow, float valueSymbol, float xmod) {

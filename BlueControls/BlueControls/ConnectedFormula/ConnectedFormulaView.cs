@@ -106,8 +106,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         }
 
         if (ConnectedFormula != null && ConnectedFormula.PadData != null) {
-            //if (Visible || base.Controls.Count > 0) {
-            var addfactor = Size.Width / ConnectedFormula.PadData.SheetSizeInPix.Width;
+            var l = ResizeControls(ConnectedFormula.PadData, Width, Height, Page);
+
+            //var addfactor = Size.Width / ConnectedFormula.PadData.SheetSizeInPix.Width;
 
             foreach (var thisit in ConnectedFormula.PadData) {
                 if (thisit.IsVisibleOnPage(Page) && thisit is IItemToControl thisitco) {
@@ -122,11 +123,22 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
                             c.Visible = true;
                         }
 
-                        var ua = thisit.UsedArea;
-                        c.Left = (int)(ua.Left * addfactor);
-                        c.Top = (int)(ua.Top / Umrechnungsfaktor2);
-                        c.Width = (int)(ua.Width * addfactor);
-                        c.Height = (int)(ua.Height / Umrechnungsfaktor2);
+                        if (thisit is IAutosizable) {
+                            foreach (var (item, newpos) in l) {
+                                if (item == thisit) {
+                                    c.Left = (int)newpos.Left;
+                                    c.Top = (int)newpos.Top;
+                                    c.Width = (int)newpos.Width;
+                                    c.Height = (int)newpos.Height;
+                                }
+                            }
+                        }
+
+                        //var ua = thisit.UsedArea;
+                        //c.Left = (int)(ua.Left * addfactor);
+                        //c.Top = (int)(ua.Top / Umrechnungsfaktor2);
+                        //c.Width = (int)(ua.Width * addfactor);
+                        //c.Height = (int)(ua.Height / Umrechnungsfaktor2);
 
                         if (thisit is TabFormulaPadItem c3) {
                             c3.CreateTabs((TabControl)c);
@@ -135,7 +147,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
                 }
             }
             _generated = true;
-            //}
         }
 
         foreach (var thisc in unused) {

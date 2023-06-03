@@ -86,15 +86,15 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnArbeitsbereich_Click(object sender, System.EventArgs e) {
-        if(CFormula?.PadData == null) {return;}
+        if (CFormula?.PadData == null) { return; }
 
-        var oldw = CFormula.PadData.SheetSizeInMm.Width * 2;
+        var oldw = CFormula.PadData.SheetSizeInPix.Width / IAutosizableExtension.GridSize;
 
         var wi = InputBox.Show("Breite in Kästchen:", oldw.ToString(Constants.Format_Float1), FormatHolder.IntegerPositive);
 
         if (string.IsNullOrEmpty(wi)) { return; }
 
-        var oldh = CFormula.PadData.SheetSizeInMm.Height * 2;
+        var oldh = CFormula.PadData.SheetSizeInPix.Height / IAutosizableExtension.GridSize;
 
         var he = InputBox.Show("Höhe in Kästchen:", oldh.ToString(Constants.Format_Float1), FormatHolder.IntegerPositive);
 
@@ -104,7 +104,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         if (op == 2) { return; }
 
-        CFormula.Resize(FloatParse(wi)/2, FloatParse(he)/2, op == 0);
+        CFormula.Resize(FloatParse(wi) * IAutosizableExtension.GridSize, FloatParse(he) * IAutosizableExtension.GridSize, op == 0);
     }
 
     private void btnBenutzerFilterWahl_Click(object sender, System.EventArgs e) {

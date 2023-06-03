@@ -244,6 +244,9 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     public Color BackColor { get; set; } = Color.White;
     public ObservableCollection<ItemConnection> Connections { get; } = new();
 
+    /// <summary>
+    /// in mm
+    /// </summary>
     [DefaultValue(10.0)]
     public float GridShow {
         get => _gridShow;
@@ -254,6 +257,9 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         }
     }
 
+    /// <summary>
+    /// in mm
+    /// </summary>
     [DefaultValue(10.0)]
     public float GridSnap {
         get => _gridsnap;
@@ -429,29 +435,15 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
             #region Hintergrund und evtl. Zeichenbereich
 
-            if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
-                //Skin.Draw_Back(gr, enDesign.Table_And_Pad, state, DisplayRectangle, this, true);
-                var ssw = (float)Math.Round(MmToPixel(SheetSizeInMm.Width, Dpi), 1);
-                var ssh = (float)Math.Round(MmToPixel(SheetSizeInMm.Height, Dpi), 1);
-                var lo = new PointM(0f, 0f).ZoomAndMove(zoom, shiftX, shiftY);
-                var ru = new PointM(ssw, ssh).ZoomAndMove(zoom, shiftX, shiftY);
+            if (_prLo != null && _prRu != null) {
+                var rLo = _prLo.ZoomAndMove(zoom, shiftX, shiftY);
+                var rRu = _prRu.ZoomAndMove(zoom, shiftX, shiftY);
+                Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X), (int)(rRu.Y - rLo.Y));
 
-                if (BackColor.A > 0) {
-                    Rectangle r = new((int)lo.X, (int)lo.Y, (int)(ru.X - lo.X), (int)(ru.Y - lo.Y));
-                    gr.FillRectangle(new SolidBrush(BackColor), r);
-                }
-
-                if (!showinprintmode && _prLo != null && _prRu != null) {
-                    var rLo = new PointM(_prLo.X, _prLo.Y).ZoomAndMove(zoom, shiftX, shiftY);
-                    var rRu = new PointM(_prRu.X, _prRu.Y).ZoomAndMove(zoom, shiftX, shiftY);
-                    Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X),
-                        (int)(rRu.Y - rLo.Y));
-                    gr.DrawRectangle(ZoomPad.PenGray, rr);
-                }
+                if (BackColor.A > 0) { gr.FillRectangle(new SolidBrush(BackColor), rr); }
+                if (!showinprintmode) { gr.DrawRectangle(ZoomPad.PenGray, rr); }
             } else {
-                if (BackColor.A > 0) {
-                    gr.Clear(BackColor);
-                }
+                if (BackColor.A > 0) { gr.Clear(BackColor); }
             }
 
             #endregion
@@ -460,34 +452,40 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
             if (_gridShow > 0.1) {
                 var po = new PointM(0, 0).ZoomAndMove(zoom, shiftX, shiftY);
-                var mo = MmToPixel(_gridShow, Dpi) * zoom;
+
+                var tmpgrid = _gridShow;
+
+                while (MmToPixel(tmpgrid, Dpi) * zoom < 5) { tmpgrid *= 2; }
+
+       
 
                 var p = new Pen(Color.FromArgb(10, 0, 0, 0));
                 float ex = 0;
 
-                for (var z = 0; z < 20; z++) {
-                    if (mo < 5) { mo *= 2; }
-                }
+     
 
-                if (mo >= 5) {
-                    do {
-                        gr.DrawLine(p, po.X + (int)ex, 0, po.X + (int)ex, sizeOfParentControl.Height);
-                        gr.DrawLine(p, 0, po.Y + (int)ex, sizeOfParentControl.Width, po.Y + (int)ex);
+                do {
 
-                        if (ex > 0) {
-                            // erste Linie nicht doppelt zeichnen
-                            gr.DrawLine(p, po.X - (int)ex, 0, po.X - (int)ex, sizeOfParentControl.Height);
-                            gr.DrawLine(p, 0, po.Y - (int)ex, sizeOfParentControl.Width, po.Y - (int)ex);
-                        }
-                        ex += mo;
-                        if (po.X - ex < 0 && 
-                            po.Y - ex < 0 &&
-                            po.X + ex > sizeOfParentControl.Width && 
-                            po.Y + ex > sizeOfParentControl.Height) {
-                            break;
-                        }
-                    } while (true);
-                }
+                    var mo = MmToPixel(ex * tmpgrid, Dpi) * zoom;
+
+                    gr.DrawLine(p, po.X + (int)mo, 0, po.X + (int)mo, sizeOfParentControl.Height);
+                    gr.DrawLine(p, 0, po.Y + (int)mo, sizeOfParentControl.Width, po.Y + (int)mo);
+
+                    if (ex > 0) {
+                        // erste Linie nicht doppelt zeichnen
+                        gr.DrawLine(p, po.X - (int)mo, 0, po.X - (int)mo, sizeOfParentControl.Height);
+                        gr.DrawLine(p, 0, po.Y - (int)mo, sizeOfParentControl.Width, po.Y - (int)mo);
+                    }
+
+                    ex++;
+
+                    if (po.X - mo < 0 &&
+                        po.Y - mo < 0 &&
+                        po.X + mo > sizeOfParentControl.Width &&
+                        po.Y + mo > sizeOfParentControl.Height) {
+                        break;
+                    }
+                } while (true);
             }
 
             #endregion

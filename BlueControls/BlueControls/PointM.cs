@@ -253,11 +253,11 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
 
         if (Parent != null) {
             switch (Parent) {
-                case BasicPadItem item:
+                case IHasKeyName item:
                     result.ParseableAdd("ParentName", item.KeyName);
                     break;
 
-                case ItemCollectionPad:
+                //case ItemCollectionPad:
                 case CreativePad:
                     result.ParseableAdd("ParentType", "Main");
                     break;

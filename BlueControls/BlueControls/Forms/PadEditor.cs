@@ -216,11 +216,13 @@ public partial class PadEditor : PadEditorReadOnly {
 
     private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
         if (!txbRasterAnzeige.Text.IsNumeral()) { return; }
+        if (!txbRasterAnzeige.Visible) { return; }
         Pad.Item.GridShow = FloatParse(txbRasterAnzeige.Text);
     }
 
     private void txbRasterFangen_TextChanged(object sender, System.EventArgs e) {
         if (!txbRasterFangen.Text.IsNumeral()) { return; }
+        if (!txbRasterFangen.Visible) { return; }
         Pad.Item.GridSnap = FloatParse(txbRasterFangen.Text);
     }
 
