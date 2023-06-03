@@ -60,6 +60,8 @@ public static partial class Extensions {
         return r;
     }
 
+    public static bool IntersectsVericalyWith(this RectangleF r, RectangleF rect) => rect.X < r.X + r.Width && r.X < rect.X + rect.Width;
+
     public static PointF NearestCornerOf(this RectangleF r, PointF p) {
         var pl = new List<PointF>
         {
@@ -138,17 +140,17 @@ public static partial class Extensions {
             // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
             //               0 und 25 rauskommen
             return new RectangleF((r.X * zoom) - shiftX,
-                (r.Y * zoom) - shiftY,
-                r.Width * zoom,
-                r.Height * zoom);
+            (r.Y * zoom) - shiftY,
+            r.Width * zoom,
+            r.Height * zoom);
         }
 
         // Beispiel: bei X=0 und Width=5 muss bei einen zoom von 5
         //               2,5 und 27,5 rauskommen
         var add = zoom / 2;
         return new RectangleF((r.X * zoom) - shiftX + add,
-            (r.Y * zoom) - shiftY + add,
-            r.Width * zoom,
+        (r.Y * zoom) - shiftY + add,
+        r.Width * zoom,
             r.Height * zoom);
     }
 

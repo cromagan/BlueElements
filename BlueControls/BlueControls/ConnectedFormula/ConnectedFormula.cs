@@ -290,6 +290,27 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         #endregion
 
+        #region Alle Items, den Abstand stutzen, wenn der vorgänger unveränderlich ist - nur bei ScaleY >1
+
+        if (scaleY > 1) {
+            for (var tocheck = 0; tocheck < its.Count; tocheck++) {
+                if (!its[tocheck].CanScaleHeightTo(scaleY)) {
+                    //var pos = PositioOf(tocheck);
+
+                    for (var coll = tocheck + 1; coll < its.Count; coll++) {
+                        //var poscoll = PositioOf(coll);
+
+                        if (its[coll].UsedArea.Y >= its[tocheck].UsedArea.Bottom && its[coll].UsedArea.IntersectsVericalyWith(its[tocheck].UsedArea)) {
+                            newY[coll] = newY[tocheck] + newH[tocheck] + its[coll].UsedArea.Top - its[tocheck].UsedArea.Bottom;
+                            //pos = PositioOf(tocheck);
+                        }
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         #region  Alle veränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen - nur den Y-Wert.
 
         for (var tocheck = 0; tocheck < its.Count; tocheck++) {
