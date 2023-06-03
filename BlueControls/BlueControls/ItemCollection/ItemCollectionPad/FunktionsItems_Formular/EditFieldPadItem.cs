@@ -69,12 +69,12 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public bool AutoSizeableHeight {
         get {
-            if (_überschriftanordung == ÜberschriftAnordnung.Links_neben_Dem_Feld ||
-                _überschriftanordung == ÜberschriftAnordnung.Ohne_mit_Abstand ||
-                _überschriftanordung == ÜberschriftAnordnung.ohne) {
-                return UsedArea.Height > MmToPixel(2f, 300);
+            if (_überschriftanordung is ÜberschriftAnordnung.Links_neben_Dem_Feld or
+                ÜberschriftAnordnung.Ohne_mit_Abstand or
+                ÜberschriftAnordnung.ohne) {
+                return UsedArea.Height > IAutosizableExtension.MinHeigthToLines / 2;
             }
-            return UsedArea.Height > MmToPixel(4f, 300); ;
+            return UsedArea.Height > IAutosizableExtension.MinHeigthToLines;
         }
     }
 

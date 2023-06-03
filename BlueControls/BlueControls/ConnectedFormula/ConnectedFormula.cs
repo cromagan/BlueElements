@@ -403,7 +403,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         if (PadData == null) { return; }
 
         var newheightiPixel = MmToPixel(newheightinmm, 300);
-        var abstand = MmToPixel(0.5f, 300);
+        //var abstand = MmToPixel(0.5f, 300);
 
         #region Items und Daten in einer sortierene Liste ermitteln, die es betrifft (its)
 
@@ -420,35 +420,58 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         #endregion
 
         //PadData.SheetSizeInMm = new SizeF(newwidthinmm, newheightinmm);
-        var fy = newheightinmm / PadData.SheetSizeInMm.Height;
+        var scaleY = newheightinmm / PadData.SheetSizeInMm.Height;
 
         #region Alle Items an die neue gedachte Y-Position schieben (newY)
 
         List<float> newY = new();
         for (var ity = 0; ity < its.Count; ity++) {
-            newY.Add(its[ity].UsedArea.Y * fy);
+            newY.Add(its[ity].UsedArea.Y * scaleY);
+        }
+
+        #endregion
+
+        #region Neue bevorzugte Höhe berechnen (newH)
+
+        List<float> newH = new();
+        for (var ity = 0; ity < its.Count; ity++) {
+            var nh = its[ity].UsedArea.Height * scaleY;
+
+            if (its[ity].AutoSizeableHeight) {
+                if (!its[ity].CanChangeHeightTo(nh)) {
+                    nh = IAutosizableExtension.MinHeigthToLines;
+                }
+            } else {
+                nh = its[ity].UsedArea.Height;
+            }
+
+            newH.Add(nh);
         }
 
         #endregion
 
         #region  Alle Items von unten nach oben auf Überlappungen (auch dem Rand) prüfen.
 
-        // Alle prüfen, weil die Höhe noch unverändert ist
+        // Alle prüfen
 
         for (var tocheck = its.Count - 1; tocheck >= 0; tocheck--) {
             var pos = PositioOf(tocheck);
+
+            if (pos.Bottom > newheightiPixel) {
+                newY[tocheck] = newheightiPixel - pos.Height;
+                pos = PositioOf(tocheck);
+            }
 
             for (var coll = its.Count - 1; coll > tocheck; coll--) {
                 var poscoll = PositioOf(coll);
                 if (pos.IntersectsWith(poscoll)) {
                     newY[tocheck] = poscoll.Top - pos.Height;
+                    pos = PositioOf(tocheck);
                 }
             }
 
-            pos = PositioOf(tocheck);
-            if (pos.Bottom > newheightiPixel) {
-                newY[tocheck] = newheightiPixel - pos.Height;
-            }
+      
+
         }
 
         #endregion
@@ -456,53 +479,101 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         #region  Alle UNveränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen.
 
         // Und von oben nach unten muss sein, weil man ja oben bündig haben will
+        // Wichtig, das CanScaleHeightTo nochmal geprüft wird.
+        // Nur so kann festgestellt werden, ob es eigentlich veränerlich wäre, aber durch die Mini-Größe doch als unveränderlich gilt
 
         for (var tocheck = 0; tocheck < its.Count; tocheck++) {
-            if (!its[tocheck].AutoSizeableHeight) {
+            if (!its[tocheck].CanScaleHeightTo(scaleY)) {
                 var pos = PositioOf(tocheck);
 
+                if (pos.Y < 0) {
+                    newY[tocheck] = 0;
+                    pos = PositioOf(tocheck);
+                }
                 for (var coll = 0; coll < tocheck; coll++) {
-                    if (!its[tocheck].AutoSizeableHeight) {
+                    if (!its[tocheck].CanScaleHeightTo(scaleY)) {
                         var poscoll = PositioOf(coll);
                         if (pos.IntersectsWith(poscoll)) {
                             newY[tocheck] = poscoll.Top + poscoll.Height;
+                            pos = PositioOf(tocheck);
                         }
                     }
                 }
 
-                pos = PositioOf(tocheck);
-                if (pos.Y < 0) {
-                    newY[tocheck] = 0;
-                }
+
             }
         }
 
         #endregion
 
+        #region  Alle veränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen - nur den Y-Wert.
 
-        //#region  Und am Schluss die veräderlichen einpassen
+        for (var tocheck = 0; tocheck < its.Count; tocheck++) {
+            if (its[tocheck].CanScaleHeightTo(scaleY)) {
+                var pos = PositioOf(tocheck);
 
-        //// Und von oben nach unten muss sein, weil man ja oben bündig haben will
 
-        //for (var tocheck = 0; tocheck < its.Count; tocheck++) {
-        //    if (its[tocheck].AutoSizeableHeight) {
-        //        var pos = PositioOf(tocheck);
+                if (pos.Y < 0) {
+                    newY[tocheck] = 0;
+                    pos = PositioOf(tocheck);
+                }
 
-        //        for (var coll = 0; coll < tocheck; coll++) {
-        //            if (its[tocheck].AutoSizeableHeight) {
-        //                var poscoll = PositioOf(coll);
-        //                if (pos.IntersectsWith(poscoll)) {
-        //                    newY[tocheck] = poscoll.Top + poscoll.Height;
-        //                }
-        //            }
-        //        }
+                for (var coll = 0; coll < tocheck; coll++) {
+                    var poscoll = PositioOf(coll);
+                    if (pos.IntersectsWith(poscoll)) {
+                        newY[tocheck] = poscoll.Top + poscoll.Height;
+                        pos = PositioOf(tocheck);
+                    }
+                }
 
-        //        pos = PositioOf(tocheck);
-        //        if (pos.Y < 0) {
-        //            newY[tocheck] = 0;
-        //        }
-        //    }
-        //}
+
+            }
+        }
+
+
+
+
+        #endregion
+
+
+        #region  Alle veränderlichen Items von oben nach unten auf Überlappungen (auch dem Rand) prüfen - nur den Height-Wert stutzen.
+
+        for (var tocheck = 0; tocheck < its.Count; tocheck++) {
+            if (its[tocheck].CanScaleHeightTo(scaleY)) {
+                var pos = PositioOf(tocheck);
+
+
+                #region  Unterer Rand
+                if (pos.Bottom > newheightiPixel) {
+                    newH[tocheck] = newheightiPixel - pos.Y;
+                    pos = PositioOf(tocheck);
+                }
+
+
+
+                #endregion
+
+                #region  Alle Items stimmen mit dem Y-Wert, also ALLE prüfen, NACH dem Item
+                for (var coll = tocheck + 1; coll < its.Count; coll++) {
+                    var poscoll = PositioOf(coll);
+                    if (pos.IntersectsWith(poscoll)) {
+                        newH[tocheck] = poscoll.Top - pos.Top;
+                        pos = PositioOf(tocheck);
+                    }
+                }
+
+
+                #endregion
+
+            }
+        }
+
+
+
+
+        #endregion
+
+
 
 
 
@@ -515,36 +586,16 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         #endregion
 
-        //#region  Alle HeightFix Items von unten nach oben auf Überlappungen (auch dem Rand) prüfen)
-
-        //for (var tocheck = its.Count; tocheck >=0; tocheck--) {
-        //    if(its[tocheck].FixHeight))
-        //    {
-        //        var pos = PositioOf(tocheck);
-
-        //    if (its[tocheck].)
-        //    }
-
-        //    //newY.Add(its[ity].UsedArea.Y * fy);
-        //}
-
-        //#endregion
-
-        //for (var t = 0; t < its.Count; t++) {
-        //    if (its[t].item.ChanChangeHeigt)
-
-        //}
-
         RectangleF PositioOf(int no) {
             var r = its[no].UsedArea;
-            return r with { Y = newY[no] };
+            return r with { Y = newY[no], Height = newH[no] };
         }
-        RectangleF PositioOfWithBorder(int no) {
-            var r = its[no].UsedArea;
-            var r2 = r with { Y = newY[no] };
-            r2.Inflate(abstand / 2, abstand / 2);
-            return r2;
-        }
+        //RectangleF PositioOfWithBorder(int no) {
+        //    var r = its[no].UsedArea;
+        //    var r2 = r with { Y = newY[no] };
+        //    r2.Inflate(abstand / 2, abstand / 2);
+        //    return r2;
+        //}
     }
 
     private void ToListOfByte(object sender, MultiUserToListEventArgs e) {

@@ -20,6 +20,7 @@
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Drawing;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Interfaces;
 
@@ -35,6 +36,27 @@ public interface IAutosizable {
     #region Methods
 
     public void SetCoordinates(RectangleF r, bool overrideFixedSize);
+
+    #endregion
+}
+
+public static class IAutosizableExtension {
+
+    #region Fields
+
+    public static float MinHeigthToLines = MmToPixel(4f, 300);
+
+    #endregion
+
+    #region Methods
+
+    public static bool CanChangeHeightTo(this IAutosizable item, float heightinPixel) {
+        if (!item.AutoSizeableHeight) { return false; }
+
+        return heightinPixel > MinHeigthToLines;
+    }
+
+    public static bool CanScaleHeightTo(this IAutosizable item, float scale) => CanChangeHeightTo(item, item.UsedArea.Height * scale);
 
     #endregion
 }
