@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -210,25 +211,23 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public string ErrorReason() {
         if (_filterType == FilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
 
+        if (_column == null && Database == null) { return "Weder Spalte noch Datenbank angegeben"; }
+
+        if (Database != null && Database.IsDisposed) { return "Datenbank verworfen"; }
+
+        if (_column == null && !_filterType.HasFlag(FilterType.Instr)) { return "Fehlerhafter Zeilenfilter"; }
+
         if (_filterType.HasFlag(FilterType.Instr)) {
-            if (SearchValue == null || SearchValue.Count == 0) { return "Instr-Filter ohne Suchtext"; }
+            if (SearchValue.Count == 0) { return "Instr-Filter ohne Suchtext"; }
             foreach (var thisV in SearchValue) {
                 if (string.IsNullOrEmpty(thisV)) { return "Instr-Filter ohne Suchtext"; }
             }
         }
 
-        if (_column == null && Database == null) { return "Weder Spalte noch Datenbank angegeben"; }
-
-        if (Database != null && Database.IsDisposed) { return "Datenbank verworfen"; }
-
-        if (Column == null && !_filterType.HasFlag(FilterType.Instr)) { return "Fehlerhafter Zeilenfilter"; }
-
         return string.Empty;
     }
 
     public bool IsNullOrEmpty() => _filterType == FilterType.KeinFilter;
-
-    public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
@@ -262,14 +261,17 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                     //_column = Database.Column.SearchByKey(LongParse(pair.Value));
                     break;
 
-                case "value":
-                    var l = new List<string>();
-                    if (SearchValue != null) {
-                        l.AddRange(SearchValue);
+                case "values":
+
+                    if (string.IsNullOrEmpty(pair.Value)) {
+                        SearchValue = new List<string>{string.Empty}.AsReadOnly();
+                    }
+                    else {
+                        SearchValue = pair.Value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
                     }
 
-                    l.Add(pair.Value.FromNonCritical());
-                    SearchValue = l.AsReadOnly();
+
+                     
                     break;
 
                 case "herkunft":
@@ -289,13 +291,11 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     }
 
     public string ReadableText() {
-        if (_filterType == FilterType.KeinFilter) { return "Filter ohne Funktion"; }
-        if (_column == null && SearchValue.Count == 0) { return "#### Filter-Fehler ####"; }
-        if (_column == null && SearchValue.Count == 1 && string.IsNullOrEmpty(SearchValue[0])) { return "#### Filter-Fehler ####"; }
+        if (!this.IsOk()) { return "#### Filter-Fehler ####"; }
 
         if (_column == null) { return "Zeilen-Filter"; }
         var nam = _column.ReadableText();
-        if (SearchValue == null || SearchValue.Count < 1) { return "#### Filter-Fehler ####"; }
+
         if (SearchValue.Count > 1) {
             return _filterType switch {
                 FilterType.Istgleich or FilterType.IstGleich_ODER or FilterType.Istgleich_GroßKleinEgal or FilterType.Istgleich_ODER_GroßKleinEgal => nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'",
@@ -303,10 +303,12 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                 _ => nam + ": Spezial-Filter"
             };
         }
+
         if (_column == Database?.Column.SysCorrect && _filterType.HasFlag(FilterType.Istgleich)) {
             if (SearchValue[0].FromPlusMinus()) { return "Fehlerfreie Zeilen"; }
             if (!SearchValue[0].FromPlusMinus()) { return "Fehlerhafte Zeilen"; }
         }
+
         switch (_filterType) {
             case FilterType.Istgleich:
 
@@ -354,7 +356,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         if (IsDisposed) { return string.Empty; }
 
         try {
-            if (!IsOk()) { return string.Empty; }
+            if (!this.IsOk()) { return string.Empty; }
 
             var result = new List<string>();
             result.ParseableAdd("ID", KeyName);
@@ -362,9 +364,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
             result.ParseableAdd("Database", Database);
             result.ParseableAdd("ColumnName", _column);
-            foreach (var t in SearchValue) {
-                result.ParseableAdd("Value", t);
-            }
+            result.ParseableAdd("Values", SearchValue);
             result.ParseableAdd("Herkunft", Herkunft);
             return result.Parseable();
         } catch {

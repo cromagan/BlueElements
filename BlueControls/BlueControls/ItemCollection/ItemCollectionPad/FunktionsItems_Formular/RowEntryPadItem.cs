@@ -137,7 +137,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public override string ReadableText() {
         var txt = "Eingangs-Zeile: ";
 
-        if (IsOk() && InputDatabase != null) {
+        if (this.IsOk() && InputDatabase != null) {
             return txt + InputDatabase.Caption;
         }
 
@@ -147,7 +147,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
         }
 

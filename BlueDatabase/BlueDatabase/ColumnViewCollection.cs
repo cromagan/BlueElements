@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -29,11 +30,13 @@ using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName {
+public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName, IEnumerable<ColumnViewItem> {
 
     #region Fields
 
     private readonly List<string> _permissionGroups_Show = new();
+
+    private List<ColumnViewItem> _internal = new();
 
     #endregion
 
@@ -55,6 +58,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
 
     #region Properties
 
+    public int Count => _internal.Count;
     public DatabaseAbstract? Database { get; private set; }
 
     //public event EventHandler? Changed;
@@ -78,11 +82,13 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
 
     #region Indexers
 
+    public ColumnViewItem? this[int index] => _internal[index];
+
     public ColumnViewItem? this[ColumnItem? vColumn] {
         get {
             if (vColumn == null) { return null; }
 
-            return this.FirstOrDefault(thisViewItem => thisViewItem != null && thisViewItem.Column == vColumn);
+            return _internal.FirstOrDefault(thisViewItem => thisViewItem != null && thisViewItem.Column == vColumn);
         }
     }
 
@@ -98,7 +104,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
     public static void Hide(string columnName, ColumnViewCollection ca) {
         foreach (var thisViewItem in ca) {
             if (thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.OrdinalIgnoreCase))) {
-                _ = ca.Remove(thisViewItem);
+                ca.Remove(thisViewItem);
                 Hide(columnName, ca);
                 return;
             }
@@ -130,7 +136,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
         #region Ungültige Spalten entfernen
 
         for (var z = 0; z < ca.Count; z++) {
-            if (ca[z].Column == null || !ca.Database.Column.Contains(ca[z]?.Column)) {
+            if (ca[z]?.Column == null || !ca.Database.Column.Contains(ca[z]?.Column)) {
                 ca.RemoveAt(z);
                 z--;
             }
@@ -197,22 +203,35 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
 
     //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
     public ColumnViewItem? First() {
-        return this.FirstOrDefault(thisViewItem => thisViewItem?.Column != null);
+        return _internal.FirstOrDefault(thisViewItem => thisViewItem?.Column != null);
+    }
+
+    public IEnumerator<ColumnViewItem> GetEnumerator() {
+        return ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() {
+        return ((IEnumerable)_internal).GetEnumerator();
+    }
+
+    public int IndexOf(ColumnViewItem? columnViewItem) {
+        if (columnViewItem == null) { return -1; }
+        return _internal.IndexOf(columnViewItem);
     }
 
     public void Invalidate_DrawWithOfAllItems() {
-        foreach (var thisViewItem in this) {
+        foreach (var thisViewItem in _internal) {
             thisViewItem?.Invalidate_DrawWidth();
         }
     }
 
     public ColumnViewItem? Last() {
-        return this.Last(thisViewItem => thisViewItem?.Column != null);
+        return _internal.Last(thisViewItem => thisViewItem?.Column != null);
     }
 
     public List<ColumnItem> ListOfUsedColumn() {
         List<ColumnItem> colList = new();
-        foreach (var t in this) {
+        foreach (var t in _internal) {
             if (t?.Column != null) { colList.Add(t.Column); }
         }
         return colList;
@@ -222,8 +241,8 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
         var viewItemNo = 0;
         var found = false;
         do {
-            if (viewItemNo >= Count) { return null; }
-            if (this[viewItemNo]?.Column is ColumnItem c) {
+            if (viewItemNo >= _internal.Count) { return null; }
+            if (_internal[viewItemNo]?.Column is ColumnItem c) {
                 if (found) { return c; }
                 if (c == column) { found = true; }
             }
@@ -232,12 +251,12 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
     }
 
     public ColumnViewItem? NextVisible(ColumnViewItem viewItem) {
-        var viewItemNo = IndexOf(viewItem);
+        var viewItemNo = _internal.IndexOf(viewItem);
         if (viewItemNo < 0) { return null; }
         do {
             viewItemNo++;
-            if (viewItemNo >= Count) { return null; }
-            if (this[viewItemNo]?.Column != null) { return this[viewItemNo]; }
+            if (viewItemNo >= _internal.Count) { return null; }
+            if (_internal[viewItemNo]?.Column != null) { return _internal[viewItemNo]; }
         } while (true);
     }
 
@@ -250,7 +269,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
 
                 case "columndata":
                     if (Database != null) {
-                        base.Add(new ColumnViewItem(Database, pair.Value, this)); // BAse, um Events zu vermeiden
+                        _internal.Add(new ColumnViewItem(Database, pair.Value, this)); // BAse, um Events zu vermeiden
                     }
 
                     break;
@@ -267,11 +286,11 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
     }
 
     public ColumnItem? PreviousVisible(ColumnItem? column) {
-        var viewItemNo = Count - 1;
+        var viewItemNo = _internal.Count - 1;
         var found = false;
         do {
             if (viewItemNo < 0) { return null; }
-            if (this[viewItemNo]?.Column is ColumnItem c) {
+            if (_internal[viewItemNo]?.Column is ColumnItem c) {
                 if (found) { return c; }
                 if (c == column) { found = true; }
             }
@@ -280,11 +299,11 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
     }
 
     public ColumnViewItem? PreviousVisible(ColumnViewItem viewItem) {
-        var viewItemNo = IndexOf(viewItem);
+        var viewItemNo = _internal.IndexOf(viewItem);
         do {
             viewItemNo--;
             if (viewItemNo < 0) { return null; }
-            if (this[viewItemNo]?.Column != null) { return this[viewItemNo]; }
+            if (_internal[viewItemNo]?.Column != null) { return _internal[viewItemNo]; }
         } while (true);
     }
 
@@ -294,7 +313,7 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
     /// </summary>
     /// <param name="columns"></param>
     public void Reduce(string[] columns) {
-        foreach (var thiscv in this) {
+        foreach (var thiscv in _internal) {
             if (thiscv?.Column is ColumnItem ci) {
                 thiscv.TmpReduced = columns.Contains(ci.Name);
             }
@@ -303,10 +322,16 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
 
     public List<ColumnItem> ReducedColumns() {
         var x = new List<ColumnItem>();
-        foreach (var thiscol in this) {
+        foreach (var thiscol in _internal) {
             if (thiscol?.Column != null && thiscol.TmpReduced) { x.Add(thiscol.Column); }
         }
         return x;
+    }
+
+    public void RemoveAt(int z) {
+        //var it = _internal[z];
+        _internal.RemoveAt(z);
+        //it.Changed -= ColumnViewItem_Changed;
     }
 
     public void ShowColumns(params string[] columnnames) {
@@ -324,15 +349,15 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
     public void Swap(int index1, int index2) {
         if (index1 == index2) { return; }
 
-        (base[index1], base[index2]) = (base[index2], base[index1]);
+        (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
 
-        if (base[index2].ViewType != ViewType.PermanentColumn) { base[index1].ViewType = ViewType.Column; }
+        if (_internal[index2].ViewType != ViewType.PermanentColumn) { _internal[index1].ViewType = ViewType.Column; }
     }
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
         var result = "{Name=" + KeyName.ToNonCritical();
-        foreach (var thisViewItem in this) {
+        foreach (var thisViewItem in _internal) {
             if (thisViewItem != null) {
                 result = result + ", Columndata=" + thisViewItem;
             }
@@ -347,9 +372,24 @@ public sealed class ColumnViewCollection : List<ColumnViewItem>, IParseable, ICl
         return result + "}";
     }
 
+    private void Add(ColumnViewItem columnViewItem) {
+        _internal.Add(columnViewItem);
+        //columnViewItem.Changed += ColumnViewItem_Changed;
+    }
+
+    private void ColumnViewItem_Changed(object sender, System.EventArgs e) {
+        throw new NotImplementedException();
+    }
+
     //    Swap(index1, index2);
     //}
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+
+    private void Remove(ColumnViewItem columnViewItem) {
+        if (_internal.Remove(columnViewItem)) {
+            //columnViewItem.Changed -= ColumnViewItem_Changed;
+        }
+    }
 
     #endregion
 }

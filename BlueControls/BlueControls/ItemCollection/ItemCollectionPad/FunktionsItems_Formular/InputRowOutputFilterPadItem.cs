@@ -222,7 +222,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
     public override string ReadableText() {
         var txt = "Filter aus Zeile: ";
 
-        if (IsOk() && OutputDatabase != null) {
+        if (this.IsOk() && OutputDatabase != null) {
             return txt + OutputDatabase.Caption;
         }
 
@@ -232,7 +232,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
         }
 

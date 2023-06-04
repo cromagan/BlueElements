@@ -70,7 +70,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public bool AutoSizeableHeight {
         get {
             if (_bearbeitung == EditTypeFormula.nur_als_Text_anzeigen) {
-                return (int) UsedArea.Height > IAutosizableExtension.MinHeigthCaption;
+                return (int)UsedArea.Height > IAutosizableExtension.MinHeigthCaption;
             }
 
             if (_überschriftanordung is ÜberschriftAnordnung.Links_neben_Dem_Feld or
@@ -276,7 +276,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public override string ReadableText() {
         var txt = "Wert aus: ";
 
-        if (IsOk() && Column != null) {
+        if (this.IsOk() && Column != null) {
             return txt + Column.Caption;
         }
 
@@ -321,7 +321,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public override QuickImage? SymbolForReadableText() {
-        if (IsOk() && Column != null) {
+        if (this.IsOk() && Column != null) {
             return Column.SymbolForReadableText();
 
             //return QuickImage.Get(ImageCode.Zeile, 16, Color.Transparent, Skin.IdColor(InputColorId));

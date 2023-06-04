@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -221,7 +222,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             }
 
             r = Database?.Row[txbTestZeile.Text];
-            if (r== null || r.IsDisposed) {
+            if (r == null || r.IsDisposed) {
                 e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, "Allgemein");
                 return;
             }

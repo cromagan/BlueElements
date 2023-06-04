@@ -25,6 +25,7 @@ using System.IO;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -260,7 +261,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     public override string ReadableText() {
         var txt = "Formulare: ";
 
-        if (IsOk() && InputDatabase != null) {
+        if (this.IsOk() && InputDatabase != null) {
             return txt + InputDatabase.Caption;
         }
 
@@ -268,7 +269,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     }
 
     public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 

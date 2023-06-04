@@ -23,7 +23,14 @@ public interface IErrorCheckable {
 
     public string ErrorReason();
 
-    public bool IsOk();
+    #endregion
+}
+
+public static class IErrorCheckableExtension {
+
+    #region Methods
+
+    public static bool IsOk(this IErrorCheckable item) => string.IsNullOrEmpty(item.ErrorReason());
 
     #endregion
 }

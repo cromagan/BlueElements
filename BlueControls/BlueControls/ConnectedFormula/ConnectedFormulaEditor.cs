@@ -65,7 +65,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         }
 
         if (l is IItemSendFilter isf && x is IItemAcceptFilter iaf) {
-            iaf.GetFilterFrom = (new List<string>() { l.KeyName }).AsReadOnly();
+            iaf.GetFilterFrom = new List<string> { l.KeyName }.AsReadOnly();
         }
 
         if (x is IItemAcceptRow iar2 && iar2.GetRowFrom == null) {

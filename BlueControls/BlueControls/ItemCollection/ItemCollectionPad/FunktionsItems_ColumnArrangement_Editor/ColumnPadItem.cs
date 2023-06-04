@@ -39,8 +39,9 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public ColumnPadItem(string internalname) : base(internalname) { }
 
-    public ColumnPadItem(ColumnItem c) : base(c.Database?.TableName + "|" + c.Name) {
+    public ColumnPadItem(ColumnItem c, bool permanent) : base(c.Database?.TableName + "|" + c.Name) {
         Column = c;
+        Permanent = permanent;
 
         if (Column != null && !Column.IsDisposed) {
             Column.Changed += Column_Changed;
@@ -68,18 +69,36 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     /// Wird von Flexoptions aufgerufen
     /// </summary>
 
+    //        _viewType = value ? ViewType.PermanentColumn : ViewType.Column;
+    //    }
+    //}
+    public bool Permanent { get; set; }
+
     protected override int SaveOrder => 999;
 
     #endregion
 
+    ///// <summary>
+    ///// Für FlexOptions
+    ///// </summary>
+    //public bool Permanent {
+    //    get => _viewType == ViewType.PermanentColumn;
+    //    set {
+    //        if (!PermanentPossible() && Permanent) { return; }
+    //        if (!NonPermanentPossible() && !value) { return; }
+
     #region Methods
 
+    //        if (value == Permanent) { return; }
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
         if (Column == null || Column.IsDisposed) { return l; }
 
         l.Add(new FlexiControlForProperty<string>(() => Datenbank));
         l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
+        l.Add(new FlexiControl());
+        l.Add(new FlexiControlForProperty<bool>(() => Permanent));
+        l.Add(new FlexiControl());
         l.Add(new FlexiControlForDelegate(Spalte_bearbeiten, "Spalte bearbeiten", ImageCode.Spalte));
         l.Add(new FlexiControl());
         l.Add(new FlexiControlForProperty<string>(() => Column.Caption));
@@ -91,10 +110,10 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         l.Add(new FlexiControlForProperty<string>(() => Column.Quickinfo, 5));
         l.Add(new FlexiControlForProperty<string>(() => Column.AdminInfo, 5));
 
-        if (AdditionalStyleOptions != null) {
-            l.Add(new FlexiControl());
-            l.AddRange(AdditionalStyleOptions);
-        }
+        //if (AdditionalStyleOptions != null) {
+        //    l.Add(new FlexiControl());
+        //    l.AddRange(AdditionalStyleOptions);
+        //}
 
         //ItemCollectionList.ItemCollectionList layouts = new();
         //foreach (var thisLayouts in Row.Database.Layouts) {

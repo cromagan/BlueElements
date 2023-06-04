@@ -108,8 +108,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         return l;
     }
 
-    public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
-
     public bool IsVisibleForMe() {
         //if(!Bei_Export_sichtbar ) { return false; }
 

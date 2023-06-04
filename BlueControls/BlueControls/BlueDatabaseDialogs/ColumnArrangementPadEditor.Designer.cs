@@ -61,7 +61,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // Pad
             // 
             this.Pad.ContextMenuAllowed = false;
-              this.Pad.ItemAdded += new System.EventHandler<BlueBasics.EventArgs.ListEventArgs>(this.Item_ItemAdded);
             this.Pad.ItemRemoved += new System.EventHandler<System.EventArgs>(this.Item_ItemRemoved);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 

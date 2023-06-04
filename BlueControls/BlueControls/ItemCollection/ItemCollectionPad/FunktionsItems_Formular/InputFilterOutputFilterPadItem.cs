@@ -30,6 +30,7 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+using static BlueBasics.Interfaces.IErrorCheckableExtension;
 
 namespace BlueControls.ItemCollection;
 
@@ -207,7 +208,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     public override string ReadableText() {
         var txt = "Filter: ";
 
-        if (IsOk() && OutputDatabase != null) {
+        if (this.IsOk() && OutputDatabase != null) {
             return txt + OutputDatabase.Caption;
         }
 
@@ -217,7 +218,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Trichter, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 

@@ -194,7 +194,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     public override string ReadableText() {
         var txt = "Variablenansicht: ";
 
-        if (IsOk() && InputDatabase != null) {
+        if (this.IsOk() && InputDatabase != null) {
             return txt + InputDatabase.Caption;
         }
 
@@ -202,7 +202,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     }
 
     public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Variable, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 

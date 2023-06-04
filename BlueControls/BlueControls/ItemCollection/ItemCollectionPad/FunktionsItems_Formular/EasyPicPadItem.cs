@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueDatabase;
@@ -130,15 +131,15 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
     public override string ReadableText() {
         var txt = "Bild: ";
 
-        if (IsOk() && InputDatabase != null) {
+        if (this.IsOk() && InputDatabase != null) {
             return txt + InputDatabase.Caption;
         }
 
         return txt + ErrorReason();
     }
 
-    public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+    public override QuickImage SymbolForReadableText() {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Bild, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 

@@ -144,7 +144,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     public override string ReadableText() {
         var txt = "Tabellenansicht: ";
 
-        if (IsOk() && OutputDatabase != null) {
+        if (this.IsOk() && OutputDatabase != null) {
             return txt + OutputDatabase.Caption;
         }
 
@@ -154,7 +154,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Datenbank, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 

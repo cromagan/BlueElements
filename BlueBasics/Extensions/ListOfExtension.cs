@@ -102,6 +102,17 @@ public static partial class Extensions {
         return l2;
     }
 
+    public static List<string> FromNonCritical(this ICollection<string> col) {
+        var l = new List<string>();
+        if (col.Count == 0) { return l; }
+
+        foreach (var thiss in col) {
+            l.Add(thiss.FromNonCritical());
+        }
+
+        return l;
+    }
+
     public static T? Get<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
         if (items != null) {
             return items.FirstOrDefault(thisp =>
@@ -206,7 +217,9 @@ public static partial class Extensions {
             _ = l.Append("|");
         }
 
-        col.Add(tagname + "=" + l.ToString().TrimEnd("|"));
+        if(l.Length >0) { l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
+      
+        col.Add(tagname + "=" + l.ToString());
     }
 
     public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T? value) where T : Enum {
@@ -316,7 +329,7 @@ public static partial class Extensions {
         if (l == null || value == null) { return; }
 
         foreach (var t in value) {
-            l!.RemoveString(t, caseSensitive);
+            l.RemoveString(t, caseSensitive);
         }
     }
 
@@ -324,7 +337,7 @@ public static partial class Extensions {
         if (l == null || value == null) { return; }
 
         for (var z = 0; z <= value.GetUpperBound(0); z++) {
-            l!.RemoveString(value[z], caseSensitive);
+            l.RemoveString(value[z], caseSensitive);
         }
     }
 

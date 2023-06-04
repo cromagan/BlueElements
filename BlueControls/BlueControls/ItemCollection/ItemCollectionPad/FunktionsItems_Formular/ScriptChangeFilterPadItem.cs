@@ -139,7 +139,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
     public override string ReadableText() {
         var txt = "Filter aus Skript: ";
 
-        if (IsOk() && OutputDatabase != null) {
+        if (this.IsOk() && OutputDatabase != null) {
             return txt + OutputDatabase.Caption;
         }
 
@@ -148,8 +148,8 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+    public override QuickImage SymbolForReadableText() {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Skript, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 

@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueDatabase;
@@ -168,15 +169,15 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
     public override string ReadableText() {
         var txt = "Dateisystem: ";
 
-        if (IsOk() && InputDatabase != null) {
+        if (this.IsOk() && InputDatabase != null) {
             return txt + InputDatabase.Caption;
         }
 
         return txt + ErrorReason();
     }
 
-    public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+    public override QuickImage SymbolForReadableText() {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Ordner, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 

@@ -207,7 +207,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     public override string ReadableText() {
         var txt = "Zeilenauswahl: ";
 
-        if (IsOk() && OutputDatabase != null) {
+        if (this.IsOk() && OutputDatabase != null) {
             return txt + OutputDatabase.Caption;
         }
 
@@ -216,8 +216,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+    public override QuickImage SymbolForReadableText() {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
         }
 

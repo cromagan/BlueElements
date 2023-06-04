@@ -27,6 +27,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
+using static BlueBasics.Interfaces.IErrorCheckableExtension;
 
 namespace BlueDatabase;
 
@@ -223,8 +224,6 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
         return string.Empty;
     }
 
-    public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
-
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void Parse(string toParse) {
@@ -282,8 +281,8 @@ public sealed class EventScript : IParseable, IReadableTextWithChangingAndKey, I
         return Name;
     }
 
-    public QuickImage? SymbolForReadableText() {
-        if (!IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
+    public QuickImage SymbolForReadableText() {
+        if (!this.IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
 
         var symb = ImageCode.Formel;
         var c = Color.Transparent;

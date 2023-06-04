@@ -128,15 +128,15 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
     public override string ReadableText() {
         var txt = "Neue Zeile anlegen: ";
 
-        if (IsOk() && InputDatabase != null) {
+        if (this.IsOk() && InputDatabase != null) {
             return txt + InputDatabase.Caption;
         }
 
         return txt + ErrorReason();
     }
 
-    public override QuickImage? SymbolForReadableText() {
-        if (IsOk()) {
+    public override QuickImage SymbolForReadableText() {
+        if (this.IsOk()) {
             return QuickImage.Get(ImageCode.PlusZeichen, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
 

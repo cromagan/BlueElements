@@ -23,6 +23,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -74,9 +75,9 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     #endregion
 
-    #region Properties
+    //public List<FlexiControl>? AdditionalStyleOptions { get; set; } = null;
 
-    public List<FlexiControl>? AdditionalStyleOptions { get; set; } = null;
+    #region Properties
 
     [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
     public bool Bei_Export_sichtbar {
@@ -307,10 +308,10 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
             new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
             new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar)
         };
-        if (AdditionalStyleOptions != null) {
-            l.Add(new FlexiControl());
-            l.AddRange(AdditionalStyleOptions);
-        }
+        //if (AdditionalStyleOptions != null) {
+        //    l.Add(new FlexiControl());
+        //    l.AddRange(AdditionalStyleOptions);
+        //}
 
         return l;
     }
@@ -420,13 +421,8 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
                 return true;
 
             case "tags":
-                value = value.Replace("\r", "|");
-
-                var tmp = value.FromNonCritical().SplitBy("|");
                 Tags.Clear();
-                foreach (var thiss in tmp) {
-                    Tags.Add(thiss.FromNonCritical());
-                }
+                Tags.AddRange(value.SplitBy("|").ToList().FromNonCritical());
                 return true;
 
             default:

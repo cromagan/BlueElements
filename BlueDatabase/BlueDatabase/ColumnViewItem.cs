@@ -110,34 +110,11 @@ public sealed class ColumnViewItem {
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? Changed;
-
-    #endregion
-
     #region Properties
 
     public ColumnItem? Column { get; }
     public int? OrderTmpSpalteX1 { get; set; }
     public ColumnViewCollection Parent { get; }
-
-    /// <summary>
-    /// Für FlexOptions
-    /// </summary>
-    public bool Permanent {
-        get => _viewType == ViewType.PermanentColumn;
-        set {
-            if (!PermanentPossible() && Permanent) { return; }
-            if (!NonPermanentPossible() && !value) { return; }
-
-            if (value == Permanent) { return; }
-
-            _viewType = value ? ViewType.PermanentColumn : ViewType.Column;
-
-            OnChanged();
-        }
-    }
 
     public Rectangle TmpAutoFilterLocation { get; set; }
     public int? TmpDrawWidth { get; set; }
@@ -149,7 +126,6 @@ public sealed class ColumnViewItem {
         set {
             if (value == _viewType) { return; }
             _viewType = value;
-            OnChanged();
         }
     }
 
@@ -161,13 +137,11 @@ public sealed class ColumnViewItem {
 
     public ColumnViewItem? NextVisible() => Parent.NextVisible(this);
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
-
     public ColumnViewItem? PreviewsVisible() => Parent.PreviousVisible(this);
 
     public override string ToString() {
         var result = "{Type=" + (int)_viewType;
-        if (Column  != null && !Column .IsDisposed) { result = result + ", ColumnName=" + Column.Name; }
+        if (Column != null && !Column.IsDisposed) { result = result + ", ColumnName=" + Column.Name; }
         //if (_spalteX1 > 0) { result = result + ", X=" + _spalteX1; }
         //if (_spalteWidth > 1) { result = result + ", Width=" + _spalteWidth; }
         //if (_spalteHeight > 1) { result = result + ", Height=" + _spalteHeight; }

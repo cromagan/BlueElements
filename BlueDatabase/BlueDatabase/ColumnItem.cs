@@ -1499,8 +1499,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// </summary>
     public bool IsFirst() => Database?.Column.First() == this;
 
-    public bool IsOk() => string.IsNullOrEmpty(ErrorReason());
-
     public bool IsSystemColumn() =>
         KeyName.ToUpper() is "SYS_CORRECT" or
             "SYS_CHANGER" or
