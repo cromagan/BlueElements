@@ -293,7 +293,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 da.CellAdd(thisColumnItem.Column.Name);
                 da.CellAdd(thisColumnItem.Column.Caption.Replace("\r", "<br>"));
                 da.CellAdd((thisColumnItem.Column.CaptionGroup1 + "/" + thisColumnItem.Column.CaptionGroup2 + "/" + thisColumnItem.Column.CaptionGroup3 + "/").TrimEnd("/"));
-                da.CellAdd(thisColumnItem.Column.Format.ToString());
+                var name = "{" + thisColumnItem.Column.Format.ToString() + "}";
+                foreach (var thisFormat in FormatHolder.AllFormats) {
+                    if (thisFormat.IsFormatIdenticalSoft(thisColumnItem.Column)) { name = thisFormat.Name; }
+                }
+                da.CellAdd(name + " (" + thisColumnItem.Column.MaxCellLenght + " Char)");
+
                 da.CellAdd(thisColumnItem.Column.Quickinfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.Column.AdminInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.Column.Tags.JoinWith("<br>"));

@@ -2008,7 +2008,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (_format == DataFormat.Verknüpfung_zu_anderer_Datenbank) { return QuickImage.Get(ImageCode.Fernglas, 16); }
 
         foreach (var thisFormat in FormatHolder.AllFormats) {
-            if (thisFormat.IsFormatIdentical(this)) { return thisFormat.Image; }
+            if (thisFormat.IsFormatIdenticalSoft(this)) { return thisFormat.Image; }
         }
 
         if (_dropdownBearbeitungErlaubt) {

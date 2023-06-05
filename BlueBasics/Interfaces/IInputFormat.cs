@@ -147,5 +147,29 @@ public static class IInputFormatExtensions {
         t.FormatierungErlaubt == source.FormatierungErlaubt &&
         t.MaxTextLenght == source.MaxTextLenght;
 
+    /// <summary>
+    /// Ignoriert Multiline und wenn MaxTextLenght 4000 ist
+    /// </summary>
+    /// <param name="t"></param>
+    /// <param name="source"></param>
+    /// <returns></returns>
+    public static bool IsFormatIdenticalSoft(this IInputFormat t, IInputFormat source) {
+        var x = t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
+                   t.AllowedChars == source.AllowedChars &&
+                   t.Prefix == source.Prefix &&
+                   t.Regex == source.Regex &&
+                   t.Suffix == source.Suffix &&
+                   t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
+                   t.FormatierungErlaubt == source.FormatierungErlaubt; ;
+        if (!x) { return false; }
+
+        if (t.MaxTextLenght < 4000) {
+            if (t.MaxTextLenght != source.MaxTextLenght) { return false; }
+        }
+
+        if (t.MaxTextLenght < 1) { return false; }
+        return true;
+    }
+
     #endregion
 }

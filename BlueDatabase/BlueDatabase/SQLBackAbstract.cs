@@ -619,7 +619,7 @@ public abstract class SqlBackAbstract {
         } while (true);
 
         var ok2 = ExecuteCommand(com + "END; ", true);
-        if (string.IsNullOrEmpty(ok2)) { return "Eigenschaft nicht gesetzt: " + ok2; }
+        if (!string.IsNullOrEmpty(ok2)) { return "Eigenschaft nicht gesetzt: " + ok2; }
 
         if (type == DatabaseDataType.ColumnName) {
             // Wichtig, erst den Wert setzen, dann umbenennen! Somit wird der Wert richtig mit umbenannt

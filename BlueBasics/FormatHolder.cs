@@ -30,8 +30,7 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     public static readonly List<FormatHolder> AllFormats = new();
 
-    public static readonly FormatHolder Bit = new() {
-        Name = "Bit",
+    public static readonly FormatHolder Bit = new("Bit") {
         Image = QuickImage.Get(ImageCode.Häkchen, 16),
         AllowedChars = "+-",
         Regex = @"^([+]|[-])$",
@@ -44,8 +43,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 1,
     };
 
-    public static readonly FormatHolder Date = new() {
-        Name = "Date",
+    public static readonly FormatHolder Date = new("Date") {
         Image = QuickImage.Get(ImageCode.Uhr, 16),
         Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}$",
         AllowedChars = Constants.Char_Numerals + ".",
@@ -58,8 +56,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 10,
     };
 
-    public static readonly FormatHolder DateTime = new() {
-        Name = "DateTime",
+    public static readonly FormatHolder DateTime = new("DateTime") {
         Image = QuickImage.Get(ImageCode.Uhr, 16),
         Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$",
         AllowedChars = Constants.Char_Numerals + ":. ",
@@ -72,8 +69,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 19
     };
 
-    public static readonly FormatHolder Email = new() {
-        Name = "EMail",
+    public static readonly FormatHolder Email = new("EMail") {
         Image = QuickImage.Get(ImageCode.Brief, 16),
         //http://emailregex.com/
         Regex = @"^[a-z0-9A-Z._-]{1,40}[@][a-z0-9A-Z._-]{1,40}[.][a-zA-Z]{1,3}$",
@@ -84,11 +80,10 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 4000,
+        MaxTextLenght = 320,
     };
 
-    public static readonly FormatHolder Filepath = new() {
-        Name = "Filepathe",
+    public static readonly FormatHolder Filepath = new("Filepath") {
         Image = QuickImage.Get(ImageCode.Ordner, 16),
         //    https://regex101.com/r/S2CbwM/1
         Regex = @"^[A-Za-z]:\\.*\\$",
@@ -102,8 +97,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 512,
     };
 
-    public static readonly FormatHolder FilepathAndName = new() {
-        Name = "FilepathAndName",
+    public static readonly FormatHolder FilepathAndName = new("FilepathAndName") {
         Image = QuickImage.Get(ImageCode.Ordner, 16),
         //    https://regex101.com/r/S2CbwM/1
         Regex = @"^[A-Za-z]:\\.*[.].*$",
@@ -117,8 +111,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 512,
     };
 
-    public static readonly FormatHolder Float = new() {
-        Name = "Float",
+    public static readonly FormatHolder Float = new("Float") {
         Image = QuickImage.Get(ImageCode.Gleitkommazahl, 16),
         //https://regex101.com/r/onr0NZ/1
         Regex = @"(^-?([1-9]\d*)|^0)([.|,]\d*[1-9])?$",
@@ -132,8 +125,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 255,
     };
 
-    public static readonly FormatHolder FloatPositive = new() {
-        Name = "Float only Positive",
+    public static readonly FormatHolder FloatPositive = new("Float only Positive") {
         Image = QuickImage.Get(ImageCode.Gleitkommazahl, 16),
         //https://regex101.com/r/onr0NZ/1
         Regex = @"(^([1-9]\d*)|^0)([.|,]\d*[1-9])?$",
@@ -147,8 +139,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 255,
     };
 
-    public static readonly FormatHolder Integer = new() {
-        Name = "Integer",
+    public static readonly FormatHolder Integer = new("Integer") {
         Image = QuickImage.Get(ImageCode.Ganzzahl, 16),
         Regex = @"^((-?[1-9]\d*)|0)$",
         AllowedChars = Constants.Char_Numerals + "-",
@@ -158,11 +149,10 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Integer,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 255,
+        MaxTextLenght = long.MinValue.ToString().Length,
     };
 
-    public static readonly FormatHolder IntegerPositive = new() {
-        Name = "Integer only Positive",
+    public static readonly FormatHolder IntegerPositive = new("Integer only Positive") {
         Image = QuickImage.Get(ImageCode.Ganzzahl, 16),
         Regex = @"^(([1-9]\d*)|0)$",
         AllowedChars = Constants.Char_Numerals + "-",
@@ -172,11 +162,10 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Integer,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 255,
+        MaxTextLenght = long.MaxValue.ToString().Length,
     };
 
-    public static readonly FormatHolder PhoneNumber = new() {
-        Name = "PhoneNumber",
+    public static readonly FormatHolder PhoneNumber = new("PhoneNumber") {
         Image = QuickImage.Get(ImageCode.Telefon, 16),
         //https://regex101.com/r/OzJr8j/1
         Regex = @"^[+][1-9][\s0-9]*[0-9]$",
@@ -187,11 +176,10 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 255
+        MaxTextLenght = 15
     };
 
-    public static readonly FormatHolder SystemName = new() {
-        Name = "Systemname",
+    public static readonly FormatHolder SystemName = new("Systemname") {
         Image = QuickImage.Get(ImageCode.Variable, 16),
         AllowedChars = Constants.Char_AZ + Constants.Char_az + Constants.Char_Numerals + "_",
         Regex = @"^[A-Za-z]\S*$",
@@ -204,8 +192,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 128
     };
 
-    public static readonly FormatHolder Text = new() {
-        Name = "Text",
+    public static readonly FormatHolder Text = new("Text") {
         Image = QuickImage.Get(ImageCode.Textfeld, 16),
         AllowedChars = string.Empty,
         Regex = string.Empty,
@@ -218,8 +205,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 4000
     };
 
-    public static readonly FormatHolder TextMitFormatierung = new() {
-        Name = "Text with format",
+    public static readonly FormatHolder TextMitFormatierung = new("Text with format") {
         Image = QuickImage.Get(ImageCode.Word, 16),
         AllowedChars = string.Empty,
         Regex = string.Empty,
@@ -232,8 +218,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 4000,
     };
 
-    public static readonly FormatHolder Url = new() {
-        Name = "Url",
+    public static readonly FormatHolder Url = new("Url") {
         Image = QuickImage.Get(ImageCode.Globus, 16),
         //    https://regex101.com/r/S2CbwM/1
         Regex = @"^(https:|http:|www\.)\S*$",
@@ -244,14 +229,17 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 4000,
+        MaxTextLenght = 2048,
     };
 
     #endregion
 
     #region Constructors
 
-    public FormatHolder() => AllFormats.Add(this);
+    public FormatHolder(string name) {
+        Name = name;
+        AllFormats.Add(this);
+    }
 
     #endregion
 
@@ -263,7 +251,7 @@ public class FormatHolder : IInputFormat, IReadableText {
     public QuickImage? Image { get; set; }
     public int MaxTextLenght { get; set; }
     public bool MultiLine { get; set; }
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; private set; } = string.Empty;
     public string Prefix { get; set; } = string.Empty;
     public string Regex { get; set; } = string.Empty;
     public bool SpellCheckingEnabled { get; set; }

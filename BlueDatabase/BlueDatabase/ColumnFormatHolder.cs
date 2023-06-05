@@ -261,9 +261,8 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 
     #region Constructors
 
-    public ColumnFormatHolder(IInputFormat vorlage) {
+    public ColumnFormatHolder(FormatHolder vorlage) : base(vorlage.Name) {
         AllFormats.Add(this);
-
         this.GetStyleFrom(vorlage);
     }
 
