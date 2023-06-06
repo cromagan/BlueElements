@@ -246,7 +246,8 @@ public partial class ZoomPad : GenericControl {
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
-        ZoomFit();
+        if(Fitting) { ZoomFit(); }
+
         base.OnSizeChanged(e);
     }
 

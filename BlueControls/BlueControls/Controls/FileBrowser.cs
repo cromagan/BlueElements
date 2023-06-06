@@ -186,18 +186,21 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
         base.OnVisibleChanged(e);
     }
 
-    private bool AddThis(string path, bool isFile) {
-        if (isFile) {
-            if (path.FilePath() == "C:\\") { return false; }
+    private bool AddThis(FileInfo fi) {
+        if (fi.Attributes.HasFlag(FileAttributes.System)) { return false; }
+        //if (fi.Attributes.HasFlag(FileAttributes.Hidden)) { return false; }
+
+        if (fi.Exists) {
+            if (fi.DirectoryName.FilePath() == "C:\\") { return false; }
             return true;
         }
 
-        path = (path.Trim("\\") + "\\").ToLower();
+        var tmp = (fi.DirectoryName.Trim("\\") + "\\").ToLower();
 
-        if (path.EndsWith("\\$getcurrent\\")) { return false; }
-        if (path.EndsWith("\\$recycle.bin\\")) { return false; }
-        if (path.EndsWith("\\$recycle\\")) { return false; }
-        if (path.EndsWith("\\system volume information\\")) { return false; }
+        if (tmp.EndsWith("\\$getcurrent\\")) { return false; }
+        if (tmp.EndsWith("\\$recycle.bin\\")) { return false; }
+        if (tmp.EndsWith("\\$recycle\\")) { return false; }
+        if (tmp.EndsWith("\\system volume information\\")) { return false; }
 
         //if (Path.EndsWith("\\Dokumente und Einstellungen\\")) { return false; }
 
@@ -542,7 +545,9 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
         #region  Datei Objekte selbst flott erstellen
 
         foreach (var fileName in allF) {
-            if (AddThis(fileName, true)) {
+            var fi = new FileInfo(fileName);
+
+            if (AddThis(fi)) {
                 if (ThumbGenerator.CancellationPending || _lastcheck != newPath) { return; }
 
                 var p = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix()) {
@@ -551,11 +556,11 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
 
                 switch (_sort) {
                     case "Größe":
-                        p.UserDefCompareKey = new FileInfo(fileName).Length.ToString(Constants.Format_Integer10);
+                        p.UserDefCompareKey = fi.Length.ToString(Constants.Format_Integer10);
                         break;
 
                     case "Erstelldatum":
-                        p.UserDefCompareKey = new FileInfo(fileName).CreationTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
+                        p.UserDefCompareKey = fi.CreationTime.ToString("yyyy/MM/dd HH:mm:ss.fff");
                         break;
 
                     default:
@@ -578,7 +583,8 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
 
         var allD = Directory.GetDirectories(newPath, "*", SearchOption.TopDirectoryOnly);
         foreach (var thisString in allD) {
-            if (AddThis(thisString, false)) {
+            var fi = new FileInfo(thisString);
+            if (AddThis(fi)) {
                 var tags = new List<string>();
                 var p = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix());
                 tags.TagSet("Folder", bool.TrueString);
@@ -596,8 +602,8 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
 
         foreach (var thisString in allF) {
             if (ThumbGenerator.CancellationPending || _lastcheck != newPath) { return; }
-
-            if (AddThis(thisString, true)) {
+            var fi = new FileInfo(thisString);
+            if (AddThis(fi)) {
                 feedBack = new List<object?> { "Image", thisString, WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk) };
                 if (ThumbGenerator.CancellationPending || _lastcheck != newPath) { return; }
                 ThumbGenerator.ReportProgress(2, feedBack);
@@ -652,7 +658,11 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
     }
 
     private void Watcher_Changed(object sender, FileSystemEventArgs e) {
-        if (e.Name.Equals("Thumbs.db", StringComparison.OrdinalIgnoreCase)) { return; }
+        var fi = new FileInfo(e.Name);
+        if (!AddThis(fi)) { return; }
+
+        //if (e.Name.Equals("Thumbs.db", StringComparison.OrdinalIgnoreCase)) { return; }
+        //if(e.ChangeType == WatcherChangeTypes.Changed) { return; }
         txbPfad_Enter(null, System.EventArgs.Empty);
     }
 

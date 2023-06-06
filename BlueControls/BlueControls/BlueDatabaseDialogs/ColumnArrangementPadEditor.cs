@@ -278,6 +278,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         _arrangement = tmporder;
         ShowOrder();
+        Pad.ZoomFit();
     }
 
     private void Change(int no, ColumnViewCollection cv) {
@@ -548,7 +549,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         }
 
         SortColumns();
-        Pad.ZoomFit();
+        //Pad.ZoomFit();
         Generating = false;
     }
 

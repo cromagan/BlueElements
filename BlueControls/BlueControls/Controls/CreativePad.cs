@@ -545,7 +545,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     protected override void OnMouseUp(MouseEventArgs e) => DoMouseUp(e);
 
     private void _Item_ItemAdded(object sender, ListEventArgs e) {
-        if (_item == null || _item.Count == 1 || Fitting) { ZoomFit(); }
+        if (_item == null || _item.Count == 0 || Fitting) { ZoomFit(); }
         Invalidate();
 
         var it = (BasicPadItem)e.Item;
@@ -560,7 +560,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
         CheckHotItem(null, true);
         Unselect();
-        ZoomFit();
+        //ZoomFit();
         Invalidate();
         OnItemRemoved();
     }
