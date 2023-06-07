@@ -104,7 +104,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return (s, string.Empty);
     }
 
-    public static GetEndFeedback ReplaceComands(string txt, Script s, LogData ld) {
+    public static GetEndFeedback ReplaceComands(string txt, Script s, LogData? ld) {
         if (Script.Comands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert", ld); }
 
         List<string> c = new();
@@ -137,7 +137,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     /// <param name="s"></param>
     /// <param name="ld"></param>
     /// <returns></returns>
-    public static GetEndFeedback ReplaceVariable(string txt, Script s, LogData ld) {
+    public static GetEndFeedback ReplaceVariable(string txt, Script s, LogData? ld) {
         var posc = 0;
         var v = s.Variables.AllStringableNames();
 
@@ -194,7 +194,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return attributes;
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(Script s, string attributText, List<List<string>> types, bool endlessArgs, LogData ld) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(Script? s, string attributText, List<List<string>> types, bool endlessArgs, LogData? ld) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
                 ? new SplittedAttributesFeedback(new VariableCollection())

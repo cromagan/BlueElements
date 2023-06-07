@@ -123,9 +123,7 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
         var (column, row) = GetTmpVariables();
-        //var CellKey = e.Tags.TagGet("CellKey");
-        //if (string.IsNullOrEmpty(CellKey)) { return; }
-        //TableView.Database.Cell.DataOfCellKey(CellKey, out var Column, out var Row);
+
         switch (e.ClickedComand.ToLower()) {
             case "spalteneigenschaftenbearbeiten":
                 TableView.OpenColumnEditor(column, null);
@@ -144,7 +142,7 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         var (column, row) = GetTmpVariables();
         if (column?.Database != null && column.Database.IsAdministrator()) {
             _ = items.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);

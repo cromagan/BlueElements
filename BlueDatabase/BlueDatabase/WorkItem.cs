@@ -137,51 +137,27 @@ public class WorkItem : IParseable, IChangedFeedback {
                     _colName = pair.Value;
                     break;
 
-                case "ck":
-                    //_colKey = LongParse(pair.Value);
-                    break;
-
                 case "rk":
                     _rowKey = LongParse(pair.Value);
                     break;
 
                 case "undotype":
-                    //_UndoType = pair.Value;
                     break;
 
                 case "cell":
-                    //var cellKey = pair.Value.TrimStart("{ColumnKey=");
-                    //if (cellKey == "{Disposed}") { cellKey = "-1|-1"; }
-                    //cellKey = cellKey.Replace(", RowKey=", "|");
-                    //cellKey = cellKey.TrimEnd("}");
-                    //var x = cellKey.SplitAndCutBy("|");
-                    //if (x.GetUpperBound(0) == 1) {
-                    //    LongTryParse(x[0], out _colKey);
-                    //    LongTryParse(x[1], out _rowKey);
-                    //}
-                    break;
-
-                case "cellkey":
-                    //cellKey = pair.Value;
-                    //var x2 = cellKey.SplitAndCutBy("|");
-                    //LongTryParse(x2[0], out _colKey);
-                    //LongTryParse(x2[1], out _rowKey);
                     break;
 
                 case "date":
-
                 case "d":
                     Date = DateTimeParse(pair.Value);
                     break;
 
                 case "user":
-
                 case "u":
                     User = pair.Value.FromNonCritical();
                     break;
 
                 case "group":
-
                 case "g":
                     //  Group = pair.Value.FromNonCritical();
                     break;

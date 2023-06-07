@@ -36,7 +36,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Fields
 
-    private readonly ConcurrentDictionary<string, ColumnItem?> _internal = new();
+    private readonly ConcurrentDictionary<string, ColumnItem> _internal = new();
 
     private bool _throwEvents = true;
 

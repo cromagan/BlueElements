@@ -254,23 +254,29 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
         _ = Focus();
         var newWord = string.Empty;
-        _markStart = IntParse(e.Tags.TagGet("MarkStart"));
-        _markEnd = IntParse(e.Tags.TagGet("MarkEnd"));
-        _cursorCharPos = IntParse(e.Tags.TagGet("Cursorpos"));
+
+        if (e.HotItem is not List<string> tags) { return false; }
+
+        _markStart = IntParse(tags.TagGet("MarkStart"));
+        _markEnd = IntParse(tags.TagGet("MarkEnd"));
+        _cursorCharPos = IntParse(tags.TagGet("Cursorpos"));
+        var word = tags.TagGet("Word");
+
         var tmp = e.ClickedComand;
         if (e.ClickedComand.StartsWith("#ChangeTo:")) {
             newWord = e.ClickedComand.Substring(10);
             tmp = "#ChangeTo";
         }
+
         switch (tmp) {
             case "#SpellAdd":
-                Dictionary.WordAdd(e.Tags.TagGet("Word"));
+                Dictionary.WordAdd(word);
                 _mustCheck = true;
                 Invalidate();
                 return true;
 
             case "#SpellAddLower":
-                Dictionary.WordAdd(e.Tags.TagGet("Word".ToLower()));
+                Dictionary.WordAdd(word.ToLower());
                 _mustCheck = true;
                 Invalidate();
                 return true;
@@ -350,17 +356,19 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     //    base.Focus();
     //}
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         AbortSpellChecking();
-        hotItem = null;
-        tags.TagSet("CursorPosBeforeClick", _cursorCharPos.ToString());
+
         var tmp = Cursor_PosAt(e.X, e.Y);
-        tags.TagSet("Char", tmp.ToString());
+        var tmpWord = _eTxt.Word(tmp);
+
+        var tags = new List<string>();
         tags.TagSet("MarkStart", _markStart.ToString());
         tags.TagSet("MarkEnd", _markEnd.ToString());
         tags.TagSet("Cursorpos", _cursorCharPos.ToString());
-        var tmpWord = _eTxt.Word(tmp);
         tags.TagSet("Word", tmpWord);
+        hotItem = tags;
+
         if (_spellChecking && !Dictionary.IsWordOk(tmpWord)) {
             _ = items.Add("Rechtschreibprüfung", true);
             if (Dictionary.IsSpellChecking) {

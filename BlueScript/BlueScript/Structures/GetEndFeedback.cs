@@ -42,12 +42,12 @@ public readonly struct GetEndFeedback {
         Variable = variable;
     }
 
-    public GetEndFeedback(string erromessage, LogData ld) {
+    public GetEndFeedback(string erromessage, LogData? ld) {
         ContinuePosition = 0;
         AllOk = false;
         AttributeText = string.Empty;
         Variable = null;
-        ld.AddMessage(erromessage);
+        ld?.AddMessage(erromessage);
     }
 
     public GetEndFeedback(int continuePosition, string attributetext) {

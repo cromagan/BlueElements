@@ -514,13 +514,12 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected virtual void TableView_ContextMenu_Init(object sender, ContextMenuInitEventArgs e) {
-        if (sender is not Table tbl || tbl.Database == null || tbl.Database.IsDisposed) { return; }
-        var cellKey = e.Tags.TagGet("Cellkey");
-        if (string.IsNullOrEmpty(cellKey)) {
-            return;
-        }
-
-        tbl.Database.Cell.DataOfCellKey(cellKey, out var column, out var row);
+        if (sender is not Table tbl || tbl.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        RowItem? row = null;
+        ColumnItem? column = null;
+        if (e.HotItem is RowItem r) { row = r; }
+        if (e.HotItem is ColumnItem c) { column = c; }
+        if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out row); }
 
         var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReason.EditNormaly, true, false));
 
@@ -562,14 +561,12 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected virtual void TableView_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (sender is not Table tbl || tbl.Database == null || tbl.Database.IsDisposed) { return; }
-
-        var cellKey = e.Tags.TagGet("CellKey");
-        if (string.IsNullOrEmpty(cellKey)) {
-            return;
-        }
-
-        tbl.Database.Cell.DataOfCellKey(cellKey, out var column, out var row);
+        if (sender is not Table tbl || tbl.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        RowItem? row = null;
+        ColumnItem? column = null;
+        if (e.HotItem is RowItem r) { row = r; }
+        if (e.HotItem is ColumnItem c) { column = c; }
+        if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out row); }
 
         var valueCol0 = string.Empty;
         if (row != null && !row.IsDisposed) {

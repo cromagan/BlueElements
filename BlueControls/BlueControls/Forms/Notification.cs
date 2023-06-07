@@ -59,6 +59,7 @@ public partial class Notification : FloatingForm {
         Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
         Location = new Point(-Width - 10, Height - 10);
         _screenTime = Math.Max(3200, text.Length * 100);
+        _screenTime = Math.Min(20000, _screenTime);
 
         //Below müsste in Allboxes ja die letzte sein - außer sich selbst
         foreach (var thisParent in AllBoxes) {

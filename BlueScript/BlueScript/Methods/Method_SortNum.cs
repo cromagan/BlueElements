@@ -60,7 +60,11 @@ internal class Method_SortNum : Method {
 
         nums.Sort();
 
-        ((VariableListString)attvar.Attributes[0]).ValueList = nums.ConvertAll(i => i.ToString(Constants.Format_Float1));
+        if (attvar.Attributes[0] is not VariableListString vli) {
+            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
+        }
+
+        vli.ValueList = nums.ConvertAll(i => i.ToString(Constants.Format_Float1));
         return DoItFeedback.Null();
     }
 

@@ -120,7 +120,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         hotItem = null;
         if (Filter.Column?.Database == null || !Filter.Column.Database.IsAdministrator()) { return; }
 

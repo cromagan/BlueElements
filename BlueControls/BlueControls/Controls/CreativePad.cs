@@ -270,7 +270,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         }
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? selectedHotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? selectedHotItem, ref bool cancel, ref bool translate) {
         CheckHotItem(e, true);
         selectedHotItem = HotItem;
         if (selectedHotItem != null) {

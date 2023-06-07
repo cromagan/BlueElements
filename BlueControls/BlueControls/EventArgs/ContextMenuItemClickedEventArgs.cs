@@ -25,9 +25,8 @@ public class ContextMenuItemClickedEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public ContextMenuItemClickedEventArgs(string clickedComand, object hotItem, List<string>? tags) {
+    public ContextMenuItemClickedEventArgs(string clickedComand, object? hotItem) {
         HotItem = hotItem;
-        Tags = tags ?? new List<string>();
         ClickedComand = clickedComand;
     }
 
@@ -36,8 +35,7 @@ public class ContextMenuItemClickedEventArgs : System.EventArgs {
     #region Properties
 
     public string ClickedComand { get; }
-    public object HotItem { get; }
-    public List<string> Tags { get; }
+    public object? HotItem { get; }
 
     #endregion
 }

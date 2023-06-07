@@ -962,24 +962,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, List<string> tags, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         hotItem = null;
-        //DatabaseAbstract.ForceSaveAll();
-        //MultiUserFile.ForceLoadSaveAll();
+        if (e == null) { return; }
 
-        //Database?.Load_Reload();
-        if (e == null) {
-            cancel = true;
-            return;
-        }
         CellOnCoordinate(e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
-        tags.TagSet("CellKey", CellCollection.KeyOfCell(_mouseOverColumn, _mouseOverRow?.Row));
-        if (_mouseOverColumn != null) {
-            tags.TagSet("ColumnName", _mouseOverColumn.Name);
-        }
-        if (_mouseOverRow?.Row != null) {
-            tags.TagSet("RowKey", _mouseOverRow?.Row.Key.ToString());
-        }
+        hotItem = CellCollection.KeyOfCell(_mouseOverColumn, _mouseOverRow?.Row);
     }
 
     public void ImportClipboard() {

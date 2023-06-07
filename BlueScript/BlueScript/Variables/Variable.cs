@@ -124,7 +124,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return "dummy" + _dummyCount;
     }
 
-    public static DoItFeedback GetVariableByParsing(string txt, Script? s, LogData ld) {
+    public static DoItFeedback GetVariableByParsing(string txt, Script? s, LogData? ld) {
         if (string.IsNullOrEmpty(txt)) { return new DoItFeedback(ld, "Kein Wert zum Parsen angekommen."); }
 
         if (txt.StartsWith("(")) {
@@ -302,7 +302,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     protected abstract object? TryParse(string txt, Script? s);
 
-    protected bool TryParse(string txt, out Variable? succesVar, Script s) {
+    protected bool TryParse(string txt, out Variable? succesVar, Script? s) {
         var x = TryParse(txt, s);
         if (x == null) {
             succesVar = null;

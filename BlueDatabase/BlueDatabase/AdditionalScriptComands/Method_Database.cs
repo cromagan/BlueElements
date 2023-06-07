@@ -19,6 +19,7 @@
 
 using BlueScript;
 using BlueScript.Methods;
+using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
@@ -36,10 +37,14 @@ public abstract class Method_Database : Method {
 
     #region Methods
 
-    protected ColumnItem? Column(VariableCollection variables, string name) => MyDatabase(variables)?.Column.Exists(name);
+    protected ColumnItem? Column(VariableCollection variables, SplittedAttributesFeedback attvar, int no) {
+        var c = attvar.Attributes[no];
+        if (c == null) { return null; }
+
+        return MyDatabase(variables)?.Column.Exists(c.Name);
+    }
 
     protected DatabaseAbstract? DatabaseOf(VariableCollection variables, string tableName) {
-
         if (!SqlBackAbstract.IsValidTableName(tableName, false)) { return null; }
 
         if (variables != null) {

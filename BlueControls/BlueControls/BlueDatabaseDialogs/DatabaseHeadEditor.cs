@@ -303,27 +303,33 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
     }
 
     private void tblUndo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        var bt = (Table)sender;
-        var cellKey = e.Tags.TagGet("Cellkey");
-        if (string.IsNullOrEmpty(cellKey)) { return; }
-        bt.Database.Cell.DataOfCellKey(cellKey, out var column, out _);
+        if (sender is not Table tbl || tbl.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        RowItem? row = null;
+        ColumnItem? column = null;
+        if (e.HotItem is RowItem r) { row = r; }
+        if (e.HotItem is ColumnItem c) { column = c; }
+        if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out row); }
+
         _ = e.UserMenu.Add("Sortierung", true);
         _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
         _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
     }
 
     private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        var bt = (Table)sender;
-        var cellKey = e.Tags.TagGet("CellKey");
-        if (string.IsNullOrEmpty(cellKey)) { return; }
-        bt.Database.Cell.DataOfCellKey(cellKey, out var column, out _);
+        if (sender is not Table tbl || tbl.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        RowItem? row = null;
+        ColumnItem? column = null;
+        if (e.HotItem is RowItem r) { row = r; }
+        if (e.HotItem is ColumnItem c) { column = c; }
+        if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out row); }
+
         switch (e.ClickedComand) {
             case "SpaltenSortierungAZ":
-                bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, column.Name, false);
+                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.Name, false);
                 break;
 
             case "SpaltenSortierungZA":
-                bt.SortDefinitionTemporary = new RowSortDefinition(bt.Database, column.Name, true);
+                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.Name, true);
                 break;
         }
     }

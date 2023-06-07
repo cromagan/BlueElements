@@ -26,10 +26,9 @@ public class ContextMenuInitEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public ContextMenuInitEventArgs(object? hotItem, List<string> tags, ItemCollectionList userMenu) {
+    public ContextMenuInitEventArgs(object? hotItem, ItemCollectionList userMenu) {
         UserMenu = userMenu;
         HotItem = hotItem;
-        Tags = tags;
         Translate = true;
         Cancel = false;
     }
@@ -40,7 +39,6 @@ public class ContextMenuInitEventArgs : System.EventArgs {
 
     public bool Cancel { get; }
     public object? HotItem { get; }
-    public List<string> Tags { get; }
     public bool Translate { get; }
     public ItemCollectionList UserMenu { get; }
 

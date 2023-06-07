@@ -26,7 +26,7 @@ using BlueDatabase.Enums;
 namespace BlueDatabase;
 
 /// <summary>
-/// Diese Klasse enthält nur das Aussehen und gibt keinerlei Events ab. Deswegen INTERNAL!
+/// Diese Klasse enthält nur das Aussehen und gibt keinerlei Events ab.
 /// </summary>
 public class CellItem {
 

@@ -92,8 +92,8 @@ public class VariableListString : Variable {
         set {
             if (ReadOnly) { return; }
 
-            _list = new List<string>();
-            if (value != null) { _list.AddRange(value); }
+            _list = value;
+            //if (value != null) { _list.AddRange(value); }
         }
     }
 

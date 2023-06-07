@@ -43,14 +43,6 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     #endregion
 
-    //public event EventHandler<ListEventArgs>? ItemAdded;
-
-    /// <summary>
-    /// Wird nach jedem entfernen eines Items ausgelöst. Auch beim Initialisiern oder bei einem Clear.
-    /// Soll eine Benutzerinteraktion abgefragt werden, ist RemoveClicked besser.
-    /// </summary>
-    //public event EventHandler? ItemRemoved;
-
     #region Properties
 
     public AddType AddAllowed {
@@ -159,13 +151,4 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     private void Suggest_ItemClicked(object sender, BasicListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
 
     #endregion
-
-    //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) {
-    //    ContextMenuItemClicked?.Invoke(this, e);
-    //}
-    //public void OnContextMenuInit(ContextMenuInitEventArgs e) {
-    //    ContextMenuInit?.Invoke(this, e);
-    //}
-    //public void GetContextMenuItems(MouseEventArgs e, ItemCollectionList Items, out object HotItem, List<string> Tags, ref bool Cancel, ref bool Translate) { }
-    //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) { }
 }

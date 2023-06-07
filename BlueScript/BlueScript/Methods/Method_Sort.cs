@@ -60,7 +60,12 @@ internal class Method_Sort : Method {
         } else {
             x.Sort();
         }
-        ((VariableListString)attvar.Attributes[0]).ValueList = x;
+
+        if (attvar.Attributes[0] is not VariableListString vli) {
+            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
+        }
+
+        vli.ValueList = x;
         return DoItFeedback.Null();
     }
 

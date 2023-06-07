@@ -44,9 +44,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
 
-    private FloatingInputBoxListBoxStyle(ItemCollectionList items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
+    private FloatingInputBoxListBoxStyle(ItemCollectionList items, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
         InitializeComponent();
-        Tag = tag;
+        Tag = hotitem;
         // Design = Items.ControlDesign;
         xpos -= Skin.PaddingSmal;
         ypos -= Skin.PaddingSmal;
@@ -79,13 +79,12 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu, false);
         ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
 
-        List<string> tags = new();
         var cancel = false;
         var translate = true;
-        control.GetContextMenuItems(e, thisContextMenu, out var hotItem, tags, ref cancel, ref translate);
+        control.GetContextMenuItems(e, thisContextMenu, out var hotItem, ref cancel, ref translate);
         if (cancel) { return; }
 
-        ContextMenuInitEventArgs ec = new(hotItem, tags, userMenu);
+        ContextMenuInitEventArgs ec = new(hotItem, userMenu);
         control.OnContextMenuInit(ec);
         if (ec.Cancel) { return; }
         if (!ec.Translate) { translate = false; }
@@ -104,7 +103,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             {
                 userMenu,
                 hotItem,
-                tags,
                 control
             };
             var contextMenu = Show(thisContextMenu, infos, (Control)control, translate);
@@ -165,8 +163,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         var infos = (List<object>)e.HotItem;
         var userMmenu = (ItemCollectionList)infos[0];
         var hotItem = infos[1];
-        var tags = (List<string>)infos[2];
-        var ob = (IContextMenu)infos[3];
+        //var tags = (List<string>)infos[2];
+        var ob = (IContextMenu)infos[2];
         Close(BlueListBoxAppearance.KontextMenu);
         Close(ob);
         if (e.ClickedComand.ToLower() == "weiterebefehle") {
@@ -177,7 +175,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             return;
         }
         if (e.ClickedComand.ToLower() == "abbruch") { return; }
-        ContextMenuItemClickedEventArgs ex = new(e.ClickedComand, hotItem, tags);
+
+        ContextMenuItemClickedEventArgs ex = new(e.ClickedComand, hotItem);
         bool done;
         if (userMmenu[e.ClickedComand] == null) {
             done = ob.ContextMenuItemClickedInternalProcessig(sender, ex);
@@ -200,7 +199,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (!e.Item.IsClickable()) { return; }
 
         if (lstbx.Appearance is not BlueListBoxAppearance.Listbox and not BlueListBoxAppearance.Gallery and not BlueListBoxAppearance.FileSystem) {
-            OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.KeyName, Tag, null)); // Das Tag hier ist eigentlich das HotItem
+            OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.KeyName, Tag)); // Das Control.Tag hier ist eigentlich das HotItem
             if (!IsDisposed) { Close(); }
         }
     }
