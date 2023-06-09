@@ -470,7 +470,7 @@ public static class IO {
                     using (FileStream obFi = new(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                         obFi.Close();
                     }
-                    _canWriteLastResult = Convert.ToBoolean(DateTime.Now.Subtract(startTime).TotalSeconds < 1);
+                    _canWriteLastResult = DateTime.Now.Subtract(startTime).TotalSeconds < 1;
                 } catch {
                     // Bei Fehler ist die Datei in Benutzung
                     _canWriteLastResult = false;

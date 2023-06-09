@@ -40,7 +40,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 1,
+        MaxTextLenght = 1
     };
 
     public static readonly FormatHolder Date = new("Date") {
@@ -53,7 +53,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.DateTime,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 10,
+        MaxTextLenght = 10
     };
 
     public static readonly FormatHolder DateTime = new("DateTime") {
@@ -80,7 +80,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 320,
+        MaxTextLenght = 320
     };
 
     public static readonly FormatHolder Filepath = new("Filepath") {
@@ -94,7 +94,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Path,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 512,
+        MaxTextLenght = 512
     };
 
     public static readonly FormatHolder FilepathAndName = new("FilepathAndName") {
@@ -108,7 +108,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 512,
+        MaxTextLenght = 512
     };
 
     public static readonly FormatHolder Float = new("Float") {
@@ -122,7 +122,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Float,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 255,
+        MaxTextLenght = 255
     };
 
     public static readonly FormatHolder FloatPositive = new("Float only Positive") {
@@ -136,7 +136,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Float,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 255,
+        MaxTextLenght = 255
     };
 
     public static readonly FormatHolder Integer = new("Integer") {
@@ -149,7 +149,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Integer,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = long.MinValue.ToString().Length,
+        MaxTextLenght = long.MinValue.ToString().Length
     };
 
     public static readonly FormatHolder IntegerPositive = new("Integer only Positive") {
@@ -162,7 +162,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.Integer,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = long.MaxValue.ToString().Length,
+        MaxTextLenght = long.MaxValue.ToString().Length
     };
 
     public static readonly FormatHolder PhoneNumber = new("PhoneNumber") {
@@ -215,21 +215,21 @@ public class FormatHolder : IInputFormat, IReadableText {
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = true,
         MultiLine = true,
-        MaxTextLenght = 4000,
+        MaxTextLenght = 4000
     };
 
     public static readonly FormatHolder Url = new("Url") {
         Image = QuickImage.Get(ImageCode.Globus, 16),
         //    https://regex101.com/r/S2CbwM/1
         Regex = @"^(https:|http:|www\.)\S*$",
-        AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "äöüÄÖÜ:?=&.-_/",
+        AllowedChars = Constants.Char_Numerals + Constants.Char_AZ + Constants.Char_az + "äöüÄÖÜ:?=&.,-_/",
         Suffix = string.Empty,
         Prefix = string.Empty,
         FormatierungErlaubt = false,
         AdditionalFormatCheck = AdditionalCheck.None,
         SpellCheckingEnabled = false,
         MultiLine = false,
-        MaxTextLenght = 2048,
+        MaxTextLenght = 2048
     };
 
     #endregion

@@ -585,6 +585,12 @@ public static partial class Extensions {
         }
     }
 
+
+    /// <summary>
+    /// Ersetzt < durch <<>
+    /// </summary>
+    /// <param name="tXt"></param>
+    /// <returns></returns>
     public static string ReplaceLowerSign(this string tXt) => tXt.Replace("<", "<<>");
 
     public static string ReplaceWord(this string input, string alt, string replacement, RegexOptions options) {

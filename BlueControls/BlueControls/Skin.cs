@@ -1314,7 +1314,7 @@ public static class Skin {
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
     public static void LoadSkin() {
         //_SkinString = "Windows10";
-        //SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", true, Convert.ToBoolean(Develop.AppName() == "SkinDesigner"));
+        //SkinDB = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), _SkinString + ".skn", "Skin", true, Develop.AppName() == "SkinDesigner");
         //="Design.GenerateAndAdd(enDesign."& A3 & ",enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
         Design.Add(Enums.Design.Button, States.Standard, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "EAEAEA", string.Empty, string.Empty, RahmenArt.Solide_1px, "B6B6B6", string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);
         Design.Add(Enums.Design.Button, States.Standard_HasFocus_MousePressed, Enums.Kontur.Rechteck, 0, 0, 0, 0, HintergrundArt.Solide, 0, "EAEAEA", string.Empty, string.Empty, RahmenArt.Solide_1px, "3399FF", string.Empty, string.Empty, "{Name=Calibri, Size=10[K]15}", string.Empty);

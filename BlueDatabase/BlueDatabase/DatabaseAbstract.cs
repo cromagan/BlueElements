@@ -1134,7 +1134,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         da.Save(filename, execute);
     }
 
-    public void Export_HTML(string filename, ColumnViewCollection? arrangement, List<RowData> sortedRows, bool execute) => Export_HTML(filename, arrangement?.ListOfUsedColumn(), sortedRows, execute);
+    public void Export_HTML(string filename, ColumnViewCollection? arrangement, List<RowData>? sortedRows, bool execute) => Export_HTML(filename, arrangement?.ListOfUsedColumn(), sortedRows, execute);
 
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }

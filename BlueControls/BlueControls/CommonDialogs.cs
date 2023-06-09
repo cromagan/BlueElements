@@ -11,7 +11,7 @@ internal static class CommonDialogs {
 
     #region Methods
 
-    public static DatabaseAbstract? ChooseKnownDatabase() {
+    public static DatabaseAbstract? ChooseKnownDatabase(string caption) {
         var l = DatabaseAbstract.AllAvailableTables();
 
         var l2 = new ItemCollectionList(true);
@@ -20,7 +20,7 @@ internal static class CommonDialogs {
             _ = l2.Add(thisd);
         }
 
-        var x = InputBoxListBoxStyle.Show("Datenbank wählen:", l2, AddType.None, true);
+        var x = InputBoxListBoxStyle.Show(caption, l2, AddType.None, true);
 
         if (x == null || x.Count != 1) { return null; }
 

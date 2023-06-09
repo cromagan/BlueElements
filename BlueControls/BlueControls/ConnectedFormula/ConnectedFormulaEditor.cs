@@ -22,7 +22,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
@@ -248,11 +247,13 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void ChooseDatabaseAndId(IItemSendRow? it) {
         if (CFormula == null || it == null) { return; }
 
-        var db = CommonDialogs.ChooseKnownDatabase();
+        it.Datenbank_wählen();
 
-        if (db == null) { return; }
+        //var db = CommonDialogs.ChooseKnownDatabase();
 
-        it.OutputDatabase = db;
+        //if (db == null) { return; }
+
+        //it.OutputDatabase = db;
         //it.Id = CFormula.NextId();
     }
 

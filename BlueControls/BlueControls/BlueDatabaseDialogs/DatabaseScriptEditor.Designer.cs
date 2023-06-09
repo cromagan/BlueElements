@@ -399,7 +399,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.chkChangeValuesInTest.QuickInfo = "<i>Tests im Skript Editor ‰ndern keine Werte,\r\nauﬂer dieses H‰kchen ist gesetzt.";
             this.chkChangeValuesInTest.Size = new System.Drawing.Size(376, 24);
             this.chkChangeValuesInTest.TabIndex = 15;
-            this.chkChangeValuesInTest.Text = "<Imagecode=Warnung|16>Skript darf auch im Test Werte der Datenbank ver‰ndern";
+            this.chkChangeValuesInTest.Text = "<Imagecode=Warnung|16> Das Skript darf auch im Test Werte der Datenbank ver‰ndern";
             // 
             // DatabaseScriptEditor
             // 

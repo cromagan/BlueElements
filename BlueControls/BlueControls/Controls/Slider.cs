@@ -185,14 +185,14 @@ public partial class Slider : IBackgroundNone {
             _slider.Height = 0;
             _sliderContainsMouse = false;
         }
-        if (Convert.ToBoolean(state & States.Standard_MouseOver)) {
+        if (state.HasFlag(States.Standard_MouseOver)) {
             if (_sliderContainsMouse) {
                 vStateBack ^= States.Standard_MouseOver;
             } else {
                 vStateSlider ^= States.Standard_MouseOver;
             }
         }
-        if (Convert.ToBoolean(state & States.Standard_MousePressed)) {
+        if (state.HasFlag(States.Standard_MousePressed)) {
             if (_sliderContainsMouse) {
                 vStateBack ^= States.Standard_MousePressed;
             } else {

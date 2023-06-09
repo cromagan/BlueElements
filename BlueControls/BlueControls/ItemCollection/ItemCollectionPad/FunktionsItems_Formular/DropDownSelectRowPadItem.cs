@@ -94,7 +94,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit,\r\naus dem daraus resultierenden Zeilen EINE per Dropdownmenu zu wählen.";
+    public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen EINE per Dropdownmenu zu wählen.";
 
     public ReadOnlyCollection<string> GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();
@@ -137,7 +137,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlRowSelector(OutputDatabase, _überschrift, _anzeige) {
             EditType = _bearbeitung,
-            CaptionPosition = CaptionPosition,
+            CaptionPosition = CaptionPosition
         };
 
         con.DoOutputSettings(parent, this);
@@ -148,7 +148,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public override string ErrorReason() {
         if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Quelle fehlt";
+            return "Eingehende Filter fehlen";
         }
         if (OutputDatabase == null || OutputDatabase.IsDisposed) {
             return "Ziel fehlt";
@@ -162,7 +162,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         l.Add(new FlexiControl());
         l.AddRange(_itemSends.GetStyleOptions(this));
         l.Add(new FlexiControl());
-        l.Add(new FlexiControl("Einstellungen:"));
+        l.Add(new FlexiControl("Einstellungen:", -1));
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Anzeige));
 

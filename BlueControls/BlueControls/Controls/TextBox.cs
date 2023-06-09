@@ -392,17 +392,17 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             }
         }
         if (this is not ComboBox cbx || cbx.DropDownStyle == ComboBoxStyle.DropDown) {
-            _ = items.Add(ContextMenuComands.Ausschneiden, Convert.ToBoolean(_markStart >= 0) && Enabled);
-            _ = items.Add(ContextMenuComands.Kopieren, Convert.ToBoolean(_markStart >= 0));
+            _ = items.Add(ContextMenuComands.Ausschneiden, (_markStart >= 0) && Enabled);
+            _ = items.Add(ContextMenuComands.Kopieren, _markStart >= 0);
             _ = items.Add(ContextMenuComands.Einfügen, Clipboard.ContainsText() && Enabled);
             if (_formatierungErlaubt) {
                 _ = items.AddSeparator();
                 _ = items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1);
-                if (Convert.ToBoolean(_markEnd > -1)) {
+                if (_markEnd > -1) {
                     _ = items.AddSeparator();
                     _ = items.Add("Als Überschrift markieren", "#Caption", Skin.GetBlueFont(Design.TextBox_Stufe3, States.Standard).SymbolForReadableText(), _markEnd > -1);
-                    _ = items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
-                    _ = items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), Convert.ToBoolean(_markEnd > -1));
+                    _ = items.Add("Fettschrift", "#Bold", Skin.GetBlueFont(Design.TextBox_Bold, States.Standard).SymbolForReadableText(), _markEnd > -1);
+                    _ = items.Add("Als normalen Text markieren", "#NoCaption", Skin.GetBlueFont(Design.TextBox, States.Standard).SymbolForReadableText(), _markEnd > -1);
                 }
             }
         }

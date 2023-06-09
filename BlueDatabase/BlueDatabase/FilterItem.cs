@@ -217,8 +217,10 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
         if (_column == null && !_filterType.HasFlag(FilterType.Instr)) { return "Fehlerhafter Zeilenfilter"; }
 
+        if (SearchValue.Count == 0) { return "Kein Suchtext vorhanden"; }
+
         if (_filterType.HasFlag(FilterType.Instr)) {
-            if (SearchValue.Count == 0) { return "Instr-Filter ohne Suchtext"; }
+
             foreach (var thisV in SearchValue) {
                 if (string.IsNullOrEmpty(thisV)) { return "Instr-Filter ohne Suchtext"; }
             }

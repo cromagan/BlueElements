@@ -18,7 +18,6 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -75,18 +74,18 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     #region Properties
 
     public new int Height {
-        get => Convert.ToBoolean(_textAnzeigeverhalten & SteuerelementVerhalten.Steuerelement_Anpassen)
+        get => _textAnzeigeverhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen)
             ? TextRequiredSize().Height
             : base.Height;
         set {
             GetDesign();
-            if (Convert.ToBoolean(_textAnzeigeverhalten & SteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
+            if (_textAnzeigeverhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
             base.Height = value;
         }
     }
 
     public new Size Size {
-        get => Convert.ToBoolean(_textAnzeigeverhalten & SteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
+        get => _textAnzeigeverhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
         set {
             GetDesign();
             if (value.Width == base.Size.Width && value.Height == base.Size.Height) { return; }
@@ -139,12 +138,12 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     public bool Translate { get; set; } = true;
 
     public new int Width {
-        get => Convert.ToBoolean(_textAnzeigeverhalten & SteuerelementVerhalten.Steuerelement_Anpassen)
+        get => _textAnzeigeverhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen)
             ? TextRequiredSize().Width
             : base.Width;
         set {
             GetDesign();
-            if (Convert.ToBoolean(_textAnzeigeverhalten & SteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
+            if (_textAnzeigeverhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen)) { return; }
             base.Width = value;
         }
     }
@@ -175,7 +174,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             return new Size((int)(s.Width + 1), (int)(s.Height + 1));
         }
         if (_eText == null) {
-            if (DesignMode) { Refresh(); }// Damit das skin Geinittet wird
+            if (DesignMode) { Refresh(); }// Damit das Skin initialisiert wird
             DrawControl(null, States.Standard);
         }
         return _eText?.LastSize() ?? new Size(1, 1);
@@ -187,6 +186,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                 GetDesign();
                 if (_design == Design.Undefiniert) { return; }
             }
+
             if (state is not States.Standard and not States.Standard_Disabled) {
                 Develop.DebugPrint(state);
                 return;
@@ -202,7 +202,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
                 _eText ??= new ExtText(_design, state) {
                     HtmlText = LanguageTool.DoTranslate(_text, Translate),
-                    State = state,
                     Multiline = true
                 };
 

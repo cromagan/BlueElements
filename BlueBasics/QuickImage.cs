@@ -299,7 +299,7 @@ public sealed class QuickImage : IReadableText, IStringable {
         return Get(GenerateCode(Name, (int)(Width * zoom), (int)(Height * zoom), Effekt, Färbung, ChangeGreenTo, Sättigung, Helligkeit, DrehWinkel, Transparenz, Zweitsymbol));
     }
 
-    public QuickImage? SymbolForReadableText() => this;
+    public QuickImage SymbolForReadableText() => this;
 
     /// <summary>
     /// Gibt den ImageCode zurück

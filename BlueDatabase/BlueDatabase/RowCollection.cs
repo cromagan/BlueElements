@@ -117,7 +117,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <summary>
     /// Durchsucht die erste (interne) Spalte der Datenbank nach dem hier angegebenen Prmärschlüssel.
     /// </summary>
-    /// <param name="primärSchlüssel">Der Primärschlüssel, nach dem gesucht werden soll. Groß/Kleinschreibung wird ignoriert.</param>
     /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
     public RowItem? this[params FilterItem[] filter] {
         get {
@@ -199,6 +198,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Gibt die mit dieser Kombination sichtbaren Zeilen zurück. Ohne Sortierung. Jede Zeile kann maximal einmal vorkommen.
     /// </summary>
     /// <param name="filter"></param>
+    /// <param name="rowSortDefinition"></param>
+    /// <param name="pinnedRows"></param>
+    /// <param name="reUseMe"></param>
     /// <returns></returns>
     public List<RowData> CalculateSortedRows(ICollection<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
 

@@ -111,7 +111,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public override string ErrorReason() {
         if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Quelle fehlt";
+            return "Eingehende Filter fehlen";
         }
         if (OutputDatabase == null || OutputDatabase.IsDisposed) {
             return "Ziel fehlt";
@@ -153,7 +153,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Datenbank, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }

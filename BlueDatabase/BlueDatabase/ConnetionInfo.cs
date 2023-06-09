@@ -184,7 +184,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
 
     public string ReadableText() => TableName;
 
-    public QuickImage? SymbolForReadableText() {
+    public QuickImage SymbolForReadableText() {
         if (AdditionalData.ToLower().Contains(".bdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
         if (AdditionalData.ToLower().Contains(".mdb")) { return QuickImage.Get(ImageCode.Diskette, 16); }
         return QuickImage.Get(ImageCode.Datenbank, 16);

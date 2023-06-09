@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -142,7 +141,7 @@ internal sealed partial class SearchAndReplace : Form {
                 if (SucheNach.Checked) {
                     trifft = originalText.Contains(suchText);
                 } else if (SucheExact.Checked) {
-                    trifft = Convert.ToBoolean(originalText == suchText);
+                    trifft = originalText == suchText;
                 } else if (InhaltEgal.Checked) {
                     trifft = true;
                 }

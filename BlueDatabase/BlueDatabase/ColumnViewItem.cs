@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -156,7 +155,7 @@ public sealed class ColumnViewItem {
         //    return !thisViewItem.Column.IsFirst();
         //}
         var nx = NextVisible();
-        return nx == null || Convert.ToBoolean(nx.ViewType != ViewType.PermanentColumn);
+        return nx == null || nx.ViewType != ViewType.PermanentColumn;
     }
 
     internal bool PermanentPossible() {
@@ -164,7 +163,7 @@ public sealed class ColumnViewItem {
         //    return thisViewItem.Column.IsFirst();
         //}
         var prev = PreviewsVisible();
-        return prev == null || Convert.ToBoolean(prev.ViewType == ViewType.PermanentColumn);
+        return prev == null || prev.ViewType == ViewType.PermanentColumn;
     }
 
     #endregion

@@ -18,7 +18,6 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
 using System.Windows.Forms;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection.ItemCollectionList;

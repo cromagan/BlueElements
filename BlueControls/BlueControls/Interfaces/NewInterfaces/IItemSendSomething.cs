@@ -62,7 +62,7 @@ public static class ItemSendSomethingExtension {
     #region Methods
 
     public static void Datenbank_wählen(this IItemSendSomething item) {
-        var db = CommonDialogs.ChooseKnownDatabase();
+        var db = CommonDialogs.ChooseKnownDatabase("Ausgangs-Datenbank wählen:");
         if (db == null) { return; }
         item.OutputDatabase = db;
     }
@@ -205,7 +205,7 @@ public class ItemSendSomething {
 
     protected List<GenericControl> GetStyleOptions(IItemSendSomething item) {
         var l = new List<GenericControl>();
-        l.Add(new FlexiControl("Ausgang:"));
+        l.Add(new FlexiControl("Ausgang:", -1));
 
         l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
 

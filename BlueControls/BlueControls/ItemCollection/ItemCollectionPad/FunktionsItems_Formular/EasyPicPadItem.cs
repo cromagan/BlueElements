@@ -88,7 +88,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new EasyPic {
-            OriginalText = Bild_Dateiname,
+            OriginalText = Bild_Dateiname
         };
 
         con.DoInputSettings(parent, this);

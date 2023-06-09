@@ -974,7 +974,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 //if (!FilterValue.ToUpper().Contains("VALUE")) { return false; }
                 //var d = modErgebnis.Ergebnis(FilterValue.Replace("VALUE", IstValue.Replace(",", "."), RegexOptions.IgnoreCase));
                 //if (d == null) { return false; }
-                //return Convert.ToBoolean(d == -1);
+                //return d == -1;
                 return true;
 
             case FilterType.KeinFilter:

@@ -17,8 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-
 namespace BlueControls.EventArgs;
 
 public class ContextMenuItemClickedEventArgs : System.EventArgs {

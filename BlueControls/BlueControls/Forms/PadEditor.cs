@@ -20,6 +20,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
+using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.ItemCollection;
@@ -159,10 +161,20 @@ public partial class PadEditor : PadEditorReadOnly {
 
         #endregion
 
-        if (Pad.LastClickedItem == null) { return; }
+        if (Pad.LastClickedItem is not BasicPadItem bpi) { return; }
 
-        var flexis = Pad.LastClickedItem?.GetStyleOptions();
-        if (flexis == null || flexis.Count == 0) { return; }
+        var flexis = bpi.GetStyleOptions();
+        if (flexis.Count == 0) { return; }
+
+        var stdWidth = tabElementEigenschaften.Width - (Skin.Padding * 4);
+
+        //Rückwärts inserten
+
+        flexis.Insert(0, new FlexiControl()); // Trennlinie
+        if (bpi is IErrorCheckable iec && !iec.IsOk()) {
+            flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), stdWidth)); // Fehlergrund
+        }
+        flexis.Insert(0, new FlexiControl(bpi.Description, stdWidth)); // Beschreibung
 
         #region  SideMenu erstellen
 
@@ -174,7 +186,7 @@ public partial class PadEditor : PadEditorReadOnly {
                 thisFlexi.Top = top;
                 thisFlexi.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
                 top = top + Skin.Padding + thisFlexi.Height;
-                thisFlexi.Width = tabElementEigenschaften.Width - (Skin.Padding * 4);
+                thisFlexi.Width = stdWidth;
             }
         }
 

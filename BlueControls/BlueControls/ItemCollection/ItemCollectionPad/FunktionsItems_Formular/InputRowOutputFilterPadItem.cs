@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
@@ -43,7 +44,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
 
     private readonly ItemAcceptRow _itemAccepts;
     private readonly ItemSendFilter _itemSends;
-    private string _eigangsWertSpalte = string.Empty;
+    private string _eingangsWertSpalte = string.Empty;
     private string _filterSpalte = string.Empty;
     private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_GrossKleinEgal;
 
@@ -75,19 +76,23 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public override string Description => "Dieses Element kann eine Zeile empfangen und einen Filter\r\nfür eine andere Datenbank erstellen und diesen abgeben.\r\nUnsichtbares Element, wird nicht angezeigt";
+    public override string Description => "Dieses Element kann eine Zeile empfangen und einen Filter für eine andere Datenbank erstellen und diesen abgeben.\r\nUnsichtbares Element, wird nicht angezeigt";
 
-    public string EigangsWertSpalte {
-        get => _eigangsWertSpalte;
+    [Description("Der Wert aus dieser Spalte wird zur Filterung verwendet.")]
+    [DefaultValue("")]
+    public string Eingangs_Wert_Spalte {
+        get => _eingangsWertSpalte;
         set {
-            if (value == _eigangsWertSpalte) { return; }
-            _eigangsWertSpalte = value;
+            if (value == _eingangsWertSpalte) { return; }
+            _eingangsWertSpalte = value;
             this.RaiseVersion();
             this.DoChilds();
             OnChanged();
         }
     }
 
+    [Description("Dieser Filter-Typ wird angewendet.")]
+    [DefaultValue(FilterTypeRowInputItem.Ist_GrossKleinEgal)]
     public FilterTypeRowInputItem Filter {
         get => _filtertype;
         set {
@@ -99,7 +104,9 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         }
     }
 
-    public string FilterSpalte {
+    [Description("Auf diese Spalte wird der Filter angewendet.")]
+    [DefaultValue("")]
+    public string Filter_Spalte {
         get => _filterSpalte;
         set {
             if (value == _filterSpalte) { return; }
@@ -140,7 +147,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var i = _itemAccepts.InputDatabase(this)?.Column.Exists(_eigangsWertSpalte);
+        var i = _itemAccepts.InputDatabase(this)?.Column.Exists(_eingangsWertSpalte);
         var o = OutputDatabase?.Column.Exists(_filterSpalte);
         var con = new InputRowOutputFilterControl(i, o, _filtertype);
         con.DoOutputSettings(parent, this);
@@ -151,11 +158,23 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
 
     public override string ErrorReason() {
         if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Quelle fehlt";
+            return "Eingehende Zeile fehlt";
         }
+
+
+        if (InputDatabase.Column.Exists(_eingangsWertSpalte)== null) {
+            return "Die Spalte, aus der der Filterwert kommen soll, fehlt.";
+        }
+
         if (OutputDatabase == null || OutputDatabase.IsDisposed) {
             return "Ziel fehlt";
         }
+
+        if (OutputDatabase.Column.Exists(_filterSpalte) == null) {
+            return "Die Spalte, in der gefiltert werden soll, fehlt.";
+        }
+
+
         return string.Empty;
     }
 
@@ -168,7 +187,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         if (inr?.OutputDatabase is DatabaseAbstract dbin) {
             var ic = new ItemCollectionList.ItemCollectionList(true);
             ic.AddRange(dbin.Column, true);
-            l.Add(new FlexiControlForProperty<string>(() => EigangsWertSpalte, ic));
+            l.Add(new FlexiControlForProperty<string>(() => Eingangs_Wert_Spalte, ic));
 
             var ic2 = new ItemCollectionList.ItemCollectionList(true);
             ic2.AddRange(typeof(FilterTypeRowInputItem));
@@ -178,11 +197,10 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         l.Add(new FlexiControl());
         l.AddRange(_itemSends.GetStyleOptions(this));
 
-        var outdb = _itemSends.OutputDatabaseGet();
-        if (outdb is DatabaseAbstract) {
+        if (_itemSends.OutputDatabaseGet() is DatabaseAbstract outdb) {
             var ic = new ItemCollectionList.ItemCollectionList(true);
             ic.AddRange(outdb.Column, true);
-            l.Add(new FlexiControlForProperty<string>(() => _filterSpalte, ic));
+            l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
         }
 
         l.Add(new FlexiControl());
@@ -201,7 +219,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
                 return true;
 
             case "inputcolumn":
-                _eigangsWertSpalte = value;
+                _eingangsWertSpalte = value;
                 return true;
 
             case "outputcolumn":
@@ -231,7 +249,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
         }
@@ -244,7 +262,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         result.AddRange(_itemAccepts.ParsableTags());
         result.AddRange(_itemSends.ParsableTags());
 
-        result.ParseableAdd("InputColumn", _eigangsWertSpalte);
+        result.ParseableAdd("InputColumn", _eingangsWertSpalte);
         result.ParseableAdd("OutputColumn", _filterSpalte);
         result.ParseableAdd("Filter", _filtertype);
 

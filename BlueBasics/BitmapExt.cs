@@ -369,7 +369,7 @@ public class BitmapExt : IDisposableExtended {
         return pa;
     }
 
-    public static Bitmap? GetBitmap(BitmapSource bitmapsource, int maxSize) {
+    public static Bitmap GetBitmap(BitmapSource bitmapsource, int maxSize) {
         Generic.CollectGarbage();
         Generic.Pause(0.1, true);
         Bitmap? bitmap;

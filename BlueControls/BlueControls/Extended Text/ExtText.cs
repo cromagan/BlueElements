@@ -357,7 +357,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
 
     public Size LastSize() {
         while (_width == null) { ReBreak(); }
-        return _width < 5 || _height < 5 || _height == null ? new Size(32, 16) : new Size((int)_width, (int)_height);
+        return _height == null || _width < 5 || _height < 5 ? new Size(32, 16) : new Size((int)_width+1, (int)_height+1);
     }
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
@@ -381,6 +381,16 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         var s = WordStart(atPosition);
         var e = WordEnd(atPosition);
         return Substring(s, e - s);
+    }
+
+    internal static Size MeasureString(string text, Design design, States state, int width) {
+        var x = new ExtText(design, state) {
+            HtmlText = text,
+            Multiline = true,
+            TextDimensions = new Size(width, -1)
+        };
+
+        return x.LastSize();
     }
 
     internal string ConvertCharToPlainText(int first, int last) {
@@ -468,7 +478,6 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         Clear();
         ResetPosition(true);
         var bf = (int)_design > 10000 ? Skin.GetBlueFont((PadStyles)_design, _row) : Skin.GetBlueFont(_design, _state);
-        if (bf == null) { return; }// Wenn die DAtenbanken entladen wurde, bei Programmende
 
         if (!string.IsNullOrEmpty(cactext)) {
             cactext = isRich ? cactext.ConvertFromHtmlToRich() : cactext.Replace("\r\n", "\r");
@@ -590,17 +599,16 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
                 font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain.ToHtmlCode(), attribut, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
-            case "BR":
-                position++;
-                Add(new ExtCharCrlfCode(_design, _state, font, stufe));
-                break;
-            //
             case "HR":
             //    Position++;
             //    this.GenerateAndAdd(new ExtChar(13, _Design, _State, PF, Stufe, MarkState));
             //    Position++;
             //    this.GenerateAndAdd(new ExtChar((int)enEtxtCodes.HorizontalLine, _Design, _State, PF, Stufe, MarkState));
             //    break;
+            case "BR":
+                position++;
+                Add(new ExtCharCrlfCode(_design, _state, font, stufe));
+                break;
 
             case "TAB":
                 position++;
@@ -760,9 +768,8 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
             var tempVar = this[pos];
             var marked = tempVar.Marking.HasFlag(state);
 
-            if (marked && tmas < 0) {
-                tmas = pos;
-            }
+            if (marked && tmas < 0) { tmas = pos; }
+
             if (!marked || pos == Count - 1) {
                 if (tmas > -1) {
                     if (pos == Count - 1) {
@@ -788,6 +795,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         var startY = (this[markStart].Pos.Y * czoom) + _drawingPos.Y;
         var endX = (this[markEnd].Pos.X * czoom) + _drawingPos.X + (this[markEnd].Size.Width * czoom);
         var endy = (this[markEnd].Pos.Y * czoom) + _drawingPos.Y + (this[markEnd].Size.Height * czoom);
+
         switch (thisState) {
             case MarkState.None:
                 break;
@@ -872,7 +880,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     //}
 
     /// <summary>
-    /// Berechnet die Zeichen-Positionen mit korrekten Umbrüchen. Die enAlignment wird ebefalls mit eingerechnet.
+    /// Berechnet die Zeichen-Positionen mit korrekten Umbrüchen. Die enAlignment wird ebenfalls mit eingerechnet.
     /// Cursor_ComputePixelXPos wird am Ende aufgerufen, einschließlich Cursor_Repair und SetNewAkt.
     /// </summary>
     /// <remarks></remarks>
@@ -961,6 +969,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     private void ResetPosition(bool andTmpText) {
         _width = null;
         _height = null;
+
         if (andTmpText) {
             _tmpHtmlText = null;
             _tmpPlainText = null;

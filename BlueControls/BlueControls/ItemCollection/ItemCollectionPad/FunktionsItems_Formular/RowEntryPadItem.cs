@@ -65,14 +65,8 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public override string Description => " Diese Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element.\r\nHat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.\r\n Unsichtbares Element, wird nicht angezeigt.";
 
-    /// <summary>
-    /// Dummy
-    /// </summary>
-    public List<int> InputColorId {
-        get => new() { OutputColorId };
 
-        set { }
-    }
+    public List<int> InputColorId => new() { OutputColorId };
 
     public DatabaseAbstract? InputDatabase => OutputDatabase;
 
@@ -146,7 +140,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Skin.IdColor(OutputColorId));
         }

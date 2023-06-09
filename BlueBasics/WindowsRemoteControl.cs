@@ -138,10 +138,12 @@ public static class WindowsRemoteControl {
 
     public static void KeyUp(KeyCode k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
 
-    public static string LastMouseButton() => Convert.ToBoolean(GetAsyncKeyState(0x1)) ? "Links"
-        : Convert.ToBoolean(GetAsyncKeyState(0x2)) ? "Rechts"
-        : Convert.ToBoolean(GetAsyncKeyState(0x4)) ? "Mitte"
-        : string.Empty;
+    public static string LastMouseButton() {
+        if (Convert.ToBoolean(GetAsyncKeyState(0x1))) { return "Links"; }
+        if (Convert.ToBoolean(GetAsyncKeyState(0x2))) { return "Rechts"; }
+        if (Convert.ToBoolean(GetAsyncKeyState(0x4))) { return "Mitte"; }
+        return string.Empty;
+    }
 
     public static void LeftAltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
 

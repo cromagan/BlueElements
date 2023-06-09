@@ -33,7 +33,6 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using BlueScript.Variables;
 using static BlueBasics.Converter;
 using Orientation = BlueBasics.Enums.Orientation;
 
@@ -96,12 +95,15 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Einfacher Info Text. Wird nirgends mehr zurück gegeben.
     /// </summary>
     /// <param name="captionText"></param>
-    public FlexiControl(string captionText) : base(false, false) {
+    public FlexiControl(string captionText, int width) : base(false, false) {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         _editType = EditTypeFormula.nur_als_Text_anzeigen;
         _caption = captionText;
         _captionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
-        var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(Design.Caption, States.Standard).Font());
+
+        var s = Extended_Text.ExtText.MeasureString(_caption, Design.Caption, States.Standard, width);
+
+        //var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(Design.Caption, States.Standard).Font());
         Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
     }
 
@@ -346,23 +348,23 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public void DeleteValue() => ValueSet(string.Empty, true, true);
 
-    public bool ParseVariables(VariableCollection list) {
-        var ct = string.Empty;
+    //public bool ParseVariables(VariableCollection list) {
+    //    var ct = string.Empty;
 
-        if (list != null) {
-            ct = list.ReplaceInText(OriginalText);
-        }
+    //    if (list != null) {
+    //        ct = list.ReplaceInText(OriginalText);
+    //    }
 
-        ValueSet(ct, true, true);
-        return ct == OriginalText;
-    }
+    //    ValueSet(ct, true, true);
+    //    return ct == OriginalText;
+    //}
 
-    public void StyleComboBox(ItemCollectionList? list, ComboBoxStyle style, bool removevalueIfNotExists) {
-        if (!Allinitialized) { _ = CreateSubControls(); }
-        foreach (var thiscb in Controls) {
-            if (thiscb is ComboBox cb) { StyleComboBox(cb, list, style, removevalueIfNotExists); }
-        }
-    }
+    //public void StyleComboBox(ItemCollectionList? list, ComboBoxStyle style, bool removevalueIfNotExists) {
+    //    if (!Allinitialized) { _ = CreateSubControls(); }
+    //    foreach (var thiscb in Controls) {
+    //        if (thiscb is ComboBox cb) { StyleComboBox(cb, list, style, removevalueIfNotExists); }
+    //    }
+    //}
 
     /// <summary>
     ///
@@ -639,12 +641,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     protected void StyleComboBox(ComboBox control, ICollection<BasicListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
-        if (control == null) {
-            if (removevalueIfNotExists) {
-                ValueSet(string.Empty, true, true);
-            }
-            return;
-        }
+        //if (control == null) {
+        //    if (removevalueIfNotExists) {
+        //        ValueSet(string.Empty, true, true);
+        //    }
+        //    return;
+        //}
 
         control.Enabled = Enabled;
         control.GetStyleFrom(this);
@@ -811,9 +813,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Controls.Add(_captionObject);
         }
         _captionObject.Enabled = Enabled;
-        _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden; // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
-        _captionObject.Text = _caption.ReplaceLowerSign();
-        _captionObject.Size = _captionObject.TextRequiredSize();
+        _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch; // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
+        _captionObject.Text = _caption;//.ReplaceLowerSign();
+        _captionObject.Size = Extended_Text.ExtText.MeasureString(_caption, Design.Caption, States.Standard, Width);//  _captionObject.TextRequiredSize();
         _captionObject.Left = 0;
         _captionObject.Top = 0;
         _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;

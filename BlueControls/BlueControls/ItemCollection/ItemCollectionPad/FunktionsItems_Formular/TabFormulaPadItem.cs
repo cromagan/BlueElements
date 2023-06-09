@@ -213,6 +213,11 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         if (InputDatabase == null || InputDatabase.IsDisposed) {
             return "Quelle fehlt";
         }
+
+        if (_childs.Count == 0) {
+            return "Keine Formulare gewählt.";
+        }
+
         //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
         //    return "Ziel fehlt";
         //}
@@ -222,6 +227,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
         l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.Add(new FlexiControl("Formulare:", -1));
         l.Add(Childs());
 
         l.Add(new FlexiControl());
@@ -268,7 +274,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return txt + ErrorReason();
     }
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Registersammlung, 16, Color.Transparent, Skin.IdColor(InputColorId));
         }
@@ -361,6 +367,20 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
             }
         }
 
+
+        if (CFormula != null) {
+            foreach (var thisf in ConnectedFormula.ConnectedFormula.AllFiles) {
+                if (!CFormula.NotAllowedChilds.Contains(thisf.Filename)) {
+
+                    if (childs.Suggestions[thisf.Filename] == null) {
+
+                        _ = childs.Suggestions.Add(thisf.Filename, ImageCode.Diskette);
+                    }
+                }
+            }
+        }
+
+
         if (CFormula != null && CFormula.PadData != null) {
             foreach (var thisf in CFormula.PadData.AllPages()) {
                 if (!CFormula.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
@@ -386,6 +406,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         _childs.AddRange(((ListBox)sender).Item.ToListOfString());
         OnChanged();
         this.RaiseVersion();
+        UpdateSideOptionMenu();
     }
 
     private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuComands.Bearbeiten);

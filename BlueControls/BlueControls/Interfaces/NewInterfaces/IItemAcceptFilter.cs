@@ -249,7 +249,7 @@ public class ItemAcceptFilter : ItemAcceptSomething {
     public DatabaseAbstract? InputDatabase(IItemAcceptFilter item) {
         var g = GetFilterFromGet(item);
 
-        if (g == null || g.Count == 0) { return null; }
+        if (g.Count == 0) { return null; }
         return g[0].OutputDatabase;
     }
 
@@ -284,9 +284,9 @@ public class ItemAcceptFilter : ItemAcceptSomething {
         l.AddRange(base.GetStyleOptions(item));
 
         if (item.OnlyOneInputDatabase) {
-            l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten_SameDatabase, "Datenquellen bearbeiten", ImageCode.Trichter));
+            l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten_SameDatabase, "Eingehende Filter wählen", ImageCode.Trichter));
         } else {
-            l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten_DifferenteDatabase, "Datenquellen bearbeiten", ImageCode.Trichter));
+            l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten_DifferenteDatabase, "Eingehende Filter wählen", ImageCode.Trichter));
         }
 
         return l;

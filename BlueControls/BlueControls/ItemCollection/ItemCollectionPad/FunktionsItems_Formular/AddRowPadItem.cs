@@ -95,7 +95,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public override string ErrorReason() {
         if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Quelle fehlt";
+            return "Eingehende Filter fehlen";
         }
         //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
         //    return "Ziel fehlt";

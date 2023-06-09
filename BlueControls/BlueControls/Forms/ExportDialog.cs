@@ -318,7 +318,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         var l = _itemNrForPrint;
         _itemNrForPrint = GeneratePrintPad(padPrint, _itemNrForPrint, cbxLayoutWahl.Text, _rowsForExport, 0);
         if (l == _itemNrForPrint) { return; }
-        e.HasMorePages = Convert.ToBoolean(_itemNrForPrint < _rowsForExport.Count);
+        e.HasMorePages = _itemNrForPrint < _rowsForExport.Count;
     }
 
     private void Tabs_SelectedIndexChanged(object sender, System.EventArgs e) {
