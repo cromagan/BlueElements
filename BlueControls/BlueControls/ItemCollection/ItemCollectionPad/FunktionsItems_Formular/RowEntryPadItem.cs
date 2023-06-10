@@ -64,11 +64,9 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     public override string Description => " Diese Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element.\r\nHat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.\r\n Unsichtbares Element, wird nicht angezeigt.";
-
-
     public List<int> InputColorId => new() { OutputColorId };
-
     public DatabaseAbstract? InputDatabase => OutputDatabase;
+    public override bool MustBeInDrawingArea => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -96,12 +94,16 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     public override string ErrorReason() {
+        var b = base.ErrorReason();
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
         if (InputDatabase == null || InputDatabase.IsDisposed) {
             return "Quelle fehlt";
         }
-        if (OutputDatabase == null || OutputDatabase.IsDisposed) {
-            return "Ziel fehlt";
-        }
+
+        b = _itemSends.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
         return string.Empty;
     }
 

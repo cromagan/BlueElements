@@ -185,6 +185,16 @@ public class ItemAcceptFilter : ItemAcceptSomething {
         item.OnChanged();
     }
 
+    public string ErrorReason(IItemAcceptFilter item) {
+        var d = InputDatabase(item);
+
+        if (d == null || d.IsDisposed) {
+            return "Eingehende Filter fehlen";
+        }
+
+        return string.Empty;
+    }
+
     public ReadOnlyCollection<IItemSendFilter> GetFilterFromGet(IItemAcceptFilter item) {
         if (item.Parent == null) {
             Develop.DebugPrint(FehlerArt.Warnung, "Parent nicht initialisiert!");

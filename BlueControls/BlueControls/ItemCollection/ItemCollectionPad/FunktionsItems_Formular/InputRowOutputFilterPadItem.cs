@@ -123,8 +123,8 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public override bool MustBeInDrawingArea => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -157,23 +157,22 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
     }
 
     public override string ErrorReason() {
-        if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Eingehende Zeile fehlt";
-        }
+        var b = base.ErrorReason();
+        if (!string.IsNullOrEmpty(b)) { return b; }
 
+        b = _itemAccepts.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (InputDatabase.Column.Exists(_eingangsWertSpalte)== null) {
+        b = _itemSends.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        if (InputDatabase?.Column.Exists(_eingangsWertSpalte) == null) {
             return "Die Spalte, aus der der Filterwert kommen soll, fehlt.";
         }
 
-        if (OutputDatabase == null || OutputDatabase.IsDisposed) {
-            return "Ziel fehlt";
-        }
-
-        if (OutputDatabase.Column.Exists(_filterSpalte) == null) {
+        if (OutputDatabase?.Column.Exists(_filterSpalte) == null) {
             return "Die Spalte, in der gefiltert werden soll, fehlt.";
         }
-
 
         return string.Empty;
     }

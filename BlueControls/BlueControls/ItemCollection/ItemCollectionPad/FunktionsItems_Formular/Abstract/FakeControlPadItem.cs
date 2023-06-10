@@ -59,6 +59,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     #region Properties
 
+    public abstract bool MustBeInDrawingArea { get; }
     protected override int SaveOrder => 3;
 
     #endregion
@@ -91,7 +92,17 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     //public abstract int InputColorId { get; set; }
     public abstract Control? CreateControl(ConnectedFormulaView parent);
 
-    public abstract string ErrorReason();
+    public virtual string ErrorReason() {
+        if (Parent == null) {
+            return "Keiner Ansicht zugeordnet.";
+        }
+
+        if (MustBeInDrawingArea && !IsInDrawingArea(UsedArea, Parent.SheetSizeInPix.ToSize())) {
+            return "Element ist nicht im Zeichenbereich."; // Invalidate löste die Berechnungen aus, muss sein, weil mehrere Filter die Berechnungen triggern
+        }
+
+        return string.Empty;
+    }
 
     public override List<GenericControl> GetStyleOptions() {
         List<GenericControl> l = new();
@@ -307,7 +318,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         }
     }
 
-    protected void DrawFakeControl(Graphics gr, RectangleF positionModified, float zoom, ÜberschriftAnordnung captionPosition, string captiontxt) {
+    protected void DrawFakeControl(Graphics gr, RectangleF positionModified, float zoom, ÜberschriftAnordnung captionPosition, string captiontxt, EditTypeFormula edittype) {
         Point cap;
         var uc = positionModified.ToRect();
 
@@ -342,8 +353,11 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         }
 
         if (uc.Width > 0 && uc.Height > 0) {
-            gr.FillRectangle(Brushes.LightGray, uc);
-            gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
+            Skin.Draw_Back(gr, Design.TextBox, States.Standard, uc, null, false);
+            Skin.Draw_Border(gr, Design.TextBox, States.Standard, uc);
+
+            //gr.FillRectangle(Brushes.LightGray, uc);
+            //gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
         }
     }
 

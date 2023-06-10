@@ -46,13 +46,9 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
-
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-
     private ColumnItem? _column;
-
     private string _columnName = string.Empty;
-
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -126,7 +122,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public string Interner_Name {
@@ -135,6 +130,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             return Column.Name;
         }
     }
+
+    public override bool MustBeInDrawingArea => true;
 
     public string Spalten_AdminInfo {
         get {
@@ -206,17 +203,19 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public override string ErrorReason() {
-        if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Quelle fehlt";
-        }
+        var b = base.ErrorReason();
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        b = _itemAccepts.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        //b = _itemSends.ErrorReason(this);
+        //if (!string.IsNullOrEmpty(b)) { return b; }
 
         if (Column == null || Column.IsDisposed) {
             return "Spalte fehlt";
         }
 
-        //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
-        //    return "Ziel fehlt";
-        //}
         return string.Empty;
     }
 
@@ -356,7 +355,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         //if (Column  ==null || Column .IsDisposed) {
         //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
         //} else {
-        DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column?.ReadableText() + ":");
+        DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column?.ReadableText() + ":", EditType);
         //}
 
         if (!forPrinting) {

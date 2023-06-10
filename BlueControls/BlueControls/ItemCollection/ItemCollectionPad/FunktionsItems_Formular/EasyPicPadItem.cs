@@ -36,7 +36,6 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
-
     private string _bild_Dateiname = string.Empty;
 
     #endregion
@@ -75,9 +74,8 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
-
+    public override bool MustBeInDrawingArea => true;
     protected override int SaveOrder => 4;
 
     #endregion
@@ -97,12 +95,15 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
     }
 
     public override string ErrorReason() {
-        if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Quelle fehlt";
-        }
-        //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
-        //    return "Ziel fehlt";
-        //}
+        var b = base.ErrorReason();
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        b = _itemAccepts.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        //b = _itemSends.ErrorReason(this);
+        //if (!string.IsNullOrEmpty(b)) { return b; }
+
         return string.Empty;
     }
 
@@ -168,7 +169,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
-        DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei");
+        DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei", EditTypeFormula.Listbox);
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);

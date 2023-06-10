@@ -74,6 +74,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public override bool MustBeInDrawingArea => false;
     public bool OnlyOneInputDatabase => false;
 
     public int OutputColorId {
@@ -105,12 +106,15 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
     }
 
     public override string ErrorReason() {
-        if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Eingehende Filter fehlen";
-        }
-        if (OutputDatabase == null || OutputDatabase.IsDisposed) {
-            return "Ziel fehlt";
-        }
+        var b = base.ErrorReason();
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        b = _itemAccepts.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        b = _itemSends.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
         return string.Empty;
     }
 

@@ -41,13 +41,9 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     #region Fields
 
     private readonly ItemAcceptRow _itemAccepts;
-
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-
     private string _überschrift = string.Empty;
-
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
-
     private string _variable = string.Empty;
 
     #endregion
@@ -96,8 +92,8 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public override bool MustBeInDrawingArea => true;
 
     public string Überschrift {
         get => _überschrift;
@@ -140,12 +136,15 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     }
 
     public override string ErrorReason() {
-        if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Quelle fehlt";
-        }
-        //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
-        //    return "Ziel fehlt";
-        //}
+        var b = base.ErrorReason();
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        b = _itemAccepts.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        //b = _itemSends.ErrorReason(this);
+        //if (!string.IsNullOrEmpty(b)) { return b; }
+
         return string.Empty;
     }
 
@@ -238,7 +237,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         if (GetRowFrom == null) {
             Skin.Draw_FormatedText(gr, "Datenquelle fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
         } else {
-            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Überschrift);
+            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Überschrift, EditTypeFormula.Textfeld);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);

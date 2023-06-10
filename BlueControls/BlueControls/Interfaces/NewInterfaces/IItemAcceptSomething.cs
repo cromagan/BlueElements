@@ -51,7 +51,7 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
     #endregion
 }
 
-public class ItemAcceptSomething {
+public abstract class ItemAcceptSomething {
     //public void InputColorIdSet(IItemAcceptSomething item, List<int> value) {
     //    if (!_inputColorId.IsDifferentTo(value)) { return; }
 

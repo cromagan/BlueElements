@@ -76,7 +76,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
@@ -90,6 +89,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
             OnChanged();
         }
     }
+
+    public override bool MustBeInDrawingArea => true;
 
     [Description("Der Dateipfad, dessen Dateien angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Pfad {
@@ -124,12 +125,15 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
     }
 
     public override string ErrorReason() {
-        if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Quelle fehlt";
-        }
-        //if (OutputDatabase == null || OutputDatabase.IsDisposed) {
-        //    return "Ziel fehlt";
-        //}
+        var b = base.ErrorReason();
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        b = _itemAccepts.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        //b = _itemSends.ErrorReason(this);
+        //if (!string.IsNullOrEmpty(b)) { return b; }
+
         return string.Empty;
     }
 
@@ -209,7 +213,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
-        DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\");
+        DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\", EditTypeFormula.Listbox);
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);

@@ -27,6 +27,7 @@ using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
@@ -435,9 +436,9 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     public void Repair() {
         // Reparatur-Routine
 
-        if (PadData == null) {
-            PadData = new ItemCollectionPad();
-        }
+        PadData ??= new ItemCollectionPad();
+
+        PadData.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
 
         foreach (var thisCon in PadData.Connections) {
             thisCon.Bei_Export_sichtbar = false;

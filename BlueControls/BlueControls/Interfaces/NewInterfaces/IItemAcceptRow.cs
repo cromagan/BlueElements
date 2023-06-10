@@ -23,8 +23,10 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
+using BlueControls.ItemCollection;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -118,6 +120,16 @@ public class ItemAcceptRow : ItemAcceptSomething {
     public void DoCreativePadAddedToCollection(IItemAcceptRow item) {
         GetRowFromGet(item)?.DoChilds();
         item.OnChanged();
+    }
+
+    public string ErrorReason(IItemAcceptRow item) {
+        var d = InputDatabase(item);
+
+        if (d == null || d.IsDisposed) {
+            return "Eingehende Zeile (Quelle) fehlt";
+        }
+
+        return string.Empty;
     }
 
     public IItemSendRow? GetRowFromGet(IItemAcceptRow item) {

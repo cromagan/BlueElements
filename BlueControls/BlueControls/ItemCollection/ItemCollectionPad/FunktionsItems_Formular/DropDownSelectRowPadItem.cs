@@ -103,6 +103,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public override bool MustBeInDrawingArea => true;
     public bool OnlyOneInputDatabase => true;
 
     public int OutputColorId {
@@ -147,12 +148,15 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     }
 
     public override string ErrorReason() {
-        if (InputDatabase == null || InputDatabase.IsDisposed) {
-            return "Eingehende Filter fehlen";
-        }
-        if (OutputDatabase == null || OutputDatabase.IsDisposed) {
-            return "Ziel fehlt";
-        }
+        var b = base.ErrorReason();
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        b = _itemAccepts.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
+        b = _itemSends.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
+
         return string.Empty;
     }
 
@@ -248,10 +252,10 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
             DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
-            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
+            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
             DrawColorScheme(gr, positionModified, zoom, null, true, true, true);
         } else {
-            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift);
+            DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, true);

@@ -18,6 +18,8 @@
 #nullable enable
 
 using BlueControls.Controls;
+using BlueControls.ItemCollection;
+using System;
 using System.Collections.Generic;
 
 namespace BlueControls.Interfaces;
@@ -49,6 +51,15 @@ public class ItemSendRow : ItemSendSomething {
             //    return true;
         }
         return false;
+    }
+
+    internal string ErrorReason(IItemSendRow item) {
+        var d = item.OutputDatabase;
+        if (d == null || d.IsDisposed) {
+            return "Ausgehende Datenbank nicht angegeben.";
+        }
+
+        return string.Empty;
     }
 
     internal List<GenericControl> GetStyleOptions(IItemSendRow item) {
