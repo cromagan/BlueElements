@@ -94,7 +94,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen EINE per Dropdownmenu zu wählen.";
+    public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen eine per Dropdownmenu zu wählen.\r\n\r\nFalls die Filterung nur eine Zeile ergibt, wird diese automatisch gewählt.";
 
     public ReadOnlyCollection<string> GetFilterFrom {
         get => _itemAccepts.GetFilterFromKeysGet();

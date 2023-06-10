@@ -115,34 +115,34 @@
     </Compile>
     <Compile Include="BlueFont.cs" />
     <Compile Include="CommonDialogs.cs" />
-    <Compile Include="ConnectedFormula\NewControls\FilterChangeControl.cs">
+    <Compile Include="ConnectedFormula\FilterChangeControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\NewControls\InputRowOutputFilterControl.cs">
+    <Compile Include="ConnectedFormula\InputRowOutputFilterControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\NewControls\RowEntryControl.cs">
+    <Compile Include="ConnectedFormula\RowEntryControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\NewControls\FlexiControlForFilterNew.cs">
+    <Compile Include="ConnectedFormula\FlexiControlForFilterNew.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\NewControls\FlexiControlForFilterNew.Designer.cs">
+    <Compile Include="ConnectedFormula\FlexiControlForFilterNew.Designer.cs">
       <DependentUpon>FlexiControlForFilterNew.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConnectedFormula\NewControls\FlexiControlVariable.cs">
+    <Compile Include="ConnectedFormula\FlexiControlVariable.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\NewControls\FlexiControlVariable.Designer.cs">
+    <Compile Include="ConnectedFormula\FlexiControlVariable.Designer.cs">
       <DependentUpon>FlexiControlVariable.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConnectedFormula\NewControls\FlexiControlRowSelector.cs">
+    <Compile Include="ConnectedFormula\FlexiControlRowSelector.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Controls\FlexiControlForDelegate.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\NewControls\ButtonAddRow.cs">
+    <Compile Include="ConnectedFormula\ButtonAddRow.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Enums\FilterTypeRowInputItem.cs" />
@@ -635,11 +635,11 @@
       <DependentUpon>Filterleiste.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="ConnectedFormula\NewControls\FlexiControlForFilterNew.resx">
+    <EmbeddedResource Include="ConnectedFormula\FlexiControlForFilterNew.resx">
       <DependentUpon>FlexiControlForFilterNew.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="ConnectedFormula\NewControls\FlexiControlVariable.resx">
+    <EmbeddedResource Include="ConnectedFormula\FlexiControlVariable.resx">
       <DependentUpon>FlexiControlVariable.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
