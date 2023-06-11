@@ -27,69 +27,74 @@ using BluePaint;
 using System;
 using static BlueBasics.Develop;
 
-namespace BeCreative;
+namespace BeCreative {
 
-public partial class Start : Form {
+    public partial class Start : Form {
 
-    #region Constructors
+        #region Constructors
 
-    public Start() {
-        InitializeComponent();
+        public Start() {
+            InitializeComponent();
+        }
+
+        #endregion
+
+        #region Methods
+
+        public static void Ende() {
+            DebugPrint(FehlerArt.Info, "Schließe Programm...");
+
+            var p = Progressbar.Show("Programm wird beendet<br><i>Speichern aller Datenbanken");
+            DatabaseAbstract.ForceSaveAll();
+            MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
+
+            p?.Update("Programm wird beendet<br><i>Speichern aller Datenbanken");
+            DatabaseAbstract.ForceSaveAll();
+            MultiUserFile.SaveAll(false); // Fonts und Dictionarys werden noch benötigt
+
+            DebugPrint(FehlerArt.Info, "Schließe Programm, noch ein SaveAll.");
+            p?.Update("Programm wird beendet<br><i>Fast geschafft!");
+            MultiUserFile.SaveAll(true); // Nun aber
+
+            p?.Close();
+            TraceLogging_End();
+        }
+
+        internal static System.Windows.Forms.Form NewForm() {
+            return new Start();
+        }
+
+        private void btnBildEditor_Click(object sender, EventArgs e) {
+            DoForm(new MainWindow(true));
+        }
+
+        private void btnDatenbank_Click(object sender, EventArgs e) {
+            DoForm(new TableView(null, true, true));
+        }
+
+        private void btnFormular_Click(object sender, EventArgs e) {
+            DoForm(new ConnectedFormulaEditor());
+        }
+
+        private void btnFormularAnsicht_Click(object sender, EventArgs e) {
+            DoForm(new FormulaView());
+        }
+
+        private void btnHierachie_Click(object sender, EventArgs e) {
+            DoForm(new RelationDiagram(null));
+        }
+
+        private void btnLayout_Click(object sender, EventArgs e) {
+            DoForm(new LayoutPadEditor(null));
+        }
+
+        private void DoForm(System.Windows.Forms.Form frm) {
+            FormManager.Current.RegisterForm(frm);
+            frm.Show();
+            Close();
+            frm.BringToFront();
+        }
+
+        #endregion
     }
-
-    #endregion
-
-    #region Methods
-
-    public static void Ende() {
-        DebugPrint(FehlerArt.Info, "Schließe Programm...");
-
-        var p = Progressbar.Show("Programm wird beendet<br><i>Speichern aller Datenbanken");
-        DatabaseAbstract.ForceSaveAll();
-        MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
-
-        p?.Update("Programm wird beendet<br><i>Speichern aller Datenbanken");
-        DatabaseAbstract.ForceSaveAll();
-        MultiUserFile.SaveAll(false); // Fonts und Dictionarys werden noch benötigt
-
-        DebugPrint(FehlerArt.Info, "Schließe Programm, noch ein SaveAll.");
-        p?.Update("Programm wird beendet<br><i>Fast geschafft!");
-        MultiUserFile.SaveAll(true); // Nun aber
-
-        p?.Close();
-        TraceLogging_End();
-    }
-
-    internal static System.Windows.Forms.Form NewForm() {
-        return new Start();
-    }
-
-    private void btnBildEditor_Click(object sender, EventArgs e) {
-        DoForm(new MainWindow(true));
-    }
-
-    private void btnDatenbank_Click(object sender, EventArgs e) {
-        DoForm(new TableView(null, true, true));
-    }
-
-    private void btnFormular_Click(object sender, EventArgs e) {
-        DoForm(new ConnectedFormulaEditor());
-    }
-
-    private void btnHierachie_Click(object sender, EventArgs e) {
-        DoForm(new RelationDiagram(null));
-    }
-
-    private void btnLayout_Click(object sender, EventArgs e) {
-        DoForm(new LayoutPadEditor(null));
-    }
-
-    private void DoForm(System.Windows.Forms.Form frm) {
-        FormManager.Current.RegisterForm(frm);
-        frm.Show();
-        Close();
-        frm.BringToFront();
-    }
-
-    #endregion
 }

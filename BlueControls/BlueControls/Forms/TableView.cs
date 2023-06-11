@@ -293,8 +293,8 @@ public partial class TableView : FormWithStatusBar {
             case "erweitert":
                 Visible = false;
                 List<RowItem> selectedRows = new();
-                if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead && Formula.ShowingRow != null) {
-                    selectedRows.Add(Formula.ShowingRow);
+                if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead && CFO.ShowingRow != null) {
+                    selectedRows.Add(CFO.ShowingRow);
                 } else {
                     selectedRows = Table.VisibleUniqueRows();
                 }
@@ -387,7 +387,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (Table.Database != database) {
-            Formula.SetData(null, null, -1);
+            CFO.SetData(null, null, -1);
         }
 
         FilterLeiste.Table = Table;
@@ -442,14 +442,14 @@ public partial class TableView : FormWithStatusBar {
 
     protected virtual void FillFormula(RowItem? r) {
         if (tbcSidebar.SelectedTab == tabFormula) {
-            if (Formula is null || Formula.IsDisposed) { return; }
+            if (CFO is null || CFO.IsDisposed) { return; }
 
-            if (!Formula.Visible) { return; }
+            if (!CFO.Visible) { return; }
 
-            if (Formula.Width < 30 || Formula.Height < 10) { return; }
+            if (CFO.Width < 30 || CFO.Height < 10) { return; }
 
-            Formula.GetConnectedFormulaFromDatabase(r?.Database);
-            Formula.SetData(r?.Database, r?.Key ?? -1);
+            CFO.GetConnectedFormulaFromDatabase(r?.Database);
+            CFO.SetData(r?.Database, r?.Key ?? -1);
         }
     }
 
@@ -772,12 +772,12 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnLoeschen_Click(object sender, System.EventArgs e) {
         if (chkAnsichtFormular.Checked) {
-            if (Formula.ShowingRow == null) {
+            if (CFO.ShowingRow == null) {
                 MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK");
                 return;
             }
 
-            var tmpr = Formula.ShowingRow;
+            var tmpr = CFO.ShowingRow;
             if (MessageBox.Show(
                     "Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?",
                     ImageCode.Warnung, "Ja", "Nein") != 0) {
@@ -957,7 +957,7 @@ public partial class TableView : FormWithStatusBar {
         if (gefRow == null) {
             MessageBox.Show("Kein Eintrag gefunden!", ImageCode.Information, "OK");
         } else {
-            if (gefRow.Row == Formula.ShowingRow) {
+            if (gefRow.Row == CFO.ShowingRow) {
                 MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!",
                     ImageCode.Information, "OK");
             } else {

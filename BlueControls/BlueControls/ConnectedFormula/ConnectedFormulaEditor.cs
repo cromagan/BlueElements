@@ -267,9 +267,9 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpDatabase = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
-        if (tmpDatabase == null) { return; }
-        FormulaSet(tmpDatabase, notAllowedchilds);
+        var tmpFormula = ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+        if (tmpFormula == null) { return; }
+        FormulaSet(tmpFormula, notAllowedchilds);
     }
 
     private void FormulaSet(ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {

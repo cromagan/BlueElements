@@ -97,7 +97,7 @@ namespace BlueControls.Forms {
             this.SplitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tbcSidebar = new BlueControls.Controls.TabControl();
             this.tabFormula = new System.Windows.Forms.TabPage();
-            this.Formula = new BlueControls.Controls.ConnectedFormulaView();
+            this.CFO = new BlueControls.Controls.ConnectedFormulaView();
             this.capZeilen2 = new BlueControls.Controls.Caption();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
@@ -938,7 +938,7 @@ namespace BlueControls.Forms {
             // tabFormula
             // 
             this.tabFormula.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabFormula.Controls.Add(this.Formula);
+            this.tabFormula.Controls.Add(this.CFO);
             this.tabFormula.Location = new System.Drawing.Point(4, 25);
             this.tabFormula.Name = "tabFormula";
             this.tabFormula.Size = new System.Drawing.Size(338, 566);
@@ -947,11 +947,11 @@ namespace BlueControls.Forms {
             // 
             // Formula
             // 
-            this.Formula.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Formula.Location = new System.Drawing.Point(0, 0);
-            this.Formula.Name = "Formula";
-            this.Formula.Size = new System.Drawing.Size(338, 566);
-            this.Formula.TabIndex = 0;
+            this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CFO.Location = new System.Drawing.Point(0, 0);
+            this.CFO.Name = "CFO";
+            this.CFO.Size = new System.Drawing.Size(338, 566);
+            this.CFO.TabIndex = 0;
             // 
             // capZeilen2
             // 
@@ -1065,7 +1065,7 @@ namespace BlueControls.Forms {
         private SaveFileDialog SaveTab;
         private Button btnSuchenUndErsetzen;
         protected TabPage tabFormula;
-        private ConnectedFormulaView Formula;
+        private ConnectedFormulaView CFO;
         private Button btnFormular;
         private GroupBox grpFormularSteuerung;
         private Button btnNeu;

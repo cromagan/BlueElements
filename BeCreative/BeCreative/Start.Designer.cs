@@ -33,24 +33,25 @@ namespace BeCreative {
             this.btnTextEditor = new BlueControls.Controls.Button();
             this.btnBildEditor = new BlueControls.Controls.Button();
             this.btnHierachie = new BlueControls.Controls.Button();
+            this.btnFormularAnsicht = new BlueControls.Controls.Button();
             this.SuspendLayout();
             // 
             // btnDatenbank
             // 
             this.btnDatenbank.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
             this.btnDatenbank.ImageCode = "Tabelle|16";
-            this.btnDatenbank.Location = new System.Drawing.Point(16, 16);
+            this.btnDatenbank.Location = new System.Drawing.Point(80, 16);
             this.btnDatenbank.Name = "btnDatenbank";
             this.btnDatenbank.Size = new System.Drawing.Size(64, 80);
             this.btnDatenbank.TabIndex = 0;
-            this.btnDatenbank.Text = "Datenbank-Editor";
+            this.btnDatenbank.Text = "Tabellen-Ansicht";
             this.btnDatenbank.Click += new System.EventHandler(this.btnDatenbank_Click);
             // 
             // btnFormular
             // 
             this.btnFormular.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
             this.btnFormular.ImageCode = "Textfeld|16";
-            this.btnFormular.Location = new System.Drawing.Point(80, 16);
+            this.btnFormular.Location = new System.Drawing.Point(272, 104);
             this.btnFormular.Name = "btnFormular";
             this.btnFormular.Size = new System.Drawing.Size(64, 80);
             this.btnFormular.TabIndex = 1;
@@ -61,7 +62,7 @@ namespace BeCreative {
             // 
             this.btnLayout.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
             this.btnLayout.ImageCode = "Layout|16";
-            this.btnLayout.Location = new System.Drawing.Point(144, 16);
+            this.btnLayout.Location = new System.Drawing.Point(208, 104);
             this.btnLayout.Name = "btnLayout";
             this.btnLayout.Size = new System.Drawing.Size(64, 80);
             this.btnLayout.TabIndex = 2;
@@ -72,7 +73,7 @@ namespace BeCreative {
             // 
             this.btnTextEditor.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
             this.btnTextEditor.ImageCode = "Textdatei|16";
-            this.btnTextEditor.Location = new System.Drawing.Point(16, 96);
+            this.btnTextEditor.Location = new System.Drawing.Point(16, 104);
             this.btnTextEditor.Name = "btnTextEditor";
             this.btnTextEditor.Size = new System.Drawing.Size(64, 80);
             this.btnTextEditor.TabIndex = 3;
@@ -82,7 +83,7 @@ namespace BeCreative {
             // 
             this.btnBildEditor.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
             this.btnBildEditor.ImageCode = "Bild|16";
-            this.btnBildEditor.Location = new System.Drawing.Point(80, 96);
+            this.btnBildEditor.Location = new System.Drawing.Point(80, 104);
             this.btnBildEditor.Name = "btnBildEditor";
             this.btnBildEditor.Size = new System.Drawing.Size(64, 80);
             this.btnBildEditor.TabIndex = 4;
@@ -93,18 +94,31 @@ namespace BeCreative {
             // 
             this.btnHierachie.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
             this.btnHierachie.ImageCode = "Hierarchie|16";
-            this.btnHierachie.Location = new System.Drawing.Point(144, 96);
+            this.btnHierachie.Location = new System.Drawing.Point(144, 104);
             this.btnHierachie.Name = "btnHierachie";
             this.btnHierachie.Size = new System.Drawing.Size(64, 80);
             this.btnHierachie.TabIndex = 5;
             this.btnHierachie.Text = "Hierachie-Editor";
             this.btnHierachie.Click += new System.EventHandler(this.btnHierachie_Click);
             // 
+            // btnFormularAnsicht
+            // 
+            this.btnFormularAnsicht.AllowDrop = true;
+            this.btnFormularAnsicht.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big;
+            this.btnFormularAnsicht.ImageCode = "Layout|16";
+            this.btnFormularAnsicht.Location = new System.Drawing.Point(16, 16);
+            this.btnFormularAnsicht.Name = "btnFormularAnsicht";
+            this.btnFormularAnsicht.Size = new System.Drawing.Size(64, 80);
+            this.btnFormularAnsicht.TabIndex = 6;
+            this.btnFormularAnsicht.Text = "Formular-Ansicht";
+            this.btnFormularAnsicht.Click += new System.EventHandler(this.btnFormularAnsicht_Click);
+            // 
             // Start
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(221, 188);
+            this.ClientSize = new System.Drawing.Size(347, 200);
+            this.Controls.Add(this.btnFormularAnsicht);
             this.Controls.Add(this.btnHierachie);
             this.Controls.Add(this.btnBildEditor);
             this.Controls.Add(this.btnTextEditor);
@@ -127,5 +141,6 @@ namespace BeCreative {
         private Button btnTextEditor;
         private Button btnBildEditor;
         private Button btnHierachie;
+        private Button btnFormularAnsicht;
     }
 }

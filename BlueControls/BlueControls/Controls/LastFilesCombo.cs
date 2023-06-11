@@ -178,6 +178,8 @@ public sealed class LastFilesCombo : ComboBox {
     private void SaveSettingsToDisk() {
         var pf = SettingsFileName().FilePath();
 
+        if (string.IsNullOrEmpty(pf)) { return; }
+
         if (!DirectoryExists(pf)) {
             _ = Directory.CreateDirectory(pf);
         }

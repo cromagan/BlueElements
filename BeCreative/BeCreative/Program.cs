@@ -3,28 +3,29 @@ using BlueControls;
 using System;
 using System.Windows.Forms;
 
-namespace BeCreative;
+namespace BeCreative {
 
-internal static class Program {
+    internal static class Program {
 
-    #region Methods
+        #region Methods
 
-    /// <summary>
-    /// Der Haupteinstiegspunkt für die Anwendung.
-    /// </summary>
-    [STAThread]
-    private static void Main() {
-        Application.EnableVisualStyles();
+        /// <summary>
+        /// Der Haupteinstiegspunkt für die Anwendung.
+        /// </summary>
+        [STAThread]
+        private static void Main() {
+            Application.EnableVisualStyles();
 
-        Develop.StartService();
-        Generic.UserGroup = Constants.Administrator;
-        FormManager.NewModeSelectionForm = Start.NewForm;
-        FormManager.ExecuteAtEnd = Start.Ende;
-        FormManager.StartForm = new Start();
-        Application.Run(FormManager.Current);
-        //Application.Run(new Start());
-        //BlueBasics.Develop.TraceLogging_End();
+            Develop.StartService();
+            Generic.UserGroup = Constants.Administrator;
+            FormManager.NewModeSelectionForm = Start.NewForm;
+            FormManager.ExecuteAtEnd = Start.Ende;
+            FormManager.StartForm = new Start();
+            Application.Run(FormManager.Current);
+            //Application.Run(new Start());
+            //BlueBasics.Develop.TraceLogging_End();
+        }
+
+        #endregion
     }
-
-    #endregion
 }
