@@ -106,7 +106,7 @@ public class LinePadItem : BasicPadItem {
     //    }
     //}
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
 
         ItemCollectionList.ItemCollectionList verhalt = new(false)
@@ -117,7 +117,7 @@ public class LinePadItem : BasicPadItem {
         };
         l.Add(new FlexiControlForProperty<ConectorStyle>(() => Linien_Verhalten, verhalt));
         AddLineStyleOption(l);
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

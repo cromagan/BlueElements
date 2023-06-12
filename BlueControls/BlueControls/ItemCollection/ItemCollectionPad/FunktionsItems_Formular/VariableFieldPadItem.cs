@@ -93,6 +93,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabaseMustBe => null;
     public override bool MustBeInDrawingArea => true;
 
     public string Überschrift {
@@ -115,6 +116,8 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
             this.RaiseVersion();
         }
     }
+
+    public bool WaitForDatabase => false;
 
     #endregion
 
@@ -148,9 +151,9 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
         l.Add(new FlexiControlForProperty<string>(() => Variable));
@@ -162,7 +165,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
         //b.AddRange(typeof(EditTypeFormula));
         //l.GenerateAndAdd(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

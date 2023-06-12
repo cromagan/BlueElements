@@ -163,10 +163,10 @@ public partial class PadEditor : PadEditorReadOnly {
 
         if (Pad.LastClickedItem is not BasicPadItem bpi) { return; }
 
-        var flexis = bpi.GetStyleOptions();
-        if (flexis.Count == 0) { return; }
-
         var stdWidth = tabElementEigenschaften.Width - (Skin.Padding * 4);
+
+        var flexis = bpi.GetStyleOptions(stdWidth);
+        if (flexis.Count == 0) { return; }
 
         //Rückwärts inserten
 

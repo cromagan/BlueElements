@@ -113,7 +113,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     #region Methods
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
         ItemCollectionList.ItemCollectionList layouts = new(true);
         foreach (var thisLayouts in Row.Database.Layouts) {
@@ -121,7 +121,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             _ = layouts.Add(p.Caption, p.KeyName, ImageCode.Stern);
         }
         l.Add(new FlexiControlForProperty<string>(() => Layout_Id, layouts));
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

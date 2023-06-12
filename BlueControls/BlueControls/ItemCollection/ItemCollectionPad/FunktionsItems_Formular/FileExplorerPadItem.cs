@@ -77,6 +77,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabaseMustBe => null;
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
     public bool Leere_Ordner_löschen {
@@ -104,6 +105,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
         }
     }
 
+    public bool WaitForDatabase => false;
     protected override int SaveOrder => 4;
 
     #endregion
@@ -137,16 +139,16 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
         l.Add(new FlexiControlForProperty<string>(() => Pfad));
         l.Add(new FlexiControlForProperty<bool>(() => Bei_Bedarf_erzeugen));
         l.Add(new FlexiControlForProperty<bool>(() => Leere_Ordner_löschen));
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

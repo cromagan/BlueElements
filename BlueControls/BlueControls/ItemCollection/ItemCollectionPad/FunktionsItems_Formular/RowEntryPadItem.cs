@@ -30,6 +30,11 @@ using BlueDatabase;
 
 namespace BlueControls.ItemCollection;
 
+/// <summary>
+/// Dieses Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element.
+/// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.
+/// Unsichtbares Element, wird nicht angezeigt.
+/// </summary>
 public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemSendRow, IItemRowInput {
 
     #region Fields
@@ -63,7 +68,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public override string Description => " Diese Element ist in jedem Formular vorhanden und empfängt die Zeile aus einem anderen Element.\r\nHat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.\r\n Unsichtbares Element, wird nicht angezeigt.";
+    public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann die Zeile aus einem übergrordnetetn Element empfangen uns weitergeben.\r\nUnsichtbares Element, wird nicht angezeigt.";
     public List<int> InputColorId => new() { OutputColorId };
     public DatabaseAbstract? InputDatabase => OutputDatabase;
     public override bool MustBeInDrawingArea => false;
@@ -107,13 +112,13 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
 
-        l.AddRange(_itemSends.GetStyleOptions(this));
+        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
 
         return l;
     }

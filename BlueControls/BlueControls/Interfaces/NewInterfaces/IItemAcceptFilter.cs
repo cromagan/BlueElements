@@ -28,6 +28,7 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueBasics.Enums;
 using System.ComponentModel;
 using BlueBasics.Interfaces;
+using BlueDatabase.AdditionalScriptComands;
 
 namespace BlueControls.Interfaces;
 
@@ -42,11 +43,6 @@ public interface IItemAcceptFilter : IItemAcceptSomething {
     /// Enthält die Schlüssel der Items
     /// </summary>
     public ReadOnlyCollection<string> GetFilterFrom { get; set; }
-
-    /// <summary>
-    /// Ob alle EingangsFilter der gleichen Datenbank entsprechen müssen
-    /// </summary>
-    public bool OnlyOneInputDatabase { get; }
 
     #endregion
 }
@@ -71,21 +67,21 @@ public static class ItemAcceptFilterExtensions {
         return l;
     }
 
-    public static void Datenquellen_bearbeiten_DifferenteDatabase(this IItemAcceptFilter item) => item.Datenquellen_bearbeiten(false);
-
-    public static void Datenquellen_bearbeiten_SameDatabase(this IItemAcceptFilter item) => item.Datenquellen_bearbeiten(true);
-
     [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
-    private static void Datenquellen_bearbeiten(this IItemAcceptFilter item, bool sameDatabase) {
+    public static void Datenquellen_bearbeiten(this IItemAcceptFilter item) {
         if (item.Parent is null) { return; }
 
-        DatabaseAbstract matchDB = null;
+        var matchDB = item.InputDatabaseMustBe;
 
-        if (sameDatabase && item.GetFilterFrom.Count > 0) {
-            if (item.Parent[item.GetFilterFrom[0]] is IItemSendSomething ir) {
-                matchDB = ir.OutputDatabase;
-            }
+        if (item.WaitForDatabase && matchDB == null) {
+            return;
         }
+
+        //if (sameDatabase && item.GetFilterFrom.Count > 0) {
+        //    if (item.Parent[item.GetFilterFrom[0]] is IItemSendSomething ir) {
+        //        matchDB = ir.OutputDatabase;
+        //    }
+        //}
 
         var x = new ItemCollectionList(false);
 
@@ -188,7 +184,7 @@ public class ItemAcceptFilter : ItemAcceptSomething {
     public string ErrorReason(IItemAcceptFilter item) {
         var d = InputDatabase(item);
 
-        if (d == null || d.IsDisposed) {
+        if (d != null && d != item.InputDatabaseMustBe) {
             return "Eingehende Filter fehlen";
         }
 
@@ -289,14 +285,14 @@ public class ItemAcceptFilter : ItemAcceptSomething {
         return false;
     }
 
-    internal List<GenericControl> GetStyleOptions(IItemAcceptFilter item) {
+    internal List<GenericControl> GetStyleOptions(IItemAcceptFilter item, int widthOfControl) {
         var l = new List<GenericControl>();
-        l.AddRange(base.GetStyleOptions(item));
+        l.AddRange(base.GetStyleOptions(item, widthOfControl));
 
-        if (item.OnlyOneInputDatabase) {
-            l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten_SameDatabase, "Eingehende Filter wählen", ImageCode.Trichter));
+        if (item.WaitForDatabase && item.InputDatabaseMustBe == null) {
+            l.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl));
         } else {
-            l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten_DifferenteDatabase, "Eingehende Filter wählen", ImageCode.Trichter));
+            l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten, "Eingehende Filter wählen", ImageCode.Trichter));
         }
 
         return l;

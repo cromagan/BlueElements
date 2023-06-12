@@ -62,9 +62,9 @@ public class ItemSendRow : ItemSendSomething {
         return string.Empty;
     }
 
-    internal List<GenericControl> GetStyleOptions(IItemSendRow item) {
+    internal List<GenericControl> GetStyleOptions(IItemSendRow item, int widthOfControl) {
         var l = new List<GenericControl>();
-        l.AddRange(base.GetStyleOptions(item));
+        l.AddRange(base.GetStyleOptions(item, widthOfControl));
         return l;
     }
 

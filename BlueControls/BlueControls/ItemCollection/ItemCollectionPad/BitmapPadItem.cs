@@ -107,7 +107,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
         Bitmap = (Bitmap?)Image_FromFile(e.FileName);
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new()
         {
             new FlexiControlForDelegate( Bildschirmbereich_wählen, "Bildschirmbereich wählen",ImageCode.Bild),
@@ -126,7 +126,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
         l.Add(new FlexiControl());
         AddLineStyleOption(l);
         l.Add(new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen));
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

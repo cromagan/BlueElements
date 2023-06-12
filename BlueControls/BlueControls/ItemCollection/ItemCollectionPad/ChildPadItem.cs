@@ -99,7 +99,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     #region Methods
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new()
         {
             new FlexiControlForProperty<string>(() => Name),
@@ -112,7 +112,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         };
         l.Add(new FlexiControlForProperty<Alignment>(() => Textlage, lage));
         l.Add(new FlexiControlForProperty<List<string>>(() => Eingebettete_Ansichten, 5));
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

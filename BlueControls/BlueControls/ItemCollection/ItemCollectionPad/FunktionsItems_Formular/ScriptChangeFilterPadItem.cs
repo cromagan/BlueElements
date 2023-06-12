@@ -74,8 +74,9 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+
+    public DatabaseAbstract? InputDatabaseMustBe => null;
     public override bool MustBeInDrawingArea => false;
-    public bool OnlyOneInputDatabase => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -87,6 +88,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         set => _itemSends.OutputDatabaseSet(value, this);
     }
 
+    public bool WaitForDatabase => false;
     protected override int SaveOrder => 1;
 
     #endregion
@@ -118,12 +120,12 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();// {
-        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
 
         return l;
     }

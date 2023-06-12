@@ -71,16 +71,16 @@ public partial class ConnectedFormulaEditor : PadEditor {
             iar2.Datenquelle_wählen();
         }
 
-        if (x is IItemAcceptFilter iaf2 && iaf2.GetFilterFrom.Count == null) {
-            iaf2.Datenquellen_bearbeiten_DifferenteDatabase();
-        }
-
         if (x is IItemSendRow isr2) {
             isr2.Datenbank_wählen();
         }
 
         if (x is IItemSendFilter isf2) {
             isf2.Datenbank_wählen();
+        }
+
+        if (x is IItemAcceptFilter iaf2 && iaf2.GetFilterFrom.Count == null) {
+            iaf2.Datenquellen_bearbeiten();
         }
     }
 
@@ -200,7 +200,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnTable_Click(object sender, System.EventArgs e) {
-        var x = new TabFormulaPadItem(string.Empty);
+        var x = new TableSelectRowPadItem(string.Empty);
         AddCentered(x);
     }
 

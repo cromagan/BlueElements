@@ -75,7 +75,9 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabaseMustBe => null;
     public override bool MustBeInDrawingArea => true;
+    public bool WaitForDatabase => false;
     protected override int SaveOrder => 4;
 
     #endregion
@@ -107,13 +109,13 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
         l.Add(new FlexiControlForProperty<string>(() => Bild_Dateiname));
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

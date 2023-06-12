@@ -189,9 +189,9 @@ public class ItemAcceptRow : ItemAcceptSomething {
         return false;
     }
 
-    internal List<GenericControl> GetStyleOptions(IItemAcceptRow item) {
+    internal List<GenericControl> GetStyleOptions(IItemAcceptRow item, int widthOfControl) {
         var l = new List<GenericControl>();
-        l.AddRange(base.GetStyleOptions(item));
+        l.AddRange(base.GetStyleOptions(item, widthOfControl));
 
         l.Add(new FlexiControlForDelegate(item.Datenquelle_wählen, "Datenquelle wählen", ImageCode.Zeile));
         //l.Add(new FlexiControl());

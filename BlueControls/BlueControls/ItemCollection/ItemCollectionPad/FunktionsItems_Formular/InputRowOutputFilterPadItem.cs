@@ -124,6 +124,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabaseMustBe => OutputDatabase;
     public override bool MustBeInDrawingArea => false;
 
     public int OutputColorId {
@@ -136,6 +137,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         set => _itemSends.OutputDatabaseSet(value, this);
     }
 
+    public bool WaitForDatabase => true;
     protected override int SaveOrder => 1;
 
     #endregion
@@ -177,10 +179,10 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         var l = new List<GenericControl>();
 
-        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
         var inr = _itemAccepts.GetRowFromGet(this);
         if (inr?.OutputDatabase is DatabaseAbstract dbin) {
@@ -194,7 +196,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         }
 
         l.Add(new FlexiControl());
-        l.AddRange(_itemSends.GetStyleOptions(this));
+        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
         if (_itemSends.OutputDatabaseGet() is DatabaseAbstract outdb) {
             var ic = new ItemCollectionList.ItemCollectionList(true);
@@ -203,7 +205,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         }
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
 
         return l;
     }

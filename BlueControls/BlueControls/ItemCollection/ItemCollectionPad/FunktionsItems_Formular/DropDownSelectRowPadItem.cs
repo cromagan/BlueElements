@@ -103,8 +103,9 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+
+    public DatabaseAbstract? InputDatabaseMustBe => OutputDatabase;
     public override bool MustBeInDrawingArea => true;
-    public bool OnlyOneInputDatabase => true;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -125,6 +126,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         }
     }
 
+    public bool WaitForDatabase => true;
     protected override int SaveOrder => 1;
 
     #endregion
@@ -160,11 +162,11 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
         l.Add(new FlexiControl());
-        l.AddRange(_itemSends.GetStyleOptions(this));
+        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
         l.Add(new FlexiControl());
         l.Add(new FlexiControl("Einstellungen:", -1));
         l.Add(new FlexiControlForProperty<string>(() => Überschrift));
@@ -175,7 +177,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

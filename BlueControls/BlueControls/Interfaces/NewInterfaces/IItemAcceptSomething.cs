@@ -36,9 +36,21 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
 
     public DatabaseAbstract? InputDatabase { get; }
 
+    /// <summary>
+    /// Welcher Datenbank die eingehenden Filter entsprechen müssen.
+    /// Wenn NULL zurück gegeben wird, ist freie Datenbankwahl
+    /// </summary>
+    public DatabaseAbstract? InputDatabaseMustBe { get; }
+
     public string Page { get; }
 
     public ItemCollectionPad? Parent { get; }
+
+    /// <summary>
+    /// Wenn InputDatabaseMustBe null zurück gibt, ob schon Filter gewählt werden dürfen.
+    /// Typischerweise false, wenn auf die Output-Database gewartet werden soll.
+    /// </summary>
+    public bool WaitForDatabase { get; }
 
     #endregion
 
@@ -78,12 +90,12 @@ public abstract class ItemAcceptSomething {
         return false;
     }
 
-    protected List<GenericControl> GetStyleOptions(IItemAcceptSomething item) {
+    protected List<GenericControl> GetStyleOptions(IItemAcceptSomething item, int widthOfControl) {
         var l = new List<GenericControl>();
 
-        l.Add(new FlexiControl("Eingang:", -1));
+        l.Add(new FlexiControl("Eingang:", widthOfControl));
 
-        //l.AddRange(base.GetStyleOptions(this));
+        //l.AddRange(base.GetStyleOptions(this, widthOfControl));
         return l;
     }
 

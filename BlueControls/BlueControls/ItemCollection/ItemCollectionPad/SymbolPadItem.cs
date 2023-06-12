@@ -58,7 +58,7 @@ public class SymbolPadItem : RectanglePadItem {
 
     #region Methods
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         ItemCollectionList.ItemCollectionList comms = new(false)
         {
             { "Ohne", ((int)Symbol.Ohne).ToString(), QuickImage.Get("Datei|32") },
@@ -74,7 +74,7 @@ public class SymbolPadItem : RectanglePadItem {
             new FlexiControlForProperty<Color>(() => Randfarbe),
             new FlexiControlForProperty<Color>(() => Hintergrundfarbe)
         };
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

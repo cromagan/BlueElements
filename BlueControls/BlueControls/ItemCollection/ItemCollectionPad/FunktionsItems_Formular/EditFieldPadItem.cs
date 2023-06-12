@@ -124,6 +124,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
+    public DatabaseAbstract? InputDatabaseMustBe => null;
+
     public string Interner_Name {
         get {
             if (Column == null || Column.IsDisposed) { return "?"; }
@@ -152,6 +154,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             if (Column != null && !Column.IsDisposed) { Column.Quickinfo = value; }
         }
     }
+
+    public bool WaitForDatabase => false;
 
     #endregion
 
@@ -219,10 +223,10 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
 
-        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
         if (InputDatabase == null) { return l; }
 
@@ -243,7 +247,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

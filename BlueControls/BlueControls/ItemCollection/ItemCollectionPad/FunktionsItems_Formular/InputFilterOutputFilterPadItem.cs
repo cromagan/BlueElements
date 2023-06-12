@@ -105,8 +105,9 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+
+    public DatabaseAbstract? InputDatabaseMustBe => OutputDatabase;
     public override bool MustBeInDrawingArea => true;
-    public bool OnlyOneInputDatabase => true;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -127,6 +128,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         }
     }
 
+    public bool WaitForDatabase => true;
     protected override int SaveOrder => 1;
 
     #endregion
@@ -163,10 +165,10 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this));
-        l.AddRange(_itemSends.GetStyleOptions(this));
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
+        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
         l.Add(new FlexiControl());
 
@@ -178,7 +180,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
 
         return l;
     }

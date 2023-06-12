@@ -88,7 +88,9 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public DatabaseAbstract? InputDatabaseMustBe => null;
     public override bool MustBeInDrawingArea => true;
+    public bool WaitForDatabase => false;
     protected override int SaveOrder => 1000;
 
     #endregion
@@ -225,14 +227,14 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return string.Empty;
     }
 
-    public override List<GenericControl> GetStyleOptions() {
+    public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this));
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
         l.Add(new FlexiControl("Formulare:", -1));
         l.Add(Childs());
 
         l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions());
+        l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
 

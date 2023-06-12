@@ -301,7 +301,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     /// und werden bei nicht gebrauchen automatisch disposed
     /// </summary>
     /// <returns></returns>
-    public virtual List<GenericControl> GetStyleOptions() {
+    public virtual List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new()
         {
             new FlexiControl(),

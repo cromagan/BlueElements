@@ -65,6 +65,17 @@ public static class ItemSendSomethingExtension {
         var db = CommonDialogs.ChooseKnownDatabase("Ausgangs-Datenbank wählen:");
         if (db == null) { return; }
         item.OutputDatabase = db;
+
+        if (item is IItemAcceptSomething ias) {
+            if (ias.InputDatabase != ias.InputDatabaseMustBe && ias.InputDatabaseMustBe != null) {
+                if (ias is IItemAcceptFilter iaf) {
+                    iaf.GetFilterFrom = new List<string>().AsReadOnly();
+                }
+                if (ias is IItemAcceptRow iar) {
+                    iar.GetRowFrom = null;
+                }
+            }
+        }
     }
 
     public static void Datenbankkopf(this IItemSendSomething item) {
@@ -203,9 +214,9 @@ public class ItemSendSomething {
         remove.CalculateInputColorIds();
     }
 
-    protected List<GenericControl> GetStyleOptions(IItemSendSomething item) {
+    protected List<GenericControl> GetStyleOptions(IItemSendSomething item, int widthOfControl) {
         var l = new List<GenericControl>();
-        l.Add(new FlexiControl("Ausgang:", -1));
+        l.Add(new FlexiControl("Ausgang:", widthOfControl));
 
         l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
 
