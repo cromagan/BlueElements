@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.IO;
 using System.Text;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -158,18 +159,27 @@ public abstract class SqlBackAbstract {
         return ExecuteCommand(cmdString, false);
     }
 
+    /// <summary>
+    /// Gibt empty zurück, wenn das Backup erstellt wurde ODER die Datei bereits existiert
+    /// </summary>
+    /// <param name="pathadditionalcsv"></param>
+    /// <returns></returns>
     public string BackupSysStyle(string pathadditionalcsv) {
-        if (string.IsNullOrEmpty(pathadditionalcsv)) { return "Kein Verzeichniss angebeben."; }
+        if (string.IsNullOrEmpty(pathadditionalcsv)) { return "Kein Backup-Verzeichniss angebeben."; }
+
+        if (!Directory.Exists(pathadditionalcsv)) { return "Backup-Verzeichniss existiert nicht."; }
 
         var d = DateTime.UtcNow.ToString(Constants.Format_Date10);
 
         var file = pathadditionalcsv.CheckPath() + "SYS_STYLE_" + d + ".csv";
-        if (IO.FileExists(file)) { return "Datei existiert bereits"; }
+        if (IO.FileExists(file)) { return string.Empty; }
 
         try {
             var dt = Fill_Table("SELECT * FROM " + SysStyle);
             if (dt != null) {
-                dt.WriteToCsvFile(file);
+                if (!dt.WriteToCsvFile(file)) { return "Schreibzugriff fehlgeschlagen."; }
+            } else {
+                return "Keine Daten zu exportieren gefunden.";
             }
 
             var bvw = new BackupVerwalter(2, 20);

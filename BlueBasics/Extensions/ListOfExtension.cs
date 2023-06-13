@@ -217,8 +217,8 @@ public static partial class Extensions {
             _ = l.Append("|");
         }
 
-        if(l.Length >0) { l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
-      
+        if (l.Length > 0) { l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
+
         col.Add(tagname + "=" + l.ToString());
     }
 
@@ -341,12 +341,12 @@ public static partial class Extensions {
         }
     }
 
-    public static void Save(this ICollection<string> l, string dateiName, Encoding code, bool executeAfter) {
+    public static bool Save(this ICollection<string> l, string dateiName, Encoding code, bool executeAfter) {
         var t = l.JoinWith("\r\n").TrimEnd("\r\n");
         if (!DirectoryExists(dateiName.FilePath())) {
             _ = Directory.CreateDirectory(dateiName.FilePath());
         }
-        WriteAllText(dateiName, t, code, executeAfter);
+        return WriteAllText(dateiName, t, code, executeAfter);
     }
 
     public static void Shuffle<T>(this IList<T> list) {

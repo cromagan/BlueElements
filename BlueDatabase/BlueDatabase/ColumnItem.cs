@@ -2195,7 +2195,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (!IsSystemColumn()) {
             // Maximale Text-Länge beeinflusst stark die Ladezeit vom Server
             var l = CalculatePreveredMaxCellLenght(1.2f);
-            if (l < MaxTextLenght) { MaxTextLenght = l; }
+            if (l < MaxCellLenght) { MaxCellLenght = l; }
+
+            if (MaxTextLenght > MaxCellLenght) { MaxTextLenght = MaxCellLenght; }
 
             // ScriptType beeinflusst, ob eine Zeile neu durchgerechnet werden muss nach einer Änderung dieser Zelle
             if (!UsedInScript()) {
@@ -2205,7 +2207,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             // Beeinflussst stark den Áufbau bei großen Zeilen.
             // Aber erst ab 20, da es ansonsten wenige verschiedene Einträge sind, es und es sich nicht reniert.
             // Zudem können zu kleine Werte ein Berechnungsfehler sein
-            if (ContentWidth > 20) {
+            Invalidate_ContentWidth();
+            if (ContentWidth > 20 && FixedColumnWidth == 0) {
                 FixedColumnWidth = ContentWidth;
             }
         }

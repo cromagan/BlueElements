@@ -104,36 +104,37 @@ internal class Method_Export : Method_Database {
 
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
 
-        switch (attvar.ValueString(1).ToUpper()) {
-            case "MDB":
-            case "BDB": {
-                    var bytes = Database.ToListOfByte(db, null, 100);
+        try {
+            switch (attvar.ValueString(1).ToUpper()) {
+                case "MDB":
+                case "BDB": {
+                        var bytes = Database.ToListOfByte(db, null, 100);
 
-                    if (bytes == null) {
-                        return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Daten.");
+                        if (bytes == null) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Daten."); }
+
+                        using FileStream x = new(filn, FileMode.Create, FileAccess.Write, FileShare.None);
+                        x.Write(bytes.ToArray(), 0, bytes.ToArray().Length);
+                        x.Flush();
+                        x.Close();
+                        break;
                     }
 
-                    using FileStream x = new(filn, FileMode.Create, FileAccess.Write, FileShare.None);
-                    x.Write(bytes.ToArray(), 0, bytes.ToArray().Length);
-                    x.Flush();
-                    x.Close();
+                case "CSV":
+                    var t = db.Export_CSV(FirstRow.ColumnInternalName, cu, r);
+                    if (string.IsNullOrEmpty(t)) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Daten."); }
+                    if (!IO.WriteAllText(filn, t, Constants.Win1252, false)) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei."); }
                     break;
-                }
 
-            case "CSV":
-                var t = db.Export_CSV(FirstRow.ColumnInternalName, cu, r);
-                if (!IO.WriteAllText(filn, t, Constants.Win1252, false)) {
-                    return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei.");
-                }
-                break;
+                case "HTML":
+                case "HTM":
+                    if (!db.Export_HTML(filn, cu, r, false)) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei."); }
+                    break;
 
-            case "HTML":
-            case "HTM":
-                db.Export_HTML(filn, cu, r, false);
-                break;
-
-            default:
-                return new DoItFeedback(infos.Data, "Export-Format unbekannt.");
+                default:
+                    return new DoItFeedback(infos.Data, "Export-Format unbekannt.");
+            }
+        } catch {
+            return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Erzeugen der Daten.");
         }
 
         return DoItFeedback.Null();
