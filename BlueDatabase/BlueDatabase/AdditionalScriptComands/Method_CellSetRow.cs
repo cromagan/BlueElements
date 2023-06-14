@@ -58,7 +58,7 @@ public class Method_CellSetRow : Method_Database {
         var columnToSet = row.Database.Column.Exists(attvar.ValueString(1));
         if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueString(1)); }
 
-        var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReason.EditAcut, false, false);
+        var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
 

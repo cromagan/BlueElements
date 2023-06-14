@@ -202,17 +202,11 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     }
 
     //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
-    public ColumnViewItem? First() {
-        return _internal.FirstOrDefault(thisViewItem => thisViewItem?.Column != null);
-    }
+    public ColumnViewItem? First() => _internal.FirstOrDefault(thisViewItem => thisViewItem?.Column != null);
 
-    public IEnumerator<ColumnViewItem> GetEnumerator() {
-        return ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
-    }
+    public IEnumerator<ColumnViewItem> GetEnumerator() => ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
 
-    IEnumerator IEnumerable.GetEnumerator() {
-        return ((IEnumerable)_internal).GetEnumerator();
-    }
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
 
     public int IndexOf(ColumnViewItem? columnViewItem) {
         if (columnViewItem == null) { return -1; }
@@ -225,9 +219,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         }
     }
 
-    public ColumnViewItem? Last() {
-        return _internal.Last(thisViewItem => thisViewItem?.Column != null);
-    }
+    public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);
 
     public List<ColumnItem> ListOfUsedColumn() {
         List<ColumnItem> colList = new();
@@ -328,11 +320,9 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         return x;
     }
 
-    public void RemoveAt(int z) {
+    public void RemoveAt(int z) =>
         //var it = _internal[z];
-        _internal.RemoveAt(z);
-        //it.Changed -= ColumnViewItem_Changed;
-    }
+        _internal.RemoveAt(z);//it.Changed -= ColumnViewItem_Changed;
 
     public void ShowColumns(params string[] columnnames) {
         if (Database == null || Database.IsDisposed) { return; }
@@ -372,14 +362,9 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         return result + "}";
     }
 
-    private void Add(ColumnViewItem columnViewItem) {
-        _internal.Add(columnViewItem);
-        //columnViewItem.Changed += ColumnViewItem_Changed;
-    }
+    private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);//columnViewItem.Changed += ColumnViewItem_Changed;
 
-    private void ColumnViewItem_Changed(object sender, System.EventArgs e) {
-        throw new NotImplementedException();
-    }
+    private void ColumnViewItem_Changed(object sender, System.EventArgs e) => throw new NotImplementedException();
 
     //    Swap(index1, index2);
     //}

@@ -20,7 +20,7 @@ using System;
 namespace BlueBasics.Enums;
 
 [Flags]
-public enum EditableErrorReason {
+public enum EditableErrorReasonType {
 
     /// <summary>
     /// Ob der Wert gelesen werden kann. Ein Speichern/Bearbeiten ist nicht geplant.
@@ -39,6 +39,7 @@ public enum EditableErrorReason {
 
     /// <summary>
     /// Es ist noch Zeit, der Benutzer kann ausgesperrt werden
+    /// Auf Zellebene werden hier bereits schon die Zeilen für LinkedCells angelegt
     /// </summary>
     EditGeneral = 8,
 

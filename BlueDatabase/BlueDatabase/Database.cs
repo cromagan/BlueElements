@@ -618,12 +618,12 @@ public sealed class Database : DatabaseAbstract {
         return new ConnectionInfo(SqlBackAbstract.MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
     }
 
-    public override string EditableErrorReason(EditableErrorReason mode) {
+    public override string EditableErrorReason(EditableErrorReasonType mode) {
         var m = base.EditableErrorReason(mode);
         if (!string.IsNullOrEmpty(m)) { return m; }
 
         //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
-        if (mode.HasFlag(BlueBasics.Enums.EditableErrorReason.Load) || mode.HasFlag(BlueBasics.Enums.EditableErrorReason.LoadForCheckingOnly)) {
+        if (mode.HasFlag(EditableErrorReasonType.Load) || mode.HasFlag(EditableErrorReasonType.LoadForCheckingOnly)) {
             if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
         }
 
@@ -639,7 +639,7 @@ public sealed class Database : DatabaseAbstract {
         }
 
         //---------- Save ------------------------------------------------------------------------------------------
-        if (mode.HasFlag(BlueBasics.Enums.EditableErrorReason.Save)) {
+        if (mode.HasFlag(EditableErrorReasonType.Save)) {
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
             if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
@@ -701,7 +701,7 @@ public sealed class Database : DatabaseAbstract {
         //LoadingEventArgs ec = new(_initialLoadDone);
         OnLoading();
 
-        var bLoaded = LoadBytesFromDisk(BlueBasics.Enums.EditableErrorReason.Load);
+        var bLoaded = LoadBytesFromDisk(EditableErrorReasonType.Load);
         if (bLoaded == null) { return; }
 
         Parse(bLoaded, this, Works, needPassword);
@@ -927,7 +927,7 @@ public sealed class Database : DatabaseAbstract {
     /// </summary>
     /// <param name="checkmode"></param>
     /// <returns></returns>
-    private byte[]? LoadBytesFromDisk(EditableErrorReason checkmode) {
+    private byte[]? LoadBytesFromDisk(EditableErrorReasonType checkmode) {
         var startTime = DateTime.UtcNow;
         byte[] bLoaded;
         while (true) {
@@ -964,7 +964,7 @@ public sealed class Database : DatabaseAbstract {
     }
 
     private bool SaveInternal() {
-        var m = EditableErrorReason(BlueBasics.Enums.EditableErrorReason.Save);
+        var m = EditableErrorReason(EditableErrorReasonType.Save);
         if (!string.IsNullOrEmpty(m)) { return false; }
 
         if (string.IsNullOrEmpty(Filename)) { return false; }
@@ -996,7 +996,7 @@ public sealed class Database : DatabaseAbstract {
     }
 
     private string WriteTempFileToDisk() {
-        var f = EditableErrorReason(BlueBasics.Enums.EditableErrorReason.Save);
+        var f = EditableErrorReason(EditableErrorReasonType.Save);
         if (!string.IsNullOrEmpty(f)) { return string.Empty; }
 
         var dataUncompressed = ToListOfByte(this, Works, 5000)?.ToArray();

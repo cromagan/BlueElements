@@ -50,7 +50,6 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName {
     internal readonly bool StrikeOut;
     internal readonly bool Underline;
     private static readonly List<BlueFont> FontsAll = new();
-
     private readonly SizeF[] _charSize;
     private readonly string _code;
 
@@ -226,6 +225,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName {
 
     #region Properties
 
+    public static BlueFont DefaultFont => Get("Arial", 8f, false, false, false, false, false, Color.Red, Color.Black, false, false, false);
     public string KeyName => ToString().Replace(" ", string.Empty).ToUpper();
 
     #endregion

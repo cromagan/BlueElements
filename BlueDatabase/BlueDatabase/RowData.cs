@@ -33,8 +33,10 @@ public static class RowDrawDataExtensions {
 
     public static RowData? Get(this List<RowData>? l, RowItem? row) => l?.FirstOrDefault(thisr => thisr?.Row == row);
 
-    public static RowData? Get(this List<RowData>? l, RowItem? row, string chapter) {
+    public static RowData? Get(this List<RowData>? l, RowItem? row, string? chapter) {
         if (l == null || row == null) { return null; }
+
+        if (chapter == null) { chapter = string.Empty; }
 
         return l.FirstOrDefault(thisr => thisr?.Row == row && thisr.Chapter == chapter);
     }

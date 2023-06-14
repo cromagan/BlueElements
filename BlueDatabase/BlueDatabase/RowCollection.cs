@@ -374,7 +374,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public string ExecuteScript(EventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem>? pinned, bool fullCheck, bool changevalues) {
-        var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReason.EditGeneral);
+        var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditGeneral);
         if (!string.IsNullOrEmpty(m) || Database == null) { return m; }
 
         var rows = CalculateVisibleRows(filter, pinned);

@@ -93,7 +93,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         ColumnItem? lColumn = null;
         if (_column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            (lColumn, _, _) = CellCollection.LinkedCellData(_column, null, false, false);
+            (lColumn, _, _, _) = CellCollection.LinkedCellData(_column, null, false, false);
         }
         lColumn ??= _column;
 

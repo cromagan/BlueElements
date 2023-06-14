@@ -60,7 +60,7 @@ public class Method_AddRow : Method_Database {
         var db = DatabaseOf(s.Variables, attvar.ValueString(0));
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueString(0) + "' nicht gefunden"); }
 
-        var m = db.EditableErrorReason(EditableErrorReason.EditAcut);
+        var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
 
         if (string.IsNullOrEmpty(attvar.ValueString(1))) { return new DoItFeedback(infos.Data, "KeyValue muss einen Wert enthalten."); }

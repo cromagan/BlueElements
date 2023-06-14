@@ -144,10 +144,10 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
         }
     }
 
-    public ReadOnlyCollection<BasicListItem> ItemOrder {
+    public ReadOnlyCollection<BasicListItem>? ItemOrder {
         get {
             if (_itemOrder == null) { CalculateItemOrder(); }
-            return (ReadOnlyCollection<BasicListItem>)_itemOrder;
+            return _itemOrder;
         }
         private set {
             _itemOrder = value;

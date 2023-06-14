@@ -213,7 +213,7 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
             DisabledReason = "Kein Bezug zu einer Zelle.";
             return;
         }
-        DisabledReason = CellCollection.EditableErrorReason(column, row, EditableErrorReason.EditNormaly, true, false); // Rechteverwaltung einfliesen lassen.
+        DisabledReason = CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false); // Rechteverwaltung einfliesen lassen.
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
@@ -422,7 +422,7 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
         ColumnItem? gbColumn;
 
         if (column?.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            (gbColumn, _, _) = CellCollection.LinkedCellData(column, row, true, false);
+            (gbColumn, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
         } else {
             gbColumn = column;
         }

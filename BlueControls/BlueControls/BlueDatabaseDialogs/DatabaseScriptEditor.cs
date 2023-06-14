@@ -252,7 +252,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             Item = null;
             return;
         }
-        if (TableView.ErrorMessage(Database, EditableErrorReason.EditNormaly)) {
+        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly)) {
             Item = null;
             return;
         }
@@ -303,7 +303,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void WriteInfosBack() {
-        if (TableView.ErrorMessage(Database, EditableErrorReason.EditNormaly) || Database == null) { return; }
+        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null) { return; }
 
         if (_item != null) {
             _item.Script = eventScriptEditor.ScriptText;

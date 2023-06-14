@@ -47,9 +47,7 @@ public partial class FormulaView : FormWithStatusBar {
 
     #region Constructors
 
-    public FormulaView() {
-        InitializeComponent();
-    }
+    public FormulaView() => InitializeComponent();
 
     #endregion
 

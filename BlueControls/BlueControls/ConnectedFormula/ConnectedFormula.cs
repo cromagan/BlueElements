@@ -381,9 +381,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         return p;
 
-        RectangleF PositioOf(int no) {
-            return new RectangleF(newX[no], newY[no], newW[no], newH[no]);
-        }
+        RectangleF PositioOf(int no) => new RectangleF(newX[no], newY[no], newW[no], newH[no]);
     }
 
     public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPad padData, float newWidthPixel, float newhHeightPixel, string page) {

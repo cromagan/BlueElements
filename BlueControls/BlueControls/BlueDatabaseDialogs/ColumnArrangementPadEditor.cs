@@ -48,7 +48,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     #region Constructors
 
     public ColumnArrangementPadEditor(DatabaseAbstract? database) : this() {
-        var m = DatabaseAbstract.EditableErrorReason(database, EditableErrorReason.EditGeneral);
+        var m = DatabaseAbstract.EditableErrorReason(database, EditableErrorReasonType.EditGeneral);
         if (!string.IsNullOrEmpty(m)) {
             MessageBox.Show(m, ImageCode.Information, "OK");
             Close();
@@ -177,7 +177,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
-        if (TableView.ErrorMessage(Database, EditableErrorReason.EditAcut) || Database == null) { return; }
+        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditAcut) || Database == null) { return; }
 
         ColumnItem? vorlage = null;
         if (Pad.LastClickedItem is ColumnPadItem cpi && cpi.Column?.Database == Database) {

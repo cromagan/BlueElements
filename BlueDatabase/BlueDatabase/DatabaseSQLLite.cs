@@ -164,13 +164,13 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return null;
     }
 
-    public override string EditableErrorReason(EditableErrorReason mode) {
+    public override string EditableErrorReason(EditableErrorReasonType mode) {
         var m = base.EditableErrorReason(mode);
         if (!string.IsNullOrEmpty(m)) { return m; }
 
         if (_sql == null) { return "Keine SQL-Verbindung vorhanden"; }
 
-        if (mode is BlueBasics.Enums.EditableErrorReason.OnlyRead or BlueBasics.Enums.EditableErrorReason.Load) { return string.Empty; }
+        if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Immer abfragen, da Änderungen direkt gespeichert werden
 

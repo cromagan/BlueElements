@@ -104,7 +104,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         var s = Extended_Text.ExtText.MeasureString(_caption, Design.Caption, States.Standard, width);
 
         //var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(Design.Caption, States.Standard).Font());
-        Size = new Size((int)(s.Width + 2), (int)(s.Height + 2));
+        Size = new Size(s.Width + 2, s.Height + 2);
     }
 
     #endregion

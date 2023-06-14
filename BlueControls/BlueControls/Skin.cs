@@ -882,7 +882,7 @@ public static class Skin {
             SkinDesign d = new() {
                 BackColor1 = Color.White,
                 BorderColor1 = Color.Red,
-                BFont = BlueFont.Get("Arial", 10f, false, false, false, false, false, Color.Red, Color.Black, false, false, false),
+                BFont = BlueFont.DefaultFont,
                 HintergrundArt = HintergrundArt.Solide,
                 RahmenArt = RahmenArt.Solide_1px,
                 Kontur = Enums.Kontur.Rechteck
@@ -1223,7 +1223,7 @@ public static class Skin {
         return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, "X" + ((int)format), rowOfStyle);
     }
 
-    public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).BFont;
+    public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).BFont ?? BlueFont.DefaultFont;
 
     /// <summary>
     /// Gibt eine Liste aller Fonts zurück, die mit dem gewählten Sheetstyle möglich sind.
@@ -1778,7 +1778,7 @@ public static class Skin {
         var @string = styleDb.Cell.GetString(column, row);
         if (string.IsNullOrEmpty(@string)) {
             Develop.DebugPrint("Schrift nicht definiert: " + styleDb.TableName + " - " + column.Name + " - " + row.CellFirstString());
-            return BlueFont.Get("Arial", 7, false, false, false, false, false, Color.Black, Color.Transparent, false, false, false);
+            return BlueFont.DefaultFont; // BlueFont.Get("Arial", 7, false, false, false, false, false, Color.Black, Color.Transparent, false, false, false);
         }
         return BlueFont.Get(@string);
     }

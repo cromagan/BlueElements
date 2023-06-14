@@ -431,7 +431,7 @@ internal sealed partial class ColumnEditor {
     /// </summary>
 
     private void Column_DatenZurückschreiben() {
-        if (TableView.ErrorMessage(_column?.Database, EditableErrorReason.EditAcut) || _column?.Database == null) { return; }
+        if (TableView.ErrorMessage(_column?.Database, EditableErrorReasonType.EditAcut) || _column?.Database == null) { return; }
 
         if (_column.IsDisposed) { return; }
 

@@ -335,7 +335,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
     }
 
     private void WriteInfosBack() {
-        if (TableView.ErrorMessage(Database, EditableErrorReason.EditAcut) || Database == null) { return; }
+        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditAcut) || Database == null) { return; }
 
         //eventScriptEditor.WriteScriptBack();
         Database.GlobalShowPass = txbKennwort.Text;

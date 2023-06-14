@@ -29,7 +29,7 @@ public sealed class TextBoxActionList : DesignerActionList {
 
     #region Properties
 
-    public IInputFormat TextFormat {
+    public IInputFormat? TextFormat {
         get {
             //for (var z = 0; z < 100; z++) {
             //    var st = (VarType)z;

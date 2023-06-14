@@ -425,7 +425,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return false;
     }
 
-    public static string EditableErrorReason(DatabaseAbstract? database, EditableErrorReason mode) {
+    public static string EditableErrorReason(DatabaseAbstract? database, EditableErrorReasonType mode) {
         if (database == null) { return "Keine Datenbank zum bearbeiten."; }
         return database.EditableErrorReason(mode);
     }
@@ -820,14 +820,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         GC.SuppressFinalize(this);
     }
 
-    public virtual string EditableErrorReason(EditableErrorReason mode) {
+    public virtual string EditableErrorReason(EditableErrorReasonType mode) {
         if (IsDisposed) { return "Datenbank verworfen."; }
 
-        if (mode is BlueBasics.Enums.EditableErrorReason.OnlyRead or BlueBasics.Enums.EditableErrorReason.Load) { return string.Empty; }
+        if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
 
-        if (ReadOnly && mode.HasFlag(BlueBasics.Enums.EditableErrorReason.Save)) { return "Datenbank schreibgeschützt!"; }
+        if (ReadOnly && mode.HasFlag(EditableErrorReasonType.Save)) { return "Datenbank schreibgeschützt!"; }
 
-        if (mode.HasFlag(BlueBasics.Enums.EditableErrorReason.EditGeneral) || mode.HasFlag(BlueBasics.Enums.EditableErrorReason.Save)) {
+        if (mode.HasFlag(EditableErrorReasonType.EditGeneral) || mode.HasFlag(EditableErrorReasonType.Save)) {
             if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
         }
 
@@ -951,7 +951,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, "Allgemein"); }
 
-            var m = EditableErrorReason(BlueBasics.Enums.EditableErrorReason.EditGeneral);
+            var m = EditableErrorReason(EditableErrorReasonType.EditGeneral);
 
             if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
 
@@ -1108,7 +1108,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                             var lcColumn = thisColumn;
                             var lCrow = thisRow?.Row;
                             if (thisColumn.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                                (lcColumn, lCrow, _) = CellCollection.LinkedCellData(thisColumn, thisRow?.Row, false, false);
+                                (lcColumn, lCrow, _, _) = CellCollection.LinkedCellData(thisColumn, thisRow?.Row, false, false);
                             }
 
                             if (lCrow != null && lcColumn != null) {
@@ -1784,7 +1784,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     protected abstract void AddUndo(string tableName, DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment);
 
     protected void CreateWatcher() {
-        if (string.IsNullOrEmpty(EditableErrorReason(BlueBasics.Enums.EditableErrorReason.Save))) {
+        if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {
             _checker = new Timer(Checker_Tick);
             _ = _checker.Change(2000, 2000);
         }
@@ -1852,7 +1852,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
         Row.ExecuteValueChanged();
 
-        if (!string.IsNullOrEmpty(EditableErrorReason(BlueBasics.Enums.EditableErrorReason.Save))) { return; }
+        if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) { return; }
         if (!LogUndo) { return; }
 
         Row.ExecuteExtraThread();
@@ -1868,7 +1868,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         if (HasPendingChanges &&
             ((_checkerTickCount > 20 && DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds > 20) ||
             _checkerTickCount > 180)) {
-            if (!string.IsNullOrEmpty(EditableErrorReason(BlueBasics.Enums.EditableErrorReason.Save))) { return; }
+            if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) { return; }
 
             _ = Save();
             _checkerTickCount = 0;

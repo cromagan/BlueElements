@@ -112,7 +112,7 @@ public partial class TableView : FormWithStatusBar {
     #region Methods
 
     public static void CheckDatabase(object? sender, System.EventArgs e) {
-        if (sender is DatabaseAbstract database && string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(database, EditableErrorReason.EditAcut))) {
+        if (sender is DatabaseAbstract database && string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(database, EditableErrorReasonType.EditAcut))) {
             if (database.IsAdministrator()) {
 
                 #region Spalten reparieren
@@ -155,7 +155,7 @@ public partial class TableView : FormWithStatusBar {
     /// <param name="database"></param>
     /// <param name="mode"></param>
     /// <returns></returns>
-    public static bool ErrorMessage(DatabaseAbstract? database, EditableErrorReason mode) {
+    public static bool ErrorMessage(DatabaseAbstract? database, EditableErrorReasonType mode) {
         var m = DatabaseAbstract.EditableErrorReason(database, mode);
         if (string.IsNullOrEmpty(m)) { return false; }
 
@@ -178,7 +178,7 @@ public partial class TableView : FormWithStatusBar {
         switch (column.Format) {
             case DataFormat.Verknüpfung_zu_anderer_Datenbank:
             case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
-                (columnLinked, _, _) = CellCollection.LinkedCellData(column, row, true, false);
+                (columnLinked, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
                 posError = true;
                 break;
         }
@@ -222,7 +222,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     public static void OpenLayoutEditor(DatabaseAbstract db, string layoutToOpen) {
-        var x = db.EditableErrorReason(EditableErrorReason.EditNormaly);
+        var x = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
         if (!string.IsNullOrEmpty(x)) {
             MessageBox.Show(x);
             return;
@@ -521,7 +521,7 @@ public partial class TableView : FormWithStatusBar {
         if (e.HotItem is ColumnItem c) { column = c; }
         if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out row); }
 
-        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReason.EditNormaly, true, false));
+        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false));
 
         if (_ansicht != Ansicht.Überschriften_und_Formular) {
             _ = e.UserMenu.Add("Info", true);
@@ -607,7 +607,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "ZeileLöschen":
-                if (ErrorMessage(tbl.Database, EditableErrorReason.EditGeneral)) { return; }
+                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditGeneral)) { return; }
                 if (!tbl.Database.IsAdministrator()) { return; }
                 if (row == null || row.IsDisposed) { return; }
 
@@ -619,7 +619,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "ContentDelete":
-                if (ErrorMessage(tbl.Database, EditableErrorReason.EditGeneral)) { return; }
+                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditGeneral)) { return; }
 
                 tbl.Database.Cell.Delete(column, row?.Key);
                 break;
@@ -665,7 +665,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "VorherigenInhaltWiederherstellen":
-                if (ErrorMessage(tbl.Database, EditableErrorReason.EditGeneral)) { return; }
+                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditGeneral)) { return; }
 
                 Table.DoUndo(column, row);
                 break;
@@ -1049,7 +1049,7 @@ public partial class TableView : FormWithStatusBar {
             return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
         }
 
-        var m = DatabaseAbstract.EditableErrorReason(Table.Database, EditableErrorReason.EditGeneral);
+        var m = DatabaseAbstract.EditableErrorReason(Table.Database, EditableErrorReasonType.EditGeneral);
 
         if (Table.Design != BlueTableAppearance.Standard || !Table.Enabled || !string.IsNullOrEmpty(m)) {
             enTabellenAnsicht = false;

@@ -57,7 +57,7 @@ public class Method_WriteBackDBVariables : Method_Database {
 
         var db = MyDatabase(s.Variables);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
-        var m = db.EditableErrorReason(EditableErrorReason.EditAcut);
+        var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Variabeln zurückschreiben im Testmodus deaktiviert."); }
 
