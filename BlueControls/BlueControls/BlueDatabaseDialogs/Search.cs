@@ -82,8 +82,20 @@ public sealed partial class Search : Form {
         var ca = _blueTable?.CurrentArrangement;
         found ??= ca?.Last()?.Column;
         var columnStarted = _col;
+
+        if (ca == null) {
+            MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
+            return;
+        }
+
         do {
-            found = ca.NextVisible(found) ?? ca.First().Column;
+            found = ca.NextVisible(found) ?? ca.First()?.Column;
+
+            if (found == null) {
+                MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
+                return;
+            }
+
             var ist1 = found.ReadableText().ToLower();
             if (!string.IsNullOrEmpty(ist1)) {
                 // Allgemeine Prüfung
@@ -105,7 +117,7 @@ public sealed partial class Search : Form {
             MessageBox.Show("Text in den Spalten nicht gefunden.", ImageCode.Information, "OK");
             return;
         }
-        _blueTable.CursorPos_Set(found, _row, true);
+        _blueTable?.CursorPos_Set(found, _row, true);
         _ = txbSuchText.Focus();
     }
 

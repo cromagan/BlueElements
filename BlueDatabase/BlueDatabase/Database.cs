@@ -733,7 +733,7 @@ public sealed class Database : DatabaseAbstract {
         _ = ExecuteScript(EventTypes.database_loaded, string.Empty, true, null);
     }
 
-    public override void RefreshColumnsData(List<ColumnItem> columns) {
+    public override void RefreshColumnsData(List<ColumnItem?>? columns) {
         if (columns == null || columns.Count == 0) { return; }
 
         foreach (var thiscol in columns) {

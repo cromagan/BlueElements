@@ -291,7 +291,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
     }
 
     private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        var it = (BitmapListItem)e.HotItem;
+        if (e.HotItem is not BitmapListItem it) { return; }
 
         switch (e.ClickedComand) {
             case "Löschen":

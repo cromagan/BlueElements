@@ -1141,10 +1141,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             foreach (var thisRow in sortedRowDataNew) {
                 var thisRowData = thisRow;
+
                 if (_mouseOverRow != null && _mouseOverRow?.Row == thisRow?.Row && _mouseOverRow.Chapter == thisRow.Chapter) {
                     _mouseOverRow.GetDataFrom(thisRowData);
                     thisRowData = _mouseOverRow;
                 } // Mouse-Daten wiederverwenden
+
                 if (CursorPosRow?.Row != null && CursorPosRow?.Row == thisRow?.Row && CursorPosRow.Chapter == thisRow.Chapter) {
                     CursorPosRow.GetDataFrom(thisRowData);
                     thisRowData = CursorPosRow;
@@ -1231,10 +1233,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public RowData? View_RowFirst() {
         if (Database == null || Database.IsDisposed) { return null; }
         var s = SortedRows();
-        return s == null || s.Count == 0 ? null : SortedRows()?[0];
+        return s == null || s.Count == 0 ? null : s[0];
     }
 
-    public RowData? View_RowLast() => Database == null ? null : SortedRows().Count == 0 ? null : SortedRows()[SortedRows().Count - 1];
+    public RowData? View_RowLast() {
+        if (Database == null || Database.IsDisposed) { return null; }
+        var s = SortedRows();
+        return s == null || s.Count == 0 ? null : s[s.Count - 1];
+    }
 
     public string ViewToString() {
         var x = new List<string>();
@@ -2013,6 +2019,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
+        Filter ??= new FilterCollection(Database);
+
         switch (e.Comand.ToLower()) {
             case "":
                 break;

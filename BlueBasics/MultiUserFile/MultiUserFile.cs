@@ -927,43 +927,55 @@ public sealed class MultiUserFile : IDisposableExtended {
     private (string TMPFileName, string FileInfoBeforeSaving, byte[]? DataUncompressed) WriteTempFileToDisk(bool iAmThePureBinSaver) {
         string fileInfoBeforeSaving;
         string tmpFileName;
-        byte[] dataUncompressed;
+        byte[]? dataUncompressed;
+
         var count = 0;
         if (!iAmThePureBinSaver && _pureBinSaver.IsBusy) { return (string.Empty, string.Empty, null); }
         if (_doingTempFile) {
             if (!iAmThePureBinSaver) { Develop.DebugPrint("Erstelle bereits TMP-File"); }
             return (string.Empty, string.Empty, null);
         }
+
         _doingTempFile = true;
+
         while (true) {
+            count++;
+
             if (!iAmThePureBinSaver) {
                 // Also, im NICHT-parallelen Prozess ist explizit der Save angestoßen worden.
-                // Somit sollte des Prgramm auf Warteschleife sein und keine Benutzereingabe mehr kommen.
+                // Somit sollte des Programm auf Warteschleife sein und keine Benutzereingabe mehr kommen.
                 // Problem: Wenn die ganze Save-Routine in einem Parallelen-Thread ist
                 Develop.LastUserActionUtc = new DateTime(1900, 1, 1);
             }
+
             var f = EditableErrorReason(EditableErrorReasonType.Save);
             if (!string.IsNullOrEmpty(f)) { _doingTempFile = false; return (string.Empty, string.Empty, null); }
+
             fileInfoBeforeSaving = GetFileInfo(Filename, true);
             dataUncompressed = OnToListOfByte();
-            tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpper());
-            try {
-                using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
-                x.Write(dataUncompressed, 0, dataUncompressed.Length);
-                x.Flush();
-                x.Close();
-                break;
-            } catch (Exception ex) {
-                // DeleteFile(TMPFileName, false); Darf nicht gelöscht werden. Datei konnte ja nicht erstell werden. also auch nix zu löschen
-                count++;
-                if (count > 15) {
-                    Develop.DebugPrint(FehlerArt.Warnung, "Speichern der TMP-Datei abgebrochen.<br>Datei: " + Filename + "<br><br><u>Grund:</u><br>" + ex.Message);
-                    _doingTempFile = false;
-                    return (string.Empty, string.Empty, null);
+
+            if (dataUncompressed != null && dataUncompressed.Length > 0) {
+                tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpper());
+                try {
+                    using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
+                    x.Write(dataUncompressed, 0, dataUncompressed.Length);
+                    x.Flush();
+                    x.Close();
+                    break;
+                } catch {
+                    // DeleteFile(TMPFileName, false); Darf nicht gelöscht werden. Datei konnte ja nicht erstell werden. also auch nix zu löschen
                 }
-                Pause(1, true);
             }
+
+            if (count > 15) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Speichern der TMP-Datei abgebrochen.<br>Datei: " + Filename);
+                _doingTempFile = false;
+                return (string.Empty, string.Empty, null);
+            }
+
+            Pause(1, true);
         }
+
         _doingTempFile = false;
         return (tmpFileName, fileInfoBeforeSaving, dataUncompressed);
     }

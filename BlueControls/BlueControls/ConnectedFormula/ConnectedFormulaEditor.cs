@@ -79,7 +79,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
             isf2.Datenbank_wählen();
         }
 
-        if (x is IItemAcceptFilter iaf2 && iaf2.GetFilterFrom.Count == null) {
+        if (x is IItemAcceptFilter iaf2 && iaf2.GetFilterFrom.Count == 0) {
             iaf2.Datenquellen_bearbeiten();
         }
     }
@@ -176,8 +176,8 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         var it = new RowEntryPadItem(string.Empty);
         it.Page = n;
-        Pad.Item.Add(it);
-        CFormula.Repair();
+        Pad.Item?.Add(it);
+        CFormula?.Repair();
 
         it.Datenbank_wählen();
 

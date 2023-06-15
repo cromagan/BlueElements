@@ -1411,10 +1411,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
     public void RefreshColumnsData(ColumnItem? column) {
         if (column == null || column.IsInCache != null) { return; }
-        RefreshColumnsData(new List<ColumnItem> { column });
+        RefreshColumnsData(new List<ColumnItem?> { column });
     }
 
-    public abstract void RefreshColumnsData(List<ColumnItem> columns);
+    public abstract void RefreshColumnsData(List<ColumnItem?>? columns);
 
     public void RefreshColumnsData(IEnumerable<FilterItem>? filter) {
         if (filter != null) {
