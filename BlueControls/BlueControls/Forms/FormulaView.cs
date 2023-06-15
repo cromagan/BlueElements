@@ -17,28 +17,11 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
-using BlueControls.BlueDatabaseDialogs;
-using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 using static BlueBasics.Develop;
-using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
@@ -52,6 +35,14 @@ public partial class FormulaView : FormWithStatusBar {
     #endregion
 
     #region Methods
+
+    private void btnFormular_Click(object sender, System.EventArgs e) {
+        DebugPrint_InvokeRequired(InvokeRequired, true);
+        if (CFO.ConnectedFormula == null) { return; }
+
+        var x = new ConnectedFormulaEditor(CFO.ConnectedFormula.Filename, null);
+        x.Show();
+    }
 
     private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs? e) {
         MultiUserFile.ForceLoadSaveAll();

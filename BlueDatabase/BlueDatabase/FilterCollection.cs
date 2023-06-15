@@ -137,6 +137,12 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         Add(fi);
     }
 
+    public void AddIfNotExists(FilterCollection filterItem) {
+        foreach (var thisFilter in filterItem) {
+            AddIfNotExists(thisFilter);
+        }
+    }
+
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
     public void Dispose() =>
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.

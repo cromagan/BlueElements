@@ -99,12 +99,12 @@
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(800, 24);
+            this.capStatusBar.Size = new System.Drawing.Size(931, 24);
             // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new System.Drawing.Point(0, 426);
-            this.pnlStatusBar.Size = new System.Drawing.Size(800, 24);
+            this.pnlStatusBar.Size = new System.Drawing.Size(931, 24);
             // 
             // ribMain
             // 
@@ -117,7 +117,7 @@
             this.ribMain.Location = new System.Drawing.Point(0, 0);
             this.ribMain.Name = "ribMain";
             this.ribMain.SelectedIndex = 1;
-            this.ribMain.Size = new System.Drawing.Size(800, 110);
+            this.ribMain.Size = new System.Drawing.Size(931, 110);
             this.ribMain.TabDefault = this.tabFile;
             this.ribMain.TabDefaultOrder = null;
             this.ribMain.TabIndex = 97;
@@ -130,7 +130,7 @@
             this.tabFile.Location = new System.Drawing.Point(4, 25);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(792, 81);
+            this.tabFile.Size = new System.Drawing.Size(923, 81);
             this.tabFile.TabIndex = 3;
             this.tabFile.Text = "Datei";
             // 
@@ -220,7 +220,7 @@
             this.tabAllgemein.Controls.Add(this.grpFormularSteuerung);
             this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
             this.tabAllgemein.Name = "tabAllgemein";
-            this.tabAllgemein.Size = new System.Drawing.Size(792, 81);
+            this.tabAllgemein.Size = new System.Drawing.Size(923, 81);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
             // 
@@ -485,7 +485,7 @@
             this.tabAdmin.Controls.Add(this.grpAdminBearbeiten);
             this.tabAdmin.Location = new System.Drawing.Point(4, 25);
             this.tabAdmin.Name = "tabAdmin";
-            this.tabAdmin.Size = new System.Drawing.Size(792, 81);
+            this.tabAdmin.Size = new System.Drawing.Size(923, 81);
             this.tabAdmin.TabIndex = 0;
             this.tabAdmin.Text = "Administration";
             // 
@@ -497,6 +497,7 @@
             this.grpAdminZeilen.Controls.Add(this.btnSuchenUndErsetzen);
             this.grpAdminZeilen.Controls.Add(this.btnZeileLöschen);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAdminZeilen.Enabled = false;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminZeilen.Location = new System.Drawing.Point(520, 0);
             this.grpAdminZeilen.Name = "grpAdminZeilen";
@@ -547,6 +548,7 @@
             this.grpAdminAllgemein.Controls.Add(this.btnPowerBearbeitung);
             this.grpAdminAllgemein.Controls.Add(this.btnSpaltenUebersicht);
             this.grpAdminAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAdminAllgemein.Enabled = false;
             this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminAllgemein.Location = new System.Drawing.Point(312, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
@@ -608,6 +610,7 @@
             // btnSkripteBearbeiten
             // 
             this.btnSkripteBearbeiten.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSkripteBearbeiten.Enabled = false;
             this.btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
             this.btnSkripteBearbeiten.Location = new System.Drawing.Point(240, 2);
             this.btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
@@ -624,10 +627,12 @@
             this.btnFormular.Size = new System.Drawing.Size(56, 66);
             this.btnFormular.TabIndex = 44;
             this.btnFormular.Text = "Formular-Editor";
+            this.btnFormular.Click += new System.EventHandler(this.btnFormular_Click);
             // 
             // btnSpaltenanordnung
             // 
             this.btnSpaltenanordnung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSpaltenanordnung.Enabled = false;
             this.btnSpaltenanordnung.ImageCode = "Spalte||||||||||Stift";
             this.btnSpaltenanordnung.Location = new System.Drawing.Point(176, 2);
             this.btnSpaltenanordnung.Name = "btnSpaltenanordnung";
@@ -638,6 +643,7 @@
             // btnDatenbankKopf
             // 
             this.btnDatenbankKopf.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnDatenbankKopf.Enabled = false;
             this.btnDatenbankKopf.ImageCode = "Datenbank||||||||||Stift";
             this.btnDatenbankKopf.Location = new System.Drawing.Point(0, 2);
             this.btnDatenbankKopf.Name = "btnDatenbankKopf";
@@ -648,6 +654,7 @@
             // btnLayouts
             // 
             this.btnLayouts.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnLayouts.Enabled = false;
             this.btnLayouts.ImageCode = "Layout||||||||||Stift";
             this.btnLayouts.Location = new System.Drawing.Point(120, 2);
             this.btnLayouts.Name = "btnLayouts";
@@ -662,7 +669,7 @@
             this.tabExport.Controls.Add(this.grpImport);
             this.tabExport.Location = new System.Drawing.Point(4, 25);
             this.tabExport.Name = "tabExport";
-            this.tabExport.Size = new System.Drawing.Size(792, 81);
+            this.tabExport.Size = new System.Drawing.Size(923, 81);
             this.tabExport.TabIndex = 2;
             this.tabExport.Text = "Import/Export";
             // 
@@ -751,7 +758,7 @@
             this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CFO.Location = new System.Drawing.Point(0, 110);
             this.CFO.Name = "CFO";
-            this.CFO.Size = new System.Drawing.Size(800, 316);
+            this.CFO.Size = new System.Drawing.Size(931, 316);
             this.CFO.TabIndex = 98;
             this.CFO.Text = "CFO";
             // 
@@ -759,11 +766,12 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(931, 450);
             this.Controls.Add(this.CFO);
             this.Controls.Add(this.ribMain);
             this.Name = "FormulaView";
             this.Text = "FormulaView";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
             this.Controls.SetChildIndex(this.ribMain, 0);
             this.Controls.SetChildIndex(this.CFO, 0);

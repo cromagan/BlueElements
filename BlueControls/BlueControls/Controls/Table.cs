@@ -44,6 +44,7 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
+using BlueScript;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using Clipboard = System.Windows.Clipboard;
@@ -79,6 +80,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private bool _drawing = false;
     private FilterCollection? _filter;
     private List<RowItem>? _filteredRows;
+    private FilterCollection? _filterFromParents = null;
     private int? _headSize;
     private bool _isinClick;
     private bool _isinDoubleClick;
@@ -214,7 +216,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DatabaseAbstract? Database { get; private set; }
+    public DatabaseAbstract? Database { get; private set; } // DatabaseSet benutzen!
 
     [DefaultValue(BlueTableAppearance.Standard)]
     public BlueTableAppearance Design {
@@ -243,6 +245,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         get {
             if (Database == null || Database.IsDisposed) { return null; }
             if (_filter == null) { Filter = new FilterCollection(Database); }
+
             return _filter;
         }
         private set {
@@ -268,13 +271,32 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, Filter, Database);
+    public List<RowItem> FilteredRows {
+        get {
+            if (_filterFromParents == null) {
+                return this.CalculateFilteredRows(ref _filteredRows, Filter, Database);
+            }
+
+            if (Filter == null) {
+                return this.CalculateFilteredRows(ref _filteredRows, _filterFromParents, Database);
+            }
+
+            var f = new FilterCollection(Database);
+            f.AddIfNotExists(Filter);
+            f.AddIfNotExists(_filterFromParents);
+            return this.CalculateFilteredRows(ref _filteredRows, f, Database);
+        }
+    }
 
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
-    public DatabaseAbstract? OutputDatabase { get => Database; set => Database = value; }
+
+    public DatabaseAbstract? InputDatabase { get => Database; set => DatabaseSet(value, string.Empty); }
+
+    public DatabaseAbstract? OutputDatabase { get => Database; set => DatabaseSet(value, string.Empty); }
+
     public List<RowItem> PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
@@ -711,7 +733,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         OnSelectedCellChanged(new CellExtEventArgs(CursorPosColumn, CursorPosRow));
 
-        if (!sameRow) { OnSelectedRowChanged(new RowEventArgs(setedrow)); }
+        if (!sameRow) {
+            OnSelectedRowChanged(new RowEventArgs(setedrow));
+            this.DoChilds(_childs, setedrow);
+        }
     }
 
     public void DatabaseSet(DatabaseAbstract? value, string viewCode) {
@@ -964,7 +989,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Database.Export_HTML(filename, CurrentArrangement, SortedRows(), execute);
     }
 
-    public void FilterFromParentsChanged() => Invalidate_FilteredRows();
+    public void FilterFromParentsChanged() {
+        Invalidate_FilteredRows();
+        _filterFromParents = this.FilterOfSender();
+        OnFilterChanged();
+    }
 
     /// <summary>
     /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
@@ -1014,6 +1043,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         ////CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
         Invalidate_Filterinfo();
         Invalidate_sortedRowData();
+        Invalidate();
     }
 
     public void Invalidate_HeadSize() {
@@ -2998,11 +3028,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void Filter_Changed(object sender, System.EventArgs e) {
         Invalidate_FilteredRows();
+
         OnFilterChanged();
     }
 
     private void Filter_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
         Invalidate_FilteredRows();
+
         OnFilterChanged();
     }
 

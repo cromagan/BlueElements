@@ -30,16 +30,15 @@ internal class ButtonAddRow : Button, IControlAcceptFilter, ICalculateRows {
     #region Fields
 
     private readonly List<IControlSendFilter> _getFilterFrom = new();
-
     private List<RowItem>? _filteredRows;
 
     #endregion
 
     #region Properties
 
-    public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), this.InputDatabase());
-
+    public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), this.InputDatabase);
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
+    public DatabaseAbstract? InputDatabase { get; set; }
 
     #endregion
 

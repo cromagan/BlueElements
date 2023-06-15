@@ -28,7 +28,6 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueBasics.Enums;
 using System.ComponentModel;
 using BlueBasics.Interfaces;
-using BlueDatabase.AdditionalScriptComands;
 
 namespace BlueControls.Interfaces;
 
@@ -253,6 +252,10 @@ public class ItemAcceptFilter : ItemAcceptSomething {
     }
 
     public DatabaseAbstract? InputDatabase(IItemAcceptFilter item) {
+        if (item.InputDatabaseMustBe is DatabaseAbstract db) {
+            return db;
+        }
+
         var g = GetFilterFromGet(item);
 
         if (g.Count == 0) { return null; }

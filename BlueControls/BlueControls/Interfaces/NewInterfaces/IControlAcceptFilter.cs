@@ -29,6 +29,8 @@ public interface IControlAcceptFilter : IControlAcceptSomething {
 
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom { get; }
 
+    public DatabaseAbstract? InputDatabase { get; set; }
+
     #endregion
 
     #region Methods
@@ -47,6 +49,8 @@ public static class IControlAcceptFilterExtension {
     public static void DoInputSettings(this IControlAcceptFilter dest, ConnectedFormulaView parent, IItemAcceptFilter source) {
         dest.Name = source.DefaultItemToControlName();
 
+        dest.InputDatabase = source.InputDatabase;
+
         foreach (var thisKey in source.GetFilterFrom) {
             var it = source.Parent?[thisKey];
 
@@ -63,7 +67,7 @@ public static class IControlAcceptFilterExtension {
     }
 
     public static FilterCollection? FilterOfSender(this IControlAcceptFilter item) {
-        if (item.InputDatabase() is not DatabaseAbstract db) { return null; }
+        if (item.InputDatabase is not DatabaseAbstract db) { return null; }
 
         var x = new FilterCollection(db);
 
@@ -76,12 +80,12 @@ public static class IControlAcceptFilterExtension {
         return x;
     }
 
-    public static DatabaseAbstract? InputDatabase(this IControlAcceptFilter item) {
-        if (item.GetFilterFrom == null || item.GetFilterFrom.Count == 0) { return null; }
-        return item.GetFilterFrom[0].OutputDatabase;
-    }
-
     #endregion
+
+    //public static DatabaseAbstract? InputDatabase(this IControlAcceptFilter item) {
+    //    if (item.GetFilterFrom == null || item.GetFilterFrom.Count == 0) { return null; }
+    //    return item.GetFilterFrom[0].OutputDatabase;
+    //}
 }
 
 public class ControlAcceptFilter : ControlAcceptSomething {

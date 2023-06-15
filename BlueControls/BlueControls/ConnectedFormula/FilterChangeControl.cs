@@ -40,6 +40,8 @@ internal class FilterChangeControl : GenericControl, IControlAcceptFilter, ICont
     public FilterItem Filter { get; }
 
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
+
+    public DatabaseAbstract? InputDatabase { get; set; }
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
