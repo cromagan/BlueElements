@@ -395,7 +395,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             return;
         }
 
-        var l = new List<ColumnItem>();
+        var l = new List<ColumnItem?>();
         foreach (var thisCo in _tableView.Database.Column) {
             if (thisCo.IsInCache == null && !thisCo.IgnoreAtRowFilter) { l.Add(thisCo); }
         }

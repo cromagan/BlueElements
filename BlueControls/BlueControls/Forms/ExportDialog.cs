@@ -336,6 +336,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             MessageBox.Show(f);
             return;
         }
+        if (Database == null || _rowsForExport == null) { return; } // wird mit Fehler schon abgedeckt
 
         if (optBildSchateln.Checked) {
             tabBildSchachteln.Enabled = true;

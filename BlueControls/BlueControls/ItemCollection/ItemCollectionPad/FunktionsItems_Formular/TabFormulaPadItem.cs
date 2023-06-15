@@ -411,10 +411,12 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuComands.Bearbeiten);
 
     private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        if (e.HotItem is not BasicListItem it) { return; }
+
         if (e.ClickedComand.ToLower() == "bearbeiten") {
             MultiUserFile.SaveAll(false);
 
-            var x = new ConnectedFormulaEditor(((BasicListItem)e.HotItem).KeyName, CFormula?.NotAllowedChilds);
+            var x = new ConnectedFormulaEditor(it.KeyName, CFormula?.NotAllowedChilds);
             _ = x.ShowDialog();
             MultiUserFile.SaveAll(false);
             x.Dispose();

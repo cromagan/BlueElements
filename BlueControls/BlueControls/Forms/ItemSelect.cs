@@ -54,7 +54,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
 
     #region Methods
 
-    public static RowItem? Show(List<RowItem?> rows, string layoutId) {
+    public static RowItem? Show(List<RowItem> rows, string layoutId) {
         try {
             var items = rows.Select(thisRow => new RowFormulaListItem(thisRow, layoutId, string.Empty)).Cast<BasicListItem?>().ToList();
 

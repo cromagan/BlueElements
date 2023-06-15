@@ -52,7 +52,7 @@ public static class Export {
         return InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile, scriptname);
     }
 
-    public static string CreateLayout(List<RowItem?> rows, string loadFile, string saveFile, string scriptname) {
+    public static string CreateLayout(List<RowItem> rows, string loadFile, string saveFile, string scriptname) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
         return InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile, scriptname);
     }
@@ -74,7 +74,7 @@ public static class Export {
     //    '   End If
     //End Sub
 
-    public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem?>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad, string scriptname) {
+    public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad, string scriptname) {
         List<string> l = new();
         if (liste == null) { return (null, "Keine Zeilen angegeben"); }
         string sav;
@@ -485,14 +485,14 @@ public static class Export {
     //}
 
     public static (List<string>? files, string error) SaveAs(RowItem row, string layout, string destinationFile, string scriptname) {
-        List<RowItem?> l = new()
+        List<RowItem> l = new()
         {
             row
         };
         return GenerateLayout_FileSystem(l, layout, destinationFile, false, string.Empty, scriptname);
     }
 
-    public static (List<string>? files, string error) SaveAsBitmap(List<RowItem?> row, string layoutId, string path) {
+    public static (List<string>? files, string error) SaveAsBitmap(List<RowItem> row, string layoutId, string path) {
         List<string> l = new();
         Develop.DebugPrint_NichtImplementiert();
         //foreach (var thisRow in row) {
@@ -505,7 +505,7 @@ public static class Export {
 
     //public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(row, layoutId, filename));
 
-    private static string InternalCreateLayout(List<RowItem?>? rows, string fileLoaded, string saveFileName, string scriptname) {
+    private static string InternalCreateLayout(List<RowItem> rows, string fileLoaded, string saveFileName, string scriptname) {
         var head = string.Empty;
         var foot = string.Empty;
         var body = fileLoaded;
@@ -523,7 +523,7 @@ public static class Export {
         if (rows != null) {
             foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
             {
-                if (thisRow != null && !thisRow .IsDisposed) {
+                if (thisRow != null && !thisRow.IsDisposed) {
                     var tmpBody = body;
 
                     var script = thisRow.ExecuteScript(null, scriptname, false, false, true, 0);

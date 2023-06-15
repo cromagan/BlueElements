@@ -237,6 +237,11 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
     }
 
     private void GenerateInfoText() {
+        if (Database == null || Database.IsDisposed) {
+            capInfo.Text = "Datenbank-Fehler";
+            return;
+        }
+
         var t = "<b>Tabelle:</b> <tab>" + Database.ConnectionData.TableName + "<br>";
         t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueID + "<br>";
         t += "<b>Zeilen:</b> <tab>" + (Database.Row.Count() - 1);
@@ -317,11 +322,13 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
 
     private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (sender is not Table tbl || tbl.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
-        RowItem? row = null;
+        //RowItem? row = null;
         ColumnItem? column = null;
-        if (e.HotItem is RowItem r) { row = r; }
+        //if (e.HotItem is RowItem r) { row = r; }
         if (e.HotItem is ColumnItem c) { column = c; }
-        if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out row); }
+        if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out _); }
+
+        if (column == null) { return; }
 
         switch (e.ClickedComand) {
             case "SpaltenSortierungAZ":

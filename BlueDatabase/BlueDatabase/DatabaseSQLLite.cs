@@ -177,7 +177,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return string.Empty;
     }
 
-    public override void RefreshColumnsData(List<ColumnItem>? columns) {
+    public override void RefreshColumnsData(List<ColumnItem?>? columns) {
         if (columns == null || columns.Count == 0) { return; }
 
         if (_sql == null) {
