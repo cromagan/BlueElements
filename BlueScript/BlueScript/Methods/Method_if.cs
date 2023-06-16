@@ -89,7 +89,7 @@ internal class Method_If : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(infos.Data, "Fehler innerhalb der runden Klammern des If-Befehls"); }
 
-        if (attvar.ValueBool(0)) {
+        if (attvar.ValueBoolGet(0)) {
             var scx = Method_CallByFilename.CallSub(s, infos, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname);
             return scx;
         }
