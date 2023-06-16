@@ -58,23 +58,23 @@ public class Method_LookupFilter : Method {
 
         if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
-        var returncolumn = allFi[0].Database.Column.Exists(attvar.ValueString(0));
-        if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueString(0)); }
+        var returncolumn = allFi[0].Database.Column.Exists(attvar.ValueStringGet(0));
+        if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
         var l = new List<string>();
 
         var r = RowCollection.MatchesTo(allFi);
         if (r.Count == 0) {
-            l.Add(attvar.ValueString(1));
+            l.Add(attvar.ValueStringGet(1));
             return new DoItFeedback(l);
         }
         if (r.Count > 1) {
-            l.Add(attvar.ValueString(2));
+            l.Add(attvar.ValueStringGet(2));
             return new DoItFeedback(l);
         }
 
         var v = RowItem.CellToVariable(returncolumn, r[0]);
-        if (v == null || v.Count != 1) { return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueString(4)); }
+        if (v == null || v.Count != 1) { return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(4)); }
 
         if (v[0] is VariableListString vl) {
             l.AddRange(vl.ValueList);

@@ -66,7 +66,7 @@ internal class Method_LoadImage : Method {
 
         try {
             Generic.CollectGarbage();
-            var bmp = (Bitmap)Image_FromFile(attvar.ValueString(0))!;
+            var bmp = (Bitmap)Image_FromFile(attvar.ValueStringGet(0))!;
             return new DoItFeedback(bmp);
         } catch {
             return new DoItFeedback(null as Bitmap);

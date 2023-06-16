@@ -78,8 +78,8 @@ internal class Method_Export : Method_Database {
 
         #region  Ansicht ermitteln (cu)
 
-        var cu = db.ColumnArrangements.Get(attvar.ValueString(2));
-        if (string.IsNullOrEmpty(attvar.ValueString(2)) || cu == null) {
+        var cu = db.ColumnArrangements.Get(attvar.ValueStringGet(2));
+        if (string.IsNullOrEmpty(attvar.ValueStringGet(2)) || cu == null) {
             cu = db.ColumnArrangements?[0];
         }
 
@@ -89,7 +89,7 @@ internal class Method_Export : Method_Database {
 
         #region  Dateinamen ermitteln (filn)
 
-        var filn = attvar.ValueString(0);
+        var filn = attvar.ValueStringGet(0);
         if (string.IsNullOrEmpty(filn)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
         if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
 
@@ -105,7 +105,7 @@ internal class Method_Export : Method_Database {
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
 
         try {
-            switch (attvar.ValueString(1).ToUpper()) {
+            switch (attvar.ValueStringGet(1).ToUpper()) {
                 case "MDB":
                 case "BDB": {
                         var bytes = Database.ToListOfByte(db, null, 100);

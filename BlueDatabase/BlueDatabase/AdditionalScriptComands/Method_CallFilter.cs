@@ -73,7 +73,7 @@ public class Method_CallFilter : Method {
         var r = allFi[0].Database.Row.CalculateFilteredRows(allFi);
         if (r == null || r.Count == 0) { return DoItFeedback.Null(); }
 
-        var vs = attvar.ValueString(0);
+        var vs = attvar.ValueStringGet(0);
 
         foreach (var thisR in r) {
             if (thisR != null && !thisR.IsDisposed) {

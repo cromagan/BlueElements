@@ -52,9 +52,9 @@ internal class Method_MoveFile : Method {
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var sop = attvar.ValueString(0);
+        var sop = attvar.ValueStringGet(0);
 
-        var dep = attvar.ValueString(1);
+        var dep = attvar.ValueStringGet(1);
 
         //if (!DirectoryExists(sop.FilePath())) { return new DoItFeedback(infos.LogData, s, "Verzeichnis existiert nicht"); }
         if (!DirectoryExists(dep.FilePath())) { return new DoItFeedback(infos.Data, "Ziel-Verzeichnis existiert nicht"); }

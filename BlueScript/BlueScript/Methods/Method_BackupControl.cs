@@ -53,7 +53,7 @@ internal class Method_BackupControl : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var filn = attvar.ValueString(0);
+        var filn = attvar.ValueStringGet(0);
 
         if (!filn.IsFormat(FormatHolder.Filepath)) { return new DoItFeedback(infos.Data, "Dateipfad-Fehler!"); }
 
@@ -62,7 +62,7 @@ internal class Method_BackupControl : Method {
         }
 
         var bvw = new BackupVerwalter(2, 20);
-        var m = bvw.CleanUpDirectory(filn, attvar.ValueString(1));
+        var m = bvw.CleanUpDirectory(filn, attvar.ValueStringGet(1));
         if (string.IsNullOrEmpty(m)) { return DoItFeedback.Null(); }
         return new DoItFeedback(infos.Data, "Fehler beim Ausführen");
     }

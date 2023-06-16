@@ -54,8 +54,8 @@ internal class Method_Sort : Method {
 
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
-        var x = attvar.ValueListString(0);
-        if (attvar.ValueBool(1)) {
+        var x = attvar.ValueListStringGet(0);
+        if (attvar.ValueBoolGet(1)) {
             x = x.SortedDistinctList();
         } else {
             x.Sort();

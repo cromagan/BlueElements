@@ -50,8 +50,8 @@ internal class Method_DateTimeDifferenceInDays : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var d1 = attvar.ValueDate(0);
-        var d2 = attvar.ValueDate(1);
+        var d1 = attvar.ValueDateGet(0);
+        var d2 = attvar.ValueDateGet(1);
         return new DoItFeedback(d1.Subtract(d2).TotalDays);
     }
 

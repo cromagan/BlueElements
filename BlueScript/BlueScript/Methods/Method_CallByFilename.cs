@@ -96,7 +96,7 @@ public class Method_CallByFilename : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var vs = attvar.ValueString(0);
+        var vs = attvar.ValueStringGet(0);
         string f;
 
         try {
@@ -117,7 +117,7 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback(infos.Data, "Fehler in Datei " + vs + ": " + error);
         }
 
-        var v = CallSub(s, infos, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBool(1), 0, vs.FileNameWithSuffix());
+        var v = CallSub(s, infos, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix());
         s.BreakFired = false;
         s.EndScript = false;
         return v;

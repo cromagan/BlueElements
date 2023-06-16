@@ -51,7 +51,7 @@ internal class Method_ToUpper : Method {
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        return new DoItFeedback(attvar.ValueString(0).ToUpper());
+        return new DoItFeedback(attvar.ValueStringGet(0).ToUpper());
     }
 
     #endregion

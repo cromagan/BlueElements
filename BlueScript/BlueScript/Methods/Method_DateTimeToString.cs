@@ -57,7 +57,7 @@ internal class Method_DateTimeToString : Method {
         //if (string.IsNullOrEmpty(d.ToString(attvar.ReadableText(1)))) {
         //    return new DoItFeedback(infos.LogData, s, "Kein Unwandlungs-String erhalten.");
         //}
-        var d = attvar.ValueDate(0);
+        var d = attvar.ValueDateGet(0);
 
         try {
             return new DoItFeedback(d.ToString(attvar.ReadableText(1)));

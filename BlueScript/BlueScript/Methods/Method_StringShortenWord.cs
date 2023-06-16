@@ -51,7 +51,7 @@ internal class Method_StringShortenWord : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        var txt = attvar.ValueString(0);
+        var txt = attvar.ValueStringGet(0);
         if (string.IsNullOrEmpty(txt)) {
             return new DoItFeedback(txt);
         }

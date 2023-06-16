@@ -49,7 +49,7 @@ internal class Method_Replace : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
-            : new DoItFeedback(attvar.ValueString(0).Replace(attvar.ValueString(1), attvar.ValueString(2)));
+            : new DoItFeedback(attvar.ValueStringGet(0).Replace(attvar.ValueStringGet(1), attvar.ValueStringGet(2)));
     }
 
     #endregion

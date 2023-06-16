@@ -54,8 +54,8 @@ internal class Method_AddDays : Method {
         //if (!ok) {
         //    return new DoItFeedback(infos.LogData, s, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
         //}
-        var d = attvar.ValueDate(0);
-        d = d.AddDays(attvar.ValueNum(1));
+        var d = attvar.ValueDateGet(0);
+        d = d.AddDays(attvar.ValueNumGet(1));
         return new DoItFeedback(d);
     }
 

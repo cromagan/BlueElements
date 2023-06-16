@@ -52,7 +52,7 @@ internal class Method_RandomInt : Method {
 
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
             ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
-            : new DoItFeedback(Constants.GlobalRND.Next(0, attvar.ValueInt(0)));
+            : new DoItFeedback(Constants.GlobalRND.Next(0, attvar.ValueIntGet(0)));
     }
 
     #endregion

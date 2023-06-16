@@ -55,7 +55,7 @@ public class Method_SoftMessage : Method_Database {
         var db = MyDatabase(s.Variables);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
-        var txt = "<b>Skript:</b> " + attvar.ValueString(0);
+        var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
         db.OnDropMessage(FehlerArt.Info, txt);
 
         return DoItFeedback.Null();

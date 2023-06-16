@@ -53,22 +53,22 @@ internal class Method_LoadTextFile : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var ft = attvar.ValueString(0).FileType();
+        var ft = attvar.ValueStringGet(0).FileType();
 
         if (ft is not FileFormat.Textdocument and not FileFormat.CSV) {
-            return new DoItFeedback(infos.Data, "Datei ist kein Textformat: " + attvar.ValueString(0));
+            return new DoItFeedback(infos.Data, "Datei ist kein Textformat: " + attvar.ValueStringGet(0));
         }
 
-        if (!IO.FileExists(attvar.ValueString(0))) {
-            return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + attvar.ValueString(0));
+        if (!IO.FileExists(attvar.ValueStringGet(0))) {
+            return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + attvar.ValueStringGet(0));
         }
 
         try {
-            var importText = File.ReadAllText(attvar.ValueString(0), Constants.Win1252);
+            var importText = File.ReadAllText(attvar.ValueStringGet(0), Constants.Win1252);
             //var bmp = (Bitmap)BitmapExt.Image_FromFile(attvar.ValueString(0))!;
             return new DoItFeedback(importText);
         } catch {
-            return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + attvar.ValueString(0));
+            return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + attvar.ValueStringGet(0));
         }
     }
 

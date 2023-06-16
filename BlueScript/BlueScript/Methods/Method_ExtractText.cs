@@ -55,7 +55,7 @@ internal class Method_ExtractText : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var tags = attvar.ValueString(0).ReduceToMulti(attvar.ValueString(1), StringComparison.OrdinalIgnoreCase);
+        var tags = attvar.ValueStringGet(0).ReduceToMulti(attvar.ValueStringGet(1), StringComparison.OrdinalIgnoreCase);
 
         if (tags == null) {
             return new DoItFeedback(infos.Data, "Nichts extrahiert - Searchpattern fehlerhaft?");

@@ -53,10 +53,10 @@ internal class Method_Join : Method {
 
         //if (string.IsNullOrEmpty(attvar.ValueString(0))) { return DoItFeedback.Null(infos, s, line); }
 
-        var tmp = attvar.ValueListString(0);
+        var tmp = attvar.ValueListStringGet(0);
         //tmp = tmp.Substring(0, tmp.Length - 1); // Listen mit Einträgen haben zur Erkennung immer noch einen zusätzlichen Zeilenumbruch
 
-        return new DoItFeedback(tmp.JoinWith(attvar.ValueString(1)));
+        return new DoItFeedback(tmp.JoinWith(attvar.ValueStringGet(1)));
     }
 
     #endregion

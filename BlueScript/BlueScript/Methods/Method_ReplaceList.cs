@@ -55,10 +55,10 @@ internal class Method_ReplaceList : Method {
 
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
-        var tmpList = attvar.ValueListString(0);
+        var tmpList = attvar.ValueListStringGet(0);
 
-        if (attvar.ValueString(3) == attvar.ValueString(4)) { return new DoItFeedback(infos.Data, "Suchtext und Ersetzungstext sind identisch."); }
-        if (!attvar.ValueBool(1) && string.Equals(attvar.ValueString(3), attvar.ValueString(4), StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback(infos.Data, "Suchtext und Ersetzungstext sind identisch."); }
+        if (attvar.ValueStringGet(3) == attvar.ValueStringGet(4)) { return new DoItFeedback(infos.Data, "Suchtext und Ersetzungstext sind identisch."); }
+        if (!attvar.ValueBoolGet(1) && string.Equals(attvar.ValueStringGet(3), attvar.ValueStringGet(4), StringComparison.OrdinalIgnoreCase)) { return new DoItFeedback(infos.Data, "Suchtext und Ersetzungstext sind identisch."); }
 
         var ct = 0;
         bool again;
@@ -67,30 +67,30 @@ internal class Method_ReplaceList : Method {
             if (ct > 10000) { return new DoItFeedback(infos.Data, "Überlauf bei ReplaceList."); }
             again = false;
             for (var z = 0; z < tmpList.Count; z++) {
-                if (attvar.ValueBool(2)) {
+                if (attvar.ValueBoolGet(2)) {
                     // Teilersetzungen
                     var orignal = tmpList[z];
 
-                    if (attvar.ValueBool(1)) {
+                    if (attvar.ValueBoolGet(1)) {
                         // Case Sensitive
-                        tmpList[z] = tmpList[z].Replace(attvar.ValueString(3), attvar.ValueString(4));
+                        tmpList[z] = tmpList[z].Replace(attvar.ValueStringGet(3), attvar.ValueStringGet(4));
                     } else {
                         // Not Case Sesitive
-                        tmpList[z] = tmpList[z].Replace(attvar.ValueString(3), attvar.ValueString(4), RegexOptions.IgnoreCase);
+                        tmpList[z] = tmpList[z].Replace(attvar.ValueStringGet(3), attvar.ValueStringGet(4), RegexOptions.IgnoreCase);
                     }
                     again = tmpList[z] != orignal;
                 } else {
                     // nur Komplett-Ersetzungen
-                    if (attvar.ValueBool(1)) {
+                    if (attvar.ValueBoolGet(1)) {
                         // Case Sensitive
-                        if (tmpList[z] == attvar.ValueString(3)) {
-                            tmpList[z] = attvar.ValueString(4);
+                        if (tmpList[z] == attvar.ValueStringGet(3)) {
+                            tmpList[z] = attvar.ValueStringGet(4);
                             again = true;
                         }
                     } else {
                         // Not Case Sesitive
-                        if (string.Equals(tmpList[z], attvar.ValueString(3), StringComparison.OrdinalIgnoreCase)) {
-                            tmpList[z] = attvar.ValueString(4);
+                        if (string.Equals(tmpList[z], attvar.ValueStringGet(3), StringComparison.OrdinalIgnoreCase)) {
+                            tmpList[z] = attvar.ValueStringGet(4);
                             again = true;
                         }
                     }
@@ -98,7 +98,7 @@ internal class Method_ReplaceList : Method {
             }
         } while (again);
 
-        ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
+        if (attvar.ValueListStringSet(0, tmpList, infos.Data) is DoItFeedback dif) { return dif; }
         return DoItFeedback.Null();
     }
 

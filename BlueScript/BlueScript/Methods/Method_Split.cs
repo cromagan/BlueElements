@@ -52,7 +52,7 @@ internal class Method_Split : Method {
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        return new DoItFeedback(attvar.ValueString(0).SplitBy(attvar.ValueString(1)));
+        return new DoItFeedback(attvar.ValueStringGet(0).SplitBy(attvar.ValueStringGet(1)));
     }
 
     #endregion

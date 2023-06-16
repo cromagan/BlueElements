@@ -56,14 +56,14 @@ internal class Method_SaveImage : Method {
 
         #region  Bild ermitteln (img)
 
-        var img = ((VariableBitmap)attvar.Attributes[2]).ValueBitmap;
+        var img = attvar.ValueBitmapGet(2);
         if (img == null) { return new DoItFeedback(infos.Data, "Bild fehlerhaft."); }
 
         #endregion
 
         #region  Dateinamen ermitteln (filn)
 
-        var filn = attvar.ValueString(0);
+        var filn = attvar.ValueStringGet(0);
         if (string.IsNullOrEmpty(filn)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
 
         if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback(infos.Data, "Dateinamen-Fehler!"); }
@@ -79,7 +79,7 @@ internal class Method_SaveImage : Method {
 
         //if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Bild Speichern im Testmodus deaktiviert."); }
 
-        switch (attvar.ValueString(1).ToUpper()) {
+        switch (attvar.ValueStringGet(1).ToUpper()) {
             case "PNG":
                 img.Save(filn, ImageFormat.Png);
 

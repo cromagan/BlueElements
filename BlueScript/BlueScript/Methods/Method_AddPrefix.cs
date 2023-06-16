@@ -52,13 +52,13 @@ internal class Method_AddPrefix : Method {
 
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
-        var tmp = attvar.ValueListString(0);
+        var tmpList = attvar.ValueListStringGet(0);
 
-        for (var z = 0; z < tmp.Count; z++) {
-            tmp[z] = attvar.ReadableText(1) + tmp[z];
+        for (var z = 0; z < tmpList.Count; z++) {
+            tmpList[z] = attvar.ReadableText(1) + tmpList[z];
         }
 
-        ((VariableListString)attvar.Attributes[0]).ValueList = tmp;
+        if (attvar.ValueListStringSet(0, tmpList, infos.Data) is DoItFeedback dif) { return dif; }
 
         return DoItFeedback.Null();
     }

@@ -74,20 +74,20 @@ public class Method_Filter : Method_Database {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var db = DatabaseOf(s.Variables, attvar.ValueString(0));
-        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueString(0) + "' nicht gefunden"); }
+        var db = DatabaseOf(s.Variables, attvar.ValueStringGet(0));
+        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         #region Spalte ermitteln
 
-        var filterColumn = db.Column.Exists(attvar.ValueString(1));
-        if (filterColumn == null) { return new DoItFeedback(infos.Data, "Spalte '" + attvar.ValueString(1) + "' in Ziel-Datenbank nicht gefunden"); }
+        var filterColumn = db.Column.Exists(attvar.ValueStringGet(1));
+        if (filterColumn == null) { return new DoItFeedback(infos.Data, "Spalte '" + attvar.ValueStringGet(1) + "' in Ziel-Datenbank nicht gefunden"); }
 
         #endregion
 
         #region Typ ermitteln
 
         FilterType filtertype;
-        switch (attvar.ValueString(2).ToLower()) {
+        switch (attvar.ValueStringGet(2).ToLower()) {
             case "is":
                 filtertype = FilterType.Istgleich_GroßKleinEgal;
                 break;
@@ -97,12 +97,12 @@ public class Method_Filter : Method_Database {
                 break;
 
             default:
-                return new DoItFeedback(infos.Data, "Filtertype unbekannt: " + attvar.ValueString(2));
+                return new DoItFeedback(infos.Data, "Filtertype unbekannt: " + attvar.ValueStringGet(2));
         }
 
         #endregion
 
-        var fii = new FilterItem(filterColumn, filtertype, attvar.ValueString(3));
+        var fii = new FilterItem(filterColumn, filtertype, attvar.ValueStringGet(3));
         return new DoItFeedback(new VariableFilterItem(fii));
     }
 

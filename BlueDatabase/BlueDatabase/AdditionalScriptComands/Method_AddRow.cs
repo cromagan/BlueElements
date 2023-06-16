@@ -57,18 +57,18 @@ public class Method_AddRow : Method_Database {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var db = DatabaseOf(s.Variables, attvar.ValueString(0));
-        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueString(0) + "' nicht gefunden"); }
+        var db = DatabaseOf(s.Variables, attvar.ValueStringGet(0));
+        if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
 
-        if (string.IsNullOrEmpty(attvar.ValueString(1))) { return new DoItFeedback(infos.Data, "KeyValue muss einen Wert enthalten."); }
+        if (string.IsNullOrEmpty(attvar.ValueStringGet(1))) { return new DoItFeedback(infos.Data, "KeyValue muss einen Wert enthalten."); }
         //var r = db.Row[attvar.ValueString(1)];
 
         //if (r != null && !(attvar.ValueBool(2)) { return Method_Row?.RowToObject(r); }
 
-        if (attvar.ValueBool(2)) {
+        if (attvar.ValueBoolGet(2)) {
             StackTrace stackTrace = new();
 
             if (stackTrace.FrameCount > 400) {
@@ -78,7 +78,7 @@ public class Method_AddRow : Method_Database {
 
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
 
-        var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), attvar.ValueString(1), attvar.ValueBool(2), true, "Script Command: Add Row");
+        var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), attvar.ValueStringGet(1), attvar.ValueBoolGet(2), true, "Script Command: Add Row");
 
         return Method_Row.RowToObjectFeedback(r);
     }

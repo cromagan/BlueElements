@@ -58,8 +58,8 @@ public class Method_CellSetFilter : Method_Database {
         var db = allFi[0].Database;
         if (db == null || db.IsDisposed) { return new DoItFeedback(infos.Data, "Datenbank verworfen."); }
 
-        var columnToSet = db.Column.Exists(attvar.ValueString(1));
-        if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueString(4)); }
+        var columnToSet = db.Column.Exists(attvar.ValueStringGet(1));
+        if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(4)); }
 
         var r = RowCollection.MatchesTo(allFi);
         if (r.Count is 0 or > 1) {

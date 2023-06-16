@@ -53,7 +53,7 @@ internal class Method_DirectoryExists : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var pf = attvar.ValueString(0);
+        var pf = attvar.ValueStringGet(0);
 
         if (!pf.IsFormat(FormatHolder.Filepath)) {
             return new DoItFeedback(infos.Data, "Dateipfad ungültig: " + pf);

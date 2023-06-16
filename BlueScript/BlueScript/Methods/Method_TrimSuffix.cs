@@ -50,12 +50,12 @@ internal class Method_TrimSuffix : Method {
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
-        var val = attvar.ValueString(0);
+        var val = attvar.ValueStringGet(0);
 
         const string tmp = Constants.Char_Numerals + " ";
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
-            var suf = attvar.ValueString(z).ToLower();
+            var suf = attvar.ValueStringGet(z).ToLower();
             if (val.Length <= suf.Length) {
                 continue;
             }

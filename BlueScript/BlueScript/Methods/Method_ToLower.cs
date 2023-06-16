@@ -50,7 +50,7 @@ internal class Method_ToLower : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        return new DoItFeedback(attvar.ValueString(0).ToLower());
+        return new DoItFeedback(attvar.ValueStringGet(0).ToLower());
     }
 
     #endregion

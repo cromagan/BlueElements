@@ -52,31 +52,31 @@ public class Method_Lookup : Method_Database {
             return DoItFeedback.AttributFehler(infos.Data, this, attvar);
         }
 
-        var db = DatabaseOf(s.Variables, attvar.ValueString(0));
+        var db = DatabaseOf(s.Variables, attvar.ValueStringGet(0));
         if (db == null) {
-            return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueString(0) + "' nicht gefunden");
+            return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
         }
 
-        var c = db.Column.Exists(attvar.ValueString(2));
+        var c = db.Column.Exists(attvar.ValueStringGet(2));
         if (c == null) {
-            return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueString(2));
+            return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(2));
         }
 
-        var r = RowCollection.MatchesTo(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, attvar.ValueString(1)));
+        var r = RowCollection.MatchesTo(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
         var l = new List<string>();
 
         if (r.Count == 0) {
-            l.Add(attvar.ValueString(3));
+            l.Add(attvar.ValueStringGet(3));
             return new DoItFeedback(l);
         }
         if (r.Count > 1) {
-            l.Add(attvar.ValueString(4));
+            l.Add(attvar.ValueStringGet(4));
             return new DoItFeedback(l);
         }
 
         var v = RowItem.CellToVariable(c, r[0]);
         if (v == null || v.Count != 1) {
-            return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueString(2));
+            return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(2));
         }
 
         if (v[0] is VariableListString vl) {

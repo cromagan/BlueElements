@@ -54,12 +54,12 @@ public class Method_CellGetRow : Method_Database {
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
         if (row?.Database is null || row.Database.IsDisposed) { return new DoItFeedback(infos.Data, "Fehler in der Zeile"); }
 
-        var c = row.Database.Column.Exists(attvar.ValueString(0));
-        if (c == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueString(0)); }
+        var c = row.Database.Column.Exists(attvar.ValueStringGet(0));
+        if (c == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
         var v = RowItem.CellToVariable(c, row);
         if (v == null || v.Count != 1) {
-            return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueString(0));
+            return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(0));
         }
 
         var l = new List<string>();

@@ -82,7 +82,7 @@ public static class IInputFormatExtensions {
             l.Add(txt);
         }
 
-        if (txt.Length > formatToCheck.MaxTextLenght) { return false; }
+
 
         foreach (var thisString in l) {
             if (!string.IsNullOrEmpty(thisString)) {
@@ -93,6 +93,8 @@ public static class IInputFormatExtensions {
                 if (!string.IsNullOrEmpty(formatToCheck.Regex) && !thisString.RegexMatch(formatToCheck.Regex)) {
                     return false;
                 }
+
+                if (thisString.Length > formatToCheck.MaxTextLenght) { return false; }
 
                 switch (formatToCheck.AdditionalFormatCheck) {
                     case AdditionalCheck.None:

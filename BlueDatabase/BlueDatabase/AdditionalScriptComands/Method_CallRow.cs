@@ -68,7 +68,7 @@ public class Method_CallRow : Method {
             return new DoItFeedback(infos.Data, "Zeile nicht gefunden");
         }
 
-        var vs = attvar.ValueString(0);
+        var vs = attvar.ValueStringGet(0);
         s.Sub++;
         var s2 = row.ExecuteScript(null, vs, false, false, s.ChangeValues, 0);
         if (!s2.AllOk) {

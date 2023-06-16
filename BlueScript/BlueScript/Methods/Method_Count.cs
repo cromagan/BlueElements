@@ -50,7 +50,7 @@ internal class Method_Count : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
             ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
-            : new DoItFeedback(attvar.ValueListString(0).Count);
+            : new DoItFeedback(attvar.ValueListStringGet(0).Count);
     }
 
     #endregion

@@ -50,12 +50,12 @@ internal class Method_EndsWith : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.ValueBool(1)) {
-                if (attvar.ValueString(0).EndsWith(attvar.ValueString(z))) {
+            if (attvar.ValueBoolGet(1)) {
+                if (attvar.ValueStringGet(0).EndsWith(attvar.ValueStringGet(z))) {
                     return DoItFeedback.Wahr();
                 }
             } else {
-                if (attvar.ValueString(0).ToLower().EndsWith(attvar.ValueString(z).ToLower())) {
+                if (attvar.ValueStringGet(0).ToLower().EndsWith(attvar.ValueStringGet(z).ToLower())) {
                     return DoItFeedback.Wahr();
                 }
             }

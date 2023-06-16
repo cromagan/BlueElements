@@ -69,7 +69,7 @@ internal class Method_ContainsWhitch : Method {
         #endregion
 
         var rx = RegexOptions.IgnoreCase;
-        if (attvar.ValueBool(1)) { rx = RegexOptions.None; }
+        if (attvar.ValueBoolGet(1)) { rx = RegexOptions.None; }
 
         if (attvar.Attributes[0] is VariableString vs2) {
             foreach (var thisW in wordlist) {

@@ -52,7 +52,7 @@ internal class Method_Add : Method {
 
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
-        var tmpList = attvar.ValueListString(0);
+        var tmpList = attvar.ValueListStringGet(0);
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableString vs) {
                 tmpList.Add(vs.ValueString);
@@ -61,7 +61,9 @@ internal class Method_Add : Method {
                 tmpList.AddRange(vl.ValueList);
             }
         }
-        ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
+
+        if (attvar.ValueListStringSet(0, tmpList, infos.Data) is DoItFeedback dif) { return dif; }
+
         return DoItFeedback.Null();
     }
 

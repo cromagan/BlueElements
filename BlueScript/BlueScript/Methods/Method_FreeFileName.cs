@@ -53,7 +53,7 @@ internal class Method_FreeFileName : Method {
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var pf = attvar.ValueString(0);
+        var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {
             return new DoItFeedback(infos.Data, "Verzeichnis existiert nicht");
@@ -69,7 +69,7 @@ internal class Method_FreeFileName : Method {
                 p += zeichen.Substring(pos, 1);
             }
 
-            if (!FileExists(pf + p + attvar.ValueString(1))) {
+            if (!FileExists(pf + p + attvar.ValueStringGet(1))) {
                 return new DoItFeedback(p);
             }
         } while (true);

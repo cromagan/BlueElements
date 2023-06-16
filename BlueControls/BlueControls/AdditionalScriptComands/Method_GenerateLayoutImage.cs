@@ -60,7 +60,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         #region  Layout index ermitteln (ind)
 
-        var ca = attvar.ValueString(0);
+        var ca = attvar.ValueStringGet(0);
 
         var ind = r.Database.Layouts.LayoutCaptionToIndex(ca);
 
@@ -70,7 +70,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         #region  scale  ermitteln (sc)
 
-        var sc = attvar.ValueNum(1);
+        var sc = attvar.ValueNumGet(1);
         if (sc is < 0.1 or > 10) { return new DoItFeedback(infos.Data, "Skalierung nur von 0.1 bis 10 erlaubt."); }
 
         #endregion

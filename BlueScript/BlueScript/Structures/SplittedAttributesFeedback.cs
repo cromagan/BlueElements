@@ -15,10 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using BlueScript.Enums;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace BlueScript.Structures;
 
@@ -66,46 +69,93 @@ public readonly struct SplittedAttributesFeedback {
         return true;
     }
 
-    public bool ValueBool(int varno) {
+    public Bitmap? ValueBitmapGet(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return null; }
+
+        if (Attributes[varno] is VariableBitmap vs) { return vs.ValueBitmap; }
+        return null;
+    }
+
+    public bool ValueBoolGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return false; }
 
         if (Attributes[varno] is VariableBool vs) { return vs.ValueBool; }
         return false;
     }
 
-    public DateTime ValueDate(int varno) {
+    public DateTime ValueDateGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return default; }
 
         if (Attributes[varno] is VariableDateTime vs) { return vs.ValueDate; }
         return default;
     }
 
-    public int ValueInt(int varno) {
+    public int ValueIntGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return 0; }
 
         if (Attributes[varno] is VariableFloat vs) { return vs.ValueInt; }
         return 0;
     }
 
-    public List<string> ValueListString(int varno) {
+    public List<string> ValueListStringGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return new(); }
 
         if (Attributes[varno] is VariableListString vs) { return vs.ValueList; }
         return new();
     }
 
-    public double ValueNum(int varno) {
+    public DoItFeedback? ValueListStringSet(int varno, List<string> value, LogData ld) {
+        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno); }
+
+        if (Attributes[varno] is VariableListString vs) {
+            vs.ValueList = value;
+            return null;
+        }
+        return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno);
+    }
+
+    public double ValueNumGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return 0; }
 
         if (Attributes[varno] is VariableFloat vs) { return vs.ValueNum; }
         return 0;
     }
 
-    public string ValueString(int varno) {
+    public string ValueStringGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
         if (Attributes[varno] is VariableString vs) { return vs.ValueString; }
         return string.Empty;
+    }
+
+    internal DoItFeedback? ValueBoolSet(int varno, bool value, LogData ld) {
+        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno); }
+
+        if (Attributes[varno] is VariableBool vs) {
+            vs.ValueBool = value;
+            return null;
+        }
+        return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno);
+    }
+
+    internal DoItFeedback? ValueNumSet(int varno, double value, LogData ld) {
+        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno); }
+
+        if (Attributes[varno] is VariableFloat vs) {
+            vs.ValueNum = value;
+            return null;
+        }
+        return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno);
+    }
+
+    internal DoItFeedback? ValueStringSet(int varno, string value, LogData ld) {
+        if (varno < 0 || varno >= Attributes.Count) { return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno); }
+
+        if (Attributes[varno] is VariableString vs) {
+            vs.ValueString = value;
+            return null;
+        }
+        return DoItFeedback.WertKonnteNichtGesetztWerden(ld, varno);
     }
 
     #endregion

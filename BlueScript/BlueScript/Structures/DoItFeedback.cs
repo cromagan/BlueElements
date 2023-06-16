@@ -115,5 +115,7 @@ public struct DoItFeedback {
 
     public static DoItFeedback Wahr() => new(true);
 
+    public static DoItFeedback WertKonnteNichtGesetztWerden(LogData ld, int atno) => new(ld, "Der Wert das Attributes " + atno + " konnte nicht gesetzt werden.");
+
     #endregion
 }

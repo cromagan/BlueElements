@@ -53,16 +53,16 @@ internal class Method_Remove : Method {
 
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
-        var tmpList = attvar.ValueListString(0);
+        var tmpList = attvar.ValueListStringGet(0);
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableString vs) {
-                tmpList!.RemoveString(vs.ValueString, attvar.ValueBool(1));
+                tmpList!.RemoveString(vs.ValueString, attvar.ValueBoolGet(1));
             }
             if (attvar.Attributes[z] is VariableListString vl) {
-                tmpList.RemoveString(vl.ValueList, attvar.ValueBool(1));
+                tmpList.RemoveString(vl.ValueList, attvar.ValueBoolGet(1));
             }
         }
- ((VariableListString)attvar.Attributes[0]).ValueList = tmpList;
+        if (attvar.ValueListStringSet(0, tmpList, infos.Data) is DoItFeedback dif) { return dif; }
         return DoItFeedback.Null();
     }
 

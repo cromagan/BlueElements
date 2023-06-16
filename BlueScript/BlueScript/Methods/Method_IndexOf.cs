@@ -51,9 +51,9 @@ internal class Method_IndexOf : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var val = attvar.ValueString(0);
+        var val = attvar.ValueStringGet(0);
 
-        var search = attvar.ValueString(1);
+        var search = attvar.ValueStringGet(1);
 
         var f = val.IndexOf(search, StringComparison.OrdinalIgnoreCase);
 

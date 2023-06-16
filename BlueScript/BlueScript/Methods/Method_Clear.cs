@@ -50,7 +50,9 @@ internal class Method_Clear : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
-        ((VariableListString)attvar.Attributes[0]).ValueList = new List<string>();
+
+        if (attvar.ValueListStringSet(0, new List<string>(), infos.Data) is DoItFeedback dif) { return dif; }
+
         return DoItFeedback.Null();
     }
 

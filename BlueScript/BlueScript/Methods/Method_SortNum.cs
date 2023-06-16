@@ -54,8 +54,8 @@ internal class Method_SortNum : Method {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
         var nums = new List<double>();
-        foreach (var txt in attvar.ValueListString(0)) {
-            nums.Add(txt.IsNumeral() ? DoubleParse(txt) : attvar.ValueNum(1));
+        foreach (var txt in attvar.ValueListStringGet(0)) {
+            nums.Add(txt.IsNumeral() ? DoubleParse(txt) : attvar.ValueNumGet(1));
         }
 
         nums.Sort();
