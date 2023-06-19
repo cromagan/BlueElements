@@ -26,6 +26,7 @@ using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using System.Linq;
+using System.Configuration;
 
 namespace BlueDatabase;
 
@@ -240,7 +241,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
-    public override bool Save() => _sql != null && _sql.ConnectionOk;
+    public override bool Save() => _sql != null;
 
     public override string UndoText(ColumnItem? column, RowItem? row) => string.Empty;
 

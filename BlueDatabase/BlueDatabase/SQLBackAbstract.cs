@@ -42,34 +42,32 @@ public abstract class SqlBackAbstract {
     public const string SysUndo = "SYS_UNDO";
     public static List<SqlBackAbstract> ConnectedSqlBack = new();
 
-    //public static List<SQLBackAbstract>? PossibleSQLBacks;
-    protected DbConnection? Connection;
+    public DbConnection? Connection;
 
     private static bool _didBackup;
     private readonly object _fill = new();
     private readonly object _getChanges = new();
 
-    //private readonly object _getRow = new();
     private readonly object _openclose = new();
 
     #endregion
 
     #region Constructors
 
-    public SqlBackAbstract() =>
-        //GetSQLBacks();
-        ConnectedSqlBack.Add(this);
+    public SqlBackAbstract() => ConnectedSqlBack.Add(this);
 
     #endregion
 
     #region Properties
 
     public static DateTime LastLoadUtc { get; private set; } = DateTime.UtcNow;
-    public bool ConnectionOk => Connection != null;
 
+    public abstract string ColumnPropertyPrimary { get; }
+    public abstract string ColumnTypeDate { get; }
+    public string ColumnTypeVarChar15 => VarChar(15);
+    public string ColumnTypeVarChar255 => VarChar(255);
+    public string ColumnTypeVarChar4000 => VarChar(4000);
     public string ConnectionString { get; protected set; } = string.Empty;
-
-    public string Date => "DATE";
 
     /// <summary>
     /// Falls die Datenbank von einer lokalen Datei geladen wurde, ist hier der Dateiname enthalten.
@@ -77,14 +75,6 @@ public abstract class SqlBackAbstract {
     public string Filename { get; protected set; } = string.Empty;
 
     public abstract int MaxStringLenght { get; }
-
-    public abstract string Primary { get; }
-
-    public string VarChar15 => VarChar(15);
-
-    public string VarChar255 => VarChar(255);
-
-    public string VarChar4000 => VarChar(4000);
 
     #endregion
 
@@ -132,7 +122,7 @@ public abstract class SqlBackAbstract {
 
         var colMain = GetColumnNames(tablename.ToUpper());
         if (colMain == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return "Spalte nicht gefunden"; }
-        if (!colMain.Contains(columnName)) { AddColumn(tablename.ToUpper(), columnName, VarChar4000, true, allowSystemTableNames); }
+        if (!colMain.Contains(columnName)) { AddColumn(tablename.ToUpper(), columnName, ColumnTypeVarChar4000, true, allowSystemTableNames); }
 
         return SetStyleData(tablename, DatabaseDataType.ColumnName, columnName.ToUpper(), columnName.ToUpper());
     }
@@ -233,23 +223,29 @@ public abstract class SqlBackAbstract {
     /// Datentabelle befüllen
     /// </summary>
     /// <returns>befüllte  Tabelle - Datatable</returns>
-    public DataTable? Fill_Table(string commandtext) {
+    public DataTable Fill_Table(string commandtext) {
         PauseSystem();
 
-        if (Connection == null || !OpenConnection()) { return null; }
-
-        Develop.CheckStackForOverflow();
+        if (Connection == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Keine Connection vorhanden");
+            return Fill_Table(commandtext);
+        }
 
         try {
             lock (_fill) {
                 var tbl = new DataTable();
                 using var command = Connection.CreateCommand();
                 command.CommandText = commandtext;
-                _ = OpenConnection();
-                tbl.Load(command.ExecuteReader());
-                _ = CloseConnection();
-                LastLoadUtc = DateTime.UtcNow;
-                return tbl;
+                if (OpenConnection()) {
+                    tbl.Load(command.ExecuteReader());
+                    _ = CloseConnection();
+                    LastLoadUtc = DateTime.UtcNow;
+                    return tbl;
+                } else {
+                    Develop.CheckStackForOverflow();
+                    Generic.Pause(1000, false);
+                    return Fill_Table(commandtext);
+                }
             }
         } catch {
             _ = CloseConnection();
@@ -432,11 +428,10 @@ public abstract class SqlBackAbstract {
                 }
             }
 
-            if (!OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
+            //if (!OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
             var dt = Fill_Table(com.ToString());
-
-            if (dt == null) { return "Keine gültige Rückgabe erhalten: \r\n" + com.ToString(); }
+            //if (dt == null) { return "Keine gültige Rückgabe erhalten: \r\n" + com.ToString(); }
             //if(dt.Rows.Count != row.Count) { return "Rückgabefehler, Zeilen ungleich"; }
 
             foreach (var thisRow in dt.Rows) {
@@ -471,7 +466,6 @@ public abstract class SqlBackAbstract {
         }
     }
 
-    //    Develop.DebugPrint(FehlerArt.Info, "Datenbank Ladezeit: " + row.Database.TableName + " - " + DateTime.Now.Subtract(ti).TotalSeconds + " Sekunden");
     public bool OpenConnection() {
         lock (_openclose) {
             if (Connection == null) { return false; }
@@ -483,10 +477,6 @@ public abstract class SqlBackAbstract {
         }
     }
 
-    //        for (var z = 1; z < reader.FieldCount; z++) {
-    //            row.Database.Cell.SetValueInternal(row.Database?.Column[z - 1].Key, r, reader[z].ToString(false), -1, -1);
-    //        }
-    //    }
     public abstract SqlBackAbstract OtherTable(string tablename);
 
     public void RenameColumn(string tablename, string oldname, string newname, bool allowSystemTableNames) {
@@ -551,7 +541,7 @@ public abstract class SqlBackAbstract {
         if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
 
         if (!colStyle.Contains("VALUE")) {
-            AddColumn(SysStyle, "VALUE", VarChar4000, true, true);
+            AddColumn(SysStyle, "VALUE", ColumnTypeVarChar4000, true, true);
             ChangeDataType(SysStyle, "VALUE", 511, true);
         }
 
@@ -563,16 +553,16 @@ public abstract class SqlBackAbstract {
 
         var colUndo = GetColumnNames(SysUndo);
         if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colUndo.Contains("TABLENAME")) { AddColumn(SysUndo, "TABLENAME", VarChar255, false, true); }
+        if (!colUndo.Contains("TABLENAME")) { AddColumn(SysUndo, "TABLENAME", ColumnTypeVarChar255, false, true); }
         if (!colUndo.Contains("COMAND")) { AddColumn(SysUndo, "COMAND", false, true); }
-        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", VarChar15, true, true); }
-        if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", VarChar15, true, true); }
-        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SysUndo, "PREVIOUSVALUE", VarChar4000, true, true); }
-        if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SysUndo, "CHANGEDTO", VarChar4000, true, true); }
+        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", ColumnTypeVarChar15, true, true); }
+        if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", ColumnTypeVarChar15, true, true); }
+        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SysUndo, "PREVIOUSVALUE", ColumnTypeVarChar4000, true, true); }
+        if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SysUndo, "CHANGEDTO", ColumnTypeVarChar4000, true, true); }
         if (!colUndo.Contains("USERNAME")) { AddColumn(SysUndo, "USERNAME", false, true); }
-        if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SysUndo, "TIMECODEUTC", Date, false, true); }
-        if (!colUndo.Contains("CMT")) { AddColumn(SysUndo, "CMT", VarChar255, true, true); }
-        if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SysUndo, "COLUMNNAME", VarChar255, true, true); }
+        if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SysUndo, "TIMECODEUTC", ColumnTypeDate, false, true); }
+        if (!colUndo.Contains("CMT")) { AddColumn(SysUndo, "CMT", ColumnTypeVarChar255, true, true); }
+        if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SysUndo, "COLUMNNAME", ColumnTypeVarChar255, true, true); }
 
         #endregion
 
@@ -831,7 +821,7 @@ public abstract class SqlBackAbstract {
         //if (s.Count() != 2) { return null; }
 
         foreach (var thisK in ConnectedSqlBack) {
-            if (thisK.ConnectionOk && thisK.ConnectionString == ci.DatabaseID) {
+            if (thisK.Connection != null && thisK.ConnectionString == ci.DatabaseID) {
                 return thisK.OtherTable(ci.TableName);
             }
         }
@@ -1013,7 +1003,7 @@ public abstract class SqlBackAbstract {
         return ExecuteCommand(command, abort);
     }
 
-    private void AddColumn(string tablename, string column, bool nullable, bool allowSystemTableNames) => AddColumn(tablename, column, VarChar255, nullable, allowSystemTableNames);
+    private void AddColumn(string tablename, string column, bool nullable, bool allowSystemTableNames) => AddColumn(tablename, column, ColumnTypeVarChar255, nullable, allowSystemTableNames);
 
     private void AddColumn(string tablename, string column, string type, bool nullable, bool allowSystemTableNames) {
         if (string.IsNullOrEmpty(column)) {

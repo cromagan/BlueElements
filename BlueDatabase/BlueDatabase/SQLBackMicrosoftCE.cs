@@ -78,9 +78,9 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
 
     #region Properties
 
+    public override string ColumnPropertyPrimary => "bigint identity(1,1)";
+    public override string ColumnTypeDate => "DATE";
     public override int MaxStringLenght => 4000;
-
-    public override string Primary => "bigint identity(1,1)";
 
     #endregion
 
@@ -180,7 +180,7 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
         var b = DeleteTable(tablename, allowSystemTableNames);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        return ExecuteCommand(@"CREATE TABLE " + tablename + "(RK " + Primary + " NOT NULL PRIMARY KEY)", true);
+        return ExecuteCommand(@"CREATE TABLE " + tablename + "(RK " + ColumnPropertyPrimary + " NOT NULL PRIMARY KEY)", true);
     }
 
     protected override string CreateTable(string tablename, List<string> keycolumns, bool allowSystemTableNames) {
