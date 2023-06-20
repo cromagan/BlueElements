@@ -57,7 +57,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     private static DateTime _lastTableCheck = new(1900, 1, 1);
     private readonly List<ColumnViewCollection> _columnArrangements = new();
     private readonly List<string> _datenbankAdmin = new();
-    private readonly List<EventScript> _eventScript = new();
+    private readonly List<DatabaseScript> _eventScript = new();
     private readonly LayoutCollection _layouts = new();
 
     private readonly List<string> _permissionGroupsNewRow = new();
@@ -217,10 +217,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
 
-    public ReadOnlyCollection<EventScript> EventScript {
+    public ReadOnlyCollection<DatabaseScript> EventScript {
         get => new(_eventScript);
         set {
-            var l = new List<EventScript>();
+            var l = new List<DatabaseScript>();
             l.AddRange(value);
             l.Sort();
 
@@ -699,27 +699,27 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         var l = EventScript;
-        if (l.Get(EventTypes.export).Count > 1) {
+        if (l.Get(DatabaseEventTypes.export).Count > 1) {
             return "Skript 'Export' mehrfach vorhanden";
         }
 
-        if (l.Get(EventTypes.database_loaded).Count > 1) {
+        if (l.Get(DatabaseEventTypes.database_loaded).Count > 1) {
             return "Skript 'Datenank geladen' mehrfach vorhanden";
         }
 
-        if (l.Get(EventTypes.prepare_formula).Count > 1) {
+        if (l.Get(DatabaseEventTypes.prepare_formula).Count > 1) {
             return "Skript 'Formular Vorbereitung' mehrfach vorhanden";
         }
 
-        if (l.Get(EventTypes.value_changed_extra_thread).Count > 1) {
+        if (l.Get(DatabaseEventTypes.value_changed_extra_thread).Count > 1) {
             return "Skript 'Wert geändert Extra Thread' mehrfach vorhanden";
         }
 
-        if (l.Get(EventTypes.new_row).Count > 1) {
+        if (l.Get(DatabaseEventTypes.new_row).Count > 1) {
             return "Skript 'Neue Zeile' mehrfach vorhanden";
         }
 
-        if (l.Get(EventTypes.value_changed).Count > 1) {
+        if (l.Get(DatabaseEventTypes.value_changed).Count > 1) {
             return "Skript 'Wert geändert' mehrfach vorhanden";
         }
 
@@ -836,7 +836,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             : string.Empty;
     }
 
-    public void EventScript_Add(EventScript ev, bool isLoading) {
+    public void EventScript_Add(DatabaseScript ev, bool isLoading) {
         _eventScript.Add(ev);
         ev.Changed += EventScript_Changed;
 
@@ -854,7 +854,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
     }
 
-    public ScriptEndedFeedback ExecuteScript(EventScript s, bool changevalues, RowItem? row) {
+    public ScriptEndedFeedback ExecuteScript(DatabaseScript s, bool changevalues, RowItem? row) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, s.Name); }
 
         var sce = CheckScriptError();
@@ -886,7 +886,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             vars.Add(new VariableString("Tablename", TableName, true, false, "Der aktuelle Tabellenname."));
             vars.Add(new VariableFloat("Rows", Row.Count, true, false, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
             vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.Name ?? string.Empty, true, false, "Der Name der ersten Spalte"));
-            vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(EventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
+            vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(DatabaseEventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
             if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
                 vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
             }
@@ -898,14 +898,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             var allowedMethods = MethodType.Standard | MethodType.Database;
 
             if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
-            if (!s.EventTypes.HasFlag(EventTypes.prepare_formula)) {
+            if (!s.EventTypes.HasFlag(DatabaseEventTypes.prepare_formula)) {
                 allowedMethods |= MethodType.IO;
                 allowedMethods |= MethodType.NeedLongTime;
             }
 
-            if (!s.EventTypes.HasFlag(EventTypes.value_changed_extra_thread) &&
-                !s.EventTypes.HasFlag(EventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(EventTypes.database_loaded)) {
+            if (!s.EventTypes.HasFlag(DatabaseEventTypes.value_changed_extra_thread) &&
+                !s.EventTypes.HasFlag(DatabaseEventTypes.prepare_formula) &&
+                !s.EventTypes.HasFlag(DatabaseEventTypes.database_loaded)) {
                 allowedMethods |= MethodType.ManipulatesUser;
             }
 
@@ -947,7 +947,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    public ScriptEndedFeedback ExecuteScript(EventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
+    public ScriptEndedFeedback ExecuteScript(DatabaseEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, "Allgemein"); }
 
@@ -965,7 +965,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, "Allgemein"); }
 
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
-                var l = EventScript.Get((EventTypes)eventname);
+                var l = EventScript.Get((DatabaseEventTypes)eventname);
                 if (l.Count == 1) { scriptname = l[0].Name; }
                 if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, string.Empty); }
             }
@@ -1717,10 +1717,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                 EventScript_RemoveAll(true);
                 List<string> ai = new(value.SplitAndCutByCr());
                 foreach (var t in ai) {
-                    EventScript_Add(new EventScript(this, t), true);
+                    EventScript_Add(new DatabaseScript(this, t), true);
                 }
 
-                CheckScriptError();
+                //CheckScriptError();
                 break;
 
             case DatabaseDataType.DatabaseVariables:

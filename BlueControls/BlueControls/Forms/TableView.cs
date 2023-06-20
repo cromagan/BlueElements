@@ -519,7 +519,7 @@ public partial class TableView : FormWithStatusBar {
         ColumnItem? column = null;
         if (e.HotItem is RowItem r) { row = r; }
         if (e.HotItem is ColumnItem c) { column = c; }
-        if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out row); }
+        if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out row); }
 
         var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false));
 
@@ -1003,7 +1003,7 @@ public partial class TableView : FormWithStatusBar {
         if (Table.Database == null || !Table.Database.IsAdministrator()) { return; }
 
         if (e.Item is not ReadableListItem bli) { return; }
-        if (bli.Item is not EventScript sc) { return; }
+        if (bli.Item is not DatabaseScript sc) { return; }
 
         string m;
 

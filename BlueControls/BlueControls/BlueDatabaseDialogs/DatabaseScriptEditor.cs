@@ -38,7 +38,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     #region Fields
 
-    private EventScript? _item;
+    private DatabaseScript? _item;
 
     #endregion
 
@@ -61,7 +61,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     public DatabaseAbstract? Database { get; private set; }
 
-    public EventScript? Item {
+    public DatabaseScript? Item {
         get {
             if (Database == null || Database.IsDisposed) { return null; }
 
@@ -81,12 +81,12 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
-                chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(EventTypes.new_row);
-                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(EventTypes.value_changed);
-                chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(EventTypes.value_changed_extra_thread);
-                chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(EventTypes.prepare_formula);
-                chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(EventTypes.database_loaded);
-                chkAuslöser_export.Checked = value.EventTypes.HasFlag(EventTypes.export);
+                chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.new_row);
+                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.value_changed);
+                chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.value_changed_extra_thread);
+                chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.prepare_formula);
+                chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.database_loaded);
+                chkAuslöser_export.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.export);
                 chkExternVerfügbar.Checked = value.ManualExecutable;
                 chkAendertWerte.Checked = value.ChangeValues;
                 eventScriptEditor.ScriptText = value.Script;
@@ -166,13 +166,13 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
 
-        EventTypes tmp = 0;
-        if (chkAuslöser_newrow.Checked) { tmp |= EventTypes.new_row; }
-        if (chkAuslöser_valuechanged.Checked) { tmp |= EventTypes.value_changed; }
-        if (chkAuslöser_prepaireformula.Checked) { tmp |= EventTypes.prepare_formula; }
-        if (chkAuslöser_valuechangedThread.Checked) { tmp |= EventTypes.value_changed_extra_thread; }
-        if (chkAuslöser_databaseloaded.Checked) { tmp |= EventTypes.database_loaded; }
-        if (chkAuslöser_export.Checked) { tmp |= EventTypes.export; }
+        DatabaseEventTypes tmp = 0;
+        if (chkAuslöser_newrow.Checked) { tmp |= DatabaseEventTypes.new_row; }
+        if (chkAuslöser_valuechanged.Checked) { tmp |= DatabaseEventTypes.value_changed; }
+        if (chkAuslöser_prepaireformula.Checked) { tmp |= DatabaseEventTypes.prepare_formula; }
+        if (chkAuslöser_valuechangedThread.Checked) { tmp |= DatabaseEventTypes.value_changed_extra_thread; }
+        if (chkAuslöser_databaseloaded.Checked) { tmp |= DatabaseEventTypes.database_loaded; }
+        if (chkAuslöser_export.Checked) { tmp |= DatabaseEventTypes.export; }
         Item.EventTypes = tmp;
     }
 
@@ -240,7 +240,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (Database == null || Database.IsDisposed) { return; }
 
-        var newScriptItem = lstEventScripts.Item.Add(new EventScript(Database));
+        var newScriptItem = lstEventScripts.Item.Add(new DatabaseScript(Database));
 
         WriteInfosBack();
 
@@ -256,7 +256,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             Item = null;
             return;
         }
-        var selectedlstEventScripts = (EventScript)((ReadableListItem)lstEventScripts.Item.Checked()[0]).Item;
+        var selectedlstEventScripts = (DatabaseScript)((ReadableListItem)lstEventScripts.Item.Checked()[0]).Item;
         Item = selectedlstEventScripts;
     }
 
@@ -311,8 +311,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
 
-        var t2 = new List<EventScript>();
-        t2.AddRange(lstEventScripts.Item.Select(thisItem => (EventScript)((ReadableListItem)thisItem).Item));
+        var t2 = new List<DatabaseScript>();
+        t2.AddRange(lstEventScripts.Item.Select(thisItem => (DatabaseScript)((ReadableListItem)thisItem).Item));
         Database.EventScript = new(t2);
 
         #endregion

@@ -26,7 +26,6 @@ using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using System.Linq;
-using System.Configuration;
 
 namespace BlueDatabase;
 
@@ -588,7 +587,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         OnLoaded();
         CreateWatcher();
         GenerateTimer();
-        _ = ExecuteScript(EventTypes.database_loaded, string.Empty, true, null);
+        _ = ExecuteScript(DatabaseEventTypes.database_loaded, string.Empty, true, null);
     }
 
     #endregion

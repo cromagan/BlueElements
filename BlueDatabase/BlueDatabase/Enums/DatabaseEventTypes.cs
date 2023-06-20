@@ -20,7 +20,7 @@ using System;
 namespace BlueDatabase.Enums;
 
 [Flags]
-public enum EventTypes {
+public enum DatabaseEventTypes {
     new_row = 1,
     value_changed = 2,
     prepare_formula = 4,

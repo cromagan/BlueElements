@@ -457,15 +457,10 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
                 while (MmToPixel(tmpgrid, Dpi) * zoom < 5) { tmpgrid *= 2; }
 
-       
-
                 var p = new Pen(Color.FromArgb(10, 0, 0, 0));
                 float ex = 0;
 
-     
-
                 do {
-
                     var mo = MmToPixel(ex * tmpgrid, Dpi) * zoom;
 
                     gr.DrawLine(p, po.X + (int)mo, 0, po.X + (int)mo, sizeOfParentControl.Height);
@@ -546,7 +541,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     public void ParseVariable(RowItem? row) {
         if (row == null || row.IsDisposed) { return; }
 
-        var script = row.ExecuteScript(EventTypes.export, string.Empty, false, false, true, 0);
+        var script = row.ExecuteScript(DatabaseEventTypes.export, string.Empty, false, false, true, 0);
         if (!script.AllOk || script.Variables == null) { return; }
         foreach (var thisV in script.Variables) {
             _ = ParseVariable(thisV);
@@ -683,7 +678,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         result.Clear();
 
         foreach (var thisCon in Connections) {
-            if (thisCon?.Item1 != null && thisCon?.Item2 != null) {
+            if (thisCon?.Item1 != null) {
                 result.ParseableAdd("Connection", thisCon.ToString());
             }
         }

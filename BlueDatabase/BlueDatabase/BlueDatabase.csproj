@@ -106,11 +106,11 @@
     <Compile Include="ConnetionInfo.cs" />
     <Compile Include="DatabaseAbstract.cs" />
     <Compile Include="DatabaseSQLLite.cs" />
-    <Compile Include="Enums\EventTypes.cs" />
+    <Compile Include="Enums\DatabaseEventTypes.cs" />
     <Compile Include="EventArgs\CellEditBlockReasonEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="ColumnFormatHolder.cs" />
-    <Compile Include="EventScript.cs" />
+    <Compile Include="DatabaseScript.cs" />
     <Compile Include="Interfaces\IColumnInputFormat.cs" />
     <Compile Include="Interfaces\IHasChangeabelDatabase.cs" />
     <Compile Include="Interfaces\IHasDatabase.cs" />

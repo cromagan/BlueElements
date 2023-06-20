@@ -31,9 +31,12 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
+using BlueDatabase.Enums;
+using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
+using BlueScript.Structures;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -42,15 +45,22 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     #region Fields
 
     public const string Version = "0.10";
+
     public static readonly List<ConnectedFormula> AllFiles = new();
+
     public static readonly float StandardHöhe = 1.75f;
+
     private readonly List<string> _databaseFiles = new();
+
+    private readonly List<FormulaScript> _eventScript = new();
     private readonly List<string> _notAllowedChilds = new();
 
+    private readonly List<Variable> _variables = new();
     private string _createDate;
 
     private string _creator;
 
+    private string _eventScriptTmp = string.Empty;
     private int _id = -1;
 
     private string _loadedVersion = "0.00";
@@ -62,6 +72,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     private bool _saved;
 
     private bool _saving;
+
+    private string _variableTmp = string.Empty;
 
     #endregion
 
@@ -117,6 +129,28 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     #region Properties
 
+    public ReadOnlyCollection<FormulaScript> EventScript {
+        get => new(_eventScript);
+        set {
+            var l = new List<FormulaScript>();
+            l.AddRange(value);
+            l.Sort();
+
+            var tmp = l.ToString(true);
+
+            if (_eventScriptTmp == tmp) { return; }
+
+            _eventScriptTmp = tmp;
+            EventScript_RemoveAll(true);
+
+            foreach (var t in l) {
+                EventScript_Add(t, true);
+            }
+
+            //CheckScriptError();
+        }
+    }
+
     public string Filename => _muf?.Filename ?? string.Empty;
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
@@ -157,6 +191,28 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             if (_saving || (_muf?.IsLoading ?? false)) { return; }
 
             _saved = false;
+        }
+    }
+
+    public VariableCollection Variables {
+        get => new(_variables);
+        set {
+            var l = new List<VariableString>();
+            l.AddRange(value.ToListVariableString());
+            l.Sort();
+
+            var tmp = l.ToString(true);
+            if (_variableTmp == tmp) { return; }
+
+            _variableTmp = tmp;
+            Variables_RemoveAll(true);
+
+            foreach (var t in value) {
+                if (t is VariableString ts) {
+                    ts.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
+                    Variables_Add(ts, true);
+                }
+            }
         }
     }
 
@@ -381,7 +437,9 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         return p;
 
-        RectangleF PositioOf(int no) => new RectangleF(newX[no], newY[no], newW[no], newH[no]);
+        RectangleF PositioOf(int no) {
+            return new RectangleF(newX[no], newY[no], newW[no], newH[no]);
+        }
     }
 
     public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPad padData, float newWidthPixel, float newhHeightPixel, string page) {
@@ -411,12 +469,71 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         return erg;
     }
 
+    public string CheckScriptError() {
+        List<string> names = new();
+
+        foreach (var thissc in _eventScript) {
+            if (!thissc.IsOk()) {
+                return thissc.Name + ": " + thissc.ErrorReason();
+            }
+
+            if (names.Contains(thissc.Name, false)) {
+                return "Skriptname '" + thissc.Name + "' mehrfach vorhanden";
+            }
+        }
+
+        var l = EventScript;
+        if (l.Get(DatabaseEventTypes.export).Count > 1) {
+            return "Skript 'Export' mehrfach vorhanden";
+        }
+
+        if (l.Get(DatabaseEventTypes.database_loaded).Count > 1) {
+            return "Skript 'Datenank geladen' mehrfach vorhanden";
+        }
+
+        if (l.Get(DatabaseEventTypes.prepare_formula).Count > 1) {
+            return "Skript 'Formular Vorbereitung' mehrfach vorhanden";
+        }
+
+        if (l.Get(DatabaseEventTypes.value_changed_extra_thread).Count > 1) {
+            return "Skript 'Wert geändert Extra Thread' mehrfach vorhanden";
+        }
+
+        if (l.Get(DatabaseEventTypes.new_row).Count > 1) {
+            return "Skript 'Neue Zeile' mehrfach vorhanden";
+        }
+
+        if (l.Get(DatabaseEventTypes.value_changed).Count > 1) {
+            return "Skript 'Wert geändert' mehrfach vorhanden";
+        }
+
+        return string.Empty;
+    }
+
     public void DiscardPendingChanges(object sender, System.EventArgs e) => _saved = true;
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
+    }
+
+    public void EventScript_Add(FormulaScript ev, bool isLoading) {
+        _eventScript.Add(ev);
+        ev.Changed += EventScript_Changed;
+
+        if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
+    }
+
+    public void EventScript_RemoveAll(bool isLoading) {
+        while (_eventScript.Count > 0) {
+            var ev = _eventScript[_eventScript.Count - 1];
+            ev.Changed -= EventScript_Changed;
+
+            _eventScript.RemoveAt(_eventScript.Count - 1);
+        }
+
+        if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
     }
 
     public void HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) {
@@ -476,6 +593,28 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     }
 
     public void Save() => _muf?.Save(true);
+
+    public void Variables_Add(VariableString va, bool isLoading) {
+        _variables.Add(va);
+        //ev.Changed += EventScript_Changed;
+        if (!isLoading) { Variables_Changed(); }
+    }
+
+    public void Variables_RemoveAll(bool isLoading) {
+        while (_variables.Count > 0) {
+            //var va = _variables[_eventScript.Count - 1];
+            //ev.Changed -= EventScript_Changed;
+
+            _variables.RemoveAt(_variables.Count - 1);
+        }
+
+        if (!isLoading) { Variables_Changed(); }
+    }
+
+    internal ScriptEndedFeedback? ExecuteScript(FormulaScript item, bool changeValuesInTest) {
+        Develop.DebugPrint_NichtImplementiert();
+        return null;
+    }
 
     /// <summary>
     /// Prüft, ob das Formular sichtbare Elemente hat.
@@ -612,6 +751,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         _saved = false;
     }
 
+    private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
+
     //private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
     //    if (_saving || (_muf?.IsLoading ?? true)) { return; }
     //    _saved = false;
@@ -677,6 +818,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         e.Data = ("{" + t.JoinWith(", ").TrimEnd(", ") + "}").WIN1252_toByte();
     }
+
+    private void Variables_Changed() => Variables = new VariableCollection(_variables);
 
     #endregion
 }

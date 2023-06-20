@@ -44,7 +44,6 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using BlueScript;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using Clipboard = System.Windows.Clipboard;

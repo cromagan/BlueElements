@@ -709,7 +709,7 @@ public sealed class Database : DatabaseAbstract {
         RepairAfterParse();
         OnLoaded();
         CreateWatcher();
-        _ = ExecuteScript(EventTypes.database_loaded, string.Empty, true, null);
+        _ = ExecuteScript(DatabaseEventTypes.database_loaded, string.Empty, true, null);
     }
 
     public void LoadFromStream(Stream stream) {
@@ -730,7 +730,7 @@ public sealed class Database : DatabaseAbstract {
         RepairAfterParse();
         OnLoaded();
         CreateWatcher();
-        _ = ExecuteScript(EventTypes.database_loaded, string.Empty, true, null);
+        _ = ExecuteScript(DatabaseEventTypes.database_loaded, string.Empty, true, null);
     }
 
     public override void RefreshColumnsData(List<ColumnItem?>? columns) {
