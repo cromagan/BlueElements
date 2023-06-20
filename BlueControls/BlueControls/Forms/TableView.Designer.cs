@@ -892,7 +892,6 @@ namespace BlueControls.Forms {
             this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.TableView_ContextMenu_Init);
             this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.TableView_ContextMenuItemClicked);
             this.Table.DatabaseChanged += new System.EventHandler(this.TableView_DatabaseChanged);
-            this.Table.EditBeforeBeginEdit += new System.EventHandler<BlueDatabase.EventArgs.CellCancelEventArgs>(this.Table_EditBeforeBeginEdit);
             this.Table.SelectedCellChanged += new System.EventHandler<BlueDatabase.EventArgs.CellExtEventArgs>(this.Table_SelectedCellChanged);
             this.Table.SelectedRowChanged += new System.EventHandler<BlueDatabase.EventArgs.RowEventArgs>(this.Table_SelectedRowChanged);
             this.Table.ViewChanged += new System.EventHandler(this.Table_ViewChanged);

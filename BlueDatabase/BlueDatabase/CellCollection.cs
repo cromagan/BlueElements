@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Drawing;
 using System.Text.RegularExpressions;
 using BlueBasics;
@@ -143,8 +144,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (row == null) {
             if (!column.IsFirst()) { return "Neue Zeilen müssen mit der ersten Spalte beginnen."; }
+
+            if (checkUserRights && !column.Database.PermissionCheck(column.Database.PermissionGroupsNewRow, null)) {
+                return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
+            }
         } else {
-            if (row.IsDisposed) { return "Die Zeile wurde verworfen."; }
+            //if (row.IsDisposed) { return "Die Zeile wurde verworfen."; }
             if (row.Database != column.Database) { return "Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft."; }
 
             if (column.Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds < 0) {

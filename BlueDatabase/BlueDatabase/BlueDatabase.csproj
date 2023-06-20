@@ -107,6 +107,7 @@
     <Compile Include="DatabaseAbstract.cs" />
     <Compile Include="DatabaseSQLLite.cs" />
     <Compile Include="Enums\EventTypes.cs" />
+    <Compile Include="EventArgs\CellEditBlockReasonEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="ColumnFormatHolder.cs" />
     <Compile Include="EventScript.cs" />
@@ -141,7 +142,6 @@
     <Compile Include="Enums\Routinen.cs" />
     <Compile Include="Enums\DatabaseDataType.cs" />
     <Compile Include="Enums\ViewType.cs" />
-    <Compile Include="EventArgs\CellCancelEventArgs.cs" />
     <Compile Include="EventArgs\CellExtEventArgs.cs" />
     <Compile Include="EventArgs\MessageEventArgs.cs" />
     <Compile Include="EventArgs\CellEventArgs.cs" />

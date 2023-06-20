@@ -1199,12 +1199,6 @@ public partial class TableView : FormWithStatusBar {
         row ??= Table.View_RowFirst();
     }
 
-    private void Table_EditBeforeBeginEdit(object sender, CellCancelEventArgs e) {
-        if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
-            e.CancelReason = "In dieser Ansicht kann der Eintrag nicht bearbeitet werden.";
-        }
-    }
-
     private void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
         if (InvokeRequired) {
             _ = Invoke(new Action(() => Table_SelectedCellChanged(sender, e)));
