@@ -962,7 +962,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public string EditableErrorReason(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview) {
         var f = CellCollection.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode);
-        if (string.IsNullOrWhiteSpace(f)) { return f; }
+        if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         if (checkEditmode) {
             if (Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
@@ -974,14 +974,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
 
             if (cellInThisDatabaseRow != null) {
-                if (!EnsureVisible(cellInThisDatabaseColumn, cellInThisDatabaseRow)) {
+                if (maychangeview && !EnsureVisible(cellInThisDatabaseColumn, cellInThisDatabaseRow)) {
                     return "Zelle konnte nicht angezeigt werden.";
                 }
                 if (!IsOnScreen(cellInThisDatabaseColumn, cellInThisDatabaseRow, DisplayRectangle)) {
                     return "Die Zelle wird nicht angezeigt.";
                 }
             } else {
-                if (!EnsureVisible(viewItem)) {
+                if (maychangeview && !EnsureVisible(viewItem)) {
                     return "Zelle konnte nicht angezeigt werden.";
                 }
                 if (!IsOnScreen(viewItem, DisplayRectangle)) {
