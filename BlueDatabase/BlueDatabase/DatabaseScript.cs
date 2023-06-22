@@ -34,7 +34,7 @@ public static class EventScriptExtension {
 
     #region Methods
 
-    public static List<DatabaseScript> Get(this ReadOnlyCollection<DatabaseScript> scripts, DatabaseEventTypes type) {
+    public static List<DatabaseScript> Get(this ReadOnlyCollection<DatabaseScript> scripts, ScriptEventTypes type) {
         var l = new List<DatabaseScript>();
 
         foreach (var thisScript in scripts) {
@@ -52,7 +52,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
     #region Fields
 
     private bool _changeValues;
-    private DatabaseEventTypes _eventTypes = 0;
+    private ScriptEventTypes _eventTypes = 0;
     private bool _executable;
     private bool _needRow;
     private string _script;
@@ -113,7 +113,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
     public string CompareKey => Name.ToString();
     public DatabaseAbstract? Database { get; private set; }
 
-    public DatabaseEventTypes EventTypes {
+    public ScriptEventTypes EventTypes {
         get => _eventTypes;
         set {
             if (_eventTypes == value) { return; }
@@ -190,33 +190,33 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
         if (!KeyName.IsFormat(FormatHolder.Text)) { return "Ungültiger Name"; }
 
-        if (_eventTypes.HasFlag(DatabaseEventTypes.prepare_formula)) {
+        if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
             if (_changeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
             if (!_needRow) { return "Routinen, die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
             if (_executable) { return "Routinen, die das Formular vorbereiten, können nicht so von außerhalb benutzt werden."; }
         }
 
-        if (_eventTypes.HasFlag(DatabaseEventTypes.export)) {
+        if (_eventTypes.HasFlag(ScriptEventTypes.export)) {
             if (_changeValues) { return "Routinen für Export können keine Werte ändern."; }
             if (!_needRow) { return "Routinen für Export müssen sich auf Zeilen beziehen."; }
         }
 
-        if (_eventTypes.HasFlag(DatabaseEventTypes.value_changed_extra_thread)) {
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) {
             if (_changeValues) { return "Routinen aus einem ExtraThread, können keine Werte ändern."; }
             if (!_needRow) { return "Routinen aus einem ExtraThread, müssen sich auf Zeilen beziehen."; }
         }
 
-        if (_eventTypes.HasFlag(DatabaseEventTypes.value_changed)) {
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) {
             if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
             if (!_changeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen"; }
         }
 
-        if (_eventTypes.HasFlag(DatabaseEventTypes.new_row)) {
+        if (_eventTypes.HasFlag(ScriptEventTypes.new_row)) {
             if (!_needRow) { return "Routinen, die neue Zeilen überwachen, müssen sich auf Zeilen beziehen."; }
             if (!_changeValues) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen"; }
         }
 
-        if (_eventTypes.HasFlag(DatabaseEventTypes.database_loaded)) {
+        if (_eventTypes.HasFlag(ScriptEventTypes.loaded)) {
             if (_needRow) { return "Routinen nach dem Laden einer Datenbank, dürfen sich nicht auf Zeilen beziehen."; }
         }
 
@@ -252,7 +252,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
                     break;
 
                 case "events":
-                    _eventTypes = (DatabaseEventTypes)IntParse(pair.Value);
+                    _eventTypes = (ScriptEventTypes)IntParse(pair.Value);
                     break;
 
                 //case "lastdone":
@@ -291,12 +291,12 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
             symb = ImageCode.Person;
         }
 
-        if (_eventTypes.HasFlag(DatabaseEventTypes.export)) { symb = ImageCode.Layout; }
-        if (_eventTypes.HasFlag(DatabaseEventTypes.database_loaded)) { symb = ImageCode.Diskette; }
-        if (_eventTypes.HasFlag(DatabaseEventTypes.new_row)) { symb = ImageCode.Zeile; }
-        if (_eventTypes.HasFlag(DatabaseEventTypes.value_changed)) { symb = ImageCode.Stift; }
-        if (_eventTypes.HasFlag(DatabaseEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
-        if (_eventTypes.HasFlag(DatabaseEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.export)) { symb = ImageCode.Layout; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.loaded)) { symb = ImageCode.Diskette; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.new_row)) { symb = ImageCode.Zeile; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) { symb = ImageCode.Stift; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 
         if (!_changeValues) { }
 

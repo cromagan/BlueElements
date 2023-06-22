@@ -17,8 +17,11 @@
 
 #nullable enable
 
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using BlueBasics.MultiUserFile;
+using BlueControls.ConnectedFormula;
+using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueDatabase;
 using static BlueBasics.Develop;
@@ -36,11 +39,22 @@ public partial class FormulaView : FormWithStatusBar {
 
     #region Methods
 
+    public static void OpenScriptEditor(ConnectedFormula.ConnectedFormula? f) {
+        if (f == null || f.IsDisposed) { return; }
+
+        var se = new ConnectedFormulaScriptEditor(f);
+        _ = se.ShowDialog();
+    }
+
+    private void Btb_Click(object sender, System.EventArgs e) {
+        throw new System.NotImplementedException();
+    }
+
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (CFO.ConnectedFormula == null) { return; }
+        if (CFormula.ConnectedFormula == null) { return; }
 
-        var x = new ConnectedFormulaEditor(CFO.ConnectedFormula.Filename, null);
+        var x = new ConnectedFormulaEditor(CFormula.ConnectedFormula.Filename, null);
         x.Show();
     }
 
@@ -55,6 +69,11 @@ public partial class FormulaView : FormWithStatusBar {
         MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
         _ = LoadTab.ShowDialog();
+    }
+
+    private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
+        OpenScriptEditor(CFormula.ConnectedFormula);
+        UpdateScripts(CFormula.ConnectedFormula.EventScript, grpSkripte);
     }
 
     private void CheckButtons() {
@@ -77,7 +96,7 @@ public partial class FormulaView : FormWithStatusBar {
 
     private void FormulaSet(ConnectedFormula.ConnectedFormula? cf) {
         if (IsDisposed) { return; }
-        CFO.SetData(cf, null, -1);
+        CFormula.SetData(cf, null, -1);
 
         //var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
 
@@ -134,6 +153,21 @@ public partial class FormulaView : FormWithStatusBar {
         if (!FileExists(LoadTab.FileName)) { return; }
 
         FormulaSet(LoadTab.FileName);
+    }
+
+    private void UpdateScripts(ReadOnlyCollection<FormulaScript> scripts, GroupBox groupBox) {
+
+        #region MyRegion
+
+        foreach (var thisControl in groupBox.Controls) {
+            if (thisControl is BlueControls.Controls.Button btb) {
+                btb.Click -= Btb_Click;
+                btb.Dispose();
+            }
+        }
+        groupBox.Controls.Clear();
+
+        #endregion
     }
 
     #endregion

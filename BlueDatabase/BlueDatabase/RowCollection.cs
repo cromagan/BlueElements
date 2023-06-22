@@ -335,7 +335,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (_executingbackgroundworks) { return; }
         _executingbackgroundworks = true;
 
-        var ev = Database.EventScript.Get(DatabaseEventTypes.value_changed_extra_thread);
+        var ev = Database.EventScript.Get(ScriptEventTypes.value_changed_extra_thread);
         var ok = false;
         if (ev.Count == 1) { ok = ev[0].IsOk(); }
 
@@ -373,7 +373,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         _executingbackgroundworks = false;
     }
 
-    public string ExecuteScript(DatabaseEventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem>? pinned, bool fullCheck, bool changevalues) {
+    public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem>? pinned, bool fullCheck, bool changevalues) {
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditGeneral);
         if (!string.IsNullOrEmpty(m) || Database == null) { return m; }
 
@@ -420,7 +420,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 _pendingChangedRows.RemoveAt(0);
 
                 if (r != null && !r.IsDisposed) {
-                    _ = r.ExecuteScript(DatabaseEventTypes.value_changed, string.Empty, true, true, true, 2);
+                    _ = r.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2);
                     r.InvalidateCheckData();
                     r.CheckRowDataIfNeeded();
                 }
@@ -523,7 +523,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (runScriptOfNewRow) {
-            _ = item.ExecuteScript(DatabaseEventTypes.new_row, string.Empty, true, true, true, 0.1f);
+            _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f);
         }
 
         return item;
@@ -564,7 +564,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             row.CellSet(thisfi.Column, thisfi.SearchValue.ToList());
         }
 
-        _ = row.ExecuteScript(DatabaseEventTypes.new_row, string.Empty, false, false, true, 1);
+        _ = row.ExecuteScript(ScriptEventTypes.new_row, string.Empty, false, false, true, 1);
 
         return row;
     }
@@ -873,7 +873,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var r = SearchByKey(rk);
         if (r == null || r.IsDisposed) { return; }
 
-        _ = r.ExecuteScript(DatabaseEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 5);
+        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 5);
     }
 
     private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => _pendingworker.Remove((BackgroundWorker)sender);

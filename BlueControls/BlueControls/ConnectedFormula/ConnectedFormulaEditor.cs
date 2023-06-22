@@ -188,6 +188,10 @@ public partial class ConnectedFormulaEditor : PadEditor {
         //ChooseDatabaseAndId(it);
     }
 
+    private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
+        FormulaView.OpenScriptEditor(CFormula);
+    }
+
     private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.ForceLoadSaveAll();
 
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {

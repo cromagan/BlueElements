@@ -17,14 +17,15 @@
 
 using System;
 
-namespace BlueDatabase.Enums;
+namespace BlueBasics.Enums;
 
 [Flags]
-public enum DatabaseEventTypes {
+public enum ScriptEventTypes {
     new_row = 1,
     value_changed = 2,
     prepare_formula = 4,
     value_changed_extra_thread = 8,
-    database_loaded = 16,
-    export = 32
+    loaded = 16,
+    export = 32,
+    clipboard_changed = 64
 }

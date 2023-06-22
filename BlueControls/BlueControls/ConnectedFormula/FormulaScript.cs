@@ -34,7 +34,7 @@ public static class FormulaScriptExtension {
 
     #region Methods
 
-    public static List<FormulaScript> Get(this ReadOnlyCollection<FormulaScript> scripts, DatabaseEventTypes type) {
+    public static List<FormulaScript> Get(this ReadOnlyCollection<FormulaScript> scripts, ScriptEventTypes type) {
         var l = new List<FormulaScript>();
 
         foreach (var thisScript in scripts) {
@@ -52,7 +52,7 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
     #region Fields
 
     private bool _changeValues;
-    private DatabaseEventTypes _eventTypes = 0;
+    private ScriptEventTypes _eventTypes = 0;
     private bool _executable;
     private string _script;
 
@@ -110,7 +110,7 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
 
     public string CompareKey => Name.ToString();
 
-    public DatabaseEventTypes EventTypes {
+    public ScriptEventTypes EventTypes {
         get => _eventTypes;
         set {
             if (_eventTypes == value) { return; }
@@ -236,7 +236,7 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
                     break;
 
                 case "events":
-                    _eventTypes = (DatabaseEventTypes)IntParse(pair.Value);
+                    _eventTypes = (ScriptEventTypes)IntParse(pair.Value);
                     break;
 
                 //case "lastdone":
@@ -275,12 +275,12 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
             symb = ImageCode.Person;
         }
 
-        if (_eventTypes.HasFlag(DatabaseEventTypes.export)) { symb = ImageCode.Layout; }
-        if (_eventTypes.HasFlag(DatabaseEventTypes.database_loaded)) { symb = ImageCode.Diskette; }
-        if (_eventTypes.HasFlag(DatabaseEventTypes.new_row)) { symb = ImageCode.Zeile; }
-        if (_eventTypes.HasFlag(DatabaseEventTypes.value_changed)) { symb = ImageCode.Stift; }
-        if (_eventTypes.HasFlag(DatabaseEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
-        if (_eventTypes.HasFlag(DatabaseEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.export)) { symb = ImageCode.Layout; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.loaded)) { symb = ImageCode.Diskette; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.new_row)) { symb = ImageCode.Zeile; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) { symb = ImageCode.Stift; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
+        if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 
         if (!_changeValues) { }
 

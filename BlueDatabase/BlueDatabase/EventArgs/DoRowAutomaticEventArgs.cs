@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
 using BlueDatabase.Enums;
 
 namespace BlueDatabase.EventArgs;
@@ -25,7 +26,7 @@ public class DoRowAutomaticEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public DoRowAutomaticEventArgs(RowItem row, DatabaseEventTypes? eventn) : base(row) => Event = eventn;
+    public DoRowAutomaticEventArgs(RowItem row, ScriptEventTypes? eventn) : base(row) => Event = eventn;
 
     #endregion
 
@@ -33,7 +34,7 @@ public class DoRowAutomaticEventArgs : RowEventArgs {
 
     public bool Done { get; set; }
 
-    public DatabaseEventTypes? Event { get; set; }
+    public ScriptEventTypes? Event { get; set; }
 
     #endregion
 }

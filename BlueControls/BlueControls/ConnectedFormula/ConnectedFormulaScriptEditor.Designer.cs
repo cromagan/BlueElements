@@ -33,9 +33,6 @@ namespace BlueControls.ConnectedFormula {
             this.tabScripts = new System.Windows.Forms.TabPage();
             this.eventScriptEditor = new BlueControls.ScriptEditor();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.grpZeile = new BlueControls.Controls.GroupBox();
-            this.cpZeile = new BlueControls.Controls.Caption();
-            this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.grpEigenschaften = new BlueControls.Controls.GroupBox();
             this.chkAendertWerte = new BlueControls.Controls.Button();
             this.btnSave = new BlueControls.Controls.Button();
@@ -43,9 +40,6 @@ namespace BlueControls.ConnectedFormula {
             this.txbName = new BlueControls.Controls.TextBox();
             this.capName = new BlueControls.Controls.Caption();
             this.grpAuslöser = new BlueControls.Controls.GroupBox();
-            this.chkAuslöser_export = new BlueControls.Controls.Button();
-            this.chkAuslöser_databaseloaded = new BlueControls.Controls.Button();
-            this.chkAuslöser_newrow = new BlueControls.Controls.Button();
             this.chkAuslöser_valuechangedThread = new BlueControls.Controls.Button();
             this.chkAuslöser_valuechanged = new BlueControls.Controls.Button();
             this.chkAuslöser_prepaireformula = new BlueControls.Controls.Button();
@@ -53,12 +47,13 @@ namespace BlueControls.ConnectedFormula {
             this.lstEventScripts = new BlueControls.Controls.ListBox();
             this.tabVariablen = new System.Windows.Forms.TabPage();
             this.variableEditor = new BlueControls.VariableEditor();
-            this.chkChangeValuesInTest = new BlueControls.Controls.Button();
+            this.chkAuslöser_formulaloaded = new BlueControls.Controls.Button();
+            this.chkAuslöser_export = new BlueControls.Controls.Button();
+            this.button1 = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.tabScripts.SuspendLayout();
             this.panel1.SuspendLayout();
-            this.grpZeile.SuspendLayout();
             this.grpEigenschaften.SuspendLayout();
             this.grpAuslöser.SuspendLayout();
             this.grpVerfügbareSkripte.SuspendLayout();
@@ -118,7 +113,6 @@ namespace BlueControls.ConnectedFormula {
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.grpZeile);
             this.panel1.Controls.Add(this.grpEigenschaften);
             this.panel1.Controls.Add(this.grpAuslöser);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Top;
@@ -126,37 +120,6 @@ namespace BlueControls.ConnectedFormula {
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1046, 149);
             this.panel1.TabIndex = 22;
-            // 
-            // grpZeile
-            // 
-            this.grpZeile.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpZeile.Controls.Add(this.chkChangeValuesInTest);
-            this.grpZeile.Controls.Add(this.cpZeile);
-            this.grpZeile.Controls.Add(this.txbTestZeile);
-            this.grpZeile.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpZeile.Location = new System.Drawing.Point(0, 77);
-            this.grpZeile.Name = "grpZeile";
-            this.grpZeile.Size = new System.Drawing.Size(848, 72);
-            this.grpZeile.TabIndex = 8;
-            this.grpZeile.TabStop = false;
-            this.grpZeile.Text = "Zeile";
-            // 
-            // cpZeile
-            // 
-            this.cpZeile.CausesValidation = false;
-            this.cpZeile.Location = new System.Drawing.Point(8, 16);
-            this.cpZeile.Name = "cpZeile";
-            this.cpZeile.Size = new System.Drawing.Size(96, 22);
-            this.cpZeile.Text = "Zeile für Test:";
-            // 
-            // txbTestZeile
-            // 
-            this.txbTestZeile.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbTestZeile.Enabled = false;
-            this.txbTestZeile.Location = new System.Drawing.Point(112, 16);
-            this.txbTestZeile.Name = "txbTestZeile";
-            this.txbTestZeile.Size = new System.Drawing.Size(536, 24);
-            this.txbTestZeile.TabIndex = 7;
             // 
             // grpEigenschaften
             // 
@@ -232,9 +195,9 @@ namespace BlueControls.ConnectedFormula {
             // grpAuslöser
             // 
             this.grpAuslöser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpAuslöser.Controls.Add(this.button1);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_export);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_databaseloaded);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_newrow);
+            this.grpAuslöser.Controls.Add(this.chkAuslöser_formulaloaded);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_valuechangedThread);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_valuechanged);
             this.grpAuslöser.Controls.Add(this.chkAuslöser_prepaireformula);
@@ -245,41 +208,6 @@ namespace BlueControls.ConnectedFormula {
             this.grpAuslöser.TabIndex = 21;
             this.grpAuslöser.TabStop = false;
             this.grpAuslöser.Text = "Auslöser";
-            // 
-            // chkAuslöser_export
-            // 
-            this.chkAuslöser_export.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 96);
-            this.chkAuslöser_export.Name = "chkAuslöser_export";
-            this.chkAuslöser_export.QuickInfo = "Das Skript wird vor einem Export ausgeführt.\r\n\r\nEs kann dazu verwendet werden, um" +
-    " Werte temporär zu ändern,\r\nVariablen hinzuzufügen oder Bilder zu laden.";
-            this.chkAuslöser_export.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_export.TabIndex = 22;
-            this.chkAuslöser_export.Text = "Export";
-            this.chkAuslöser_export.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
-            // 
-            // chkAuslöser_databaseloaded
-            // 
-            this.chkAuslöser_databaseloaded.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAuslöser_databaseloaded.Location = new System.Drawing.Point(8, 80);
-            this.chkAuslöser_databaseloaded.Name = "chkAuslöser_databaseloaded";
-            this.chkAuslöser_databaseloaded.QuickInfo = "Das Skript wird direkt nach dem ersten Laden einer Datenbank angestoßen.\r\n\r\nEs ka" +
-    "nn verwendet werden, um z.B. Backups zu erstellen.";
-            this.chkAuslöser_databaseloaded.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_databaseloaded.TabIndex = 21;
-            this.chkAuslöser_databaseloaded.Text = "Datenbank geladen";
-            this.chkAuslöser_databaseloaded.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
-            // 
-            // chkAuslöser_newrow
-            // 
-            this.chkAuslöser_newrow.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAuslöser_newrow.Location = new System.Drawing.Point(9, 32);
-            this.chkAuslöser_newrow.Name = "chkAuslöser_newrow";
-            this.chkAuslöser_newrow.QuickInfo = "Das Skript wir nach dem Erstellen einer\r\nneuen Zeile ausgeführt.";
-            this.chkAuslöser_newrow.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_newrow.TabIndex = 17;
-            this.chkAuslöser_newrow.Text = "Neue Zeile";
-            this.chkAuslöser_newrow.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
             // chkAuslöser_valuechangedThread
             // 
@@ -306,7 +234,7 @@ namespace BlueControls.ConnectedFormula {
             // chkAuslöser_prepaireformula
             // 
             this.chkAuslöser_prepaireformula.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(9, 16);
+            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 32);
             this.chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
             this.chkAuslöser_prepaireformula.QuickInfo = "Das Skript wird verwendet zur Datenkonsitenzprüfung\r\nund für Variablen für Formul" +
     "are.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen oder\r\nlange dauernd" +
@@ -364,22 +292,48 @@ namespace BlueControls.ConnectedFormula {
             this.variableEditor.Size = new System.Drawing.Size(1283, 618);
             this.variableEditor.TabIndex = 0;
             // 
-            // chkChangeValuesInTest
+            // chkAuslöser_formulaloaded
             // 
-            this.chkChangeValuesInTest.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkChangeValuesInTest.Location = new System.Drawing.Point(112, 40);
-            this.chkChangeValuesInTest.Name = "chkChangeValuesInTest";
-            this.chkChangeValuesInTest.QuickInfo = "<i>Tests im Skript Editor ändern keine Werte,\r\naußer dieses Häkchen ist gesetzt.";
-            this.chkChangeValuesInTest.Size = new System.Drawing.Size(376, 24);
-            this.chkChangeValuesInTest.TabIndex = 15;
-            this.chkChangeValuesInTest.Text = "<Imagecode=Warnung|16> Das Skript darf auch im Test Werte der Datenbank verändern";
+            this.chkAuslöser_formulaloaded.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.chkAuslöser_formulaloaded.Location = new System.Drawing.Point(8, 80);
+            this.chkAuslöser_formulaloaded.Name = "chkAuslöser_formulaloaded";
+            this.chkAuslöser_formulaloaded.QuickInfo = "Das Skript wird direkt nach dem ersten Laden einer Datenbank angestoßen.\r\n\r\nEs ka" +
+    "nn verwendet werden, um z.B. Backups zu erstellen.";
+            this.chkAuslöser_formulaloaded.Size = new System.Drawing.Size(176, 16);
+            this.chkAuslöser_formulaloaded.TabIndex = 21;
+            this.chkAuslöser_formulaloaded.Text = "Formular geladen";
+            this.chkAuslöser_formulaloaded.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
             // 
-            // DatabaseScriptEditor
+            // chkAuslöser_export
+            // 
+            this.chkAuslöser_export.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 96);
+            this.chkAuslöser_export.Name = "chkAuslöser_export";
+            this.chkAuslöser_export.QuickInfo = "Das Skript wird vor einem Export ausgeführt.\r\n\r\nEs kann dazu verwendet werden, um" +
+    " Werte temporär zu ändern,\r\nVariablen hinzuzufügen oder Bilder zu laden.";
+            this.chkAuslöser_export.Size = new System.Drawing.Size(176, 16);
+            this.chkAuslöser_export.TabIndex = 22;
+            this.chkAuslöser_export.Text = "Export";
+            this.chkAuslöser_export.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            // 
+            // button1
+            // 
+            this.button1.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.button1.Location = new System.Drawing.Point(8, 16);
+            this.button1.Name = "button1";
+            this.button1.QuickInfo = "Das Skript wird verwendet zur Datenkonsitenzprüfung\r\nund für Variablen für Formul" +
+    "are.\r\n\r\nEs kann keine Daten ändern, auf Festplatte zugreifen oder\r\nlange dauernd" +
+    "e Prozesse anstoßen.";
+            this.button1.Size = new System.Drawing.Size(175, 16);
+            this.button1.TabIndex = 23;
+            this.button1.Text = "Clipbard Veränderung";
+            // 
+            // ConnectedFormulaScriptEditor
             // 
             this.ClientSize = new System.Drawing.Size(1297, 677);
             this.Controls.Add(this.GlobalTab);
             this.MinimizeBox = false;
-            this.Name = "DatabaseScriptEditor";
+            this.Name = "ConnectedFormulaScriptEditor";
             this.ShowInTaskbar = false;
             this.Text = "Datenbank-Eigenschaften";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
@@ -389,7 +343,6 @@ namespace BlueControls.ConnectedFormula {
             this.GlobalTab.ResumeLayout(false);
             this.tabScripts.ResumeLayout(false);
             this.panel1.ResumeLayout(false);
-            this.grpZeile.ResumeLayout(false);
             this.grpEigenschaften.ResumeLayout(false);
             this.grpAuslöser.ResumeLayout(false);
             this.grpVerfügbareSkripte.ResumeLayout(false);
@@ -409,19 +362,15 @@ namespace BlueControls.ConnectedFormula {
         private ScriptEditor eventScriptEditor;
         private Button chkAuslöser_prepaireformula;
         private Button chkAuslöser_valuechanged;
-        private Button chkAuslöser_newrow;
         private Button chkAendertWerte;
         private Button chkExternVerfügbar;
         private TextBox txbName;
         private Caption capName;
-        private TextBox txbTestZeile;
-        private GroupBox grpZeile;
-        private Caption cpZeile;
         private Button chkAuslöser_valuechangedThread;
         private Panel panel1;
         private GroupBox grpAuslöser;
-        private Button chkAuslöser_databaseloaded;
         private Button chkAuslöser_export;
-        private Button chkChangeValuesInTest;
+        private Button chkAuslöser_formulaloaded;
+        private Button button1;
     }
 }

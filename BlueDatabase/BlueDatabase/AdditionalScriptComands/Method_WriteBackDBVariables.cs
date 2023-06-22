@@ -61,7 +61,7 @@ public class Method_WriteBackDBVariables : Method_Database {
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
         if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Variabeln zurückschreiben im Testmodus deaktiviert."); }
 
-        db.WriteBackDbVariables(s.Variables);
+        db.Variables = DatabaseAbstract.WriteBackDbVariables(s.Variables, db.Variables, "DB_");
 
         return DoItFeedback.Null();
     }

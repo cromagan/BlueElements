@@ -81,12 +81,12 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
-                chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.new_row);
-                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.value_changed);
-                chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.value_changed_extra_thread);
-                chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.prepare_formula);
-                chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.database_loaded);
-                chkAuslöser_export.Checked = value.EventTypes.HasFlag(DatabaseEventTypes.export);
+                chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.new_row);
+                chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
+                chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
+                chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
+                chkAuslöser_databaseloaded.Checked = value.EventTypes.HasFlag(ScriptEventTypes.loaded);
+                chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
                 chkExternVerfügbar.Checked = value.ManualExecutable;
                 chkAendertWerte.Checked = value.ChangeValues;
                 eventScriptEditor.ScriptText = value.Script;
@@ -166,13 +166,13 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
 
-        DatabaseEventTypes tmp = 0;
-        if (chkAuslöser_newrow.Checked) { tmp |= DatabaseEventTypes.new_row; }
-        if (chkAuslöser_valuechanged.Checked) { tmp |= DatabaseEventTypes.value_changed; }
-        if (chkAuslöser_prepaireformula.Checked) { tmp |= DatabaseEventTypes.prepare_formula; }
-        if (chkAuslöser_valuechangedThread.Checked) { tmp |= DatabaseEventTypes.value_changed_extra_thread; }
-        if (chkAuslöser_databaseloaded.Checked) { tmp |= DatabaseEventTypes.database_loaded; }
-        if (chkAuslöser_export.Checked) { tmp |= DatabaseEventTypes.export; }
+        ScriptEventTypes tmp = 0;
+        if (chkAuslöser_newrow.Checked) { tmp |= ScriptEventTypes.new_row; }
+        if (chkAuslöser_valuechanged.Checked) { tmp |= ScriptEventTypes.value_changed; }
+        if (chkAuslöser_prepaireformula.Checked) { tmp |= ScriptEventTypes.prepare_formula; }
+        if (chkAuslöser_valuechangedThread.Checked) { tmp |= ScriptEventTypes.value_changed_extra_thread; }
+        if (chkAuslöser_databaseloaded.Checked) { tmp |= ScriptEventTypes.loaded; }
+        if (chkAuslöser_export.Checked) { tmp |= ScriptEventTypes.export; }
         Item.EventTypes = tmp;
     }
 

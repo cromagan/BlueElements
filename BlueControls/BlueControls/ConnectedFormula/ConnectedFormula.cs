@@ -37,6 +37,10 @@ using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
 using BlueScript.Structures;
+using BlueScript.Enums;
+using BlueScript;
+using BlueDatabase.EventArgs;
+using static BlueBasics.Generic;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -44,7 +48,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     #region Fields
 
-    public const string Version = "0.10";
+    public const string Version = "0.30";
 
     public static readonly List<ConnectedFormula> AllFiles = new();
 
@@ -117,6 +121,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     public event EventHandler? Changed;
 
+    public event EventHandler<MessageEventArgs>? DropMessage;
+
     public event EventHandler? Loaded;
 
     public event EventHandler? Loading;
@@ -128,6 +134,9 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     #endregion
 
     #region Properties
+
+    [DefaultValue(true)]
+    public bool DropMessages { get; set; } = true;
 
     public ReadOnlyCollection<FormulaScript> EventScript {
         get => new(_eventScript);
@@ -146,7 +155,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             foreach (var t in l) {
                 EventScript_Add(t, true);
             }
-
+            _saved = false;
             //CheckScriptError();
         }
     }
@@ -213,6 +222,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                     Variables_Add(ts, true);
                 }
             }
+
+            _saved = false;
         }
     }
 
@@ -483,27 +494,27 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         }
 
         var l = EventScript;
-        if (l.Get(DatabaseEventTypes.export).Count > 1) {
+        if (l.Get(ScriptEventTypes.export).Count > 1) {
             return "Skript 'Export' mehrfach vorhanden";
         }
 
-        if (l.Get(DatabaseEventTypes.database_loaded).Count > 1) {
+        if (l.Get(ScriptEventTypes.loaded).Count > 1) {
             return "Skript 'Datenank geladen' mehrfach vorhanden";
         }
 
-        if (l.Get(DatabaseEventTypes.prepare_formula).Count > 1) {
+        if (l.Get(ScriptEventTypes.prepare_formula).Count > 1) {
             return "Skript 'Formular Vorbereitung' mehrfach vorhanden";
         }
 
-        if (l.Get(DatabaseEventTypes.value_changed_extra_thread).Count > 1) {
+        if (l.Get(ScriptEventTypes.value_changed_extra_thread).Count > 1) {
             return "Skript 'Wert geändert Extra Thread' mehrfach vorhanden";
         }
 
-        if (l.Get(DatabaseEventTypes.new_row).Count > 1) {
+        if (l.Get(ScriptEventTypes.new_row).Count > 1) {
             return "Skript 'Neue Zeile' mehrfach vorhanden";
         }
 
-        if (l.Get(DatabaseEventTypes.value_changed).Count > 1) {
+        if (l.Get(ScriptEventTypes.value_changed).Count > 1) {
             return "Skript 'Wert geändert' mehrfach vorhanden";
         }
 
@@ -536,12 +547,65 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
     }
 
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
+        try {
+            if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, "Allgemein"); }
+
+            //var m = EditableErrorReason(EditableErrorReasonType.EditGeneral);
+
+            //if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
+
+            #region Script ermitteln
+
+            if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
+                return new ScriptEndedFeedback("Event und Skript angekommen!", false, "Allgemein");
+            }
+
+            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, "Allgemein"); }
+
+            if (string.IsNullOrEmpty(scriptname) && eventname != null) {
+                var l = EventScript.Get((ScriptEventTypes)eventname);
+                if (l.Count == 1) { scriptname = l[0].Name; }
+                if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, string.Empty); }
+            }
+
+            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Kein Skriptname angekommen", false, "Allgemein"); }
+
+            var script = EventScript.Get(scriptname);
+
+            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, scriptname); }
+
+            //if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, scriptname); }
+
+            //if (!script.NeedRow) { row = null; }
+
+            #endregion
+
+            //if (!script.ChangeValues) { changevalues = false; }
+
+            return ExecuteScript(script);
+        } catch {
+            Develop.CheckStackForOverflow();
+            return ExecuteScript(eventname, scriptname, changevalues, row);
+        }
+    }
+
     public void HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) {
         if (!_saved) { e.HasPendingChanges = true; return; }
 
         if (IntParse(_loadedVersion.Replace(".", string.Empty)) < IntParse(Version.Replace(".", string.Empty))) {
             e.HasPendingChanges = true;
         }
+    }
+
+    public bool IsAdministrator() {
+        if (string.Equals(UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
+        //if (_datenbankAdmin == null || _datenbankAdmin.Count == 0) { return false; }
+        //if (_datenbankAdmin.Contains(Constants.Everybody, false)) { return true; }
+        //if (!string.IsNullOrEmpty(UserName) && _datenbankAdmin.Contains("#User: " + UserName, false)) { return true; }
+        //return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
+        return false;
     }
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
@@ -611,9 +675,75 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         if (!isLoading) { Variables_Changed(); }
     }
 
-    internal ScriptEndedFeedback? ExecuteScript(FormulaScript item, bool changeValuesInTest) {
-        Develop.DebugPrint_NichtImplementiert();
-        return null;
+    internal ScriptEndedFeedback ExecuteScript(FormulaScript s) {
+        if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, s.Name); }
+
+        var sce = CheckScriptError();
+        if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, "Allgemein"); }
+
+        try {
+
+            #region Variablen für Skript erstellen
+
+            VariableCollection vars = new();
+
+            foreach (var thisvar in Variables.ToListVariableString()) {
+                var v = new VariableString("Formula_" + thisvar.Name, thisvar.ValueString, false, false, "Formular-Kopf-Variable\r\n" + thisvar.Comment);
+                vars.Add(v);
+            }
+
+            vars.Add(new VariableString("User", UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+            vars.Add(new VariableString("Usergroup", UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+            vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+
+            #endregion
+
+            #region  Erlaubte Methoden ermitteln
+
+            var allowedMethods = MethodType.Standard | MethodType.Database;
+
+            //if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
+            if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
+                allowedMethods |= MethodType.IO;
+                allowedMethods |= MethodType.NeedLongTime;
+            }
+
+            if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
+                !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
+                !s.EventTypes.HasFlag(ScriptEventTypes.loaded)) {
+                allowedMethods |= MethodType.ManipulatesUser;
+            }
+
+            allowedMethods |= MethodType.ChangeAnyDatabaseOrRow;
+
+            #endregion
+
+            #region Script ausführen
+
+            Script sc = new(vars, string.Empty, true, allowedMethods, s.Attributes()) {
+                ScriptText = s.Script
+            };
+            var scf = sc.Parse(0, s.Name);
+
+            #endregion
+
+            #region Variablen zurückschreiben und Special Rules ausführen
+
+            if (sc.ChangeValues && scf.AllOk) {
+                Variables = DatabaseAbstract.WriteBackDbVariables(vars, Variables, "Formula_");
+            }
+
+            if (!scf.AllOk) {
+                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.Name + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
+            }
+
+            #endregion
+
+            return scf;
+        } catch {
+            Develop.CheckStackForOverflow();
+            return ExecuteScript(s);
+        }
     }
 
     /// <summary>
@@ -636,6 +766,12 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         }
 
         return false;
+    }
+
+    internal void OnDropMessage(FehlerArt type, string message) {
+        if (IsDisposed) { return; }
+        if (!DropMessages) { return; }
+        DropMessage?.Invoke(this, new MessageEventArgs(type, message));
     }
 
     internal void Resize(float newWidthPixel, float newhHeightPixel, bool changeControls) {
@@ -724,6 +860,28 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                     _id = IntParse(pair.Value);
                     break;
 
+                case "events":
+                    _eventScriptTmp = pair.Value;
+                    EventScript_RemoveAll(true);
+                    List<string> ai = new(pair.Value.SplitAndCutByCr());
+                    foreach (var t in ai) {
+                        EventScript_Add(new FormulaScript(this, t.FromNonCritical()), true);
+                    }
+
+                    break;
+
+                case "variables":
+                    _variableTmp = pair.Value;
+                    Variables_RemoveAll(true);
+                    List<string> va = new(pair.Value.SplitAndCutByCr());
+                    foreach (var t in va) {
+                        var l = new VariableString("dummy");
+                        l.Parse(t.FromNonCritical());
+                        l.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
+                        Variables_Add(l, true);
+                    }
+                    break;
+
                 default:
                     DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                     break;
@@ -761,6 +919,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         Repair();
 
         Loaded?.Invoke(this, e);
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null);
     }
 
     private void OnLoading(object sender, System.EventArgs e) => Loading?.Invoke(this, e);
@@ -803,20 +962,28 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         var t = new List<string>();
 
-        t.Add("Type=ConnectedFormula");
-        t.Add("Version=" + Version);
-        t.Add("CreateDate=" + _createDate.ToNonCritical());
-        t.Add("CreateName=" + _creator.ToNonCritical());
+        t.ParseableAdd("Type", "ConnectedFormula");
+        t.ParseableAdd("Version", Version);
+        t.ParseableAdd("CreateDate", _createDate);
+        t.ParseableAdd("CreateName", _creator);
         //t.GenerateAndAdd("FilePath=" + FilePath.ToNonCritical());
-        t.Add("LastUsedID=" + _id);
-        t.Add("DatabaseFiles=" + _databaseFiles.JoinWithCr().ToNonCritical());
-        t.Add("NotAllowedChilds=" + _notAllowedChilds.JoinWithCr().ToNonCritical());
+        t.ParseableAdd("LastUsedID", _id);
+        t.ParseableAdd("DatabaseFiles", _databaseFiles);
+        t.ParseableAdd("NotAllowedChilds", _notAllowedChilds);
 
         if (PadData != null) {
-            t.Add("PadItemData=" + PadData.ToString().ToNonCritical());
+            t.ParseableAdd("PadItemData", PadData.ToString());
         }
 
-        e.Data = ("{" + t.JoinWith(", ").TrimEnd(", ") + "}").WIN1252_toByte();
+        if (Variables.Count > 0) {
+            t.ParseableAdd("Variables", Variables.ToList().ToString(true));
+        }
+
+        if (EventScript.Count > 0) {
+            t.ParseableAdd("Events", EventScript.ToString(true));
+        }
+
+        e.Data = t.Parseable().WIN1252_toByte();
     }
 
     private void Variables_Changed() => Variables = new VariableCollection(_variables);

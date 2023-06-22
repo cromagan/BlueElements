@@ -202,6 +202,12 @@ public static partial class Extensions {
         col.Add(tagname + "=" + v.ToNonCritical());
     }
 
+    /// <summary>
+    /// Fügt nur die Key-Namen in die Liste hinzu
+    /// </summary>
+    /// <param name="col"></param>
+    /// <param name="tagname"></param>
+    /// <param name="value"></param>
     public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value) {
         if (value == null || !value.Any()) { return; }
         ParseableAdd(col, tagname, value.ToListOfString());

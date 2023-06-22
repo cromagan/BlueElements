@@ -77,7 +77,8 @@
             this.grpImport = new BlueControls.Controls.GroupBox();
             this.btnClipboardImport = new BlueControls.Controls.Button();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
-            this.CFO = new BlueControls.Controls.ConnectedFormulaView();
+            this.CFormula = new BlueControls.Controls.ConnectedFormulaView();
+            this.grpSkripte = new BlueControls.Controls.GroupBox();
             this.pnlStatusBar.SuspendLayout();
             this.ribMain.SuspendLayout();
             this.tabFile.SuspendLayout();
@@ -99,12 +100,12 @@
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(931, 24);
+            this.capStatusBar.Size = new System.Drawing.Size(1202, 24);
             // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new System.Drawing.Point(0, 426);
-            this.pnlStatusBar.Size = new System.Drawing.Size(931, 24);
+            this.pnlStatusBar.Size = new System.Drawing.Size(1202, 24);
             // 
             // ribMain
             // 
@@ -117,7 +118,7 @@
             this.ribMain.Location = new System.Drawing.Point(0, 0);
             this.ribMain.Name = "ribMain";
             this.ribMain.SelectedIndex = 1;
-            this.ribMain.Size = new System.Drawing.Size(931, 110);
+            this.ribMain.Size = new System.Drawing.Size(1202, 110);
             this.ribMain.TabDefault = this.tabFile;
             this.ribMain.TabDefaultOrder = null;
             this.ribMain.TabIndex = 97;
@@ -218,9 +219,10 @@
             this.tabAllgemein.Controls.Add(this.grpAnsicht);
             this.tabAllgemein.Controls.Add(this.grpHilfen);
             this.tabAllgemein.Controls.Add(this.grpFormularSteuerung);
+            this.tabAllgemein.Controls.Add(this.grpSkripte);
             this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
             this.tabAllgemein.Name = "tabAllgemein";
-            this.tabAllgemein.Size = new System.Drawing.Size(923, 81);
+            this.tabAllgemein.Size = new System.Drawing.Size(1194, 81);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
             // 
@@ -233,7 +235,7 @@
             this.grpAnsichtWahl.Controls.Add(this.chkAnsichtNurTabelle);
             this.grpAnsichtWahl.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAnsichtWahl.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAnsichtWahl.Location = new System.Drawing.Point(954, 0);
+            this.grpAnsichtWahl.Location = new System.Drawing.Point(1210, 0);
             this.grpAnsichtWahl.Name = "grpAnsichtWahl";
             this.grpAnsichtWahl.Size = new System.Drawing.Size(260, 81);
             this.grpAnsichtWahl.TabIndex = 5;
@@ -279,7 +281,7 @@
             this.grpAnsicht.Controls.Add(this.cbxColumnArr);
             this.grpAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAnsicht.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAnsicht.Location = new System.Drawing.Point(626, 0);
+            this.grpAnsicht.Location = new System.Drawing.Point(882, 0);
             this.grpAnsicht.Margin = new System.Windows.Forms.Padding(0);
             this.grpAnsicht.Name = "grpAnsicht";
             this.grpAnsicht.Padding = new System.Windows.Forms.Padding(0);
@@ -359,7 +361,7 @@
             this.grpHilfen.Controls.Add(this.btnSuchFenster);
             this.grpHilfen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpHilfen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpHilfen.Location = new System.Drawing.Point(370, 0);
+            this.grpHilfen.Location = new System.Drawing.Point(626, 0);
             this.grpHilfen.Name = "grpHilfen";
             this.grpHilfen.Size = new System.Drawing.Size(256, 81);
             this.grpHilfen.TabIndex = 6;
@@ -408,7 +410,7 @@
             this.grpFormularSteuerung.Controls.Add(this.btnZurück);
             this.grpFormularSteuerung.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFormularSteuerung.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpFormularSteuerung.Location = new System.Drawing.Point(0, 0);
+            this.grpFormularSteuerung.Location = new System.Drawing.Point(256, 0);
             this.grpFormularSteuerung.Name = "grpFormularSteuerung";
             this.grpFormularSteuerung.Size = new System.Drawing.Size(370, 81);
             this.grpFormularSteuerung.TabIndex = 4;
@@ -610,13 +612,13 @@
             // btnSkripteBearbeiten
             // 
             this.btnSkripteBearbeiten.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnSkripteBearbeiten.Enabled = false;
             this.btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
             this.btnSkripteBearbeiten.Location = new System.Drawing.Point(240, 2);
             this.btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
             this.btnSkripteBearbeiten.Size = new System.Drawing.Size(56, 66);
             this.btnSkripteBearbeiten.TabIndex = 45;
             this.btnSkripteBearbeiten.Text = "Skripte";
+            this.btnSkripteBearbeiten.Click += new System.EventHandler(this.btnSkripteBearbeiten_Click);
             // 
             // btnFormular
             // 
@@ -753,28 +755,41 @@
             this.LoadTab.Title = "Bitte Datenbank laden!";
             this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
-            // CFO
+            // CFormula
             // 
-            this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.CFO.Location = new System.Drawing.Point(0, 110);
-            this.CFO.Name = "CFO";
-            this.CFO.Size = new System.Drawing.Size(931, 316);
-            this.CFO.TabIndex = 98;
-            this.CFO.Text = "CFO";
+            this.CFormula.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.CFormula.Location = new System.Drawing.Point(0, 110);
+            this.CFormula.Name = "CFormula";
+            this.CFormula.Size = new System.Drawing.Size(1202, 316);
+            this.CFormula.TabIndex = 98;
+            this.CFormula.Text = "CFO";
+            // 
+            // grpSkripte
+            // 
+            this.grpSkripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpSkripte.CausesValidation = false;
+            this.grpSkripte.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpSkripte.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpSkripte.Location = new System.Drawing.Point(0, 0);
+            this.grpSkripte.Name = "grpSkripte";
+            this.grpSkripte.Size = new System.Drawing.Size(256, 81);
+            this.grpSkripte.TabIndex = 7;
+            this.grpSkripte.TabStop = false;
+            this.grpSkripte.Text = "Skripte";
             // 
             // FormulaView
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(931, 450);
-            this.Controls.Add(this.CFO);
+            this.ClientSize = new System.Drawing.Size(1202, 450);
+            this.Controls.Add(this.CFormula);
             this.Controls.Add(this.ribMain);
             this.Name = "FormulaView";
             this.Text = "FormulaView";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
             this.Controls.SetChildIndex(this.ribMain, 0);
-            this.Controls.SetChildIndex(this.CFO, 0);
+            this.Controls.SetChildIndex(this.CFormula, 0);
             this.pnlStatusBar.ResumeLayout(false);
             this.ribMain.ResumeLayout(false);
             this.tabFile.ResumeLayout(false);
@@ -852,6 +867,7 @@
         private Controls.GroupBox grpImport;
         private Controls.Button btnClipboardImport;
         private System.Windows.Forms.OpenFileDialog LoadTab;
-        private Controls.ConnectedFormulaView CFO;
+        private Controls.ConnectedFormulaView CFormula;
+        private Controls.GroupBox grpSkripte;
     }
 }

@@ -541,7 +541,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     public void ParseVariable(RowItem? row) {
         if (row == null || row.IsDisposed) { return; }
 
-        var script = row.ExecuteScript(DatabaseEventTypes.export, string.Empty, false, false, true, 0);
+        var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0);
         if (!script.AllOk || script.Variables == null) { return; }
         foreach (var thisV in script.Variables) {
             _ = ParseVariable(thisV);

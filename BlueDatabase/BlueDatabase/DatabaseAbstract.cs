@@ -627,6 +627,22 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         } while (true);
     }
 
+    public static VariableCollection WriteBackDbVariables(VariableCollection scriptVars, VariableCollection existingVars, string suffix) {
+        var vaa = new List<VariableString>();
+        vaa.AddRange(existingVars.ToListVariableString());
+
+        foreach (var thisvar in vaa) {
+            var v = scriptVars.Get(suffix + thisvar.Name);
+
+            if (v is VariableString vs) {
+                thisvar.ReadOnly = false; // weil kein OnChanged vorhanden ist
+                thisvar.ValueString = vs.ValueString;
+                thisvar.ReadOnly = true; // weil kein OnChanged vorhanden ist
+            }
+        }
+        return new VariableCollection(vaa);
+    }
+
     /// <summary>
     /// Der komplette Pfad mit abschlieﬂenden \
     /// </summary>
@@ -699,27 +715,27 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         var l = EventScript;
-        if (l.Get(DatabaseEventTypes.export).Count > 1) {
+        if (l.Get(ScriptEventTypes.export).Count > 1) {
             return "Skript 'Export' mehrfach vorhanden";
         }
 
-        if (l.Get(DatabaseEventTypes.database_loaded).Count > 1) {
+        if (l.Get(ScriptEventTypes.loaded).Count > 1) {
             return "Skript 'Datenank geladen' mehrfach vorhanden";
         }
 
-        if (l.Get(DatabaseEventTypes.prepare_formula).Count > 1) {
+        if (l.Get(ScriptEventTypes.prepare_formula).Count > 1) {
             return "Skript 'Formular Vorbereitung' mehrfach vorhanden";
         }
 
-        if (l.Get(DatabaseEventTypes.value_changed_extra_thread).Count > 1) {
+        if (l.Get(ScriptEventTypes.value_changed_extra_thread).Count > 1) {
             return "Skript 'Wert ge‰ndert Extra Thread' mehrfach vorhanden";
         }
 
-        if (l.Get(DatabaseEventTypes.new_row).Count > 1) {
+        if (l.Get(ScriptEventTypes.new_row).Count > 1) {
             return "Skript 'Neue Zeile' mehrfach vorhanden";
         }
 
-        if (l.Get(DatabaseEventTypes.value_changed).Count > 1) {
+        if (l.Get(ScriptEventTypes.value_changed).Count > 1) {
             return "Skript 'Wert ge‰ndert' mehrfach vorhanden";
         }
 
@@ -886,7 +902,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             vars.Add(new VariableString("Tablename", TableName, true, false, "Der aktuelle Tabellenname."));
             vars.Add(new VariableFloat("Rows", Row.Count, true, false, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
             vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.Name ?? string.Empty, true, false, "Der Name der ersten Spalte"));
-            vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(DatabaseEventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
+            vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
             if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
                 vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zus‰zliche Daten gespeichert werden."));
             }
@@ -898,14 +914,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             var allowedMethods = MethodType.Standard | MethodType.Database;
 
             if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
-            if (!s.EventTypes.HasFlag(DatabaseEventTypes.prepare_formula)) {
+            if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
                 allowedMethods |= MethodType.IO;
                 allowedMethods |= MethodType.NeedLongTime;
             }
 
-            if (!s.EventTypes.HasFlag(DatabaseEventTypes.value_changed_extra_thread) &&
-                !s.EventTypes.HasFlag(DatabaseEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(DatabaseEventTypes.database_loaded)) {
+            if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
+                !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
+                !s.EventTypes.HasFlag(ScriptEventTypes.loaded)) {
                 allowedMethods |= MethodType.ManipulatesUser;
             }
 
@@ -931,7 +947,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
                     }
                 }
 
-                WriteBackDbVariables(vars);
+                Variables = WriteBackDbVariables(vars, Variables, "DB_");
             }
 
             if (!scf.AllOk) {
@@ -947,7 +963,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
     }
 
-    public ScriptEndedFeedback ExecuteScript(DatabaseEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, "Allgemein"); }
 
@@ -965,7 +981,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, "Allgemein"); }
 
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
-                var l = EventScript.Get((DatabaseEventTypes)eventname);
+                var l = EventScript.Get((ScriptEventTypes)eventname);
                 if (l.Count == 1) { scriptname = l[0].Name; }
                 if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, string.Empty); }
             }
@@ -1486,22 +1502,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         }
 
         if (!isLoading) { Variables_Changed(); }
-    }
-
-    public void WriteBackDbVariables(VariableCollection vars) {
-        var vaa = new List<VariableString>();
-        vaa.AddRange(Variables.ToListVariableString());
-
-        foreach (var thisvar in vaa) {
-            var v = vars.Get("DB_" + thisvar.Name);
-
-            if (v is VariableString vs) {
-                thisvar.ReadOnly = false; // weil kein OnChanged vorhanden ist
-                thisvar.ValueString = vs.ValueString;
-                thisvar.ReadOnly = true; // weil kein OnChanged vorhanden ist
-            }
-        }
-        Variables = new VariableCollection(vaa);
     }
 
     internal void DevelopWarnung(string t) {

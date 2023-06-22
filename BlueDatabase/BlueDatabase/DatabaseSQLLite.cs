@@ -587,7 +587,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         OnLoaded();
         CreateWatcher();
         GenerateTimer();
-        _ = ExecuteScript(DatabaseEventTypes.database_loaded, string.Empty, true, null);
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null);
     }
 
     #endregion
