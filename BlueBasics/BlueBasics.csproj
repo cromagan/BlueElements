@@ -102,6 +102,7 @@
     <Compile Include="Enums\AdditionalCheck.cs" />
     <Compile Include="Enums\ScriptEventTypes.cs" />
     <Compile Include="Enums\SortierTyp.cs" />
+    <Compile Include="EventArgs\MessageEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserFileBackGroundWorker.cs" />
     <Compile Include="EventArgs\MultiUserToListEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserParseEventArgs.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Extensions\RectangleFExtension.cs" />
     <Compile Include="Cryptogaphy.cs" />
     <Compile Include="HTML.cs" />
+    <Compile Include="Interfaces\ICanDropMessages.cs" />
     <Compile Include="Interfaces\IHasKeyName.cs" />
     <Compile Include="Interfaces\IErrorCheckable.cs" />
     <Compile Include="Interfaces\IDisposableExtended.cs" />

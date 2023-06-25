@@ -31,12 +31,13 @@ public class Method_Row : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { FilterVar };
+    public override List<List<string>> Args => new() { BoolVal, FilterVar };
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
-                                          "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt. Es wird keine neue Zeile erstellt.\r\n" +
+                                          "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt oder - falls CreateRow True - eine neue Zeile erstellt.\r\n" +
                                           "Mit RowIsNull kann abgefragt werden, ob die Zeile gefunden wurde.\r\n" +
-                                          "Werden mehrere Zeilen gefunden, wird das Programm abgebrochen. Um das zu verhindern, kann RowCount benutzt werden.";
+                                          "Werden mehrere Zeilen gefunden, wird das Programm abgebrochen. Um das zu verhindern, kann RowCount benutzt werden.\r\n" +
+                                          "Soll eine Zeile erstellt werden, und dies schlägt fehl, wird das Programm ebenfalls unterbrochen";
 
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
@@ -46,7 +47,7 @@ public class Method_Row : Method {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "Row(Filter, ...)";
+    public override string Syntax => "Row(CreateRow, Filter, ...)";
 
     #endregion
 
@@ -75,14 +76,21 @@ public class Method_Row : Method {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
+        var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
         if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
         var r = RowCollection.MatchesTo(allFi);
 
         if (r.Count > 1) { return new DoItFeedback(infos.Data, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 
-        if (r.Count is 0 or > 1) {
+
+        if (r.Count == 0) {
+            if (attvar.ValueBoolGet(0)) {
+                var nr = RowCollection.GenerateAndAdd(allFi, "Skript Befehl 'ROW'");
+                if (nr == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden"); }
+                return RowToObjectFeedback(nr);
+            }
+
             return RowToObjectFeedback(null);
         }
 

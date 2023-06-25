@@ -1004,7 +1004,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             default: {
                     if (addRowIfNotExists) {
-                        targetRow = linkedDatabase.Row.GenerateAndAdd(filter, "LinkedCell aus " + column.Database.TableName);
+                        targetRow = RowCollection.GenerateAndAdd(filter, "LinkedCell aus " + column.Database.TableName);
                     } else {
                         cr = true;
                     }

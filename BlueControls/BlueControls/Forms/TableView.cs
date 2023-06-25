@@ -566,7 +566,7 @@ public partial class TableView : FormWithStatusBar {
         ColumnItem? column = null;
         if (e.HotItem is RowItem r) { row = r; }
         if (e.HotItem is ColumnItem c) { column = c; }
-        if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out row); }
+        if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out row); }
 
         var valueCol0 = string.Empty;
         if (row != null && !row.IsDisposed) {
@@ -1015,7 +1015,7 @@ public partial class TableView : FormWithStatusBar {
             }
         } else {
             //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-            var s = Table.Database.ExecuteScript(sc, sc.ChangeValues, null);
+            var s = Table.Database.ExecuteScript(sc, sc.ChangeValues, null, null);
             m = s.Protocol.JoinWithCr();
         }
 

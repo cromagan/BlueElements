@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueDatabase.EventArgs;
+using BlueBasics.EventArgs;
 
 namespace BlueControls.Forms;
 
@@ -133,7 +133,7 @@ public partial class FormWithStatusBar : Form {
         }
     }
 
-    internal static void Db_DropMessage(object sender, MessageEventArgs e) => UpdateStatusBar(e.Type, e.Message, true);
+    internal static void GotMessageDropMessage(object sender, MessageEventArgs e) => UpdateStatusBar(e.Type, e.Message, true);
 
     protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e) {
         Forms.Remove(this);

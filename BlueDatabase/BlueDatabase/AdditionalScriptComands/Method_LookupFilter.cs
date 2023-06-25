@@ -58,7 +58,9 @@ public class Method_LookupFilter : Method {
 
         if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
-        var returncolumn = allFi[0].Database.Column.Exists(attvar.ValueStringGet(0));
+        if (allFi[0].Database is not DatabaseAbstract db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
+
+        var returncolumn = db.Column.Exists(attvar.ValueStringGet(0));
         if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
         var l = new List<string>();

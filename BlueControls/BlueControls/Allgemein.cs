@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Windows.Forms;
 using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -80,27 +81,34 @@ public static class Allgemein {
         return null;
     }
 
-    public static void StartDatabaseService() {
+    public static void StartGlobalService() {
         if (_serviceStarted) { return; }
         _serviceStarted = true;
         DatabaseAbstract.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
+        ConnectedFormula.ConnectedFormula.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
     }
 
     private static void AllFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
+                if (thisit is ICanDropMessages dm) {
+                    dm.DropMessage += FormWithStatusBar.GotMessageDropMessage;
+                }
+
                 if (thisit is DatabaseAbstract db) {
                     db.Loaded += TableView.CheckDatabase;
-                    db.DropMessage += FormWithStatusBar.Db_DropMessage;
                 }
             }
         }
 
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
+                if (thisit is DatabaseAbstract dm) {
+                    dm.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
+                }
+
                 if (thisit is DatabaseAbstract db) {
                     db.Loaded -= TableView.CheckDatabase;
-                    db.DropMessage -= FormWithStatusBar.Db_DropMessage;
                 }
             }
         }

@@ -80,7 +80,7 @@ internal class Method_Export : Method_Database {
 
         var cu = db.ColumnArrangements.Get(attvar.ValueStringGet(2));
         if (string.IsNullOrEmpty(attvar.ValueStringGet(2)) || cu == null) {
-            cu = db.ColumnArrangements?[0];
+            cu = db.ColumnArrangements[0];
         }
 
         if (cu == null) { return new DoItFeedback(infos.Data, "Ansicht-Fehler!"); }

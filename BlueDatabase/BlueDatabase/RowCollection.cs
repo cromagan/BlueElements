@@ -137,6 +137,51 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Methods
 
+    /// <summary>
+    /// Erstellt eine neue Spalte mit den aus den Filterkriterien. Nur Fiter IstGleich wird unterstützt.
+    /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
+    /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
+    /// Am Schluß wird noch das Skript ausgeführt.
+    /// </summary>
+    /// <param name="fi"></param>
+    /// <param name="comment"></param>
+    /// <returns></returns>
+    public static RowItem? GenerateAndAdd(List<FilterItem> fi, string comment) {
+        IReadOnlyCollection<string>? first = null;
+
+        DatabaseAbstract? database = null;
+
+        foreach (var thisfi in fi) {
+            if (thisfi.FilterType != FilterType.Istgleich && thisfi.FilterType != FilterType.Istgleich_GroßKleinEgal) { return null; }
+            if (thisfi.Column == null) { return null; }
+            if (thisfi.Database == null) { return null; }
+            database ??= thisfi.Database;
+
+            if (database.Column.First() == thisfi.Column) {
+                if (first != null) { return null; }
+                first = thisfi.SearchValue;
+            }
+
+            if (thisfi.Column.Database != database) { return null; }
+        }
+
+        if (database == null || database.IsDisposed) { return null; }
+
+        if (first == null) { return null; }
+
+        var row = database.Row.GenerateAndAdd(database.Row.NextRowKey(), first.JoinWithCr(), false, true, comment);
+
+        if (row == null || row.IsDisposed) { return null; }
+
+        foreach (var thisfi in fi) {
+            row.CellSet(thisfi.Column, thisfi.SearchValue.ToList());
+        }
+
+        _ = row.ExecuteScript(ScriptEventTypes.new_row, string.Empty, false, false, true, 1);
+
+        return row;
+    }
+
     public static string UniqueKeyValue() {
         var x = 9999;
         do {
@@ -529,50 +574,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return item;
     }
 
-    //                var key = new List<long>();
-    /// <summary>
-    /// Erstellt eine neue Spalte mit den aus den Filterkriterien. nur Fiter IstGleich wird unterstützt.
-    /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
-    /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
-    /// Am Schluß wird noch das Skript ausgeführt.
-    /// </summary>
-    /// <param name="fi"></param>
-    /// <param name="comment"></param>
-    /// <returns></returns>
-    public RowItem? GenerateAndAdd(List<FilterItem> fi, string comment) {
-        if (Database == null || Database.IsDisposed) { return null; }
-
-        IReadOnlyCollection<string>? first = null;
-
-        foreach (var thisfi in fi) {
-            if (Database.Column.First() == thisfi.Column) {
-                if (first != null) { return null; }
-                first = thisfi.SearchValue;
-            }
-            if (thisfi.FilterType != FilterType.Istgleich) { return null; }
-            if (thisfi.Column == null) { return null; }
-            if (thisfi.Column.Database != Database) { return null; }
-        }
-
-        if (first == null) { return null; }
-
-        var row = GenerateAndAdd(NextRowKey(), first.JoinWithCr(), false, true, comment);
-
-        if (row == null || row.IsDisposed) { return null; }
-
-        foreach (var thisfi in fi) {
-            row.CellSet(thisfi.Column, thisfi.SearchValue.ToList());
-        }
-
-        _ = row.ExecuteScript(ScriptEventTypes.new_row, string.Empty, false, false, true, 1);
-
-        return row;
-    }
-
-    //    foreach (var thisColumn in Database.Column) {
-    //        if (thisColumn.LinkedDatabase is DatabaseAbstract dbl) {
-    //            if (!done.Contains(dbl)) {
-    //                done.Add(dbl);
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) => GenerateAndAdd(NextRowKey(), valueOfCellInFirstColumn, true, true, comment);
 
     //    List<DatabaseAbstract> done = new();

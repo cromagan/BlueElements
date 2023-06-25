@@ -30,7 +30,7 @@ public class Method_WriteBackDBVariables : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { };
+    public override List<List<string>> Args => new();
 
     public override string Description => "Schreibt die aktuellen Datenbank-Variabeln vorzeitig zurück in die Datenbank.\r\n" +
                                 "So kann mit Routinen, die separate Skripte aufrufen, auf die Datenbank Variablen zugegriffen werden.";

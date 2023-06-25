@@ -25,7 +25,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 
 namespace BlueControls.ConnectedFormula;
@@ -158,7 +157,7 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
     public object Clone() => new FormulaScript(Formula, ToString());
 
     public int CompareTo(object obj) {
-        if (obj is DatabaseScript v) {
+        if (obj is FormulaScript v) {
             return CompareKey.CompareTo(v.CompareKey);
         }
 

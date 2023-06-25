@@ -68,10 +68,10 @@ public class Method_CallFilter : Method {
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
         //var db = MyDatabase(s);
-        if (allFi[0].Database == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
+        if (allFi[0].Database is not DatabaseAbstract db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
-        var r = allFi[0].Database.Row.CalculateFilteredRows(allFi);
-        if (r == null || r.Count == 0) { return DoItFeedback.Null(); }
+        var r = db.Row.CalculateFilteredRows(allFi);
+        if (r.Count == 0) { return DoItFeedback.Null(); }
 
         var vs = attvar.ValueStringGet(0);
 

@@ -31,7 +31,6 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
@@ -39,18 +38,17 @@ using static BlueBasics.IO;
 using BlueScript.Structures;
 using BlueScript.Enums;
 using BlueScript;
-using BlueDatabase.EventArgs;
 using static BlueBasics.Generic;
 
 namespace BlueControls.ConnectedFormula;
 
-public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyName {
+public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyName, ICanDropMessages {
 
     #region Fields
 
     public const string Version = "0.30";
 
-    public static readonly List<ConnectedFormula> AllFiles = new();
+    public static readonly ObservableCollection<ConnectedFormula> AllFiles = new();
 
     public static readonly float StandardHöhe = 1.75f;
 
@@ -863,7 +861,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                 case "events":
                     _eventScriptTmp = pair.Value;
                     EventScript_RemoveAll(true);
-                    List<string> ai = new(pair.Value.SplitAndCutByCr());
+                    List<string> ai = new(pair.Value.FromNonCritical().SplitAndCutByCr());
                     foreach (var t in ai) {
                         EventScript_Add(new FormulaScript(this, t.FromNonCritical()), true);
                     }
@@ -873,7 +871,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                 case "variables":
                     _variableTmp = pair.Value;
                     Variables_RemoveAll(true);
-                    List<string> va = new(pair.Value.SplitAndCutByCr());
+                    List<string> va = new(pair.Value.FromNonCritical().SplitAndCutByCr());
                     foreach (var t in va) {
                         var l = new VariableString("dummy");
                         l.Parse(t.FromNonCritical());

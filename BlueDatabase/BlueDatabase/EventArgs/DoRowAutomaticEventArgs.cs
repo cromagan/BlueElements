@@ -18,7 +18,6 @@
 #nullable enable
 
 using BlueBasics.Enums;
-using BlueDatabase.Enums;
 
 namespace BlueDatabase.EventArgs;
 

@@ -74,7 +74,6 @@ public static partial class Extensions {
     /// Gib TRUE zurück, wenn ein Item erfolgreich entfernt wurde.
     /// Gibt False zurück, wenn kein Item entfernt wurde - weil es auf Fehler lief oder gar nicht vorhanden war.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     /// <param name="iC"></param>
     /// <param name="remove"></param>
     /// <returns></returns>

@@ -46,7 +46,7 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
+public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanDropMessages {
 
     #region Fields
 
@@ -870,7 +870,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
     }
 
-    public ScriptEndedFeedback ExecuteScript(DatabaseScript s, bool changevalues, RowItem? row) {
+    public ScriptEndedFeedback ExecuteScript(DatabaseScript s, bool changevalues, RowItem? row, List<string>? attributes) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, s.Name); }
 
         var sce = CheckScriptError();
@@ -906,6 +906,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
                 vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
             }
+
+            vars.Add(new VariableListString("Attributes", attributes, true, true, "Enthält - falls übergeben worden - die Attribute aus dem Skript, das dieses hier aufruft."));
 
             #endregion
 
@@ -959,11 +961,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
             return scf;
         } catch {
             Develop.CheckStackForOverflow();
-            return ExecuteScript(s, changevalues, row);
+            return ExecuteScript(s, changevalues, row, attributes);
         }
     }
 
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row, List<string>? attributes) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, "Allgemein"); }
 
@@ -1000,10 +1002,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
 
             if (!script.ChangeValues) { changevalues = false; }
 
-            return ExecuteScript(script, changevalues, row);
+            return ExecuteScript(script, changevalues, row, attributes);
         } catch {
             Develop.CheckStackForOverflow();
-            return ExecuteScript(eventname, scriptname, changevalues, row);
+            return ExecuteScript(eventname, scriptname, changevalues, row, attributes);
         }
     }
 
@@ -1425,12 +1427,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName {
         return false;
     }
 
-    public void RefreshColumnsData(ColumnItem? column) {
-        if (column == null || column.IsInCache != null) { return; }
-        RefreshColumnsData(new List<ColumnItem?> { column });
+    public void RefreshColumnsData(ColumnItem column) {
+        if (column.IsInCache != null) { return; }
+        RefreshColumnsData(new List<ColumnItem> { column });
     }
 
-    public abstract void RefreshColumnsData(List<ColumnItem?>? columns);
+    public abstract void RefreshColumnsData(List<ColumnItem> columns);
 
     public void RefreshColumnsData(IEnumerable<FilterItem>? filter) {
         if (filter != null) {

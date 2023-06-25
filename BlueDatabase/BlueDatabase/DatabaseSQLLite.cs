@@ -177,8 +177,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return string.Empty;
     }
 
-    public override void RefreshColumnsData(List<ColumnItem?>? columns) {
-        if (columns == null || columns.Count == 0) { return; }
+    public override void RefreshColumnsData(List<ColumnItem> columns) {
+        if (columns.Count == 0) { return; }
 
         if (_sql == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "SQL Verbindung verworfen");
@@ -587,7 +587,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         OnLoaded();
         CreateWatcher();
         GenerateTimer();
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null);
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
     }
 
     #endregion

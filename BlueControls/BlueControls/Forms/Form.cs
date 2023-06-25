@@ -122,7 +122,7 @@ public partial class Form : System.Windows.Forms.Form {
 
     protected override void OnCreateControl() {
         Develop.StartService();
-        Allgemein.StartDatabaseService();
+        Allgemein.StartGlobalService();
         base.OnCreateControl();
     }
 

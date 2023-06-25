@@ -583,7 +583,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
         DoingScript = true;
-        var script = Database.ExecuteScript(eventname, scriptname, changevalues, this);
+        var script = Database.ExecuteScript(eventname, scriptname, changevalues, this, null);
 
         if (!script.AllOk) {
             Database.OnScriptError(new RowCancelEventArgs(this, script.ProtocolText));

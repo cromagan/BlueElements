@@ -39,7 +39,7 @@ public sealed class Database : DatabaseAbstract {
 
     public readonly List<WorkItem> Works;
 
-    private readonly string _tablename = string.Empty;
+    private readonly string _tablename;
 
     private string _canWriteError = string.Empty;
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
@@ -709,7 +709,7 @@ public sealed class Database : DatabaseAbstract {
         RepairAfterParse();
         OnLoaded();
         CreateWatcher();
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null);
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
     }
 
     public void LoadFromStream(Stream stream) {
@@ -730,11 +730,11 @@ public sealed class Database : DatabaseAbstract {
         RepairAfterParse();
         OnLoaded();
         CreateWatcher();
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null);
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
     }
 
-    public override void RefreshColumnsData(List<ColumnItem?>? columns) {
-        if (columns == null || columns.Count == 0) { return; }
+    public override void RefreshColumnsData(List<ColumnItem> columns) {
+        if (columns.Count == 0) { return; }
 
         foreach (var thiscol in columns) {
             if (thiscol != null) {

@@ -265,7 +265,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
 
         if (filename == null || !FileExists(filename)) {
-            CheckButtons();
+            //CheckButtons();
             return;
         }
 
@@ -288,6 +288,8 @@ public partial class ConnectedFormulaEditor : PadEditor {
         }
 
         Pad.Item = CFormula?.PadData;
+
+        CheckButtons();
     }
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {

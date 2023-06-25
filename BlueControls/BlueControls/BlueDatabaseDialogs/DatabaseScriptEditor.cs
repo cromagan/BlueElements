@@ -26,7 +26,6 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -232,7 +231,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
         }
 
-        e.Feedback = Database?.ExecuteScript(_item, chkChangeValuesInTest.Checked, r);
+        e.Feedback = Database?.ExecuteScript(_item, chkChangeValuesInTest.Checked, r, null);
     }
 
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
