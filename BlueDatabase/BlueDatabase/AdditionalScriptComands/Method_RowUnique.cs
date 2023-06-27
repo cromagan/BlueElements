@@ -27,17 +27,16 @@ using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
-public class Method_Row : Method {
+public class Method_RowUnique : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new() { FilterVar };
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
-                                          "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt. Es wird keine neue Zeile erstellt.\r\n" +
-                                          "Mit RowIsNull kann abgefragt werden, ob die Zeile gefunden wurde.\r\n" +
-                                          "Werden mehrere Zeilen gefunden, wird das Programm abgebrochen. Um das zu verhindern, kann RowCount benutzt werden.\r\n" +
-                                          "Alternative: Der Befehl RowUnique kümmert sich darum, das immer eine Zeile zurückgegeben wird.";
+                                          "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
+                                          "Werden mehrere Zeilen gefunden, werden die Zeilen bis auf eine gelöscht.\r\n" +
+                                          "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
 
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
@@ -47,30 +46,13 @@ public class Method_Row : Method {
 
     public override string StartSequence => "(";
 
-    public override string Syntax => "Row(Filter, ...)";
+    public override string Syntax => "RowUnique( Filter, ...)";
 
     #endregion
 
     #region Methods
 
-    public static RowItem? ObjectToRow(Variable? attribute) {
-        if (attribute is not VariableRowItem vro) { return null; }
-
-        //var d = attribute.ObjectData();
-        //if (d.ToUpper() == "NULL") { return null; }
-
-        //var d2 = d.SplitAndCutBy("|");
-
-        //var db = Database.GetByFilename(d2[0], true, false);
-
-        //return db?.Row.SearchByKey(LongParse(d2[1]));
-
-        return vro.RowItem;
-    }
-
-    public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "row" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "rowunique" };
 
     public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
@@ -83,11 +65,13 @@ public class Method_Row : Method {
 
         if (r.Count > 1) { return new DoItFeedback(infos.Data, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 
-        if (r.Count is 0 or > 1) {
-            return RowToObjectFeedback(null);
+        if (r.Count == 0) {
+            var nr = RowCollection.GenerateAndAdd(allFi, "Skript Befehl 'RowUnique'");
+            if (nr == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden"); }
+            return Method_Row.RowToObjectFeedback(nr);
         }
 
-        return RowToObjectFeedback(r[0]);
+        return Method_Row.RowToObjectFeedback(r[0]);
     }
 
     #endregion
