@@ -85,12 +85,12 @@ internal class Method_If : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "if" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(infos.Data, "Fehler innerhalb der runden Klammern des If-Befehls"); }
 
         if (attvar.ValueBoolGet(0)) {
-            var scx = Method_CallByFilename.CallSub(s, infos, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname);
+            var scx = Method_CallByFilename.CallSub(vs, infos, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, infos.Methods, infos.AllowedMethods | MethodType.Break, infos.ChangeValues, infos.ScriptAttributes);
             return scx;
         }
 
