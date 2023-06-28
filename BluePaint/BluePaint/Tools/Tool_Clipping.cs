@@ -72,6 +72,8 @@ public partial class Tool_Clipping {
 
     public void DrawZusatz(AdditionalDrawing e, Bitmap? originalPic) {
         SolidBrush brushBlau = new(Color.FromArgb(120, 0, 0, 255));
+        if (originalPic == null) { return; }
+
         if (Links.Value != 0) {
             e.FillRectangle(brushBlau, new Rectangle(0, 0, Convert.ToInt32(Links.Value), originalPic.Height));
         }

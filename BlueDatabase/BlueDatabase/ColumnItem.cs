@@ -1548,7 +1548,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (Database == null || Database.IsDisposed) { return; }
         if (Name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
 
-        var x = new List<ColumnItem?> { this };
+        var x = new List<ColumnItem> { this };
         Database?.RefreshColumnsData(x);
     }
 

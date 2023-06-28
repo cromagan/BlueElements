@@ -337,15 +337,17 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
             #region Permanent
 
-            if (permanentPossible) {
-                if (leftestItem.Permanent) {
-                    thisColumnViewCollection[itemsdone.Count].ViewType = ViewType.PermanentColumn;
+            if (thisColumnViewCollection[itemsdone.Count] is ColumnViewItem cvi) {
+                if (permanentPossible) {
+                    if (leftestItem.Permanent) {
+                        cvi.ViewType = ViewType.PermanentColumn;
+                    } else {
+                        permanentPossible = false;
+                    }
                 } else {
-                    permanentPossible = false;
+                    leftestItem.Permanent = false;
+                    cvi.ViewType = ViewType.Column;
                 }
-            } else {
-                leftestItem.Permanent = false;
-                thisColumnViewCollection[itemsdone.Count].ViewType = ViewType.Column;
             }
 
             #endregion

@@ -40,7 +40,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     #region Fields
 
-    private readonly Accessor<T?>? _accessor;
+    private readonly Accessor<T>? _accessor;
 
     #endregion
 

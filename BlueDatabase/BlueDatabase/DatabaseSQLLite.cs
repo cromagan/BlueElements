@@ -234,7 +234,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (_sql == null) { return (false, "SQL Verbindung fehlerhaft"); }
 
         try {
-            return (true, _sql.LoadRow(TableName, l, refreshAlways, sortedRows, 1));
+            return (true, _sql.LoadRow(TableName, l, refreshAlways, sortedRows));
         } catch {
             return RefreshRowData(rows, refreshAlways, sortedRows);
         }

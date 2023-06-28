@@ -147,7 +147,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
 
         var tmp = ca.PermissionGroups_Show.SortedDistinctList();
         tmp.RemoveString(Constants.Administrator, false);
-        tmp.RemoveNullOrEmpty();
+        //tmp.RemoveNullOrEmpty();
 
         switch (number) {
             case 0:

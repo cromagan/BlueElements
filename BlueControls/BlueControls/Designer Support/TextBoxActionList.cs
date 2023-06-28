@@ -4,6 +4,8 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueDatabase;
 
+#nullable enable
+
 namespace BlueControls.Designer_Support;
 
 public sealed class TextBoxActionList : DesignerActionList {

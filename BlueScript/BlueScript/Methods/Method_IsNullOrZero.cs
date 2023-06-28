@@ -57,41 +57,21 @@ internal class Method_IsNullOrZero : Method {
             return DoItFeedback.Wahr();
         }
 
-        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(); }
-        if (attvar.Attributes[0] is VariableUnknown) { return DoItFeedback.Wahr(); }
 
-        if (attvar.Attributes[0] is VariableFloat f) {
+        var v = attvar.Attributes[0];
+        if (v == null) { return new DoItFeedback("Interner Fehler"); }
+
+
+        if (v.IsNullOrEmpty) { return DoItFeedback.Wahr(); }
+        if (v is VariableUnknown) { return DoItFeedback.Wahr(); }
+
+        if (v is VariableFloat f) {
             if (f.ValueNum == 0) { return DoItFeedback.Wahr(); }
-
             return DoItFeedback.Falsch();
         }
+
         return new DoItFeedback(infos.Data, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
-        //if (attvar.Attributes == null) {
-        //    if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {
-        //        return DoItFeedback.AttributFehler(infos.LogData,  s, this, attvar, line);
-        //    } else {
-        //        return DoItFeedback.Wahr(line);
-        //    }
-        //} else {
-        //    if (string.IsNullOrEmpty(attvar.ValueString(0))) {
-        //        return DoItFeedback.Wahr(line);
-        //    } else {
-        //        if (attvar.Attributes[0].Type is VariableDataType.Null or VariableDataType.Error
-        //            or VariableDataType.NotDefinedYet) {
-        //            return DoItFeedback.Wahr(line);
-        //        } else {
-        //            if (attvar.Attributes[0] is not VariableFloat) {
-        //                return new DoItFeedback(infos.LogData, s, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
-        //            } else {
-        //                if (attvar.ValueNum(0) == 0) {
-        //                    return DoItFeedback.Wahr(line);
-        //                } else {
-        //                    return DoItFeedback.Falsch(line);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+
     }
 
     #endregion

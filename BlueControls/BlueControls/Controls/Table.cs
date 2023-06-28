@@ -146,7 +146,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public event EventHandler<FilterEventArgs>? AutoFilterClicked;
 
-    public new event EventHandler<CellEditBlockReasonEventArgs>? BlockEdit;
+    public event EventHandler<CellEditBlockReasonEventArgs>? BlockEdit;
 
     public event EventHandler<CellEventArgs>? ButtonCellClicked;
 

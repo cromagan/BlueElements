@@ -34,7 +34,7 @@ public struct DoItFeedback {
         Variable = variable;
     }
 
-    public DoItFeedback(LogData? ld, string errormessage) {
+    public DoItFeedback(LogData ld, string errormessage) {
         AllOk = false;
         Variable = null;
         ld?.AddMessage(errormessage);
@@ -101,9 +101,9 @@ public struct DoItFeedback {
 
     public static DoItFeedback Falsch() => new(false);
 
-    public static DoItFeedback FalscherDatentyp(LogData? ld) => new(ld, "Falscher Datentyp.");
+    public static DoItFeedback FalscherDatentyp(LogData ld) => new(ld, "Falscher Datentyp.");
 
-    public static DoItFeedback Klammerfehler(LogData? ld) => new(ld, "Fehler bei der Klammersetzung.");
+    public static DoItFeedback Klammerfehler(LogData ld) => new(ld, "Fehler bei der Klammersetzung.");
 
     public static DoItFeedback Null() => new();
 

@@ -40,7 +40,7 @@ internal sealed partial class ColumnEditor {
     #region Fields
 
     private readonly Table? _table;
-    private ColumnItem _column;
+    private ColumnItem? _column;
 
     #endregion
 
@@ -195,20 +195,20 @@ internal sealed partial class ColumnEditor {
         btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).ToString();
     }
 
-    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column.Useage());
+    private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column?.Useage() ?? "Fehler");
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
         if (_column?.Database == null || _column.Database.IsDisposed) { return; }
         if (!AllOk()) { return; }
 
-        _column = _table?.CurrentArrangement[_column]?.NextVisible()?.Column;
+        _column = _table?.CurrentArrangement?[_column]?.NextVisible()?.Column;
         Column_DatenAuslesen();
     }
 
     private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
         if (_column?.Database == null || _column.Database.IsDisposed) { return; }
         if (!AllOk()) { return; }
-        _column = _table?.CurrentArrangement[_column]?.PreviewsVisible()?.Column;
+        _column = _table?.CurrentArrangement?[_column]?.PreviewsVisible()?.Column;
         Column_DatenAuslesen();
     }
 
@@ -251,6 +251,8 @@ internal sealed partial class ColumnEditor {
     /// <param name="e"></param>
 
     private void cbxLinkedDatabase_TextChanged(object? sender, System.EventArgs e) {
+        if (_column == null || _column.IsDisposed) { return; }
+
         _column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
 
         cbxTargetColumn.Item.Clear();
@@ -285,7 +287,9 @@ internal sealed partial class ColumnEditor {
     private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();
 
     private void Column_DatenAuslesen() {
-        capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, _column.Database.TableName);
+        if (_column == null || _column.IsDisposed) { return; }
+
+        capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, _column.Database?.TableName);
 
         cbxFormat.Item.AddRange(typeof(DataFormat));
         cbxRandLinks.Item.AddRange(typeof(ColumnLineStyle));
@@ -317,7 +321,7 @@ internal sealed partial class ColumnEditor {
             _ = cbxEinheit.Item.Add("St.", ImageCode.Eins);
         }
         lbxCellEditor.Suggestions.Clear();
-        lbxCellEditor.Suggestions.AddRange(_column.Database.Permission_AllUsed(true));
+        lbxCellEditor.Suggestions.AddRange(_column.Database?.Permission_AllUsed(true));
         if (_table?.CurrentArrangement != null) {
             butAktuellZurueck.Enabled = _table.CurrentArrangement[_column]?.PreviewsVisible() != null;
             butAktuellVor.Enabled = _table.CurrentArrangement[_column]?.NextVisible() != null;
@@ -537,7 +541,7 @@ internal sealed partial class ColumnEditor {
         if (linkdb == null || tblFilterliste.Database == null) { tblFilterliste.DatabaseSet(null, string.Empty); }
 
         if (tblFilterliste.Database != null &&
-            tblFilterliste.Database.Tags.TagGet("Filename") != linkdb.ConnectionData.UniqueID) {
+            tblFilterliste.Database.Tags.TagGet("Filename") != linkdb?.ConnectionData?.UniqueID) {
             tblFilterliste.DatabaseSet(null, string.Empty);
         }
 
@@ -550,9 +554,12 @@ internal sealed partial class ColumnEditor {
 
             var vis = db.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
             var sp = db.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
+            if (sp == null || sp.IsDisposed) { return; }
+
             sp.Align = AlignmentHorizontal.Rechts;
 
             var b = db.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
+            if (b == null || b.IsDisposed) { return; }
             b.Quickinfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.TextBearbeitungErlaubt = true;
@@ -592,7 +599,7 @@ internal sealed partial class ColumnEditor {
             t.TagSet("Filename", linkdb.ConnectionData.UniqueID);
             db.Tags = t.AsReadOnly();
 
-            tblFilterliste.Filter.Add(vis, FilterType.Istgleich, "+");
+            tblFilterliste?.Filter?.Add(vis, FilterType.Istgleich, "+");
         }
 
         linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
@@ -600,15 +607,17 @@ internal sealed partial class ColumnEditor {
         var spalteauDb = linkdb.Column.Exists(cbxTargetColumn.Text);
 
         foreach (var col in linkdb.Column) {
-            var r = tblFilterliste.Database.Row[col.Name] ?? tblFilterliste.Database.Row.GenerateAndAdd(col.Name, "Neue Spalte");
+            var r = tblFilterliste?.Database?.Row[col.Name] ?? tblFilterliste?.Database?.Row.GenerateAndAdd(col.Name, "Neue Spalte");
 
-            r.CellSet("Spalte", col.ReadableText() + " = ");
-            r.CellSet("SpalteName", col.Name);
+            if (r != null) {
+                r.CellSet("Spalte", col.ReadableText() + " = ");
+                r.CellSet("SpalteName", col.Name);
 
-            if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Format.NeedTargetDatabase() && !col.IsSystemColumn()) {
-                r.CellSet("visible", true);
-            } else {
-                r.CellSet("visible", false);
+                if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Format.NeedTargetDatabase() && !col.IsSystemColumn()) {
+                    r.CellSet("visible", true);
+                } else {
+                    r.CellSet("visible", false);
+                }
             }
         }
 
@@ -640,15 +649,21 @@ internal sealed partial class ColumnEditor {
     /// </summary>
 
     private void SetLinkedCellFilter() {
-        foreach (var thisr in tblFilterliste.Database.Row) {
+        if (tblFilterliste.Database is not DatabaseAbstract db) { return; }
+        if (_column == null || _column.IsDisposed) { return; }
+
+        foreach (var thisr in db.Row) {
             thisr.CellSet("Such", string.Empty);
         }
+
+        var c = db.Column["SpalteName"];
+        if (c == null) { return; }
 
         foreach (var thisFi in _column.LinkedCellFilter) {
             var x = thisFi.SplitBy("|");
 
             if (x != null && x.Count() == 3) {
-                var r = tblFilterliste.Database.Row[new FilterItem(tblFilterliste.Database?.Column["SpalteName"], FilterType.Istgleich_GroßKleinEgal, x[0])];
+                var r = db.Row[new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, x[0])];
 
                 if (r != null && r.CellGetBoolean("Visible")) {
                     r.CellSet("Such", x[2].FromNonCritical());

@@ -134,10 +134,15 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
     /// Gibt die Spaltenname in Grosschreibung zurück
     /// </summary>
     /// <returns></returns>
-    public override List<string>? GetColumnNames(string tablename) {
-        if (!OpenConnection()) { return null; }
-
+    public override List<string> GetColumnNames(string tablename) {
         var columns = new List<string>();
+
+        if (!IsValidTableName(tablename, true)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
+            return columns;
+        }
+
+        if (!OpenConnection() || Connection == null) { return GetColumnNames(tablename); }
 
         using var com = Connection.CreateCommand();
 
@@ -146,7 +151,7 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
         using var reader = com.ExecuteReader(CommandBehavior.SchemaOnly);
 
         var schemaTable = reader.GetSchemaTable();
-        if (schemaTable == null) { return null; }
+        if (schemaTable == null) { return GetColumnNames(tablename); }
 
         foreach (DataRow colRow in schemaTable.Rows) {
             columns.Add(colRow.Field<string>("ColumnName").ToUpper());

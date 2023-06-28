@@ -58,11 +58,12 @@ internal class Method_IsNullOrEmpty : Method {
             return DoItFeedback.Wahr();
         }
 
-        if (attvar.Attributes[0].IsNullOrEmpty) { return DoItFeedback.Wahr(); }
+        var v = attvar.Attributes[0];
+        if (v == null) { return new DoItFeedback("Interner Fehler"); }
 
-        if (attvar.Attributes[0] is VariableUnknown) {
-            return DoItFeedback.Wahr();
-        }
+        if (v.IsNullOrEmpty) { return DoItFeedback.Wahr(); }
+
+        if (v is VariableUnknown) { return DoItFeedback.Wahr(); }
 
         return DoItFeedback.Falsch();
     }

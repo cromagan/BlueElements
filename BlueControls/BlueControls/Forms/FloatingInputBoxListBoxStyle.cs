@@ -160,6 +160,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     }
 
     private static void _ContextMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+        if (e.HotItem == null) { return; }
+
         var infos = (List<object>)e.HotItem;
         var userMmenu = (ItemCollectionList)infos[0];
         var hotItem = infos[1];

@@ -223,6 +223,11 @@ public static class Develop {
         DebugPrint(FehlerArt.Warnung, "Totes Fenster!");
     }
 
+    public static void DebugPrint_InternalError() {
+        if (IsHostRunning()) { Debugger.Break(); }
+        DebugPrint(FehlerArt.Fehler, "Schwerer Interner Fehler.");
+    }
+
     public static void DebugPrint_InvokeRequired(bool invokeRequired, bool fehler) {
         if (!invokeRequired) { return; }
         if (IsHostRunning()) { Debugger.Break(); }

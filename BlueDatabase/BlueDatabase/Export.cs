@@ -45,7 +45,7 @@ public static class Export {
 
     public static string CreateLayout(RowItem row, string loadFile, string saveFile, string scriptname) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
-        List<RowItem?> tmpList = new()
+        List<RowItem> tmpList = new()
         {
             row
         };

@@ -83,12 +83,14 @@ internal class Method_BerechneVariable : Method {
 
         var attvar = SplitAttributeToVars(s, value, Sargs, SEndlessArgs, infos.Data);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, new Method_BerechneVariable(), attvar); }
-
+            if (attvar.Attributes[0] is Variable v) {
         if (generateVariable) {
-            attvar.Attributes[0].KeyName = varnam.ToLower();
-            attvar.Attributes[0].ReadOnly = false;
-            s.Variables.Add(attvar.Attributes[0]);
-            return new DoItFeedback(attvar.Attributes[0]);
+
+               v.KeyName = varnam.ToLower();
+               v.ReadOnly = false;
+                s.Variables.Add(v);
+                return new DoItFeedback(v);
+
         }
 
         if (vari == null) {
@@ -96,7 +98,12 @@ internal class Method_BerechneVariable : Method {
             return new DoItFeedback(infos.Data, "Interner Fehler");
         }
 
-        return vari.GetValueFrom(attvar.Attributes[0], infos.Data);
+        return vari.GetValueFrom(v, infos.Data);
+
+            }
+            // attvar.Attributes[0] müsste immer eine Variable sein...
+            return new DoItFeedback(infos.Data, "Interner Fehler");
+
     }
 
     public override List<string> Comand(VariableCollection? currentvariables) => currentvariables?.AllNames() ?? new List<string>();

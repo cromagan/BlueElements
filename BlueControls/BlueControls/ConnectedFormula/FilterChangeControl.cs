@@ -37,7 +37,7 @@ internal class FilterChangeControl : GenericControl, IControlAcceptFilter, ICont
 
     #region Properties
 
-    public FilterItem Filter { get; }
+    public FilterItem? Filter { get; }
 
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
 

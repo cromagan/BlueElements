@@ -35,14 +35,14 @@ public readonly struct GetEndFeedback {
 
     #region Constructors
 
-    public GetEndFeedback(Variable variable) {
+    public GetEndFeedback(Variable? variable) {
         ContinuePosition = 0;
         AllOk = true;
         AttributeText = string.Empty;
         Variable = variable;
     }
 
-    public GetEndFeedback(string erromessage, LogData? ld) {
+    public GetEndFeedback(string erromessage, LogData ld) {
         ContinuePosition = 0;
         AllOk = false;
         AttributeText = string.Empty;

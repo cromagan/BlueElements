@@ -55,6 +55,20 @@ public readonly struct SplittedAttributesFeedback {
 
     #region Methods
 
+    public string Name(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
+
+        if (Attributes[varno] is Variable vs) { return vs.Name; }
+        return string.Empty;
+    }
+
+    public string MyClassId(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
+
+        if (Attributes[varno] is Variable vs) { return vs.MyClassId; }
+        return string.Empty;
+    }
+
     public string ReadableText(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 

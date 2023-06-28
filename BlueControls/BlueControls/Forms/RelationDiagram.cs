@@ -69,15 +69,15 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //   Dim ItS As New Size(60, 80)
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
         if (string.IsNullOrEmpty(what)) { return null; }
-        if (Pad.Item[what] != null) { return null; }
+        if (Pad?.Item?[what] != null) { return null; }
         var r = Database.Row[what];
-        if (r== null || r.IsDisposed) {
+        if (r == null || r.IsDisposed) {
             MessageBox.Show("<b>" + what + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
             return null;
         }
         if (ItemOfRow(r) != null) { return null; }
         RowFormulaPadItem i2 = new(Database, r.Key, layoutId);
-        Pad.AddCentered(i2);
+        Pad?.AddCentered(i2);
         //  Pad.Invalidate()
         i2.SetLeftTopPoint(xPos, ypos);
         //i2.InDenVordergrund();

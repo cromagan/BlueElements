@@ -99,9 +99,7 @@ public static class Polygons {
         tempPolyRoundRec.CloseFigure();
         return tempPolyRoundRec;
 
-        void AddRad90(int mxX, int mxY, int gradStart) {
-            tempPolyRoundRec.AddArc(mxX, mxY, radius, radius, gradStart, 90);
-        }
+        void AddRad90(int mxX, int mxY, int gradStart) => tempPolyRoundRec.AddArc(mxX, mxY, radius, radius, gradStart, 90);
     }
 
     public static GraphicsPath Poly_Triangle(PointF p1, PointF p2, PointF p3) {
