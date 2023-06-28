@@ -17,7 +17,10 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueDatabase;
+using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -77,11 +80,11 @@ public class VariableDatabase : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object x, Script s) => null;
+    protected override Variable? NewWithThisValue(object x, VariableCollection vs) => null;
 
     protected override void SetValue(object? x) { }
 
-    protected override object? TryParse(string txt, Script? s) => null;
+    protected override object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes) => null;
 
     #endregion
 }

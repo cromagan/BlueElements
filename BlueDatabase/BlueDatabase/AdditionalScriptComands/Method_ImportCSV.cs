@@ -47,24 +47,24 @@ internal class Method_ImportCSV : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "importcsv" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
-        var db = MyDatabase(s.Variables);
+        var db = MyDatabase(vs);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Import im Testmodus deaktiviert."); }
+        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Import im Testmodus deaktiviert."); }
 
-        var sx = db?.Import(txt, true, true, sep, false, false, true);
+        var sx = db.Import(txt, true, true, sep, false, false, true);
 
-        if (sx == null || string.IsNullOrEmpty(sx)) {
+        if (string.IsNullOrEmpty(sx)) {
             return DoItFeedback.Null();
         }
 

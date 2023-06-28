@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -46,25 +47,24 @@ internal class Method_Do : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "do" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var du = 0;
 
+        DoItFeedback scx;
         do {
             du++;
             if (du > 100000) { return new DoItFeedback(infos.Data, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
-            var scx = Method_CallByFilename.CallSub(s, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname);
+            scx = Method_CallByFilename.CallSub(vs, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, infos.Methods, infos.AllowedMethods | MethodType.Break, infos.ChangeValues, infos.ScriptAttributes);
             if (!scx.AllOk) { return scx; }
 
-            if (s.BreakFired || s.EndScript) { break; }
+            if (scx.BreakFired || scx.EndScript) { break; }
         } while (true);
 
-        s.BreakFired = false;
-
-        return DoItFeedback.Null();
+        return new DoItFeedback(false, scx.EndScript);
     }
 
     #endregion

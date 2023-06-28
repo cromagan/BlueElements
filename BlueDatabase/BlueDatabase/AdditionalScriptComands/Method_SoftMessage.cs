@@ -48,11 +48,11 @@ public class Method_SoftMessage : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "softmessage" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var db = MyDatabase(s.Variables);
+        var db = MyDatabase(vs);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);

@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 
@@ -120,7 +121,7 @@ public class VariableListString : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x, Script s) {
+    protected override Variable NewWithThisValue(object x, VariableCollection vs) {
         var v = new VariableListString(string.Empty);
         v.SetValue(x);
         return v;
@@ -134,7 +135,7 @@ public class VariableListString : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, Script? s) {
+    protected override object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes) {
         if (txt.Length > 1 && txt.StartsWith("{") && txt.EndsWith("}")) {
             var t = txt.DeKlammere(false, true, false, true);
 
@@ -142,7 +143,9 @@ public class VariableListString : Variable {
                 return new List<string>();
             } // Leere Liste
 
-            var l = Method.SplitAttributeToVars(s, t, new List<List<string>> { new() { VariableString.ShortName_Plain } }, true, null);
+            var infos = new CanDoFeedback(t, 0, string.Empty, string.Empty, string.Empty, null, allowedMethods, lm, changeValues, scriptAttributes);
+
+            var l = Method.SplitAttributeToVars(vs, infos, new List<List<string>> { new() { VariableString.ShortName_Plain } }, true);
             if (!string.IsNullOrEmpty(l.ErrorMessage)) {
                 return null;
             }

@@ -46,13 +46,13 @@ public class Method_Lookup : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "lookup" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
             return DoItFeedback.AttributFehler(infos.Data, this, attvar);
         }
 
-        var db = DatabaseOf(s.Variables, attvar.ValueStringGet(0));
+        var db = DatabaseOf(vs, attvar.ValueStringGet(0));
         if (db == null) {
             return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
         }
@@ -81,8 +81,8 @@ public class Method_Lookup : Method_Database {
 
         if (v[0] is VariableListString vl) {
             l.AddRange(vl.ValueList);
-        } else if (v[0] is VariableString vs) {
-            var w = vs.ValueString;
+        } else if (v[0] is VariableString vsx) {
+            var w = vsx.ValueString;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
         } else {
             return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");

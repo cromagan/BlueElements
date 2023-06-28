@@ -48,9 +48,8 @@ internal class Method_Return : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "return" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        s.EndScript = true;
-        return DoItFeedback.Null();
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        return new DoItFeedback(false, true);
     }
 
     #endregion

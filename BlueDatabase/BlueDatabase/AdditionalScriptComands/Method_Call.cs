@@ -50,19 +50,19 @@ internal class Method_Call : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "call" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var vs = attvar.ValueStringGet(0);
+        var vsx = attvar.ValueStringGet(0);
 
-        var db = MyDatabase(s.Variables);
+        var db = MyDatabase(vs);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
-        var sc = db.EventScript.Get(vs);
+        var sc = db.EventScript.Get(vsx);
         if (sc == null) { return new DoItFeedback(infos.Data, "Skript nicht vorhanden: " + vs); }
 
-        if (sc.Attributes() != s.Attributes && s.Attributes != "*") {
+        if (sc.Attributes() != infos.ScriptAttributes && infos.ScriptAttributes != "*") {
             return new DoItFeedback(infos.Data, "Aufzurufendes Skript hat andere Bedingungen.");
         }
 
@@ -72,9 +72,9 @@ internal class Method_Call : Method_Database {
             return new DoItFeedback(infos.Data, "Fehler in Unter-Skript " + vs + ": " + error);
         }
 
-        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(s, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs);
-        s.BreakFired = false;
-        s.EndScript = false;
+        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(vs, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vsx, null, infos.Methods, infos.AllowedMethods | MethodType.Break, infos.ChangeValues, infos.ScriptAttributes);
+        scx.BreakFired = false;
+        scx.EndScript = false;
 
         return scx;
     }

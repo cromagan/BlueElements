@@ -57,10 +57,10 @@ internal class Method_BerechneVariable : Method {
     /// </summary>
     /// <param name="infos"></param>
     /// <param name="newcommand">Erwartet wird: X=5;</param>
-    /// <param name="s"></param>
+    /// <param name="vs"></param>
     /// <param name="generateVariable"></param>
     /// <returns></returns>
-    public static DoItFeedback VariablenBerechnung(CanDoFeedback infos, string newcommand, Script s, bool generateVariable) {
+    public static DoItFeedback VariablenBerechnung(CanDoFeedback infos, string newcommand, VariableCollection vs, bool generateVariable) {
         //if (s.BerechneVariable == null) { return new DoItFeedback(infos.LogData, s, "Interner Fehler"); }
 
         var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
@@ -71,7 +71,7 @@ internal class Method_BerechneVariable : Method {
 
         if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos.Data, varnam + " ist kein gültiger Variablen-Name"); }
 
-        var vari = s.Variables.Get(varnam);
+        var vari = vs.Get(varnam);
         if (generateVariable && vari != null) {
             return new DoItFeedback(infos.Data, "Variable " + varnam + " ist bereits vorhanden.");
         }
@@ -81,29 +81,25 @@ internal class Method_BerechneVariable : Method {
 
         var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
 
-        var attvar = SplitAttributeToVars(s, value, Sargs, SEndlessArgs, infos.Data);
+        var attvar = SplitAttributeToVars(vs, infos, Sargs, SEndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, new Method_BerechneVariable(), attvar); }
-            if (attvar.Attributes[0] is Variable v) {
-        if (generateVariable) {
-
-               v.KeyName = varnam.ToLower();
-               v.ReadOnly = false;
-                s.Variables.Add(v);
+        if (attvar.Attributes[0] is Variable v) {
+            if (generateVariable) {
+                v.KeyName = varnam.ToLower();
+                v.ReadOnly = false;
+                vs.Add(v);
                 return new DoItFeedback(v);
-
-        }
-
-        if (vari == null) {
-            // es sollte generateVariable greifen, und hier gar nimmer ankommen. Aber um die IDE zu befriedigen
-            return new DoItFeedback(infos.Data, "Interner Fehler");
-        }
-
-        return vari.GetValueFrom(v, infos.Data);
-
             }
-            // attvar.Attributes[0] müsste immer eine Variable sein...
-            return new DoItFeedback(infos.Data, "Interner Fehler");
 
+            if (vari == null) {
+                // es sollte generateVariable greifen, und hier gar nimmer ankommen. Aber um die IDE zu befriedigen
+                return new DoItFeedback(infos.Data, "Interner Fehler");
+            }
+
+            return vari.GetValueFrom(v, infos.Data);
+        }
+        // attvar.Attributes[0] müsste immer eine Variable sein...
+        return new DoItFeedback(infos.Data, "Interner Fehler");
     }
 
     public override List<string> Comand(VariableCollection? currentvariables) => currentvariables?.AllNames() ?? new List<string>();
@@ -112,10 +108,10 @@ internal class Method_BerechneVariable : Method {
     /// Berechnet z.B.   X = 5;
     /// Die Variable, die berechnet werden soll, muss bereits existieren - und wird auch auf Existenz und Datentyp geprüft.
     /// </summary>
-    /// <param name="s"></param>
+    /// <param name="vs"></param>
     /// <param name="infos"></param>
     /// <returns></returns>
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) => VariablenBerechnung(infos, infos.ComandText + infos.AttributText + ";", s, false);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) => VariablenBerechnung(infos, infos.ComandText + infos.AttributText + ";", vs, false);
 
     #endregion
 }

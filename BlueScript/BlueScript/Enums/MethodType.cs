@@ -16,45 +16,49 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using BlueBasics;
 
 namespace BlueScript.Enums;
 
 [Flags]
 public enum MethodType {
+    None = 0,
 
     /// <summary>
     /// Methoden, die eine Variable modifizieren oder für den normalen Betrieb benötigt werden.
     /// </summary>
-    Standard = 0,
+    Standard = 1,
 
     /// <summary>
     /// Methoden, die in irgend einer Weiße auf das System zugreifen. z.B. Dateisystem, Andere Datenbank oder Clipboard
     /// </summary>
-    IO = 1,
+    IO = 2,
 
     /// <summary>
     /// Methoden, die über einer Datenbank aufgerufen werden müssen.
     /// </summary>
-    Database = 2,
+    Database = 4,
 
     /// <summary>
     /// Methoden, die sich innerhalb der aktuellen Zeile der Datenbank bewegen
     /// </summary>
-    MyDatabaseRow = 4,
+    MyDatabaseRow = 8,
 
     /// <summary>
     /// Methoden, die andere Zeilen - egal in welcher Datenbank - ändern können.
     /// </summary>
-    ChangeAnyDatabaseOrRow = 8,
+    ChangeAnyDatabaseOrRow = 16,
 
     /// <summary>
     /// Methoden, die an sich harmlos sind, aber lang zum Ausführen benötigen. Unpassend für z.B. RowCheck
     /// </summary>
-    NeedLongTime = 16,
+    NeedLongTime = 32,
 
     /// <summary>
     /// Der Befehl stört den Benutzer aktiv. Z.B. wird das Clipbard verändert der ein Programm gestartet.
     /// Dateioperationen fallen nicht darunter, dafür ist IO zu verwenden.
     /// </summary>
-    ManipulatesUser = 32
+    ManipulatesUser = 64,
+
+    Break = 128
 }

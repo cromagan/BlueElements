@@ -48,16 +48,16 @@ internal class Method_MatchColumnFormat : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "matchcolumnformat" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var column = Column(s.Variables, attvar, 1);
+        var column = Column(vs, attvar, 1);
         if (column == null || column.IsDisposed) { return new DoItFeedback(infos.Data, "Spalte in Datenbank nicht gefunden"); }
 
         var tocheck = new List<string>();
         if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
-        if (attvar.Attributes[0] is VariableString vs) { tocheck.Add(vs.ValueString); }
+        if (attvar.Attributes[0] is VariableString vsx) { tocheck.Add(vsx.ValueString); }
 
         tocheck = tocheck.SortedDistinctList();
 

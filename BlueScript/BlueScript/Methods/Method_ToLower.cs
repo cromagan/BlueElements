@@ -46,8 +46,8 @@ internal class Method_ToLower : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "tolower" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         return new DoItFeedback(attvar.ValueStringGet(0).ToLower());

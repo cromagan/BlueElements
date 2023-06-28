@@ -35,7 +35,7 @@ internal class Method_Break : Method {
     public override bool EndlessArgs => false;
     public override string EndSequence => ";";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.Standard;
+    public override MethodType MethodType => MethodType.Standard | MethodType.Break;
     public override string Returns => string.Empty;
     public override string StartSequence => "";
 
@@ -47,12 +47,12 @@ internal class Method_Break : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "break" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        if (s.Sub < 1) { return new DoItFeedback(infos.Data, "Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        //if (s.Sub < 1) { return new DoItFeedback(infos.Data, "Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
 
-        if (s.BreakFired) { return new DoItFeedback(infos.Data, "Break doppelt ausgelöst."); }
-        s.BreakFired = true;
-        return DoItFeedback.Null();
+        //if (s.BreakFired) { return new DoItFeedback(infos.Data, "Break doppelt ausgelöst."); }
+        //s.BreakFired = true;
+        return new DoItFeedback(true, false);
     }
 
     #endregion

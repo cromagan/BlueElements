@@ -17,8 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 
 namespace BlueScript.Variables;
@@ -98,7 +101,7 @@ public class VariableString : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x, Script s) {
+    protected override Variable NewWithThisValue(object x, VariableCollection vs) {
         var v = new VariableString(string.Empty);
         v.SetValue(x);
         return v;
@@ -112,7 +115,7 @@ public class VariableString : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, Script? s) {
+    protected override object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes) {
         if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
             var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
             tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +

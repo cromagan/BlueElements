@@ -53,11 +53,11 @@ public class Method_AddRow : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "addrow" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var db = DatabaseOf(s.Variables, attvar.ValueStringGet(0));
+        var db = DatabaseOf(vs, attvar.ValueStringGet(0));
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
@@ -76,7 +76,7 @@ public class Method_AddRow : Method_Database {
             }
         }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
+        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
 
         var r = db.Row.GenerateAndAdd(db.Row.NextRowKey(), attvar.ValueStringGet(1), attvar.ValueBoolGet(2), true, "Script Command: Add Row");
 

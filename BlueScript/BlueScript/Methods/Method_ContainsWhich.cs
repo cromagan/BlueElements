@@ -50,8 +50,8 @@ internal class Method_ContainsWhitch : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "containswhich" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var found = new List<string>();
@@ -61,7 +61,7 @@ internal class Method_ContainsWhitch : Method {
         var wordlist = new List<string>();
 
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is VariableString vs) { wordlist.Add(vs.ValueString); }
+            if (attvar.Attributes[z] is VariableString vsx) { wordlist.Add(vsx.ValueString); }
             if (attvar.Attributes[z] is VariableListString vl) { wordlist.AddRange(vl.ValueList); }
         }
         wordlist = wordlist.SortedDistinctList();

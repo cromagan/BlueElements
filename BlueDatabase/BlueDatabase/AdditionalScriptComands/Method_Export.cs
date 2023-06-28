@@ -50,8 +50,8 @@ internal class Method_Export : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "export" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         #region  Filter ermitteln (allfi)
@@ -64,7 +64,7 @@ internal class Method_Export : Method_Database {
 
         #region  Datebank ermitteln (db)
 
-        var db = MyDatabase(s.Variables);
+        var db = MyDatabase(vs);
 
         if (db == null || allFi[0].Database != db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
@@ -102,7 +102,7 @@ internal class Method_Export : Method_Database {
 
         #endregion
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
+        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
 
         try {
             switch (attvar.ValueStringGet(1).ToUpper()) {

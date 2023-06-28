@@ -18,7 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Windows;
+using System.Reflection.Emit;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -27,36 +27,49 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_ClipboardText : Method {
+internal class Method_RemoveDoubleSpaces : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
-    public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.";
+    public override List<List<string>> Args => new() { StringVal };
+    public override string Description => "Entfernt aus dem Text unnötige Leerzeichen, Tabs etc.\r\nKann dazu verwendet werden, um Code-Dateien (z.B. HTML) zu standardisieren.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "ClipboardText()";
+    public override string Syntax => "RemoveDoubleSpaces(text)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "clipboardtext" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "removedoublespaces" };
 
     public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
         var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
+            DoItFeedback.AttributFehler(infos.Data, this, attvar);
         }
 
-        if (Clipboard.ContainsText()) {
-            return new DoItFeedback(Clipboard.GetText());
-        }
-        return DoItFeedback.Null();
+        var t = attvar.ValueStringGet(0);
+        string ot;
+        do {
+            ot = t;
+            t = t.Replace("\n", "\r");
+            t = t.Replace("\t", "\r");
+            t = t.Replace("  ", " ");
+            t = t.Replace("\r ", "\r");
+            t = t.Replace(" \r", "\r");
+            t = t.Replace("\r\r", "\r");
+            t = t.Replace(">\r", ">");
+            t = t.Replace("\r<", "<");
+            t = t.Replace(" <", "<");
+            t = t.Replace("> ", ">");
+        } while (ot != t);
+
+        return new DoItFeedback(t);
     }
 
     #endregion

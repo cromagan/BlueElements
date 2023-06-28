@@ -49,9 +49,8 @@ internal class Method_End : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "end" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        s.EndScript = true;
-        return DoItFeedback.Null();
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        return new DoItFeedback(false, true);
     }
 
     #endregion

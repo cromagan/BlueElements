@@ -51,21 +51,21 @@ public class Method_SetError : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "seterror" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var see = s.Variables.GetSystem("SetErrorEnabled");
+        var see = vs.GetSystem("SetErrorEnabled");
         if (see is not VariableBool seet) { return new DoItFeedback(infos.Data, "SetErrorEnabled Variable nicht gefunden"); }
         if (!seet.ValueBool) { return new DoItFeedback(infos.Data, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
 
-        var r = MyRow(s.Variables);
+        var r = MyRow(vs);
         if (r == null || r.IsDisposed) { return new DoItFeedback(infos.Data, "Interner Fehler, Zeile nicht gefunden"); }
 
         r.LastCheckedRowFeedback ??= new List<string>();
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
-            var column = Column(s.Variables, attvar, z);
+            var column = Column(vs, attvar, z);
             if (column == null || column.IsDisposed) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.Name(z)); }
             r.LastCheckedRowFeedback.Add(column.Name.ToUpper() + "|" + attvar.ValueStringGet(0));
         }

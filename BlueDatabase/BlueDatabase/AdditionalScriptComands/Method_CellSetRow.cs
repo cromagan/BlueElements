@@ -48,8 +48,8 @@ public class Method_CellSetRow : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "cellsetrow" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
@@ -60,14 +60,14 @@ public class Method_CellSetRow : Method_Database {
 
         var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
-        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
+        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
 
-        if (row == MyRow(s.Variables)) {
+        if (row == MyRow(vs)) {
             return new DoItFeedback(infos.Data, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
         }
 
         var value = string.Empty;
-        if (attvar.Attributes[0] is VariableString vs) { value = vs.ValueString; }
+        if (attvar.Attributes[0] is VariableString vsx) { value = vsx.ValueString; }
         if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
         if (attvar.Attributes[0] is VariableFloat vf) { value = vf.ValueForReplace; }
 

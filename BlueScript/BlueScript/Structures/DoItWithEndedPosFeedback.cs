@@ -27,18 +27,21 @@ public readonly struct DoItWithEndedPosFeedback {
 
     internal readonly bool AllOk;
 
+    internal readonly bool BreakFired = false;
+    internal readonly bool EndSkript = false;
     internal readonly int Position;
-
     internal readonly Variable? Variable;
 
     #endregion
 
     #region Constructors
 
-    public DoItWithEndedPosFeedback(bool allOk, Variable? variable, int endpos) {
+    public DoItWithEndedPosFeedback(bool allOk, Variable? variable, int endpos, bool breakFired, bool endskript) {
         AllOk = allOk;
         Variable = variable;
         Position = endpos;
+        EndSkript = endskript;
+        BreakFired = breakFired;
     }
 
     public DoItWithEndedPosFeedback(string errormessage, LogData ld) {

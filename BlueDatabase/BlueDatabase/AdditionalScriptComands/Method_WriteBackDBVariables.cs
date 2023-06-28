@@ -51,17 +51,17 @@ public class Method_WriteBackDBVariables : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "writebackdbvariables" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var db = MyDatabase(s.Variables);
+        var db = MyDatabase(vs);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
-        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Variabeln zurückschreiben im Testmodus deaktiviert."); }
+        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Variabeln zurückschreiben im Testmodus deaktiviert."); }
 
-        db.Variables = DatabaseAbstract.WriteBackDbVariables(s.Variables, db.Variables, "DB_");
+        db.Variables = DatabaseAbstract.WriteBackDbVariables(vs, db.Variables, "DB_");
 
         return DoItFeedback.Null();
     }

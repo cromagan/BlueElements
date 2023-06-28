@@ -50,10 +50,12 @@ public class Script {
 
         ReducedScriptText = string.Empty;
         ChangeValues = changevalues;
-        Variables = variablen ?? new();
+        Variables = variablen;
         AllowedMethods = allowedMethods;
 
-        AdditionalFilesPath = (additionalFilesPath.Trim("\\") + "\\").CheckPath();
+        if (!string.IsNullOrEmpty(additionalFilesPath)) {
+            variablen.Add(new VariableString("AdditionalFilesPfad", (additionalFilesPath.Trim("\\") + "\\").CheckPath(), true, false, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+        }
 
         Attributes = attributes;
     }
@@ -62,42 +64,36 @@ public class Script {
 
     #region Properties
 
-    /// <summary>
-    /// Bei diesem Pfad können zusätzliche Dateien - wie z.B. Skript-Subroutinen enthalten sein.
-    /// Der Pfad mit abschließenden \
-    /// </summary>
-    public string AdditionalFilesPath { get; }
-
     public MethodType AllowedMethods { get; }
-    public string Attributes { get; private set; }
-    public bool BreakFired { get; set; }
+    public string Attributes { get; }
+
     public bool ChangeValues { get; }
-    public bool EndScript { get; set; }
+
     public string ReducedScriptText { get; private set; }
     public string ScriptText { get; set; } = string.Empty;
-    public int Sub { get; set; }
+
     public VariableCollection Variables { get; }
 
     #endregion
 
     #region Methods
 
-    public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, Script s, bool expectedvariablefeedback, LogData ld) {
+    public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, List<Method> lm, bool expectedvariablefeedback, LogData ld, VariableCollection vs, MethodType allowedMethods, bool changevalues, string scriptAttributes) {
         if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
         foreach (var thisC in Comands) {
-            var f = thisC.CanDo(txt, pos, expectedvariablefeedback, s, ld);
+            var f = thisC.CanDo(txt, pos, expectedvariablefeedback, lm, ld, vs, allowedMethods, changevalues, scriptAttributes);
             if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                var fn = thisC.DoIt(s, f);
-                return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinueOrErrorPosition);
+                var fn = thisC.DoIt(vs, f);
+                return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript);
             }
         }
 
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, s, ld))) {
+        foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, lm, ld, vs, allowedMethods, changevalues, scriptAttributes))) {
             if (f.MustAbort) {
                 return new DoItWithEndedPosFeedback(f.ErrorMessage, ld);
             }
@@ -119,6 +115,35 @@ public class Script {
     public static int Line(string? txt, int? pos) {
         if (pos == null || txt == null) { return 0; }
         return txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
+    }
+
+    public static ScriptEndedFeedback Parse(string redScriptText, int lineadd, string subname, VariableCollection vs, List<Method> lm, MethodType allowedMethods, bool changevalues, string scriptAttributes) {
+        var pos = 0;
+        var EndScript = false;
+
+        var ld = new LogData(subname, lineadd + 1);
+
+        do {
+            if (pos >= redScriptText.Length || EndScript) {
+                return new ScriptEndedFeedback(vs, ld.Protocol, true);
+            }
+
+            if (redScriptText.Substring(pos, 1) == "¶") {
+                pos++;
+                ld.LineAdd(1);
+            } else {
+                var f = ComandOnPosition(redScriptText, pos, lm, false, ld, vs, allowedMethods, changevalues, scriptAttributes);
+                if (!f.AllOk) {
+                    return new ScriptEndedFeedback(vs, ld.Protocol, false);
+                }
+
+                EndScript = f.EndSkript;
+
+                pos = f.Position;
+                ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);
+                if (f.BreakFired) { return new ScriptEndedFeedback(vs, ld.Protocol, true); }
+            }
+        } while (true);
     }
 
     public static (string reducedText, string error) ReduceText(string txt) {
@@ -145,7 +170,7 @@ public class Script {
                 case "\r":
                     if (gänsef) {
                         var t = s.ToString();
-                        return (t, "Fehler mit Gänsefüschen in Zeile " + Line(t,pos));
+                        return (t, "Fehler mit Gänsefüschen in Zeile " + Line(t, pos));
                     }
                     _ = s.Append("¶");
                     comment = false;
@@ -173,44 +198,14 @@ public class Script {
         if (!string.IsNullOrEmpty(error)) {
             return new ScriptEndedFeedback(error, false, subname);
         }
-        BreakFired = false;
-        Sub = 0;
 
-        return Parse(ReducedScriptText, lineadd, subname);
+        return Script.Parse(ReducedScriptText, lineadd, subname, Variables, Comands, AllowedMethods, ChangeValues, Attributes);
     }
+
+    #endregion
 
     //internal int AddBitmapToCache(Bitmap? bmp) {
     //    BitmapCache.Add(bmp);
     //    return BitmapCache.IndexOf(bmp);
     //}
-
-    public ScriptEndedFeedback Parse(string redScriptText, int lineadd, string subname) {
-        var pos = 0;
-        EndScript = false;
-
-        var ld = new LogData(subname, lineadd + 1);
-
-        do {
-            if (pos >= redScriptText.Length || EndScript) {
-                return new ScriptEndedFeedback(Variables, ld.Protocol, true);
-            }
-
-            if (BreakFired) { return new ScriptEndedFeedback(Variables, ld.Protocol, true); }
-
-            if (redScriptText.Substring(pos, 1) == "¶") {
-                pos++;
-                ld.LineAdd(1);
-            } else {
-                var f = ComandOnPosition(redScriptText, pos, this, false, ld);
-                if (!f.AllOk) {
-                    return new ScriptEndedFeedback(Variables, ld.Protocol, false);
-                }
-
-                pos = f.Position;
-                ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);
-            }
-        } while (true);
-    }
-
-    #endregion
 }

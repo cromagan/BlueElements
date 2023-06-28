@@ -46,13 +46,13 @@ public class Method_GenerateLayoutImage : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "generatelayoutimage" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         #region  Meine Zeile ermitteln (r)
 
-        var r = MyRow(s.Variables);
+        var r = MyRow(vs);
 
         if (r?.Database == null) { return new DoItFeedback(infos.Data, "Zeilenfehler!"); }
 

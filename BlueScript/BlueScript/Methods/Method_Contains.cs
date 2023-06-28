@@ -47,8 +47,8 @@ internal class Method_Contains : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "contains" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         #region Wortliste erzeugen
@@ -71,14 +71,14 @@ internal class Method_Contains : Method {
             return DoItFeedback.Falsch();
         }
 
-        if (attvar.Attributes[0] is VariableString vs) {
+        if (attvar.Attributes[0] is VariableString vsxy) {
             foreach (var thisW in wordlist) {
                 if (attvar.ValueBoolGet(1)) {
-                    if (vs.ValueString.Contains(thisW)) {
+                    if (vsxy.ValueString.Contains(thisW)) {
                         return DoItFeedback.Wahr();
                     }
                 } else {
-                    if (vs.ValueString.ToLower().Contains(thisW.ToLower())) {
+                    if (vsxy.ValueString.ToLower().Contains(thisW.ToLower())) {
                         return DoItFeedback.Wahr();
                     }
                 }

@@ -47,8 +47,8 @@ internal class Method_MoveFile : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "movefile" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
@@ -64,7 +64,7 @@ internal class Method_MoveFile : Method {
             return new DoItFeedback(infos.Data, "Zieldatei existiert bereits.");
         }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
+        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveFile(sop, dep, false)) {
             return new DoItFeedback(infos.Data, "Verschieben fehlgeschlagen.");

@@ -47,8 +47,8 @@ public class Method_UniqueRowID : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "uniquerowid" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
             ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
             : new DoItFeedback(RowCollection.UniqueKeyValue());

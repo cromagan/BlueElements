@@ -17,11 +17,22 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using BlueBasics.Enums;
+using BlueBasics;
+using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 
 namespace BlueScript.Variables;
 
 public class VariableUnknown : Variable {
+
+    #region Fields
+
+    private string _value = string.Empty;
+
+    #endregion
 
     #region Constructors
 
@@ -40,6 +51,8 @@ public class VariableUnknown : Variable {
     #region Properties
 
     public static string ClassId => "ukn";
+
+    public static string ShortName_Plain => "ukn";
     public static string ShortName_Variable => "*ukn";
     public override int CheckOrder => 100;
     public override bool GetFromStringPossible => true;
@@ -52,6 +65,20 @@ public class VariableUnknown : Variable {
     public override string ReadableText => "[unknown]";
 
     public override bool ToStringPossible => false;
+
+    /// <summary>
+    /// Der Wert ohne " am Anfang/Ende. Gleichgesetzt mit ReadableText
+    /// </summary>
+    public string Value {
+        get => _value;
+        set {
+            if (ReadOnly) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Read Only Variable!"); // Wichtig für DatabaseVariables
+                return;
+            }
+            _value = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
+        }
+    }
 
     public override string ValueForReplace => ReadableText;
 
@@ -71,15 +98,21 @@ public class VariableUnknown : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x, Script s) {
+    protected override Variable NewWithThisValue(object x, VariableCollection vs) {
         var v = new VariableUnknown(string.Empty);
         v.SetValue(x);
         return v;
     }
 
-    protected override void SetValue(object? x) { }
+    protected override void SetValue(object? x) {
+        if (x is string val) {
+            _value = val.RestoreCriticalVariableChars();
+        } else {
+            Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler!");
+        }
+    }
 
-    protected override object TryParse(string txt, Script? s) => txt;
+    protected override object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes) => txt;
 
     #endregion
 }

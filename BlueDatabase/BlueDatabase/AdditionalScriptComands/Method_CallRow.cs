@@ -54,11 +54,11 @@ public class Method_CallRow : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "callrow" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var see = s.Variables.GetSystem("SetErrorEnabled");
+        var see = vs.GetSystem("SetErrorEnabled");
         if (see is not VariableBool seet) { return new DoItFeedback(infos.Data, "SetErrorEnabled Variable nicht gefunden"); }
         if (seet.ValueBool) { return new DoItFeedback(infos.Data, "'CallRow' bei FehlerCheck Routinen nicht erlaubt."); }
 
@@ -68,16 +68,14 @@ public class Method_CallRow : Method {
             return new DoItFeedback(infos.Data, "Zeile nicht gefunden");
         }
 
-        var vs = attvar.ValueStringGet(0);
-        s.Sub++;
-        var s2 = row.ExecuteScript(null, vs, false, false, s.ChangeValues, 0);
+        var vsx = attvar.ValueStringGet(0);
+
+        var s2 = row.ExecuteScript(null, vsx, false, false, infos.ChangeValues, 0);
         if (!s2.AllOk) {
             infos.Data.Protocol.AddRange(s2.Protocol);
-            return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");
+            return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vsx + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");
         }
-        s.Sub--;
-        s.BreakFired = false;
-        s.EndScript = false;
+
         return DoItFeedback.Null();
     }
 

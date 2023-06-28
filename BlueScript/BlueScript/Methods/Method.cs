@@ -19,7 +19,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Security.AccessControl;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
@@ -104,20 +106,20 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return (s, string.Empty);
     }
 
-    public static GetEndFeedback ReplaceComands(string txt, Script s, LogData ld) {
+    public static GetEndFeedback ReplaceComands(string txt, List<Method> lm, LogData ld, VariableCollection vs, MethodType allowedMethods, bool changevalues, string scriptAttributes) {
         if (Script.Comands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert", ld); }
 
         List<string> c = new();
         foreach (var thisc in Script.Comands) {
             if (!string.IsNullOrEmpty(thisc.Returns)) {
-                c.AddRange(thisc.Comand(s.Variables).Select(thiscs => thiscs + thisc.StartSequence));
+                c.AddRange(thisc.Comand(vs).Select(thiscs => thiscs + thisc.StartSequence));
             }
         }
         var posc = 0;
         do {
             var (pos, _) = NextText(txt, posc, c, true, false, KlammernStd);
             if (pos < 0) { return new GetEndFeedback(0, txt); }
-            var f = Script.ComandOnPosition(txt, pos, s, true, ld);
+            var f = Script.ComandOnPosition(txt, pos, lm, true, ld, vs, allowedMethods, changevalues, scriptAttributes);
             if (!f.AllOk) { return new GetEndFeedback("Durch Befehl abgebrochen: " + txt, ld); }
 
             if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
@@ -138,9 +140,9 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     /// <param name="s"></param>
     /// <param name="ld"></param>
     /// <returns></returns>
-    public static GetEndFeedback ReplaceVariable(string txt, Script s, LogData ld) {
+    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection vs, LogData ld) {
         var posc = 0;
-        var v = s.Variables.AllStringableNames();
+        var v = vs.AllStringableNames();
 
         do {
             var (pos, which) = NextText(txt, posc, v, true, true, KlammernStd);
@@ -157,10 +159,10 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
             //    if (pose <= pos) { return new GetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
             //    var x = Variable.GetVariableByParsing(txt.Substring(pos + 1, pose - pos - 1), s);
             //    if (x.Variable is not VariableString x2) { return new GetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
-            //    thisV = s.Variables.Get(x2.ValueString);
+            //    thisV = vs.Get(x2.ValueString);
             //    endz = pose + 1;
             //} else {
-            var thisV = s.Variables.Get(which);
+            var thisV = vs.Get(which);
             var endz = pos + which.Length;
             //}
             if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which, ld); }
@@ -195,14 +197,14 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return attributes;
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(Script? s, string attributText, List<List<string>> types, bool endlessArgs, LogData ld) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection vs, CanDoFeedback infos, List<List<string>> types, bool endlessArgs) {
         if (types.Count == 0) {
-            return string.IsNullOrEmpty(attributText)
+            return string.IsNullOrEmpty(infos.AttributText)
                 ? new SplittedAttributesFeedback(new VariableCollection())
                 : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
         }
 
-        var attributes = SplitAttributeToString(attributText);
+        var attributes = SplitAttributeToString(infos.AttributText);
         if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler."); }
         if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
         if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
@@ -230,10 +232,10 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
                 if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
 
-                if (s != null) { v = s.Variables.Get(varn); }
+                v = vs.Get(varn);
                 if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
             } else {
-                var tmp2 = Variable.GetVariableByParsing(attributes[n], s, ld);
+                var tmp2 = Variable.GetVariableByParsing(attributes[n], infos.Data, vs, infos.AllowedMethods, infos.Methods, infos.ChangeValues, infos.ScriptAttributes);
                 if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
                 v = tmp2.Variable;
             }
@@ -255,7 +257,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return new SplittedAttributesFeedback(feedbackVariables);
     }
 
-    public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, Script s, LogData ld) {
+    public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, List<Method> lm, LogData ld, VariableCollection vs, MethodType allowedMethods, bool changevalues, string scriptAttributes) {
         if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns)) {
             return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
         }
@@ -264,7 +266,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         }
         var maxl = scriptText.Length;
 
-        foreach (var thiscomand in Comand(s.Variables)) {
+        foreach (var thiscomand in Comand(vs)) {
             var comandtext = thiscomand + StartSequence;
             var l = comandtext.Length;
             if (pos + l < maxl) {
@@ -282,11 +284,11 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
                         cont = cont + codebltxt.Length + 2;
                     }
 
-                    if (!s.AllowedMethods.HasFlag(MethodType)) {
+                    if (!allowedMethods.HasFlag(MethodType)) {
                         return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' kann in diesem Skript nicht benutzt werden.", true, ld);
                     }
 
-                    return new CanDoFeedback(scriptText, cont, comandtext, f.AttributeText, codebltxt, ld);
+                    return new CanDoFeedback(scriptText, cont, comandtext, f.AttributeText, codebltxt, ld, allowedMethods, lm, changevalues, scriptAttributes);
                 }
             }
         }
@@ -295,7 +297,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     public abstract List<string> Comand(VariableCollection? currentvariables);
 
-    public abstract DoItFeedback DoIt(Script s, CanDoFeedback infos);
+    public abstract DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos);
 
     public string HintText() {
         var co = "Syntax:\r\n";
@@ -339,8 +341,8 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
             return new GetEndFeedback("Endpunkt '" + EndSequence + "' nicht gefunden.", ld);
         }
 
-        var txtBTW = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
-        return new GetEndFeedback(pos + which.Length, txtBTW);
+        var txtBtw = scriptText.Substring(startpos + lenghtStartSequence, pos - startpos - lenghtStartSequence);
+        return new GetEndFeedback(pos + which.Length, txtBtw);
     }
 
     #endregion

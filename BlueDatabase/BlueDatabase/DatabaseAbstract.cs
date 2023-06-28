@@ -903,9 +903,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             vars.Add(new VariableFloat("Rows", Row.Count, true, false, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
             vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.Name ?? string.Empty, true, false, "Der Name der ersten Spalte"));
             vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
-            if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) {
-                vars.Add(new VariableString("AdditionalFilesPfad", AdditionalFilesPfadWhole(), true, false, "Der Dateipfad der Datenbank, in dem zusäzliche Daten gespeichert werden."));
-            }
 
             vars.Add(new VariableListString("Attributes", attributes, true, true, "Enthält - falls übergeben worden - die Attribute aus dem Skript, das dieses hier aufruft."));
 

@@ -46,8 +46,8 @@ internal class Method_Count : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "count" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
             ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
             : new DoItFeedback(attvar.ValueListStringGet(0).Count);

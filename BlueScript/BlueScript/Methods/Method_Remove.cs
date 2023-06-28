@@ -47,16 +47,16 @@ internal class Method_Remove : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "remove" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
         var tmpList = attvar.ValueListStringGet(0);
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is VariableString vs) {
-                tmpList!.RemoveString(vs.ValueString, attvar.ValueBoolGet(1));
+            if (attvar.Attributes[z] is VariableString vsx) {
+                tmpList!.RemoveString(vsx.ValueString, attvar.ValueBoolGet(1));
             }
             if (attvar.Attributes[z] is VariableListString vl) {
                 tmpList.RemoveString(vl.ValueList, attvar.ValueBoolGet(1));

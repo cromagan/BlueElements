@@ -17,8 +17,10 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Extensions;
@@ -86,7 +88,7 @@ public class VariableBool : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x, Script s) {
+    protected override Variable NewWithThisValue(object x, VariableCollection vs) {
         var v = new VariableBool(string.Empty);
         v.SetValue(x);
         return v;
@@ -100,7 +102,7 @@ public class VariableBool : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, Script? s) {
+    protected override object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes) {
         if (Method_If.GetBool(txt) is bool b) { return b; }
 
         #region Auf Restliche Boolsche Operationen testen
@@ -123,7 +125,7 @@ public class VariableBool : Variable {
             var s1 = txt.Substring(0, i);
             Variable? v1 = null;
             if (!string.IsNullOrEmpty(s1)) {
-                var tmp1 = GetVariableByParsing(s1, s, null);
+                var tmp1 = GetVariableByParsing(s1, null, vs, allowedMethods, lm, changeValues, scriptAttributes);
                 if (!tmp1.AllOk) { return null; }//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
 
                 v1 = tmp1.Variable;
@@ -138,7 +140,7 @@ public class VariableBool : Variable {
             var s2 = txt.Substring(i + check.Length);
             if (string.IsNullOrEmpty(s2)) { return null; }//new DoItFeedback(infos.LogData, s, "Wert nach Operator (" + check + ") nicht gefunden: " + txt);
 
-            var tmp2 = GetVariableByParsing(s2, s, null);
+            var tmp2 = GetVariableByParsing(s2, null, vs, allowedMethods, lm, changeValues, scriptAttributes);
             if (!tmp2.AllOk) {
                 return null;//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
             }

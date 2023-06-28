@@ -54,15 +54,15 @@ public class Method_CallDatabase : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "calldatabase" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var see = s.Variables.GetSystem("SetErrorEnabled");
+        var see = vs.GetSystem("SetErrorEnabled");
         if (see is not VariableBool seet) { return new DoItFeedback(infos.Data, "SetErrorEnabled Variable nicht gefunden"); }
         if (seet.ValueBool) { return new DoItFeedback(infos.Data, "'CallDatabase' bei FehlerCheck Routinen nicht erlaubt."); }
 
-        var db = DatabaseOf(s.Variables, attvar.ValueStringGet(0));
+        var db = DatabaseOf(vs, attvar.ValueStringGet(0));
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
@@ -71,7 +71,7 @@ public class Method_CallDatabase : Method_Database {
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 400) { return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf"); }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "CallDatabase im Testmodus deaktiviert."); }
+        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "CallDatabase im Testmodus deaktiviert."); }
 
         var f = db.ExecuteScript(null, attvar.ValueStringGet(1), true, null, null);
 

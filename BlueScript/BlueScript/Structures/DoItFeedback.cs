@@ -75,6 +75,11 @@ public struct DoItFeedback {
         Variable = new VariableDateTime(value);
     }
 
+    public DoItFeedback(bool breakFired, bool endScript) : this() {
+        BreakFired = breakFired;
+        EndScript = endScript;
+    }
+
     public DoItFeedback(string[] list) {
         AllOk = true;
         Variable = new VariableListString(list);
@@ -90,6 +95,8 @@ public struct DoItFeedback {
     #region Properties
 
     public bool AllOk { get; }
+    public bool BreakFired { get; set; } = false;
+    public bool EndScript { get; set; } = false;
     public Variable? Variable { get; }
 
     #endregion

@@ -47,8 +47,8 @@ internal class Method_Join : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "join" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         //if (string.IsNullOrEmpty(attvar.ValueString(0))) { return DoItFeedback.Null(infos, s, line); }

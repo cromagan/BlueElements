@@ -17,8 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
@@ -96,7 +99,7 @@ public class VariableFloat : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x, Script s) {
+    protected override Variable NewWithThisValue(object x, VariableCollection vs) {
         var v = new VariableFloat(string.Empty);
         v.SetValue(x);
         return v;
@@ -112,7 +115,7 @@ public class VariableFloat : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, Script? s) {
+    protected override object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes) {
         var (pos2, _) = NextText(txt, 0, MathFormulaParser.RechenOperatoren, false, false, KlammernStd);
         if (pos2 >= 0) {
             var erg = MathFormulaParser.Ergebnis(txt);

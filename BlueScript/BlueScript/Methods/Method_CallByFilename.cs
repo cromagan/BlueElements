@@ -52,74 +52,76 @@ public class Method_CallByFilename : Method {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="s">Das Script, von welchem die Variablen benutzt werden sollen</param>
+    /// <param name="vs"></param>
     /// <param name="infos"></param>
     /// <param name="aufgerufenVon">Name der Funktion, z.B. Do-Schleife</param>
     /// <param name="reducedscripttext">Der Scripttext, der ausgeführt werden soll. Bereits standardisiert</param>
     /// <param name="keepVariables">Ob Variablen, die in dem Script erzeugt werden, nch außen getragen werden sollen</param>
     /// <param name="lineadd">Zb. bei einer Do Schleife, die Zeile, in der das Do steht. Bei Scripten aus dem Dateisytem 0</param>
     /// <param name="subname">Zb. bei einer Do Schleife, der gleich Wert wie in Infos.Logdata. Bei Scripten aus dem Dateisystem dessen Name</param>
+    /// <param name="addMe"></param>
+    /// <param name="lm"></param>
+    /// <param name="allowedMethods"></param>
     /// <returns></returns>
-    public static DoItFeedback CallSub(Script s, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname) {
-        s.Sub++;
-
+    public static DoItFeedback CallSub(VariableCollection vs, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe, List<Method> lm, MethodType allowedMethods, bool changevalues, string scriptAttributes) {
         if (keepVariables) {
-            var scx = s.Parse(reducedscripttext, lineadd, subname);
+            if (addMe != null) { vs.Add(addMe); }
+
+            var scx = Script.Parse(reducedscripttext, lineadd, subname, vs, lm, allowedMethods, changevalues, scriptAttributes);
             if (!scx.AllOk) {
                 infos.Data.Protocol.AddRange(scx.Protocol);
                 return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
             }
         } else {
             var tmpv = new VariableCollection();
-            tmpv.AddRange(s.Variables);
+            tmpv.AddRange(vs);
+            if (addMe != null) { tmpv.Add(addMe); }
 
-            var scx = s.Parse(reducedscripttext, lineadd, subname);
+            var scx = Script.Parse(reducedscripttext, lineadd, subname, vs, lm, allowedMethods, changevalues, scriptAttributes);
             if (!scx.AllOk) {
                 infos.Data.Protocol.AddRange(scx.Protocol);
                 return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
             }
 
-            s.Variables.Clear();
-            s.Variables.AddRange(tmpv);
+            vs.Clear();
+            vs.AddRange(tmpv);
         }
-        s.Sub--;
-
-        if (s.Sub < 0) { return new DoItFeedback(infos.Data, "Subroutinen-Fehler"); }
-        //s.BreakFired = false;
 
         return DoItFeedback.Null();
     }
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "callbyfilename" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var vs = attvar.ValueStringGet(0);
+        var vsx = attvar.ValueStringGet(0);
         string f;
 
+        var addp = vs.GetString("AdditionalFilesPfad");
+
         try {
-            if (FileExists(vs)) {
-                f = File.ReadAllText(vs, Encoding.UTF8);
-            } else if (FileExists(s.AdditionalFilesPath + vs)) {
-                f = File.ReadAllText(s.AdditionalFilesPath + vs, Encoding.UTF8);
+            if (FileExists(vsx)) {
+                f = File.ReadAllText(vsx, Encoding.UTF8);
+            } else if (FileExists(addp + vs)) {
+                f = File.ReadAllText(addp + vs, Encoding.UTF8);
             } else {
-                return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + vs);
+                return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + vsx);
             }
         } catch {
-            return new DoItFeedback(infos.Data, "Fehler beim Lesen der Datei: " + vs);
+            return new DoItFeedback(infos.Data, "Fehler beim Lesen der Datei: " + vsx);
         }
 
         (f, string error) = Script.ReduceText(f);
 
         if (!string.IsNullOrEmpty(error)) {
-            return new DoItFeedback(infos.Data, "Fehler in Datei " + vs + ": " + error);
+            return new DoItFeedback(infos.Data, "Fehler in Datei " + vsx + ": " + error);
         }
 
-        var v = CallSub(s, infos, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix());
-        s.BreakFired = false;
-        s.EndScript = false;
+        var v = CallSub(vs, infos, "Datei-Subroutinen-Aufruf [" + vsx + "]", f, attvar.ValueBoolGet(1), 0, vsx.FileNameWithSuffix(), null, infos.Methods, infos.AllowedMethods, infos.ChangeValues, infos.ScriptAttributes);
+        v.BreakFired = false;
+        v.EndScript = false;
         return v;
     }
 

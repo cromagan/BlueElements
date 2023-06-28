@@ -17,6 +17,10 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using BlueScript.Enums;
+using BlueScript.Methods;
+
 namespace BlueScript.Structures;
 
 public readonly struct CanDoFeedback {
@@ -32,9 +36,11 @@ public readonly struct CanDoFeedback {
         CodeBlockAfterText = string.Empty;
         CurrentReducedScriptText = reducedscript;
         Data = ld;
+        AllowedMethods = MethodType.None;
+        Methods = null;
     }
 
-    public CanDoFeedback(string reducedscript, int continuePosition, string comandText, string attributtext, string codeblockaftertext, LogData ld) {
+    public CanDoFeedback(string reducedscript, int continuePosition, string comandText, string attributtext, string codeblockaftertext, LogData ld, MethodType allowedMethods, List<Method> methods, bool changeValues, string scriptAttributes) {
         ContinueOrErrorPosition = continuePosition;
         ErrorMessage = string.Empty;
         MustAbort = false;
@@ -43,16 +49,29 @@ public readonly struct CanDoFeedback {
         CodeBlockAfterText = codeblockaftertext;
         CurrentReducedScriptText = reducedscript;
         Data = ld;
+        AllowedMethods = allowedMethods;
+        Methods = methods;
+        ChangeValues = changeValues;
+        ScriptAttributes = scriptAttributes;
     }
 
     #endregion
 
     #region Properties
 
+    public MethodType AllowedMethods { get; }
+
     /// <summary>
     /// Der Text zwischen dem StartString und dem EndString
     /// </summary>
     public string AttributText { get; }
+
+    /// <summary>
+    /// Startbedingungen des Skriptes
+    /// </summary>
+    /// <returns></returns>
+
+    public bool ChangeValues { get; }
 
     /// <summary>
     /// Falls ein Codeblock { } direkt nach dem Befehl beginnt, dessen Inhalt
@@ -77,11 +96,14 @@ public readonly struct CanDoFeedback {
 
     public LogData Data { get; }
     public string ErrorMessage { get; }
+    public List<Method>? Methods { get; }
 
     /// <summary>
     /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
     /// </summary>
     public bool MustAbort { get; }
+
+    public string ScriptAttributes { get; }
 
     #endregion
 }

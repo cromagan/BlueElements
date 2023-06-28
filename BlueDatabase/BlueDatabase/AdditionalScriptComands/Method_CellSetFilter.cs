@@ -48,8 +48,8 @@ public class Method_CellSetFilter : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "cellsetfilter" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
@@ -66,12 +66,12 @@ public class Method_CellSetFilter : Method_Database {
             return DoItFeedback.Falsch();
         }
 
-        if (r[0] == MyRow(s.Variables)) {
+        if (r[0] == MyRow(vs)) {
             return new DoItFeedback(infos.Data, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
         }
 
         var value = string.Empty;
-        if (attvar.Attributes[0] is VariableString vs) { value = vs.ValueString; }
+        if (attvar.Attributes[0] is VariableString vsx) { value = vsx.ValueString; }
         if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
         if (attvar.Attributes[0] is VariableFloat vf) { value = vf.ValueForReplace; }
 

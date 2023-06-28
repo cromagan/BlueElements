@@ -47,8 +47,8 @@ internal class Method_MoveDirectory : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "movedirectory" };
 
-    public override DoItFeedback DoIt(Script s, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(s, infos.AttributText, Args, EndlessArgs, infos.Data);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
+        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
@@ -58,7 +58,7 @@ internal class Method_MoveDirectory : Method {
 
         if (DirectoryExists(dep)) { return new DoItFeedback(infos.Data, "Ziel-Verzeichnis existiert bereits."); }
 
-        if (!s.ChangeValues) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
+        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveDirectory(sop, dep, false)) {
             return new DoItFeedback(infos.Data, "Verschieben fehlgeschlagen.");
