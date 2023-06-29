@@ -63,11 +63,11 @@ public class Method_CallByFilename : Method {
     /// <param name="lm"></param>
     /// <param name="allowedMethods"></param>
     /// <returns></returns>
-    public static DoItFeedback CallSub(VariableCollection vs, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe, List<Method> lm, MethodType allowedMethods, bool changevalues, string scriptAttributes) {
+    public static DoItFeedback CallSub(VariableCollection vs, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe, ScriptProperties scp) {
         if (keepVariables) {
             if (addMe != null) { vs.Add(addMe); }
 
-            var scx = Script.Parse(reducedscripttext, lineadd, subname, vs, lm, allowedMethods, changevalues, scriptAttributes);
+            var scx = Script.Parse(reducedscripttext, lineadd, subname, vs, scp);
             if (!scx.AllOk) {
                 infos.Data.Protocol.AddRange(scx.Protocol);
                 return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
@@ -77,7 +77,7 @@ public class Method_CallByFilename : Method {
             tmpv.AddRange(vs);
             if (addMe != null) { tmpv.Add(addMe); }
 
-            var scx = Script.Parse(reducedscripttext, lineadd, subname, vs, lm, allowedMethods, changevalues, scriptAttributes);
+            var scx = Script.Parse(reducedscripttext, lineadd, subname, vs, scp);
             if (!scx.AllOk) {
                 infos.Data.Protocol.AddRange(scx.Protocol);
                 return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
@@ -119,7 +119,7 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback(infos.Data, "Fehler in Datei " + vsx + ": " + error);
         }
 
-        var v = CallSub(vs, infos, "Datei-Subroutinen-Aufruf [" + vsx + "]", f, attvar.ValueBoolGet(1), 0, vsx.FileNameWithSuffix(), null, infos.Methods, infos.AllowedMethods, infos.ChangeValues, infos.ScriptAttributes);
+        var v = CallSub(vs, infos, "Datei-Subroutinen-Aufruf [" + vsx + "]", f, attvar.ValueBoolGet(1), 0, vsx.FileNameWithSuffix(), null, infos.ScriptProperties);
         v.BreakFired = false;
         v.EndScript = false;
         return v;

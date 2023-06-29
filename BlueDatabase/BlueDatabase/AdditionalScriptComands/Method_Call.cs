@@ -62,7 +62,7 @@ internal class Method_Call : Method_Database {
         var sc = db.EventScript.Get(vsx);
         if (sc == null) { return new DoItFeedback(infos.Data, "Skript nicht vorhanden: " + vs); }
 
-        if (sc.Attributes() != infos.ScriptAttributes && infos.ScriptAttributes != "*") {
+        if (sc.Attributes() != infos.ScriptProperties.ScriptAttributes && infos.ScriptProperties.ScriptAttributes != "*") {
             return new DoItFeedback(infos.Data, "Aufzurufendes Skript hat andere Bedingungen.");
         }
 
@@ -72,7 +72,7 @@ internal class Method_Call : Method_Database {
             return new DoItFeedback(infos.Data, "Fehler in Unter-Skript " + vs + ": " + error);
         }
 
-        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(vs, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vsx, null, infos.Methods, infos.AllowedMethods | MethodType.Break, infos.ChangeValues, infos.ScriptAttributes);
+        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(vs, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vsx, null, infos.ScriptProperties);
         scx.BreakFired = false;
         scx.EndScript = false;
 

@@ -53,12 +53,14 @@ internal class Method_Do : Method {
 
         var du = 0;
 
+        var scp = new ScriptProperties(infos.ScriptProperties, infos.ScriptProperties.AllowedMethods | MethodType.Break);
+
         DoItFeedback scx;
         do {
             du++;
             if (du > 100000) { return new DoItFeedback(infos.Data, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
-            scx = Method_CallByFilename.CallSub(vs, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, infos.Methods, infos.AllowedMethods | MethodType.Break, infos.ChangeValues, infos.ScriptAttributes);
+            scx = Method_CallByFilename.CallSub(vs, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, scp);
             if (!scx.AllOk) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }

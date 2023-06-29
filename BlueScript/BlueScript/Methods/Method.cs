@@ -106,7 +106,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return (s, string.Empty);
     }
 
-    public static GetEndFeedback ReplaceComands(string txt, List<Method> lm, LogData ld, VariableCollection vs, MethodType allowedMethods, bool changevalues, string scriptAttributes) {
+    public static GetEndFeedback ReplaceComands(string txt, VariableCollection vs, LogData ld, ScriptProperties scp) {
         if (Script.Comands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert", ld); }
 
         List<string> c = new();
@@ -119,7 +119,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         do {
             var (pos, _) = NextText(txt, posc, c, true, false, KlammernStd);
             if (pos < 0) { return new GetEndFeedback(0, txt); }
-            var f = Script.ComandOnPosition(txt, pos, lm, true, ld, vs, allowedMethods, changevalues, scriptAttributes);
+            var f = Script.ComandOnPosition(txt, pos, true, ld, vs, scp);
             if (!f.AllOk) { return new GetEndFeedback("Durch Befehl abgebrochen: " + txt, ld); }
 
             if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
@@ -235,7 +235,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
                 v = vs.Get(varn);
                 if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
             } else {
-                var tmp2 = Variable.GetVariableByParsing(attributes[n], infos.Data, vs, infos.AllowedMethods, infos.Methods, infos.ChangeValues, infos.ScriptAttributes);
+                var tmp2 = Variable.GetVariableByParsing(attributes[n], infos.Data, vs, infos.ScriptProperties);
                 if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
                 v = tmp2.Variable;
             }
@@ -257,12 +257,12 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return new SplittedAttributesFeedback(feedbackVariables);
     }
 
-    public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, List<Method> lm, LogData ld, VariableCollection vs, MethodType allowedMethods, bool changevalues, string scriptAttributes) {
+    public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, LogData ld, VariableCollection vs, ScriptProperties scp) {
         if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns)) {
-            return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
+            return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld, scp);
         }
         if (expectedvariablefeedback && string.IsNullOrEmpty(Returns)) {
-            return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
+            return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld, scp);
         }
         var maxl = scriptText.Length;
 
@@ -273,26 +273,26 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
                 if (string.Equals(scriptText.Substring(pos, l), comandtext, StringComparison.OrdinalIgnoreCase)) {
                     var f = GetEnd(scriptText, pos + thiscomand.Length, StartSequence.Length, ld);
                     if (!f.AllOk) {
-                        return new CanDoFeedback(scriptText, f.ContinuePosition, "Fehler bei " + comandtext, true, ld);
+                        return new CanDoFeedback(scriptText, f.ContinuePosition, "Fehler bei " + comandtext, true, ld, scp);
                     }
                     var cont = f.ContinuePosition;
                     var codebltxt = string.Empty;
                     if (GetCodeBlockAfter) {
                         var (codeblock, errorreason) = GetCodeBlockText(scriptText, cont);
-                        if (!string.IsNullOrEmpty(errorreason)) { return new CanDoFeedback(scriptText, f.ContinuePosition, errorreason, true, ld); }
+                        if (!string.IsNullOrEmpty(errorreason)) { return new CanDoFeedback(scriptText, f.ContinuePosition, errorreason, true, ld, scp); }
                         codebltxt = codeblock;
                         cont = cont + codebltxt.Length + 2;
                     }
 
-                    if (!allowedMethods.HasFlag(MethodType)) {
-                        return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' kann in diesem Skript nicht benutzt werden.", true, ld);
+                    if (!scp.AllowedMethods.HasFlag(MethodType)) {
+                        return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' kann in diesem Skript nicht benutzt werden.", true, ld, scp);
                     }
 
-                    return new CanDoFeedback(scriptText, cont, comandtext, f.AttributeText, codebltxt, ld, allowedMethods, lm, changevalues, scriptAttributes);
+                    return new CanDoFeedback(scriptText, cont, comandtext, f.AttributeText, codebltxt, ld, scp);
                 }
             }
         }
-        return new CanDoFeedback(scriptText, pos, "Kann nicht geparst werden", false, ld);
+        return new CanDoFeedback(scriptText, pos, "Kann nicht geparst werden", false, ld, scp);
     }
 
     public abstract List<string> Comand(VariableCollection? currentvariables);

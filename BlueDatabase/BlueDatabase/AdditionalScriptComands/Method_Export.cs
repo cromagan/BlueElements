@@ -102,7 +102,7 @@ internal class Method_Export : Method_Database {
 
         #endregion
 
-        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
+        if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "Export im Testmodus deaktiviert."); }
 
         try {
             switch (attvar.ValueStringGet(1).ToUpper()) {

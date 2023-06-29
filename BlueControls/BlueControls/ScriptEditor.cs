@@ -30,6 +30,7 @@ using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.EventArgs;
+using BlueScript.Structures;
 using FastColoredTextBoxNS;
 
 namespace BlueControls;
@@ -165,7 +166,8 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         OnExecuteScript(ex);
 
         if (ex.Feedback == null) {
-            var s = new Script(null, string.Empty, true, MethodType.Standard, "*");
+            var scp = new ScriptProperties(MethodType.Standard, false, "*");
+            var s = new Script(null, string.Empty, scp);
             ex.Feedback = s.Parse(0, "Main");
         }
 

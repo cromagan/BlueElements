@@ -58,7 +58,7 @@ internal class Method_MoveDirectory : Method {
 
         if (DirectoryExists(dep)) { return new DoItFeedback(infos.Data, "Ziel-Verzeichnis existiert bereits."); }
 
-        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
+        if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveDirectory(sop, dep, false)) {
             return new DoItFeedback(infos.Data, "Verschieben fehlgeschlagen.");

@@ -77,7 +77,7 @@ internal class Method_SaveImage : Method {
 
         #endregion
 
-        //if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Bild Speichern im Testmodus deaktiviert."); }
+        //if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "Bild Speichern im Testmodus deaktiviert."); }
 
         switch (attvar.ValueStringGet(1).ToUpper()) {
             case "PNG":

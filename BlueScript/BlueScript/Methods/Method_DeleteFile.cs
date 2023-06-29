@@ -61,7 +61,7 @@ internal class Method_DeleteFile : Method {
             return DoItFeedback.Wahr();
         }
 
-        //if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert."); }
+        //if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert."); }
 
         try {
             return new DoItFeedback(IO.DeleteFile(filn, false));

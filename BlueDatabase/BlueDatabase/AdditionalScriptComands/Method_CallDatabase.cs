@@ -71,7 +71,7 @@ public class Method_CallDatabase : Method_Database {
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 400) { return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf"); }
 
-        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "CallDatabase im Testmodus deaktiviert."); }
+        if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "CallDatabase im Testmodus deaktiviert."); }
 
         var f = db.ExecuteScript(null, attvar.ValueStringGet(1), true, null, null);
 

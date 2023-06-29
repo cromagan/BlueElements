@@ -716,7 +716,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
             #region Script ausführen
 
-            Script sc = new(vars, string.Empty, true, allowedMethods, s.Attributes()) {
+            var scp = new ScriptProperties(allowedMethods, true, s.Attributes());
+            Script sc = new(vars, string.Empty, scp) {
                 ScriptText = s.Script
             };
             var scf = sc.Parse(0, s.Name);

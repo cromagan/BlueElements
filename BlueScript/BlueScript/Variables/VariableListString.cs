@@ -121,7 +121,7 @@ public class VariableListString : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x, VariableCollection vs) {
+    protected override Variable NewWithThisValue(object x) {
         var v = new VariableListString(string.Empty);
         v.SetValue(x);
         return v;
@@ -135,20 +135,16 @@ public class VariableListString : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes) {
+    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
         if (txt.Length > 1 && txt.StartsWith("{") && txt.EndsWith("}")) {
             var t = txt.DeKlammere(false, true, false, true);
 
-            if (string.IsNullOrEmpty(t)) {
-                return new List<string>();
-            } // Leere Liste
+            if (string.IsNullOrEmpty(t)) { return new List<string>(); } // Leere Liste
 
-            var infos = new CanDoFeedback(t, 0, string.Empty, string.Empty, string.Empty, null, allowedMethods, lm, changeValues, scriptAttributes);
+            var infos = new CanDoFeedback(t, 0, string.Empty, string.Empty, string.Empty, null, scp);
 
             var l = Method.SplitAttributeToVars(vs, infos, new List<List<string>> { new() { VariableString.ShortName_Plain } }, true);
-            if (!string.IsNullOrEmpty(l.ErrorMessage)) {
-                return null;
-            }
+            if (!string.IsNullOrEmpty(l.ErrorMessage)) { return null; }
 
             return l.Attributes.AllStringValues();
         }

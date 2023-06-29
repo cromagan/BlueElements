@@ -83,11 +83,11 @@ public class VariableXml : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable? NewWithThisValue(object x, VariableCollection vs) => null;
+    protected override Variable? NewWithThisValue(object x) => null;
 
     protected override void SetValue(object? x) { }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes) => null;
+    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => null;
 
     #endregion
 }

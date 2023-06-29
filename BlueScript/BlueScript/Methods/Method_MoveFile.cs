@@ -64,7 +64,7 @@ internal class Method_MoveFile : Method {
             return new DoItFeedback(infos.Data, "Zieldatei existiert bereits.");
         }
 
-        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
+        if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "Verschieben im Testmodus deaktiviert."); }
 
         if (!MoveFile(sop, dep, false)) {
             return new DoItFeedback(infos.Data, "Verschieben fehlgeschlagen.");

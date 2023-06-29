@@ -60,7 +60,7 @@ internal class Method_ImportCSV : Method_Database {
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
 
-        if (!infos.ChangeValues) { return new DoItFeedback(infos.Data, "Import im Testmodus deaktiviert."); }
+        if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "Import im Testmodus deaktiviert."); }
 
         var sx = db.Import(txt, true, true, sep, false, false, true);
 

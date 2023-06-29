@@ -930,7 +930,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             #region Script ausführen
 
-            Script sc = new(vars, AdditionalFilesPfadWhole(), changevalues, allowedMethods, s.Attributes()) {
+            var scp = new ScriptProperties(allowedMethods, changevalues, s.Attributes());
+
+            Script sc = new(vars, AdditionalFilesPfadWhole(), scp) {
                 ScriptText = s.Script
             };
             var scf = sc.Parse(0, s.Name);

@@ -41,7 +41,7 @@ public class Script {
 
     #region Constructors
 
-    public Script(VariableCollection variablen, string additionalFilesPath, bool changevalues, MethodType allowedMethods, string attributes) {
+    public Script(VariableCollection variablen, string additionalFilesPath, ScriptProperties scp) {
         Comands ??= GetInstaceOfType<Method>();
         if (VarTypes == null) {
             VarTypes = GetInstaceOfType<Variable>("NAME");
@@ -49,15 +49,15 @@ public class Script {
         }
 
         ReducedScriptText = string.Empty;
-        ChangeValues = changevalues;
+        ChangeValues = scp.ChangeValues;
         Variables = variablen;
-        AllowedMethods = allowedMethods;
+        AllowedMethods = scp.AllowedMethods;
 
         if (!string.IsNullOrEmpty(additionalFilesPath)) {
             variablen.Add(new VariableString("AdditionalFilesPfad", (additionalFilesPath.Trim("\\") + "\\").CheckPath(), true, false, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
         }
 
-        Attributes = attributes;
+        Attributes = scp.ScriptAttributes;
     }
 
     #endregion
@@ -78,11 +78,11 @@ public class Script {
 
     #region Methods
 
-    public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, List<Method> lm, bool expectedvariablefeedback, LogData ld, VariableCollection vs, MethodType allowedMethods, bool changevalues, string scriptAttributes) {
+    public static DoItWithEndedPosFeedback ComandOnPosition(string txt, int pos, bool expectedvariablefeedback, LogData ld, VariableCollection vs, ScriptProperties scp) {
         if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
         foreach (var thisC in Comands) {
-            var f = thisC.CanDo(txt, pos, expectedvariablefeedback, lm, ld, vs, allowedMethods, changevalues, scriptAttributes);
+            var f = thisC.CanDo(txt, pos, expectedvariablefeedback, ld, vs, scp);
             if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
@@ -93,7 +93,7 @@ public class Script {
 
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, lm, ld, vs, allowedMethods, changevalues, scriptAttributes))) {
+        foreach (var f in Comands.Select(thisC => thisC.CanDo(txt, pos, !expectedvariablefeedback, ld, vs, scp))) {
             if (f.MustAbort) {
                 return new DoItWithEndedPosFeedback(f.ErrorMessage, ld);
             }
@@ -117,7 +117,7 @@ public class Script {
         return txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
     }
 
-    public static ScriptEndedFeedback Parse(string redScriptText, int lineadd, string subname, VariableCollection vs, List<Method> lm, MethodType allowedMethods, bool changevalues, string scriptAttributes) {
+    public static ScriptEndedFeedback Parse(string redScriptText, int lineadd, string subname, VariableCollection vs, ScriptProperties scp) {
         var pos = 0;
         var EndScript = false;
 
@@ -132,7 +132,7 @@ public class Script {
                 pos++;
                 ld.LineAdd(1);
             } else {
-                var f = ComandOnPosition(redScriptText, pos, lm, false, ld, vs, allowedMethods, changevalues, scriptAttributes);
+                var f = ComandOnPosition(redScriptText, pos, false, ld, vs, scp);
                 if (!f.AllOk) {
                     return new ScriptEndedFeedback(vs, ld.Protocol, false);
                 }
@@ -199,7 +199,9 @@ public class Script {
             return new ScriptEndedFeedback(error, false, subname);
         }
 
-        return Script.Parse(ReducedScriptText, lineadd, subname, Variables, Comands, AllowedMethods, ChangeValues, Attributes);
+        var scp = new ScriptProperties(AllowedMethods, ChangeValues, Attributes);
+
+        return Script.Parse(ReducedScriptText, lineadd, subname, Variables, scp);
     }
 
     #endregion

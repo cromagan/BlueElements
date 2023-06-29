@@ -60,8 +60,6 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     public abstract int CheckOrder { get; }
 
-    //public abstract string ClassId { get; }
-
     public string Comment {
         get => _comment;
         set {
@@ -108,7 +106,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             return "\"" + MyClassId + ";" + Name + "\"";
         }
         set {
-            var x = TryParse(value, null, MethodType.Standard, new List<Method>(), false, string.Empty);
+            var x = TryParse(value, null, null);
             if (x == null) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler");
             }
@@ -126,18 +124,18 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return "dummy" + _dummyCount;
     }
 
-    public static DoItFeedback GetVariableByParsing(string txt, LogData ld, VariableCollection vs, MethodType allowedMethods, List<Method> lm, bool changevalues, string scriptAttributes) {
+    public static DoItFeedback GetVariableByParsing(string txt, LogData ld, VariableCollection vs, ScriptProperties scp) {
         if (string.IsNullOrEmpty(txt)) { return new DoItFeedback(ld, "Kein Wert zum Parsen angekommen."); }
 
         if (txt.StartsWith("(")) {
             var (pose, _) = NextText(txt, 0, KlammerZu, false, false, KlammernStd);
             if (pose < txt.Length - 1) {
                 // Wir haben so einen Fall: (true) || (true)
-                var tmp = GetVariableByParsing(txt.Substring(1, pose - 1), ld, vs, allowedMethods, lm, changevalues, scriptAttributes);
+                var tmp = GetVariableByParsing(txt.Substring(1, pose - 1), ld, vs, scp);
                 if (!tmp.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler in ()"); }
                 if (tmp.Variable == null) { return new DoItFeedback(ld, "Allgemeiner Befehls-Berechnungsfehler"); }
                 if (!tmp.Variable.ToStringPossible) { return new DoItFeedback(ld, "Falscher Variablentyp: " + tmp.Variable.MyClassId); }
-                return GetVariableByParsing(tmp.Variable.ValueForReplace + txt.Substring(pose + 1), ld, vs, allowedMethods, lm, changevalues, scriptAttributes);
+                return GetVariableByParsing(tmp.Variable.ValueForReplace + txt.Substring(pose + 1), ld, vs, scp);
             }
         }
 
@@ -145,7 +143,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
         var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernStd);
         if (uu > 0) {
-            var txt1 = GetVariableByParsing(txt.Substring(0, uu), ld, vs, allowedMethods, lm, changevalues, scriptAttributes);
+            var txt1 = GetVariableByParsing(txt.Substring(0, uu), ld, vs, scp);
             if (!txt1.AllOk || txt1.Variable == null) {
                 return new DoItFeedback(ld, "Befehls-Berechnungsfehler vor &&");
             }
@@ -153,12 +151,12 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             if (txt1.Variable.ValueForReplace == "false") {
                 return txt1;
             }
-            return GetVariableByParsing(txt.Substring(uu + 2), ld, vs, allowedMethods, lm, changevalues, scriptAttributes);
+            return GetVariableByParsing(txt.Substring(uu + 2), ld, vs, scp);
         }
 
         var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernStd);
         if (oo > 0) {
-            var txt1 = GetVariableByParsing(txt.Substring(0, oo), ld, vs, allowedMethods, lm, changevalues, scriptAttributes);
+            var txt1 = GetVariableByParsing(txt.Substring(0, oo), ld, vs, scp);
             if (!txt1.AllOk || txt1.Variable == null) {
                 return new DoItFeedback(ld, "Befehls-Berechnungsfehler vor ||");
             }
@@ -166,18 +164,18 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             if (txt1.Variable.ValueForReplace == "true") {
                 return txt1;
             }
-            return GetVariableByParsing(txt.Substring(oo + 2), ld, vs, allowedMethods, lm, changevalues, scriptAttributes);
+            return GetVariableByParsing(txt.Substring(oo + 2), ld, vs, scp);
         }
 
         var t = Method.ReplaceVariable(txt, vs, ld);
         if (!t.AllOk) { return new DoItFeedback(ld, "Variablen-Berechnungsfehler"); }
         if (t.Variable != null) { return new DoItFeedback(t.Variable); }
-        if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, vs, allowedMethods, lm, changevalues, scriptAttributes); }
+        if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, vs, scp); }
 
-        var t2 = Method.ReplaceComands(txt, lm, ld, vs, allowedMethods, changevalues, scriptAttributes);
+        var t2 = Method.ReplaceComands(txt, vs, ld, scp);
         if (!t2.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler"); }
         if (t2.Variable != null) { return new DoItFeedback(t2.Variable); }
-        if (txt != t.AttributeText) { return GetVariableByParsing(t2.AttributeText, ld, vs, allowedMethods, lm, changevalues, scriptAttributes); }
+        if (txt != t.AttributeText) { return GetVariableByParsing(t2.AttributeText, ld, vs, scp); }
 
         var (posa, _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
         if (posa > -1) {
@@ -186,11 +184,11 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
             var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
             if (!string.IsNullOrEmpty(tmptxt)) {
-                var tmp = GetVariableByParsing(tmptxt, ld, vs, allowedMethods, lm, changevalues, scriptAttributes);
+                var tmp = GetVariableByParsing(tmptxt, ld, vs, scp);
                 if (!tmp.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler in ()"); }
                 if (tmp.Variable == null) { return new DoItFeedback(ld, "Allgemeiner Berechnungsfehler in ()"); }
                 if (!tmp.Variable.ToStringPossible) { return new DoItFeedback(ld, "Falscher Variablentyp: " + tmp.Variable.MyClassId); }
-                return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), ld, vs, allowedMethods, lm, changevalues, scriptAttributes);
+                return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), ld, vs, scp);
             }
         }
 
@@ -200,7 +198,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
         foreach (var thisVt in Script.VarTypes) {
             if (thisVt.GetFromStringPossible) {
-                if (thisVt.TryParse(txt, out var v, vs)) {
+                if (thisVt.TryParse(txt, out var v, vs, scp)) {
                     return new DoItFeedback(v);
                 }
             }
@@ -294,20 +292,20 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return result.Parseable(base.ToString());
     }
 
-    protected abstract Variable? NewWithThisValue(object x, VariableCollection vs);
+    protected abstract Variable? NewWithThisValue(object x);
 
     protected abstract void SetValue(object? x);
 
-    protected abstract object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes);
+    protected abstract object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp);
 
-    protected bool TryParse(string txt, out Variable? succesVar, VariableCollection vs) {
-        var x = TryParse(txt, vs, MethodType.None, new List<Method>(), false, string.Empty);
+    protected bool TryParse(string txt, out Variable? succesVar, VariableCollection vs, ScriptProperties scp) {
+        var x = TryParse(txt, vs, scp);
         if (x == null) {
             succesVar = null;
             return false;
         }
 
-        succesVar = NewWithThisValue(x, vs);
+        succesVar = NewWithThisValue(x);
         return succesVar != null;
     }
 

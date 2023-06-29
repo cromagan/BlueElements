@@ -78,7 +78,7 @@ public class Method_CallFilter : Method {
         foreach (var thisR in r) {
             if (thisR != null && !thisR.IsDisposed) {
                 //s.Sub++;
-                var s2 = thisR.ExecuteScript(null, vsx, false, true, infos.ChangeValues, 0);
+                var s2 = thisR.ExecuteScript(null, vsx, false, true, infos.ScriptProperties.ChangeValues, 0);
                 if (!s2.AllOk) {
                     infos.Data.Protocol.AddRange(s2.Protocol);
                     return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen");

@@ -88,7 +88,7 @@ public class VariableBool : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x, VariableCollection vs) {
+    protected override Variable NewWithThisValue(object x) {
         var v = new VariableBool(string.Empty);
         v.SetValue(x);
         return v;
@@ -102,8 +102,10 @@ public class VariableBool : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes) {
+    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
         if (Method_If.GetBool(txt) is bool b) { return b; }
+
+        if (scp == null) { return null; }
 
         #region Auf Restliche Boolsche Operationen testen
 
@@ -125,7 +127,7 @@ public class VariableBool : Variable {
             var s1 = txt.Substring(0, i);
             Variable? v1 = null;
             if (!string.IsNullOrEmpty(s1)) {
-                var tmp1 = GetVariableByParsing(s1, null, vs, allowedMethods, lm, changeValues, scriptAttributes);
+                var tmp1 = GetVariableByParsing(s1, null, vs, scp);
                 if (!tmp1.AllOk) { return null; }//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
 
                 v1 = tmp1.Variable;
@@ -140,7 +142,7 @@ public class VariableBool : Variable {
             var s2 = txt.Substring(i + check.Length);
             if (string.IsNullOrEmpty(s2)) { return null; }//new DoItFeedback(infos.LogData, s, "Wert nach Operator (" + check + ") nicht gefunden: " + txt);
 
-            var tmp2 = GetVariableByParsing(s2, null, vs, allowedMethods, lm, changeValues, scriptAttributes);
+            var tmp2 = GetVariableByParsing(s2, null, vs, scp);
             if (!tmp2.AllOk) {
                 return null;//new DoItFeedback(infos.LogData, s, "Befehls-Berechnungsfehler in ():" + tmp1.ErrorMessage);
             }

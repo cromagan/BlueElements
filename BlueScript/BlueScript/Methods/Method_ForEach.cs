@@ -67,11 +67,12 @@ internal class Method_ForEach : Method {
         }
 
         var scx = new DoItFeedback(false, false);
+        var scp = new ScriptProperties(infos.ScriptProperties, infos.ScriptProperties.AllowedMethods | MethodType.Break);
 
         foreach (var thisl in l) {
             var nv = new VariableString(varnam, thisl, true, false, "Interations-Variable");
 
-            scx = Method_CallByFilename.CallSub(vs, infos, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, nv, infos.Methods, infos.AllowedMethods | MethodType.Break, infos.ChangeValues, infos.ScriptAttributes);
+            scx = Method_CallByFilename.CallSub(vs, infos, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, nv, scp);
             if (!scx.AllOk) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }

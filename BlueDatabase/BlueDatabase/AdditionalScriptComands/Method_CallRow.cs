@@ -70,7 +70,7 @@ public class Method_CallRow : Method {
 
         var vsx = attvar.ValueStringGet(0);
 
-        var s2 = row.ExecuteScript(null, vsx, false, false, infos.ChangeValues, 0);
+        var s2 = row.ExecuteScript(null, vsx, false, false, infos.ScriptProperties.ChangeValues, 0);
         if (!s2.AllOk) {
             infos.Data.Protocol.AddRange(s2.Protocol);
             return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vsx + "]' wegen vorherhigem Fehler bei Zeile '" + row.CellFirstString() + "' abgebrochen");

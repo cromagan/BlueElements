@@ -99,7 +99,7 @@ public class VariableFloat : Variable {
         return DoItFeedback.Null();
     }
 
-    protected override Variable NewWithThisValue(object x, VariableCollection vs) {
+    protected override Variable NewWithThisValue(object x) {
         var v = new VariableFloat(string.Empty);
         v.SetValue(x);
         return v;
@@ -115,7 +115,7 @@ public class VariableFloat : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, MethodType allowedMethods, List<Method> lm, bool changeValues, string scriptAttributes) {
+    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
         var (pos2, _) = NextText(txt, 0, MathFormulaParser.RechenOperatoren, false, false, KlammernStd);
         if (pos2 >= 0) {
             var erg = MathFormulaParser.Ergebnis(txt);
