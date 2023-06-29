@@ -47,8 +47,8 @@ internal class Method_Round : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "round" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         var n = (int)attvar.ValueNumGet(1);
         if (n < 0) { n = 0; }

@@ -48,8 +48,8 @@ public class Method_CellSetRow : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "cellsetrow" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[2]);
@@ -60,7 +60,7 @@ public class Method_CellSetRow : Method_Database {
 
         var m = CellCollection.EditableErrorReason(columnToSet, row, EditableErrorReasonType.EditAcut, false, false);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
-        if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
+        if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
 
         if (row == MyRow(vs)) {
             return new DoItFeedback(infos.Data, "Die eigene Zelle kann nur über die Variabeln geändert werden.");

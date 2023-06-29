@@ -46,8 +46,8 @@ internal class Method_Element : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "element" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         var i = attvar.ValueIntGet(1);
         var list = attvar.ValueListStringGet(0);

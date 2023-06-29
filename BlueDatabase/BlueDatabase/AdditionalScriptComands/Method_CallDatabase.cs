@@ -54,8 +54,8 @@ public class Method_CallDatabase : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "calldatabase" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var see = vs.GetSystem("SetErrorEnabled");
@@ -71,7 +71,7 @@ public class Method_CallDatabase : Method_Database {
         StackTrace stackTrace = new();
         if (stackTrace.FrameCount > 400) { return new DoItFeedback(infos.Data, "Stapelspeicherüberlauf"); }
 
-        if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "CallDatabase im Testmodus deaktiviert."); }
+        if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "CallDatabase im Testmodus deaktiviert."); }
 
         var f = db.ExecuteScript(null, attvar.ValueStringGet(1), true, null, null);
 

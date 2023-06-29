@@ -141,9 +141,9 @@ public class VariableListString : Variable {
 
             if (string.IsNullOrEmpty(t)) { return new List<string>(); } // Leere Liste
 
-            var infos = new CanDoFeedback(t, 0, string.Empty, string.Empty, string.Empty, null, scp);
+            //var infos = new CanDoFeedback(t, 0, string.Empty, string.Empty, string.Empty, null);
 
-            var l = Method.SplitAttributeToVars(vs, infos, new List<List<string>> { new() { VariableString.ShortName_Plain } }, true);
+            var l = Method.SplitAttributeToVars(vs, t, new List<List<string>> { new() { VariableString.ShortName_Plain } }, true, null, scp);
             if (!string.IsNullOrEmpty(l.ErrorMessage)) { return null; }
 
             return l.Attributes.AllStringValues();

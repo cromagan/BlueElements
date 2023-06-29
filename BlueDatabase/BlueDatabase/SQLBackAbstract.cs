@@ -38,12 +38,12 @@ public abstract class SqlBackAbstract {
 
     #region Fields
 
+    public const string DatabaseProperty = "~DATABASE~";
     public const string SysStyle = "SYS_STYLE";
     public const string SysUndo = "SYS_UNDO";
     public static List<SqlBackAbstract> ConnectedSqlBack = new();
 
     public DbConnection? Connection;
-
     private static bool _didBackup;
     private readonly object _fill = new();
     private readonly object _getChanges = new();
@@ -91,6 +91,8 @@ public abstract class SqlBackAbstract {
         }
 
         if (!t.ContainsOnlyChars(Constants.Char_AZ + Constants.Char_Numerals + "_")) { return false; }
+
+        if(tablename == "ALL_TAB_COLS") {  return false; } // system-name
 
         // eigentlich 128, aber minus BAK_ und _2023_03_28
         if (t.Length > 100) { return false; }
@@ -262,13 +264,11 @@ public abstract class SqlBackAbstract {
             throw new Exception();
         }
 
-        if (string.IsNullOrEmpty(columnName)) {
-            columnName = "~Database~";
-        } else {
-            if (!ColumnItem.IsValidColumnName(columnName)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + tablename);
-                throw new Exception();
-            }
+        if (string.IsNullOrEmpty(columnName)) { columnName = DatabaseProperty; }
+
+        if (columnName != DatabaseProperty && !ColumnItem.IsValidColumnName(columnName)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + columnName);
+            throw new Exception();
         }
 
         var cmd = @"select VALUE, PART from " + SysStyle + " " +
@@ -460,7 +460,7 @@ public abstract class SqlBackAbstract {
         }
 
         if (!ColumnItem.IsValidColumnName(newname)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + oldname);
+            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + newname);
             return;
         }
 
@@ -574,13 +574,11 @@ public abstract class SqlBackAbstract {
         var ty = type.ToString();
 
         columnName = columnName.ToUpper();
-        if (string.IsNullOrEmpty(columnName)) {
-            columnName = "~Database~";
-        } else {
-            if (!ColumnItem.IsValidColumnName(columnName)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + tablename);
-                return "Spaltenname ungültig";
-            }
+        if (string.IsNullOrEmpty(columnName)) { columnName = DatabaseProperty; }
+
+        if (columnName != DatabaseProperty && !ColumnItem.IsValidColumnName(columnName)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + tablename);
+            return "Spaltenname ungültig";
         }
 
         var isVal = GetStyleData(tablename, ty, columnName);

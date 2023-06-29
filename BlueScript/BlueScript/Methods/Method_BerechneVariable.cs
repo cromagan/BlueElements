@@ -60,7 +60,7 @@ internal class Method_BerechneVariable : Method {
     /// <param name="vs"></param>
     /// <param name="generateVariable"></param>
     /// <returns></returns>
-    public static DoItFeedback VariablenBerechnung(CanDoFeedback infos, string newcommand, VariableCollection vs, bool generateVariable) {
+    public static DoItFeedback VariablenBerechnung(CanDoFeedback infos, ScriptProperties scp, string newcommand, VariableCollection vs, bool generateVariable) {
         //if (s.BerechneVariable == null) { return new DoItFeedback(infos.LogData, s, "Interner Fehler"); }
 
         var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
@@ -80,8 +80,8 @@ internal class Method_BerechneVariable : Method {
         }
 
         var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
+        var attvar = SplitAttributeToVars(vs, value, Sargs, SEndlessArgs, infos.Data, scp);
 
-        var attvar = SplitAttributeToVars(vs, infos, Sargs, SEndlessArgs);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, new Method_BerechneVariable(), attvar); }
         if (attvar.Attributes[0] is Variable v) {
             if (generateVariable) {
@@ -111,7 +111,7 @@ internal class Method_BerechneVariable : Method {
     /// <param name="vs"></param>
     /// <param name="infos"></param>
     /// <returns></returns>
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) => VariablenBerechnung(infos, infos.ComandText + infos.AttributText + ";", vs, false);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) => VariablenBerechnung(infos, scp, infos.ComandText + infos.AttributText + ";", vs, false);
 
     #endregion
 }

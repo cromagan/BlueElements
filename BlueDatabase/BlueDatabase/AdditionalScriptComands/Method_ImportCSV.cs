@@ -47,8 +47,8 @@ internal class Method_ImportCSV : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "importcsv" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var txt = attvar.ValueStringGet(0);
@@ -60,7 +60,7 @@ internal class Method_ImportCSV : Method_Database {
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
 
-        if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "Import im Testmodus deaktiviert."); }
+        if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Import im Testmodus deaktiviert."); }
 
         var sx = db.Import(txt, true, true, sep, false, false, true);
 

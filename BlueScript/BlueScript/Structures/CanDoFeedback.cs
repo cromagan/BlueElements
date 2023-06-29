@@ -27,7 +27,7 @@ public readonly struct CanDoFeedback {
 
     #region Constructors
 
-    public CanDoFeedback(string reducedscript, int errorposition, string errormessage, bool mustabort, LogData ld, ScriptProperties? scp) {
+    public CanDoFeedback(string reducedscript, int errorposition, string errormessage, bool mustabort, LogData ld) {
         ContinueOrErrorPosition = errorposition;
         ErrorMessage = errormessage;
         MustAbort = mustabort;
@@ -36,10 +36,9 @@ public readonly struct CanDoFeedback {
         CodeBlockAfterText = string.Empty;
         CurrentReducedScriptText = reducedscript;
         Data = ld;
-        ScriptProperties = scp;
     }
 
-    public CanDoFeedback(string reducedscript, int continuePosition, string comandText, string attributtext, string codeblockaftertext, LogData ld, ScriptProperties scp) {
+    public CanDoFeedback(string reducedscript, int continuePosition, string comandText, string attributtext, string codeblockaftertext, LogData ld) {
         ContinueOrErrorPosition = continuePosition;
         ErrorMessage = string.Empty;
         MustAbort = false;
@@ -48,7 +47,6 @@ public readonly struct CanDoFeedback {
         CodeBlockAfterText = codeblockaftertext;
         CurrentReducedScriptText = reducedscript;
         Data = ld;
-        ScriptProperties = scp;
     }
 
     #endregion
@@ -92,8 +90,6 @@ public readonly struct CanDoFeedback {
     /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.
     /// </summary>
     public bool MustAbort { get; }
-
-    public ScriptProperties? ScriptProperties { get; }
 
     #endregion
 }

@@ -47,20 +47,20 @@ internal class Method_Do : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "do" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var du = 0;
 
-        var scp = new ScriptProperties(infos.ScriptProperties, infos.ScriptProperties.AllowedMethods | MethodType.Break);
+        var scp2 = new ScriptProperties(scp, scp.AllowedMethods | MethodType.Break);
 
         DoItFeedback scx;
         do {
             du++;
             if (du > 100000) { return new DoItFeedback(infos.Data, "Do-Schleife nach 100.000 Durchläufen abgebrochen."); }
 
-            scx = Method_CallByFilename.CallSub(vs, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null, scp);
+            scx = Method_CallByFilename.CallSub(vs, scp2, infos, "Do-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null);
             if (!scx.AllOk) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }

@@ -49,8 +49,8 @@ internal class Method_DeleteFile : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "deletefile" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var filn = attvar.ValueStringGet(0);
@@ -61,7 +61,7 @@ internal class Method_DeleteFile : Method {
             return DoItFeedback.Wahr();
         }
 
-        //if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert."); }
+        //if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Löschen im Testmodus deaktiviert."); }
 
         try {
             return new DoItFeedback(IO.DeleteFile(filn, false));

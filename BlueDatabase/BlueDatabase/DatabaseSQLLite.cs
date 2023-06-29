@@ -446,7 +446,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                         #region Datenbank-Styles
 
-                        var v = _sql?.GetStyleData(tablename, comand, "~DATABASE~");
+                        var v = _sql?.GetStyleData(tablename, comand, SqlBackAbstract.DatabaseProperty);
                         if (v != null) { _ = SetValueInternal(t, v, null, null, true); }
 
                         #endregion
@@ -538,7 +538,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             #region Datenbank Eigenschaften laden
 
-            var l = _sql?.GetStyleDataAll(TableName, "~DATABASE~");
+            var l = _sql?.GetStyleDataAll(TableName, SqlBackAbstract.DatabaseProperty);
 
             if (l == null) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");

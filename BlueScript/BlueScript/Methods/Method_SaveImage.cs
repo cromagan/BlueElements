@@ -50,8 +50,8 @@ internal class Method_SaveImage : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "saveimage" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         #region  Bild ermitteln (img)
@@ -77,7 +77,7 @@ internal class Method_SaveImage : Method {
 
         #endregion
 
-        //if (!infos.ScriptProperties.ChangeValues) { return new DoItFeedback(infos.Data, "Bild Speichern im Testmodus deaktiviert."); }
+        //if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Bild Speichern im Testmodus deaktiviert."); }
 
         switch (attvar.ValueStringGet(1).ToUpper()) {
             case "PNG":

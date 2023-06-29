@@ -55,8 +55,8 @@ public class Method_CallFilter : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "callfilter" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var see = vs.GetSystem("SetErrorEnabled");
@@ -78,7 +78,7 @@ public class Method_CallFilter : Method {
         foreach (var thisR in r) {
             if (thisR != null && !thisR.IsDisposed) {
                 //s.Sub++;
-                var s2 = thisR.ExecuteScript(null, vsx, false, true, infos.ScriptProperties.ChangeValues, 0);
+                var s2 = thisR.ExecuteScript(null, vsx, false, true, scp.ChangeValues, 0);
                 if (!s2.AllOk) {
                     infos.Data.Protocol.AddRange(s2.Protocol);
                     return new DoItFeedback(infos.Data, "'Subroutinen-Aufruf [" + vs + "]' wegen vorherhigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen");

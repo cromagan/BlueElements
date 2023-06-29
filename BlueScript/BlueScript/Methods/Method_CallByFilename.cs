@@ -63,11 +63,11 @@ public class Method_CallByFilename : Method {
     /// <param name="lm"></param>
     /// <param name="allowedMethods"></param>
     /// <returns></returns>
-    public static DoItFeedback CallSub(VariableCollection vs, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe, ScriptProperties scp) {
+    public static DoItFeedback CallSub(VariableCollection vs, ScriptProperties scp, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe) {
         if (keepVariables) {
             if (addMe != null) { vs.Add(addMe); }
 
-            var scx = Script.Parse(reducedscripttext, lineadd, subname, vs, scp);
+            var scx = Script.Parse(vs, scp, reducedscripttext, lineadd, subname);
             if (!scx.AllOk) {
                 infos.Data.Protocol.AddRange(scx.Protocol);
                 return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
@@ -77,7 +77,7 @@ public class Method_CallByFilename : Method {
             tmpv.AddRange(vs);
             if (addMe != null) { tmpv.Add(addMe); }
 
-            var scx = Script.Parse(reducedscripttext, lineadd, subname, vs, scp);
+            var scx = Script.Parse(vs, scp, reducedscripttext, lineadd, subname);
             if (!scx.AllOk) {
                 infos.Data.Protocol.AddRange(scx.Protocol);
                 return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
@@ -85,6 +85,8 @@ public class Method_CallByFilename : Method {
 
             vs.Clear();
             vs.AddRange(tmpv);
+
+            if (scx.BreakFired) { return new DoItFeedback(true, false); }
         }
 
         return DoItFeedback.Null();
@@ -92,8 +94,8 @@ public class Method_CallByFilename : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "callbyfilename" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var vsx = attvar.ValueStringGet(0);
@@ -119,7 +121,7 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback(infos.Data, "Fehler in Datei " + vsx + ": " + error);
         }
 
-        var v = CallSub(vs, infos, "Datei-Subroutinen-Aufruf [" + vsx + "]", f, attvar.ValueBoolGet(1), 0, vsx.FileNameWithSuffix(), null, infos.ScriptProperties);
+        var v = CallSub(vs, scp, infos, "Datei-Subroutinen-Aufruf [" + vsx + "]", f, attvar.ValueBoolGet(1), 0, vsx.FileNameWithSuffix(), null);
         v.BreakFired = false;
         v.EndScript = false;
         return v;

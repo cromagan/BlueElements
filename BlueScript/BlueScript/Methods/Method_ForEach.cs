@@ -49,8 +49,8 @@ internal class Method_ForEach : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "foreach" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var l = attvar.ValueListStringGet(1);
@@ -67,12 +67,12 @@ internal class Method_ForEach : Method {
         }
 
         var scx = new DoItFeedback(false, false);
-        var scp = new ScriptProperties(infos.ScriptProperties, infos.ScriptProperties.AllowedMethods | MethodType.Break);
+        var scp2 = new ScriptProperties(scp, scp.AllowedMethods | MethodType.Break);
 
         foreach (var thisl in l) {
             var nv = new VariableString(varnam, thisl, true, false, "Interations-Variable");
 
-            scx = Method_CallByFilename.CallSub(vs, infos, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, nv, scp);
+            scx = Method_CallByFilename.CallSub(vs, scp2, infos, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, nv);
             if (!scx.AllOk) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }

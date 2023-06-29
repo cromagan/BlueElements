@@ -47,8 +47,8 @@ internal class Method_DateTimeToString : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "datetimetostring" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos) {
-        var attvar = SplitAttributeToVars(vs, infos, Args, EndlessArgs);
+    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         //var ok = DateTimeTryParse(attvar.ReadableText(0), out var d);
         //if (!ok) {
