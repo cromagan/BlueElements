@@ -185,7 +185,7 @@ public sealed class LastFilesCombo : ComboBox {
         }
 
         if (CanWriteInDirectory(pf)) {
-            _settings.Save(SettingsFileName(), Encoding.UTF8, false);
+            _settings.WriteAllText(SettingsFileName(), Encoding.UTF8, false);
         }
     }
 

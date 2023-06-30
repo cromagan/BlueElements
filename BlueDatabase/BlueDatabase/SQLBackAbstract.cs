@@ -28,6 +28,9 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+using static BlueBasics.Constants;
+using static BlueBasics.Extensions;
+using static BlueBasics.IO;
 
 namespace BlueDatabase;
 
@@ -92,7 +95,7 @@ public abstract class SqlBackAbstract {
 
         if (!t.ContainsOnlyChars(Constants.Char_AZ + Constants.Char_Numerals + "_")) { return false; }
 
-        if(tablename == "ALL_TAB_COLS") {  return false; } // system-name
+        if (tablename == "ALL_TAB_COLS") { return false; } // system-name
 
         // eigentlich 128, aber minus BAK_ und _2023_03_28
         if (t.Length > 100) { return false; }
@@ -874,6 +877,45 @@ public abstract class SqlBackAbstract {
     /// <returns></returns>
     protected abstract List<string>? AllTables();
 
+    protected void CompareBackUp(DateTime compareDate) {
+        var tbl = Tables();
+        if (tbl == null) { return; }
+
+        tbl.Add(SysStyle);
+
+        var alltb = AllTables();
+        if (alltb == null) { return; }
+
+        var l = new List<string>();
+
+        var d = compareDate.ToString(Constants.Format_Date10);
+
+        foreach (var thist in tbl) {
+            l.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            l.Add("~~~~~~ " + thist);
+            l.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+            var ntc = "BAK_" + thist.ToUpper() + "_" + d;
+
+            if (alltb.Contains(ntc)) {
+                var dt1 = Fill_Table("SELECT * FROM " + thist + " MINUS SELECT * FROM " + ntc);
+                var dt2 = Fill_Table("SELECT * FROM " + ntc + " MINUS SELECT * FROM " + thist);
+                l.Add("Vergleich 1 Zeilen:" + dt1.Rows.Count);
+                l.Add("Vergleich 2 Zeilen:" + dt2.Rows.Count);
+                //l.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+                //l.Add(dt1.ToCSV());
+                //l.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+                //l.Add(dt2.ToCSV());
+                l.Add(" ");
+                l.Add(" ");
+            }
+        }
+
+        l.WriteAllText(TempFile("", "","txt"), Win1252, true);
+    }
+
     protected abstract string CreateTable(string tablename, bool allowSystemTableNames);
 
     //    try {
@@ -882,6 +924,10 @@ public abstract class SqlBackAbstract {
 
     protected abstract string DeleteTable(string tablename, bool allowSystemTableNames);
 
+    /// <summary>
+    /// Erstellt von allen Datenbanken eine Backup auf dem Server im Format BAK_TABLENAME_YYYY_MM_DD.
+    /// Nur der erste Aufruf der Routine wir wirklich ausgeführt.
+    /// </summary>
     protected void DoBackUp() {
         if (_didBackup) { return; }
         _didBackup = true;

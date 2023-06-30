@@ -347,14 +347,6 @@ public static partial class Extensions {
         }
     }
 
-    public static bool Save(this ICollection<string> l, string dateiName, Encoding code, bool executeAfter) {
-        var t = l.JoinWith("\r\n").TrimEnd("\r\n");
-        if (!DirectoryExists(dateiName.FilePath())) {
-            _ = Directory.CreateDirectory(dateiName.FilePath());
-        }
-        return WriteAllText(dateiName, t, code, executeAfter);
-    }
-
     public static void Shuffle<T>(this IList<T> list) {
         for (var i1 = 0; i1 < list.Count; i1++) {
             var i2 = Constants.GlobalRND.Next(i1, list.Count);
@@ -422,10 +414,6 @@ public static partial class Extensions {
         return l;
     }
 
-    //public static double TagGetDouble(this ICollection<string>? col, string tagname) => DoubleParse(TagGet(col, tagname));
-
-    //public static int TagGetInt(this ICollection<string>? col, string tagname) => IntParse(TagGet(col, tagname));
-
     public static void TagRemove(this ICollection<string> col, string tagname) {
         var found = col.TagGetPosition(tagname);
         if (found >= 0) {
@@ -433,6 +421,7 @@ public static partial class Extensions {
         }
     }
 
+    //public static int TagGetInt(this ICollection<string>? col, string tagname) => IntParse(TagGet(col, tagname));
     public static void TagSet(this List<string> col, string tagname, string value) {
         var found = col.TagGetPosition(tagname);
         var n = tagname + ": " + value;
@@ -445,6 +434,7 @@ public static partial class Extensions {
         col.Add(n);
     }
 
+    //public static double TagGetDouble(this ICollection<string>? col, string tagname) => DoubleParse(TagGet(col, tagname));
     /// <summary>
     /// Führt bei allem Typen ein ToString aus und addiert diese mittels \r. Enthält ein ToString ein \r, dann wird abgebrochen.
     /// </summary>
@@ -464,6 +454,14 @@ public static partial class Extensions {
             }
         }
         return tmp.TrimCr();
+    }
+
+    public static bool WriteAllText(this ICollection<string> l, string filename, Encoding endcoding, bool executeAfter) {
+        var t = l.JoinWith("\r\n").TrimEnd("\r\n");
+        if (!DirectoryExists(filename.FilePath())) {
+            _ = Directory.CreateDirectory(filename.FilePath());
+        }
+        return IO.WriteAllText(filename, t, endcoding, executeAfter);
     }
 
     /// <summary>

@@ -1175,7 +1175,7 @@ public partial class TableView : FormWithStatusBar {
 
     private void SaveSettingsToDisk() {
         if (CanWriteInDirectory(SettingsFileName().FilePath())) {
-            _settings.Save(SettingsFileName(), Encoding.UTF8, false);
+            _settings.WriteAllText(SettingsFileName(), Encoding.UTF8, false);
         }
     }
 

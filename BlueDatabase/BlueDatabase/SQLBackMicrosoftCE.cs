@@ -45,6 +45,7 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
         Connection = sql.Connection;
         RepairAll(tablename.ToUpper());
         DoBackUp();
+//        CompareBackUp(new DateTime(2023, 6, 29));
     }
 
     public SQLBackMicrosoftCE(string filename, bool create) : base() {

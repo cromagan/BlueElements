@@ -304,11 +304,11 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
                 no = no.Replace(",", "_");
                 no = no.Replace("__", "_");
                 var newn = IO.TempFile(fl.SelectedPath, no, "txt");
-                t.Save(newn, Constants.Win1252, false);
+                t.WriteAllText(newn, Constants.Win1252, false);
             }
         }
         var newn2 = IO.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
-        l.Save(newn2, Constants.Win1252, true);
+        l.WriteAllText(newn2, Constants.Win1252, true);
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Close();

@@ -1952,7 +1952,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 var l = new List<string>();
-                l.Save(fullhashname, Encoding.UTF8, false);
+                l.WriteAllText(fullhashname, Encoding.UTF8, false);
             }
 
             #endregion

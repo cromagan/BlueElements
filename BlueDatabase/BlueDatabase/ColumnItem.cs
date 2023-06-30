@@ -1918,7 +1918,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             l.Add(maxCount + " - " + keyValue);
         } while (d.Count > 0);
 
-        l.Save(TempFile(string.Empty, string.Empty, "txt"), Encoding.UTF8, true);
+        l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Encoding.UTF8, true);
     }
 
     public double? Summe(FilterCollection? filter) {

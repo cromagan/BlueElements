@@ -27,7 +27,7 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static bool WriteToCsvFile(this DataTable dataTable, string filePath) {
+    public static string ToCSV(this DataTable dataTable) {
         try {
             StringBuilder sb = new StringBuilder();
 
@@ -41,7 +41,15 @@ public static partial class Extensions {
                 sb.AppendLine(string.Join(",", fields));
             }
 
-            File.WriteAllText(filePath, sb.ToString());
+            return sb.ToString();
+        } catch {
+            return string.Empty;
+        }
+    }
+
+    public static bool WriteToCsvFile(this DataTable dataTable, string filePath) {
+        try {
+            File.WriteAllText(filePath, dataTable.ToCSV());
             return true;
         } catch {
             return false;

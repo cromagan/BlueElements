@@ -209,7 +209,7 @@ public static class Develop {
                         if (l != null) { endl.AddRange(l); }
                     }
                     HTML_AddFoot(endl);
-                    endl.Save(TempFile(string.Empty, "Endmeldung", "html"), Encoding.UTF8, true);
+                    endl.WriteAllText(TempFile(string.Empty, "Endmeldung", "html"), Encoding.UTF8, true);
                     AbortExe();
                     return;
                 }
