@@ -1184,7 +1184,7 @@ public static class Skin {
         try {
             if (qi != null) { gr.DrawImage(qi, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
             if (!string.IsNullOrEmpty(txt)) { bFont.DrawString(gr, txt, fitInRect.X + pSize.Width + xp, fitInRect.Y + yp2); }
-        } catch (Exception) {
+        } catch {
             // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird. Was immer das auch heiﬂen mag...
             //Develop.DebugPrint(ex);
         }
@@ -1214,6 +1214,7 @@ public static class Skin {
             return new Size(minSie, minSie);
         } catch {
             // tmpImageCode wird an anderer Stelle verwendet
+            Develop.CheckStackForOverflow();
             return FormatedText_NeededSize(text, image, font, minSie);
         }
     }

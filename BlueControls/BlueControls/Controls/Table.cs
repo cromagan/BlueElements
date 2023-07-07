@@ -1238,6 +1238,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return SortedRows(); // Rekursiver aufruf. Manchmal funktiniert OnRowsSorted nicht...
         } catch {
             // Komisch, manchmal wird die Variable _sortedRowDatax verworfen.
+            Develop.CheckStackForOverflow();
             Invalidate_sortedRowData();
             return SortedRows();
         }

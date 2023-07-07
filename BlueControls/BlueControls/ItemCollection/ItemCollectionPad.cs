@@ -492,6 +492,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
             #endregion
         } catch {
+            Develop.CheckStackForOverflow();
             return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, seite, showinprintmode);
         }
         return true;

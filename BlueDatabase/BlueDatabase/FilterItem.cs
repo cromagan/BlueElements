@@ -220,7 +220,6 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         if (SearchValue.Count == 0) { return "Kein Suchtext vorhanden"; }
 
         if (_filterType.HasFlag(FilterType.Instr)) {
-
             foreach (var thisV in SearchValue) {
                 if (string.IsNullOrEmpty(thisV)) { return "Instr-Filter ohne Suchtext"; }
             }
@@ -266,14 +265,11 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                 case "values":
 
                     if (string.IsNullOrEmpty(pair.Value)) {
-                        SearchValue = new List<string>{string.Empty}.AsReadOnly();
-                    }
-                    else {
+                        SearchValue = new List<string> { string.Empty }.AsReadOnly();
+                    } else {
                         SearchValue = pair.Value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
                     }
 
-
-                     
                     break;
 
                 case "herkunft":
@@ -370,6 +366,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             result.ParseableAdd("Herkunft", Herkunft);
             return result.Parseable();
         } catch {
+            Develop.CheckStackForOverflow();
             return ToString();
         }
     }

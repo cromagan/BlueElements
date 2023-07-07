@@ -336,8 +336,7 @@ public static class Develop {
 
                 if (_deleteTraceLog && FileExists(_currentTraceLogFile)) { _ = DeleteFile(_currentTraceLogFile, false); }
             }
-        } catch {
-        }
+        } catch { }
         _currentTraceLogFile = string.Empty;
         _deleteTraceLog = true;
     }

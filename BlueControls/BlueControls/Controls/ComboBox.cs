@@ -288,7 +288,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         try {
             if (btnDropDown == null) { return; }
             if (!btnDropDown.Focused && !Focused && !FloatingForm.IsShowing(this)) { base.OnLostFocus(e); }
-        } catch (Exception) { }
+        } catch { }
     }
 
     //private void _Item_ItemRemoved(object sender, System.EventArgs e) {

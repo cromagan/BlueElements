@@ -444,9 +444,7 @@ public sealed class MultiUserFile : IDisposableExtended {
                     Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 2: " + Filename);
                 }
             }
-        } catch {
-            //Develop.DebugPrint(ex);
-        }
+        } catch { }
     }
 
     /// <summary>
@@ -522,8 +520,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             _ = Load_Reload();
             if (AgeOfBlockDatei >= 0) { _ = DeleteBlockDatei(true, true); }
             _ = Save(true);
-        } catch {
-        }
+        } catch { }
     }
 
     public void WaitEditable() {
@@ -760,9 +757,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         try {
             var data = WriteTempFileToDisk(true);
             _pureBinSaver.ReportProgress(100, data);
-        } catch {
-            // OPeration completed bereits aufgerufen
-        }
+        } catch { }            // OPeration completed bereits aufgerufen
     }
 
     private void PureBinSaver_ProgressChanged(object sender, ProgressChangedEventArgs e) {

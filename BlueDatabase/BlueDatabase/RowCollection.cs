@@ -231,6 +231,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
             });
         } catch {
+            Develop.CheckStackForOverflow();
             return CalculateFilteredRows(filter);
         }
 
@@ -656,6 +657,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             return r;
         } catch {
+            Develop.CheckStackForOverflow();
             return SearchByKey(key);
         }
     }

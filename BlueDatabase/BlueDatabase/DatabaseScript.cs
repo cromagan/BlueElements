@@ -316,6 +316,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
             return result.Parseable();
         } catch {
+            Develop.CheckStackForOverflow();
             return ToString();
         }
     }

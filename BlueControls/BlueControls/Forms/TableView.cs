@@ -874,6 +874,8 @@ public partial class TableView : FormWithStatusBar {
         var x = new ColumnArrangementPadEditor(Table.Database);
         _ = x.ShowDialog();
 
+        if(Table.Database.ColumnArrangements.Count == 0) { return; }
+
         var car = Table.Database.ColumnArrangements.CloneWithClones();
         if (car[0] is ColumnViewCollection cvc) {
             ColumnViewCollection.ShowAllColumns(cvc);

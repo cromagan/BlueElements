@@ -468,6 +468,7 @@ public sealed class Database : DatabaseAbstract {
 
     public static List<byte>? ToListOfByte(DatabaseAbstract db, List<WorkItem>? works, int minLen) {
         try {
+            var x = db.LastChange;
             List<byte> l = new();
             // Wichtig, Reihenfolge und Länge NIE verändern!
             SaveToByteList(l, DatabaseDataType.Formatkennung, "BlueDatabase");
@@ -517,6 +518,8 @@ public sealed class Database : DatabaseAbstract {
             //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
             SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
 
+            if (x != db.LastChange) { return null; } // Works haben sich evtl. geändert
+
             // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
             // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
             // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
@@ -545,8 +548,11 @@ public sealed class Database : DatabaseAbstract {
                 return null;
             }
 
+            if (x != db.LastChange) { return null; } // Stand stimmt nicht mehr
+
             return l;
         } catch {
+            Develop.CheckStackForOverflow();
             return ToListOfByte(db, works, minLen);
         }
     }

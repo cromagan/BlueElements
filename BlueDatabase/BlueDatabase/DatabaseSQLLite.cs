@@ -204,6 +204,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         try {
             _sql.LoadColumns(TableName, columns);
         } catch {
+            Develop.CheckStackForOverflow();
             RefreshColumnsData(columns);
         }
 
@@ -236,6 +237,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         try {
             return (true, _sql.LoadRow(TableName, l, refreshAlways, sortedRows));
         } catch {
+            Develop.CheckStackForOverflow();
             return RefreshRowData(rows, refreshAlways, sortedRows);
         }
     }
@@ -470,6 +472,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 OnDropMessage(FehlerArt.Fehler, errormessage);
             }
         } catch {
+            Develop.CheckStackForOverflow();
             DoLastChanges(data);
         }
 

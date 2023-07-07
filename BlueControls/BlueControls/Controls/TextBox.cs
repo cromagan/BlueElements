@@ -514,7 +514,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (position + word.Length < _eTxt.Count && !_eTxt[position + word.Length].IsWordSeperator()) { return false; }
             var tt = _eTxt.ConvertCharToPlainText(position, position + word.Length - 1);
             return string.Equals(word, tt, StringComparison.OrdinalIgnoreCase);
-        } catch (Exception) {
+        } catch {
+            Develop.CheckStackForOverflow();
             return WordStarts(word, position);
         }
     }
