@@ -345,6 +345,7 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
                 return;
             } catch {
                 // Kann dank Multitasking disposed sein
+                Develop.CheckStackForOverflow();
                 _Database_Loaded(sender, e); // am Anfang der Routine wird auf disposed geprüft
                 return;
             }
@@ -447,6 +448,7 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
             return (_tmpColumn, _tmpRow);
         } catch {
             // Multitasking sei dank kann _database trotzem null sein...
+            Develop.CheckStackForOverflow();
             return GetTmpVariables();
         }
     }

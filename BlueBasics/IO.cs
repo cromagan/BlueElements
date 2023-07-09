@@ -224,6 +224,7 @@ public static class IO {
             return file != null && !string.IsNullOrEmpty(file) && !file.ContainsChars(Constants.Char_PfadSonderZeichen) && File.Exists(file);
         } catch {
             // Objekt wird an anderer stelle benutzt?!?
+            Develop.CheckStackForOverflow();
             return FileExists(file);
         }
     }

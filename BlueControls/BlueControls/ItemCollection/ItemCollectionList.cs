@@ -168,6 +168,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
 
                 return this.FirstOrDefault(thisItem => thisItem != null && string.Equals(@internal, thisItem.Internal, StringComparison.OrdinalIgnoreCase));
             } catch {
+                Develop.CheckStackForOverflow();
                 return this[@internal];
             }
         }
@@ -755,6 +756,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
             _maxNeededItemSize = new Size(maxX, maxy);
             return _maxNeededItemSize;
         } catch {
+            Develop.CheckStackForOverflow();
             return ComputeAllItemPositions(controlDrawingArea, sliderY, biggestItemX, heightAdded, senkrechtAllowed);
         }
     }
@@ -807,6 +809,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
 
             return (w, h, hall, or);
         } catch {
+            Develop.CheckStackForOverflow();
             return ItemData();
         }
     }
@@ -932,6 +935,7 @@ public class ItemCollectionList : ObservableCollection<BasicListItem>, ICloneabl
                 _ = thisItem?.SizeUntouchedForListBox(ItemDesign);
             });
         } catch {
+            Develop.CheckStackForOverflow();
             PreComputeSize();
         }
     }

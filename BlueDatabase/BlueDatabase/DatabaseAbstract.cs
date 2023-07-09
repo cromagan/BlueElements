@@ -59,7 +59,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private readonly List<string> _datenbankAdmin = new();
     private readonly List<DatabaseScript> _eventScript = new();
     private readonly LayoutCollection _layouts = new();
-
     private readonly List<string> _permissionGroupsNewRow = new();
     private readonly List<string> _tags = new();
     private readonly List<Variable> _variables = new();
@@ -71,7 +70,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private string _createDate = string.Empty;
     private string _creator = string.Empty;
     private string _eventScriptTmp = string.Empty;
-
     private double _globalScale;
     private string _globalShowPass = string.Empty;
     private RowSortDefinition? _sortDefinition;
@@ -271,6 +269,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             return ConnectionData.UniqueID;
         }
     }
+
+    public DateTime LastChange { get; private set; } = new(1900, 1, 1);
 
     public LayoutCollection Layouts {
         get => _layouts;
@@ -1304,6 +1304,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 }
                 if (row != null && dorowautmatic) { _ = row.ExecuteScript(null, string.Empty, true, true, true, 0); }
             }
+            if (zeilNo % 1000 == 0 & zeilNo > 1000) {
+                OnDropMessage(FehlerArt.Info, "Import: Zwischenspeichern der Datenbank");
+                Save();
+            }
+
+            if (zeilNo % 100 == 0) {
+                OnDropMessage(FehlerArt.Info, "Import: Zeile " + zeilNo  + " von " + zeil.Count);
+            }
         }
 
         OnDropMessage(FehlerArt.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
@@ -1565,6 +1573,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (type.IsObsolete()) { return string.Empty; }
+
+        LastChange = DateTime.Now;
 
         if (type.IsCellValue()) {
             if (column == null || row == null) {

@@ -26,7 +26,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class Import : IHasDatabase {
+public sealed partial class Import : FormWithStatusBar, IHasDatabase {
 
     #region Fields
 

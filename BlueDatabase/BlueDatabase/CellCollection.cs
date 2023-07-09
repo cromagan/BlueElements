@@ -480,6 +480,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return !ContainsKey(cellKey) ? string.Empty : this[cellKey].Value;
         } catch {
             // Manchmal verscwhindwet der vorhandene Key?!?
+            Develop.CheckStackForOverflow();
             return GetString(column, row);
         }
     }
@@ -595,6 +596,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         } catch (Exception ex) {
             Develop.DebugPrint("Unerwarteter Filter-Fehler", ex);
             Pause(1, true);
+            Develop.CheckStackForOverflow();
             return MatchesTo(column, row, filter);
         }
     }

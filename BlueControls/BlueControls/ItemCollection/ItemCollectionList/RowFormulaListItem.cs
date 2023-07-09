@@ -115,6 +115,7 @@ public class RowFormulaListItem : BasicListItem {
             if (_tmpBmp == null) { GeneratePic(); }
             return _tmpBmp?.Size ?? new Size(200, 200);
         } catch {
+            Develop.CheckStackForOverflow();
             return ComputeSizeUntouchedForListBox(itemdesign);
         }
     }

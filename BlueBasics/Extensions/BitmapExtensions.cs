@@ -151,8 +151,7 @@ public static partial class Extensions {
 
             gr.DrawImage(tmp, (int)((maxwidth - calcwidth) / 2.0), (int)((maxheight - calcheight) / 2.0), calcwidth, calcheight);
             return imageResize;
-        } catch {
-        }
+        } catch { }
 
         try {
             if (!collectGarbage) { Generic.CollectGarbage(); }

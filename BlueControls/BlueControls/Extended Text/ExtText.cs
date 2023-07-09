@@ -357,7 +357,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
 
     public Size LastSize() {
         while (_width == null) { ReBreak(); }
-        return _height == null || _width < 5 || _height < 5 ? new Size(32, 16) : new Size((int)_width+1, (int)_height+1);
+        return _height == null || _width < 5 || _height < 5 ? new Size(32, 16) : new Size((int)_width + 1, (int)_height + 1);
     }
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
@@ -402,6 +402,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
             return T.ToString().Replace("\n", string.Empty);
         } catch {
             // Wenn Chars geändert wird (und dann der Count nimmer stimmt)
+            Develop.CheckStackForOverflow();
             return ConvertCharToPlainText(first, last);
         }
     }

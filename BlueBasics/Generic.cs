@@ -96,11 +96,8 @@ public static class Generic {
             var source = x.DownloadString(linkUrl);
             title = Regex.Match(source, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
             title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
-        } catch {
-            // Title = "unbekannt";
-            // DebugPrint(enFehlerArt.Warnung, ex);
-            // return false;
-        }
+        } catch { }
+
         title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "!.,()+-_ " + Constants.Char_Numerals);
         using StreamWriter writer = new(TempFile(saveTo.TrimEnd("\\") + "\\" + title + ".url"));
         writer.WriteLine("[InternetShortcut]");
@@ -169,9 +166,7 @@ public static class Generic {
                         l.Add(thist);
                     }
                 }
-            } catch (Exception) {
-                //Develop.DebugPrint(FehlerArt.Info, ex);
-            }
+            } catch { }
         }
         return l;
     }
@@ -199,9 +194,7 @@ public static class Generic {
                         l.Add((T)Activator.CreateInstance(thist, constructorArgs));
                     }
                 }
-            } catch (Exception) {
-                //Develop.DebugPrint(FehlerArt.Info, ex);
-            }
+            } catch { }
         }
         return l;
     }

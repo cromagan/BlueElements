@@ -350,8 +350,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                 var s = gr.MeasureString(Name, font);
                 BlueFont.DrawString(gr, Name, font, new SolidBrush(Randfarbe), positionModified.Left, positionModified.Top - s.Height - (9f * zoom));
             }
-        } catch {
-        }
+        } catch { }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 

@@ -240,6 +240,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName {
             gr.DrawString(text, font, brush, x, y, stringFormat);
         } catch {
             // Wird bereits an anderer Stelle verwendet... Multitasking, wenn mehrere items auf einmal generiert werden.
+            Develop.CheckStackForOverflow();
             DrawString(gr, text, font, brush, x, y, stringFormat);
         }
     }

@@ -293,6 +293,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void FixColumnArrangement() {
         if (Database == null || Database.IsDisposed) { return; }
         if (Generating || Sorting) { return; }
+        if(Database.ColumnArrangements.Count == 0) { return; }
 
         var cloneOfColumnArrangements = Database.ColumnArrangements.CloneWithClones();
         var thisColumnViewCollection = cloneOfColumnArrangements[_arrangement];
