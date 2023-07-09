@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using BlueBasics;
+using BlueBasics.Enums;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
@@ -43,18 +44,18 @@ public static class Export {
 
     #region Methods
 
-    public static string CreateLayout(RowItem row, string loadFile, string saveFile, string scriptname) {
+    public static string CreateLayout(RowItem row, string loadFile, string saveFile) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
         List<RowItem> tmpList = new()
         {
             row
         };
-        return InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile, scriptname);
+        return InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
     }
 
-    public static string CreateLayout(List<RowItem> rows, string loadFile, string saveFile, string scriptname) {
+    public static string CreateLayout(List<RowItem> rows, string loadFile, string saveFile) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
-        return InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile, scriptname);
+        return InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
     }
 
     //Shared Sub SaveAsBitmap(Row As RowItem)
@@ -74,7 +75,7 @@ public static class Export {
     //    '   End If
     //End Sub
 
-    public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad, string scriptname) {
+    public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
         List<string> l = new();
         if (liste == null) { return (null, "Keine Zeilen angegeben"); }
         string sav;
@@ -86,7 +87,7 @@ public static class Export {
                 sav = TempFile(zielPfad, liste[0].CellFirstString(), lad.FileSuffix());
             }
 
-            fehler = CreateLayout(liste, lad, sav, scriptname);
+            fehler = CreateLayout(liste, lad, sav);
             l.Add(sav);
         } else {
             foreach (var thisRow in liste) {
@@ -97,7 +98,7 @@ public static class Export {
                     sav = TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
                 }
 
-                fehler = CreateLayout(thisRow, lad, sav, scriptname);
+                fehler = CreateLayout(thisRow, lad, sav);
                 l.Add(sav);
             }
             //    If OpenIt Then ExecuteFile(ZielPfad)
@@ -484,12 +485,12 @@ public static class Export {
     //    } while (true);
     //}
 
-    public static (List<string>? files, string error) SaveAs(RowItem row, string layout, string destinationFile, string scriptname) {
+    public static (List<string>? files, string error) SaveAs(RowItem row, string layout, string destinationFile) {
         List<RowItem> l = new()
         {
             row
         };
-        return GenerateLayout_FileSystem(l, layout, destinationFile, false, string.Empty, scriptname);
+        return GenerateLayout_FileSystem(l, layout, destinationFile, false, string.Empty);
     }
 
     public static (List<string>? files, string error) SaveAsBitmap(List<RowItem> row, string layoutId, string path) {
@@ -505,7 +506,7 @@ public static class Export {
 
     //public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(row, layoutId, filename));
 
-    private static string InternalCreateLayout(List<RowItem> rows, string fileLoaded, string saveFileName, string scriptname) {
+    private static string InternalCreateLayout(List<RowItem> rows, string fileLoaded, string saveFileName) {
         var head = string.Empty;
         var foot = string.Empty;
         var body = fileLoaded;
@@ -518,6 +519,7 @@ public static class Export {
         }
 
         var f = string.Empty;
+        var onemled = string.Empty;
 
         var tmpSave = head;
         if (rows != null) {
@@ -526,10 +528,11 @@ public static class Export {
                 if (thisRow != null && !thisRow.IsDisposed) {
                     var tmpBody = body;
 
-                    var script = thisRow.ExecuteScript(null, scriptname, false, false, true, 0);
+                    var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0);
 
                     if (!script.AllOk) {
                         f = f + thisRow.CellFirstString() + "\r\n";
+                        onemled = script.ProtocolText;
                     }
 
                     if (script.Variables != null) {
@@ -548,7 +551,7 @@ public static class Export {
             WriteAllText(saveFileName, tmpSave, Constants.Win1252, false);
         }
 
-        if (!string.IsNullOrEmpty(f)) { return "Fehler bei:\r\n" + f; }
+        if (!string.IsNullOrEmpty(f)) { return "Fehler bei:\r\n" + f + "\r\nDie Meldung des letzten Eintrages:\r\n" + onemled; }
 
         return string.Empty;
     }
