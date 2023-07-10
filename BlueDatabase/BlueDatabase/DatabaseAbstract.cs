@@ -1192,36 +1192,21 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return GetById(x, null);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
-    public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart, bool dorowautmatic) {
-        // Vorbereitung des Textes -----------------------------
+    public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
+        Develop.DebugPrint_NichtImplementiert(); // ROUTINE UNGETESTET!
+
+        #region Text vorbereiten
+
         importText = importText.Replace("\r\n", "\r").Trim("\r");
 
-        #region die Zeilen (zeil) vorbereiten
+        #endregion
+
+        #region Die Zeilen (zeil) vorbereiten
 
         var ein = importText.SplitAndCutByCr();
         List<string[]> zeil = new();
         var neuZ = 0;
         for (var z = 0; z <= ein.GetUpperBound(0); z++) {
-            //#region Das Skript berechnen
-
-            //if (!string.IsNullOrEmpty(scriptnameeverychangedrow)) {
-            //    var vars = new VariableCollection {
-            //        new VariableString("Row", ein[z], false, false, "Der Original-Text. Dieser kann (und soll) manipuliert werden."),
-            //        new VariableBool("IsCaption", spalteZuordnen && z == 0, true, false, "Wenn TRUE, ist das die erste Zeile, die Überschriften enthält."),
-            //        new VariableString("Seperator", splitChar, true, false, "Das Trennzeichen")
-            //    };
-            //    var x = new BlueScript.Script(vars, string.Empty, false) {
-            //        ScriptText = scriptnameeverychangedrow
-            //    };
-            //    if (!x.Parse()) {
-            //        OnDropMessage(FehlerArt.Warnung, "Skript-Fehler, Import kann nicht ausgeführt werden.");
-            //        return x.Error;
-            //    }
-            //    ein[z] = vars.GetString("Row");
-            //}
-
-            //#endregion
-
             if (eliminateMultipleSplitter) {
                 ein[z] = ein[z].Replace(splitChar + splitChar, splitChar);
             }
@@ -1233,22 +1218,22 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
 
         if (zeil.Count == 0) {
-            OnDropMessage(FehlerArt.Warnung, "Import kann nicht ausgeführt werden.");
-            return "Import kann nicht ausgeführt werden.";
+            OnDropMessage(FehlerArt.Warnung, "Abbruch, keine Zeilen zum Importieren erkannt.");
+            return "Abbruch, keine Zeilen zum Importieren erkannt.";
         }
 
         #endregion
 
         #region Spaltenreihenfolge (columns) ermitteln
 
-        List<ColumnItem?> columns = new();
+        List<ColumnItem> columns = new();
         var startZ = 0;
 
         if (spalteZuordnen) {
             startZ = 1;
             for (var spaltNo = 0; spaltNo < zeil[0].GetUpperBound(0) + 1; spaltNo++) {
                 if (string.IsNullOrEmpty(zeil[0][spaltNo])) {
-                    OnDropMessage(FehlerArt.Warnung, "Abbruch,<br>leerer Spaltenname.");
+                    OnDropMessage(FehlerArt.Warnung, "Abbruch, leerer Spaltenname.");
                     return "Abbruch,<br>leerer Spaltenname.";
                 }
                 zeil[0][spaltNo] = SqlBackAbstract.MakeValidColumnName(zeil[0][spaltNo]);
@@ -1256,7 +1241,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 var col = Column.Exists(zeil[0][spaltNo]);
                 if (col == null) {
                     if (!ColumnItem.IsValidColumnName(zeil[0][spaltNo])) {
-                        OnDropMessage(FehlerArt.Warnung, "Abbruch,<br>ungültiger Spaltenname.");
+                        OnDropMessage(FehlerArt.Warnung, "Abbruch, ungültiger Spaltenname.");
                         return "Abbruch,<br>ungültiger Spaltenname.";
                     }
 
@@ -1266,6 +1251,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                         col.Format = DataFormat.Text;
                     }
                 }
+
+                if (col == null) {
+                    OnDropMessage(FehlerArt.Warnung, "Abbruch, Spaltenfehler.");
+                    return "Abbruch,<br>Spaltenfehler.";
+                }
+
                 columns.Add(col);
             }
         } else {
@@ -1278,41 +1269,111 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                     newc.MultiLine = true;
                 }
 
+                if (newc == null) {
+                    OnDropMessage(FehlerArt.Warnung, "Abbruch, Spaltenfehler.");
+                    return "Abbruch, Spaltenfehler.";
+                }
                 columns.Add(newc);
             }
         }
 
         #endregion
 
-        // -------------------------------------
-        // --- Importieren ---
-        // -------------------------------------
+        #region Neue Werte in ein Dictionary schreiben (dictNeu)
 
-        for (var zeilNo = startZ; zeilNo < zeil.Count; zeilNo++) {
-            var tempVar2 = Math.Min(zeil[zeilNo].GetUpperBound(0) + 1, columns.Count);
-            RowItem? row = null;
-            for (var spaltNo = 0; spaltNo < tempVar2; spaltNo++) {
-                if (spaltNo == 0) {
-                    row = null;
-                    if (zeileZuordnen && !string.IsNullOrEmpty(zeil[zeilNo][spaltNo])) { row = Row[zeil[zeilNo][spaltNo]]; }
-                    if (row == null && !string.IsNullOrEmpty(zeil[zeilNo][spaltNo])) {
-                        row = Row.GenerateAndAdd(zeil[zeilNo][spaltNo], "Import, fehlende Zeile");
-                        neuZ++;
-                    }
+        var dictNeu = new Dictionary<string, string[]>();
+
+        for (var rowNo = startZ; rowNo < zeil.Count; rowNo++) {
+            if (zeileZuordnen) {
+                if (zeil[rowNo].GetUpperBound(0) > 0 && !string.IsNullOrEmpty(zeil[rowNo][0]) && !dictNeu.ContainsKey(zeil[rowNo][0].ToUpper())) {
+                    dictNeu.Add(zeil[rowNo][0].ToUpper(), zeil[rowNo]);
                 } else {
-                    row?.CellSet(columns[spaltNo], zeil[zeilNo][spaltNo].SplitAndCutBy("|").JoinWithCr());
+                    OnDropMessage(FehlerArt.Warnung, "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.");
+                    return "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.";
                 }
-                if (row != null && dorowautmatic) { _ = row.ExecuteScript(null, string.Empty, true, true, true, 0); }
+            } else {
+                dictNeu.Add(rowNo.ToString(), zeil[rowNo]);
             }
-            if (zeilNo % 1000 == 0 & zeilNo > 1000) {
+        }
+
+        #endregion
+
+        #region Zeilen, die BEACHTET werden sollen, in ein Dictionary schreiben (dictVorhanden)
+
+        var dictVorhanden = new Dictionary<string, RowItem>();
+
+        if (zeileZuordnen) {
+            foreach (var thisR in Row) {
+                var f = thisR.CellFirstString().ToUpper();
+                if (!string.IsNullOrEmpty(f) && !dictVorhanden.ContainsKey(f)) {
+                    dictVorhanden.Add(f, thisR);
+                } else {
+                    OnDropMessage(FehlerArt.Warnung, "Abbruch, vorhandene Zeilen sind nicht eindeutig.");
+                    return "Abbruch, vorhandene Zeilen sind nicht eindeutig.";
+                }
+            }
+        }
+
+        #endregion
+
+        #region Der eigentliche Import
+
+        var tmp = 0;
+        foreach (var thisD in dictNeu) {
+
+            #region Spaltenanzahl zum Import ermitteln (maxColCount)
+
+            var maxColCount = Math.Min(thisD.Value.GetUpperBound(0) + 1, columns.Count);
+
+            if (maxColCount == 0) {
+                OnDropMessage(FehlerArt.Warnung, "Abbruch, Leere Zeile im Import.");
+                return "Abbruch, Leere Zeile im Import.";
+            }
+
+            #endregion
+
+            #region Row zum schreiben ermitteln (row)
+
+            RowItem? row = null;
+
+            if (dictVorhanden.ContainsKey(thisD.Key)) {
+                dictVorhanden.TryGetValue(thisD.Key, out row);
+                dictVorhanden.Remove(thisD.Key); // Speedup
+            } else {
+                neuZ++;
+                row = Row.GenerateAndAdd(thisD.Value[0], "Import, fehlende Zeile");
+            }
+
+            if (row == null) {
+                OnDropMessage(FehlerArt.Warnung, "Abbruch, Import-Fehler.");
+                return "Abbruch, Import-Fehler.";
+            }
+
+            #endregion
+
+            #region Werte in die Spalten schreiben
+
+            for (var colNo = 0; colNo < maxColCount; colNo++) {
+                row.CellSet(columns[colNo], thisD.Value[colNo].SplitAndCutBy("|").JoinWithCr());
+            }
+
+            #endregion
+
+            #region Speichern und Ausgabe
+
+            if (tmp % 1000 == 0 & tmp > 1000) {
                 OnDropMessage(FehlerArt.Info, "Import: Zwischenspeichern der Datenbank");
                 Save();
             }
 
-            if (zeilNo % 100 == 0) {
-                OnDropMessage(FehlerArt.Info, "Import: Zeile " + zeilNo  + " von " + zeil.Count);
+            if (tmp % 100 == 0) {
+                OnDropMessage(FehlerArt.Info, "Import: Zeile " + tmp + " von " + zeil.Count);
             }
+
+            #endregion
         }
+
+        #endregion
 
         OnDropMessage(FehlerArt.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
         return string.Empty;
@@ -1337,7 +1398,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             importText = x.JoinWithCr();
         }
 
-        return Import(importText, true, true, sep, false, false, true);
+        return Import(importText, true, true, sep, false, false);
     }
 
     public bool IsAdministrator() {

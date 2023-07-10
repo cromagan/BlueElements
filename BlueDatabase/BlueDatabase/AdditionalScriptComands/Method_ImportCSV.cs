@@ -62,7 +62,7 @@ internal class Method_ImportCSV : Method_Database {
 
         if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Import im Testmodus deaktiviert."); }
 
-        var sx = db.Import(txt, true, true, sep, false, false, true);
+        var sx = db.Import(txt, true, true, sep, false, false);
 
         if (string.IsNullOrEmpty(sx)) {
             return DoItFeedback.Null();

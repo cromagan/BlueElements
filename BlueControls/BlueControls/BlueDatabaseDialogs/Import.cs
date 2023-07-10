@@ -90,7 +90,7 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
         var m = "Datenbank-Fehler";
 
         if (Database != null && !Database.IsDisposed) {
-            m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked, false);
+            m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked);
         }
 
         if (!string.IsNullOrEmpty(m)) {
