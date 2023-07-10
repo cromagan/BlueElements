@@ -357,7 +357,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             Tabs.SelectedTab = tabDateiExport;
             var (files, error) = Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1
                 ? Export.SaveAsBitmap(_rowsForExport, cbxLayoutWahl.Text, _zielPfad)
-                : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad, string.Empty);
+                : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
             lstExported.Item.AddRange(files);
 
             if (!string.IsNullOrEmpty(error)) {
