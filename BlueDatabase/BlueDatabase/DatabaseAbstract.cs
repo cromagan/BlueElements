@@ -1193,7 +1193,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
-        Develop.DebugPrint_NichtImplementiert(); // ROUTINE UNGETESTET!
 
         #region Text vorbereiten
 
@@ -1318,8 +1317,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         #region Der eigentliche Import
 
-        var tmp = 0;
+        var no = 0;
         foreach (var thisD in dictNeu) {
+            no++;
 
             #region Spaltenanzahl zum Import ermitteln (maxColCount)
 
@@ -1361,13 +1361,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             #region Speichern und Ausgabe
 
-            if (tmp % 1000 == 0 & tmp > 1000) {
+            if (no % 5000 == 0 & no > 1000) {
                 OnDropMessage(FehlerArt.Info, "Import: Zwischenspeichern der Datenbank");
                 Save();
             }
 
-            if (tmp % 100 == 0) {
-                OnDropMessage(FehlerArt.Info, "Import: Zeile " + tmp + " von " + zeil.Count);
+            if (no % Constants.GlobalRND.Next(40, 60) == 0) {
+                OnDropMessage(FehlerArt.Info, "Import: Zeile " + no + " von " + zeil.Count);
             }
 
             #endregion
@@ -1375,6 +1375,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         #endregion
 
+        Save();
         OnDropMessage(FehlerArt.Info, "<b>Import abgeschlossen.</b>\r\n" + neuZ + " neue Zeilen erstellt.");
         return string.Empty;
     }

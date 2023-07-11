@@ -884,13 +884,15 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return;
         }
 
+        if (!column.SaveContent) { return; }
+        if (!column.IsSystemColumn()) { Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); return; }
+
         if (row == null || row.IsDisposed) {
             Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + Database?.ConnectionData.TableName);
             return;
         }
 
-        if (!column.IsSystemColumn()) { Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); return; }
-        if (!column.SaveContent) { return; }
+
 
         var cellKey = KeyOfCell(column, row);
         var oldval = string.Empty;

@@ -92,7 +92,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
     public static float IntervalDistance(float minA, float maxA, float minB, float maxB) => minA < minB ? minB - maxA : minA - maxB;
 
     // Check if polygon A is going to collide with polygon B for the given velocity
-    public static StrPolygonCollisionResult PolygonCollision(AbstractPhysicPadItem polygonA, AbstractPhysicPadItem polygonB, PointM? velocity) {
+    public static StrPolygonCollisionResult PolygonCollision(AbstractPhysicPadItem polygonA, AbstractPhysicPadItem polygonB, PointM velocity) {
         StrPolygonCollisionResult result = new() {
             CheckedObjectA = polygonA,
             CheckedObjectB = polygonB,
@@ -172,7 +172,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
     }
 
     // Calculate the projection of a polygon on an axis and returns it as a [min, max] interval
-    public static void ProjectPolygon(PointM? axis, AbstractPhysicPadItem polygon, out float min, out float max) {
+    public static void ProjectPolygon(PointM axis, AbstractPhysicPadItem polygon, out float min, out float max) {
         // To project a point on an axis use the dot product
         var d = axis.DotProduct(polygon.MovablePoint[0]);
         min = d;
@@ -201,7 +201,7 @@ public abstract class AbstractPhysicPadItem : BasicPadItem {
     }
 
     // https://www.codeproject.com/Articles/15573/2D-Polygon-Collision-Detection
-    public StrPolygonCollisionResult ColidesWith(AbstractPhysicPadItem polygonB, PointM? velocity) => PolygonCollision(this, polygonB, velocity);
+    public StrPolygonCollisionResult ColidesWith(AbstractPhysicPadItem polygonB, PointM velocity) => PolygonCollision(this, polygonB, velocity);
 
     //   http://csharphelper.com/blog/2014/07/find-the-centroid-of-a-polygon-in-c/
     // Find the polygon's centroid.

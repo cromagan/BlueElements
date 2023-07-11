@@ -451,8 +451,8 @@ public static class IO {
             File.WriteAllText(filename, contents, encoding);
             if (executeAfter) { _ = ExecuteFile(filename); }
             return true;
-        } catch (Exception ex) {
-            Develop.DebugPrint(FehlerArt.Info, "Fehler beim Speichern der Datei: " + filename, ex);
+        } catch {
+          //  Develop.DebugPrint(FehlerArt.Info, "Fehler beim Speichern der Datei: " + filename, ex);
             return false;
         }
     }

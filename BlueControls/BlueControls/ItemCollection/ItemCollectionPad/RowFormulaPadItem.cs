@@ -86,10 +86,10 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public override string QuickInfo {
         get {
             var r = Row;
-            if (r== null || r.IsDisposed) { return string.Empty; }
+            if (r == null || r.IsDisposed) { return string.Empty; }
             if (_lastQuickInfo == r.QuickInfo) { return _tmpQuickInfo; }
             _lastQuickInfo = r.QuickInfo;
-            _tmpQuickInfo = _lastQuickInfo.Replace(r.CellFirstString(), "<b>[<imagecode=Stern|16>" + Row.CellFirstString() + "]</b>");
+            _tmpQuickInfo = _lastQuickInfo.Replace(r.CellFirstString(), "<b>[<imagecode=Stern|16>" + r.CellFirstString() + "]</b>");
             return _tmpQuickInfo;
         }
         // ReSharper disable once ValueParameterNotUsed
@@ -115,12 +115,15 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = new();
-        ItemCollectionList.ItemCollectionList layouts = new(true);
-        foreach (var thisLayouts in Row.Database.Layouts) {
-            ItemCollectionPad p = new(thisLayouts, string.Empty);
-            _ = layouts.Add(p.Caption, p.KeyName, ImageCode.Stern);
+
+        if (Row?.Database is DatabaseAbstract dbl) {
+            ItemCollectionList.ItemCollectionList layouts = new(true);
+            foreach (var thisLayouts in dbl.Layouts) {
+                ItemCollectionPad p = new(thisLayouts, string.Empty);
+                _ = layouts.Add(p.Caption, p.KeyName, ImageCode.Stern);
+            }
+            l.Add(new FlexiControlForProperty<string>(() => Layout_Id, layouts));
         }
-        l.Add(new FlexiControlForProperty<string>(() => Layout_Id, layouts));
         l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
     }
