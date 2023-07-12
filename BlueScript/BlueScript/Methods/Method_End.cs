@@ -49,9 +49,7 @@ internal class Method_End : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "end" };
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        return new DoItFeedback(false, true);
-    }
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) => new DoItFeedback(false, true);
 
     #endregion
 }

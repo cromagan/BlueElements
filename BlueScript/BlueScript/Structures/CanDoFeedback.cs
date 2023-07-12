@@ -17,10 +17,6 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using BlueScript.Enums;
-using BlueScript.Methods;
-
 namespace BlueScript.Structures;
 
 public readonly struct CanDoFeedback {

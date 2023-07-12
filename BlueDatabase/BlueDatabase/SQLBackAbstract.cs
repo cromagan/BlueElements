@@ -29,7 +29,6 @@ using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Constants;
-using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
 namespace BlueDatabase;
@@ -913,7 +912,7 @@ public abstract class SqlBackAbstract {
             }
         }
 
-        l.WriteAllText(TempFile("", "","txt"), Win1252, true);
+        l.WriteAllText(TempFile("", "", "txt"), Win1252, true);
     }
 
     protected abstract string CreateTable(string tablename, bool allowSystemTableNames);

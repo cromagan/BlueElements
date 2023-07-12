@@ -26,7 +26,7 @@ public class RowCheckedEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors, VariableCollection variables) : base(row) {
+    public RowCheckedEventArgs(RowItem row, List<string>? columnsWithErrors, VariableCollection? variables) : base(row) {
         ColumnsWithErrors = columnsWithErrors;
         Variables = variables;
     }
@@ -36,7 +36,7 @@ public class RowCheckedEventArgs : RowEventArgs {
     #region Properties
 
     public List<string>? ColumnsWithErrors { get; }
-    public VariableCollection Variables { get; }
+    public VariableCollection? Variables { get; }
 
     #endregion
 }

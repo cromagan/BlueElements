@@ -19,7 +19,6 @@
 
 using System.Collections.Generic;
 using BlueDatabase.Enums;
-using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;

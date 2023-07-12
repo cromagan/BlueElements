@@ -57,6 +57,8 @@
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
     <Compile Include="Methods\Method_BackupControl.cs" />
     <Compile Include="Methods\Method_ForEach.cs" />
+    <Compile Include="Methods\Method_DownloadImage.cs" />
+    <Compile Include="Methods\Method_DownloadWebPage.cs" />
     <Compile Include="Methods\Method_RemoveDoubleSpaces.cs" />
     <Compile Include="Methods\Method_Return.cs" />
     <Compile Include="Methods\Method_SaveImage.cs" />

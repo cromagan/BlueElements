@@ -57,10 +57,11 @@ internal class Method_Number : Method {
             if (Converter.DoubleTryParse(vs.ValueString, out var dbl)) {
                 return new DoItFeedback(dbl);
             }
-            //return new DoItFeedback(infos.LogData, s, "'" + vs.ValueString + "' kann nicht als Zahl interpretiert werden.");
         }
 
-        return new DoItFeedback(attvar.Attributes[1]);
+        if (attvar.Attributes[1] is Variable v) { return new DoItFeedback(v); }
+
+        return new DoItFeedback(attvar.ValueNumGet(1));
     }
 
     #endregion

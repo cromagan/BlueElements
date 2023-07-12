@@ -22,7 +22,6 @@ using System.IO;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
-using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;

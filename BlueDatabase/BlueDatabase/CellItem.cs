@@ -245,7 +245,9 @@ public class CellItem {
     /// </summary>
     /// <returns></returns>
 
-    public static List<string> ValuesReadable(ColumnItem column, RowItem Row, ShortenStyle style) {
+    public static List<string>? ValuesReadable(ColumnItem? column, RowItem? row, ShortenStyle style) {
+        if (column == null || row == null) { return null; }
+
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
             //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
@@ -254,10 +256,10 @@ public class CellItem {
         }
         List<string> ret = new();
         if (!column.MultiLine) {
-            ret.Add(ValueReadable(column, Row.CellGetString(column), style, column.BehaviorOfImageAndText, true));
+            ret.Add(ValueReadable(column, row.CellGetString(column), style, column.BehaviorOfImageAndText, true));
             return ret;
         }
-        var x = Row.CellGetList(column);
+        var x = row.CellGetList(column);
         foreach (var thisstring in x) {
             ret.Add(ValueReadable(column, thisstring, style, column.BehaviorOfImageAndText, true));
         }

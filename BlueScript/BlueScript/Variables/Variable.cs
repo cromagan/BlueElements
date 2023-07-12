@@ -19,12 +19,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Extensions;
@@ -198,7 +196,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
         foreach (var thisVt in Script.VarTypes) {
             if (thisVt.GetFromStringPossible) {
-                if (thisVt.TryParse(txt, out var v, varCol, scp)) {
+                if (thisVt.TryParse(txt, out var v, varCol, scp) && v != null) {
                     return new DoItFeedback(v);
                 }
             }
@@ -218,7 +216,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     public int CompareTo(object obj) {
         if (obj is Variable v) {
-            return CompareKey.CompareTo(v.CompareKey);
+            return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
         }
 
         Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");

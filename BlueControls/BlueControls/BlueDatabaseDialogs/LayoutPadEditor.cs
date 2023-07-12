@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -46,7 +45,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
 
     #region Constructors
 
-    public LayoutPadEditor(DatabaseAbstract database) : base() {
+    public LayoutPadEditor(DatabaseAbstract? database) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -87,6 +86,9 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     }
 
     internal void LoadLayout(string fileOrLayoutId) {
+        if (Database == null || Database.IsDisposed) { return; }
+        if (Pad.Item == null) { return; }
+
         SaveCurrentLayout();
         cbxLayout.Text = fileOrLayoutId;
 
@@ -102,7 +104,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             } else {
                 DisablePad();
                 TextPadItem x = new("x", "Nicht editierbares Layout aus dem Dateisystem");
-                Pad?.Item.Add(x);
+                Pad.Item.Add(x);
                 x.Stil = PadStyles.Style_Überschrift_Haupt;
                 x.SetCoordinates(new RectangleF(0, 0, 1000, 400), true);
                 ItemChanged();
@@ -137,6 +139,8 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     }
 
     private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
+        if (Database == null || Database.IsDisposed) { return; }
+
         SaveCurrentLayout();
         var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", string.Empty, FormatHolder.Text);
         if (string.IsNullOrEmpty(ex)) { return; }
@@ -156,6 +160,9 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     }
 
     private void btnLayoutLöschen_Click(object sender, System.EventArgs e) {
+        if (Database == null || Database.IsDisposed) { return; }
+        if (Pad.Item == null) { return; }
+
         SaveCurrentLayout();
         var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.KeyName);
         if (ind < 0) {
@@ -176,6 +183,9 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, string.Empty);
 
     private void btnLayoutUmbenennen_Click(object sender, System.EventArgs e) {
+        if (Database == null || Database.IsDisposed) { return; }
+        if (Pad.Item == null) { return; }
+
         SaveCurrentLayout();
         var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.KeyName);
         if (ind < 0) {
@@ -244,8 +254,10 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     private void Database_Disposing(object sender, System.EventArgs e) => Close();
 
     private void SaveCurrentLayout() {
-        //scriptEditor.WriteScriptBack();
         if (Database == null || Database.IsDisposed) { return; }
+
+        if (Pad.Item == null) { return; }
+
         var newl = Pad.Item.ToString();
         var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.KeyName);
         if (ind > -1) {
@@ -256,8 +268,8 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             Database.Layouts = lay;
 
             if (!newl.StartsWith("{ID=#")) { Develop.DebugPrint("ID nicht gefunden: " + newl); }
-            var ko = newl.IndexOf(", ", StringComparison.Ordinal);
-            var id = newl.Substring(4, ko - 4);
+            //var ko = newl.IndexOf(", ", StringComparison.Ordinal);
+            //var id = newl.Substring(4, ko - 4);
         } else if (Pad.Item.KeyName.FileSuffix().ToUpper() == "BCR") {
             WriteAllText(Pad.Item.KeyName, newl, Encoding.UTF8, false);
         }

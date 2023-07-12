@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -26,49 +27,52 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_RemoveDoubleSpaces : Method {
+internal class Method_DownloadWebPage : Method {
+
+    #region Fields
+
+    private static readonly VariableCollection Last = new VariableCollection();
+
+    #endregion
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal };
-    public override string Description => "Entfernt aus dem Text unnötige Leerzeichen, Tabs etc.\r\nKann dazu verwendet werden, um Code-Dateien (z.B. HTML) zu standardisieren.";
+    public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
+    public override string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.Standard;
-    public override string Returns => VariableString.ShortName_Plain;
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override string Returns => VariableString.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "RemoveDoubleSpaces(text)";
+    public override string Syntax => "DownloadWebPage(Url)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "removedoublespaces" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "downloadwebpage" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            DoItFeedback.AttributFehler(infos.Data, this, attvar);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+
+        var url = attvar.ValueStringGet(0);
+        var varn = "X" + url.ReduceToChars(Constants.AllowedCharsVariableName);
+
+        if (Last.Get(varn) is VariableString vb) {
+            return new DoItFeedback(vb.ValueString);
         }
 
-        var t = attvar.ValueStringGet(0);
-        string ot;
-        do {
-            ot = t;
-            t = t.Replace("\n", "\r");
-            t = t.Replace("\t", "\r");
-            t = t.Replace("  ", " ");
-            t = t.Replace("\r ", "\r");
-            t = t.Replace(" \r", "\r");
-            t = t.Replace("\r\r", "\r");
-            t = t.Replace(">\r", ">");
-            t = t.Replace("\r<", "<");
-            t = t.Replace(" <", "<");
-            t = t.Replace("> ", ">");
-        } while (ot != t);
+        try {
+            Generic.CollectGarbage();
+            var txt = Generic.Download(url);
 
-        return new DoItFeedback(t);
+            Last.Add(new VariableString(varn, txt, true, false, string.Empty));
+            return new DoItFeedback(txt);
+        } catch {
+            return new DoItFeedback(string.Empty);
+        }
     }
 
     #endregion

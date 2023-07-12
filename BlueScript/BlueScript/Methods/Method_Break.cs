@@ -47,13 +47,11 @@ internal class Method_Break : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "break" };
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) =>
         //if (s.Sub < 1) { return new DoItFeedback(infos.Data, "Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
-
         //if (s.BreakFired) { return new DoItFeedback(infos.Data, "Break doppelt ausgelöst."); }
         //s.BreakFired = true;
-        return new DoItFeedback(true, false);
-    }
+        new DoItFeedback(true, false);
 
     #endregion
 }

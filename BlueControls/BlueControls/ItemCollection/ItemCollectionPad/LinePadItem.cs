@@ -151,8 +151,8 @@ public class LinePadItem : BasicPadItem {
 
     protected override RectangleF CalculateUsedArea() {
         if (_point1.X == 0d && _point2.X == 0d && _point1.Y == 0d && _point2.Y == 0d) { return RectangleF.Empty; }
-        if (_tempPoints.Count == 0) { CalcTempPoints(); }
-        if (_tempPoints.Count == 0) { return RectangleF.Empty; }
+        if (_tempPoints == null || _tempPoints.Count == 0) { CalcTempPoints(); }
+        if (_tempPoints == null || _tempPoints.Count == 0) { return RectangleF.Empty; }
         var x1 = float.MaxValue;
         var y1 = float.MaxValue;
         var x2 = float.MinValue;
@@ -170,22 +170,13 @@ public class LinePadItem : BasicPadItem {
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (Stil != PadStyles.Undefiniert) {
             CalcTempPoints();
-            if (_tempPoints.Count == 0) { return; }
+            if (_tempPoints == null || _tempPoints.Count == 0 || Parent == null) { return; }
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
                 gr.DrawLine(Skin.GetBlueFont(Stil, Parent.SheetStyle).Pen(zoom * Parent.SheetStyleScale), _tempPoints[z].ZoomAndMove(zoom, shiftX, shiftY), _tempPoints[z + 1].ZoomAndMove(zoom, shiftX, shiftY));
             }
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
-
-    //protected override BasicPadItem? TryCreate(string id, string name) {
-    //    if (id.Equals("blueelements.clsitemline", StringComparison.OrdinalIgnoreCase) ||
-    //        id.Equals("blueelements.itemline", StringComparison.OrdinalIgnoreCase) ||
-    //        id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
-    //        return new LinePadItem(name);
-    //    }
-    //    return null;
-    //}
 
     private static bool SchneidetDas(BasicPadItem? thisBasicItem, PointM p1, PointM p2) {
         if (thisBasicItem == null) { return false; }
@@ -210,7 +201,7 @@ public class LinePadItem : BasicPadItem {
     }
 
     private bool Begradige(int p1) {
-        if (p1 >= _tempPoints.Count - 1) { return false; }
+        if (_tempPoints == null || p1 >= _tempPoints.Count - 1) { return false; }
         if ((int)_tempPoints[p1].X == (int)_tempPoints[p1 + 1].X || (int)_tempPoints[p1].Y == (int)_tempPoints[p1 + 1].Y) { return false; }
         PointF np1;
         PointF np2;
@@ -284,6 +275,8 @@ public class LinePadItem : BasicPadItem {
     }
 
     private bool IsVerdeckt(float x, float y) {
+        if (Parent == null) { return false; }
+
         foreach (var thisBasicItem in Parent) {
             if (thisBasicItem != null) {
                 if (thisBasicItem is not LinePadItem) {
@@ -299,10 +292,12 @@ public class LinePadItem : BasicPadItem {
     }
 
     private bool LöscheVerdeckte(int p1) {
-        if (_tempPoints[p1].Equals(_point1)) { return false; }
-        if (_tempPoints[p1].Equals(_point2)) { return false; }
+        if (_tempPoints?[p1] is not PointF p) { return false; }
 
-        if (IsVerdeckt(_tempPoints[p1].X, _tempPoints[p1].Y)) {
+        //if (Math.Abs(p.X - _point1.X) < 0.001 && Math.Abs(p.Y - _point1.Y) < 0.001) { return false; }
+        //if (Math.Abs(p.X - _point2.X) < 0.001 && Math.Abs(p.Y - _point2.Y) < 0.001) { return false; }
+
+        if (IsVerdeckt(p.X, p.Y)) {
             _tempPoints.RemoveAt(p1);
             return true;
         }
@@ -310,12 +305,15 @@ public class LinePadItem : BasicPadItem {
     }
 
     private bool SchneidetWas(float x1, float y1, float x2, float y2) {
+        if (Parent == null) { return false; }
         PointM p1 = new(x1, y1);
         PointM p2 = new(x2, y2);
         return Parent.Any(thisItemBasic => SchneidetDas(thisItemBasic, p1, p2));
     }
 
     private bool Vereinfache(int p1) {
+        if (_tempPoints == null) { return false; }
+
         if (Linien_Verhalten != ConectorStyle.AusweichenUndGerade) {
             if (p1 > 0 && p1 < _tempPoints.Count - 1) {
                 if (!SchneidetWas(_tempPoints[p1 - 1].X, _tempPoints[p1 - 1].Y, _tempPoints[p1 + 1].X, _tempPoints[p1 + 1].Y)) {
@@ -364,6 +362,9 @@ public class LinePadItem : BasicPadItem {
     }
 
     private bool WeicheAus(int p1) {
+        if (_tempPoints == null) { return false; }
+        if (Parent == null) { return false; }
+
         if (_tempPoints.Count > 100) { return false; }
         if (p1 >= _tempPoints.Count - 1) { return false; }
         //   If _TempPoints.Count > 4 Then Return False

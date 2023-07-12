@@ -42,7 +42,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Fields
 
-    private readonly List<RowItem>? _rowsForExport;
+    private readonly List<RowItem> _rowsForExport;
     private readonly string _saveTo = string.Empty;
     private readonly string _zielPfad;
     private int _itemNrForPrint;
@@ -53,9 +53,9 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     public ExportDialog(DatabaseAbstract db, string autosaveFile) : this(db, null, autosaveFile) { }
 
-    public ExportDialog(DatabaseAbstract db, List<RowItem>? rows) : this(db, rows, string.Empty) { }
+    public ExportDialog(DatabaseAbstract db, List<RowItem> rows) : this(db, rows, string.Empty) { }
 
-    public ExportDialog(DatabaseAbstract db, List<RowItem>? rows, string autosaveFile) {
+    public ExportDialog(DatabaseAbstract db, List<RowItem> rows, string autosaveFile) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -83,7 +83,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Properties
 
-    public DatabaseAbstract? Database { get; private set; }
+    public DatabaseAbstract Database { get; private set; }
 
     #endregion
 
@@ -125,11 +125,13 @@ public sealed partial class ExportDialog : IHasDatabase {
     /// <param name="rowsForExport"></param>
     /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat. -1 falls keine (gültige) Liste übergeben wurde.</returns>
 
-    public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem>? rowsForExport, float abstandMm) {
+    public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem> rowsForExport, float abstandMm) {
+        if (pad.Item == null) { return -1; }
+
         pad.Item.Clear();
         Generic.CollectGarbage();
 
-        if (rowsForExport == null || rowsForExport.Count < 1) { return -1; }
+        if (rowsForExport.Count < 1) { return -1; }
 
         ItemCollectionPad tmp = new(layout, rowsForExport[0].Database, rowsForExport[0].Key);
         var oneItem = tmp.MaxBounds(null);
@@ -167,6 +169,8 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void _Database_Disposing(object sender, System.EventArgs e) => Close();
 
     private void Attribute_Changed(object? sender, System.EventArgs? e) {
+        if (padSchachteln.Item == null) { return; }
+
         _ = FloatTryParse(flxBreite.Value, out var b);
         _ = FloatTryParse(flxHöhe.Value, out var h);
         _ = FloatTryParse(flxAbstand.Value, out var ab);
@@ -203,6 +207,9 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void btnSchachtelnSpeichern_Click(object sender, System.EventArgs e) {
+        if (padSchachteln.Item == null) { return; }
+        if (_rowsForExport == null) { return; }
+
         _ = FloatTryParse(flxBreite.Value, out var b);
         _ = FloatTryParse(flxHöhe.Value, out var h);
         _ = FloatTryParse(flxAbstand.Value, out var ab);
@@ -217,7 +224,10 @@ public sealed partial class ExportDialog : IHasDatabase {
             var nr = _itemNrForPrint;
             _itemNrForPrint = GeneratePrintPad(padSchachteln, _itemNrForPrint, cbxLayoutWahl.Text, _rowsForExport, ab);
 
-            var x = TempFile(_zielPfad, _rowsForExport[0].Database.Caption + "_" + b + "x" + h + "_" + ab, "png");
+            var nam = "Export";
+            if (_rowsForExport[0].Database is DatabaseAbstract db) { nam = db.Caption; }
+
+            var x = TempFile(_zielPfad, nam + "_" + b + "x" + h + "_" + ab, "png");
             padSchachteln.Item.BackColor = Color.Transparent;
             padSchachteln.Item.SaveAsBitmap(x);
             l.Add(x);
@@ -240,20 +250,26 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
 
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
+        if (Database == null || Database.IsDisposed) { return; }
+
         if (Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1) {
             padVorschau.ShowInPrintMode = true;
-            padVorschau.Item = new ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport[0].Database, _rowsForExport[0].Key);
+            padVorschau.Item = new ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport?[0].Database, _rowsForExport[0].Key);
             padVorschau.ZoomFit();
         } else {
-            padVorschau.Item.Clear();
+            if (padVorschau.Item != null) { padVorschau.Item.Clear(); }
         }
     }
 
-    private void EintragsText() => capAnzahlInfo.Text = _rowsForExport == null || _rowsForExport.Count == 0
-        ? "Bitte wählen sie die Einträge für den Export."
-        : _rowsForExport.Count == 1
-            ? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _rowsForExport[0].CellFirstString().Replace("\r\n", " ")
-            : "Es sind <b>" + _rowsForExport.Count + "</b> Einträge gewählt.";
+    private void EintragsText() {
+        if (_rowsForExport.Count == 0) {
+            capAnzahlInfo.Text = "Bitte wählen sie die Einträge für den Export.";
+        } else if (_rowsForExport.Count == 1) {
+            capAnzahlInfo.Text = "Es ist genau ein Eintrag gewählt:<br> <b>-" + _rowsForExport[0].CellFirstString().Replace("\r\n", " ");
+        } else {
+            capAnzahlInfo.Text = "Es sind <b>" + _rowsForExport.Count + "</b> Einträge gewählt.";
+        }
+    }
 
     private void Exported_ItemClicked(object sender, BasicListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
 

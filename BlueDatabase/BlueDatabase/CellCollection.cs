@@ -712,7 +712,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public List<string> ValuesReadable(ColumnItem column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style);
+    public List<string>? ValuesReadable(ColumnItem? column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style);
 
     internal static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
         List<RowItem?> allRows = new();
@@ -891,8 +891,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + Database?.ConnectionData.TableName);
             return;
         }
-
-
 
         var cellKey = KeyOfCell(column, row);
         var oldval = string.Empty;

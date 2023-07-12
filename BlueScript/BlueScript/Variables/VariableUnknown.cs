@@ -17,11 +17,8 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueBasics;
-using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Structures;
 
 namespace BlueScript.Variables;

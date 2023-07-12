@@ -20,7 +20,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using BlueBasics.Interfaces;
-using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;

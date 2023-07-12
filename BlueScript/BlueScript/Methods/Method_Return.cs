@@ -48,9 +48,7 @@ internal class Method_Return : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "return" };
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        return new DoItFeedback(false, true);
-    }
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) => new DoItFeedback(false, true);
 
     #endregion
 }
