@@ -47,12 +47,12 @@ internal class Method_IsNumeral : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "isnumeral" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.Falsch(); }
         if (attvar.Attributes[0] is VariableFloat) { return DoItFeedback.Wahr(); }
-        if (attvar.Attributes[0] is VariableString vsx) {
-            if (vsx.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }
+        if (attvar.Attributes[0] is VariableString vs) {
+            if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }
         }
         return DoItFeedback.Falsch();
     }

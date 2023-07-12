@@ -32,8 +32,8 @@ public class Method_StringToDateTime : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "stringtodatetime" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         var ok = DateTimeTryParse(attvar.ReadableText(0), out var d);
         if (!ok) {
             return new DoItFeedback(infos.Data, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");

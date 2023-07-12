@@ -46,8 +46,8 @@ internal class Method_SetIfHasValue : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "SetIfHasValue" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
@@ -64,9 +64,9 @@ internal class Method_SetIfHasValue : Method {
                     }
                     break;
 
-                case VariableString vsx:
-                    if (!string.IsNullOrEmpty(vsx.ValueString)) {
-                        if (attvar.ValueStringSet(0, vsx.ValueString, infos.Data) is DoItFeedback dif2) { return dif2; }
+                case VariableString vs:
+                    if (!string.IsNullOrEmpty(vs.ValueString)) {
+                        if (attvar.ValueStringSet(0, vs.ValueString, infos.Data) is DoItFeedback dif2) { return dif2; }
                         return DoItFeedback.Null();
                     }
                     break;

@@ -46,9 +46,9 @@ internal class Method_Exception : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "Exception" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen."); }
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen.")
             : new DoItFeedback(infos.Data, "Abbruch durch Exception-Befehl: " + attvar.ValueStringGet(0));
     }

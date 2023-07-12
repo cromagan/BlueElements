@@ -333,13 +333,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
                 uc.Width -= (int)(100 * zoom);
                 break;
 
-            case ÜberschriftAnordnung.Ohne_mit_Abstand:
-                cap = new Point(-1, -1);
-                uc.Y += (int)(19 * zoom);
-                uc.Height -= (int)(19 * zoom);
-                break;
-
-            case ÜberschriftAnordnung.Über_dem_Feld:
             default:
                 cap = new Point(0, 0);
                 uc.Y += (int)(19 * zoom);

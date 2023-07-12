@@ -50,16 +50,16 @@ internal class Method_Call : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "call" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var vsx = attvar.ValueStringGet(0);
+        var vs = attvar.ValueStringGet(0);
 
-        var db = MyDatabase(vs);
+        var db = MyDatabase(varCol);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
-        var sc = db.EventScript.Get(vsx);
+        var sc = db.EventScript.Get(vs);
         if (sc == null) { return new DoItFeedback(infos.Data, "Skript nicht vorhanden: " + vs); }
 
         if (sc.Attributes() != scp.ScriptAttributes && scp.ScriptAttributes != "*") {
@@ -72,7 +72,7 @@ internal class Method_Call : Method_Database {
             return new DoItFeedback(infos.Data, "Fehler in Unter-Skript " + vs + ": " + error);
         }
 
-        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(vs, scp, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vsx, null);
+        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(varCol, scp, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null);
         scx.BreakFired = false;
         scx.EndScript = false;
 

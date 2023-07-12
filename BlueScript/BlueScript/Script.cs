@@ -78,22 +78,22 @@ public class Script {
 
     #region Methods
 
-    public static DoItWithEndedPosFeedback ComandOnPosition(VariableCollection vs, ScriptProperties scp, string txt, int pos, bool expectedvariablefeedback, LogData ld) {
+    public static DoItWithEndedPosFeedback ComandOnPosition(VariableCollection varCol, ScriptProperties scp, string txt, int pos, bool expectedvariablefeedback, LogData ld) {
         if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
         foreach (var thisC in Comands) {
-            var f = thisC.CanDo(vs, scp, txt, pos, expectedvariablefeedback, ld);
+            var f = thisC.CanDo(varCol, scp, txt, pos, expectedvariablefeedback, ld);
             if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                var fn = thisC.DoIt(vs, f, scp);
+                var fn = thisC.DoIt(varCol, f, scp);
                 return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinueOrErrorPosition, fn.BreakFired, fn.EndScript);
             }
         }
 
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var f in Comands.Select(thisC => thisC.CanDo(vs, scp, txt, pos, !expectedvariablefeedback, ld))) {
+        foreach (var f in Comands.Select(thisC => thisC.CanDo(varCol, scp, txt, pos, !expectedvariablefeedback, ld))) {
             if (f.MustAbort) {
                 return new DoItWithEndedPosFeedback(f.ErrorMessage, ld);
             }
@@ -117,7 +117,7 @@ public class Script {
         return txt.Substring(0, Math.Min((int)pos, txt.Length)).Count(c => c == '¶') + 1;
     }
 
-    public static ScriptEndedFeedback Parse(VariableCollection vs, ScriptProperties scp, string redScriptText, int lineadd, string subname) {
+    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string redScriptText, int lineadd, string subname) {
         var pos = 0;
         var EndScript = false;
 
@@ -125,23 +125,23 @@ public class Script {
 
         do {
             if (pos >= redScriptText.Length || EndScript) {
-                return new ScriptEndedFeedback(vs, ld.Protocol, true, false);
+                return new ScriptEndedFeedback(varCol, ld.Protocol, true, false);
             }
 
             if (redScriptText.Substring(pos, 1) == "¶") {
                 pos++;
                 ld.LineAdd(1);
             } else {
-                var f = ComandOnPosition(vs, scp, redScriptText, pos, false, ld);
+                var f = ComandOnPosition(varCol, scp, redScriptText, pos, false, ld);
                 if (!f.AllOk) {
-                    return new ScriptEndedFeedback(vs, ld.Protocol, false, false);
+                    return new ScriptEndedFeedback(varCol, ld.Protocol, false, false);
                 }
 
                 EndScript = f.EndSkript;
 
                 pos = f.Position;
                 ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);
-                if (f.BreakFired) { return new ScriptEndedFeedback(vs, ld.Protocol, true, true); }
+                if (f.BreakFired) { return new ScriptEndedFeedback(varCol, ld.Protocol, true, true); }
             }
         } while (true);
     }

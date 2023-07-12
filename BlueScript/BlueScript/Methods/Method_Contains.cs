@@ -47,8 +47,8 @@ internal class Method_Contains : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "contains" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         #region Wortliste erzeugen
@@ -56,29 +56,29 @@ internal class Method_Contains : Method {
         var wordlist = new List<string>();
 
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is VariableString vsx) { wordlist.Add(vsx.ValueString); }
-            if (attvar.Attributes[z] is VariableListString vlx) { wordlist.AddRange(vlx.ValueList); }
+            if (attvar.Attributes[z] is VariableString vs1) { wordlist.Add(vs1.ValueString); }
+            if (attvar.Attributes[z] is VariableListString vl1) { wordlist.AddRange(vl1.ValueList); }
         }
         wordlist = wordlist.SortedDistinctList();
 
         #endregion
 
-        if (attvar.Attributes[0] is VariableListString vl) {
-            var x = vl.ValueList;
+        if (attvar.Attributes[0] is VariableListString vl2) {
+            var x = vl2.ValueList;
             if (wordlist.Any(thisW => x.Contains(thisW, attvar.ValueBoolGet(1)))) {
                 return DoItFeedback.Wahr();
             }
             return DoItFeedback.Falsch();
         }
 
-        if (attvar.Attributes[0] is VariableString vsxy) {
+        if (attvar.Attributes[0] is VariableString vs2) {
             foreach (var thisW in wordlist) {
                 if (attvar.ValueBoolGet(1)) {
-                    if (vsxy.ValueString.Contains(thisW)) {
+                    if (vs2.ValueString.Contains(thisW)) {
                         return DoItFeedback.Wahr();
                     }
                 } else {
-                    if (vsxy.ValueString.ToLower().Contains(thisW.ToLower())) {
+                    if (vs2.ValueString.ToLower().Contains(thisW.ToLower())) {
                         return DoItFeedback.Wahr();
                     }
                 }

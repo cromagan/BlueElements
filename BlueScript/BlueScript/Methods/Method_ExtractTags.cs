@@ -51,15 +51,15 @@ internal class Method_ExtractTags : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "extracttags" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var comment = "Mit dem Befehl 'ExtractTags' erstellt";
-        vs.RemoveWithComment(comment);
+        varCol.RemoveWithComment(comment);
 
         var tags = new List<string>();
-        if (attvar.Attributes[0] is VariableString vsx) { tags.Add(vsx.ValueString); }
+        if (attvar.Attributes[0] is VariableString vs) { tags.Add(vs.ValueString); }
         if (attvar.Attributes[0] is VariableListString vl) { tags.AddRange(vl.ValueList); }
 
         foreach (var thisw in tags) {
@@ -69,7 +69,7 @@ internal class Method_ExtractTags : Method {
                 var vn = x[0].ToLower().ReduceToChars(Constants.AllowedCharsVariableName);
                 var thisv = x[1].Trim();
                 if (!string.IsNullOrEmpty(vn) && !string.IsNullOrEmpty(thisv)) {
-                    vs.Add(new VariableString("extracted_" + vn, thisv, true, false, comment));
+                    varCol.Add(new VariableString("extracted_" + vn, thisv, true, false, comment));
                 }
             }
         }

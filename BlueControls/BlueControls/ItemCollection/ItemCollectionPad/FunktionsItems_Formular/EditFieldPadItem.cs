@@ -69,9 +69,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
                 return (int)UsedArea.Height > IAutosizableExtension.MinHeigthCaption;
             }
 
-            if (_überschriftanordung is ÜberschriftAnordnung.Links_neben_Dem_Feld or
-                ÜberschriftAnordnung.Ohne_mit_Abstand or
-                ÜberschriftAnordnung.ohne) {
+            if (_überschriftanordung is ÜberschriftAnordnung.Links_neben_Dem_Feld or ÜberschriftAnordnung.ohne) {
                 return (int)UsedArea.Height > IAutosizableExtension.MinHeigthTextBox;
             }
 

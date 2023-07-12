@@ -49,8 +49,8 @@ internal class Method_ForEach : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "foreach" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var l = attvar.ValueListStringGet(1);
@@ -61,7 +61,7 @@ internal class Method_ForEach : Method {
 
         if (!Variable.IsValidName(varnam)) { return new DoItFeedback(infos.Data, varnam + " ist kein gültiger Variablen-Name"); }
 
-        var vari = vs.Get(varnam);
+        var vari = varCol.Get(varnam);
         if (vari != null) {
             return new DoItFeedback(infos.Data, "Variable " + varnam + " ist bereits vorhanden.");
         }
@@ -72,7 +72,7 @@ internal class Method_ForEach : Method {
         foreach (var thisl in l) {
             var nv = new VariableString(varnam, thisl, true, false, "Interations-Variable");
 
-            scx = Method_CallByFilename.CallSub(vs, scp2, infos, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, nv);
+            scx = Method_CallByFilename.CallSub(varCol, scp2, infos, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, nv);
             if (!scx.AllOk) { return scx; }
 
             if (scx.BreakFired || scx.EndScript) { break; }

@@ -50,8 +50,8 @@ internal class Method_Export : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "export" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         #region  Filter ermitteln (allfi)
@@ -64,7 +64,7 @@ internal class Method_Export : Method_Database {
 
         #region  Datebank ermitteln (db)
 
-        var db = MyDatabase(vs);
+        var db = MyDatabase(varCol);
 
         if (db == null || allFi[0].Database != db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 

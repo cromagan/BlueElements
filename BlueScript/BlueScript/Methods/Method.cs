@@ -106,20 +106,20 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return (s, string.Empty);
     }
 
-    public static GetEndFeedback ReplaceComands(string txt, VariableCollection vs, LogData ld, ScriptProperties scp) {
+    public static GetEndFeedback ReplaceComands(string txt, VariableCollection varCol, LogData ld, ScriptProperties scp) {
         if (Script.Comands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert", ld); }
 
         List<string> c = new();
         foreach (var thisc in Script.Comands) {
             if (!string.IsNullOrEmpty(thisc.Returns)) {
-                c.AddRange(thisc.Comand(vs).Select(thiscs => thiscs + thisc.StartSequence));
+                c.AddRange(thisc.Comand(varCol).Select(thiscs => thiscs + thisc.StartSequence));
             }
         }
         var posc = 0;
         do {
             var (pos, _) = NextText(txt, posc, c, true, false, KlammernStd);
             if (pos < 0) { return new GetEndFeedback(0, txt); }
-            var f = Script.ComandOnPosition(vs, scp, txt, pos, true, ld);
+            var f = Script.ComandOnPosition(varCol, scp, txt, pos, true, ld);
             if (!f.AllOk) { return new GetEndFeedback("Durch Befehl abgebrochen: " + txt, ld); }
 
             if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
@@ -140,9 +140,9 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     /// <param name="s"></param>
     /// <param name="ld"></param>
     /// <returns></returns>
-    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection vs, LogData ld) {
+    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection varCol, LogData ld) {
         var posc = 0;
-        var v = vs.AllStringableNames();
+        var v = varCol.AllStringableNames();
 
         do {
             var (pos, which) = NextText(txt, posc, v, true, true, KlammernStd);
@@ -159,10 +159,10 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
             //    if (pose <= pos) { return new GetEndFeedback("Variablen-Findung End-~-Zeichen nicht gefunden."); }
             //    var x = Variable.GetVariableByParsing(txt.Substring(pos + 1, pose - pos - 1), s);
             //    if (x.Variable is not VariableString x2) { return new GetEndFeedback("Fehler beim Berechnen des Variablen-Namens."); }
-            //    thisV = vs.Get(x2.ValueString);
+            //    thisV = varcol.Get(x2.ValueString);
             //    endz = pose + 1;
             //} else {
-            var thisV = vs.Get(which);
+            var thisV = varCol.Get(which);
             var endz = pos + which.Length;
             //}
             if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which, ld); }
@@ -197,7 +197,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return attributes;
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection vs, string attributText, List<List<string>> types, bool endlessArgs, LogData ld, ScriptProperties scp) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection varcol, string attributText, List<List<string>> types, bool endlessArgs, LogData ld, ScriptProperties scp) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
                 ? new SplittedAttributesFeedback(new VariableCollection())
@@ -232,10 +232,10 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
                 if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
 
-                v = vs.Get(varn);
+                v = varcol.Get(varn);
                 if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
             } else {
-                var tmp2 = Variable.GetVariableByParsing(attributes[n], ld, vs, scp);
+                var tmp2 = Variable.GetVariableByParsing(attributes[n], ld, varcol, scp);
                 if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
                 v = tmp2.Variable;
             }
@@ -257,7 +257,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return new SplittedAttributesFeedback(feedbackVariables);
     }
 
-    //public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection vs, ScriptProperties scp, CanDoFeedback infos, List<List<string>> types, bool endlessArgs) {
+    //public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection varcol, ScriptProperties scp, CanDoFeedback infos, List<List<string>> types, bool endlessArgs) {
     //    if (types.Count == 0) {
     //        return string.IsNullOrEmpty(infos.AttributText)
     //            ? new SplittedAttributesFeedback(new VariableCollection())
@@ -285,10 +285,10 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     //            if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
 
-    //            v = vs.Get(varn);
+    //            v = varcol.Get(varn);
     //            if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
     //        } else {
-    //            var tmp2 = Variable.GetVariableByParsing(attributes[n], infos.Data, vs, scp);
+    //            var tmp2 = Variable.GetVariableByParsing(attributes[n], infos.Data, varcol, scp);
     //            if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
     //            v = tmp2.Variable;
     //        }
@@ -310,7 +310,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     //    return new SplittedAttributesFeedback(feedbackVariables);
     //}
 
-    public CanDoFeedback CanDo(VariableCollection vs, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
+    public CanDoFeedback CanDo(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
         if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns)) {
             return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
         }
@@ -319,7 +319,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         }
         var maxl = scriptText.Length;
 
-        foreach (var thiscomand in Comand(vs)) {
+        foreach (var thiscomand in Comand(varCol)) {
             var comandtext = thiscomand + StartSequence;
             var l = comandtext.Length;
             if (pos + l < maxl) {
@@ -350,7 +350,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     public abstract List<string> Comand(VariableCollection? currentvariables);
 
-    public abstract DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp);
+    public abstract DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp);
 
     public string HintText() {
         var co = "Syntax:\r\n";

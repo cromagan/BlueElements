@@ -46,8 +46,8 @@ internal class Method_Replace : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "replace" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
             : new DoItFeedback(attvar.ValueStringGet(0).Replace(attvar.ValueStringGet(1), attvar.ValueStringGet(2)));
     }

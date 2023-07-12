@@ -55,22 +55,6 @@ public sealed class ColumnViewItem {
                     //Column?.Repair(); // Alte Formate reparieren
                     break;
 
-                //case "x":
-                //    _spalteX1 = IntParse(pair.Value);
-                //    break;
-
-                //case "width":
-                //    _spalteWidth = IntParse(pair.Value);
-                //    break;
-
-                //case "height":
-                //    _spalteHeight = IntParse(pair.Value);
-                //    break;
-
-                //case "caption":
-                //    _überschriftAnordnung = (ÜberschriftAnordnung)IntParse(pair.Value);
-                //    break;
-
                 case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
                     _viewType = ViewType.PermanentColumn;
                     break;
@@ -83,17 +67,13 @@ public sealed class ColumnViewItem {
                     //    _editType = (EditTypeFormula)IntParse(pair.Value);
                     break;
 
-                //if (_überschriftAnordnung != ÜberschriftAnordnung.Über_dem_Feld) { result = result + ", Caption=" + (int)_überschriftAnordnung; }
-                //result = result + ", EditType=" + (int)_editType;
-
                 default:
                     Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
                     break;
             }
         }
-        //if (Column  ==null || Column .IsDisposed) { Develop.DebugPrint(FehlerArt.Warnung, "Ungültige Spalte"); }
+
         if (Column != null && _viewType == ViewType.None) { _viewType = ViewType.Column; }
-        //if (Column != null && _viewType != ViewType.None) { Column.CheckFormulaEditType(); }
     }
 
     private ColumnViewItem(ColumnViewCollection parent) : base() {
@@ -141,12 +121,6 @@ public sealed class ColumnViewItem {
     public override string ToString() {
         var result = "{Type=" + (int)_viewType;
         if (Column != null && !Column.IsDisposed) { result = result + ", ColumnName=" + Column.Name; }
-        //if (_spalteX1 > 0) { result = result + ", X=" + _spalteX1; }
-        //if (_spalteWidth > 1) { result = result + ", Width=" + _spalteWidth; }
-        //if (_spalteHeight > 1) { result = result + ", Height=" + _spalteHeight; }
-        //if (_überschriftAnordnung != ÜberschriftAnordnung.Über_dem_Feld) { result = result + ", Caption=" + (int)_überschriftAnordnung; }
-        //if (_editType != EditTypeFormula.None) { result = result + ", EditType=" + (int)_editType; }
-
         return result + "}";
     }
 

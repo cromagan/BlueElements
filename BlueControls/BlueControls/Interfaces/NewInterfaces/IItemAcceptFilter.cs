@@ -55,7 +55,7 @@ public static class ItemAcceptFilterExtensions {
 
         if (item.GetFilterFrom != null) {
             foreach (var thisID in item.GetFilterFrom) {
-                if (item.Parent[thisID] is IItemSendFilter i) {
+                if (item?.Parent?[thisID] is IItemSendFilter i) {
                     l.Add(i.OutputColorId);
                 }
             }

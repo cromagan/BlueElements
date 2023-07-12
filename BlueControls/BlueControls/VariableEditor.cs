@@ -54,9 +54,10 @@ public partial class VariableEditor : UserControl {
         }
         var list = new VariableCollection();
 
-        foreach (var thisr in filterVariablen.Table.Database.Row) {
-            var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, false,
-                thisr.CellGetString("Kommentar"));
+        if (filterVariablen?.Table?.Database is not DatabaseAbstract db) { return list; }
+
+        foreach (var thisr in db.Row) {
+            var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, false, thisr.CellGetString("Kommentar"));
             list.Add(v);
         }
 

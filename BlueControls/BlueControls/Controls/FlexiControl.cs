@@ -814,12 +814,18 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
         _captionObject.Enabled = Enabled;
         _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch; // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
-        _captionObject.Text = _caption;//.ReplaceLowerSign();
-        _captionObject.Size = Extended_Text.ExtText.MeasureString(_caption, Design.Caption, States.Standard, Width);//  _captionObject.TextRequiredSize();
+
+        if (_captionPosition == ÜberschriftAnordnung.Ohne_mit_Abstand) {
+            _captionObject.Text = " ";
+        } else {
+            _captionObject.Text = _caption;
+        }
+
+        _captionObject.Size = Extended_Text.ExtText.MeasureString(_captionObject.Text, Design.Caption, States.Standard, Width);//  _captionObject.TextRequiredSize();
         _captionObject.Left = 0;
         _captionObject.Top = 0;
         _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-        _captionObject.Visible = _captionPosition != ÜberschriftAnordnung.Ohne_mit_Abstand;
+        _captionObject.Visible = true; // _captionPosition != ÜberschriftAnordnung.Ohne_mit_Abstand;
         _captionObject.Translate = _translateCaption;
         _captionObject.BringToFront();
     }
@@ -978,8 +984,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 }
                 break;
 
-            case ÜberschriftAnordnung.Über_dem_Feld:
-            case ÜberschriftAnordnung.Ohne_mit_Abstand:
+            default:
                 if (_captionObject != null) {
                     control.Left = 0;
                     control.Top = _captionObject.Height;
@@ -987,10 +992,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                     control.Height = Height - _captionObject.Height;
                     //if ( _captionObject.Height < 4) { Develop.DebugPrint("Caption Height zu klein"); }
                 }
-                break;
-
-            default:
-                Develop.DebugPrint(_captionPosition);
                 break;
         }
         control.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;

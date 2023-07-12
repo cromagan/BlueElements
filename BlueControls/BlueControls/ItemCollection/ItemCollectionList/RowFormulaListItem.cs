@@ -72,7 +72,7 @@ public class RowFormulaListItem : BasicListItem {
 
     public override string QuickInfo {
         get {
-            if (_row == null) { return string.Empty; }
+            if (_row?.Database == null) { return string.Empty; }
 
             return !string.IsNullOrEmpty(_row.Database.ZeilenQuickInfo)
                 ? _row.QuickInfo.CreateHtmlCodes(true)
@@ -138,10 +138,10 @@ public class RowFormulaListItem : BasicListItem {
         }
     }
 
-    protected override string GetCompareKey() => _row.CompareKey();
+    protected override string GetCompareKey() => _row?.CompareKey() ?? string.Empty;
 
     private void GeneratePic() {
-        if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#")) {
+        if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#") || Row?.Database == null) {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }

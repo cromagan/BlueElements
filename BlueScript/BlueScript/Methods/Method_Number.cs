@@ -47,14 +47,14 @@ internal class Method_Number : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "number" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         if (attvar.Attributes[0] is VariableFloat vf) { return new DoItFeedback(vf.ValueNum); }
 
-        if (attvar.Attributes[0] is VariableString vsx) {
-            if (Converter.DoubleTryParse(vsx.ValueString, out var dbl)) {
+        if (attvar.Attributes[0] is VariableString vs) {
+            if (Converter.DoubleTryParse(vs.ValueString, out var dbl)) {
                 return new DoItFeedback(dbl);
             }
             //return new DoItFeedback(infos.LogData, s, "'" + vs.ValueString + "' kann nicht als Zahl interpretiert werden.");

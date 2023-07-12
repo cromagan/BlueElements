@@ -50,8 +50,8 @@ public class Method_LookupFilter : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "lookupfilter" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 3);
@@ -80,8 +80,8 @@ public class Method_LookupFilter : Method {
 
         if (v[0] is VariableListString vl) {
             l.AddRange(vl.ValueList);
-        } else if (v[0] is VariableString vsx) {
-            var w = vsx.ValueString;
+        } else if (v[0] is VariableString vs) {
+            var w = vs.ValueString;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
         } else {
             return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");

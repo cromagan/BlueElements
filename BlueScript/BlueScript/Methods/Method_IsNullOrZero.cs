@@ -46,8 +46,8 @@ internal class Method_IsNullOrZero : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "isnullorzero" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {

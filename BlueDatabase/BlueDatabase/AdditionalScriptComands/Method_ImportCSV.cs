@@ -47,14 +47,14 @@ internal class Method_ImportCSV : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "importcsv" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
-        var db = MyDatabase(vs);
+        var db = MyDatabase(varCol);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);

@@ -46,8 +46,8 @@ internal class Method_SetIfExists : Method {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "SetIfExists" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
@@ -58,8 +58,8 @@ internal class Method_SetIfExists : Method {
             if (attvar.MyClassId(z) != attvar.MyClassId(0)) { return new DoItFeedback(infos.Data, "Variablentyp zur Ausgangsvariable unterschiedlich."); }
 
             switch (attvar.Attributes[z]) {
-                case VariableString vsx:
-                    if (attvar.ValueStringSet(0, vsx.ValueString, infos.Data) is DoItFeedback dif) { return dif; }
+                case VariableString vs:
+                    if (attvar.ValueStringSet(0, vs.ValueString, infos.Data) is DoItFeedback dif) { return dif; }
                     return DoItFeedback.Null();
 
                 case VariableBool vb:

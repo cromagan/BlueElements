@@ -48,16 +48,16 @@ internal class Method_IsDropDownItem : Method_Database {
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "isdropdownitem" };
 
-    public override DoItFeedback DoIt(VariableCollection vs, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(vs, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var column = Column(vs, attvar, 1);
+        var column = Column(varCol, attvar, 1);
         if (column == null || column.IsDisposed) { return new DoItFeedback(infos.Data, "Spalte in Datenbank nicht gefunden"); }
 
         var tocheck = new List<string>();
         if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
-        if (attvar.Attributes[0] is VariableString vsx) { tocheck.Add(vsx.ValueString); }
+        if (attvar.Attributes[0] is VariableString vs) { tocheck.Add(vs.ValueString); }
 
         tocheck = tocheck.SortedDistinctList();
 

@@ -64,9 +64,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
                 return UsedArea.Height > IAutosizableExtension.MinHeigthCaption;
             }
 
-            if (_überschriftanordung is ÜberschriftAnordnung.Links_neben_Dem_Feld or
-                ÜberschriftAnordnung.Ohne_mit_Abstand or
-                ÜberschriftAnordnung.ohne) {
+            if (_überschriftanordung is ÜberschriftAnordnung.Links_neben_Dem_Feld or ÜberschriftAnordnung.ohne) {
                 return UsedArea.Height > IAutosizableExtension.MinHeigthTextBox;
             }
 

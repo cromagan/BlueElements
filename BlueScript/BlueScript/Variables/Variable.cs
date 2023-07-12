@@ -124,18 +124,18 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         return "dummy" + _dummyCount;
     }
 
-    public static DoItFeedback GetVariableByParsing(string txt, LogData ld, VariableCollection vs, ScriptProperties scp) {
+    public static DoItFeedback GetVariableByParsing(string txt, LogData ld, VariableCollection varCol, ScriptProperties scp) {
         if (string.IsNullOrEmpty(txt)) { return new DoItFeedback(ld, "Kein Wert zum Parsen angekommen."); }
 
         if (txt.StartsWith("(")) {
             var (pose, _) = NextText(txt, 0, KlammerZu, false, false, KlammernStd);
             if (pose < txt.Length - 1) {
                 // Wir haben so einen Fall: (true) || (true)
-                var tmp = GetVariableByParsing(txt.Substring(1, pose - 1), ld, vs, scp);
+                var tmp = GetVariableByParsing(txt.Substring(1, pose - 1), ld, varCol, scp);
                 if (!tmp.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler in ()"); }
                 if (tmp.Variable == null) { return new DoItFeedback(ld, "Allgemeiner Befehls-Berechnungsfehler"); }
                 if (!tmp.Variable.ToStringPossible) { return new DoItFeedback(ld, "Falscher Variablentyp: " + tmp.Variable.MyClassId); }
-                return GetVariableByParsing(tmp.Variable.ValueForReplace + txt.Substring(pose + 1), ld, vs, scp);
+                return GetVariableByParsing(tmp.Variable.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);
             }
         }
 
@@ -143,7 +143,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
         var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernStd);
         if (uu > 0) {
-            var txt1 = GetVariableByParsing(txt.Substring(0, uu), ld, vs, scp);
+            var txt1 = GetVariableByParsing(txt.Substring(0, uu), ld, varCol, scp);
             if (!txt1.AllOk || txt1.Variable == null) {
                 return new DoItFeedback(ld, "Befehls-Berechnungsfehler vor &&");
             }
@@ -151,12 +151,12 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             if (txt1.Variable.ValueForReplace == "false") {
                 return txt1;
             }
-            return GetVariableByParsing(txt.Substring(uu + 2), ld, vs, scp);
+            return GetVariableByParsing(txt.Substring(uu + 2), ld, varCol, scp);
         }
 
         var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernStd);
         if (oo > 0) {
-            var txt1 = GetVariableByParsing(txt.Substring(0, oo), ld, vs, scp);
+            var txt1 = GetVariableByParsing(txt.Substring(0, oo), ld, varCol, scp);
             if (!txt1.AllOk || txt1.Variable == null) {
                 return new DoItFeedback(ld, "Befehls-Berechnungsfehler vor ||");
             }
@@ -164,18 +164,18 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             if (txt1.Variable.ValueForReplace == "true") {
                 return txt1;
             }
-            return GetVariableByParsing(txt.Substring(oo + 2), ld, vs, scp);
+            return GetVariableByParsing(txt.Substring(oo + 2), ld, varCol, scp);
         }
 
-        var t = Method.ReplaceVariable(txt, vs, ld);
+        var t = Method.ReplaceVariable(txt, varCol, ld);
         if (!t.AllOk) { return new DoItFeedback(ld, "Variablen-Berechnungsfehler"); }
         if (t.Variable != null) { return new DoItFeedback(t.Variable); }
-        if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, vs, scp); }
+        if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, varCol, scp); }
 
-        var t2 = Method.ReplaceComands(txt, vs, ld, scp);
+        var t2 = Method.ReplaceComands(txt, varCol, ld, scp);
         if (!t2.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler"); }
         if (t2.Variable != null) { return new DoItFeedback(t2.Variable); }
-        if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, ld, vs, scp); }
+        if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, ld, varCol, scp); }
 
         var (posa, _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
         if (posa > -1) {
@@ -184,11 +184,11 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
             var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
             if (!string.IsNullOrEmpty(tmptxt)) {
-                var tmp = GetVariableByParsing(tmptxt, ld, vs, scp);
+                var tmp = GetVariableByParsing(tmptxt, ld, varCol, scp);
                 if (!tmp.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler in ()"); }
                 if (tmp.Variable == null) { return new DoItFeedback(ld, "Allgemeiner Berechnungsfehler in ()"); }
                 if (!tmp.Variable.ToStringPossible) { return new DoItFeedback(ld, "Falscher Variablentyp: " + tmp.Variable.MyClassId); }
-                return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), ld, vs, scp);
+                return GetVariableByParsing(txt.Substring(0, posa) + tmp.Variable.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);
             }
         }
 
@@ -198,7 +198,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
         foreach (var thisVt in Script.VarTypes) {
             if (thisVt.GetFromStringPossible) {
-                if (thisVt.TryParse(txt, out var v, vs, scp)) {
+                if (thisVt.TryParse(txt, out var v, varCol, scp)) {
                     return new DoItFeedback(v);
                 }
             }
@@ -298,8 +298,8 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     protected abstract object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp);
 
-    protected bool TryParse(string txt, out Variable? succesVar, VariableCollection vs, ScriptProperties scp) {
-        var x = TryParse(txt, vs, scp);
+    protected bool TryParse(string txt, out Variable? succesVar, VariableCollection varCol, ScriptProperties scp) {
+        var x = TryParse(txt, varCol, scp);
         if (x == null) {
             succesVar = null;
             return false;
