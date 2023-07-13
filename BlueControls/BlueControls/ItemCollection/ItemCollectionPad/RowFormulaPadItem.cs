@@ -37,25 +37,25 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     private string _lastQuickInfo = string.Empty;
     private string _layoutId = string.Empty;
-    private long _rowKey;
+    private string _rowKey;
     private string _tmpQuickInfo = string.Empty;
 
     #endregion
 
     #region Constructors
 
-    public RowFormulaPadItem() : this(string.Empty, null, -1, string.Empty) { }
+    public RowFormulaPadItem() : this(string.Empty, null, string.Empty, string.Empty) { }
 
-    public RowFormulaPadItem(string internalname) : this(internalname, null, -1, string.Empty) { }
+    public RowFormulaPadItem(string internalname) : this(internalname, null, string.Empty, string.Empty) { }
 
-    public RowFormulaPadItem(DatabaseAbstract database, long rowkey) : this(database, rowkey, string.Empty) { }
+    public RowFormulaPadItem(DatabaseAbstract database, string? rowkey) : this(database, rowkey, string.Empty) { }
 
-    public RowFormulaPadItem(DatabaseAbstract database, long rowkey, string layoutId) : this(string.Empty, database, rowkey, layoutId) { }
+    public RowFormulaPadItem(DatabaseAbstract database, string? rowkey, string layoutId) : this(string.Empty, database, rowkey, layoutId) { }
 
-    public RowFormulaPadItem(string internalname, DatabaseAbstract? database, long rowkey, string layoutId) : base(internalname) {
+    public RowFormulaPadItem(string internalname, DatabaseAbstract? database, string? rowkey, string layoutId) : base(internalname) {
         Database = database;
         if (Database != null) { Database.Disposing += _Database_Disposing; }
-        _rowKey = rowkey;
+        _rowKey = rowkey ?? string.Empty;
         if (Database != null && string.IsNullOrEmpty(layoutId)) {
             ItemCollectionPad p = new(Database.Layouts[0], string.Empty);
             layoutId = p.KeyName;
@@ -142,7 +142,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
             case "rowid": // TODO: alt
             case "rowkey":
-                _rowKey = LongParse(value);
+                _rowKey = value;
                 return true;
 
             case "firstvalue":
@@ -157,7 +157,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
                 if (rowtmp == null) {
                     MessageBox.Show("<b><u>Eintrag nicht hinzugefügt</b></u><br>" + n, ImageCode.Warnung, "OK");
                 } else {
-                    _rowKey = rowtmp.Key;
+                    _rowKey = rowtmp.KeyName;
                     MessageBox.Show("<b><u>Eintrag neu gefunden:</b></u><br>" + n, ImageCode.Warnung, "OK");
                 }
                 return true; // Alles beim Alten
@@ -171,7 +171,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         var result = new List<string>();
         result.ParseableAdd("LayoutID", _layoutId);
         result.ParseableAdd("Database", Database);
-        if (_rowKey != 0) { result.ParseableAdd("RowKey", _rowKey); }
+        if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }
         if (Row is RowItem r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
         return result.Parseable(base.ToString());
     }

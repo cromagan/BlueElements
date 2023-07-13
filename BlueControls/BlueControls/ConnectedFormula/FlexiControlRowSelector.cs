@@ -101,120 +101,6 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
         Invalidate();
     }
 
-    //public void SetData(DatabaseAbstract? database, long? rowkey) {
-    //    if (_disposing || IsDisposed) { return; }
-
-    //    if (OutputDatabase != database) {
-    //        return;
-    //        //            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
-    //    }
-
-    //    BlueBasics.Develop.DebugPrint_NichtImplementiert();
-
-    //    //if (FilterDefiniton == null || FilterDefiniton.IsDisposed) { return; }
-
-    //    //if (FilterDefiniton.Row.Count > 0) {
-    //    //    #region Filter erstellen
-
-    //    //    var f = new FilterCollection(OutputDatabase);
-
-    //    //    foreach (var thisR in FilterDefiniton.Row) {
-    //    //        #region Column ermitteln
-
-    //    //        var column = OutputDatabase?.Column.Exists(thisR.CellGetString("Spalte"));
-    //    //        if (Column  ==null || Column .IsDisposed) {
-    //    //            return;
-    //    //        }
-
-    //    //        #endregion
-
-    //    //        #region Type ermitteln
-
-    //    //        var onlyifhasvalue = false;
-    //    //        var word = false;
-
-    //    //        FilterType ft;
-    //    //        switch (thisR.CellGetString("Filterart").ToLower()) {
-    //    //            case "=":
-    //    //                ft = FilterType.Istgleich_GroßKleinEgal;
-    //    //                break;
-
-    //    //            case "=!empty":
-    //    //                ft = FilterType.Istgleich_GroßKleinEgal;
-    //    //                onlyifhasvalue = true;
-    //    //                break;
-
-    //    //            case "=word":
-    //    //                ft = FilterType.Istgleich_ODER_GroßKleinEgal;
-    //    //                word = true;
-    //    //                break;
-
-    //    //            default:
-    //    //                ft = FilterType.Istgleich_GroßKleinEgal;
-    //    //                DebugPrint("Filter " + thisR.CellGetInteger("Filterart") + " nicht definiert.");
-    //    //                break;
-    //    //        }
-
-    //    //        #endregion
-
-    //    //        #region Value ermitteln
-
-    //    //        var calcrows = false;
-
-    //    //        List<string> value = new();
-
-    //    //        if (otherdatabase?.Row.SearchByKey(rowkey) is RowItem r) {
-    //    //            r.CheckRowDataIfNeeded();
-    //    //            calcrows = true;
-
-    //    //            var tmpvalue = thisR.CellGetString("suchtxt");
-
-    //    //            if (tmpvalue.Equals("#first", StringComparison.OrdinalIgnoreCase)) {
-    //    //                tmpvalue = r.CellFirstString();
-    //    //            } else {
-    //    //                tmpvalue = r.ReplaceVariables(tmpvalue, false, false);
-    //    //            }
-
-    //    //            if (word) {
-    //    //                List<string> names = new();
-    //    //                names.AddRange(column.GetUcaseNamesSortedByLenght());
-
-    //    //                foreach (var thisWord in names) {
-    //    //                    var fo = tmpvalue.IndexOfWord(thisWord, 0, RegexOptions.IgnoreCase);
-    //    //                    if (fo > -1) {
-    //    //                        value.Add(thisWord);
-    //    //                    }
-    //    //                }
-
-    //    //                if (value.Count == 0) {
-    //    //                    calcrows = false;
-    //    //                }
-    //    //            } else {
-    //    //                value.Add(tmpvalue); // Immer hinzufügen. Es gibt Einträge, wo der erste Befüllt ist, und der Zweite leer sein kann.
-    //    //            }
-    //    //        }
-
-    //    //        #endregion
-
-    //    //        if (value.Count > 0 || !onlyifhasvalue) {
-    //    //            f.Add(new FilterItem(column, ft, value));
-    //    //        }
-
-    //    //        #endregion
-
-    //    //        #region Zeile(n) ermitteln und Script löschen
-
-    //    //        _rows = calcrows ? OutputDatabase?.Row.CalculateFilteredRows(f) : null;
-
-    //    //        #endregion
-    //    //    }
-
-    //    //    if (_disposing || IsDisposed) { return; } // Multitasking...
-    //    //}
-
-    //    UpdateMyCollection();
-    //}
-
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
@@ -240,7 +126,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
     protected override void OnValueChanged() {
         base.OnValueChanged();
-        Row = string.IsNullOrEmpty(Value) ? null : OutputDatabase?.Row.SearchByKey(LongParse(Value));
+        Row = string.IsNullOrEmpty(Value) ? null : OutputDatabase?.Row.SearchByKey(Value);
     }
 
     private void UpdateMyCollection() {
@@ -266,13 +152,13 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
         var f = FilteredRows;
         if (f != null) {
             foreach (var thisR in f) {
-                if (cb?.Item?[thisR.Key.ToString()] == null) {
+                if (cb?.Item?[thisR.KeyName] == null) {
                     var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
-                    _ = cb?.Item?.Add(tmpQuickInfo, thisR.Key.ToString());
+                    _ = cb?.Item?.Add(tmpQuickInfo, thisR.KeyName);
                     //cb.Item.Add(thisR, string.Empty);
                 } else {
                     foreach (var thisIt in ex) {
-                        if (thisIt.KeyName == thisR.Key.ToString()) {
+                        if (thisIt.KeyName == thisR.KeyName) {
                             _ = ex.Remove(thisIt);
                             break;
                         }

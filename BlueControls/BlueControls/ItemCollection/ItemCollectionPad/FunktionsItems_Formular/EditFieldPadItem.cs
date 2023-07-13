@@ -180,7 +180,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         //var ff = parent.SearchOrGenerate(rfw2);
 
         var con = new FlexiControlForCell();
-        con.SetData(Column?.Database, -1);
+        con.SetData(Column?.Database, string.Empty);
         con.ColumnName = Column?.Name ?? string.Empty;
         con.EditType = EditType;
         con.CaptionPosition = CaptionPosition;

@@ -75,7 +75,7 @@ internal class Method_ForEach : Method {
             if (scx.BreakFired || scx.EndScript) { break; }
         }
 
-        return new DoItFeedback(false, scx.EndScript);
+        return new DoItFeedback(false, scx.EndScript); // Du muss die Breaks konsumieren, aber EndSkript muss weitergegeben werden
     }
 
     #endregion

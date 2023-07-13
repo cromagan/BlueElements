@@ -387,7 +387,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (Table.Database != database) {
-            CFO.SetData(null, null, -1);
+            CFO.SetData(null, null, string.Empty);
         }
 
         FilterLeiste.Table = Table;
@@ -449,7 +449,7 @@ public partial class TableView : FormWithStatusBar {
             if (CFO.Width < 30 || CFO.Height < 10) { return; }
 
             CFO.GetConnectedFormulaFromDatabase(r?.Database);
-            CFO.SetData(r?.Database, r?.Key ?? -1);
+            CFO.SetData(r?.Database, r?.KeyName ?? string.Empty);
         }
     }
 
@@ -551,7 +551,7 @@ public partial class TableView : FormWithStatusBar {
 
         _ = e.UserMenu.Add("Zeile", true);
         _ = e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && tbl.Database.IsAdministrator());
-        _ = e.UserMenu.Add("Datenüberprüfung", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null);
+        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null);
 
         foreach (var thiss in tbl.Database.EventScript) {
             if (thiss != null && thiss.ManualExecutable && thiss.NeedRow) {
@@ -621,7 +621,7 @@ public partial class TableView : FormWithStatusBar {
             case "ContentDelete":
                 if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditGeneral)) { return; }
 
-                tbl.Database.Cell.Delete(column, row?.Key);
+                tbl.Database.Cell.Delete(column, row?.KeyName);
                 break;
 
             case "SpaltenEigenschaftenBearbeiten":
@@ -874,7 +874,7 @@ public partial class TableView : FormWithStatusBar {
         var x = new ColumnArrangementPadEditor(Table.Database);
         _ = x.ShowDialog();
 
-        if(Table.Database.ColumnArrangements.Count == 0) { return; }
+        if (Table.Database.ColumnArrangements.Count == 0) { return; }
 
         var car = Table.Database.ColumnArrangements.CloneWithClones();
         if (car[0] is ColumnViewCollection cvc) {

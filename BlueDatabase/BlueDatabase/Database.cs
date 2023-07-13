@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (column) 2023 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -73,7 +73,7 @@ public sealed class Database : DatabaseAbstract {
         Initialize();
 
         if (!string.IsNullOrEmpty(filename)) {
-            //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \r\n" + filename.FileNameWithoutSuffix()));
+            //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \row\n" + filename.FileNameWithoutSuffix()));
             LoadFromFile(filename, create, needPassword);
         } else if (stream != null) {
             LoadFromStream(stream);
@@ -103,9 +103,9 @@ public sealed class Database : DatabaseAbstract {
         return new Database(ci, false, needPassword);
     }
 
-    public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, out long rowKey, out string value, out string colName) {
+    public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, out string? rowKey, out string value, out string colName) {
         colName = string.Empty;
-        rowKey = -1;
+        rowKey = string.Empty;
 
         switch ((Routinen)bLoaded[pointer]) {
             //case Routinen.CellFormat: {
@@ -113,9 +113,9 @@ public sealed class Database : DatabaseAbstract {
             //        var les = NummerCode3(bLoaded, pointer + 2);
             //        //colKey = NummerCode3(bLoaded, pointer + 5);
             //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var b = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-            //        value = b.ToStringWin1252();
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringWin1252();
             //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
             //        //var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
             //        pointer += 11 + les + 4;
@@ -126,9 +126,9 @@ public sealed class Database : DatabaseAbstract {
             //        var les = NummerCode3(bLoaded, pointer + 2);
             //        //colKey = NummerCode3(bLoaded, pointer + 5);
             //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var b = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-            //        value = b.ToStringUtf8();
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
             //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
             //        // var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
             //        pointer += 11 + les + 4;
@@ -139,9 +139,9 @@ public sealed class Database : DatabaseAbstract {
             //        var les = NummerCode3(bLoaded, pointer + 2);
             //        //colKey = NummerCode7(bLoaded, pointer + 5);
             //        rowKey = NummerCode7(bLoaded, pointer + 12);
-            //        var b = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
-            //        value = b.ToStringUtf8();
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 19, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
             //        //var  width = NummerCode2(bLoaded, pointer + 19 + les);
             //        //var  height = NummerCode2(bLoaded, pointer + 19 + les + 2);
             //        pointer += 19 + les + 4;
@@ -150,7 +150,7 @@ public sealed class Database : DatabaseAbstract {
             case Routinen.CellFormatUTF8_V401: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
-                    rowKey = NummerCode7(bLoaded, pointer + 5);
+                    rowKey = NummerCode7(bLoaded, pointer + 5).ToString();
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 12, b, 0, les);
                     value = b.ToStringUtf8();
@@ -164,9 +164,9 @@ public sealed class Database : DatabaseAbstract {
             //        var les = NummerCode3(bLoaded, pointer + 2);
             //        //colKey = -1;
             //        rowKey = -1;
-            //        var b = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
-            //        value = b.ToStringWin1252();
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 5, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringWin1252();
             //        //width = 0;
             //        //height = 0;
             //        pointer += 5 + les;
@@ -176,7 +176,7 @@ public sealed class Database : DatabaseAbstract {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
                     //colKey = -1;
-                    rowKey = -1;
+                    rowKey = string.Empty;
                     var b = new byte[les];
                     Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
                     value = b.ToStringUtf8();
@@ -190,9 +190,9 @@ public sealed class Database : DatabaseAbstract {
             //        var les = NummerCode3(bLoaded, pointer + 2);
             //        //colKey = NummerCode3(bLoaded, pointer + 5);
             //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var b = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-            //        value = b.ToStringWin1252();
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringWin1252();
             //        //width = 0;
             //        //height = 0;
             //        pointer += 11 + les;
@@ -203,9 +203,9 @@ public sealed class Database : DatabaseAbstract {
             //        var les = NummerCode3(bLoaded, pointer + 2);
             //        //colKey = NummerCode3(bLoaded, pointer + 5);
             //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var b = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, b, 0, les);
-            //        value = b.ToStringUtf8();
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
             //        //width = 0;
             //        //height = 0;
             //        pointer += 11 + les;
@@ -216,9 +216,9 @@ public sealed class Database : DatabaseAbstract {
             //        var les = NummerCode3(bLoaded, pointer + 2);
             //        //colKey = NummerCode7(bLoaded, pointer + 5);
             //        rowKey = NummerCode7(bLoaded, pointer + 12);
-            //        var b = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 19, b, 0, les);
-            //        value = b.ToStringUtf8();
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 19, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
             //        //width = 0;
             //        //height = 0;
             //        pointer += 19 + les;
@@ -238,6 +238,24 @@ public sealed class Database : DatabaseAbstract {
                     value = b.ToStringUtf8();
 
                     pointer += 6 + les + cles;
+                    break;
+                }
+
+            case Routinen.CellFormatUTF8_V402: {
+                    type = DatabaseDataType.UTF8Value_withoutSizeData;
+
+                    var lenghtRowKey = NummerCode1(bLoaded, pointer + 1);
+                    var rowKeyByte = new byte[lenghtRowKey];
+                    Buffer.BlockCopy(bLoaded, pointer + 2, rowKeyByte, 0, lenghtRowKey);
+                    rowKey = rowKeyByte.ToStringUtf8();
+
+                    var lenghtValue = NummerCode2(bLoaded, pointer + 2 + lenghtRowKey);
+                    var valueByte = new byte[lenghtValue];
+                    Buffer.BlockCopy(bLoaded, pointer + 2 + lenghtRowKey + 2, valueByte, 0, lenghtValue);
+                    value = valueByte.ToStringUtf8();
+
+                    pointer +=  2 + lenghtRowKey + 2 + lenghtValue;
+
                     break;
                 }
 
@@ -272,7 +290,7 @@ public sealed class Database : DatabaseAbstract {
 
                 #region Zeile suchen oder erstellen
 
-                if (rowKey > -1) {
+                if (!string.IsNullOrEmpty(rowKey)) {
                     row = db.Row.SearchByKey(rowKey);
                     if (row == null || row.IsDisposed) {
                         _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, null, true);
@@ -437,12 +455,12 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), name);
         SaveToByteList(l, DatabaseDataType.ScriptType, ((int)c.ScriptType).ToString(), name);
         SaveToByteList(l, DatabaseDataType.Prefix, c.Prefix, name);
-        //SaveToByteList(l, DatabaseDataType.KeyColumnKey, c.KeyColumnKey.ToString(false), key);
+        //SaveToByteList(l, DatabaseDataType.KeyColumnKey, column.KeyColumnKey.ToString(false), key);
         SaveToByteList(l, DatabaseDataType.ColumnNameOfLinkedDatabase, c.LinkedCell_ColumnNameOfLinkedDatabase, name);
-        //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, c.VorschlagsColumn.ToString(false), key);
+        //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, column.VorschlagsColumn.ToString(false), key);
         SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), name);
         SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
-        //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, c.TimeCode, key);
+        //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
 
         foreach (var thisR in db.Row) {
             SaveToByteList(l, c, thisR);
@@ -803,18 +821,21 @@ public sealed class Database : DatabaseAbstract {
 
     public override string UndoText(ColumnItem? column, RowItem? row) => UndoText(column, row, Works);
 
-    internal static void SaveToByteList(List<byte> list, ColumnItem c, RowItem r) {
-        if (!c.SaveContent) { return; }
+    internal static void SaveToByteList(List<byte> list, ColumnItem column, RowItem row) {
+        if (!column.SaveContent) { return; }
 
-        var cv = c.Database?.Cell.GetStringBehindLinkedValue(c, r);
+        var cellContent = column.Database?.Cell.GetStringBehindLinkedValue(column, row);
+        if (cellContent == null || string.IsNullOrEmpty(cellContent)) { return; }
 
-        if (cv == null || string.IsNullOrEmpty(cv)) { return; }
-        var b = cv.UTF8_ToByte();
-        list.Add((byte)Routinen.CellFormatUTF8_V401);
-        list.Add((byte)DatabaseDataType.Value_withoutSizeData);
-        SaveToByteList(list, b.Length, 3);
-        SaveToByteList(list, r.Key, 7);
-        list.AddRange(b);
+        list.Add((byte)Routinen.CellFormatUTF8_V402);
+
+        var rowKeyByte = row.KeyName.UTF8_ToByte();
+        SaveToByteList(list, rowKeyByte.Length, 1);
+        list.AddRange(rowKeyByte);
+
+        var cellContentByte = cellContent.UTF8_ToByte();
+        SaveToByteList(list, cellContentByte.Length, 2);
+        list.AddRange(cellContentByte);
     }
 
     //public override void WaitEditable() => _muf.WaitEditable();
@@ -889,10 +910,12 @@ public sealed class Database : DatabaseAbstract {
     //}
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
 
+    private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
+
     //protected override string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
     private static int NummerCode3(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
 
-    //private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
+    //private static int NummerCode2(IReadOnlyList<byte> cellContentByte, int pointer) => (cellContentByte[pointer] * 255) + cellContentByte[pointer + 1];
     private static long NummerCode7(IReadOnlyList<byte> b, int pointer) {
         long nu = 0;
         for (var n = 0; n < 7; n++) {

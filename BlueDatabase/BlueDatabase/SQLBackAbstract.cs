@@ -116,7 +116,7 @@ public abstract class SqlBackAbstract {
 
     /// <summary>
     /// Erstellt eine Spalte nur bei Bedarf.
-    /// Aber der Key wird aktualisiert.
+    /// Aber der KeyName wird aktualisiert.
     /// </summary>
     /// <param name="tablename"></param>
     /// <param name="columnName"></param>
@@ -131,11 +131,11 @@ public abstract class SqlBackAbstract {
         return SetStyleData(tablename, DatabaseDataType.ColumnName, columnName.ToUpper(), columnName.ToUpper());
     }
 
-    public string AddUndo(string tablename, DatabaseDataType comand, string? columname, long? rowKey, string previousValue, string changedTo, string comment) {
+    public string AddUndo(string tablename, DatabaseDataType comand, string? columname, string? rowKey, string previousValue, string changedTo, string comment) {
         if (!OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
         //var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
-        var rk = rowKey is not null and > -1 ? rowKey.ToString() : string.Empty;
+        var rk = rowKey ?? string.Empty;
 
         var cmdString = "INSERT INTO " + SysUndo +
             " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, TIMECODEUTC, CMT) VALUES (" +
@@ -339,7 +339,7 @@ public abstract class SqlBackAbstract {
         _ = row.Clear("Row Keys werden neu geladen");
 
         foreach (var thisRow in dt.Rows) {
-            var rk = LongParse(((DataRow)thisRow)[0].ToString());
+            var rk = ((DataRow)thisRow)[0].ToString();
             _ = row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, true);
         }
     }
@@ -407,7 +407,7 @@ public abstract class SqlBackAbstract {
                 if (count > 0) { com.Append(" OR "); }
 
                 count++;
-                com.Append("RK = " + Dbval(thisr.Key));
+                com.Append("RK = " + Dbval(thisr.KeyName));
             }
         }
 
@@ -417,7 +417,7 @@ public abstract class SqlBackAbstract {
 
         foreach (var thisRow in dt.Rows) {
             var reader = (DataRow)thisRow;
-            var rk = LongParse(reader[0].ToString());
+            var rk = reader[0].ToString();
             var r = db.Row.SearchByKey(rk) ?? db.Row.GenerateAndAdd(rk, string.Empty, false, false, "Load row");
 
             if (r != null && !r.IsDisposed) {
@@ -567,7 +567,7 @@ public abstract class SqlBackAbstract {
 
         if (type.Nameless()) { return string.Empty; }
         //command
-        //if (type == DatabaseDataType.AddColumnKeyInfo) { return true; } // enthält zwar den Key, aber Wertlos, wenn der Spaltenname noch nicht bekannt ist...
+        //if (type == DatabaseDataType.AddColumnKeyInfo) { return true; } // enthält zwar den KeyName, aber Wertlos, wenn der Spaltenname noch nicht bekannt ist...
         //if (type == DatabaseDataType.AutoExport) { return true; }
         if (type == DatabaseDataType.UndoInOne) { return string.Empty; }
         var c = 0;
@@ -630,7 +630,7 @@ public abstract class SqlBackAbstract {
     /// <param name="columname"></param>
     /// <param name="rowkey"></param>
     /// <returns></returns>
-    public string SetValueInternal(string tablename, DatabaseDataType type, string value, string? columname, long? rowkey) {
+    public string SetValueInternal(string tablename, DatabaseDataType type, string value, string? columname, string? rowkey) {
         if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
             return "Tabellenname ungültig: " + tablename;
@@ -673,7 +673,7 @@ public abstract class SqlBackAbstract {
         #region Zellen-Wert
 
         if (type.IsCellValue() && columname != null && rowkey != null) {
-            return SetCellValue(tablename, columname, (long)rowkey, value);
+            return SetCellValue(tablename, columname, rowkey, value);
         }
 
         #endregion
@@ -848,7 +848,7 @@ public abstract class SqlBackAbstract {
 
             #region Zeile ermitteln, in die der Wert geschrieben werden soll
 
-            var rk = LongParse(reader[0].ToString());
+            var rk = reader[0].ToString();
             var row = db.Row.SearchByKey(rk);
 
             if (row == null || row.IsDisposed) {
@@ -1067,7 +1067,7 @@ public abstract class SqlBackAbstract {
         }
     }
 
-    //private (string? value, string error) GetCellValue(string tablename, string columnname, long rowkey) {
+    //private (string? value, string error) GetCellValue(string tablename, string columnname, string? rowKey) {
     //    if (!IsValidTableName(tablename, false)) {
     //            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
     //            return (null, "Tabellenname ungültig: " + tablename);
@@ -1126,7 +1126,7 @@ public abstract class SqlBackAbstract {
     /// <param name="newValue"></param>
     /// <param name="columnname"></param>
     /// <returns></returns>
-    private string SetCellValue(string tablename, string columnname, long rowkey, string newValue) {
+    private string SetCellValue(string tablename, string columnname, string? rowkey, string newValue) {
         if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
 

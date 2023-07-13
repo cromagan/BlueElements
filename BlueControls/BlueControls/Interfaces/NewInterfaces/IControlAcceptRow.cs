@@ -35,7 +35,7 @@ public interface IControlAcceptRow : IControlAcceptSomething, IDisposableExtende
 
     #region Methods
 
-    public void SetData(DatabaseAbstract? database, long? rowkey);
+    public void SetData(DatabaseAbstract? database, string rowkey);
 
     #endregion
 }

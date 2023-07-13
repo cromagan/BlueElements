@@ -279,7 +279,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 
         if (!isLoading) {
-            _ = _sql?.SetValueInternal(TableName, type, value, column?.Name, row?.Key);
+            _ = _sql?.SetValueInternal(TableName, type, value, column?.Name, row?.KeyName);
         }
 
         return base.SetValueInternal(type, value, column, row, isLoading);
@@ -291,7 +291,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (ReadOnly) { return; } // Sicherheitshalber!
 
         var columnName = column?.Name ?? string.Empty;
-        var rowkey = row?.Key ?? -1;
+        var rowkey = row?.KeyName ?? string.Empty;
 
         var err = _sql?.AddUndo(tableName, type, columnName, rowkey, previousValue, changedTo, comment);
         if (!string.IsNullOrEmpty(err)) {
@@ -363,7 +363,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
 
         try {
-            var rk = new List<long>();
+            var rk = new List<string>();
 
             foreach (var (tablename, comand, columnname, rowkey, newvalue, timecode) in data) {
                 if (TableName == tablename && timecode > IsInCache) {
@@ -379,7 +379,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                      //    var c = Column.SearchByKey(LongParse(columnkey));
 
                      //    if (c != null && !c.IsDisposed) {
-                     //        var newn = _sql.GetLastColumnName(tablename, c.Key);
+                     //        var newn = _sql.GetLastColumnName(tablename, c.KeyName);
                      //        c.Name = newn;
                      //    }
 
@@ -397,7 +397,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                             //case DatabaseDataType.Comand_AddColumn:
                             //    _ = Column.SetValueInternal(t, true, columnname);
                             //    var c = Column.SearchByKey(LongParse(columnkey));
-                            //    var name = _sql.GetLastColumnName(TableName, c.Key);
+                            //    var name = _sql.GetLastColumnName(TableName, c.KeyName);
                             //    _ = SetValueInternal(DatabaseDataType.ColumnName, name, c.Name, null, true);
                             //    c.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
                             //    break;
@@ -405,19 +405,19 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                             case DatabaseDataType.Comand_AddColumnByName:
                                 _ = Column.SetValueInternal(t, true, newvalue); // ColumName kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Spalte bekannt ist und nicht gespeichert wird
                                 var c2 = Column.Exists(newvalue);
-                                //var columnname = _sql.GetLastColumnName(TableName, c.Key);
+                                //var columnname = _sql.GetLastColumnName(TableName, c.KeyName);
                                 //_ = SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
                                 c2?.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
                                 break;
 
                             case DatabaseDataType.Comand_AddRow:
-                                _ = Row.SetValueInternal(t, LongParse(newvalue), null, true); // RowKey kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Zeile bekannt ist und nicht gespeichert wird
-                                _ = rk.AddIfNotExists(LongParse(newvalue)); // Nachher auch laden
+                                _ = Row.SetValueInternal(t, newvalue, null, true); // RowKey kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Zeile bekannt ist und nicht gespeichert wird
+                                _ = rk.AddIfNotExists(newvalue); // Nachher auch laden
                                 break;
 
                             case DatabaseDataType.Comand_RemoveRow:
-                                var r = Row.SearchByKey(LongParse(rowkey));
-                                _ = Row.SetValueInternal(t, r?.Key, r, true);
+                                var r = Row.SearchByKey(rowkey);
+                                _ = Row.SetValueInternal(t, r?.KeyName, r, true);
                                 break;
 
                             default:
@@ -431,14 +431,14 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                         #region Zeilen zum neu Einlesen merken uns Spaltenbreite invalidierne
 
                         var c = Column.Exists(columnname);
-                        var r = Row.SearchByKey(LongParse(rowkey));
+                        var r = Row.SearchByKey(rowkey);
                         //if (r== null || r.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile nicht gefunden"); }
                         //if (c == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht gefunden"); }
                         if (r != null && c != null) {
                             // Kann sein, dass der Bentzer hier ja schon eine Zeile oder so geklscht hat
                             // hier geklscht, aber anderer PC mat bei der noch vorhanden Zeile eine Änderung
                             if (timecode > r.IsInCache || timecode > c.IsInCache) {
-                                _ = rk.AddIfNotExists(r.Key);
+                                _ = rk.AddIfNotExists(r.KeyName);
                                 c.Invalidate_ContentWidth();
                             }
                         }

@@ -46,7 +46,7 @@ public static partial class Extensions {
         return true;
     }
 
-    public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<long, T>? l) where T : ICanBeEmpty? {
+    public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<string, T>? l) where T : ICanBeEmpty? {
         if (l == null || l.Count == 0) { return false; }
         var remo = (from pair in l where pair.Value == null || pair.Value.IsNullOrEmpty() select pair.Key).ToList();
         if (remo.Count == 0) { return false; }

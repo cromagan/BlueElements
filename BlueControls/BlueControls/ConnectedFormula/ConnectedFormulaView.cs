@@ -50,7 +50,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
     public ConnectedFormulaView(string page) {
         InitializeComponent();
         Page = page;
-        SetData(null, null, -1);
+        SetData(null, null, string.Empty);
     }
 
     #endregion
@@ -77,8 +77,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
 
     public string Page { get; } = "Head";
 
-    [DefaultValue(-1)]
-    public long RowKey { get; private set; } = -1;
+    [DefaultValue("")]
+    public string RowKey { get; private set; } = string.Empty;
 
     //set => SetData(ConnectedFormula, Database, value, Page);
     [Browsable(false)]
@@ -160,9 +160,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
             var f = database.FormulaFileName();
 
             var rk = RowKey;
-            if (Database != database) {
-                rk = -1;
-            }
+            if (Database != database) { rk = string.Empty; }
 
             if (f != null) {
                 var tmpFormula = GetByFilename(f);
@@ -198,9 +196,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         return c;
     }
 
-    public void SetData(DatabaseAbstract? database, long? rowKey) => SetData(ConnectedFormula, database, rowKey ?? -1);
+    public void SetData(DatabaseAbstract? database, string? rowKey) => SetData(ConnectedFormula, database, rowKey ?? string.Empty);
 
-    public void SetData(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database, long rowKey) {
+    public void SetData(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database, string? rowKey) {
         if (IsDisposed) { return; }
 
         var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
@@ -242,7 +240,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
             }
         }
 
-        if (rowKey != -1 && Database != null && cf != null) {
+        if (!string.IsNullOrEmpty(rowKey) && Database != null && cf != null) {
             RowKey = rowKey;
             _tmpShowingRow = Database?.Row.SearchByKey(RowKey);
             SetInputRow();
@@ -253,13 +251,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         ResumeLayout();
         Invalidate();
     }
-
-    //public void SetData(DatabaseAbstract? database, long? rowkey) {
-    //    if (database != Database && rowkey == RowKey) { return; }
-    //    //_database = database;
-    //    //_rowkey = rowkey ?? -1;
-    //    SetData(ConnectedFormula, database, rowkey ?? -1, Page);
-    //}
 
     protected override void DrawControl(Graphics gr, States state) {
         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
@@ -284,17 +275,17 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
 
     private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
 
-    private void _Database_Disposing(object sender, System.EventArgs e) => SetData(null, -1);
+    private void _Database_Disposing(object sender, System.EventArgs e) => SetData(null, string.Empty);
 
     private void RemoveRow() {
-        RowKey = -1;
+        RowKey = string.Empty;
         _tmpShowingRow = null;
         if (_generated) { SetInputRow(); }
     }
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
-        if (e.Row != null && RowKey == e.Row.Key) {
-            SetData(ConnectedFormula, Database, -1);
+        if (e.Row != null && RowKey == e.Row.KeyName) {
+            SetData(ConnectedFormula, Database, string.Empty);
         }
     }
 

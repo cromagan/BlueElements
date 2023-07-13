@@ -35,7 +35,7 @@ public class WorkItem : IParseable, IChangedFeedback {
     private string _colName = string.Empty;
 
     private bool _isPending;
-    private long _rowKey;
+    private string _rowKey;
 
     #endregion
 
@@ -46,14 +46,14 @@ public class WorkItem : IParseable, IChangedFeedback {
     public WorkItem(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user) {
         Comand = comand;
         _colName = column?.Name ?? string.Empty;
-        _rowKey = row?.Key ?? -1;
+        _rowKey = row?.KeyName ?? string.Empty;
         PreviousValue = previousValue;
         _changedTo = changedTo;
         User = user;
         Date = DateTime.UtcNow;
     }
 
-    //public WorkItem(DatabaseDataType comand, ColumnItem column, RowItem row, string previousValue, string changedTo, string user) : this(comand, column?.Key ?? -1, row?.Key ?? -1, previousValue, changedTo, user) { }
+    //public WorkItem(DatabaseDataType comand, ColumnItem column, RowItem row, string previousValue, string changedTo, string user) : this(comand, column?.KeyName ?? -1, row?.KeyName ?? -1, previousValue, changedTo, user) { }
 
     public WorkItem(string s) => Parse(s);
 
@@ -94,7 +94,7 @@ public class WorkItem : IParseable, IChangedFeedback {
 
     public string PreviousValue { get; private set; } = string.Empty;
 
-    public long RowKey {
+    public string RowKey {
         get => _rowKey;
         set {
             if (value == _rowKey) { return; }
@@ -138,7 +138,7 @@ public class WorkItem : IParseable, IChangedFeedback {
                     break;
 
                 case "rk":
-                    _rowKey = LongParse(pair.Value);
+                    _rowKey = pair.Value;
                     break;
 
                 case "undotype":

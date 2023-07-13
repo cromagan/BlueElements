@@ -64,32 +64,30 @@ public class Method_CallByFilename : Method {
     /// <param name="allowedMethods"></param>
     /// <returns></returns>
     public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe) {
+        ScriptEndedFeedback scx;
+
         if (keepVariables) {
             if (addMe != null) { varCol.Add(addMe); }
-
-            var scx = Script.Parse(varCol, scp, reducedscripttext, lineadd, subname);
-            if (!scx.AllOk) {
-                infos.Data.Protocol.AddRange(scx.Protocol);
-                return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
-            }
+            scx = Script.Parse(varCol, scp, reducedscripttext, lineadd, subname);
         } else {
             var tmpv = new VariableCollection();
             tmpv.AddRange(varCol);
             if (addMe != null) { tmpv.Add(addMe); }
 
-            var scx = Script.Parse(varCol, scp, reducedscripttext, lineadd, subname);
-            if (!scx.AllOk) {
-                infos.Data.Protocol.AddRange(scx.Protocol);
-                return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
+            scx = Script.Parse(varCol, scp, reducedscripttext, lineadd, subname);
+
+            if (scx.AllOk) {
+                varCol.Clear();
+                varCol.AddRange(tmpv);
             }
-
-            varCol.Clear();
-            varCol.AddRange(tmpv);
-
-            if (scx.BreakFired) { return new DoItFeedback(true, false); }
         }
 
-        return DoItFeedback.Null();
+        if (!scx.AllOk) {
+            infos.Data.Protocol.AddRange(scx.Protocol);
+            return new DoItFeedback(infos.Data, "'" + aufgerufenVon + "' wegen vorherhiger Fehler abgebrochen");
+        }
+
+        return new DoItFeedback(scx.BreakFired, scx.EndScript);
     }
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "callbyfilename" };
@@ -121,10 +119,9 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback(infos.Data, "Fehler in Datei " + vs + ": " + error);
         }
 
-        var v = CallSub(varCol, scp, infos, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix(), null);
-        v.BreakFired = false;
-        v.EndScript = false;
-        return v;
+        var scx = CallSub(varCol, scp, infos, "Datei-Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs.FileNameWithSuffix(), null);
+        if (!scx.AllOk) { return scx; }
+        return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }
 
     #endregion

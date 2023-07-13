@@ -1528,7 +1528,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public abstract (bool didreload, string errormessage) RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows);
 
-    public (bool didreload, string errormessage) RefreshRowData(List<long> keys, bool refreshAlways, List<RowItem>? sortedRows) {
+    public (bool didreload, string errormessage) RefreshRowData(List<string> keys, bool refreshAlways, List<RowItem>? sortedRows) {
         if (keys.Count == 0) { return (false, string.Empty); }
 
         var r = new List<RowItem>();
@@ -1673,14 +1673,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                     return f2;
 
                 case DatabaseDataType.Comand_RemoveRow:
-                    return Row.SetValueInternal(type, row?.Key, row, isLoading);
+                    return Row.SetValueInternal(type, row?.KeyName, row, isLoading);
 
                 case DatabaseDataType.Comand_AddRow:
-                    var rk = LongParse(value);
-                    var f1 = Row.SetValueInternal(type, rk, null, isLoading);
+                    var f1 = Row.SetValueInternal(type, value, null, isLoading);
 
                     if (!isLoading) {
-                        var thisRow = Row.SearchByKey(rk);
+                        var thisRow = Row.SearchByKey(value);
                         if (thisRow != null && !thisRow.IsDisposed) { thisRow.IsInCache = DateTime.UtcNow; }
                     }
 

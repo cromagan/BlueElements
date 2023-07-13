@@ -49,7 +49,7 @@ public static class IControlSendRowExtension {
 
         foreach (var thischild in childs) {
             thischild.GetRowFrom = item;
-            thischild.SetData(item.OutputDatabase, row?.Key);
+            thischild.SetData(item.OutputDatabase, row?.KeyName);
 
             //if (thischild is IDisabledReason id) {
             //    if (!did) {

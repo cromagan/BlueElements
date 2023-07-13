@@ -165,7 +165,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
                         cc = new ConnectedFormulaView(pg);
                         t.Controls.Add(cc);
-                        cc.SetData(cf, null, -1);
+                        cc.SetData(cf, null, string.Empty);
                         cc.Dock = DockStyle.Fill;
                         cc.GenerateView();
 

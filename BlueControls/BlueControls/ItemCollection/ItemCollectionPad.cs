@@ -93,7 +93,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(string layoutId, DatabaseAbstract? database, long rowkey) : this(database?.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
+    public ItemCollectionPad(string layoutId, DatabaseAbstract? database, string? rowkey) : this(database?.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
         _ = ResetVariables();
 

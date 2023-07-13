@@ -69,17 +69,17 @@ public class TabControl : AbstractTabControl, IControlAcceptRow {
 
     public RowItem? LastInputRow { get; private set; }
 
-    [DefaultValue(-1)]
-    public long RowKey { get; private set; } = -1;
+    [DefaultValue("")]
+    public string RowKey { get; private set; } = string.Empty;
 
     #endregion
 
     #region Methods
 
-    public void SetData(DatabaseAbstract? database, long? rowkey) {
+    public void SetData(DatabaseAbstract? database, string? rowkey) {
         if (database != Database && rowkey == RowKey) { return; }
         Database = database;
-        RowKey = rowkey ?? -1;
+        RowKey = rowkey ?? string.Empty;
         DoTabChilds();
     }
 

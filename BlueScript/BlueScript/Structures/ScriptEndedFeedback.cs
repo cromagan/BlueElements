@@ -27,13 +27,14 @@ public class ScriptEndedFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool breakFired) {
+    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool breakFired, bool endscript) {
         Variables = variables;
         GiveItAnotherTry = false;
         Protocol = protocol;
         AllOk = allOk;
         ProtocolText = GenNiceProtokoll(protocol);
         BreakFired = breakFired;
+        EndScript = endscript;
     }
 
     /// <summary>
@@ -60,6 +61,8 @@ public class ScriptEndedFeedback {
 
     public bool AllOk { get; }
     public bool BreakFired { get; }
+    public bool EndScript { get; }
+
     public bool GiveItAnotherTry { get; }
 
     public List<string> Protocol { get; }

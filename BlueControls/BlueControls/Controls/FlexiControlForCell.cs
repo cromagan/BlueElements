@@ -47,7 +47,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
     private string _columnName = string.Empty;
     private IControlSendRow? _getRowFrom;
-    private long _rowKey = -1;
+    private string _rowKey = string.Empty;
     private ColumnItem? _tmpColumn;
     private RowItem? _tmpRow;
 
@@ -67,7 +67,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         CaptionPosition = captionPosition;
         EditType = editType;
         ColumnName = column;
-        SetData(database, -1);
+        SetData(database, string.Empty);
         CheckEnabledState();
     }
 
@@ -167,7 +167,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void SetData(DatabaseAbstract? database, long? rowkey) {
+    public void SetData(DatabaseAbstract? database, string? rowkey) {
         if (rowkey == _rowKey && database == Database) { return; }
         FillCellNow();
 
@@ -183,7 +183,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         }
 
         Database = database;
-        _rowKey = rowkey ?? -1;
+        _rowKey = rowkey ?? string.Empty;
         _tmpRow = null;
         _tmpColumn = null;
 
@@ -585,8 +585,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
     }
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
-        if (e.Row.Key == _rowKey) {
-            _rowKey = -1;
+        if (e.Row.KeyName == _rowKey) {
+            _rowKey = string.Empty;
             _tmpRow = null;
         }
     }

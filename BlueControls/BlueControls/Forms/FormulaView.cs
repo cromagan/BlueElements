@@ -114,7 +114,7 @@ public partial class FormulaView : FormWithStatusBar {
             DropMessages = cf.IsAdministrator();
         }
 
-        CFormula.SetData(cf, null, -1);
+        CFormula.SetData(cf, null, string.Empty);
 
         UpdateScripts(CFormula.ConnectedFormula?.EventScript, grpSkripte);
         CheckButtons();

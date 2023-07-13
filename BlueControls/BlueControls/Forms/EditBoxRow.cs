@@ -30,14 +30,14 @@ public partial class EditBoxRow : DialogWithOkAndCancel {
     private EditBoxRow(string txt, ConnectedFormula.ConnectedFormula? cf, RowItem? row) : base(false, true) {
         InitializeComponent();
 
-        formToEdit.SetData(cf, row?.Database, -1);
+        formToEdit.SetData(cf, row?.Database, string.Empty);
 
         if (row != null && !row.IsDisposed) {
             if (cf == null) {
                 formToEdit.GetConnectedFormulaFromDatabase(row?.Database);
             }
 
-            formToEdit.SetData(row?.Database, row?.Key ?? -1);
+            formToEdit.SetData(row?.Database, row?.KeyName ?? string.Empty);
         }
 
         Setup(txt, formToEdit, formToEdit.MinimumSize.Width + 50);

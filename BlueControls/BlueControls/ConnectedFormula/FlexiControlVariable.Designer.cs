@@ -14,7 +14,7 @@ namespace BlueControls.Controls {
         protected override void Dispose(bool disposing) {
 
 
-            if(disposing) { SetData(null,-1); }
+            if (disposing) { SetData(null, string.Empty); }
 
 
             if (disposing && (components != null)) {

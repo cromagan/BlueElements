@@ -49,9 +49,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Constructors
 
-    public RowItem(DatabaseAbstract database, long key) {
+    public RowItem(DatabaseAbstract database, string key) {
         Database = database;
-        Key = key;
+        KeyName = key;
         _tmpQuickInfo = null;
         if (Database != null && !Database.IsDisposed) {
             Database.Cell.CellValueChanged += Cell_CellValueChanged;
@@ -90,9 +90,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public DatabaseAbstract? Database { get; private set; }
     public bool IsDisposed { get; private set; }
-    public long Key { get; private set; }
-
-    public string KeyName => Key.ToString();
+    public string KeyName { get; private set; }
 
     public string QuickInfo {
         get {
@@ -332,7 +330,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var sdb = source.Database;
         if (sdb is null || sdb.IsDisposed) { return; }
 
-        if (nameAndKeyToo) { Key = source.Key; }
+        if (nameAndKeyToo) { KeyName = source.KeyName; }
 
         foreach (var thisColumn in Database.Column) {
             var value = sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.Name], source);
@@ -353,7 +351,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 }
             }
         }
-        _ = r.Append(Constants.SecondSortChar + Key);
+        _ = r.Append(Constants.SecondSortChar + KeyName);
         return r.ToString();
     }
 
@@ -542,7 +540,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     internal bool NeedDataCheck() {
         if (Database == null || Database.IsDisposed) { return false; }
-        return Database.Row.NeedDataCheck(Key);
+        return Database.Row.NeedDataCheck(KeyName);
     }
 
     internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);

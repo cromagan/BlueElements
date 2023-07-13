@@ -984,9 +984,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 if (maychangeview && !EnsureVisible(viewItem)) {
                     return "Zelle konnte nicht angezeigt werden.";
                 }
-                if (!IsOnScreen(viewItem, DisplayRectangle)) {
-                    return "Die Zelle wird nicht angezeigt.";
-                }
+                //if (!IsOnScreen(viewItem, DisplayRectangle)) {
+                //    return "Die Zelle wird nicht angezeigt.";
+                //}
             }
         }
 
@@ -1156,7 +1156,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         try {
             var displayR = DisplayRectangleWithoutSlider();
             var maxY = 0;
-            if (UserEdit_NewRowAllowed()) { maxY += _pix18; }
+            if (UserEdit_NewRowAllowed()) { maxY += _pix18; } 
             var expanded = true;
             var lastCap = string.Empty;
 
@@ -3180,7 +3180,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                     case "pin":
                         foreach (var thisk in pair.Value.FromNonCritical().SplitBy("|")) {
-                            var r = db.Row.SearchByKey(LongParse(thisk));
+                            var r = db.Row.SearchByKey(thisk);
                             if (r != null && !r.IsDisposed) { PinnedRows.Add(r); }
                         }
 

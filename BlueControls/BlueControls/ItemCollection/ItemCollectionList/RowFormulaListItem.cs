@@ -46,7 +46,7 @@ public class RowFormulaListItem : BasicListItem {
     /// <param name="row"></param>
     /// <param name="layoutId"></param>
     /// <param name="userDefCompareKey"></param>
-    public RowFormulaListItem(RowItem row, string layoutId, string userDefCompareKey) : base(row.Key.ToString(), true) {
+    public RowFormulaListItem(RowItem row, string layoutId, string userDefCompareKey) : base(row.KeyName, true) {
         _row = row;
         _layoutId = layoutId;
         UserDefCompareKey = userDefCompareKey;
@@ -145,7 +145,7 @@ public class RowFormulaListItem : BasicListItem {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
-        ItemCollectionPad pad = new(_layoutId, Row.Database, Row.Key);
+        ItemCollectionPad pad = new(_layoutId, Row.Database, Row.KeyName);
         var mb = pad.MaxBounds(null);
         if (_tmpBmp != null) {
             if (_tmpBmp.Width != mb.Width || _tmpBmp.Height != mb.Height) {

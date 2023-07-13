@@ -61,7 +61,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbZeilenQuickInfo = new BlueControls.Controls.TextBox();
             this.capZeilenQuickInfo = new BlueControls.Controls.Caption();
             this.txbGlobalScale = new BlueControls.Controls.TextBox();
-            this.caption1 = new BlueControls.Controls.Caption();
+            this.capGlobalScale = new BlueControls.Controls.Caption();
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.tabRechte = new System.Windows.Forms.TabPage();
             this.tabSortierung = new System.Windows.Forms.TabPage();
@@ -262,8 +262,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capInfo
             // 
-            this.capInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
             this.capInfo.CausesValidation = false;
             this.capInfo.Location = new System.Drawing.Point(8, 56);
             this.capInfo.Name = "capInfo";
@@ -301,7 +299,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabAllgemein.Controls.Add(this.txbZeilenQuickInfo);
             this.tabAllgemein.Controls.Add(this.capZeilenQuickInfo);
             this.tabAllgemein.Controls.Add(this.txbGlobalScale);
-            this.tabAllgemein.Controls.Add(this.caption1);
+            this.tabAllgemein.Controls.Add(this.capGlobalScale);
             this.tabAllgemein.Controls.Add(this.txbTags);
             this.tabAllgemein.Controls.Add(this.btnSpaltenuebersicht);
             this.tabAllgemein.Controls.Add(this.capInfo);
@@ -329,6 +327,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbStandardFormulaFile
             // 
+            this.txbStandardFormulaFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txbStandardFormulaFile.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbStandardFormulaFile.Location = new System.Drawing.Point(8, 424);
             this.txbStandardFormulaFile.Name = "txbStandardFormulaFile";
@@ -347,6 +346,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbAdditionalFiles
             // 
+            this.txbAdditionalFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txbAdditionalFiles.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 376);
             this.txbAdditionalFiles.Name = "txbAdditionalFiles";
@@ -365,6 +365,8 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbZeilenQuickInfo
             // 
+            this.txbZeilenQuickInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.txbZeilenQuickInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbZeilenQuickInfo.Location = new System.Drawing.Point(8, 176);
             this.txbZeilenQuickInfo.MultiLine = true;
@@ -375,7 +377,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // capZeilenQuickInfo
             // 
-            this.capZeilenQuickInfo.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capZeilenQuickInfo.CausesValidation = false;
             this.capZeilenQuickInfo.Location = new System.Drawing.Point(8, 160);
             this.capZeilenQuickInfo.Name = "capZeilenQuickInfo";
@@ -384,20 +385,21 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // txbGlobalScale
             // 
+            this.txbGlobalScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txbGlobalScale.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbGlobalScale.Location = new System.Drawing.Point(160, 456);
             this.txbGlobalScale.Name = "txbGlobalScale";
             this.txbGlobalScale.Size = new System.Drawing.Size(160, 24);
             this.txbGlobalScale.TabIndex = 39;
             // 
-            // caption1
+            // capGlobalScale
             // 
-            this.caption1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.caption1.CausesValidation = false;
-            this.caption1.Location = new System.Drawing.Point(8, 456);
-            this.caption1.Name = "caption1";
-            this.caption1.Size = new System.Drawing.Size(144, 18);
-            this.caption1.Text = "Bevorzugtes Skalierung:";
+            this.capGlobalScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.capGlobalScale.CausesValidation = false;
+            this.capGlobalScale.Location = new System.Drawing.Point(8, 456);
+            this.capGlobalScale.Name = "capGlobalScale";
+            this.capGlobalScale.Size = new System.Drawing.Size(144, 18);
+            this.capGlobalScale.Text = "Bevorzugtes Skalierung:";
             // 
             // btnSpaltenuebersicht
             // 
@@ -480,6 +482,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tblUndo.DropMessages = false;
+            this.tblUndo.InputDatabase = null;
             this.tblUndo.Location = new System.Drawing.Point(0, 56);
             this.tblUndo.Name = "tblUndo";
             this.tblUndo.OutputDatabase = null;
@@ -558,7 +561,7 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capUndoAnzahl;
         private TextBox txbUndoAnzahl;
         private TextBox txbGlobalScale;
-        private Caption caption1;
+        private Caption capGlobalScale;
         private TabControl GlobalTab;
         private TextBox txbZeilenQuickInfo;
         private Caption capZeilenQuickInfo;

@@ -212,16 +212,16 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return (fi, string.Empty);
     }
 
-    public static string KeyOfCell(string colname, long rowKey) => colname.ToUpper() + "|" + rowKey;
+    public static string KeyOfCell(string colname, string? rowKey) => colname.ToUpper() + "|" + rowKey;
 
     public static string KeyOfCell(ColumnItem? column, RowItem? row) {
         // Alte verweise eleminieren.
         column = column?.Database?.Column.Exists(column.Name);
-        row = row?.Database?.Row.SearchByKey(row.Key);
+        row = row?.Database?.Row.SearchByKey(row.KeyName);
 
-        if (column != null && row != null) { return KeyOfCell(column.Name, row.Key); }
-        if (column == null && row != null) { return KeyOfCell(string.Empty, row.Key); }
-        if (column != null && row == null) { return KeyOfCell(column.Name, -1); }
+        if (column != null && row != null) { return KeyOfCell(column.Name, row.KeyName); }
+        if (column == null && row != null) { return KeyOfCell(string.Empty, row.KeyName); }
+        if (column != null && row == null) { return KeyOfCell(column.Name, string.Empty); }
 
         return string.Empty;
     }
@@ -262,11 +262,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (repairLinkedValue) { return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists); }
 
         var key = column.Database?.Cell.GetStringBehindLinkedValue(column, row);
-        if (string.IsNullOrEmpty(key)) {
+        if (key == null || string.IsNullOrEmpty(key)) {
             return (linkedDatabase.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase), null, "Keine Verlinkung vorhanden.", false);
         }
 
-        if (!key.IsNumeral()) { return (null, null, "Falsches Format", false); }
+        if (key.Contains("|")) { return (null, null, "Falsches Format", false); }
 
         //var v = key.SplitAndCutBy("|");
         //if (v.Length != 2) { return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists); }
@@ -276,7 +276,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             linkedDatabase.RefreshColumnsData(linkedColumn);
         }
 
-        var linkedRow = linkedDatabase.Row.SearchByKey(LongParse(key));
+        var linkedRow = linkedDatabase.Row.SearchByKey(key);
 
         return (linkedColumn, linkedRow, string.Empty, false);
 
@@ -292,13 +292,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var cd = cellKey.SplitAndCutBy("|");
         if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(FehlerArt.Fehler, "Falscher CellKey übergeben: " + cellKey); }
         column = Database?.Column.Exists(cd[0]);
-        row = Database?.Row.SearchByKey(LongParse(cd[1]));
+        row = Database?.Row.SearchByKey(cd[1]);
     }
 
-    public void Delete(ColumnItem? column, long? rowKey) {
+    public void Delete(ColumnItem? column, string? rowKey) {
         if (column == null || rowKey == null) { return; }
 
-        var cellKey = KeyOfCell(column.Name, (long)rowKey);
+        var cellKey = KeyOfCell(column.Name, rowKey);
         if (!ContainsKey(cellKey)) { return; }
 
         if (!TryRemove(cellKey, out _)) {
@@ -370,14 +370,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                         //    RelationNameChanged(ThisColumnItem, PreviewsValue, CurrentValue);
                         //    break;
                         case DataFormat.RelationText:
-                            RelationTextNameChanged(thisColumnItem, row.Key, previewsValue, currentValue);
+                            RelationTextNameChanged(thisColumnItem, row.KeyName, previewsValue, currentValue);
                             break;
                     }
                 }
             }
         }
         //if (column.KeyColumnKey > -1) {
-        //    ChangeValueOfKey(currentValue, column, row.Key);
+        //    ChangeValueOfKey(currentValue, column, row.KeyName);
         //}
     }
 
@@ -479,7 +479,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             return !ContainsKey(cellKey) ? string.Empty : this[cellKey].Value;
         } catch {
-            // Manchmal verscwhindwet der vorhandene Key?!?
+            // Manchmal verscwhindwet der vorhandene KeyName?!?
             Develop.CheckStackForOverflow();
             return GetString(column, row);
         }
@@ -500,7 +500,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, false, false);
             return lcolumn == null || lrow == null || lrow.CellIsNullOrEmpty(lcolumn);
         }
-        var cellKey = KeyOfCell(column.Name, row.Key);
+        var cellKey = KeyOfCell(column.Name, row.KeyName);
         return !ContainsKey(cellKey) || string.IsNullOrEmpty(this[cellKey].Value);
     }
 
@@ -703,7 +703,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (!isLoading) {
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                Database?.Row.AddRowWithChangedValue(row.Key);
+                Database?.Row.AddRowWithChangedValue(row.KeyName);
             }
             //if (!row.NeedDataCheck()) {
             //    DoSpecialFormats(column, row);
@@ -712,7 +712,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public List<string>? ValuesReadable(ColumnItem? column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style);
+    public List<string> ValuesReadable(ColumnItem column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style);
 
     internal static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
         List<RowItem?> allRows = new();
@@ -1020,7 +1020,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
             if (targetColumn != null && targetRow != null && string.IsNullOrEmpty(fehler) && column != null && row != null) {
-                column.Database?.Cell.SetValueBehindLinkedValue(column, row, targetRow.Key.ToString(), true);
+                column.Database?.Cell.SetValueBehindLinkedValue(column, row, targetRow.KeyName, true);
                 return (targetColumn, targetRow, fehler, cr);
             }
 
@@ -1039,13 +1039,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         foreach (var rowItem in dbtmp.Row) {
             if (rowItem != null) {
-                completeRelationText = completeRelationText.Replace("/@X" + rowItem.Key + "X@/", rowItem.CellFirstString());
+                completeRelationText = completeRelationText.Replace("/@X" + rowItem.KeyName + "X@/", rowItem.CellFirstString());
             }
         }
         return completeRelationText;
     }
 
-    private string ChangeTextToRowId(string completeRelationText, string oldValue, string newValue, long keyOfCHangedRow) {
+    private string ChangeTextToRowId(string completeRelationText, string oldValue, string newValue, string keyOfCHangedRow) {
         var dbtmp = Database;
         if (dbtmp == null || dbtmp.IsDisposed) { return completeRelationText; }
 
@@ -1066,7 +1066,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
             if (completeRelationText.ToUpper().Contains(names[z])) {
                 var r = dbtmp.Row[names[z]];
-                if (r != null && !r.IsDisposed) { DoReplace(names[z], r.Key); }
+                if (r != null && !r.IsDisposed) { DoReplace(names[z], r.KeyName); }
             }
         }
         if (string.IsNullOrEmpty(newValue)) { return completeRelationText; }
@@ -1079,7 +1079,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             DoReplace(oldValue, keyOfCHangedRow);
         }
         return completeRelationText;
-        void DoReplace(string name, long key) {
+        void DoReplace(string name, string key) {
             if (!string.IsNullOrEmpty(name)) {
                 completeRelationText = completeRelationText.Replace(name, "/@X" + key + "X@/", RegexOptions.IgnoreCase);
             }
@@ -1111,7 +1111,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     //    }
     //}
 
-    private void RelationTextNameChanged(ColumnItem? columnToRepair, long rowKey, string oldValue, string newValue) {
+    private void RelationTextNameChanged(ColumnItem? columnToRepair, string? rowKey, string oldValue, string newValue) {
         if (Database == null || Database.IsDisposed) { return; }
 
         if (string.IsNullOrEmpty(newValue)) { return; }
@@ -1134,12 +1134,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     ///// <summary>
-    ///// Ändert bei allen Zeilen - die den gleichen Key (KeyColumn, Relation) benutzen wie diese Zeile - den Inhalt der Zellen ab um diese gleich zu halten.
+    ///// Ändert bei allen Zeilen - die den gleichen KeyName (KeyColumn, Relation) benutzen wie diese Zeile - den Inhalt der Zellen ab um diese gleich zu halten.
     ///// </summary>
     ///// <param name="currentvalue"></param>
     ///// <param name="column"></param>
     ///// <param name="rowKey"></param>
-    //private void ChangeValueOfKey(string currentvalue, ColumnItem? column, long rowKey) {
+    //private void ChangeValueOfKey(string currentvalue, ColumnItem? column, string? rowKey) {
     //    var keyc = _database.Column.SearchByKey(column.KeyColumnKey); // Schlüsselspalte für diese Spalte bestimmen
     //    if (keyc is null) { return; }
     /// <summary>
@@ -1151,7 +1151,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     private void RepairRelationText(ColumnItem column, RowItem row, string previewsValue) {
         var currentString = GetString(column, row);
-        currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, -1);
+        currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
         currentString = ChangeTextFromRowId(currentString);
         if (currentString != GetString(column, row)) {
             Set(column, row, currentString);
@@ -1180,7 +1180,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     ///// <summary>
-    ///// Ändert bei allen anderen Spalten den Inhalt der Zelle ab (um diese gleich zuhalten), wenn diese Spalte der Key für die anderen ist.
+    ///// Ändert bei allen anderen Spalten den Inhalt der Zelle ab (um diese gleich zuhalten), wenn diese Spalte der KeyName für die anderen ist.
     ///// </summary>
     ///// <param name="column"></param>
     ///// <param name="ownRow"></param>
@@ -1191,19 +1191,19 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     //    List<RowItem>? rows = null;
 
     //    foreach (var thisColumn in _database.Column) {
-    //        //if (thisColumn.LinkedCell_RowKeyIsInColumn == column.Key) {
+    //        //if (thisColumn.LinkedCell_RowKeyIsInColumn == column.KeyName) {
     //        //    LinkedCellData(thisColumn, ownRow, true, false); // Repariert auch Zellbezüge
     //        //}
 
     //        //if (thisColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
     //        //    foreach (var thisV in thisColumn.LinkedCellFilterx) {
     //        //        if (IntTryParse(thisV, out var key)) {
-    //        //            if (key == column.Key) { LinkedCellData(thisColumn, ownRow, true, false); break; }
+    //        //            if (key == column.KeyName) { LinkedCellData(thisColumn, ownRow, true, false); break; }
     //        //        }
     //        //    }
     //        //}
 
-    //        //if (thisColumn.KeyColumnKey == column.Key) {
+    //        //if (thisColumn.KeyColumnKey == column.KeyName) {
     //        //    if (rows == null) {
     //        //        rows = column.Format == DataFormat.RelationText
     //        //            ? ConnectedRowsOfRelations(currentvalue, ownRow)

@@ -45,5 +45,6 @@ public enum Routinen : byte {
 
     CellFormatUTF8_V401 = 8,
 
-    ColumnUTF8_V401 = 9
+    ColumnUTF8_V401 = 9,
+    CellFormatUTF8_V402 = 10
 }

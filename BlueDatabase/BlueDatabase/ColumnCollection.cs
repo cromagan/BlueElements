@@ -465,7 +465,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //        return null;
     //    }
 
-    //    return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.Key == key);
+    //    return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.KeyName == key);
     //}
 
     //internal static string ParsableColumnName(ColumnItem? column) => column == null ? "ColumnName=?" : "ColumnName=" + column.Name;
@@ -510,8 +510,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                     Develop.DebugPrint(FehlerArt.Fehler, "Name nicht korrekt!");
                 }
 
-                //if (l.Key != thisColumn.Key) {
-                //    Develop.DebugPrint(FehlerArt.Fehler, "Key nicht korrekt!");
+                //if (l.KeyName != thisColumn.KeyName) {
+                //    Develop.DebugPrint(FehlerArt.Fehler, "KeyName nicht korrekt!");
                 //}
             } else {
                 Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht erzeugt!");

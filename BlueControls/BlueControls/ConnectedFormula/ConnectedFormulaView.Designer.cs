@@ -16,12 +16,12 @@ namespace BlueControls.Controls {
 
             if(disposing) {
                 //SetData(null,null);
-                SetData(null, null, -1);
+                SetData(null, null, string.Empty);
             }
 
 
             if (disposing && (components != null)) {
-                SetData(null, null, -1);
+                SetData(null, null, string.Empty);
                 components?.Dispose();
             }
             base.Dispose(disposing);

@@ -73,10 +73,8 @@ internal class Method_Call : Method_Database {
         }
 
         var scx = BlueScript.Methods.Method_CallByFilename.CallSub(varCol, scp, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null);
-        scx.BreakFired = false;
-        scx.EndScript = false;
-
-        return scx;
+        if (!scx.AllOk) { return scx; }
+        return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }
 
     #endregion

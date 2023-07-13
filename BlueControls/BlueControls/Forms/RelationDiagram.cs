@@ -76,7 +76,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
             return null;
         }
         if (ItemOfRow(r) != null) { return null; }
-        RowFormulaPadItem i2 = new(Database, r.Key, layoutId);
+        RowFormulaPadItem i2 = new(Database, r.KeyName, layoutId);
         Pad?.AddCentered(i2);
         //  Pad.Invalidate()
         i2.SetLeftTopPoint(xPos, ypos);
