@@ -98,7 +98,8 @@ public class CellLikeListItem : BasicListItem {
         //var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, ShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
         var txt = CellItem.ValueReadable(_styleLikeThis, Internal, ShortenStyle.HTML, _bildTextverhalten, true);
 
-        return txt.CompareKey(_styleLikeThis.SortType) + "|" + Internal;
+        if (_styleLikeThis != null) { return txt.CompareKey(_styleLikeThis.SortType) + "|" + Internal; }
+        return string.Empty;
         //Internal.CompareKey(_StyleLikeThis.SortType) + "|" + Internal;
     }
 

@@ -56,8 +56,9 @@ internal class Method_BerechneVariable : Method {
     ///
     /// </summary>
     /// <param name="infos"></param>
+    /// <param name="scp"></param>
     /// <param name="newcommand">Erwartet wird: X=5;</param>
-    /// <param name="vs"></param>
+    /// <param name="varCol"></param>
     /// <param name="generateVariable"></param>
     /// <returns></returns>
     public static DoItFeedback VariablenBerechnung(CanDoFeedback infos, ScriptProperties scp, string newcommand, VariableCollection varCol, bool generateVariable) {
@@ -108,7 +109,7 @@ internal class Method_BerechneVariable : Method {
     /// Berechnet z.B.   X = 5;
     /// Die Variable, die berechnet werden soll, muss bereits existieren - und wird auch auf Existenz und Datentyp geprüft.
     /// </summary>
-    /// <param name="vs"></param>
+    /// <param name="varCol"></param>
     /// <param name="infos"></param>
     /// <returns></returns>
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) => VariablenBerechnung(infos, scp, infos.ComandText + infos.AttributText + ";", varCol, false);

@@ -24,7 +24,6 @@ using System.Threading;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
-using static BlueBasics.Converter;
 using System.Linq;
 
 namespace BlueDatabase;
@@ -129,11 +128,10 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             return l;
         }
 
-        if (tb != null)
-            foreach (var thistb in tb) {
-                var t = ConnectionDataOfOtherTable(thistb, false);
-                if (t != null) { l.Add(t); }
-            }
+        foreach (var thistb in tb) {
+            var t = ConnectionDataOfOtherTable(thistb, false);
+            if (t != null) { l.Add(t); }
+        }
 
         return l;
     }
@@ -261,7 +259,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             return;
         }
 
-        if (l != null && l.Count > 0) {
+        if (l.Count > 0) {
             foreach (var thisstyle in l) {
                 _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
                 if (!t.IsObsolete()) {
@@ -548,7 +546,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 return;
             }
 
-            if (l != null && l.Count > 0) {
+            if (l.Count > 0) {
                 foreach (var thisstyle in l) {
                     _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
                     if (!t.IsObsolete()) {

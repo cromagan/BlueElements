@@ -41,7 +41,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     #region Constructors
 
-    public RelationDiagram(DatabaseAbstract database) {
+    public RelationDiagram(DatabaseAbstract? database) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -70,7 +70,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad?.Item?[what] != null) { return null; }
-        var r = Database.Row[what];
+        var r = Database?.Row[what];
         if (r == null || r.IsDisposed) {
             MessageBox.Show("<b>" + what + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
             return null;
@@ -86,9 +86,14 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     public RowFormulaPadItem? ItemOfRow(RowItem r) {
-        foreach (var thisItem in Pad.Item) {
-            if (thisItem is RowFormulaPadItem tempVar && tempVar.Row == r) { return tempVar; }
+        if (Pad.Item != null) {
+            foreach (var thisItem in Pad.Item) {
+                if (thisItem is RowFormulaPadItem tempVar && tempVar.Row == r) {
+                    return tempVar;
+                }
+            }
         }
+
         return null;
     }
 
@@ -103,7 +108,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     private void BezPlus(RowFormulaPadItem? initialItem) {
         // Den Beziehungstext holen
-        var t = initialItem.Row.CellGetString(_column).ToUpper();
+        var t = initialItem?.Row.CellGetString(_column).ToUpper();
         if (string.IsNullOrEmpty(t)) { return; }
         // Alle möglichen Namen holen
         List<string> names = new();

@@ -30,7 +30,7 @@ public class VariableCollection : IEnumerable<Variable> {
 
     #region Fields
 
-    private List<Variable> _internal = new();
+    private readonly List<Variable> _internal = new();
 
     #endregion
 
@@ -66,7 +66,7 @@ public class VariableCollection : IEnumerable<Variable> {
 
     public int Count => _internal.Count;
 
-    public bool ReadOnly { get; private set; }
+    public bool ReadOnly { get; }
 
     #endregion
 
@@ -136,7 +136,6 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <summary>
     /// Gibt von allen Variablen, die ein String sind, den Inhalt ohne " am Anfang/Ende zurück.
     /// </summary>
-    /// <param name="vars"></param>
     /// <returns></returns>
     public List<string> AllStringValues() {
         var l = new List<string>();
@@ -151,7 +150,7 @@ public class VariableCollection : IEnumerable<Variable> {
     //public object Clone() => new VariableCollection(ToList(), ReadOnly);
 
     public Variable? Get(string name) {
-        if (_internal == null || _internal.Count == 0) { return null; }
+        if (_internal.Count == 0) { return null; }
 
         return _internal.FirstOrDefault(thisv =>
             !thisv.SystemVariable && string.Equals(thisv.Name, name, StringComparison.OrdinalIgnoreCase));
@@ -177,7 +176,6 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <summary>
     /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
     /// </summary>
-    /// <param name="vars"></param>
     /// <param name="name"></param>
     public double GetDouble(string name) {
         var v = _internal.Get(name);

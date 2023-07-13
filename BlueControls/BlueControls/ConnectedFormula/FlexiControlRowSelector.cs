@@ -27,7 +27,6 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using static BlueBasics.Converter;
 using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;

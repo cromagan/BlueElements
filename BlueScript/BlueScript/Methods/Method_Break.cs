@@ -51,7 +51,7 @@ internal class Method_Break : Method {
         //if (s.Sub < 1) { return new DoItFeedback(infos.Data, "Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }
         //if (s.BreakFired) { return new DoItFeedback(infos.Data, "Break doppelt ausgelöst."); }
         //s.BreakFired = true;
-        new DoItFeedback(true, false);
+        new(true, false);
 
     #endregion
 }

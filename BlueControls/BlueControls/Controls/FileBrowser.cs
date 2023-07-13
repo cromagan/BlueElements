@@ -93,7 +93,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
         }
     }
 
-    public RowItem? LastInputRow { get; private set; }
+    public RowItem? LastInputRow { get; }
 
     public string OriginalText {
         get => _originalText;

@@ -197,11 +197,10 @@ public partial class ZoomPicWithPoints : ZoomPic {
         var pathtxt = FilenameTxt(path);
         try {
             Bmp?.Save(path, ImageFormat.Png);
-            if (Tags != null) {
-                Tags.TagSet("Erstellt", Generic.UserName);
-                Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
-                Tags.WriteAllText(pathtxt, Constants.Win1252, false);
-            }
+
+            Tags.TagSet("Erstellt", Generic.UserName);
+            Tags.TagSet("Datum", DateTime.Now.ToString(Constants.Format_Date5));
+            Tags.WriteAllText(pathtxt, Constants.Win1252, false);
         } catch {
             Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
             _ = MessageBox.Show("Fehler beim Speichern");

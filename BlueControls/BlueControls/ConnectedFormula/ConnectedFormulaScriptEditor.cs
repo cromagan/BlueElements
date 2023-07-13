@@ -52,7 +52,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
 
     #region Properties
 
-    public ConnectedFormula? Formula { get; private set; }
+    public ConnectedFormula? Formula { get; }
 
     public FormulaScript? Item {
         get {

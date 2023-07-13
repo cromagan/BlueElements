@@ -47,10 +47,8 @@ public abstract class Method_Database : Method {
     protected DatabaseAbstract? DatabaseOf(VariableCollection variables, string tableName) {
         if (!SqlBackAbstract.IsValidTableName(tableName, false)) { return null; }
 
-        if (variables != null) {
-            var db = MyDatabase(variables)?.ConnectionDataOfOtherTable(tableName, false);
-            return DatabaseAbstract.GetById(db, null);
-        }
+        var db = MyDatabase(variables)?.ConnectionDataOfOtherTable(tableName, false);
+        return DatabaseAbstract.GetById(db, null);
 
         return null;
     }

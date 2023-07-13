@@ -84,7 +84,7 @@ public sealed class Database : DatabaseAbstract {
 
     #region Properties
 
-    public static string DatabaseId => typeof(Database).Name;
+    public static string DatabaseId => nameof(Database);
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename);
     public string Filename { get; private set; } = string.Empty;
     public override string TableName => _tablename;
@@ -254,7 +254,7 @@ public sealed class Database : DatabaseAbstract {
                     Buffer.BlockCopy(bLoaded, pointer + 2 + lenghtRowKey + 2, valueByte, 0, lenghtValue);
                     value = valueByte.ToStringUtf8();
 
-                    pointer +=  2 + lenghtRowKey + 2 + lenghtValue;
+                    pointer += 2 + lenghtRowKey + 2 + lenghtValue;
 
                     break;
                 }

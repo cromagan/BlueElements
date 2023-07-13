@@ -67,7 +67,7 @@ public class TabControl : AbstractTabControl, IControlAcceptRow {
         }
     }
 
-    public RowItem? LastInputRow { get; private set; }
+    public RowItem? LastInputRow { get; }
 
     [DefaultValue("")]
     public string RowKey { get; private set; } = string.Empty;

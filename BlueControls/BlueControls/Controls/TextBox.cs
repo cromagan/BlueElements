@@ -507,8 +507,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             return (bool)Invoke(new Func<bool>(() => WordStarts(word, position)));
         }
         try {
-            if (_eTxt == null) { GenerateEtxt(true); }
-            if (_eTxt == null) { return false; }
+            //if (_eTxt == null) { GenerateEtxt(true); }
+            //if (_eTxt == null) { return false; }
             if (position + word.Length > _eTxt.Count + 1) { return false; }
             if (position > 0 && !_eTxt[position - 1].IsWordSeperator()) { return false; }
             if (position + word.Length < _eTxt.Count && !_eTxt[position + word.Length].IsWordSeperator()) { return false; }

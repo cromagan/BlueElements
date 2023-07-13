@@ -251,7 +251,7 @@ public class FormatHolder : IInputFormat, IReadableText {
     public QuickImage? Image { get; set; }
     public int MaxTextLenght { get; set; }
     public bool MultiLine { get; set; }
-    public string Name { get; private set; } = string.Empty;
+    public string Name { get; }
     public string Prefix { get; set; } = string.Empty;
     public string Regex { get; set; } = string.Empty;
     public bool SpellCheckingEnabled { get; set; }

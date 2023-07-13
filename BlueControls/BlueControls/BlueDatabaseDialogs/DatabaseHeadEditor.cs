@@ -86,7 +86,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
         PermissionGroups_NewRow.Item.Clear();
-        PermissionGroups_NewRow.Item.AddRange(Database.PermissionGroupsNewRow);
+        PermissionGroups_NewRow.Item.AddRange(Database?.PermissionGroupsNewRow);
         DatenbankAdmin.Item.Clear();
         DatenbankAdmin.Item.AddRange(Database.DatenbankAdmin);
         txbKennwort.Text = Database.GlobalShowPass;
@@ -309,11 +309,9 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
 
     private void tblUndo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (sender is not Table tbl || tbl.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
-        RowItem? row = null;
         ColumnItem? column = null;
-        if (e.HotItem is RowItem r) { row = r; }
         if (e.HotItem is ColumnItem c) { column = c; }
-        if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out row); }
+        if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out _); }
 
         _ = e.UserMenu.Add("Sortierung", true);
         _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
@@ -326,7 +324,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         ColumnItem? column = null;
         //if (e.HotItem is RowItem r) { row = r; }
         if (e.HotItem is ColumnItem c) { column = c; }
-        if (e.HotItem is string ck && db != null) { db.Cell.DataOfCellKey(ck, out column, out _); }
+        if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out _); }
 
         if (column == null) { return; }
 

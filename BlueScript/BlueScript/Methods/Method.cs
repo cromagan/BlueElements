@@ -216,7 +216,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
             var exceptetType = n < types.Count ? types[n] : types[types.Count - 1]; // Bei Endlessargs den letzten nehmen
 
             // Variable ermitteln oder eine Dummy-Variable als Rückgabe ermitteln
-            Variable? v = null;
+            Variable? v;
 
             var mustBeVar = exceptetType.Count > 0 && exceptetType[0].StartsWith("*");
 

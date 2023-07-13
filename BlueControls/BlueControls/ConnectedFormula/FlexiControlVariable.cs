@@ -115,7 +115,7 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
         }
     }
 
-    public RowItem? LastInputRow { get; private set; }
+    public RowItem? LastInputRow { get; }
 
     #endregion
 

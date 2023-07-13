@@ -240,7 +240,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
 
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
-        if (Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1) {
+        if (Database != null && Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1) {
             padVorschau.ShowInPrintMode = true;
             padVorschau.Item = new ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport[0].Database, _rowsForExport[0].KeyName);
             padVorschau.ZoomFit();

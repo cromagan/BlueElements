@@ -267,8 +267,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
         var start = -((colorId.Count - 1) * width / 2);
 
-        for (var pos = 0; pos < colorId.Count; pos++) {
-            DrawArrow(gr, positionModified, zoom, symbol, colorId[pos], Alignment.Top_HorizontalCenter, arrowY, symbolY, start);
+        foreach (var thisColorId in colorId) {
+            DrawArrow(gr, positionModified, zoom, symbol, thisColorId, Alignment.Top_HorizontalCenter, arrowY, symbolY, start);
             start += width;
         }
     }

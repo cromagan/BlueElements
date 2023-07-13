@@ -122,7 +122,7 @@ public sealed class QuickImage : IReadableText, IStringable {
     public string Färbung { get; } = string.Empty;
     public int Height { get; private set; }
     public int Helligkeit { get; }
-    public bool IsError { get; private set; }
+    public bool IsError { get; }
     public string Name { get; } = string.Empty;
     public int Sättigung { get; }
     public int Transparenz { get; }

@@ -102,7 +102,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    public RowItem? LastInputRow { get; private set; }
+    public RowItem? LastInputRow { get; }
 
     public string OriginalText {
         get => _originalText;

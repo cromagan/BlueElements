@@ -52,7 +52,6 @@ public class Method_CallByFilename : Method {
     /// <summary>
     ///
     /// </summary>
-    /// <param name="vs"></param>
     /// <param name="infos"></param>
     /// <param name="aufgerufenVon">Name der Funktion, z.B. Do-Schleife</param>
     /// <param name="reducedscripttext">Der Scripttext, der ausgeführt werden soll. Bereits standardisiert</param>
@@ -60,8 +59,7 @@ public class Method_CallByFilename : Method {
     /// <param name="lineadd">Zb. bei einer Do Schleife, die Zeile, in der das Do steht. Bei Scripten aus dem Dateisytem 0</param>
     /// <param name="subname">Zb. bei einer Do Schleife, der gleich Wert wie in Infos.Logdata. Bei Scripten aus dem Dateisystem dessen Name</param>
     /// <param name="addMe"></param>
-    /// <param name="lm"></param>
-    /// <param name="allowedMethods"></param>
+    /// <param name="varCol"></param>
     /// <returns></returns>
     public static DoItFeedback CallSub(VariableCollection varCol, ScriptProperties scp, CanDoFeedback infos, string aufgerufenVon, string reducedscripttext, bool keepVariables, int lineadd, string subname, VariableString? addMe) {
         ScriptEndedFeedback scx;

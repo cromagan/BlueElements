@@ -87,8 +87,8 @@ public static partial class Extensions {
         if (maxwidth < 1) { maxwidth = 1; }
         if (maxheight < 1) { maxheight = 1; }
 
-        var calcwidth = maxwidth;
-        var calcheight = maxheight;
+        int calcwidth;
+        int calcheight;
 
         switch (sizeMode) {
             case SizeModes.EmptySpace:

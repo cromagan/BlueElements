@@ -228,7 +228,7 @@ public sealed class MultiUserFile : IDisposableExtended {
             return ms.ToArray();
         }
 
-        return new byte[0];
+        return Array.Empty<byte>();
     }
 
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.

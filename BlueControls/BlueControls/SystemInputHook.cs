@@ -27,6 +27,7 @@ public sealed class SystemInputHook {
 
     #region Fields
 
+    private readonly Timer _tim;
     private bool _keyIsPressing;
 
     private Keys _keyLastKey;
@@ -38,8 +39,6 @@ public sealed class SystemInputHook {
     private int _mouseLastX;
 
     private int _mouseLastY;
-
-    private Timer _tim;
 
     #endregion
 

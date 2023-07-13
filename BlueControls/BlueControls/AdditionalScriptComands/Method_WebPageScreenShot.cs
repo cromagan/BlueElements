@@ -17,61 +17,64 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using CefSharp;
+
+//using CefSharp.WinForms;
+using CefSharp.OffScreen;
+using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_DownloadWebPage : Method {
-
-    #region Fields
-
-    private static readonly VariableCollection Last = new();
-
-    #endregion
+internal class Method_WebPageScreenShot : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
-    public override string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
+    public override List<List<string>> Args => new() { new() { VariableWebpage.ShortName_Variable } };
+    public override string Description => "Gibt die aktuelle Anzeige der WebPage zurück. NULL falls irgendwas fehlschlägt";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
-    public override string Returns => VariableString.ShortName_Variable;
+    public override string Returns => VariableBitmap.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "DownloadWebPage(Url)";
+    public override string Syntax => "WebPageScreenShot(WebPageVariable)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "downloadwebpage" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpagescreenshot" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var url = attvar.ValueStringGet(0);
-        var varn = "X" + url.ReduceToChars(Constants.AllowedCharsVariableName);
+        // Da es keine Möglichkeit gibt, eine Url Variable (außerhalb eines If) zu deklarieren,
+        // darf diese Routine nicht fehlschlagen.
 
-        if (Last.Get(varn) is VariableString vb) {
-            return new DoItFeedback(vb.ValueString);
-        }
+        if (attvar.Attributes[0] is not VariableWebpage vwb) { return new DoItFeedback(infos.Data, "Interner Fehler"); }
+
+        if (vwb.ValueWebpage is not ChromiumWebBrowser wb) { return new DoItFeedback(infos.Data, "Keine Webseite geladen"); }
+        if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
 
         try {
             Generic.CollectGarbage();
-            var txt = Generic.Download(url);
+            //var bitmap = new Bitmap(wb.Width, wb.Height);
+            //wb.DrawToBitmap(bitmap, new Rectangle(0, 0, wb.Width, wb.Height));
 
-            Last.Add(new VariableString(varn, txt, true, false, string.Empty));
-            return new DoItFeedback(txt);
+            return new DoItFeedback(null as Bitmap);
         } catch {
-            return new DoItFeedback(string.Empty);
+            return new DoItFeedback(null as Bitmap);
         }
     }
 

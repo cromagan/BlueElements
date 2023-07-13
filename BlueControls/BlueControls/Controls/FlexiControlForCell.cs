@@ -115,7 +115,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         }
     }
 
-    public RowItem? LastInputRow { get; private set; }
+    public RowItem? LastInputRow { get; }
 
     #endregion
 

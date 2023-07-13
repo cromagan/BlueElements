@@ -82,8 +82,6 @@ public static class IInputFormatExtensions {
             l.Add(txt);
         }
 
-
-
         foreach (var thisString in l) {
             if (!string.IsNullOrEmpty(thisString)) {
                 if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) {
@@ -162,7 +160,7 @@ public static class IInputFormatExtensions {
                    t.Regex == source.Regex &&
                    t.Suffix == source.Suffix &&
                    t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
-                   t.FormatierungErlaubt == source.FormatierungErlaubt; ;
+                   t.FormatierungErlaubt == source.FormatierungErlaubt;
         if (!x) { return false; }
 
         if (t.MaxTextLenght < 4000) {

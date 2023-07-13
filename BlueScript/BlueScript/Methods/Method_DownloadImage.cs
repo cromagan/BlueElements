@@ -33,7 +33,7 @@ internal class Method_DownloadImage : Method {
 
     #region Fields
 
-    private static readonly VariableCollection Last = new VariableCollection();
+    private static readonly VariableCollection Last = new();
 
     #endregion
 

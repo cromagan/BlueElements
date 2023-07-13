@@ -151,7 +151,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
             if (cf != null) {
                 if (cf.HasVisibleItemsForMe(pgvis)) {
-                    ConnectedFormulaView? cc = null;
+                    ConnectedFormulaView? cc;
 
                     if (existTab == null) {
 

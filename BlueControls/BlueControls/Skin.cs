@@ -1090,7 +1090,7 @@ public static class Skin {
     /// <summary>
     /// Bild wird in dieser Routine nicht mehr gändert, aber in der nachfolgenden
     /// </summary>
-    /// <param name="GR"></param>
+    /// <param name="gr"></param>
     /// <param name="txt"></param>
     /// <param name="design"></param>
     /// <param name="state"></param>

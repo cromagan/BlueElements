@@ -257,30 +257,30 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         List<float> newW = new();
         List<float> newY = new();
         List<float> newH = new();
-        for (var ity = 0; ity < its.Count; ity++) {
+        foreach (var thisIt in its) {
 
             #region  newY
 
-            newY.Add(its[ity].UsedArea.Y * scaleY);
+            newY.Add(thisIt.UsedArea.Y * scaleY);
 
             #endregion
 
             #region  newX
 
-            newX.Add(its[ity].UsedArea.X * scaleX);
+            newX.Add(thisIt.UsedArea.X * scaleX);
 
             #endregion
 
             #region  newH
 
-            var nh = its[ity].UsedArea.Height * scaleY;
+            var nh = thisIt.UsedArea.Height * scaleY;
 
-            if (its[ity].AutoSizeableHeight) {
-                if (!its[ity].CanChangeHeightTo(nh)) {
+            if (thisIt.AutoSizeableHeight) {
+                if (!thisIt.CanChangeHeightTo(nh)) {
                     nh = IAutosizableExtension.MinHeigthCapAndBox;
                 }
             } else {
-                nh = its[ity].UsedArea.Height;
+                nh = thisIt.UsedArea.Height;
             }
 
             newH.Add(nh);
@@ -289,7 +289,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
             #region  newW
 
-            newW.Add(its[ity].UsedArea.Width * scaleX);
+            newW.Add(thisIt.UsedArea.Width * scaleX);
 
             #endregion
         }

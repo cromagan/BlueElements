@@ -110,7 +110,7 @@ public class FormManager : ApplicationContext {
                 }
             }
 
-            ExecuteAtEnd();
+            ExecuteAtEnd?.Invoke();
             ExitThread();
             Develop.AbortExe();
         }

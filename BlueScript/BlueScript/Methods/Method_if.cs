@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.ComponentModel;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -92,7 +91,7 @@ internal class Method_If : Method {
 
         if (attvar.ValueBoolGet(0)) {
             var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "If-Befehl-Inhalt", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null);
-            if(!scx.AllOk) { return scx; }
+            if (!scx.AllOk) { return scx; }
             return new DoItFeedback(scx.BreakFired, scx.EndScript); // If muss die Breaks und Endsripts erhalten!
         }
 

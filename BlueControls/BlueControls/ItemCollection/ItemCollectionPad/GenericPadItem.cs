@@ -72,12 +72,7 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
 
         gr.Clear(Color.White);
 
-        var font = Skin.GetBlueFont(Stil, Parent.SheetStyle);
-
-        if (font == null) {
-            GeneratedBitmap = bmp;
-            return;
-        }
+        var font = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
 
         Skin.Draw_FormatedText(gr, _text, null, Alignment.Horizontal_Vertical_Center, new Rectangle(0, 0, Size.Width, Size.Height), null, false, font, false);
         gr.DrawRectangle(font.Pen(1), new Rectangle(0, 0, Size.Width, Size.Height));

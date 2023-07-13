@@ -41,7 +41,7 @@ internal class Method_LoadImage : Method {
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableBitmap.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "LoadImage(Filename, username, password)";
+    public override string Syntax => "LoadImage(Filename)";
 
     #endregion
 

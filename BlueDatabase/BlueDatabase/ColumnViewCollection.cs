@@ -34,9 +34,8 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
 
     #region Fields
 
+    private readonly List<ColumnViewItem> _internal = new();
     private readonly List<string> _permissionGroups_Show = new();
-
-    private List<ColumnViewItem> _internal = new();
 
     #endregion
 

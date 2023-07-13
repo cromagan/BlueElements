@@ -662,7 +662,7 @@ internal sealed partial class ColumnEditor {
         foreach (var thisFi in _column.LinkedCellFilter) {
             var x = thisFi.SplitBy("|");
 
-            if (x != null && x.Count() == 3) {
+            if (x != null && x.Length == 3) {
                 var r = db.Row[new FilterItem(c, FilterType.Istgleich_GroﬂKleinEgal, x[0])];
 
                 if (r != null && r.CellGetBoolean("Visible")) {

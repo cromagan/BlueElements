@@ -1156,7 +1156,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         try {
             var displayR = DisplayRectangleWithoutSlider();
             var maxY = 0;
-            if (UserEdit_NewRowAllowed()) { maxY += _pix18; } 
+            if (UserEdit_NewRowAllowed()) { maxY += _pix18; }
             var expanded = true;
             var lastCap = string.Empty;
 
@@ -2882,8 +2882,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Draw_Table_What(Graphics gr, List<RowData> sr, TableDrawColumn col, TableDrawType type, int permaX, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, ColumnViewCollection ca) {
-        if (sr == null) { return; }
-
         var lfdno = 0;
 
         var firstOnScreen = true;
@@ -2891,7 +2889,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         foreach (var viewItem in ca) {
             if (viewItem?.Column != null) {
                 lfdno++;
-                if (viewItem != null && IsOnScreen(viewItem, displayRectangleWoSlider)) {
+                if (IsOnScreen(viewItem, displayRectangleWoSlider)) {
                     if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (viewItem.OrderTmpSpalteX1 ?? 0) + (viewItem.TmpDrawWidth ?? 0) > permaX) ||
                         (col == TableDrawColumn.Permament && viewItem.ViewType == ViewType.PermanentColumn)) {
                         switch (type) {

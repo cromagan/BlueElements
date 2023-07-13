@@ -51,7 +51,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         SetStyle(ControlStyles.AllPaintingInWmPaint, true);
         SetStyle(ControlStyles.UserPaint, true);
 
-        TabDefaultOrder = new string[0];
+        TabDefaultOrder = Array.Empty<string>();
     }
 
     #endregion
