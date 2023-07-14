@@ -61,7 +61,7 @@ public class Method_Lookup : Method_Database {
             return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(2));
         }
 
-        var r = RowCollection.MatchesTo(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
+        var r = RowCollection.MatchesTo(new FilterItem(db.Column.First(), FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
         var l = new List<string>();
 
         if (r.Count == 0) {
@@ -73,21 +73,21 @@ public class Method_Lookup : Method_Database {
             return new DoItFeedback(l);
         }
 
-        var v = RowItem.CellToVariable(c, r[0]);
-        if (v == null || v.Count != 1) {
-            return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(2));
-        }
+        //var v = RowItem.CellToVariable(c, r[0]);
+        //if (v == null || v.Count != 1) {
+        //    return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(2));
+        //}
 
-        if (v[0] is VariableListString vl) {
-            l.AddRange(vl.ValueList);
-        } else if (v[0] is VariableString vs) {
-            var w = vs.ValueString;
-            if (!string.IsNullOrEmpty(w)) { l.Add(w); }
-        } else {
-            return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");
-        }
+        //if (v[0] is VariableListString vl) {
+        //    l.AddRange(vl.ValueList);
+        //} else if (v[0] is VariableString vs) {
+        //    var w = vs.ValueString;
+        //    if (!string.IsNullOrEmpty(w)) { l.Add(w); }
+        //} else {
+        //    return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");
+        //}
 
-        return new DoItFeedback(l);
+        return new DoItFeedback(r[0].CellGetList(c));
     }
 
     #endregion
