@@ -41,6 +41,12 @@ namespace BlueScript.Methods;
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_LoadUrl : Method {
 
+    #region Fields
+
+    private static bool didSettings = false;
+
+    #endregion
+
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
@@ -79,13 +85,8 @@ internal class Method_LoadUrl : Method {
         try {
             Generic.CollectGarbage();
 
-            CefSharpSettings.SubprocessExitIfParentProcessClosed = true;
+            DoSettings();
 
-            var settings = new CefSettings() {
-                CachePath = Path.Combine(Environment.GetFolderPath(
-                    Environment.SpecialFolder.LocalApplicationData), "CefSharp\\Cache")
-            };
-            Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
             var browser = new ChromiumWebBrowser(attvar.ValueStringGet(0));
 
             //var browser = new ChromiumWebBrowser(attvar.ValueStringGet(0));
@@ -127,6 +128,19 @@ internal class Method_LoadUrl : Method {
             return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
             //return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + attvar.ValueString(0));
         }
+    }
+
+    private void DoSettings() {
+        if (didSettings) { return; }
+        didSettings = true;
+
+        CefSharpSettings.SubprocessExitIfParentProcessClosed = true;
+
+        var settings = new CefSettings() {
+            CachePath = Path.Combine(Environment.GetFolderPath(
+                Environment.SpecialFolder.LocalApplicationData), "CefSharp\\Cache")
+        };
+        Cef.Initialize(settings, performDependencyCheck: true, browserProcessHandler: null);
     }
 
     #endregion
