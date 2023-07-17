@@ -1286,10 +1286,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             if (zeileZuordnen) {
                 if (zeil[rowNo].GetUpperBound(0) > 0 && !string.IsNullOrEmpty(zeil[rowNo][0]) && !dictNeu.ContainsKey(zeil[rowNo][0].ToUpper())) {
                     dictNeu.Add(zeil[rowNo][0].ToUpper(), zeil[rowNo]);
-                } else {
-                    OnDropMessage(FehlerArt.Warnung, "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.");
-                    return "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.";
                 }
+                //else {
+                //    OnDropMessage(FehlerArt.Warnung, "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.");
+                //    return "Abbruch, eingehende Werte können nicht eindeutig zugeordnet werden.";
+                //}
             } else {
                 dictNeu.Add(rowNo.ToString(), zeil[rowNo]);
             }

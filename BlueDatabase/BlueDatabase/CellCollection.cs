@@ -289,7 +289,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             row = null;
             return;
         }
-        var cd = cellKey.SplitAndCutBy("|");
+        var cd = cellKey.SplitBy("|");
         if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(FehlerArt.Fehler, "Falscher CellKey übergeben: " + cellKey); }
         column = Database?.Column.Exists(cd[0]);
         row = Database?.Row.SearchByKey(cd[1]);
