@@ -124,7 +124,9 @@ internal sealed partial class SearchAndReplace : Form {
         }
         foreach (var thisRow in db.Row) {
             if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_blueTable.Filter)) {
-                if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(db.Column.SysLocked)) { ro.Add(thisRow); }
+                if (db.Column.SysLocked is ColumnItem sl) {
+                    if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(sl)) { ro.Add(thisRow); }
+                }
             }
         }
         var count = 0;

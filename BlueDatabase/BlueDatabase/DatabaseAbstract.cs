@@ -1964,8 +1964,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             return true;
         }
 
-        if (string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
-            if (row != null && Cell.GetString(Column.SysRowCreator, row).ToUpper() == tmpName) { return true; }
+        if (Column.SysRowCreator is ColumnItem src && string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
+            if (row != null && Cell.GetString(src, row).ToUpper() == tmpName) { return true; }
         } else if (string.Equals(allowed, "#USER: " + tmpName, StringComparison.OrdinalIgnoreCase)) {
             return true;
         } else if (string.Equals(allowed, "#USER:" + tmpName, StringComparison.OrdinalIgnoreCase)) {

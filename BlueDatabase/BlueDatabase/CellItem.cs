@@ -177,12 +177,12 @@ public class CellItem {
 
                 //if (column.BildTextVerhalten == BildTextVerhalten.Interpretiere_Bool) {
                 //    if (txt == "+") {
-                //        if (column == column.Database.Column.SysCorrect) { return "Ok"; }
-                //        if (column == column.Database.Column.SysLocked) { return "gesperrt"; }
+                //        if (column == column.Database.Column.SysCorrectx) { return "Ok"; }
+                //        if (column == column.Database.Column.SysLockedx) { return "gesperrt"; }
                 //        return "ja";
                 //    } else if (txt == "-") {
-                //        if (column == column.Database.Column.SysCorrect) { return "fehlerhaft"; }
-                //        if (column == column.Database.Column.SysLocked) { return "bearbeitbar"; }
+                //        if (column == column.Database.Column.SysCorrectx) { return "fehlerhaft"; }
+                //        if (column == column.Database.Column.SysLockedx) { return "bearbeitbar"; }
                 //        return "nein";
                 //    }
                 //}

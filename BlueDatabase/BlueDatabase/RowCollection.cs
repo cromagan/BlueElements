@@ -553,8 +553,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (fullprocessing) {
-            db.Cell.SystemSet(db.Column.SysRowCreator, item, Generic.UserName);
-            db.Cell.SystemSet(db.Column.SysRowCreateDate, item, DateTime.UtcNow.ToString(Constants.Format_Date5));
+            if (db.Column.SysRowCreator is ColumnItem src) { db.Cell.SystemSet(src, item, Generic.UserName); }
+            if (db.Column.SysRowCreateDate is ColumnItem scd) { db.Cell.SystemSet(scd, item, DateTime.UtcNow.ToString(Constants.Format_Date5)); }
 
             // Dann die Inital-Werte reinschreiben
             foreach (var thisColum in db.Column) {
@@ -630,7 +630,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public bool Remove(RowItem? row, string comment) => row != null && Remove(row.KeyName, comment);
 
     public bool RemoveOlderThan(float inHours, string comment) {
-        var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(Database?.Column.SysRowCreateDate) where DateTime.Now.Subtract(d).TotalHours > inHours select thisrowitem.KeyName).Select(dummy => dummy).ToList();
+        if (Database?.Column.SysRowCreateDate is not ColumnItem src) { return false; }
+
+        var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(src) where DateTime.Now.Subtract(d).TotalHours > inHours select thisrowitem.KeyName).Select(dummy => dummy).ToList();
         //foreach (var thisrowitem in _Internal.Values)
         //{
         //    if (thisrowitem != null)

@@ -168,7 +168,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         _maxTextLenght = 4000;
         _maxCellLenght = 4000;
         _contentwidth = -1;
-        UnsavedContentWidth = -1;
+        ContentWidthIsValid = false;
         _captionBitmapCode = string.Empty;
         _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
         //_AutofilterErlaubt = true;
@@ -452,14 +452,13 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public int ContentWidth {
         get => _contentwidth;
         set {
-            UnsavedContentWidth = value;
             if (_contentwidth == value) { return; }
-
             _ = Database?.ChangeData(DatabaseDataType.ColumnContentWidth, this, null, _contentwidth.ToString(), value.ToString(), string.Empty);
             OnChanged();
         }
     }
 
+    public bool ContentWidthIsValid { get; private set; } = false;
     public DatabaseAbstract? Database { get; private set; }
 
     public TranslationType DoOpticalTranslation {
@@ -936,8 +935,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public int UnsavedContentWidth { get; set; }
-
     #endregion
 
     #region Methods
@@ -1136,8 +1133,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         AdminInfo = source.AdminInfo;
         //TimeCode = source.TimeCode;
         if (changeWidth) {
-            UnsavedContentWidth = source.UnsavedContentWidth;
             ContentWidth = source.ContentWidth;
+            ContentWidthIsValid = source.ContentWidthIsValid;
+        } else {
+            Invalidate_ContentWidth();
         }
 
         FilterOptions = source.FilterOptions;
@@ -1283,11 +1282,11 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (!IsValidColumnName(KeyName)) { return "Der Spaltenname ist ungültig."; }
 
         //if (!IsSystemColumn()) {
-            //if (_maxTextLenght == 4000) {
-            //    _maxTextLenght = CalculatePreveredMaxTextLenght(1.2);
-            //}
+        //if (_maxTextLenght == 4000) {
+        //    _maxTextLenght = CalculatePreveredMaxTextLenght(1.2);
+        //}
 
-            if (_maxCellLenght < _maxTextLenght) { return "Zellengröße zu klein!"; }
+        if (_maxCellLenght < _maxTextLenght) { return "Zellengröße zu klein!"; }
         //}
 
         if (_maxCellLenght < 1) { return "Zellengröße zu klein!"; }
@@ -1972,6 +1971,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public QuickImage? SymbolForReadableText() {
         if (IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
         if (Database == null || Database.IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
+        if (this == null || IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
 
         if (this == Database.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
 
@@ -2182,7 +2182,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// <summary>
     /// Wenn sich ein Zelleninhalt verändert hat, muss die Spalte neu berechnet werden.
     /// </summary>
-    internal void Invalidate_ContentWidth() => UnsavedContentWidth = -1;
+    internal void Invalidate_ContentWidth() => ContentWidthIsValid = false;
 
     internal void Invalidate_Head() {
         TmpCaptionTextSize = new SizeF(-1, -1);
@@ -2434,7 +2434,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
             case DatabaseDataType.ColumnContentWidth:
                 _contentwidth = IntParse(newvalue);
-                UnsavedContentWidth = _contentwidth;
+                ContentWidthIsValid = true;
                 break;
 
             case DatabaseDataType.CaptionBitmapCode:

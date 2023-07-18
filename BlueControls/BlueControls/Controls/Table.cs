@@ -370,7 +370,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public static int CalculateColumnContentWidth(Table? table, ColumnItem column, BlueFont? cellFont, int pix16) {
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
-        if (column.UnsavedContentWidth > 0) { return column.UnsavedContentWidth; }
+        if (column.ContentWidthIsValid) { return column.ContentWidth; }
 
         if (column.Database == null) { return 16; }
 
@@ -378,21 +378,26 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         var newContentWidth = 16; // Wert muss gesetzt werden, dass er am ende auch gespeichert wird
 
-        if (column.Format == DataFormat.Button) {
-            // Beim Button reicht eine Abfrage mit Row null
-            newContentWidth = Cell_ContentSize(table, column, null, cellFont, pix16).Width;
-        } else {
-            _ = Parallel.ForEach(column.Database.Row, thisRowItem => {
-                //var originalText = thisRowItem.CellGetString(column);
+        try {
+            if (column.Format == DataFormat.Button) {
+                // Beim Button reicht eine Abfrage mit Row null
+                newContentWidth = Cell_ContentSize(table, column, null, cellFont, pix16).Width;
+            } else {
+                _ = Parallel.ForEach(column.Database.Row, thisRowItem => {
+                    //var originalText = thisRowItem.CellGetString(column);
 
-                if (thisRowItem != null && !thisRowItem.CellIsNullOrEmpty(column)) {
-                    //var (s, quickImage) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
+                    if (thisRowItem != null && !thisRowItem.CellIsNullOrEmpty(column)) {
+                        //var (s, quickImage) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
 
-                    var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
+                        var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
 
-                    newContentWidth = Math.Max(newContentWidth, wx);
-                }
-            });
+                        newContentWidth = Math.Max(newContentWidth, wx);
+                    }
+                });
+            }
+        } catch {
+            Develop.CheckStackForOverflow();
+            return CalculateColumnContentWidth(table, column, cellFont, pix16);
         }
 
         column.ContentWidth = newContentWidth;
@@ -696,9 +701,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void CollapesAll() {
+        if (Database?.Column.SysChapter is not ColumnItem sc) { return; }
+
         _collapsed.Clear();
-        if (Database != null && !Database.IsDisposed && Database?.Column.SysChapter != null) {
-            _collapsed.AddRange(Database.Column.SysChapter.Contents());
+        if (Database != null && !Database.IsDisposed && sc != null) {
+            _collapsed.AddRange(sc.Contents());
         }
         Invalidate_sortedRowData();
     }
@@ -1002,6 +1009,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void ExpandAll() {
+        if (Database?.Column.SysChapter is null) { return; }
+
         _collapsed.Clear();
         CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
         Invalidate_sortedRowData();
@@ -2826,7 +2835,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     Math.Min(currentRow.DrawHeight, 24));
 
                 Draw_CellListBox(gr, viewItem, currentRow, cellrectangle, r, Enums.Design.Item_Listbox, itStat);
-                if (!currentRow.Row.CellGetBoolean(Database.Column.SysCorrect)) {
+                if (Database.Column.SysCorrect is ColumnItem sc && !currentRow.Row.CellGetBoolean(sc)) {
                     gr.DrawImage(QuickImage.Get("Warnung|16||||||120||50"), new Point(r.Right - 19, (int)(r.Top + ((r.Height - 16) / 2.0))));
                 }
                 if (currentRow.ShowCap) {

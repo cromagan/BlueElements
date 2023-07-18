@@ -151,10 +151,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             //if (row.IsDisposed) { return "Die Zeile wurde verworfen."; }
             if (row.Database != column.Database) { return "Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft."; }
 
-            if (column.Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds < 0) {
-                column.Database.RefreshColumnsData(column.Database.Column.SysLocked);
-                if (column != column.Database.Column.SysLocked && row.CellGetBoolean(column.Database.Column.SysLocked) && !column.EditAllowedDespiteLock) {
-                    return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
+            if (column.Database.Column.SysLocked != null) {
+                if (column.Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds < 0) {
+                    column.Database.RefreshColumnsData(column.Database.Column.SysLocked);
+                    if (column != column.Database.Column.SysLocked && row.CellGetBoolean(column.Database.Column.SysLocked) && !column.EditAllowedDespiteLock) {
+                        return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
+                    }
                 }
             }
         }
@@ -866,12 +868,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (changeSysColumns) {
             DoSpecialFormats(column, row, oldValue, false);
-            SystemSet(dbtmp.Column.SysRowChanger, row, UserName);
-            SystemSet(dbtmp.Column.SysRowChangeDate, row, DateTime.UtcNow.ToString(Constants.Format_Date5));
-            //column.TimeCode = tc;
+            if (dbtmp.Column.SysRowChanger is ColumnItem src) { SystemSet(src, row, UserName); }
+            if (dbtmp.Column.SysRowChangeDate is ColumnItem scd) { SystemSet(scd, row, DateTime.UtcNow.ToString(Constants.Format_Date5)); }
         }
 
-        //Invalidate_CellContentSize(column, row);
         column.Invalidate_ContentWidth();
         row.InvalidateCheckData();
         OnCellValueChanged(new CellEventArgs(column, row));
