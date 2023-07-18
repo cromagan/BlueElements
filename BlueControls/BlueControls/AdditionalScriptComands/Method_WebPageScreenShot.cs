@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Threading;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -69,10 +70,24 @@ internal class Method_WebPageScreenShot : Method {
 
         try {
             Generic.CollectGarbage();
-            //var bitmap = new Bitmap(wb.Width, wb.Height);
-            //wb.DrawToBitmap(bitmap, new Rectangle(0, 0, wb.Width, wb.Height));
+            string jsString = "Math.max(document.body.scrollHeight, " +
+                              "document.documentElement.scrollHeight, document.body.offsetHeight, " +
+                              "document.documentElement.offsetHeight, document.body.clientHeight, " +
+                              "document.documentElement.clientHeight);";
 
-            return new DoItFeedback(null as Bitmap);
+            var executedScript = wb.EvaluateScriptAsync(jsString).Result.Result;
+            int width = 1280;
+            var height = Convert.ToInt32(executedScript);
+
+            var size = new Size(width, height);
+
+            wb.Size = size;
+
+            Thread.Sleep(500);
+            // Wait for the screenshot to be taken.
+            var bitmap = wb.ScreenshotOrNull();
+
+            return new DoItFeedback(bitmap);
         } catch {
             return new DoItFeedback(null as Bitmap);
         }

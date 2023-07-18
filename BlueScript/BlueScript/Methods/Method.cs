@@ -135,7 +135,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     /// Achtung: nur Stringable Variablen werden berücksichtigt.
     /// </summary>
     /// <param name="txt"></param>
-    /// <param name="s"></param>
+    /// <param name="varCol"></param>
     /// <param name="ld"></param>
     /// <returns></returns>
     public static GetEndFeedback ReplaceVariable(string txt, VariableCollection varCol, LogData ld) {

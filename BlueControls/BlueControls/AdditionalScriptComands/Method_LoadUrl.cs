@@ -50,7 +50,7 @@ internal class Method_LoadUrl : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Description => "Lädt die angebenen Internet-Adresse.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Webpage des Wertes NULL.";
+    public override string Description => "Lädt die angebenen Internet-Adresse.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Webpage des Wertes NULL.\r\n\r\nAlle Befehle, die auf die Url zugreifen können, beginnen mit WebPage.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
@@ -89,33 +89,21 @@ internal class Method_LoadUrl : Method {
 
             var browser = new ChromiumWebBrowser(attvar.ValueStringGet(0));
 
-            //var browser = new ChromiumWebBrowser(attvar.ValueStringGet(0));
-            ////browser.FrameLoadEnd += Browser_FrameLoadEnd;
-
-            ////browser.Size = new Size(800, 600);
-            ////browser.Visible = true;
-            ////browser.Refresh();
-            ////browser.WaitForInitialLoadAsync();
-
-            //var d2 = DateTime.Now;
-            //while (!browser.IsBrowserInitialized) {
-            //    Develop.DoEvents();
-            //    if (DateTime.Now.Subtract(d2).TotalSeconds > 10) {
-            //        return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
-            //    }
-            //}
-
-            browser.Load(attvar.ValueStringGet(0));
-
-            //var d1 = DateTime.Now;
-            //while (!browser.IsLoading) {
-            //    Develop.DoEvents();
-            //    if (DateTime.Now.Subtract(d1).TotalSeconds > 10) {
-            //        return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
-            //    }
-            //}
-
+            #region  Warten, bis der Ladevorgang gestartet ist
             var d = DateTime.Now;
+            while (!browser.IsLoading) {
+                Develop.DoEvents();
+                if (DateTime.Now.Subtract(d).TotalSeconds > 10) {
+                    return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
+                }
+            }
+
+
+
+            #endregion
+
+            #region  Warten, bis der Ladevorgang abgeschlossen ist
+            d = DateTime.Now;
             while (browser.IsLoading) {
                 Develop.DoEvents();
                 if (DateTime.Now.Subtract(d).TotalSeconds > 10) {
@@ -123,10 +111,13 @@ internal class Method_LoadUrl : Method {
                 }
             }
 
+
+
+            #endregion
+
             return new DoItFeedback(new VariableWebpage(browser));
         } catch {
             return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
-            //return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + attvar.ValueString(0));
         }
     }
 
