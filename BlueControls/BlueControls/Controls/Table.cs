@@ -2515,9 +2515,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     thisViewItem.OrderTmpSpalteX1 = null;
                 }
             }
-            //foreach (var ThisRowItem in _Database.Row) {
-            //    if (ThisRowItem != null) { ThisRowItem.TMP_Y = null; }
-            //}
+
+
+            var sx = SliderX.Value;
+            var se = SliderX.Enabled;
+
             _wiederHolungsSpaltenWidth = 0;
             _mouseOverText = string.Empty;
             var wdh = true;
@@ -2532,7 +2534,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         maxX += Column_DrawWidth(thisViewItem, displayR);
                         _wiederHolungsSpaltenWidth = Math.Max(_wiederHolungsSpaltenWidth, maxX);
                     } else {
-                        thisViewItem.OrderTmpSpalteX1 = SliderX.Enabled ? (int)(maxX - SliderX.Value) : maxX;
+                        thisViewItem.OrderTmpSpalteX1 = se ? (int)(maxX - sx) : maxX;
                         maxX += Column_DrawWidth(thisViewItem, displayR);
                     }
                 }
