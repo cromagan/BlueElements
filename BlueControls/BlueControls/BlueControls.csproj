@@ -121,6 +121,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AdditionalScriptComands\Method_GenerateLayoutImage.cs" />
+    <Compile Include="AdditionalScriptComands\Method_WebPageFillTextBox.cs" />
     <Compile Include="AdditionalScriptComands\Method_WebPageScreenShot.cs" />
     <Compile Include="AdditionalScriptComands\Method_LoadUrl.cs" />
     <Compile Include="AdditionalScriptComands\VariableWebpage.cs" />
