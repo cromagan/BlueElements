@@ -1362,13 +1362,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var count = 0;
             do {
                 count++;
-                if (count > 10) {
-                    DrawWaitScreen(gr);
-                    FormWithStatusBar.UpdateStatusBar(FehlerArt.Warnung, "Datenbank-laden nach 10 Versuchen aufgegeben", true);
-                    _databaseDrawError = DateTime.UtcNow;
-                    _drawing = false;
-                    return;
-                }
+                //if (count > 10) {
+                //    DrawWaitScreen(gr);
+                //    FormWithStatusBar.UpdateStatusBar(FehlerArt.Warnung, "Datenbank-laden nach 10 Versuchen aufgegeben", true);
+                //    _databaseDrawError = DateTime.UtcNow;
+                //    _drawing = false;
+                //    return;
+                //}
 
                 sortedRowData = SortedRows();
 
@@ -1407,7 +1407,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     FormWithStatusBar.UpdateStatusBar(FehlerArt.Warnung, errormessage, true);
                 }
 
-                if (!didreload) { break; }
+                if (!didreload || count > 15) { break; }
                 Invalidate_sortedRowData();
             } while (true);
 
@@ -2515,7 +2515,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     thisViewItem.OrderTmpSpalteX1 = null;
                 }
             }
-
 
             var sx = SliderX.Value;
             var se = SliderX.Enabled;
