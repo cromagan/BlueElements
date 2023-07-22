@@ -977,17 +977,17 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 if (format.TextboxEditPossible()) {
                     if (!doDropDown) {
                         return EditTypeTable.Textfeld;
-                    } else {
-                        if (isMultiline) {
-                            return EditTypeTable.Dropdown_Single;
-                        } else {
-                            if (keybordInputAllowed) {
-                                return EditTypeTable.Textfeld_mit_Auswahlknopf;
-                            } else {
-                                return EditTypeTable.Dropdown_Single;
-                            }
-                        }
                     }
+
+                    if (isMultiline) {
+                        return EditTypeTable.Dropdown_Single;
+                    }
+
+                    if (keybordInputAllowed) {
+                        return EditTypeTable.Textfeld_mit_Auswahlknopf;
+                    }
+
+                    return EditTypeTable.Dropdown_Single;
                 }
 
                 Develop.DebugPrint(format);

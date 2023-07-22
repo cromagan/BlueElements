@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Threading;
+using System.Threading.Tasks;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -36,25 +37,25 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_WebPageFillTextBox : Method {
+internal class Method_WebPageGetAllIds : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableWebpage.ShortName_Variable }, StringVal, StringVal };
-    public override string Description => "Füllt ein Textfeld in der Webpage aus.";
+    public override List<List<string>> Args => new() { new() { VariableWebpage.ShortName_Variable } };
+    public override string Description => "Gibt eine Liste aller IDS zurück, mit denen interagiert werden kann.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
-    public override string Returns => string.Empty;
+    public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "WebPageFillTextBox(WebPageVariable, id, value)";
+    public override string Syntax => "WebPageGetAllIds(WebPageVariable)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpagefilltextbox" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpagegetallids" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
@@ -67,27 +68,44 @@ internal class Method_WebPageFillTextBox : Method {
 
         try {
             Generic.CollectGarbage();
+            // Führen Sie den JavaScript-Code aus, um alle IDs auf der Seite zu extrahieren
+            //var script = @"var elements = document.querySelectorAll('*');
+            //                var ids = [];
+            //                for (var i = 0; i < elements.length; i++) {
+            //                    if (elements[i].id) {
+            //                        ids.push(elements[i].id);
+            //                    }
+            //                }
+            //                ids;";
 
-            var task = wb.EvaluateScriptAsync("document.getElementById('" + attvar.ValueStringGet(1) + "').value = '" + attvar.ValueStringGet(2) + "'");
+            var script = @"var inputs = document.getElementsByTagName('input');
+                            var ids = [];
+                            for (var i = 0; i < inputs.length; i++) {
+                                if (inputs[i].id) {
+                                    ids.push(inputs[i].id);
+                                }
+                            }
+                            ids;";
 
-            while (!task.IsCompleted) { Generic.Pause(0.1, false); }
+            var l = new List<string>();
 
-            if (!Method_LoadUrl.WaitLoaded(wb)) {
-                return new DoItFeedback("Webseite konnte nicht neu geladen werden.");
+            var task = wb.EvaluateScriptAsync(script);
+
+            while (!task.IsCompleted) {
+                Generic.Pause(0.1, false);
             }
 
-            if (!task.IsFaulted) {
-                var response = task.Result;
-                if (!response.Success) {
-                    // Es ist ein Fehler beim Ausführen des Skripts aufgetreten
-                    return new DoItFeedback("Fehler beim Befüllen des Feldes: " + response.Message);
+            if (!task.IsFaulted && task.Result.Success && task.Result.Result is List<object> ids) {
+                foreach (var id in ids) {
+                    l.Add(id.ToString());
                 }
-                return new DoItFeedback("Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
+                return new DoItFeedback(l);
             }
 
-            return DoItFeedback.Null();
+            // Es ist ein Fehler beim Ausführen des Skripts aufgetreten
+            return new DoItFeedback("Fehler beim Extrahieren der IDs: " + task.Exception?.Message);
         } catch {
-            return new DoItFeedback("Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
+            return new DoItFeedback("Allgemeiner Fehler beim Auslesen der IDs.");
         }
     }
 

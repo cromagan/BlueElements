@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Drawing.Imaging;
 using BlueBasics;
@@ -63,6 +64,36 @@ internal class Method_LoadUrl : Method {
 
     #region Methods
 
+    public static bool WaitLoaded(ChromiumWebBrowser browser) {
+        Generic.Pause(0.1, false); // Um au jeden Fall das IsLoading zu erfassen
+
+        #region  Warten, bis der Ladevorgang gestartet ist
+
+        var d = DateTime.Now;
+        while (!browser.IsLoading) {
+            Develop.DoEvents();
+            if (DateTime.Now.Subtract(d).TotalSeconds > 10) {
+                return true;
+            }
+        }
+
+        #endregion
+
+        #region  Warten, bis der Ladevorgang abgeschlossen ist
+
+        d = DateTime.Now;
+        while (browser.IsLoading) {
+            Generic.Pause(1, true);
+            if (DateTime.Now.Subtract(d).TotalSeconds > 30) {
+                return false;
+            }
+        }
+
+        #endregion
+
+        return true;
+    }
+
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "loadurl" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
@@ -89,32 +120,9 @@ internal class Method_LoadUrl : Method {
 
             var browser = new ChromiumWebBrowser(attvar.ValueStringGet(0));
 
-            #region  Warten, bis der Ladevorgang gestartet ist
-            var d = DateTime.Now;
-            while (!browser.IsLoading) {
-                Develop.DoEvents();
-                if (DateTime.Now.Subtract(d).TotalSeconds > 10) {
-                    return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
-                }
+            if (!WaitLoaded(browser)) {
+                return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
             }
-
-
-
-            #endregion
-
-            #region  Warten, bis der Ladevorgang abgeschlossen ist
-            d = DateTime.Now;
-            while (browser.IsLoading) {
-                Develop.DoEvents();
-                if (DateTime.Now.Subtract(d).TotalSeconds > 10) {
-                    return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
-                }
-            }
-
-
-
-            #endregion
-
             return new DoItFeedback(new VariableWebpage(browser));
         } catch {
             return new DoItFeedback(new VariableWebpage(null as ChromiumWebBrowser));
