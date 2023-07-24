@@ -17,23 +17,14 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing;
-using System.Drawing.Imaging;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using CefSharp;
-
-//using CefSharp.WinForms;
-using static BlueBasics.Extensions;
-
-using CefSharp;
-
 using CefSharp.OffScreen;
+using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace BlueScript.Methods;

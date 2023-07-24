@@ -368,7 +368,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     #region Methods
 
-    public static int CalculateColumnContentWidth(Table? table, ColumnItem column, BlueFont? cellFont, int pix16) {
+    public static int CalculateColumnContentWidth(Table table, ColumnItem column, BlueFont? cellFont, int pix16) {
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
         if (column.ContentWidthIsValid) { return column.ContentWidth; }
 
@@ -404,8 +404,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return newContentWidth;
     }
 
-    public static Size Cell_ContentSize(Table? table, ColumnItem? column, RowItem? row, BlueFont? cellFont, int pix16) {
-        if (table?.Database == null || column?.Database == null || row == null || table.Database.IsDisposed) { return new Size(pix16, pix16); }
+    public static Size Cell_ContentSize(Table? table, ColumnItem column, RowItem row, BlueFont? cellFont, int pix16) {
+        if (column?.Database == null || row == null || column.Database.IsDisposed) { return new Size(pix16, pix16); }
 
         if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);
@@ -420,7 +420,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (column.Format == DataFormat.Button) {
             ButtonCellEventArgs e = new(column, row);
-            table.OnNeedButtonArgs(e);
+            table?.OnNeedButtonArgs(e);
             contentSize = Button.StandardSize(e.Text, e.Image);
         } else if (column.MultiLine) {
             var tmp = SplitMultiLine(column.Database.Cell.GetString(column, row));
