@@ -30,25 +30,25 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_WebPageFillTextBox : Method_WebPage {
+internal class Method_WebPageClick : Method_WebPage {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { WebPageVal, StringVal, StringVal };
-    public override string Description => "Füllt ein Textfeld in der Webpage aus.";
+    public override List<List<string>> Args => new() { WebPageVal, StringVal };
+    public override string Description => "Drückt einen Button, Klasse oder Link in der Webpage und wartet, bis die Seite geladen ist.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "WebPageFillTextBox(WebPageVariable, id, value)";
+    public override string Syntax => "WebPageClick(WebPageVariable, id)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpagefilltextbox" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpageclick" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
@@ -60,23 +60,54 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
         if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
 
         try {
-            var script = "document.getElementById('" + attvar.ValueStringGet(1) + "').value = '" + attvar.ValueStringGet(2) + "'";
+
+            #region Versuch, Button per ID
+
+            var script = @"var button = document.getElementById('" + attvar.ValueStringGet(1) + "');" + @"
+                                 if (button) {
+                                     button.click();
+                                     'success';
+                                  } else {
+                                     'error';
+                                  }";
+
             var task = DoTask(wb, script);
 
             if (!WaitLoaded(wb)) {
                 return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
             }
 
-            if (task.IsFaulted) {
-                var response = task.Result;
-                if (!response.Success) {
-                    // Es ist ein Fehler beim Ausführen des Skripts aufgetreten
-                    return new DoItFeedback(infos.Data, "Fehler beim Befüllen des Feldes: " + response.Message);
-                }
-                return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
+            if (!task.IsFaulted && task.Result.Success && task.Result.Result is string result) {
+                if (result == "success") { return DoItFeedback.Null(); }
+                //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
             }
 
-            return DoItFeedback.Null();
+            #endregion
+
+            #region Versuch, Button per tag
+
+            script = @"var element = document.querySelector('" + attvar.ValueStringGet(1) + "');" + @"
+                    if (element) {
+                        element.click();
+                        'success';
+                    } else {
+                        'error';
+                    }";
+
+            task = DoTask(wb, script);
+
+            if (!WaitLoaded(wb)) {
+                return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
+            }
+
+            if (!task.IsFaulted && task.Result.Success && task.Result.Result is string result2) {
+                if (result2 == "success") { return DoItFeedback.Null(); }
+                //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
+            }
+
+            #endregion
+
+            return new DoItFeedback(infos.Data, "Fehler beim Klicken des Buttons: " + task.Exception?.Message);
         } catch {
             return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
         }

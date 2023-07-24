@@ -28,25 +28,25 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_WebPageGetAllIds : Method_WebPage {
+internal class Method_WebPageGetAllClasses : Method_WebPage {
 
     #region Properties
 
     public override List<List<string>> Args => new() { WebPageVal };
-    public override string Description => "Gibt eine Liste aller IDS zurück, mit denen interagiert werden kann.";
+    public override string Description => "Gibt eine Liste aller Klassen zurück.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "WebPageGetAllIds(WebPageVariable)";
+    public override string Syntax => "WebPageGetAllClasses(WebPageVariable)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpagegetallids" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpagegetallclasses" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
@@ -58,24 +58,17 @@ internal class Method_WebPageGetAllIds : Method_WebPage {
         if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
 
         try {
-            //// Führen Sie den JavaScript-Code aus, um alle IDs auf der Seite zu extrahieren
-            ////var script = @"var elements = document.querySelectorAll('*');
-            ////                var ids = [];
-            ////                for (var i = 0; i < elements.length; i++) {
-            ////                    if (elements[i].id) {
-            ////                        ids.push(elements[i].id);
-            ////                    }
-            ////                }
-            ////                ids;";
-
-            var script = @"var inputs = document.getElementsByTagName('input');
-                            var ids = [];
-                            for (var i = 0; i < inputs.length; i++) {
-                                if (inputs[i].id) {
-                                    ids.push(inputs[i].id);
-                                }
-                            }
-                            ids;";
+            var script = @"
+                    var elements = document.getElementsByTagName('*');
+                    var classes = [];
+                    for (var i = 0; i < elements.length; i++) {
+                        var elementClasses = elements[i].classList;
+                        for (var j = 0; j < elementClasses.length; j++) {
+                            var className = elementClasses[j];
+                            classes.push(className);
+                        }
+                    }
+                    classes;";
 
             var task = DoTask(wb, script);
 
@@ -89,9 +82,9 @@ internal class Method_WebPageGetAllIds : Method_WebPage {
             }
 
             // Es ist ein Fehler beim Ausführen des Skripts aufgetreten
-            return new DoItFeedback(infos.Data, "Fehler beim Extrahieren der IDs: " + task.Exception?.Message);
+            return new DoItFeedback(infos.Data, "Fehler beim Extrahieren der Links: " + task.Exception?.Message);
         } catch {
-            return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Auslesen der IDs.");
+            return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Auslesen der Links.");
         }
     }
 

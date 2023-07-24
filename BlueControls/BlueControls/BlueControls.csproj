@@ -120,8 +120,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AdditionalScriptComands\Method_WebPage.cs" />
     <Compile Include="AdditionalScriptComands\Method_GenerateLayoutImage.cs" />
-    <Compile Include="AdditionalScriptComands\Method_WebPageClickButton.cs" />
+    <Compile Include="AdditionalScriptComands\Method_WebPageClick.cs" />
+    <Compile Include="AdditionalScriptComands\Method_WebPageGetAllClasses.cs" />
+    <Compile Include="AdditionalScriptComands\Method_WebPageGetAllLinks.cs" />
     <Compile Include="AdditionalScriptComands\Method_WebPageGetAllIds.cs" />
     <Compile Include="AdditionalScriptComands\Method_WebPageFillTextBox.cs" />
     <Compile Include="AdditionalScriptComands\Method_WebPageScreenShot.cs" />

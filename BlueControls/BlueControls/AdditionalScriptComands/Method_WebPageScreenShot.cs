@@ -20,9 +20,9 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Drawing.Imaging;
 using System.Threading;
 using BlueBasics;
+using BlueDatabase.AdditionalScriptComands;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -30,17 +30,16 @@ using CefSharp;
 
 //using CefSharp.WinForms;
 using CefSharp.OffScreen;
-using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_WebPageScreenShot : Method {
+internal class Method_WebPageScreenShot : Method_WebPage {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableWebpage.ShortName_Variable } };
+    public override List<List<string>> Args => new() { WebPageVal };
     public override string Description => "Gibt die aktuelle Anzeige der WebPage zurück. NULL falls irgendwas fehlschlägt";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";

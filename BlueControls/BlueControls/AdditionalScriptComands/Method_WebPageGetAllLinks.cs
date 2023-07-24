@@ -17,44 +17,36 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Threading;
-using BlueBasics;
+using BlueDatabase.AdditionalScriptComands;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using CefSharp;
-
-//using CefSharp.WinForms;
 using CefSharp.OffScreen;
-using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_WebPageClickButton : Method {
+internal class Method_WebPageGetAllLinks : Method_WebPage {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new() { VariableWebpage.ShortName_Variable }, StringVal };
-    public override string Description => "Drückt einen Button in der Webpage und wartet, bis die Seite geladen ist.";
+    public override List<List<string>> Args => new() { WebPageVal };
+    public override string Description => "Gibt eine Liste aller Links zurück.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
-    public override string Returns => string.Empty;
+    public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "WebPageClickButton(WebPageVariable, id)";
+    public override string Syntax => "WebPageGetAllLinks(WebPageVariable)";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpageclickbutton" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpagegetalllinks" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
@@ -66,32 +58,30 @@ internal class Method_WebPageClickButton : Method {
         if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
 
         try {
-            Generic.CollectGarbage();
+            var script = @"var inputs = document.getElementsByTagName('a');
+                            var ids = [];
+                            for (var i = 0; i < inputs.length; i++) {
+                                if (inputs[i].id) {
+                                    ids.push(inputs[i].href);
+                                }
+                            }
+                            ids;";
 
-            var script = @"var button = document.getElementById('" +  attvar.ValueStringGet(1)  + "');" + @"
-                                 if (button) {
-                                     button.click();
-                                     'success';
-                                  } else {
-                                     'error';
-                                  }";
+            var task = DoTask(wb, script);
 
-            var task = wb.EvaluateScriptAsync(script);
+            var l = new List<string>();
 
-            while (!task.IsCompleted) { Generic.Pause(0.1, false); }
-
-            if (!Method_LoadUrl.WaitLoaded(wb)) {
-                return new DoItFeedback("Webseite konnte nicht neu geladen werden.");
+            if (!task.IsFaulted && task.Result.Success && task.Result.Result is List<object> ids) {
+                foreach (var id in ids) {
+                    l.Add(id.ToString());
+                }
+                return new DoItFeedback(l);
             }
 
-            if (!task.IsFaulted && task.Result.Success && task.Result.Result is string result) {
-                if (result == "success") { return DoItFeedback.Null(); }
-                return new DoItFeedback("Fehler: Der Button wurde nicht gefunden.");
-            }
-
-            return new DoItFeedback("Fehler beim Klicken des Buttons: " + task.Exception?.Message);
+            // Es ist ein Fehler beim Ausführen des Skripts aufgetreten
+            return new DoItFeedback(infos.Data, "Fehler beim Extrahieren der Links: " + task.Exception?.Message);
         } catch {
-            return new DoItFeedback("Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
+            return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Auslesen der Links.");
         }
     }
 

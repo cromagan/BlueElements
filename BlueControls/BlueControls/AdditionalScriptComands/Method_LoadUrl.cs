@@ -26,12 +26,13 @@ using CefSharp.OffScreen;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using BlueDatabase.AdditionalScriptComands;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_LoadUrl : Method {
+internal class Method_LoadUrl : Method_WebPage {
 
     #region Fields
 
@@ -54,36 +55,6 @@ internal class Method_LoadUrl : Method {
     #endregion
 
     #region Methods
-
-    public static bool WaitLoaded(ChromiumWebBrowser browser) {
-        Generic.Pause(0.1, false); // Um au jeden Fall das IsLoading zu erfassen
-
-        #region  Warten, bis der Ladevorgang gestartet ist
-
-        var d = DateTime.Now;
-        while (!browser.IsLoading) {
-            Develop.DoEvents();
-            if (DateTime.Now.Subtract(d).TotalSeconds > 10) {
-                return true;
-            }
-        }
-
-        #endregion
-
-        #region  Warten, bis der Ladevorgang abgeschlossen ist
-
-        d = DateTime.Now;
-        while (browser.IsLoading) {
-            Generic.Pause(1, true);
-            if (DateTime.Now.Subtract(d).TotalSeconds > 30) {
-                return false;
-            }
-        }
-
-        #endregion
-
-        return true;
-    }
 
     public override List<string> Comand(VariableCollection? currentvariables) => new() { "loadurl" };
 
@@ -134,13 +105,4 @@ internal class Method_LoadUrl : Method {
     }
 
     #endregion
-
-    //private void Browser_FrameLoadEnd(object sender, FrameLoadEndEventArgs e) {
-    //    var browser = (ChromiumWebBrowser)(sender);
-
-    //    var bitmap = new Bitmap(browser.Width, browser.Height);
-    //    browser.DrawToBitmap(bitmap, new Rectangle(0, 0, browser.Width, browser.Height));
-
-    //    bitmap.Save("D:\\Test111.png", ImageFormat.Png);
-    //}
 }
