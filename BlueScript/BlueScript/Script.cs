@@ -41,7 +41,7 @@ public class Script {
 
     #region Constructors
 
-    public Script(VariableCollection? variablen, string additionalFilesPath, ScriptProperties scp) {
+    public Script(VariableCollection variablen, string additionalFilesPath, ScriptProperties scp) {
         Comands ??= GetInstaceOfType<Method>();
         if (VarTypes == null) {
             VarTypes = GetInstaceOfType<Variable>("NAME");

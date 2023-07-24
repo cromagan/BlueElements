@@ -152,7 +152,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         DatabaseAbstract? database = null;
 
         foreach (var thisfi in fi) {
-            if (thisfi.FilterType != FilterType.Istgleich && thisfi.FilterType != FilterType.Istgleich_GroﬂKleinEgal) { return null; }
+            if (thisfi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroﬂKleinEgal) { return null; }
             if (thisfi.Column == null) { return null; }
             if (thisfi.Database == null) { return null; }
             database ??= thisfi.Database;
