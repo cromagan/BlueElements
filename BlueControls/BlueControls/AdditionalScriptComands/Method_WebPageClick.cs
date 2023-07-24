@@ -84,9 +84,17 @@ internal class Method_WebPageClick : Method_WebPage {
 
             #endregion
 
-            #region Versuch, Button per tag
+            #region Versuch, Button per Angzeigten Text
 
-            script = @"var element = document.querySelector('" + attvar.ValueStringGet(1) + "');" + @"
+            script = @"var elements = document.getElementsByTagName('button');
+                    var element = null;
+                    for (var i = 0; i < elements.length; i++) {
+                        var buttonText = elements[i].textContent.trim();
+                        if (buttonText === '" + attvar.ValueStringGet(1) + @"') {
+                            element = elements[i];
+                            break;
+                        }
+                    }
                     if (element) {
                         element.click();
                         'success';
@@ -102,6 +110,29 @@ internal class Method_WebPageClick : Method_WebPage {
 
             if (!task.IsFaulted && task.Result.Success && task.Result.Result is string result2) {
                 if (result2 == "success") { return DoItFeedback.Null(); }
+                //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
+            }
+
+            #endregion
+
+            #region Versuch, Button per Klassenname
+
+            script = @"var element = document.querySelector('" + attvar.ValueStringGet(1) + "');" + @"
+                    if (element) {
+                        element.click();
+                        'success';
+                    } else {
+                        'error';
+                    }";
+
+            task = DoTask(wb, script);
+
+            if (!WaitLoaded(wb)) {
+                return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
+            }
+
+            if (!task.IsFaulted && task.Result.Success && task.Result.Result is string result3) {
+                if (result3 == "success") { return DoItFeedback.Null(); }
                 //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
             }
 
