@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31112.23
+# Visual Studio Version 17
+VisualStudioVersion = 17.6.33829.357
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueControls", "BlueControls\BlueControls.csproj", "{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -28,8 +28,8 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}.Debug|Any CPU.Build.0 = Debug|x64
 		{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}.Debug|x64.Build.0 = Debug|Any CPU
 		{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}.Debug|x86.ActiveCfg = Debug|Any CPU
