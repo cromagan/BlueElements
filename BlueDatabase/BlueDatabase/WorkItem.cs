@@ -26,101 +26,42 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public class WorkItem : IParseable, IChangedFeedback {
-
-    #region Fields
-
-    private string _changedTo = string.Empty;
-
-    private string _colName = string.Empty;
-
-    private bool _isPending;
-    private string _rowKey;
-
-    #endregion
-
-    //private ItemState _state;
+public class WorkItem : IParseable {
 
     #region Constructors
 
     public WorkItem(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user) {
         Comand = comand;
-        _colName = column?.Name ?? string.Empty;
-        _rowKey = row?.KeyName ?? string.Empty;
+        ColName = column?.Name ?? string.Empty;
+        RowKey = row?.KeyName ?? string.Empty;
         PreviousValue = previousValue;
-        _changedTo = changedTo;
+        ChangedTo = changedTo;
         User = user;
-        Date = DateTime.UtcNow;
+        DateTimeUTC = DateTime.UtcNow;
     }
 
-    //public WorkItem(DatabaseDataType comand, ColumnItem column, RowItem row, string previousValue, string changedTo, string user) : this(comand, column?.KeyName ?? -1, row?.KeyName ?? -1, previousValue, changedTo, user) { }
-
     public WorkItem(string s) => Parse(s);
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler? Changed;
 
     #endregion
 
     #region Properties
 
     public string CellKey => CellCollection.KeyOfCell(ColName, RowKey);
-
-    public string ChangedTo {
-        get => _changedTo;
-        set {
-            if (value == _changedTo) { return; }
-            _changedTo = value;
-            OnChanged();
-        }
-    }
-
-    public string ColName {
-        get => _colName;
-        set {
-            if (value == _colName) { return; }
-            _colName = value;
-            OnChanged();
-        }
-    }
-
-    public DatabaseDataType Comand { get; private set; }
-    public DateTime Date { get; private set; }
-
-    //public bool HistorischRelevant => State is ItemState.Pending or ItemState.Undo;
-
-    public string PreviousValue { get; private set; } = string.Empty;
-
-    public string RowKey {
-        get => _rowKey;
-        set {
-            if (value == _rowKey) { return; }
-            _rowKey = value;
-            OnChanged();
-        }
-    }
-
+    public string ChangedTo { get; private set; } = string.Empty;
+    public string ColName { get; private set; } = string.Empty;
+    public DatabaseDataType Comand { get; private set; } = (DatabaseDataType)0;
+    public string Coment { get; private set; }
+    public DateTime DateTimeUTC { get; private set; }
+    public string? PreviousValue { get; private set; }
+    public string RowKey { get; private set; } = string.Empty;
+    public string TableName { get; private set; }
     public string User { get; private set; } = string.Empty;
-
-    internal bool IsPending {
-        get => _isPending;
-        set {
-            if (value == _isPending) { return; }
-            _isPending = value;
-            OnChanged();
-        }
-    }
 
     #endregion
 
     #region Methods
 
-    public string CompareKey() => Date.ToString(Constants.Format_Date) + _colName;
-
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public string CompareKey() => DateTimeUTC.ToString(Constants.Format_Date) + ColName;
 
     public void Parse(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
@@ -134,11 +75,11 @@ public class WorkItem : IParseable, IChangedFeedback {
                     break;
 
                 case "cn":
-                    _colName = pair.Value;
+                    ColName = pair.Value;
                     break;
 
                 case "rk":
-                    _rowKey = pair.Value;
+                    RowKey = pair.Value;
                     break;
 
                 case "undotype":
@@ -149,7 +90,7 @@ public class WorkItem : IParseable, IChangedFeedback {
 
                 case "date":
                 case "d":
-                    Date = DateTimeParse(pair.Value);
+                    DateTimeUTC = DateTimeParse(pair.Value);
                     break;
 
                 case "user":
@@ -168,7 +109,7 @@ public class WorkItem : IParseable, IChangedFeedback {
                     break;
 
                 case "c":
-                    _changedTo = pair.Value.FromNonCriticalWithQuote();
+                    ChangedTo = pair.Value.FromNonCriticalWithQuote();
                     break;
 
                 case "p":
@@ -177,7 +118,7 @@ public class WorkItem : IParseable, IChangedFeedback {
 
                 case "changedto":
                 case "ct": // Todo: alt: 10.08.2021
-                    _changedTo = pair.Value.FromNonCritical();
+                    ChangedTo = pair.Value.FromNonCritical();
                     break;
 
                 default:
@@ -188,12 +129,12 @@ public class WorkItem : IParseable, IChangedFeedback {
     }
 
     public new string ToString() => "{CO=" + (int)Comand +
-                                    ", CN=" + _colName +
-                                    ", RK=" + _rowKey +
-                                    ", D=" + Date +
+                                    ", CN=" + ColName +
+                                    ", RK=" + RowKey +
+                                    ", D=" + DateTimeUTC +
                                     ", U=" + User.ToNonCritical() +
                                     ", P=" + PreviousValue.ToNonCriticalWithQuote() +
-                                    ", C=" + _changedTo.ToNonCriticalWithQuote() +
+                                    ", C=" + ChangedTo.ToNonCriticalWithQuote() +
                                     "}";
 
     public string UndoTextTableMouseOver() {
@@ -201,10 +142,10 @@ public class WorkItem : IParseable, IChangedFeedback {
         var n = "'" + ChangedTo + "'";
         if (a == "''") { a = "<IMAGECODE=Stern|16>"; }
         if (n == "''") { n = "<IMAGECODE=Papierkorb|16>"; }
-        return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + Date + ", " + User + ")</i>";
+        return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + DateTimeUTC + ", " + User + ")</i>";
     }
 
-    internal bool LogsUndo(DatabaseAbstract database) => database.Column.Exists(_colName) is ColumnItem c && c.ShowUndo;
+    internal bool LogsUndo(DatabaseAbstract database) => database.Column.Exists(ColName) is ColumnItem c && c.ShowUndo;
 
     #endregion
 }

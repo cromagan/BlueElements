@@ -37,8 +37,6 @@ public sealed class Database : DatabaseAbstract {
 
     #region Fields
 
-
-
     private readonly string _tablename;
 
     private string _canWriteError = string.Empty;
@@ -61,8 +59,6 @@ public sealed class Database : DatabaseAbstract {
 
     private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : base(readOnly) {
         //Develop.StartService();
-
-
 
         _tablename = SqlBackAbstract.MakeValidTableName(tablename);
 
@@ -575,8 +571,6 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-
-
     public override string AdditionalFilesPfadWhole() {
         var x = base.AdditionalFilesPfadWhole();
         if (!string.IsNullOrEmpty(x)) { return x; }
@@ -805,7 +799,6 @@ public sealed class Database : DatabaseAbstract {
         x.Close();
     }
 
-
     internal static void SaveToByteList(List<byte> list, ColumnItem column, RowItem row) {
         if (!column.SaveContent) { return; }
 
@@ -875,24 +868,6 @@ public sealed class Database : DatabaseAbstract {
         return r;
     }
 
-    protected override void AddUndo(string tableName, DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) {
-        if (IsDisposed) { return; }
-        if (type.IsObsolete()) { return; }
-        // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
-
-        Works.Add(new WorkItem(type, column, row, previousValue, changedTo, userName));
-    }
-
-    protected override void Initialize() {
-        base.Initialize();
-        Works.Clear();
-    }
-
-    //protected override void Dispose(bool disposing) {
-    //    //_muf?.Dispose();
-    //    //Works?.Dispose();
-    //    base.Dispose(disposing);
-    //}
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
 
     private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];

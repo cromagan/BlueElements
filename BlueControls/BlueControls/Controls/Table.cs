@@ -619,11 +619,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     lasNr = z;
                     if (isfirst) {
                         las = new TextListItem(
-                            "Aktueller Text - ab " + database.Works[z].Date + " UTC, geändert von " +
+                            "Aktueller Text - ab " + database.Works[z].DateTimeUTC + " UTC, geändert von " +
                             database.Works[z].User, "Cancel", null, false, true, string.Empty);
                     } else {
                         las = new TextListItem(
-                            "ab " + database.Works[z].Date + " UTC, geändert von " + database.Works[z].User,
+                            "ab " + database.Works[z].DateTimeUTC + " UTC, geändert von " + database.Works[z].User,
                             co.ToString(Constants.Format_Integer5) + database.Works[z].ChangedTo, null, false, true,
                             string.Empty);
                     }
@@ -634,7 +634,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             if (las != null) {
                 co++;
-                _ = i.Add("vor " + database.Works[lasNr].Date + " UTC",
+                _ = i.Add("vor " + database.Works[lasNr].DateTimeUTC + " UTC",
                     co.ToString(Constants.Format_Integer5) + database.Works[lasNr].PreviousValue);
             }
         }

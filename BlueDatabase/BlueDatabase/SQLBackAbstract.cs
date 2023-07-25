@@ -188,7 +188,7 @@ public abstract class SqlBackAbstract {
             return;
         }
 
-        var s = (DataFormat)IntParse(GetStyleData(tablename, DatabaseDataType.ColumnFormat.ToString(), column));
+        var s = (DataFormat)IntParse(GetStyleData(tablename, DatabaseDataType.ColumnFormat, column));
 
         if (s == DataFormat.Verknüpfung_zu_anderer_Datenbank) { charlenght = Math.Max(charlenght, 35); }
         if (s == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { charlenght = Math.Max(charlenght, 15); }
@@ -260,7 +260,7 @@ public abstract class SqlBackAbstract {
     /// <returns></returns>
     public abstract List<string> GetColumnNames(string tablename);
 
-    public string GetStyleData(string tablename, string type, string columnName) {
+    public string GetStyleData(string tablename, DatabaseDataType type, string columnName) {
         if (!IsValidTableName(tablename, true)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
             throw new Exception();
@@ -275,7 +275,7 @@ public abstract class SqlBackAbstract {
 
         var cmd = @"select VALUE, PART from " + SysStyle + " " +
                         "where TABLENAME = " + Dbval(tablename.ToUpper()) + " " +
-                        "and TYPE = " + Dbval(type) + " " +
+                        "and TYPE = " + Dbval(type.ToString()) + " " +
                         "and COLUMNNAME = " + Dbval(columnName.ToUpper()) + " " +
                         "ORDER BY PART ASC";
 
@@ -473,7 +473,7 @@ public abstract class SqlBackAbstract {
         cmdString = "UPDATE " + SysStyle + " SET COLUMNNAME = " + Dbval(newname) + " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) + " AND COLUMNNAME = " + Dbval(oldname.ToUpper());
         _ = ExecuteCommand(cmdString, true);
 
-        var test = GetStyleData(tablename, DatabaseDataType.ColumnName.ToString(), newname);
+        var test = GetStyleData(tablename, DatabaseDataType.ColumnName, newname);
 
         if (test != newname) {
             Develop.DebugPrint(FehlerArt.Fehler, "Fataler Umbenennungs-Fehler!");
@@ -583,14 +583,14 @@ public abstract class SqlBackAbstract {
             return "Spaltenname ungültig";
         }
 
-        var isVal = GetStyleData(tablename, ty, columnName);
+        var isVal = GetStyleData(tablename, type, columnName);
         if (isVal == null) { return "Kein Wert angekommen!"; }
         if (isVal == newValue) { return string.Empty; }
 
         var com = "BEGIN DELETE FROM " + SysStyle +
                   " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) +
                   " AND COLUMNNAME = " + Dbval(columnName.ToUpper()) +
-                  " AND TYPE = " + Dbval(type.ToString()) + "; ";
+                  " AND TYPE = " + Dbval(ty) + "; ";
 
         var maxPartStringLenght = Math.Min(MaxStringLenght, 500);
 
@@ -751,7 +751,7 @@ public abstract class SqlBackAbstract {
     /// <param name="fromDate"></param>
     /// <param name="toDate"></param>
     /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
-    internal List<(string tablename, string comand, string columnname, string rowkey, string newValue, DateTime timecode)>? GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate) {
+    internal List<WorkItem>? GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate, bool allData) {
         lock (_getChanges) {
             var commandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, CHANGEDTO, TIMECODEUTC from " + SysUndo + " ";
 
@@ -768,7 +768,7 @@ public abstract class SqlBackAbstract {
             // Sortierung nach Tabellen
             commandText += " ORDER BY TIMECODEUTC ASC";
 
-            var fb = new List<(string tablename, string comand, string columnname, string rowkey, string newValue, DateTime timecode)>();
+            var fb = new List<WorkItem>();
 
             var dt = Fill_Table(commandText);
 

@@ -714,7 +714,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         //}
 
         if (LogUndo) {
-            AddUndo(TableName, comand, column, row, previousValue, changedTo, UserName, comment);
+            AddUndo(comand, column, row, previousValue, changedTo, UserName, comment);
         }
 
         //if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
@@ -1873,7 +1873,23 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return string.Empty;
     }
 
-    protected abstract void AddUndo(string tableName, DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment);
+    /// <summary>
+    /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <param name="previousValue"></param>
+    /// <param name="changedTo"></param>
+    /// <param name="userName"></param>
+    /// <param name="comment"></param>
+    protected virtual void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) {
+        if (IsDisposed) { return; }
+        if (type.IsObsolete()) { return; }
+        // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
+
+        Works.Add(new WorkItem(type, column, row, previousValue, changedTo, userName));
+    }
 
     protected void CreateWatcher() {
         if (string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) {
@@ -1906,7 +1922,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         _layouts.Clear();
     }
 
-    protected virtual void Initialize() {
+    protected void Initialize() {
         Cell.Initialize();
 
         _columnArrangements.Clear();
@@ -1926,6 +1942,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         _sortDefinition = null;
         EventScript_RemoveAll(true);
         Variables_RemoveAll(true);
+        Works.Clear();
     }
 
     protected void OnLoaded() {
