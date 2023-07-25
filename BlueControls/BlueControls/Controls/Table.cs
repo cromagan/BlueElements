@@ -1729,7 +1729,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                             _mouseOverText = "Verknüpfung zur Ziel-Datenbank fehlerhaft.";
                         }
                     } else if (Database.IsAdministrator()) {
-                        _mouseOverText = Database.UndoText(_mouseOverColumn, _mouseOverRow?.Row);
+                        _mouseOverText = DatabaseAbstract.UndoText(_mouseOverColumn, _mouseOverRow?.Row);
                     }
                 }
                 _mouseOverText = _mouseOverText.Trim();

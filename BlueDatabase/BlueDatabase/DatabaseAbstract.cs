@@ -51,9 +51,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     #region Fields
 
     public const string DatabaseVersion = "4.02";
-
     public static readonly ObservableCollection<DatabaseAbstract> AllFiles = new();
     public static List<Type>? DatabaseTypes;
+    public readonly List<WorkItem> Works;
     private static DateTime _lastTableCheck = new(1900, 1, 1);
     private readonly List<ColumnViewCollection> _columnArrangements = new();
     private readonly List<string> _datenbankAdmin = new();
@@ -100,6 +100,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         Row = new RowCollection(this);
         Column = new ColumnCollection(this);
+
+        Works = new List<WorkItem>();
 
         // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
         // Die Events registriert werden, um z.B: das Passwort abzufragen
@@ -604,6 +606,25 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
 
         return null;
+    }
+
+    public static string UndoText(ColumnItem? column, RowItem? row) {
+        if (column?.Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
+
+        if (db.Works == null || db.Works.Count == 0) { return string.Empty; }
+
+        var cellKey = CellCollection.KeyOfCell(column, row);
+        var t = string.Empty;
+        for (var z = db.Works.Count - 1; z >= 0; z--) {
+            if (db.Works[z] != null && db.Works[z].CellKey == cellKey) {
+                t = t + db.Works[z].UndoTextTableMouseOver() + "<br>";
+            }
+        }
+        t = t.Trim("<br>");
+        t = t.Trim("<hr>");
+        t = t.Trim("<br>");
+        t = t.Trim("<hr>");
+        return t;
     }
 
     public static string UniqueKeyValue() {
@@ -1556,8 +1577,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public void SetReadOnly() => ReadOnly = true;
 
     public override string ToString() => base.ToString() + " " + TableName;
-
-    public abstract string UndoText(ColumnItem? column, RowItem? row);
 
     public void Variables_Add(VariableString va, bool isLoading) {
         _variables.Add(va);

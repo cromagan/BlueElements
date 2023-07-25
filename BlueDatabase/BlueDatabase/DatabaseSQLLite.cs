@@ -242,8 +242,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     public override bool Save() => _sql != null;
 
-    public override string UndoText(ColumnItem? column, RowItem? row) => string.Empty;
-
     /// <summary>
     /// Liest die Spaltenattribute aus der Style-Datenbank und schreibt sie in die Spalte
     /// Achtung: Die Connection wird nicht geschlossen!

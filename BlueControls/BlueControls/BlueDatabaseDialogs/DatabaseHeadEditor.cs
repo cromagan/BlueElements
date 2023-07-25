@@ -123,10 +123,12 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
     }
 
     private void AddUndoToTable(WorkItem work, int index, string db, bool checkNeeded) {
-        if (checkNeeded && tblUndo.Database.Row[work.ToString()] != null) { return; }
+        if (checkNeeded && tblUndo.Database?.Row[work.ToString()] != null) { return; }
+
+        if (Database is not DatabaseAbstract dbx || dbx.IsDisposed) { return; }
 
         var cd = work.CellKey.SplitAndCutBy("|");
-        Database.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
+        dbx.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
         var r = tblUndo.Database.Row.GenerateAndAdd(work.ToString(), "New Undo Item");
         r.CellSet("ColumnName", cd[0]);
         r.CellSet("RowKey", cd[1]);

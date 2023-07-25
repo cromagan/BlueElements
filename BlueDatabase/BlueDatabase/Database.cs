@@ -37,7 +37,7 @@ public sealed class Database : DatabaseAbstract {
 
     #region Fields
 
-    public readonly List<WorkItem> Works;
+
 
     private readonly string _tablename;
 
@@ -62,7 +62,7 @@ public sealed class Database : DatabaseAbstract {
     private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : base(readOnly) {
         //Develop.StartService();
 
-        Works = new List<WorkItem>();
+
 
         _tablename = SqlBackAbstract.MakeValidTableName(tablename);
 
@@ -270,7 +270,7 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public static void Parse(byte[] data, DatabaseAbstract db, List<WorkItem>? works, NeedPassword? needPassword) {
+    public static void Parse(byte[] data, DatabaseAbstract db, NeedPassword? needPassword) {
         db.Column.ThrowEvents = false;
         db.Row.ThrowEvents = false;
         var pointer = 0;
@@ -279,7 +279,7 @@ public sealed class Database : DatabaseAbstract {
         RowItem? row = null;
         var columnUsed = new List<ColumnItem>();
 
-        works?.Clear();
+        db.Works.Clear();
 
         do {
             if (pointer >= data.Length) { break; }
@@ -467,8 +467,8 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public static bool SaveToFile(DatabaseAbstract db, List<WorkItem>? works, int minLen, string filn) {
-        var bytes = ToListOfByte(db, works, minLen);
+    public static bool SaveToFile(DatabaseAbstract db, int minLen, string filn) {
+        var bytes = ToListOfByte(db, minLen);
 
         if (bytes == null) {
             return false;
@@ -484,7 +484,7 @@ public sealed class Database : DatabaseAbstract {
         return true;
     }
 
-    public static List<byte>? ToListOfByte(DatabaseAbstract db, List<WorkItem>? works, int minLen) {
+    public static List<byte>? ToListOfByte(DatabaseAbstract db, int minLen) {
         try {
             var x = db.LastChange;
             List<byte> l = new();
@@ -542,8 +542,8 @@ public sealed class Database : DatabaseAbstract {
             // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
             // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
             List<string> works2 = new();
-            if (works != null) {
-                foreach (var thisWorkItem in works) {
+            if (db.Works != null) {
+                foreach (var thisWorkItem in db.Works) {
                     if (thisWorkItem != null) {
                         if (thisWorkItem.Comand != DatabaseDataType.Value_withoutSizeData) {
                             works2.Add(thisWorkItem.ToString());
@@ -571,25 +571,11 @@ public sealed class Database : DatabaseAbstract {
             return l;
         } catch {
             Develop.CheckStackForOverflow();
-            return ToListOfByte(db, works, minLen);
+            return ToListOfByte(db, minLen);
         }
     }
 
-    public static string UndoText(ColumnItem? column, RowItem? row, List<WorkItem>? works) {
-        if (works == null || works.Count == 0) { return string.Empty; }
-        var cellKey = CellCollection.KeyOfCell(column, row);
-        var t = string.Empty;
-        for (var z = works.Count - 1; z >= 0; z--) {
-            if (works[z] != null && works[z].CellKey == cellKey) {
-                t = t + works[z].UndoTextTableMouseOver() + "<br>";
-            }
-        }
-        t = t.Trim("<br>");
-        t = t.Trim("<hr>");
-        t = t.Trim("<br>");
-        t = t.Trim("<hr>");
-        return t;
-    }
+
 
     public override string AdditionalFilesPfadWhole() {
         var x = base.AdditionalFilesPfadWhole();
@@ -728,7 +714,7 @@ public sealed class Database : DatabaseAbstract {
         var bLoaded = LoadBytesFromDisk(EditableErrorReasonType.Load);
         if (bLoaded == null) { return; }
 
-        Parse(bLoaded, this, Works, needPassword);
+        Parse(bLoaded, this, needPassword);
 
         RepairAfterParse();
         OnLoaded();
@@ -749,7 +735,7 @@ public sealed class Database : DatabaseAbstract {
         //    bLoaded = MultiUserFile.UnzipIt(bLoaded);
         //}
 
-        Parse(bLoaded, this, Works, null);
+        Parse(bLoaded, this, null);
 
         RepairAfterParse();
         OnLoaded();
@@ -809,7 +795,7 @@ public sealed class Database : DatabaseAbstract {
 
         Filename = newFileName;
 
-        var l = ToListOfByte(this, Works, 100);
+        var l = ToListOfByte(this, 100);
 
         if (l == null) { return; }
 
@@ -819,7 +805,6 @@ public sealed class Database : DatabaseAbstract {
         x.Close();
     }
 
-    public override string UndoText(ColumnItem? column, RowItem? row) => UndoText(column, row, Works);
 
     internal static void SaveToByteList(List<byte> list, ColumnItem column, RowItem row) {
         if (!column.SaveContent) { return; }
@@ -1028,7 +1013,7 @@ public sealed class Database : DatabaseAbstract {
         var f = EditableErrorReason(EditableErrorReasonType.Save);
         if (!string.IsNullOrEmpty(f)) { return string.Empty; }
 
-        var dataUncompressed = ToListOfByte(this, Works, 5000)?.ToArray();
+        var dataUncompressed = ToListOfByte(this, 5000)?.ToArray();
 
         if (dataUncompressed == null) { return string.Empty; }
 
