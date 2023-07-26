@@ -289,26 +289,17 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(value) || value.Length < 3) { return result; }
         if (value.Substring(0, 1) != "{") { return result; }
 
-        //value = value.DeKlammere(false, true, false, true);
-
-        //if (value.StartsWith("{") && value.EndsWith("}")) {
-        //    //Develop.DebugPrint("Entklammerung fehlgeschlagen: " + value);
-        //    value = value.Substring(1, value.Length - 2);
-        //}
-
-        //value = value.TrimEnd(",");
         var start = 1;
         var noarunde = true;
         do {
             var (gleichpos, _) = NextText(value, start, Gleich, false, false, KlammernGeschweift);
-            if (gleichpos < 0) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value);
-            }
+            if (gleichpos < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value); }
+
             var tag = value.Substring(start, gleichpos - start).Trim().ToLower();
-            if (string.IsNullOrEmpty(tag)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value);
-            }
+            if (string.IsNullOrEmpty(tag)) { Develop.DebugPrint(FehlerArt.Fehler, "Parsen nicht möglich:" + value); }
+
             var (kommapos, _) = NextText(value, gleichpos, Komma, false, true, KlammernGeschweift);
+
             string tagval;
             if (kommapos < 0) {
                 tagval = value.Substring(gleichpos + 1, value.Length - gleichpos - 2).Trim();
@@ -319,6 +310,11 @@ public static partial class Extensions {
                 var test = value.Substring(kommapos);
                 if (test is ",}" or ", }") { noarunde = false; }
             }
+
+            if (tagval.Length > 1 && tagval.StartsWith("\"") && tagval.EndsWith("\"")) {
+                tagval = tagval.Substring(1, tagval.Length - 2);
+            }
+
             result.Add(new KeyValuePair<string, string>(tag, tagval));
             start = kommapos + 1;
         }
@@ -419,7 +415,7 @@ public static partial class Extensions {
 
     public static bool IsWordSeperator(this char value) {
         const string tr = "~|=<>+`´\r\n\t";
-        if(value == '_'){ return false;}
+        if (value == '_') { return false; }
         return char.IsPunctuation(value) || char.IsSeparator(value) || tr.Contains(value.ToString());
     }
 
@@ -584,7 +580,6 @@ public static partial class Extensions {
             }
         }
     }
-
 
     /// <summary>
     /// Ersetzt < durch <<>

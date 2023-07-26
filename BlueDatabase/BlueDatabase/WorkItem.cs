@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -30,15 +31,19 @@ public class WorkItem : IParseable {
 
     #region Constructors
 
-    public WorkItem(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user) {
+    public WorkItem(string tablename, DatabaseDataType comand, string column, string row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) {
         Comand = comand;
-        ColName = column?.Name ?? string.Empty;
-        RowKey = row?.KeyName ?? string.Empty;
+        ColName = column;
+        RowKey = row;
         PreviousValue = previousValue;
         ChangedTo = changedTo;
         User = user;
-        DateTimeUTC = DateTime.UtcNow;
+        DateTimeUTC = timeutc;
+        TableName = tablename;
+        Comment = comment;
     }
+
+    public WorkItem(string tablename, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) : this(tablename, comand, column?.Name ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, comment, timeutc) { }
 
     public WorkItem(string s) => Parse(s);
 
@@ -47,15 +52,15 @@ public class WorkItem : IParseable {
     #region Properties
 
     public string CellKey => CellCollection.KeyOfCell(ColName, RowKey);
-    public string ChangedTo { get; private set; } = string.Empty;
-    public string ColName { get; private set; } = string.Empty;
-    public DatabaseDataType Comand { get; private set; } = (DatabaseDataType)0;
-    public string Coment { get; private set; }
+    public string ChangedTo { get; private set; }
+    public string ColName { get; private set; }
+    public DatabaseDataType Comand { get; private set; }
+    public string Comment { get; private set; }
     public DateTime DateTimeUTC { get; private set; }
-    public string? PreviousValue { get; private set; }
-    public string RowKey { get; private set; } = string.Empty;
+    public string PreviousValue { get; private set; }
+    public string RowKey { get; private set; }
     public string TableName { get; private set; }
-    public string User { get; private set; } = string.Empty;
+    public string User { get; private set; }
 
     #endregion
 
@@ -109,16 +114,20 @@ public class WorkItem : IParseable {
                     break;
 
                 case "c":
-                    ChangedTo = pair.Value.FromNonCriticalWithQuote();
+                    ChangedTo = pair.Value.FromNonCritical();
                     break;
 
                 case "p":
-                    PreviousValue = pair.Value.FromNonCriticalWithQuote();
+                    PreviousValue = pair.Value.FromNonCritical();
                     break;
 
                 case "changedto":
                 case "ct": // Todo: alt: 10.08.2021
                     ChangedTo = pair.Value.FromNonCritical();
+                    break;
+
+                case "cmt":
+                    Comment = pair.Value.FromNonCritical();
                     break;
 
                 default:
@@ -128,14 +137,19 @@ public class WorkItem : IParseable {
         }
     }
 
-    public new string ToString() => "{CO=" + (int)Comand +
-                                    ", CN=" + ColName +
-                                    ", RK=" + RowKey +
-                                    ", D=" + DateTimeUTC +
-                                    ", U=" + User.ToNonCritical() +
-                                    ", P=" + PreviousValue.ToNonCriticalWithQuote() +
-                                    ", C=" + ChangedTo.ToNonCriticalWithQuote() +
-                                    "}";
+    public new string ToString() {
+        var l = new List<string>();
+
+        l.ParseableAdd("CO", Comand);
+        l.ParseableAdd("CN", ColName);
+        l.ParseableAdd("RK", RowKey);
+        l.ParseableAdd("D", DateTimeUTC);
+        l.ParseableAdd("U", User);
+        l.ParseableAdd("P", PreviousValue);
+        l.ParseableAdd("C", ChangedTo);
+        l.ParseableAdd("CMT", Comment);
+        return l.Parseable();
+    }
 
     public string UndoTextTableMouseOver() {
         var a = "'" + PreviousValue + "'";

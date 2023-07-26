@@ -122,39 +122,41 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         GenerateInfoText();
     }
 
-    private void AddUndoToTable(WorkItem work, int index, string db, bool checkNeeded) {
+    private void AddUndoToTable(WorkItem work, int index, bool checkNeeded) {
         if (checkNeeded && tblUndo.Database?.Row[work.ToString()] != null) { return; }
 
         if (Database is not DatabaseAbstract dbx || dbx.IsDisposed) { return; }
 
-        var cd = work.CellKey.SplitAndCutBy("|");
-        dbx.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
-        var r = tblUndo.Database.Row.GenerateAndAdd(work.ToString(), "New Undo Item");
-        r.CellSet("ColumnName", cd[0]);
-        r.CellSet("RowKey", cd[1]);
+        //var cd = work.CellKey.SplitAndCutBy("|");
+        //dbx.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
+        var r = tblUndo?.Database?.Row.GenerateAndAdd(work.ToString(), "New Undo Item");
+        if (r == null) { return; }
+
+        r.CellSet("ColumnName", work.ColName);
+        r.CellSet("RowKey", work.RowKey);
         r.CellSet("index", index);
-        r.CellSet("db", db);
-        if (col != null) {
-            r.CellSet("ColumnName", col.Name);
+        if (dbx.Column.Exists(work.ColName) is ColumnItem col && !col.IsDisposed) {
             r.CellSet("columnCaption", col.Caption);
         }
-        if (row != null && !row.IsDisposed) {
+        if (dbx.Row.SearchByKey(work.RowKey) is RowItem row && !row.IsDisposed) {
             r.CellSet("RowFirst", row.CellFirstString());
-        } else if (cd[1] != "-1") {
+        } else if (!string.IsNullOrEmpty(work.RowKey)) {
             r.CellSet("RowFirst", "[gelöscht]");
         }
         r.CellSet("Aenderer", work.User);
         r.CellSet("AenderZeit", work.CompareKey());
+        r.CellSet("Kommentar", work.Comment);
+
         var symb = ImageCode.Fragezeichen;
         var alt = work.PreviousValue;
         var neu = work.ChangedTo;
-        var aenderung = work.Comand.ToString();
+        //var aenderung = work.Comand.ToString();
         switch (work.Comand) {
             //case DatabaseDataType.UTF8Value_withoutSizeData:
-            //case DatabaseDataType.Value_withoutSizeData:
-            //    symb = ImageCode.Textfeld;
-            //    aenderung = "Wert geändert";
-            //    break;
+            case DatabaseDataType.Value_withoutSizeData:
+                symb = ImageCode.Stift;
+                //aenderung = "Wert geändert";
+                break;
 
             //case DatabaseDataType.AutoExport:
             //    aenderung = "Export ausgeführt oder geändert";
@@ -163,22 +165,28 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
             //    symb = ImageCode.Karton;
             //    break;
 
+            case DatabaseDataType.DatabaseVariables:
+                alt = "[Variablen alt]";
+                neu = "[Variablen neu]";
+                symb = ImageCode.Variable;
+                break;
+
             case DatabaseDataType.EventScript:
-                aenderung = "Import Script geändert";
-                alt = string.Empty;
-                neu = string.Empty;
-                symb = ImageCode.Pfeil_Links;
+                //aenderung = "Import Script geändert";
+                alt = "[Skript alt]";
+                neu = "[Skript neu]";
+                symb = ImageCode.Skript;
                 break;
 
             case DatabaseDataType.Layouts:
-                aenderung = "Layouts verändert";
-                alt = string.Empty;
-                neu = string.Empty;
+                //aenderung = "Layouts verändert";
+                alt = "[Layout alt]";
+                neu = "[Layout neu]";
                 symb = ImageCode.Layout;
                 break;
 
             case DatabaseDataType.Comand_AddRow:
-                aenderung = "Neue Zeile";
+                //aenderung = "Neue Zeile";
                 symb = ImageCode.PlusZeichen;
                 break;
 
@@ -191,18 +199,18 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
             //    break;
 
             case DatabaseDataType.ColumnArrangement:
-                aenderung = "Spalten-Anordnungen verändert";
+                //aenderung = "Spalten-Anordnungen verändert";
                 symb = ImageCode.Spalte;
-                alt = string.Empty;
-                neu = string.Empty;
+                alt = "[Spaltenanordnung alt]";
+                neu = "[Spaltenanordnung neu]";
                 break;
 
             case DatabaseDataType.Comand_RemoveRow:
-                aenderung = "Zeile gelöscht";
+                //aenderung = "Zeile gelöscht";
                 symb = ImageCode.MinusZeichen;
                 break;
         }
-        r.CellSet("Aenderung", aenderung);
+        r.CellSet("Aenderung", work.Comand.ToString());
         r.CellSet("symbol", symb + "|24");
         r.CellSet("Wertalt", alt);
         r.CellSet("Wertneu", neu);
@@ -252,20 +260,19 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
 
     private void GenerateUndoTabelle() {
         Database x = new(false, DatabaseAbstract.UniqueKeyValue());
-        _ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
+        //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
-        _ = x.Column.GenerateAndAdd("db", "Herkunft", ColumnFormatHolder.Text);
-        //x.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
         _ = x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
         _ = x.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder.DateTime);
         _ = x.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
         foreach (var thisColumn in x.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
@@ -279,7 +286,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
 
         var car = x.ColumnArrangements.CloneWithClones();
         ColumnViewCollection.ShowAllColumns(car[1]);
-        ColumnViewCollection.Hide("hidden", car[1]);
+        //ColumnViewCollection.Hide("hidden", car[1]);
         ColumnViewCollection.HideSystemColumns(car[1]);
 
         x.ColumnArrangements = new(car);
@@ -288,9 +295,9 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         tblUndo.DatabaseSet(x, string.Empty);
         tblUndo.Arrangement = 1;
 
-        if (Database is Database db) {
+        if (Database is DatabaseAbstract db) {
             for (var n = 0; n < db.Works.Count; n++) {
-                AddUndoToTable(db.Works[n], n, string.Empty, false);
+                AddUndoToTable(db.Works[n], n, false);
             }
         }
     }

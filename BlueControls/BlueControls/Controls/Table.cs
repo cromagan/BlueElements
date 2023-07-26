@@ -606,7 +606,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
         };
 
-        if (db is Database database) {
+        if (db is DatabaseAbstract database) {
             if (database.Works.Count == 0) { return i; }
 
             var isfirst = true;

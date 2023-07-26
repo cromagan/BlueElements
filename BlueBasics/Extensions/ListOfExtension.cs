@@ -146,7 +146,7 @@ public static partial class Extensions {
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
         if (value == null || string.IsNullOrEmpty(value)) { return; }
-        col.Add(tagname + "=" + value.ToNonCritical());
+        col.Add(tagname + "=" + value.ToNonCriticalWithQuote());
     }
 
     public static void ParseableAdd<T>(this ICollection<string> col, string tagname, string nameofeveryItem, ICollection<T>? value) where T : IStringable? {
@@ -230,7 +230,18 @@ public static partial class Extensions {
 
     public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T? value) where T : Enum {
         if (value == null) { return; }
-        col.Add(tagname + "=" + ((int)(object)value));
+
+        try {
+            col.Add(tagname + "=" + ((int)(object)value));
+            return;
+        } catch { }
+
+        try {
+            col.Add(tagname + "=" + ((byte)(object)value));
+            return;
+        } catch { }
+
+        Develop.DebugPrint(FehlerArt.Fehler, "Parseable unbekannt!");
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {

@@ -1888,7 +1888,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (type.IsObsolete()) { return; }
         // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
 
-        Works.Add(new WorkItem(type, column, row, previousValue, changedTo, userName));
+        Works.Add(new WorkItem(TableName, type, column, row, previousValue, changedTo, userName, comment, DateTime.UtcNow));
     }
 
     protected void CreateWatcher() {

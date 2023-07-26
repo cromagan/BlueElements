@@ -534,7 +534,7 @@ public abstract class SqlBackAbstract {
         if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
         if (!colUndo.Contains("TABLENAME")) { AddColumn(SysUndo, "TABLENAME", ColumnTypeVarChar255, false, true); }
         if (!colUndo.Contains("COMAND")) { AddColumn(SysUndo, "COMAND", false, true); }
-        if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", ColumnTypeVarChar15, true, true); }
+        //if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", ColumnTypeVarChar15, true, true); }
         if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", ColumnTypeVarChar15, true, true); }
         if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SysUndo, "PREVIOUSVALUE", ColumnTypeVarChar4000, true, true); }
         if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SysUndo, "CHANGEDTO", ColumnTypeVarChar4000, true, true); }
@@ -743,7 +743,6 @@ public abstract class SqlBackAbstract {
     //    }
     internal static string MakeValidColumnName(string columnname) => columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
 
-    //    com = com + " FROM " + tablename.ToUpper();
     /// <summary>
     ///
     /// </summary>
@@ -753,7 +752,7 @@ public abstract class SqlBackAbstract {
     /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
     internal List<WorkItem>? GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate, bool allData) {
         lock (_getChanges) {
-            var commandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, CHANGEDTO, TIMECODEUTC from " + SysUndo + " ";
+            var commandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, CMT, TIMECODEUTC from " + SysUndo + " ";
 
             // nur bestimmte Tabellen
             commandText += "WHERE (";
@@ -774,7 +773,20 @@ public abstract class SqlBackAbstract {
 
             foreach (var thisRow in dt.Rows) {
                 var reader = (DataRow)thisRow;
-                fb.Add((reader[0].ToString(), reader[1].ToString(), reader[2].ToString(), reader[3].ToString(), reader[4].ToString(), DateTimeParse(reader[5].ToString())));
+                if (Enum.TryParse(reader[1].ToString(), out DatabaseDataType t)) {
+                    if (!t.IsObsolete()) {
+                        var wi = new WorkItem(reader[0].ToString(),
+                                             t,
+                                             reader[2].ToString(),
+                                             reader[3].ToString(),
+                                             reader[4].ToString(),
+                                             reader[5].ToString(),
+                                             reader[6].ToString(),
+                                             reader[7].ToString(),
+                                             DateTimeParse(reader[8].ToString()));
+                        fb.Add(wi);
+                    }
+                }
             }
 
             return fb;

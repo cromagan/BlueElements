@@ -365,6 +365,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             foreach (var thisWork in data) {
                 if (TableName == thisWork.TableName && thisWork.DateTimeUTC > IsInCache) {
+                    Works.Add(thisWork);
+
                     //_ = Enum.TryParse(thisWork.Comand, out DatabaseDataType t);
 
                     if (thisWork.Comand.IsObsolete()) {
@@ -569,7 +571,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             #region Undo Speicher einlesen
 
-            var undos = _sql?.GetLastChanges(TableName, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1), true);
+            var undos = _sql?.GetLastChanges(new List<DatabaseSqlLite> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1), true);
+
+            Works.AddRange(undos);
 
             #endregion
 
