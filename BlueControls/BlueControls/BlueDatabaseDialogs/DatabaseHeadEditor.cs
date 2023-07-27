@@ -122,7 +122,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void AddUndoToTable(UndoItem work) {
-        if (tblUndo.Database?.Row[work.ToString()] != null) { return; }
+        //if (tblUndo.Database?.Row[work.ToString()] != null) { return; }
 
         if (Database is not DatabaseAbstract dbx || dbx.IsDisposed) { return; }
 

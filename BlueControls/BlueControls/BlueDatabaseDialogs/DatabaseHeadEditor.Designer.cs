@@ -428,7 +428,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabRechte.Location = new System.Drawing.Point(4, 25);
             this.tabRechte.Name = "tabRechte";
             this.tabRechte.Padding = new System.Windows.Forms.Padding(3);
-            this.tabRechte.Size = new System.Drawing.Size(1129, 643);
+            this.tabRechte.Size = new System.Drawing.Size(1233, 678);
             this.tabRechte.TabIndex = 4;
             this.tabRechte.Text = "Rechte";
             // 
@@ -441,7 +441,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSortierung.Location = new System.Drawing.Point(4, 25);
             this.tabSortierung.Name = "tabSortierung";
             this.tabSortierung.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSortierung.Size = new System.Drawing.Size(1129, 643);
+            this.tabSortierung.Size = new System.Drawing.Size(1233, 678);
             this.tabSortierung.TabIndex = 2;
             this.tabSortierung.Text = "Sortierung";
             // 
@@ -452,14 +452,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabUndo.Controls.Add(this.tblUndo);
             this.tabUndo.Location = new System.Drawing.Point(4, 25);
             this.tabUndo.Name = "tabUndo";
-            this.tabUndo.Size = new System.Drawing.Size(1129, 643);
+            this.tabUndo.Size = new System.Drawing.Size(1233, 678);
             this.tabUndo.TabIndex = 6;
             this.tabUndo.Text = "Undo";
             // 
             // btnClipboard
             // 
+            this.btnClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnClipboard.ImageCode = "Clipboard|24";
-            this.btnClipboard.Location = new System.Drawing.Point(8, 592);
+            this.btnClipboard.Location = new System.Drawing.Point(8, 632);
             this.btnClipboard.Name = "btnClipboard";
             this.btnClipboard.Size = new System.Drawing.Size(176, 40);
             this.btnClipboard.TabIndex = 3;
@@ -477,7 +478,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tblUndo.Name = "tblUndo";
             this.tblUndo.OutputDatabase = null;
             this.tblUndo.ShowWaitScreen = true;
-            this.tblUndo.Size = new System.Drawing.Size(1129, 584);
+            this.tblUndo.Size = new System.Drawing.Size(1233, 624);
             this.tblUndo.TabIndex = 0;
             this.tblUndo.Text = "UndoTab";
             this.tblUndo.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.tblUndo_ContextMenuInit);

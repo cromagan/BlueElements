@@ -536,20 +536,29 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="fullprocessing">Sollen der Zeilenersteller, das Datum und die Initalwerte geschrieben werden?</param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public RowItem? GenerateAndAdd(string key, string valueOfCellInFirstColumn, bool runScriptOfNewRow, bool fullprocessing, string comment) {
+    public RowItem GenerateAndAdd(string key, string valueOfCellInFirstColumn, bool runScriptOfNewRow, bool fullprocessing, string comment) {
         var db = Database;
-        if (db == null || db.IsDisposed) { return null; }
+        if (db == null || db.IsDisposed) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank verworfen!");
+            throw new Exception();
+        }
 
         var item = SearchByKey(key);
         if (item != null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
-            return null;
+            throw new Exception();
         }
-        _ = db.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key.ToString(), comment);
+        var s = db.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key.ToString(), comment);
+        if (!string.IsNullOrEmpty(s)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen: " + s);
+            throw new Exception();
+        }
+
+
         item = SearchByKey(key);
         if (item == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
-            return null;
+            Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen, ID Fehler");
+            throw new Exception();
         }
 
         if (fullprocessing) {
