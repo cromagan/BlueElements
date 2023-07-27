@@ -53,7 +53,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public const string DatabaseVersion = "4.02";
     public static readonly ObservableCollection<DatabaseAbstract> AllFiles = new();
     public static List<Type>? DatabaseTypes;
-    public readonly List<WorkItem> Works;
+
+    /// <summary>
+    /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
+    /// </summary>
+    public readonly List<UndoItem> Undo;
+
     private static DateTime _lastTableCheck = new(1900, 1, 1);
     private readonly List<ColumnViewCollection> _columnArrangements = new();
     private readonly List<string> _datenbankAdmin = new();
@@ -80,7 +85,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private string _standardFormulaFile = string.Empty;
 
     //private string _timeCode = string.Empty;
-    private int _undoCount;
+    //private int _undoCount;
 
     private string _variableTmp = string.Empty;
     private string _zeilenQuickInfo = string.Empty;
@@ -101,7 +106,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         Row = new RowCollection(this);
         Column = new ColumnCollection(this);
 
-        Works = new List<WorkItem>();
+        Undo = new List<UndoItem>();
 
         // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
         // Die Events registriert werden, um z.B: das Passwort abzufragen
@@ -335,14 +340,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    [Browsable(false)]
-    public int UndoCount {
-        get => _undoCount;
-        set {
-            if (_undoCount == value) { return; }
-            _ = ChangeData(DatabaseDataType.UndoCount, null, null, _undoCount.ToString(), value.ToString(), string.Empty);
-        }
-    }
+    //[Browsable(false)]
+    //public int UndoCount {
+    //    get => _undoCount;
+    //    set {
+    //        if (_undoCount == value) { return; }
+    //        _ = ChangeData(DatabaseDataType.UndoCount, null, null, _undoCount.ToString(), value.ToString(), string.Empty);
+    //    }
+    //}
 
     public VariableCollection Variables {
         get => new(_variables);
@@ -611,13 +616,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public static string UndoText(ColumnItem? column, RowItem? row) {
         if (column?.Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
 
-        if (db.Works == null || db.Works.Count == 0) { return string.Empty; }
+        if (db.Undo.Count == 0) { return string.Empty; }
 
         var cellKey = CellCollection.KeyOfCell(column, row);
         var t = string.Empty;
-        for (var z = db.Works.Count - 1; z >= 0; z--) {
-            if (db.Works[z] != null && db.Works[z].CellKey == cellKey) {
-                t = t + db.Works[z].UndoTextTableMouseOver() + "<br>";
+        for (var z = db.Undo.Count - 1; z >= 0; z--) {
+            if (db.Undo[z] != null && db.Undo[z].CellKey == cellKey) {
+                t = t + db.Undo[z].UndoTextTableMouseOver() + "<br>";
             }
         }
         t = t.Trim("<br>");
@@ -791,7 +796,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
 
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
-        UndoCount = sourceDatabase.UndoCount;
+        //UndoCount = sourceDatabase.UndoCount;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
         if (tagsToo) {
             Tags = new(sourceDatabase.Tags.Clone());
@@ -817,7 +822,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         //Events = sourceDatabase.Events;
 
-        UndoCount = sourceDatabase.UndoCount;
+        //UndoCount = sourceDatabase.UndoCount;
     }
 
     public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists);
@@ -1212,6 +1217,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         return GetById(x, null);// new DatabaseSQL(_sql, readOnly, tablename);
     }
+
+    public abstract void GetUndoCache();
 
     public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
 
@@ -1848,9 +1855,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             //    //_rulesScript = value;
             //    break;
 
-            case DatabaseDataType.UndoCount:
-                _undoCount = IntParse(value);
-                break;
+            //case DatabaseDataType.UndoCount:
+            //    _undoCount = IntParse(value);
+            //    break;
 
             case DatabaseDataType.UndoInOne:
                 // Muss eine übergeordnete Routine bei Befarf abfangen
@@ -1888,7 +1895,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (type.IsObsolete()) { return; }
         // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
 
-        Works.Add(new WorkItem(TableName, type, column, row, previousValue, changedTo, userName, comment, DateTime.UtcNow));
+        Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, comment, DateTime.UtcNow));
     }
 
     protected void CreateWatcher() {
@@ -1933,7 +1940,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         _globalShowPass = string.Empty;
         _creator = UserName;
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
-        _undoCount = 300;
         _caption = string.Empty;
         LoadedVersion = DatabaseVersion;
         _globalScale = 1f;
@@ -1942,7 +1948,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         _sortDefinition = null;
         EventScript_RemoveAll(true);
         Variables_RemoveAll(true);
-        Works.Clear();
+        Undo.Clear();
     }
 
     protected void OnLoaded() {

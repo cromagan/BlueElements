@@ -750,7 +750,7 @@ public abstract class SqlBackAbstract {
     /// <param name="fromDate"></param>
     /// <param name="toDate"></param>
     /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
-    internal List<WorkItem>? GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate, bool allData) {
+    internal List<UndoItem>? GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate, bool allData) {
         lock (_getChanges) {
             var commandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, CMT, TIMECODEUTC from " + SysUndo + " ";
 
@@ -767,7 +767,7 @@ public abstract class SqlBackAbstract {
             // Sortierung nach Tabellen
             commandText += " ORDER BY TIMECODEUTC ASC";
 
-            var fb = new List<WorkItem>();
+            var fb = new List<UndoItem>();
 
             var dt = Fill_Table(commandText);
 
@@ -775,7 +775,7 @@ public abstract class SqlBackAbstract {
                 var reader = (DataRow)thisRow;
                 if (Enum.TryParse(reader[1].ToString(), out DatabaseDataType t)) {
                     if (!t.IsObsolete()) {
-                        var wi = new WorkItem(reader[0].ToString(),
+                        var wi = new UndoItem(reader[0].ToString(),
                                              t,
                                              reader[2].ToString(),
                                              reader[3].ToString(),

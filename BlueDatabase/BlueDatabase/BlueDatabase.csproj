@@ -159,7 +159,7 @@
     <Compile Include="RowCollection.cs" />
     <Compile Include="RowItem.cs" />
     <Compile Include="RowSortDefinition.cs" />
-    <Compile Include="WorkItem.cs" />
+    <Compile Include="UndoItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

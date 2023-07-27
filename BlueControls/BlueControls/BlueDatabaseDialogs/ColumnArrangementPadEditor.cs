@@ -107,7 +107,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (ca == null) { return; }
 
         if (MessageBox.Show("Alle Spalten anzeigen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-        ColumnViewCollection.ShowAllColumns(ca);
+        ca.ShowAllColumns();
 
         Change(_arrangement, ca);
         ShowOrder();
@@ -259,7 +259,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
-        ColumnViewCollection.HideSystemColumns(ca);
+        ca.HideSystemColumns();
         Change(_arrangement, ca);
 
         ShowOrder();
@@ -293,7 +293,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void FixColumnArrangement() {
         if (Database == null || Database.IsDisposed) { return; }
         if (Generating || Sorting) { return; }
-        if(Database.ColumnArrangements.Count == 0) { return; }
+        if (Database.ColumnArrangements.Count == 0) { return; }
 
         var cloneOfColumnArrangements = Database.ColumnArrangements.CloneWithClones();
         var thisColumnViewCollection = cloneOfColumnArrangements[_arrangement];

@@ -275,7 +275,7 @@ public sealed class Database : DatabaseAbstract {
         RowItem? row = null;
         var columnUsed = new List<ColumnItem>();
 
-        db.Works.Clear();
+        db.Undo.Clear();
 
         do {
             if (pointer >= data.Length) { break; }
@@ -534,27 +534,25 @@ public sealed class Database : DatabaseAbstract {
 
             if (x != db.LastChange) { return null; } // Works haben sich evtl. geändert
 
-            // Beim Erstellen des Undo-Speichers die Works nicht verändern, da auch bei einem nicht
+            // Beim Erstellen des Undo-Speichers die Undos nicht verändern, da auch bei einem nicht
             // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
-            // Status des Work-Items ist egal, da es beim LADEN automatisch auf 'Undo' gesetzt wird.
             List<string> works2 = new();
-            if (db.Works != null) {
-                foreach (var thisWorkItem in db.Works) {
-                    if (thisWorkItem != null) {
-                        if (thisWorkItem.Comand != DatabaseDataType.Value_withoutSizeData) {
+            foreach (var thisWorkItem in db.Undo) {
+                if (thisWorkItem != null) {
+                    if (thisWorkItem.Comand != DatabaseDataType.Value_withoutSizeData) {
+                        works2.Add(thisWorkItem.ToString());
+                    } else {
+                        if (thisWorkItem.LogsUndo(db)) {
                             works2.Add(thisWorkItem.ToString());
-                        } else {
-                            if (thisWorkItem.LogsUndo(db)) {
-                                works2.Add(thisWorkItem.ToString());
-                            }
                         }
                     }
                 }
             }
 
-            SaveToByteList(l, DatabaseDataType.UndoCount, db.UndoCount.ToString());
-            if (works2.Count > db.UndoCount) { works2.RemoveRange(0, works2.Count - db.UndoCount); }
-            SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.9)));
+            var UndoCount = 5000;
+            //SaveToByteList(l, DatabaseDataType.UndoCount, db.UndoCount.ToString());
+            if (works2.Count > UndoCount) { works2.RemoveRange(0, works2.Count - UndoCount); }
+            SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
             SaveToByteList(l, DatabaseDataType.EOF, "END");
 
             if (l.Count < minLen) {
@@ -676,6 +674,8 @@ public sealed class Database : DatabaseAbstract {
             return false;
         }
     }
+
+    public override void GetUndoCache() { }
 
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
@@ -853,11 +853,11 @@ public sealed class Database : DatabaseAbstract {
         var r = base.SetValueInternal(type, value, column, row, isLoading);
 
         if (type == DatabaseDataType.UndoInOne) {
-            Works.Clear();
+            Undo.Clear();
             var uio = value.SplitAndCutByCr();
             for (var z = 0; z <= uio.GetUpperBound(0); z++) {
-                WorkItem tmpWork = new(uio[z]);
-                Works.Add(tmpWork);
+                UndoItem tmpWork = new(uio[z]);
+                Undo.Add(tmpWork);
             }
         }
 
@@ -1003,4 +1003,6 @@ public sealed class Database : DatabaseAbstract {
     }
 
     #endregion
+
+    // Wird automatisch immer eingelesen
 }

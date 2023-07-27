@@ -27,11 +27,11 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public class WorkItem : IParseable {
+public class UndoItem : IParseable {
 
     #region Constructors
 
-    public WorkItem(string tablename, DatabaseDataType comand, string column, string row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) {
+    public UndoItem(string tablename, DatabaseDataType comand, string column, string row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) {
         Comand = comand;
         ColName = column;
         RowKey = row;
@@ -43,9 +43,9 @@ public class WorkItem : IParseable {
         Comment = comment;
     }
 
-    public WorkItem(string tablename, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) : this(tablename, comand, column?.Name ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, comment, timeutc) { }
+    public UndoItem(string tablename, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) : this(tablename, comand, column?.Name ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, comment, timeutc) { }
 
-    public WorkItem(string s) => Parse(s);
+    public UndoItem(string s) => Parse(s);
 
     #endregion
 

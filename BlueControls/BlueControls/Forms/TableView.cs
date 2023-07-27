@@ -878,7 +878,7 @@ public partial class TableView : FormWithStatusBar {
 
         var car = Table.Database.ColumnArrangements.CloneWithClones();
         if (car[0] is ColumnViewCollection cvc) {
-            ColumnViewCollection.ShowAllColumns(cvc);
+            cvc.ShowAllColumns();
             Table.Database.ColumnArrangements = new(car);
         }
 

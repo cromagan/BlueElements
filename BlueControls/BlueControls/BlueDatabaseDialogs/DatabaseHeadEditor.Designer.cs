@@ -16,7 +16,7 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueDatabaseDialogs
 {
-    public sealed partial class DatabaseHeadEditor : Form
+    public sealed partial class DatabaseHeadEditor 
     {
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
@@ -67,11 +67,9 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSortierung = new System.Windows.Forms.TabPage();
             this.tabUndo = new System.Windows.Forms.TabPage();
             this.btnClipboard = new BlueControls.Controls.Button();
-            this.txbUndoAnzahl = new BlueControls.Controls.TextBox();
-            this.capUndoAnzahl = new BlueControls.Controls.Caption();
             this.tblUndo = new BlueControls.Controls.Table();
             this.capBinInfo = new BlueControls.Controls.Caption();
-            this.btnSave = new BlueControls.Controls.Button();
+            this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
             this.GlobalTab.SuspendLayout();
@@ -80,6 +78,15 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSortierung.SuspendLayout();
             this.tabUndo.SuspendLayout();
             this.SuspendLayout();
+            // 
+            // capStatusBar
+            // 
+            this.capStatusBar.Size = new System.Drawing.Size(1244, 24);
+            // 
+            // pnlStatusBar
+            // 
+            this.pnlStatusBar.Location = new System.Drawing.Point(0, 732);
+            this.pnlStatusBar.Size = new System.Drawing.Size(1244, 24);
             // 
             // grpBenutzergruppen
             // 
@@ -213,9 +220,10 @@ namespace BlueControls.BlueDatabaseDialogs
             // btnOk
             // 
             this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.Location = new System.Drawing.Point(973, 651);
+            this.btnOk.ImageCode = "Häkchen|24";
+            this.btnOk.Location = new System.Drawing.Point(1144, 715);
             this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(72, 24);
+            this.btnOk.Size = new System.Drawing.Size(88, 32);
             this.btnOk.TabIndex = 11;
             this.btnOk.Text = "OK";
             this.btnOk.Click += new System.EventHandler(this.OkBut_Click);
@@ -226,10 +234,10 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbTags.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbTags.Location = new System.Drawing.Point(568, 24);
+            this.txbTags.Location = new System.Drawing.Point(624, 24);
             this.txbTags.MultiLine = true;
             this.txbTags.Name = "txbTags";
-            this.txbTags.Size = new System.Drawing.Size(463, 581);
+            this.txbTags.Size = new System.Drawing.Size(601, 643);
             this.txbTags.TabIndex = 26;
             this.txbTags.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -238,7 +246,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbCaption.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbCaption.Location = new System.Drawing.Point(8, 24);
             this.txbCaption.Name = "txbCaption";
-            this.txbCaption.Size = new System.Drawing.Size(552, 24);
+            this.txbCaption.Size = new System.Drawing.Size(608, 24);
             this.txbCaption.TabIndex = 24;
             // 
             // capCaption
@@ -253,7 +261,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // capTags
             // 
             this.capTags.CausesValidation = false;
-            this.capTags.Location = new System.Drawing.Point(568, 8);
+            this.capTags.Location = new System.Drawing.Point(624, 8);
             this.capTags.Name = "capTags";
             this.capTags.QuickInfo = "Tags / Eigenschaften, die von einem ";
             this.capTags.Size = new System.Drawing.Size(152, 16);
@@ -265,7 +273,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo.CausesValidation = false;
             this.capInfo.Location = new System.Drawing.Point(8, 56);
             this.capInfo.Name = "capInfo";
-            this.capInfo.Size = new System.Drawing.Size(552, 90);
+            this.capInfo.Size = new System.Drawing.Size(608, 90);
             this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // GlobalTab
@@ -282,7 +290,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
             this.GlobalTab.SelectedIndex = 0;
-            this.GlobalTab.Size = new System.Drawing.Size(1047, 645);
+            this.GlobalTab.Size = new System.Drawing.Size(1241, 707);
             this.GlobalTab.TabDefault = null;
             this.GlobalTab.TabDefaultOrder = null;
             this.GlobalTab.TabIndex = 21;
@@ -309,7 +317,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
             this.tabAllgemein.Name = "tabAllgemein";
             this.tabAllgemein.Padding = new System.Windows.Forms.Padding(3);
-            this.tabAllgemein.Size = new System.Drawing.Size(1039, 616);
+            this.tabAllgemein.Size = new System.Drawing.Size(1233, 678);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
             // 
@@ -317,7 +325,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.btnOptimize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnOptimize.ImageCode = "Blitz|16";
-            this.btnOptimize.Location = new System.Drawing.Point(8, 528);
+            this.btnOptimize.Location = new System.Drawing.Point(8, 590);
             this.btnOptimize.Name = "btnOptimize";
             this.btnOptimize.QuickInfo = "Stellt alle Spalten um, \r\ndass die Daten";
             this.btnOptimize.Size = new System.Drawing.Size(200, 32);
@@ -329,9 +337,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.txbStandardFormulaFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txbStandardFormulaFile.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbStandardFormulaFile.Location = new System.Drawing.Point(8, 424);
+            this.txbStandardFormulaFile.Location = new System.Drawing.Point(8, 486);
             this.txbStandardFormulaFile.Name = "txbStandardFormulaFile";
-            this.txbStandardFormulaFile.Size = new System.Drawing.Size(440, 24);
+            this.txbStandardFormulaFile.Size = new System.Drawing.Size(608, 24);
             this.txbStandardFormulaFile.TabIndex = 47;
             this.txbStandardFormulaFile.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -339,7 +347,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.capStandardFormulaFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capStandardFormulaFile.CausesValidation = false;
-            this.capStandardFormulaFile.Location = new System.Drawing.Point(8, 408);
+            this.capStandardFormulaFile.Location = new System.Drawing.Point(8, 470);
             this.capStandardFormulaFile.Name = "capStandardFormulaFile";
             this.capStandardFormulaFile.Size = new System.Drawing.Size(152, 18);
             this.capStandardFormulaFile.Text = "Standard-Formular-Datei:";
@@ -348,9 +356,9 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.txbAdditionalFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txbAdditionalFiles.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 376);
+            this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 438);
             this.txbAdditionalFiles.Name = "txbAdditionalFiles";
-            this.txbAdditionalFiles.Size = new System.Drawing.Size(552, 24);
+            this.txbAdditionalFiles.Size = new System.Drawing.Size(608, 24);
             this.txbAdditionalFiles.TabIndex = 45;
             this.txbAdditionalFiles.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -358,7 +366,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.capAdditional.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capAdditional.CausesValidation = false;
-            this.capAdditional.Location = new System.Drawing.Point(8, 360);
+            this.capAdditional.Location = new System.Drawing.Point(8, 422);
             this.capAdditional.Name = "capAdditional";
             this.capAdditional.Size = new System.Drawing.Size(152, 18);
             this.capAdditional.Text = "Zugehörige-Dateien-Pfad:";
@@ -371,7 +379,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbZeilenQuickInfo.Location = new System.Drawing.Point(8, 176);
             this.txbZeilenQuickInfo.MultiLine = true;
             this.txbZeilenQuickInfo.Name = "txbZeilenQuickInfo";
-            this.txbZeilenQuickInfo.Size = new System.Drawing.Size(552, 168);
+            this.txbZeilenQuickInfo.Size = new System.Drawing.Size(608, 230);
             this.txbZeilenQuickInfo.TabIndex = 43;
             this.txbZeilenQuickInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
@@ -387,7 +395,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.txbGlobalScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.txbGlobalScale.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbGlobalScale.Location = new System.Drawing.Point(160, 456);
+            this.txbGlobalScale.Location = new System.Drawing.Point(160, 518);
             this.txbGlobalScale.Name = "txbGlobalScale";
             this.txbGlobalScale.Size = new System.Drawing.Size(160, 24);
             this.txbGlobalScale.TabIndex = 39;
@@ -396,7 +404,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.capGlobalScale.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.capGlobalScale.CausesValidation = false;
-            this.capGlobalScale.Location = new System.Drawing.Point(8, 456);
+            this.capGlobalScale.Location = new System.Drawing.Point(8, 518);
             this.capGlobalScale.Name = "capGlobalScale";
             this.capGlobalScale.Size = new System.Drawing.Size(144, 18);
             this.capGlobalScale.Text = "Bevorzugtes Skalierung:";
@@ -405,7 +413,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.btnSpaltenuebersicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnSpaltenuebersicht.ImageCode = "Spalte|16";
-            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(8, 488);
+            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(8, 550);
             this.btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
             this.btnSpaltenuebersicht.Size = new System.Drawing.Size(200, 32);
             this.btnSpaltenuebersicht.TabIndex = 35;
@@ -420,7 +428,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabRechte.Location = new System.Drawing.Point(4, 25);
             this.tabRechte.Name = "tabRechte";
             this.tabRechte.Padding = new System.Windows.Forms.Padding(3);
-            this.tabRechte.Size = new System.Drawing.Size(1039, 616);
+            this.tabRechte.Size = new System.Drawing.Size(1129, 643);
             this.tabRechte.TabIndex = 4;
             this.tabRechte.Text = "Rechte";
             // 
@@ -433,7 +441,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabSortierung.Location = new System.Drawing.Point(4, 25);
             this.tabSortierung.Name = "tabSortierung";
             this.tabSortierung.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSortierung.Size = new System.Drawing.Size(1039, 616);
+            this.tabSortierung.Size = new System.Drawing.Size(1129, 643);
             this.tabSortierung.TabIndex = 2;
             this.tabSortierung.Text = "Sortierung";
             // 
@@ -441,40 +449,22 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             this.tabUndo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.tabUndo.Controls.Add(this.btnClipboard);
-            this.tabUndo.Controls.Add(this.txbUndoAnzahl);
-            this.tabUndo.Controls.Add(this.capUndoAnzahl);
             this.tabUndo.Controls.Add(this.tblUndo);
             this.tabUndo.Location = new System.Drawing.Point(4, 25);
             this.tabUndo.Name = "tabUndo";
-            this.tabUndo.Size = new System.Drawing.Size(1039, 616);
+            this.tabUndo.Size = new System.Drawing.Size(1129, 643);
             this.tabUndo.TabIndex = 6;
             this.tabUndo.Text = "Undo";
             // 
             // btnClipboard
             // 
-            this.btnClipboard.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnClipboard.Location = new System.Drawing.Point(864, 8);
+            this.btnClipboard.ImageCode = "Clipboard|24";
+            this.btnClipboard.Location = new System.Drawing.Point(8, 592);
             this.btnClipboard.Name = "btnClipboard";
-            this.btnClipboard.Size = new System.Drawing.Size(168, 32);
+            this.btnClipboard.Size = new System.Drawing.Size(176, 40);
             this.btnClipboard.TabIndex = 3;
-            this.btnClipboard.Text = "Clipboard";
+            this.btnClipboard.Text = "In die Zwischenablage";
             this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
-            // 
-            // txbUndoAnzahl
-            // 
-            this.txbUndoAnzahl.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbUndoAnzahl.Location = new System.Drawing.Point(176, 8);
-            this.txbUndoAnzahl.Name = "txbUndoAnzahl";
-            this.txbUndoAnzahl.Size = new System.Drawing.Size(88, 24);
-            this.txbUndoAnzahl.TabIndex = 1;
-            // 
-            // capUndoAnzahl
-            // 
-            this.capUndoAnzahl.CausesValidation = false;
-            this.capUndoAnzahl.Location = new System.Drawing.Point(0, 8);
-            this.capUndoAnzahl.Name = "capUndoAnzahl";
-            this.capUndoAnzahl.Size = new System.Drawing.Size(168, 40);
-            this.capUndoAnzahl.Text = "Anzahl gespeicherter Undos:<br>(Standard: 300)";
             // 
             // tblUndo
             // 
@@ -483,11 +473,11 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tblUndo.DropMessages = false;
             this.tblUndo.InputDatabase = null;
-            this.tblUndo.Location = new System.Drawing.Point(0, 56);
+            this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
             this.tblUndo.OutputDatabase = null;
             this.tblUndo.ShowWaitScreen = true;
-            this.tblUndo.Size = new System.Drawing.Size(1039, 562);
+            this.tblUndo.Size = new System.Drawing.Size(1129, 584);
             this.tblUndo.TabIndex = 0;
             this.tblUndo.Text = "UndoTab";
             this.tblUndo.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.tblUndo_ContextMenuInit);
@@ -503,27 +493,19 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capBinInfo.Text = "Die hier aufgeführten Binärdaten können - falls es ein Bild ist - mit DB_Dateinam" +
     "e mit Suffix angesprochen werden.";
             // 
-            // btnSave
-            // 
-            this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnSave.ImageCode = "Diskette|16";
-            this.btnSave.Location = new System.Drawing.Point(840, 651);
-            this.btnSave.Name = "btnSave";
-            this.btnSave.Size = new System.Drawing.Size(112, 24);
-            this.btnSave.TabIndex = 22;
-            this.btnSave.Text = "Speichern";
-            this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
-            // 
             // DatabaseHeadEditor
             // 
-            this.ClientSize = new System.Drawing.Size(1050, 677);
-            this.Controls.Add(this.btnSave);
-            this.Controls.Add(this.GlobalTab);
+            this.ClientSize = new System.Drawing.Size(1244, 756);
             this.Controls.Add(this.btnOk);
+            this.Controls.Add(this.GlobalTab);
             this.MinimizeBox = false;
             this.Name = "DatabaseHeadEditor";
             this.ShowInTaskbar = false;
             this.Text = "Datenbank-Eigenschaften";
+            this.Controls.SetChildIndex(this.GlobalTab, 0);
+            this.Controls.SetChildIndex(this.pnlStatusBar, 0);
+            this.Controls.SetChildIndex(this.btnOk, 0);
+            this.pnlStatusBar.ResumeLayout(false);
             this.grpBenutzergruppen.ResumeLayout(false);
             this.grpKennwort.ResumeLayout(false);
             this.GlobalTab.ResumeLayout(false);
@@ -558,8 +540,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Button btnSpaltenuebersicht;
         private Table tblUndo;
         private Caption capNeueZeilenInfo;
-        private Caption capUndoAnzahl;
-        private TextBox txbUndoAnzahl;
         private TextBox txbGlobalScale;
         private Caption capGlobalScale;
         private TabControl GlobalTab;
@@ -568,7 +548,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private Caption capBinInfo;
         private TextBox txbAdditionalFiles;
         private Caption capAdditional;
-        private Button btnSave;
         private Button btnClipboard;
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;

@@ -114,20 +114,6 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
     /// </summary>
     /// <param name="ca"></param>
-    public static void HideSystemColumns(ColumnViewCollection ca) {
-        foreach (var thisViewItem in ca) {
-            if (thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.IsSystemColumn())) {
-                ca.Remove(thisViewItem);
-                HideSystemColumns(ca);
-                return;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
-    /// </summary>
-    /// <param name="ca"></param>
     /// <param name="number"></param>
     public static void Repair(ColumnViewCollection ca, int number) {
         if (ca.Database == null || ca.Database.IsDisposed) { return; }
@@ -151,7 +137,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         switch (number) {
             case 0:
                 if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Alle Spalten"; }
-                ShowAllColumns(ca);
+                ca.ShowAllColumns();
                 break;
 
             case 1:
@@ -163,20 +149,6 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         ca.PermissionGroups_Show = new ReadOnlyCollection<string>(tmp);
 
         if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Ansicht " + number; }
-    }
-
-    /// <summary>
-    /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
-    /// </summary>
-    /// <param name="ca"></param>
-    public static void ShowAllColumns(ColumnViewCollection ca) {
-        if (ca.Database == null || ca.Database.IsDisposed) { return; }
-
-        foreach (var thisColumn in ca.Database.Column) {
-            if (ca[thisColumn] == null) {
-                ca.Add(new ColumnViewItem(thisColumn, ViewType.Column, ca));
-            }
-        }
     }
 
     public void Add(ColumnItem? column, bool permanent) {
@@ -206,6 +178,16 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     public IEnumerator<ColumnViewItem> GetEnumerator() => ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
+
+    public void HideSystemColumns() {
+        foreach (var thisViewItem in this) {
+            if (thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.IsSystemColumn())) {
+                Remove(thisViewItem);
+                HideSystemColumns();
+                return;
+            }
+        }
+    }
 
     public int IndexOf(ColumnViewItem? columnViewItem) {
         if (columnViewItem == null) { return -1; }
@@ -323,13 +305,23 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         //var it = _internal[z];
         _internal.RemoveAt(z);//it.Changed -= ColumnViewItem_Changed;
 
+    public void ShowAllColumns() {
+        if (Database == null || Database.IsDisposed) { return; }
+
+        foreach (var thisColumn in Database.Column) {
+            if (this[thisColumn] == null && !thisColumn.IsDisposed) {
+                Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
+            }
+        }
+    }
+
     public void ShowColumns(params string[] columnnames) {
         if (Database == null || Database.IsDisposed) { return; }
 
         foreach (var thisColumn in columnnames) {
             var c = Database?.Column.Exists(thisColumn);
 
-            if (c != null && this[c] == null) {
+            if (c != null && this[c] == null && this[c] == null && !c.IsDisposed) {
                 Add(new ColumnViewItem(c, ViewType.Column, this));
             }
         }

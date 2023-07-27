@@ -175,6 +175,17 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return string.Empty;
     }
 
+    public override void GetUndoCache() {
+
+        #region Undo Speicher einlesen
+
+        var undos = _sql?.GetLastChanges(new List<DatabaseSqlLite> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1), true);
+
+        Undo.AddRange(undos);
+
+        #endregion
+    }
+
     public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns.Count == 0) { return; }
 
@@ -351,7 +362,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return oo;
     }
 
-    private void DoLastChanges(List<WorkItem>? data) {
+    private void DoLastChanges(List<UndoItem>? data) {
         if (data == null) { return; }
         if (IsDisposed) { return; }
 
@@ -365,7 +376,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             foreach (var thisWork in data) {
                 if (TableName == thisWork.TableName && thisWork.DateTimeUTC > IsInCache) {
-                    Works.Add(thisWork);
+                    if (Undo.Count > 0) { Undo.Add(thisWork); }
 
                     //_ = Enum.TryParse(thisWork.Comand, out DatabaseDataType t);
 
@@ -566,14 +577,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             foreach (var thisColumn in Column) {
                 thisColumn.IsInCache = null;
             }
-
-            #endregion
-
-            #region Undo Speicher einlesen
-
-            var undos = _sql?.GetLastChanges(new List<DatabaseSqlLite> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1), true);
-
-            Works.AddRange(undos);
 
             #endregion
 

@@ -35,7 +35,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public sealed partial class DatabaseHeadEditor : IHasDatabase {
+public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase {
 
     #region Fields
 
@@ -108,7 +108,6 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         txbAdditionalFiles.Text = Database.AdditionalFilesPfad;
         txbStandardFormulaFile.Text = Database.StandardFormulaFile;
         txbZeilenQuickInfo.Text = Database.ZeilenQuickInfo.Replace("<br>", "\r");
-        txbUndoAnzahl.Text = Database.UndoCount.ToString();
 
         PermissionGroups_NewRow.Suggestions.Clear();
         PermissionGroups_NewRow.Suggestions.AddRange(Database.Permission_AllUsed(false));
@@ -122,8 +121,8 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         GenerateInfoText();
     }
 
-    private void AddUndoToTable(WorkItem work, int index, bool checkNeeded) {
-        if (checkNeeded && tblUndo.Database?.Row[work.ToString()] != null) { return; }
+    private void AddUndoToTable(UndoItem work) {
+        if (tblUndo.Database?.Row[work.ToString()] != null) { return; }
 
         if (Database is not DatabaseAbstract dbx || dbx.IsDisposed) { return; }
 
@@ -134,7 +133,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
 
         r.CellSet("ColumnName", work.ColName);
         r.CellSet("RowKey", work.RowKey);
-        r.CellSet("index", index);
+        //r.CellSet("index", index);
         if (dbx.Column.Exists(work.ColName) is ColumnItem col && !col.IsDisposed) {
             r.CellSet("columnCaption", col.Caption);
         }
@@ -144,7 +143,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
             r.CellSet("RowFirst", "[gelöscht]");
         }
         r.CellSet("Aenderer", work.User);
-        r.CellSet("AenderZeit", work.CompareKey());
+        r.CellSet("AenderZeit", work.DateTimeUTC);
         r.CellSet("Kommentar", work.Comment);
 
         var symb = ImageCode.Fragezeichen;
@@ -220,25 +219,6 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
 
     private void btnOptimize_Click(object sender, System.EventArgs e) => Database?.Optimize();
 
-    private void btnSave_Click(object sender, System.EventArgs e) {
-        btnSave.Enabled = false;
-
-        //scriptEditor.Message("Speichervorgang...");
-
-        var ok = false;
-        if (Database != null) {
-            WriteInfosBack();
-            ok = Database.Save();
-        }
-        if (ok) {
-            MessageBox.Show("Speichern erfolgreich.", ImageCode.Häkchen, "Ok");
-        } else {
-            //scriptEditor.Message("Speichern fehlgeschlagen!");
-            MessageBox.Show("Speichern fehlgeschlagen!", ImageCode.Kreuz, "Ok");
-        }
-        btnSave.Enabled = true;
-    }
-
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
     private void Database_Disposing(object sender, System.EventArgs e) {
@@ -261,7 +241,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
     private void GenerateUndoTabelle() {
         Database x = new(false, DatabaseAbstract.UniqueKeyValue());
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
-        _ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
+        //_ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
         _ = x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.IntegerPositive);
@@ -285,9 +265,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         x.RepairAfterParse();
 
         var car = x.ColumnArrangements.CloneWithClones();
-        ColumnViewCollection.ShowAllColumns(car[1]);
-        //ColumnViewCollection.Hide("hidden", car[1]);
-        ColumnViewCollection.HideSystemColumns(car[1]);
+        car[1].ShowColumns("ColumnName", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar");
 
         x.ColumnArrangements = new(car);
 
@@ -296,10 +274,19 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         tblUndo.Arrangement = 1;
 
         if (Database is DatabaseAbstract db) {
-            for (var n = 0; n < db.Works.Count; n++) {
-                AddUndoToTable(db.Works[n], n, false);
+            if (db.Undo.Count == 0) {
+                FormWithStatusBar.UpdateStatusBar(FehlerArt.Info, "Lade Undo-Speicher", true);
+
+                db.GetUndoCache();
+            }
+            FormWithStatusBar.UpdateStatusBar(FehlerArt.Info, "Erstelle Tabellen Ansicht des Undo-Speichers", true);
+
+            foreach (var thisUndo in db.Undo) {
+                AddUndoToTable(thisUndo);
             }
         }
+
+        tblUndo.SortDefinitionTemporary = new RowSortDefinition(x, "Aenderzeit", true);
     }
 
     private void GlobalTab_Selecting(object sender, TabControlCancelEventArgs e) {
@@ -354,7 +341,7 @@ public sealed partial class DatabaseHeadEditor : IHasDatabase {
         //eventScriptEditor.WriteScriptBack();
         Database.GlobalShowPass = txbKennwort.Text;
         Database.Caption = txbCaption.Text;
-        Database.UndoCount = txbUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(txbUndoAnzahl.Text), 5) : 5;
+        //Database.UndoCount = txbUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(txbUndoAnzahl.Text), 5) : 5;
         if (txbGlobalScale.Text.IsDouble()) {
             Database.GlobalScale = Math.Min(DoubleParse(txbGlobalScale.Text), 5);
             Database.GlobalScale = Math.Max(0.5, Database.GlobalScale);

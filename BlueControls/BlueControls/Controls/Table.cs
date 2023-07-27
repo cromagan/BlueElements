@@ -607,24 +607,26 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         };
 
         if (db is DatabaseAbstract database) {
-            if (database.Works.Count == 0) { return i; }
+            database.GetUndoCache();
+
+            if (database.Undo.Count == 0) { return i; }
 
             var isfirst = true;
             TextListItem? las = null;
             var lasNr = -1;
             var co = 0;
-            for (var z = database.Works.Count - 1; z >= 0; z--) {
-                if (database.Works[z].CellKey == cellkey) {
+            for (var z = database.Undo.Count - 1; z >= 0; z--) {
+                if (database.Undo[z].CellKey == cellkey) {
                     co++;
                     lasNr = z;
                     if (isfirst) {
                         las = new TextListItem(
-                            "Aktueller Text - ab " + database.Works[z].DateTimeUTC + " UTC, geändert von " +
-                            database.Works[z].User, "Cancel", null, false, true, string.Empty);
+                            "Aktueller Text - ab " + database.Undo[z].DateTimeUTC + " UTC, geändert von " +
+                            database.Undo[z].User, "Cancel", null, false, true, string.Empty);
                     } else {
                         las = new TextListItem(
-                            "ab " + database.Works[z].DateTimeUTC + " UTC, geändert von " + database.Works[z].User,
-                            co.ToString(Constants.Format_Integer5) + database.Works[z].ChangedTo, null, false, true,
+                            "ab " + database.Undo[z].DateTimeUTC + " UTC, geändert von " + database.Undo[z].User,
+                            co.ToString(Constants.Format_Integer5) + database.Undo[z].ChangedTo, null, false, true,
                             string.Empty);
                     }
                     isfirst = false;
@@ -634,8 +636,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             if (las != null) {
                 co++;
-                _ = i.Add("vor " + database.Works[lasNr].DateTimeUTC + " UTC",
-                    co.ToString(Constants.Format_Integer5) + database.Works[lasNr].PreviousValue);
+                _ = i.Add("vor " + database.Undo[lasNr].DateTimeUTC + " UTC",
+                    co.ToString(Constants.Format_Integer5) + database.Undo[lasNr].PreviousValue);
             }
         }
 
