@@ -1171,9 +1171,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var expanded = true;
             var lastCap = string.Empty;
 
-            List<RowData?> sortedRowDataNew;
+            List<RowData> sortedRowDataNew;
             if (Database == null || Database.IsDisposed) {
-                sortedRowDataNew = new List<RowData?>();
+                sortedRowDataNew = new List<RowData>();
             } else {
                 sortedRowDataNew = Database.Row.CalculateSortedRows(FilteredRows, SortUsed(), PinnedRows, _sortedRowData);
             }
@@ -1185,12 +1185,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             foreach (var thisRow in sortedRowDataNew) {
                 var thisRowData = thisRow;
 
-                if (_mouseOverRow != null && _mouseOverRow?.Row == thisRow?.Row && _mouseOverRow.Chapter == thisRow.Chapter) {
+                if (_mouseOverRow != null && _mouseOverRow.Row == thisRow.Row && _mouseOverRow.Chapter == thisRow.Chapter) {
                     _mouseOverRow.GetDataFrom(thisRowData);
                     thisRowData = _mouseOverRow;
                 } // Mouse-Daten wiederverwenden
 
-                if (CursorPosRow?.Row != null && CursorPosRow?.Row == thisRow?.Row && CursorPosRow.Chapter == thisRow.Chapter) {
+                if (CursorPosRow?.Row != null && CursorPosRow.Row == thisRow.Row && CursorPosRow.Chapter == thisRow.Chapter) {
                     CursorPosRow.GetDataFrom(thisRowData);
                     thisRowData = CursorPosRow;
                 } // Cursor-Daten wiederverwenden

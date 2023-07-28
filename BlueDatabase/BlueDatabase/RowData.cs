@@ -86,6 +86,7 @@ public class RowData : IComparable, IDisposableExtended {
         AdditionalSort = string.Empty;
         ShowCap = false;
         MarkYellow = false;
+        IsDisposed = false;
     }
 
     #endregion
@@ -97,10 +98,10 @@ public class RowData : IComparable, IDisposableExtended {
     public string Chapter { get; }
     public int DrawHeight { get; set; }
     public bool Expanded { get; set; }
-    public bool IsDisposed { get; private set; } = false;
+    public bool IsDisposed { get; private set; }
     public bool MarkYellow { get; set; }
     public string PinStateSortAddition { get; set; }
-    public RowItem? Row { get; private set; }
+    public RowItem Row { get; private set; }
     public bool ShowCap { get; set; }
     public int Y { get; set; }
 
@@ -146,7 +147,7 @@ public class RowData : IComparable, IDisposableExtended {
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
-                Row = null;
+                //Row = null;
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
 
