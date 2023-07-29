@@ -231,15 +231,17 @@ public static partial class Extensions {
     public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T? value) where T : Enum {
         if (value == null) { return; }
 
-        try {
+        Type underlyingType = Enum.GetUnderlyingType(typeof(T));
+
+        if (underlyingType == typeof(int)) {
             col.Add(tagname + "=" + ((int)(object)value));
             return;
-        } catch { }
+        }
 
-        try {
+        if (underlyingType == typeof(byte)) {
             col.Add(tagname + "=" + ((byte)(object)value));
             return;
-        } catch { }
+        }
 
         Develop.DebugPrint(FehlerArt.Fehler, "Parseable unbekannt!");
     }
