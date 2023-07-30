@@ -99,9 +99,11 @@ public sealed class Database : DatabaseAbstract {
         return new Database(ci, false, needPassword);
     }
 
-    public static void Parse(byte[] bLoaded, ref int pointer, out DatabaseDataType type, out string? rowKey, out string value, out string colName) {
-        colName = string.Empty;
-        rowKey = string.Empty;
+    public static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {
+        string colName = string.Empty;
+        string rowKey = string.Empty;
+        string value;
+        DatabaseDataType type;
 
         switch ((Routinen)bLoaded[pointer]) {
             //case Routinen.CellFormat: {
@@ -147,8 +149,7 @@ public sealed class Database : DatabaseAbstract {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
                     rowKey = NummerCode7(bLoaded, pointer + 5).ToString();
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 12, b, 0, les);
+                    var b = new Span<byte>(bLoaded, pointer + 12, les).ToArray();
                     value = b.ToStringUtf8();
                     pointer += 12 + les;
                     //colKey = -1;
@@ -171,10 +172,8 @@ public sealed class Database : DatabaseAbstract {
             case Routinen.DatenAllgemeinUTF8: {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
-                    //colKey = -1;
                     rowKey = string.Empty;
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
+                    var b = new Span<byte>(bLoaded, pointer + 5, les).ToArray();
                     value = b.ToStringUtf8();
                     //width = 0;
                     //height = 0;
@@ -224,13 +223,11 @@ public sealed class Database : DatabaseAbstract {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
 
                     var cles = NummerCode1(bLoaded, pointer + 2);
-                    var cb = new byte[cles];
-                    Buffer.BlockCopy(bLoaded, pointer + 3, cb, 0, cles);
+                    var cb = new Span<byte>(bLoaded, pointer + 3, cles).ToArray();
                     colName = cb.ToStringUtf8();
 
                     var les = NummerCode3(bLoaded, pointer + 3 + cles);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 6 + cles, b, 0, les);
+                    var b = new Span<byte>(bLoaded, pointer + 6 + cles, les).ToArray();
                     value = b.ToStringUtf8();
 
                     pointer += 6 + les + cles;
@@ -241,13 +238,11 @@ public sealed class Database : DatabaseAbstract {
                     type = DatabaseDataType.UTF8Value_withoutSizeData;
 
                     var lenghtRowKey = NummerCode1(bLoaded, pointer + 1);
-                    var rowKeyByte = new byte[lenghtRowKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 2, rowKeyByte, 0, lenghtRowKey);
+                    var rowKeyByte = new Span<byte>(bLoaded, pointer + 2, lenghtRowKey).ToArray();
                     rowKey = rowKeyByte.ToStringUtf8();
 
                     var lenghtValue = NummerCode2(bLoaded, pointer + 2 + lenghtRowKey);
-                    var valueByte = new byte[lenghtValue];
-                    Buffer.BlockCopy(bLoaded, pointer + 2 + lenghtRowKey + 2, valueByte, 0, lenghtValue);
+                    var valueByte = new Span<byte>(bLoaded, pointer + 2 + lenghtRowKey + 2, lenghtValue).ToArray();
                     value = valueByte.ToStringUtf8();
 
                     pointer += 2 + lenghtRowKey + 2 + lenghtValue;
@@ -260,10 +255,12 @@ public sealed class Database : DatabaseAbstract {
                     value = string.Empty;
                     //width = 0;
                     //height = 0;
-                    Develop.DebugPrint(FehlerArt.Fehler, "Laderoutine nicht definiert: " + bLoaded[pointer]);
+                    Develop.DebugPrint(FehlerArt.Fehler, $"Laderoutine nicht definiert: {bLoaded[pointer]}");
                     break;
                 }
         }
+
+        return (pointer, type, value, colName, rowKey);
     }
 
     public static void Parse(byte[] data, DatabaseAbstract db, NeedPassword? needPassword) {
@@ -280,9 +277,10 @@ public sealed class Database : DatabaseAbstract {
         do {
             if (pointer >= data.Length) { break; }
 
-            Parse(data, ref pointer, out var art, out var rowKey, out var inhalt, out var columname);
+            var (i, type, value, columname, rowKey) = Parse(data, pointer);
+            pointer = i;
 
-            if (!art.IsObsolete()) {
+            if (!type.IsObsolete()) {
 
                 #region Zeile suchen oder erstellen
 
@@ -323,7 +321,7 @@ public sealed class Database : DatabaseAbstract {
                 if (!string.IsNullOrEmpty(columname)) {
                     column = db.Column.Exists(columname);
                     if (column == null || column.IsDisposed) {
-                        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
+                        if (type != DatabaseDataType.ColumnName) { Develop.DebugPrint(type + " an erster Stelle!"); }
                         _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, true, columname);
                         column = db.Column.Exists(columname);
                     }
@@ -340,11 +338,11 @@ public sealed class Database : DatabaseAbstract {
 
                 #region Bei verschlüsselten Datenbanken das Passwort abfragen
 
-                if (art == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(inhalt)) {
+                if (type == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
                     var pwd = string.Empty;
 
                     if (needPassword != null) { pwd = needPassword(); }
-                    if (pwd != inhalt) {
+                    if (pwd != value) {
                         db.SetReadOnly();
                         break;
                     }
@@ -352,9 +350,9 @@ public sealed class Database : DatabaseAbstract {
 
                 #endregion
 
-                var fehler = db.SetValueInternal(art, inhalt, column, row, true);
+                var fehler = db.SetValueInternal(type, value, column, row, true);
 
-                if (art == DatabaseDataType.EOF) { break; }
+                if (type == DatabaseDataType.EOF) { break; }
 
                 if (!string.IsNullOrEmpty(fehler)) {
                     db.SetReadOnly();
@@ -372,7 +370,7 @@ public sealed class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.Name, thisColumn, null, true);
+                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.KeyName, thisColumn, null, true);
             }
         }
 
@@ -396,9 +394,9 @@ public sealed class Database : DatabaseAbstract {
     public static void SaveToByteList(ColumnItem c, ref List<byte> l) {
         if (c.Database is not DatabaseAbstract db) { return; }
 
-        var name = c.Name;
+        var name = c.KeyName;
 
-        SaveToByteList(l, DatabaseDataType.ColumnName, c.Name, name);
+        SaveToByteList(l, DatabaseDataType.ColumnName, c.KeyName, name);
         SaveToByteList(l, DatabaseDataType.ColumnCaption, c.Caption, name);
         SaveToByteList(l, DatabaseDataType.ColumnFormat, ((int)c.Format).ToString(), name);
         SaveToByteList(l, DatabaseDataType.CaptionGroup1, c.CaptionGroup1, name);
@@ -833,7 +831,7 @@ public sealed class Database : DatabaseAbstract {
     internal static void SaveToByteList(List<byte> list, ColumnCollection c) {
         //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString(false));
         foreach (var columnitem in c) {
-            if (columnitem != null && !string.IsNullOrEmpty(columnitem.Name)) {
+            if (columnitem != null && !string.IsNullOrEmpty(columnitem.KeyName)) {
                 SaveToByteList(columnitem, ref list);
             }
         }

@@ -29,7 +29,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
@@ -119,7 +118,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         hotItem = null;
         if (Filter.Column?.Database == null || !Filter.Column.Database.IsAdministrator()) { return; }
 
@@ -156,7 +155,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
         base.OnControlAdded(e);
         e.Control.MouseUp += Control_MouseUp;
         if (e.Control is ComboBox cbx) {
-            ItemCollectionList item2 = new(true)
+            ItemCollectionList.ItemCollectionList item2 = new(true)
             {
                 { "Keine weiteren Einträge vorhanden", "|~" }
             };

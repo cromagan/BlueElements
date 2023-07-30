@@ -18,12 +18,12 @@
 #nullable enable
 
 using System.Collections.Generic;
-using BlueControls.ItemCollection;
+using BlueDatabase.AdditionalScriptComands;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptComands;
+namespace BlueControls.AdditionalScriptComands;
 
 public class Method_GenerateLayoutImage : Method_Database {
 
@@ -74,7 +74,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         #endregion
 
-        var l = new ItemCollectionPad(r, ind);
+        var l = new ItemCollectionPad.ItemCollectionPad(r, ind);
 
         var bmp = l.ToBitmap((float)sc);
 

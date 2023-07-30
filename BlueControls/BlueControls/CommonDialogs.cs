@@ -2,7 +2,6 @@
 
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 
 namespace BlueControls.Forms;
@@ -14,7 +13,7 @@ internal static class CommonDialogs {
     public static DatabaseAbstract? ChooseKnownDatabase(string caption) {
         var l = DatabaseAbstract.AllAvailableTables();
 
-        var l2 = new ItemCollectionList(true);
+        var l2 = new ItemCollectionList.ItemCollectionList(true);
 
         foreach (var thisd in l) {
             _ = l2.Add(thisd);

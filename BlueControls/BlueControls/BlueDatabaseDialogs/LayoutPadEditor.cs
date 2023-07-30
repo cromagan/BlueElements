@@ -25,7 +25,7 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.ItemCollection;
+using BlueControls.ItemCollectionPad;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using static BlueBasics.IO;
@@ -146,7 +146,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         if (string.IsNullOrEmpty(ex)) { return; }
         LoadLayout(string.Empty);
 
-        ItemCollectionPad c = new() {
+        ItemCollectionPad.ItemCollectionPad c = new() {
             Caption = ex
         };
 
@@ -210,7 +210,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
 
     private void btnTextEditor_Click(object sender, System.EventArgs e) => ExecuteFile("notepad.exe", cbxLayout.Text);
 
-    private void cbxLayout_ItemClicked(object sender, BasicListItemEventArgs e) => LoadLayout(e.Item.KeyName);
+    private void cbxLayout_ItemClicked(object sender, AbstractListItemEventArgs e) => LoadLayout(e.Item.KeyName);
 
     private void CheckButtons() {
         if (Database == null || Database.IsDisposed) {

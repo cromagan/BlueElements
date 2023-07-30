@@ -21,7 +21,7 @@ using System;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.Converter;
 
 namespace BlueControls.Forms;
@@ -30,8 +30,8 @@ public partial class FontSelectDialog {
 
     #region Fields
 
-    private static ItemCollectionList? _fnList;
-    private static ItemCollectionList? _fsList;
+    private static ItemCollectionList.ItemCollectionList? _fnList;
+    private static ItemCollectionList.ItemCollectionList? _fsList;
     private bool _adding;
 
     #endregion
@@ -43,7 +43,7 @@ public partial class FontSelectDialog {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         if (_fnList == null) {
-            _fnList = new ItemCollectionList(true);
+            _fnList = new ItemCollectionList.ItemCollectionList(true);
             foreach (var f in FontFamily.Families) {
                 if (string.IsNullOrEmpty(f.Name)) {
                     continue;
@@ -58,7 +58,7 @@ public partial class FontSelectDialog {
                 }
             }
             //_fnList.Sort();
-            _fsList = new ItemCollectionList(true)
+            _fsList = new ItemCollectionList.ItemCollectionList(true)
             {
                 { "8",SortierTyp.ZahlenwertFloat },
                 { "9", SortierTyp.ZahlenwertFloat },

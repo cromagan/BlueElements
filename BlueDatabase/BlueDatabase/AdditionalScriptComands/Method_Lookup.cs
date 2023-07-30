@@ -61,7 +61,11 @@ public class Method_Lookup : Method_Database {
             return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(2));
         }
 
-        var r = RowCollection.MatchesTo(new FilterItem(db.Column.First(), FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
+        if (db.Column.First() is not ColumnItem cf) {
+            return new DoItFeedback(infos.Data, "Erste Spalte der Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
+        }
+
+        var r = RowCollection.MatchesTo(new FilterItem(cf, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));
         var l = new List<string>();
 
         if (r.Count == 0) {

@@ -19,7 +19,6 @@ using System.ComponentModel;
 using System.IO;
 using BlueBasics;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
 using static BlueBasics.IO;
 
 namespace BlueControls.Forms;
@@ -39,7 +38,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     #region Methods
 
     public void DisablePad() {
-        Pad.Item = new ItemCollectionPad();
+        Pad.Item = new ItemCollectionPad.ItemCollectionPad();
         Pad.Enabled = false;
     }
 
@@ -62,11 +61,11 @@ public partial class PadEditorWithFileAccess : PadEditor {
     /// <param name="useThisID">Wenn das Blatt bereits eine Id hat, muss die Id verwendet werden. Wird das Feld leer gelassen, wird die beinhaltete Id benutzt.</param>
     public void LoadFromString(string data, string useThisID) {
         Pad.Enabled = true;
-        Pad.Item = new ItemCollectionPad(data, useThisID);
+        Pad.Item = new ItemCollectionPad.ItemCollectionPad(data, useThisID);
         ItemChanged();
     }
 
-    private void btnLastFiles_ItemClicked(object sender, BasicListItemEventArgs e) => LoadFile(e.Item.KeyName, string.Empty);
+    private void btnLastFiles_ItemClicked(object sender, AbstractListItemEventArgs e) => LoadFile(e.Item.KeyName, string.Empty);
 
     private void btnNeu_Click(object sender, System.EventArgs e) {
         Pad?.Item?.Clear();

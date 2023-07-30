@@ -21,7 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueScript.Structures;
 using BlueScript.Variables;
 

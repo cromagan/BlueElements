@@ -16,21 +16,21 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.EventArgs;
 
-public class ListOfBasicListItemEventArgs : System.EventArgs {
+public class ListOfAbstractListItemEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public ListOfBasicListItemEventArgs(List<BasicListItem> items) => Items = items;
+    public ListOfAbstractListItemEventArgs(List<AbstractListItem> items) => Items = items;
 
     #endregion
 
     #region Properties
 
-    public List<BasicListItem> Items { get; }
+    public List<AbstractListItem> Items { get; }
 
     #endregion
 }

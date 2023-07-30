@@ -26,8 +26,8 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls;
 
@@ -62,9 +62,9 @@ public static class Allgemein {
         var par = o.ParentControl<IContextMenu>();
         if (par == null) { return null; }
 
-        ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu, false);
-        ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
-        List<string> tags = new();
+        ItemCollectionList.ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu, false);
+        ItemCollectionList.ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
+
         var cancel = false;
         var translate = true;
         par.GetContextMenuItems(null, thisContextMenu, out var hotItem, ref cancel, ref translate);

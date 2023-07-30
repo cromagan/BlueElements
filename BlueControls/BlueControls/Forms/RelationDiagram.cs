@@ -24,8 +24,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionPad;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 
@@ -46,6 +45,8 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Database = database;
+
+        if (Database == null) { return; }
         Database.Disposing += Database_Disposing;
         foreach (var thisColumnItem in Database.Column) {
             if (thisColumnItem != null && thisColumnItem.Format == DataFormat.RelationText) {
@@ -68,15 +69,16 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //private bool RelationsValid;
     //   Dim ItS As New Size(60, 80)
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
+        if (Database is not DatabaseAbstract db) { return null; }
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad?.Item?[what] != null) { return null; }
-        var r = Database?.Row[what];
+        var r = db.Row[what];
         if (r == null || r.IsDisposed) {
             MessageBox.Show("<b>" + what + "</B> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
             return null;
         }
         if (ItemOfRow(r) != null) { return null; }
-        RowFormulaPadItem i2 = new(Database, r.KeyName, layoutId);
+        RowFormulaPadItem i2 = new(db, r.KeyName, layoutId);
         Pad?.AddCentered(i2);
         //  Pad.Invalidate()
         i2.SetLeftTopPoint(xPos, ypos);
@@ -287,24 +289,28 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //}
 
     private void btnTextExport_Click(object sender, System.EventArgs e) {
+        if (Pad.Item == null || Pad.Item.IsDisposed) { return; }
+        if (_column == null) { return; }
+
         FolderBrowserDialog fl = new();
         _ = fl.ShowDialog();
+
         List<string> l = new();
         foreach (var thisR in Pad.Item) {
-            if (thisR is RowFormulaPadItem r) {
+            if (thisR is RowFormulaPadItem rfi && rfi.Row is RowItem r) {
                 //_ = r.Row.ExecuteScript(true, true, "to be sure");
                 l.Add("#######################################################################");
                 l.Add(" ");
-                l.Add(r.Row.CellFirstString());
+                l.Add(r.CellFirstString());
                 l.Add(" ");
-                var t = r.Row.CellGetList(_column);
+                var t = r.CellGetList(_column);
                 l.AddRange(t);
                 l.Add(" ");
                 l.Add(" ");
                 l.Add(" ");
                 l.Add(" ");
                 l.Add(" ");
-                var no = r.Row.CellFirstString();
+                var no = r.CellFirstString();
                 no = no.Replace(" ", "_");
                 no = no.Replace(",", "_");
                 no = no.Replace("__", "_");
@@ -319,16 +325,17 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     private void Database_Disposing(object sender, System.EventArgs e) => Close();
 
     private void Hinzu_Click(object sender, System.EventArgs e) {
-        ItemCollectionList il = new(true);
-        il.AddRange(Database.Column.First().Contents());
+        if (Database?.Column.First() is not ColumnItem c) { return; }
+
+        ItemCollectionList.ItemCollectionList il = new(true);
+        il.AddRange(c.Contents());
         //il.Sort();
         il.CheckBehavior = CheckBehavior.SingleSelection;
         var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, AddType.None, true);
-        if (i == null || i.Count != 1) {
-            return;
-        }
+        if (i == null || i.Count != 1) { return; }
+
         _ = AddOne(i[0], 0, 0, string.Empty);
-        if (Pad.Item.Count < 10) {
+        if (Pad.Item != null && Pad.Item.Count < 10) {
             Pad.ZoomFit();
         }
         //RepairLinesAndFullProcessing();

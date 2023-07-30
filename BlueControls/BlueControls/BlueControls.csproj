@@ -418,32 +418,32 @@
     <Compile Include="Forms\Notification.Designer.cs">
       <DependentUpon>Notification.cs</DependentUpon>
     </Compile>
-    <Compile Include="ItemCollection\ItemCollectionList\ReadableListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\AddRowPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\RowEntryPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\TableSelectRowPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\EasyPicPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\DropDownSelectRowPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\ScriptChangeFilterPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\InputFilterOutputFilterPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\InputRowOutputFilterPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\TabFormulaPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\Abstract\FakeControlPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\VariableFieldPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\FileExplorerPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_Formular\EditFieldPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
-    <Compile Include="ItemCollection\ItemConnection.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Temporär\PhysicPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Abstract\AbstractPhysicPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\GenericPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\FunktionsItems_ColumnArrangement_Editor\ColumnPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Abstract\FixedRectangleBitmapPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Abstract\RectanglePadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\SymbolPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Temporär\clsKraft.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Temporär\strPolygonCollisionResult.cs" />
+    <Compile Include="ItemCollectionList\ReadableListItem.cs" />
+    <Compile Include="ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\AddRowPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RowEntryPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TableSelectRowPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\EasyPicPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\DropDownSelectRowPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\ScriptChangeFilterPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\InputFilterOutputFilterPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\InputRowOutputFilterPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TabFormulaPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\Abstract\FakeControlPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\VariableFieldPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\FileExplorerPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\EditFieldPadItem.cs" />
+    <Compile Include="ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
+    <Compile Include="ItemConnection.cs" />
+    <Compile Include="ItemCollectionPad\Temporär\PhysicPadItem.cs" />
+    <Compile Include="ItemCollectionPad\Abstract\AbstractPhysicPadItem.cs" />
+    <Compile Include="ItemCollectionPad\GenericPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_ColumnArrangement_Editor\ColumnPadItem.cs" />
+    <Compile Include="ItemCollectionPad\Abstract\FixedRectangleBitmapPadItem.cs" />
+    <Compile Include="ItemCollectionPad\Abstract\RectanglePadItem.cs" />
+    <Compile Include="ItemCollectionPad\SymbolPadItem.cs" />
+    <Compile Include="ItemCollectionPad\Temporär\clsKraft.cs" />
+    <Compile Include="ItemCollectionPad\Temporär\strPolygonCollisionResult.cs" />
     <Compile Include="Controls\RibbonBar.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -605,21 +605,21 @@
     <Compile Include="Interfaces\ICanHaveVariablesItemLevel.cs" />
     <Compile Include="Interfaces\IContextMenu.cs" />
     <Compile Include="Interfaces\IMouseAndKeyHandle.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\Abstract\BasicListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\BitmapListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\CellLikeListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\LineListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\RowFormulaListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionList\TextListItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\Abstract\BasicPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\BitmapPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\ChildPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\DimensionPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\LinePadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\RowFormulaPadItem.cs" />
-    <Compile Include="ItemCollection\ItemCollectionPad\TextPadItem.cs" />
+    <Compile Include="ItemCollectionList\AbstractListItem.cs" />
+    <Compile Include="ItemCollectionList\BitmapListItem.cs" />
+    <Compile Include="ItemCollectionList\CellLikeListItem.cs" />
+    <Compile Include="ItemCollectionList\ItemCollectionList.cs" />
+    <Compile Include="ItemCollectionList\LineListItem.cs" />
+    <Compile Include="ItemCollectionList\RowFormulaListItem.cs" />
+    <Compile Include="ItemCollectionList\TextListItem.cs" />
+    <Compile Include="ItemCollectionPad\Abstract\BasicPadItem.cs" />
+    <Compile Include="ItemCollectionPad\BitmapPadItem.cs" />
+    <Compile Include="ItemCollectionPad\ChildPadItem.cs" />
+    <Compile Include="ItemCollectionPad\DimensionPadItem.cs" />
+    <Compile Include="ItemCollectionPad\ItemCollectionPad.cs" />
+    <Compile Include="ItemCollectionPad\LinePadItem.cs" />
+    <Compile Include="ItemCollectionPad\RowFormulaPadItem.cs" />
+    <Compile Include="ItemCollectionPad\TextPadItem.cs" />
     <Compile Include="Controls\LastFilesCombo.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -909,6 +909,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

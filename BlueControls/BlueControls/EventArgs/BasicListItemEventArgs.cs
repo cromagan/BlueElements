@@ -17,21 +17,21 @@
 
 #nullable enable
 
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.EventArgs;
 
-public class BasicListItemEventArgs : System.EventArgs {
+public class AbstractListItemEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public BasicListItemEventArgs(BasicListItem item) => Item = item;
+    public AbstractListItemEventArgs(AbstractListItem item) => Item = item;
 
     #endregion
 
     #region Properties
 
-    public BasicListItem Item { get; }
+    public AbstractListItem Item { get; }
 
     #endregion
 }

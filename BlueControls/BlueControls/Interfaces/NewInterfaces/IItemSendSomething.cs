@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Forms;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -40,7 +39,7 @@ public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangin
 
     public string Page { get; }
 
-    public ItemCollectionPad? Parent { get; }
+    public ItemCollectionPad.ItemCollectionPad? Parent { get; }
 
     #endregion
 

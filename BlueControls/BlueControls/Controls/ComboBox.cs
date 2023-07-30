@@ -31,7 +31,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase.Interfaces;
 
 namespace BlueControls.Controls;
@@ -79,7 +79,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     public event EventHandler? DropDownShowing;
 
-    public event EventHandler<BasicListItemEventArgs>? ItemClicked;
+    public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
 
     #endregion
 
@@ -123,7 +123,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public ItemCollectionList Item { get; } = new(BlueListBoxAppearance.DropdownSelectbox, true);
+    public ItemCollectionList.ItemCollectionList Item { get; } = new(BlueListBoxAppearance.DropdownSelectbox, true);
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
@@ -152,14 +152,14 @@ public partial class ComboBox : TextBox, ITranslateable {
             y = Cursor.Position.Y - MousePos().Y + Height; //Identisch
         }
         Item.UncheckAll();
-        if (_drawStyle != ComboboxStyle.RibbonBar && Item[Text] != null) { Item[Text].Checked = true; }
+        if (_drawStyle != ComboboxStyle.RibbonBar && Item[Text] is AbstractListItem bli) { bli.Checked = true; }
         var dropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, x, y, Width, null, this, Translate);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         _btnDropDownIsIn = false;
     }
 
-    internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
+    internal bool WasThisValueClicked() => Text == _lastClickedText;
 
     protected override void DrawControl(Graphics gr, States state) {
         if (_drawStyle != ComboboxStyle.TextBox) {
@@ -237,7 +237,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         FloatingForm.Close(this);
     }
 
-    protected virtual void OnItemClicked(BasicListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+    protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     protected override void OnLostFocus(System.EventArgs e) {
         Invalidate();
@@ -301,10 +301,10 @@ public partial class ComboBox : TextBox, ITranslateable {
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         Item.UncheckAll();
         FloatingForm.Close(this);
-        if (!string.IsNullOrEmpty(e.ClickedComand)) {
+        if (!string.IsNullOrEmpty(e.ClickedComand) && Item[e.ClickedComand] is AbstractListItem bli) {
             _lastClickedText = e.ClickedComand;
             Text = e.ClickedComand;
-            OnItemClicked(new BasicListItemEventArgs(Item[e.ClickedComand]));
+            OnItemClicked(new AbstractListItemEventArgs(bli));
         }
         _ = Focus();
     }

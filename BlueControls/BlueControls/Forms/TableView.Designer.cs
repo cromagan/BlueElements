@@ -237,7 +237,7 @@ namespace BlueControls.Forms {
             this.btnLetzteDateien.Size = new System.Drawing.Size(104, 66);
             this.btnLetzteDateien.TabIndex = 1;
             this.btnLetzteDateien.Text = "zuletzt geöffnete Dateien";
-            this.btnLetzteDateien.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
+            this.btnLetzteDateien.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
             // 
             // btnOeffnen
             // 
@@ -416,7 +416,7 @@ namespace BlueControls.Forms {
             this.cbxColumnArr.Name = "cbxColumnArr";
             this.cbxColumnArr.Size = new System.Drawing.Size(200, 22);
             this.cbxColumnArr.TabIndex = 2;
-            this.cbxColumnArr.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxColumnArr_ItemClicked);
+            this.cbxColumnArr.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.cbxColumnArr_ItemClicked);
             // 
             // grpHilfen
             // 
@@ -594,7 +594,7 @@ namespace BlueControls.Forms {
             this.cbxDoSript.Size = new System.Drawing.Size(64, 66);
             this.cbxDoSript.TabIndex = 41;
             this.cbxDoSript.Text = "Skript ausführen";
-            this.cbxDoSript.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxDoSript_ItemClicked);
+            this.cbxDoSript.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.cbxDoSript_ItemClicked);
             // 
             // btnSuchenUndErsetzen
             // 
@@ -781,7 +781,7 @@ namespace BlueControls.Forms {
             this.btnDrucken.Size = new System.Drawing.Size(80, 66);
             this.btnDrucken.TabIndex = 13;
             this.btnDrucken.Text = "Drucken bzw. Export";
-            this.btnDrucken.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.btnDrucken_ItemClicked);
+            this.btnDrucken.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.btnDrucken_ItemClicked);
             // 
             // btnHTMLExport
             // 

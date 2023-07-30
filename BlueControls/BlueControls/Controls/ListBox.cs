@@ -31,8 +31,8 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase.Interfaces;
+using BlueControls.ItemCollectionList;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
@@ -51,7 +51,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private bool _filterAllowed;
 
     //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
-    private BasicListItem? _mouseOverItem;
+    private AbstractListItem? _mouseOverItem;
 
     private bool _moveAllowed;
 
@@ -65,7 +65,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        Item = new ItemCollectionList(true);
+        Item = new ItemCollectionList.ItemCollectionList(true);
         Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
         Item.CollectionChanged += Item_CollectionChanged;
         Item.Changed += Item_Changed;
@@ -86,9 +86,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public event EventHandler? ItemCheckedChanged;
 
-    public event EventHandler<BasicListItemEventArgs>? ItemClicked;
+    public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
 
-    public event EventHandler<BasicListItemEventArgs>? ItemDoubleClick;
+    public event EventHandler<AbstractListItemEventArgs>? ItemDoubleClick;
 
     #endregion
 
@@ -146,7 +146,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ItemCollectionList Item { get; }
+    public BlueControls.ItemCollectionList.ItemCollectionList Item { get; }
 
     [DefaultValue(false)]
     public bool MoveAllowed {
@@ -189,7 +189,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ItemCollectionList Suggestions { get; } = new(true);
+    public BlueControls.ItemCollectionList.ItemCollectionList Suggestions { get; } = new(true);
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
@@ -226,7 +226,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         var sg = Suggestions[rück[0]];
         if (sg == null) { return; }
 
-        Item.Add(sg.Clone() as BasicListItem);
+        Item.Add(sg.Clone() as AbstractListItem);
     }
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
@@ -238,7 +238,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public new bool Focused() => base.Focused || Plus.Focused || Minus.Focused || Up.Focused || Down.Focused || SliderY.Focused() || FilterCap.Focused || FilterTxt.Focused;
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
+    public void GetContextMenuItems(MouseEventArgs? e, BlueControls.ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
     public void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
 
@@ -312,7 +312,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (!Enabled) { return; }
         var nd = MouseOverNode(MousePos().X, MousePos().Y);
         if (nd == null) { return; }
-        OnItemDoubleClick(new BasicListItemEventArgs(nd));
+        OnItemDoubleClick(new AbstractListItemEventArgs(nd));
     }
 
     protected override void OnHandleCreated(System.EventArgs e) {
@@ -350,7 +350,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                     if (Appearance is BlueListBoxAppearance.Listbox or BlueListBoxAppearance.Autofilter or BlueListBoxAppearance.Gallery or BlueListBoxAppearance.FileSystem) {
                         if (nd.IsClickable()) { nd.Checked = !nd.Checked; }
                     }
-                    OnItemClicked(new BasicListItemEventArgs(nd));
+                    OnItemClicked(new AbstractListItemEventArgs(nd));
                 }
                 break;
 
@@ -455,15 +455,15 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         CheckButtons();
     }
 
-    private BasicListItem? MouseOverNode(int x, int y) => ButtonsVisible() && y >= Height - Plus.Height ? null : Item[x, (int)(y + SliderY.Value)];
+    private AbstractListItem? MouseOverNode(int x, int y) => ButtonsVisible() && y >= Height - Plus.Height ? null : Item[x, (int)(y + SliderY.Value)];
 
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
     private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnItemClicked(BasicListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
-    private void OnItemDoubleClick(BasicListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
+    private void OnItemDoubleClick(AbstractListItemEventArgs e) => ItemDoubleClick?.Invoke(this, e);
 
     private void Plus_Click(object sender, System.EventArgs e) {
         OnAddClicked();
@@ -495,7 +495,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     private void Up_Click(object sender, System.EventArgs e) {
-        BasicListItem? ln = null;
+        AbstractListItem? ln = null;
         foreach (var thisItem in Item.ItemOrder) {
             if (thisItem != null) {
                 if (thisItem.Checked) {

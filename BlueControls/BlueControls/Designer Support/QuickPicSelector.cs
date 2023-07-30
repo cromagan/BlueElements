@@ -55,7 +55,7 @@ public sealed class QuickPicSelector : UITypeEditor {
             return;
         }
 
-        _c = _fqp.ICode();
+        _c = _fqp.ImgCode();
         _edSvc.CloseDropDown();
     }
 

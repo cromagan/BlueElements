@@ -19,7 +19,6 @@
 
 using System.Collections.Generic;
 using System.Windows.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Forms;
 
@@ -35,7 +34,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
 
     private InputBoxComboStyle() : this(string.Empty, string.Empty, null, false) { }
 
-    private InputBoxComboStyle(string txt, string vorschlagsText, ItemCollectionList? suggestOriginal, bool texteingabeErlaubt) : base(true, true) {
+    private InputBoxComboStyle(string txt, string vorschlagsText, ItemCollectionList.ItemCollectionList? suggestOriginal, bool texteingabeErlaubt) : base(true, true) {
         InitializeComponent();
         cbxText.Text = vorschlagsText;
         if (suggestOriginal != null) {
@@ -51,10 +50,10 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
 
     #region Methods
 
-    public static string Show(string txt, ItemCollectionList? suggest, bool texteingabeErlaubt) => Show(txt, string.Empty, suggest, texteingabeErlaubt);
+    public static string Show(string txt, ItemCollectionList.ItemCollectionList? suggest, bool texteingabeErlaubt) => Show(txt, string.Empty, suggest, texteingabeErlaubt);
 
     public static string Show(string txt, List<string> suggest, bool texteingabeErlaubt) {
-        ItemCollectionList Suggest = new(true);
+        ItemCollectionList.ItemCollectionList Suggest = new(true);
         Suggest.AddRange(suggest);
         //Suggest.Sort();
         return Show(txt, string.Empty, Suggest, texteingabeErlaubt);
@@ -70,7 +69,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
     /// <param name="suggest">Wird geklont, es kann auch aus einer Listbox kommen, und dann stimmen die Events nicht mehr. Es muss auch einbe ItemCollection bleiben, damit aus der Datenbank auch Bilder etc. angezeigt werden können.</param>
     /// <returns></returns>
 
-    private static string Show(string txt, string vorschlagsText, ItemCollectionList? suggest, bool texteingabeErlaubt) {
+    private static string Show(string txt, string vorschlagsText, ItemCollectionList.ItemCollectionList? suggest, bool texteingabeErlaubt) {
         var MB = new InputBoxComboStyle(txt, vorschlagsText, suggest, texteingabeErlaubt);
         _ = MB.ShowDialog();
         return MB._giveBack;

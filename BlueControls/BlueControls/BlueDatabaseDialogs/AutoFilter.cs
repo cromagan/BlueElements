@@ -26,7 +26,7 @@ using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
@@ -116,8 +116,8 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, Width - (Skin.PaddingSmal * 2));
         lsbFilterItems.Height = Math.Min(lsbFilterItems.Height, 560);
 
-        BasicListItem? leere = null;
-        BasicListItem? nichtleere = null;
+        AbstractListItem? leere = null;
+        AbstractListItem? nichtleere = null;
 
         #region die Besonderen Filter generieren
 
@@ -165,7 +165,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                     if (thisfilter.Column == _column) {
                         if (thisfilter.FilterType.HasFlag(FilterType.Istgleich)) {
                             foreach (var thisValue in thisfilter.SearchValue) {
-                                if (lsbFilterItems.Item[thisValue] is BasicListItem bli) {
+                                if (lsbFilterItems.Item[thisValue] is AbstractListItem bli) {
                                     bli.Checked = true;
                                 } else if (string.IsNullOrEmpty(thisValue) && leere != null) {
                                     leere.Checked = true;
@@ -243,7 +243,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         OnFilterComand(new FilterComandEventArgs(comand, _column, newFilter));
     }
 
-    private void FiltItems_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void FiltItems_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (_multiAuswahlUnd || _multiAuswahlOder) { return; }
 
         var doJoker = !string.IsNullOrEmpty(_column.AutoFilterJoker);
@@ -263,7 +263,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     private void OnFilterComand(FilterComandEventArgs e) => FilterComand?.Invoke(this, e);
 
-    private void sFilter_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void sFilter_ItemClicked(object sender, AbstractListItemEventArgs e) {
         switch (e.Item.KeyName.ToLower()) {
             case "filterleere": {
                     CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich | FilterType.MultiRowIgnorieren, string.Empty));

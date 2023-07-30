@@ -329,7 +329,7 @@ namespace BlueControls.Forms {
             this.cbxSchriftGröße.Regex = null;
             this.cbxSchriftGröße.Size = new Size(168, 22);
             this.cbxSchriftGröße.TabIndex = 3;
-            this.cbxSchriftGröße.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.cbxSchriftGröße_ItemClicked);
+            this.cbxSchriftGröße.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.cbxSchriftGröße_ItemClicked);
             // 
             // capSchriftgröße
             // 
@@ -350,7 +350,7 @@ namespace BlueControls.Forms {
             this.PadDesign.Regex = null;
             this.PadDesign.Size = new Size(264, 22);
             this.PadDesign.TabIndex = 1;
-            this.PadDesign.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.PadDesign_ItemClicked);
+            this.PadDesign.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.PadDesign_ItemClicked);
             // 
             // capDesign
             // 

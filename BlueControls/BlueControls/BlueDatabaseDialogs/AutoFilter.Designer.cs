@@ -89,7 +89,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lsbFilterItems.Name = "lsbFilterItems";
             this.lsbFilterItems.Size = new Size(150, 12);
             this.lsbFilterItems.TabIndex = 5;
-            this.lsbFilterItems.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.FiltItems_ItemClicked);
+            this.lsbFilterItems.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.FiltItems_ItemClicked);
             this.lsbFilterItems.LostFocus += new EventHandler(this.Something_LostFocus);
             // 
             // lsbStandardFilter
@@ -103,7 +103,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lsbStandardFilter.Size = new Size(150, 72);
             this.lsbStandardFilter.TabIndex = 1;
             this.lsbStandardFilter.Text = "Standard";
-            this.lsbStandardFilter.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.sFilter_ItemClicked);
+            this.lsbStandardFilter.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.sFilter_ItemClicked);
             this.lsbStandardFilter.LostFocus += new EventHandler(this.Something_LostFocus);
             // 
             // capWas

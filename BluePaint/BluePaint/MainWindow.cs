@@ -163,7 +163,7 @@ public partial class MainWindow {
 
     private void btnGrößeÄndern_Click(object sender, System.EventArgs e) => SetTool(new Tool_Resize());
 
-    private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (!IsSaved() || e.Item == null) { return; }
         LoadFromDisk(e.Item.KeyName);
     }

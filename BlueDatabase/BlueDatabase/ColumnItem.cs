@@ -106,6 +106,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     private int _maxCellLenght;
     private int _maxTextLenght;
     private bool _multiLine;
+    private string _name = string.Empty;
     private string _prefix;
     private string _quickInfo;
     private string _regex = string.Empty;
@@ -140,7 +141,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         #region Standard-Werte
 
-        KeyName = name;
+        _name = name;
         _caption = string.Empty;
         //_CaptionBitmapCode = null;
         _format = DataFormat.Text;
@@ -298,7 +299,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     //    var ex = database.Column.SearchByKey(columnkey);
     //    if (ex != null) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "KeyName existiert bereits");
+    //        Develop.DebugPrint(FehlerArt.Fehler, "_name existiert bereits");
     //    }
     public bool AfterEditQuickSortRemoveDouble {
         get => _multiLine && _afterEditQuickSortRemoveDouble;
@@ -590,7 +591,32 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public bool IsDisposed { get; private set; }
 
-    public string KeyName { get; private set; }
+    public string KeyName {
+        get => _name.ToUpper();
+        set {
+            value = value.ToUpper();
+            if (value == _name.ToUpper()) { return; }
+
+            if (!ColumNameAllowed(value)) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt: " + _name);
+                return;
+            }
+
+            //if (Database?.Column.Exists(value) != null) {
+            //    Develop.DebugPrint(FehlerArt.Warnung, "Name existiert bereits!");
+            //    return;
+            //}
+
+            //if (!IsValidColumnName(value)) {
+            //    Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt!");
+            //    return;
+            //}
+
+            _ = Database?.ChangeData(DatabaseDataType.ColumnName, this, null, _name, value, string.Empty);
+            OnChanged();
+            CheckIfIAmAKeyColumn();
+        }
+    }
 
     public ColumnLineStyle LineLeft {
         get => _lineLeft;
@@ -604,7 +630,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     //        var c = Database?.Column.SearchByKey(_keyColumnKey);
     //        c?.CheckIfIAmAKeyColumn();
-    //        Database?.ChangeData(DatabaseDataType.KeyColumnKey, KeyName, null, _keyColumnKey.ToString(false), value.ToString(false), string.Empty);
+    //        Database?.ChangeData(DatabaseDataType.KeyColumnKey, _name, null, _keyColumnKey.ToString(false), value.ToString(false), string.Empty);
     //        c = Database?.Column.SearchByKey(_keyColumnKey);
     //        c?.CheckIfIAmAKeyColumn();
     //        OnChanged();
@@ -633,7 +659,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    //        _ = (Database?.ChangeData(DatabaseDataType.ColumnKey, Name, null, KeyName, value.ToString(), string.Empty));
+    //        _ = (Database?.ChangeData(DatabaseDataType.ColumnKey, Name, null, _name, value.ToString(), string.Empty));
     //        OnChanged();
     //    }
     //}
@@ -737,33 +763,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             _ = Database?.ChangeData(DatabaseDataType.MultiLine, this, null, _multiLine.ToPlusMinus(), value.ToPlusMinus(), string.Empty);
             Invalidate_ColumAndContent();
             OnChanged();
-        }
-    }
-
-    public string Name {
-        get => KeyName.ToUpper();
-        set {
-            value = value.ToUpper();
-            if (value == KeyName.ToUpper()) { return; }
-
-            if (!ColumNameAllowed(value)) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt: " + KeyName);
-                return;
-            }
-
-            //if (Database?.Column.Exists(value) != null) {
-            //    Develop.DebugPrint(FehlerArt.Warnung, "Name existiert bereits!");
-            //    return;
-            //}
-
-            //if (!IsValidColumnName(value)) {
-            //    Develop.DebugPrint(FehlerArt.Warnung, "Spaltenname nicht erlaubt!");
-            //    return;
-            //}
-
-            _ = Database?.ChangeData(DatabaseDataType.ColumnName, this, null, KeyName, value, string.Empty);
-            OnChanged();
-            CheckIfIAmAKeyColumn();
         }
     }
 
@@ -1112,10 +1111,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (source.Database != null) { source.Repair(); }
 
         if (nameAndKeyToo) {
-            Name = source.Name;
-            //Database?.ChangeData(DatabaseDataType.ColumnKey, this, null, this.KeyName.ToString(false), source.KeyName.ToString(false));
+            KeyName = source.KeyName;
+            //Database?.ChangeData(DatabaseDataType.ColumnKey, this, null, this._name.ToString(false), source._name.ToString(false));
 
-            //KeyName = source.KeyName;
+            //_name = source._name;
         }
 
         Caption = source.Caption;
@@ -1185,14 +1184,14 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public bool ColumNameAllowed(string nameToTest) {
         if (!IsValidColumnName(nameToTest)) { return false; }
 
-        if (nameToTest.Equals(KeyName, StringComparison.OrdinalIgnoreCase)) { return true; }
+        if (nameToTest.Equals(_name, StringComparison.OrdinalIgnoreCase)) { return true; }
         if (Database?.Column.Exists(nameToTest) != null) { return false; }
 
         return true;
     }
 
     public string CompareKey() {
-        var tmp = string.IsNullOrEmpty(_caption) ? KeyName + Constants.FirstSortChar + KeyName : _caption + Constants.FirstSortChar + KeyName;
+        var tmp = string.IsNullOrEmpty(_caption) ? _name + Constants.FirstSortChar + _name : _caption + Constants.FirstSortChar + _name;
         tmp = tmp.Trim(' ');
         tmp = tmp.TrimStart('-');
         tmp = tmp.Trim(' ');
@@ -1276,10 +1275,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public string ErrorReason() {
         if (Database == null || Database.IsDisposed) { return "Datenbank verworfen"; }
-        //if (KeyName < 0) { return "Interner Fehler: ID nicht definiert"; }
-        if (string.IsNullOrEmpty(KeyName)) { return "Der Spaltenname ist nicht definiert."; }
+        //if (_name < 0) { return "Interner Fehler: ID nicht definiert"; }
+        if (string.IsNullOrEmpty(_name)) { return "Der Spaltenname ist nicht definiert."; }
 
-        if (!IsValidColumnName(KeyName)) { return "Der Spaltenname ist ungültig."; }
+        if (!IsValidColumnName(_name)) { return "Der Spaltenname ist ungültig."; }
 
         //if (!IsSystemColumn()) {
         //if (_maxTextLenght == 4000) {
@@ -1293,7 +1292,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (_maxCellLenght > 4000) { return "Zellengröße zu groß!"; }
         if (_maxTextLenght > 4000) { return "Maximallänge zu groß!"; }
 
-        if (Database.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(KeyName, thisColumn.Name, StringComparison.OrdinalIgnoreCase))) {
+        if (Database.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_name, thisColumn._name, StringComparison.OrdinalIgnoreCase))) {
             return "Spalten-Name bereits vorhanden.";
         }
 
@@ -1484,7 +1483,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public bool IsFirst() => Database?.Column.First() == this;
 
     public bool IsSystemColumn() =>
-        KeyName.ToUpper() is "SYS_CORRECT" or
+        _name.ToUpper() is "SYS_CORRECT" or
             "SYS_CHANGER" or
             "SYS_CREATOR" or
             "SYS_CHAPTER" or
@@ -1528,7 +1527,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 done = true;
             }
             if (!done) {
-                ret = KeyName; //_Caption + " (" + _Name + ")";
+                ret = _name; //_Caption + " (" + _Name + ")";
             }
         }
         ret = ret.Replace("\n", "\r").Replace("\r\r", "\r");
@@ -1545,7 +1544,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public void RefreshColumnsData() {
         if (IsInCache != null) { return; }
         if (Database == null || Database.IsDisposed) { return; }
-        if (Name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
+        if (_name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
 
         var x = new List<ColumnItem> { this };
         Database?.RefreshColumnsData(x);
@@ -1694,7 +1693,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             ResetSystemToDefault(false);
             CheckIfIAmAKeyColumn();
         } catch (Exception ex) {
-            Develop.DebugPrint("Reparatur der Spalte fehlgeschlagen: " + Name, ex);
+            Develop.DebugPrint("Reparatur der Spalte fehlgeschlagen: " + _name, ex);
         }
     }
 
@@ -1707,7 +1706,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             ForeColor = Color.FromArgb(0, 0, 0);
             //CaptionBitmapCode = null;
         }
-        switch (Name.ToUpper()) {
+        switch (_name.ToUpper()) {
             case "SYS_CREATOR":
                 _format = DataFormat.Text;
                 _maxTextLenght = 20;
@@ -1867,7 +1866,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             //    break;
 
             default:
-                Develop.DebugPrint("Unbekannte Kennung: " + KeyName);
+                Develop.DebugPrint("Unbekannte Kennung: " + _name);
                 break;
         }
     }
@@ -2013,7 +2012,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //            break;
     public override string ToString() {
         if (IsDisposed) { return "Disposed"; }
-        return Name + " -> " + Caption;
+        return _name + " -> " + Caption;
     }
 
     public string Useage() {
@@ -2038,11 +2037,11 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
         if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
         if (UsedInScript()) { t += " - Regeln-Skript<br>"; }
-        if (Database.ZeilenQuickInfo.ToUpper().Contains(Name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
-        if (_tags.JoinWithCr().ToUpper().Contains(Name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
+        if (Database.ZeilenQuickInfo.ToUpper().Contains(_name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
+        if (_tags.JoinWithCr().ToUpper().Contains(_name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
         var layout = false;
         foreach (var thisLayout in Database.Layouts) {
-            if (thisLayout.Contains(Name.ToUpper())) { layout = true; }
+            if (thisLayout.Contains(_name.ToUpper())) { layout = true; }
         }
         if (layout) { t += " - Layouts<br>"; }
 
@@ -2142,14 +2141,14 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (Database == null || Database.IsDisposed) { return; }
 
         foreach (var c in Database.Column) {
-            //if (thisColumn.KeyColumnKey == KeyName) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
-            //if (thisColumn.LinkedCell_RowKeyIsInColumn == KeyName) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
-            //if (ThisColumn.LinkedCell_ColumnValueFoundIn == KeyName) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+            //if (thisColumn.KeyColumnKey == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
+            //if (thisColumn.LinkedCell_RowKeyIsInColumn == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
+            //if (ThisColumn.LinkedCell_ColumnValueFoundIn == _name) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
             if (c.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 foreach (var thisitem in c.LinkedCellFilter) {
                     var tmp = thisitem.SplitBy("|");
 
-                    if (tmp[2].ToLower().Contains("~" + Name.ToLower() + "~")) {
+                    if (tmp[2].ToLower().Contains("~" + _name.ToLower() + "~")) {
                         Am_A_Key_For_Other_Column = "Spalte " + c.ReadableText() + " verweist auf diese Spalte";
                     }
                 }
@@ -2256,18 +2255,18 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
                 var nname = newvalue.ToUpper();
 
-                if (isLoading && nname != KeyName) {
-                    return "Namen Inkonsistent: " + nname + " " + KeyName;
+                if (isLoading && nname != _name) {
+                    return "Namen Inkonsistent: " + nname + " " + _name;
                 }
 
-                var ok = Database?.Column.ChangeName(KeyName, nname) ?? false;
+                var ok = Database?.Column.ChangeName(_name, nname) ?? false;
 
                 if (!ok) {
                     Database?.SetReadOnly();
                     return "Schwerer Spalten Umbenennungsfehler!";
                 }
 
-                KeyName = nname;
+                _name = nname;
                 //Invalidate_TmpVariablesx();
                 break;
 
@@ -2721,7 +2720,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (Database == null || Database.IsDisposed) { return false; }
 
         foreach (var thiss in Database.EventScript) {
-            if (thiss.Script.ContainsWord(Name, RegexOptions.IgnoreCase)) { return true; }
+            if (thiss.Script.ContainsWord(_name, RegexOptions.IgnoreCase)) { return true; }
         }
 
         return false;

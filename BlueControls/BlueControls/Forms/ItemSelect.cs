@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 
 namespace BlueControls.Forms;
@@ -31,13 +31,13 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
 
     #region Fields
 
-    private BasicListItem? _giveBack;
+    private AbstractListItem? _giveBack;
 
     #endregion
 
     #region Constructors
 
-    private ItemSelect(List<BasicListItem?> items) : base(true, true) {
+    private ItemSelect(List<AbstractListItem?> items) : base(true, true) {
         InitializeComponent();
 
         List.Item.Clear();
@@ -56,7 +56,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
 
     public static RowItem? Show(List<RowItem> rows, string layoutId) {
         try {
-            var items = rows.Select(thisRow => new RowFormulaListItem(thisRow, layoutId, string.Empty)).Cast<BasicListItem?>().ToList();
+            var items = rows.Select(thisRow => new RowFormulaListItem(thisRow, layoutId, string.Empty)).Cast<AbstractListItem?>().ToList();
 
             var x = Show(items);
             return (x as RowFormulaListItem)?.Row;
@@ -67,7 +67,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
     }
 
     public static string Show(List<string> files) {
-        var items = new List<BasicListItem?>();
+        var items = new List<AbstractListItem?>();
 
         foreach (var thisString in files) {
             if (thisString.FileType() == FileFormat.Image) {
@@ -78,7 +78,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
         return x != null ? x.KeyName : string.Empty;
     }
 
-    public static BasicListItem? Show(List<BasicListItem?>? items) {
+    public static AbstractListItem? Show(List<AbstractListItem?>? items) {
         if (items == null || items.Count == 0) { return null; }
 
         var x = new ItemSelect(items);

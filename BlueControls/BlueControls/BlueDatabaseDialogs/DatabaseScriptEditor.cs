@@ -24,7 +24,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using BlueScript.Structures;

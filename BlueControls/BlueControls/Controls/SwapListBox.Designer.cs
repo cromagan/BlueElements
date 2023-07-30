@@ -66,7 +66,7 @@ namespace BlueControls.Controls {
             this.Main.Name = "Main";
             this.Main.Size = new Size(345, 115);
             this.Main.TabIndex = 0;
-            this.Main.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.Main_ItemClicked);
+            this.Main.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.Main_ItemClicked);
             this.Main.CollectionChanged += Main_CollectionChanged; 
             // 
             // Suggest
@@ -80,7 +80,7 @@ namespace BlueControls.Controls {
             this.Suggest.Name = "Suggest";
             this.Suggest.Size = new Size(345, 252);
             this.Suggest.TabIndex = 1;
-            this.Suggest.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.Suggest_ItemClicked);
+            this.Suggest.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.Suggest_ItemClicked);
             // 
             // SwapListBox
             // 

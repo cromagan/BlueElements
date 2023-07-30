@@ -28,7 +28,9 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.ItemCollection;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionPad;
+using BlueControls.ItemCollectionPad.Abstract;
+using BlueControls.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
@@ -129,7 +131,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
-        ItemCollectionList aa = new(true);
+        ItemCollectionList.ItemCollectionList aa = new(true);
         aa.AddRange(Database.Permission_AllUsed(false));
         //aa.Sort();
         aa.CheckBehavior = CheckBehavior.MultiSelection;
@@ -239,7 +241,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
 
-        ItemCollectionList ic = new(true);
+        ItemCollectionList.ItemCollectionList ic = new(true);
         foreach (var thisColumnItem in Database.Column) {
             if (thisColumnItem != null && ca[thisColumnItem] == null) { _ = ic.Add(thisColumnItem); }
         }
@@ -265,7 +267,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         ShowOrder();
     }
 
-    private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void cbxInternalColumnArrangementSelector_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (string.IsNullOrEmpty(cbxInternalColumnArrangementSelector.Text)) { return; }
 
         var tmporder = IntParse(e.Item.KeyName);
@@ -495,7 +497,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         foreach (var thisCombi in dbColumnCombi) {
             foreach (var thisc in ca) {
                 if (thisc?.Column is ColumnItem c) {
-                    var it = Pad.Item[c.Database?.TableName + "|" + c.Name] as ColumnPadItem;
+                    var it = Pad.Item[c.Database?.TableName + "|" + c.KeyName] as ColumnPadItem;
 
                     if (c.LinkedDatabase != null) {
                         // String als Namen als eindeutige Kennung
@@ -517,9 +519,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
                                 if (c.Database?.Column != null)
                                     foreach (var thisc2 in c.Database.Column) {
-                                        if (tmp[2].Contains("~" + thisc2.Name + "~")) {
+                                        if (tmp[2].Contains("~" + thisc2.KeyName + "~")) {
                                             if (thisc2.Database != null) {
-                                                var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Database.TableName + "|" + thisc2.Name];
+                                                var rkcolit = (ColumnPadItem?)Pad.Item[thisc2.Database.TableName + "|" + thisc2.KeyName];
                                                 if (rkcolit != null) {
                                                     _ = Pad.Item.Connections.AddIfNotExists(new ItemConnection(rkcolit, ConnectionType.Bottom, false, databItem, ConnectionType.Top, true, false));
                                                 }

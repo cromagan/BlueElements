@@ -23,7 +23,6 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -62,7 +61,7 @@ public static class ItemAcceptRowExtensions {
     public static void Datenquelle_wählen(this IItemAcceptRow item) {
         if (item.Parent is null) { return; }
 
-        var x = new ItemCollectionList(false);
+        var x = new ItemCollectionList.ItemCollectionList(false);
         foreach (var thisR in item.Parent) {
             if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendRow rfp) {
                 _ = x.Add(rfp);

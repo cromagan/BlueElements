@@ -19,7 +19,6 @@
 
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
-using BlueControls.ItemCollection;
 using BlueDatabase;
 using System.Collections.Generic;
 
@@ -44,7 +43,7 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
 
     public string Page { get; }
 
-    public ItemCollectionPad? Parent { get; }
+    public ItemCollectionPad.ItemCollectionPad? Parent { get; }
 
     /// <summary>
     /// Wenn InputDatabaseMustBe null zurück gibt, ob schon Filter gewählt werden dürfen.

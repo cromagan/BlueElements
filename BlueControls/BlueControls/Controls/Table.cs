@@ -39,7 +39,7 @@ using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -601,8 +601,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //        newFiles.GenerateAndAdd(neu);
     //        delList.GenerateAndAdd(thisf);
     //    }
-    public static ItemCollectionList UndoItems(DatabaseAbstract? db, string cellkey) {
-        ItemCollectionList i = new(BlueListBoxAppearance.KontextMenu, false) {
+    public static BlueControls.ItemCollectionList.ItemCollectionList UndoItems(DatabaseAbstract? db, string cellkey) {
+        BlueControls.ItemCollectionList.ItemCollectionList i = new(BlueListBoxAppearance.KontextMenu, false) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
         };
 
@@ -621,11 +621,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     lasNr = z;
                     if (isfirst) {
                         las = new TextListItem(
-                            "Aktueller Text - ab " + database.Undo[z].DateTimeUTC + " UTC, geändert von " +
+                            "Aktueller Text - ab " + database.Undo[z].DateTimeUtc + " UTC, geändert von " +
                             database.Undo[z].User, "Cancel", null, false, true, string.Empty);
                     } else {
                         las = new TextListItem(
-                            "ab " + database.Undo[z].DateTimeUTC + " UTC, geändert von " + database.Undo[z].User,
+                            "ab " + database.Undo[z].DateTimeUtc + " UTC, geändert von " + database.Undo[z].User,
                             co.ToString(Constants.Format_Integer5) + database.Undo[z].ChangedTo, null, false, true,
                             string.Empty);
                     }
@@ -636,7 +636,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             if (las != null) {
                 co++;
-                _ = i.Add("vor " + database.Undo[lasNr].DateTimeUTC + " UTC",
+                _ = i.Add("vor " + database.Undo[lasNr].DateTimeUtc + " UTC",
                     co.ToString(Constants.Format_Integer5) + database.Undo[lasNr].PreviousValue);
             }
         }
@@ -1049,7 +1049,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public new bool Focused() => base.Focused || SliderY.Focused() || SliderX.Focused() || BTB.Focused || BCB.Focused;
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         hotItem = null;
         if (e == null) { return; }
 
@@ -2326,11 +2326,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
         }
 
-        ItemCollectionList t = new(true) {
+        ItemCollectionList.ItemCollectionList t = new(true) {
             Appearance = BlueListBoxAppearance.DropdownSelectbox
         };
 
-        ItemCollectionList.GetItemCollection(t, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);
+        ItemCollectionList.ItemCollectionList.GetItemCollection(t, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);
         if (t.Count == 0) {
             // Hm.. Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
             if (contentHolderCellColumn.TextBearbeitungErlaubt) { Cell_Edit(cellInThisDatabaseColumn, cellInThisDatabaseRow, false); } else {
@@ -2387,7 +2387,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         box.Tag = new List<object?> { cellInThisDatabaseColumn, cellInThisDatabaseRow };
 
         if (box is ComboBox cbox) {
-            ItemCollectionList.GetItemCollection(cbox.Item, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);
+            ItemCollectionList.ItemCollectionList.GetItemCollection(cbox.Item, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);
             if (cbox.Item.Count == 0) {
                 return Cell_Edit_TextBox(cellInThisDatabaseColumn, cellInThisDatabaseRow, contentHolderCellColumn, contentHolderCellRow, BTB, 0, 0);
             }

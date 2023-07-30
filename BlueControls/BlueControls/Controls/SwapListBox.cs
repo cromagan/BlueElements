@@ -25,7 +25,7 @@ using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Controls;
 
@@ -53,7 +53,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ItemCollectionList Item => Main.Item;
+    public ItemCollectionList.ItemCollectionList Item => Main.Item;
 
     #endregion
 
@@ -61,13 +61,13 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     public void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
 
-    internal void SuggestionsAdd(ItemCollectionList? item) {
+    internal void SuggestionsAdd(ItemCollectionList.ItemCollectionList? item) {
         if (item == null) { return; }
 
         foreach (var thisi in item) {
             if (Main.Item[thisi.KeyName] == null && Suggest.Item[thisi.KeyName] == null) {
                 thisi.Checked = false;
-                Suggest.Item.Add(thisi.Clone() as BasicListItem);
+                Suggest.Item.Add(thisi.Clone() as AbstractListItem);
             }
         }
     }
@@ -78,7 +78,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         var sourceItem = source.Item[@internal];
         var targetItem = target.Item[@internal];
         if (sourceItem != null && targetItem == null) {
-            target.Item.Add(sourceItem.Clone() as BasicListItem);
+            target.Item.Add(sourceItem.Clone() as AbstractListItem);
         } else if (sourceItem == null && targetItem == null) {
             targetItem = new TextListItem(@internal, @internal, null, false, true, string.Empty);
             target.Item.Add(targetItem);
@@ -113,9 +113,9 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
-                if (thisit is BasicListItem bli) {
+                if (thisit is AbstractListItem bli) {
                     if (Suggest.Item[bli.KeyName] == null) {
-                        Suggest.Item.Add(bli.Clone() as BasicListItem);
+                        Suggest.Item.Add(bli.Clone() as AbstractListItem);
                     }
                 }
             }
@@ -138,17 +138,17 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     //    ItemRemoved?.Invoke(this, e);
     //}
     //private void Main_ItemAdded(object sender, ListEventArgs e) {
-    //    MoveItemBetweenList(Suggest, Main, ((BasicListItem)e.Item).Internal, true);
+    //    MoveItemBetweenList(Suggest, Main, ((AbstractListItem)e.Item).Internal, true);
     //    OnItemAdded(e);
     //}
 
-    private void Main_ItemClicked(object sender, BasicListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
+    private void Main_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
 
     //private void Main_ItemRemoved(object sender, System.EventArgs e) => OnItemRemoved(e);
 
-    //private void Main_ItemRemoving(object sender, ListEventArgs e) => MoveItemBetweenList(Main, Suggest, ((BasicListItem)e.Item).Internal, false);
+    //private void Main_ItemRemoving(object sender, ListEventArgs e) => MoveItemBetweenList(Main, Suggest, ((AbstractListItem)e.Item).Internal, false);
 
-    private void Suggest_ItemClicked(object sender, BasicListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
+    private void Suggest_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
 
     #endregion
 }

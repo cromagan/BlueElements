@@ -27,7 +27,7 @@ using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.IO;
 
 namespace BlueControls.Controls;
@@ -120,7 +120,7 @@ public sealed class LastFilesCombo : ComboBox {
         GenerateMenu();
     }
 
-    protected override void OnItemClicked(BasicListItemEventArgs e) {
+    protected override void OnItemClicked(AbstractListItemEventArgs e) {
         base.OnItemClicked(e);
 
         if (e.Item.Tag is not List<string> t) { return; }

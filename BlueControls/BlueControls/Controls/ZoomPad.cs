@@ -22,7 +22,7 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
-using BlueControls.ItemCollection;
+using BlueControls.ItemCollectionList;
 
 namespace BlueControls.Controls;
 
@@ -113,7 +113,7 @@ public partial class ZoomPad : GenericControl {
         var mb = MaxBounds();
         var x = AvailablePaintArea();
         x.Inflate(-16, -16);
-        _zoomFit = ItemCollectionPad.ZoomFitValue(mb, x.Size);
+        _zoomFit = ItemCollectionPad.ItemCollectionPad.ZoomFitValue(mb, x.Size);
         Zoom = _zoomFit;
     }
 
@@ -153,8 +153,8 @@ public partial class ZoomPad : GenericControl {
         var maxBounds = MaxBounds();
 
         if (maxBounds.Width == 0) { return; }
-        var p = ItemCollectionPad.CenterPos(maxBounds, AvailablePaintArea().Size, Zoom);
-        var sliderv = ItemCollectionPad.SliderValues(maxBounds, Zoom, p);
+        var p = ItemCollectionPad.ItemCollectionPad.CenterPos(maxBounds, AvailablePaintArea().Size, Zoom);
+        var sliderv = ItemCollectionPad.ItemCollectionPad.SliderValues(maxBounds, Zoom, p);
         if (p.X < 0) {
             SliderX.Enabled = true;
             SliderX.Minimum = (float)((maxBounds.Left * Zoom) - (Width * 0.6d));
@@ -246,7 +246,7 @@ public partial class ZoomPad : GenericControl {
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
-        if(Fitting) { ZoomFit(); }
+        if (Fitting) { ZoomFit(); }
 
         base.OnSizeChanged(e);
     }

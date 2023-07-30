@@ -33,7 +33,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueScript.Variables;
 using Microsoft.Win32;
@@ -394,7 +394,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
         e.Effect = DragDropEffects.None;
     }
 
-    private void lsbFiles_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void lsbFiles_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (File.Exists(e.Item.KeyName)) {
             switch (e.Item.KeyName.FileType()) {
                 case FileFormat.Link:

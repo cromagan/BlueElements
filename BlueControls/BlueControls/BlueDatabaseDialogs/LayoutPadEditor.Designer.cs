@@ -187,7 +187,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.cbxLayout.Name = "cbxLayout";
             this.cbxLayout.Size = new Size(216, 22);
             this.cbxLayout.TabIndex = 0;
-            this.cbxLayout.ItemClicked += new EventHandler<BasicListItemEventArgs>(this.cbxLayout_ItemClicked);
+            this.cbxLayout.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.cbxLayout_ItemClicked);
             // 
             // tabRight
             // 

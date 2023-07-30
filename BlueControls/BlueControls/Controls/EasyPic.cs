@@ -29,7 +29,6 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
@@ -167,7 +166,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         hotItem = null;
         if (_bitmap != null) {
             _ = items.Add("Externes Fenster öffnen", "ExF");

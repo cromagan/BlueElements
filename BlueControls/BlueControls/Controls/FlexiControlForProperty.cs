@@ -25,7 +25,7 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
@@ -51,7 +51,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// </summary>
     /// <param name="expr"></param>
     /// <param name="list"></param>
-    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList? list) : this(expr, 1, list) { }
+    public FlexiControlForProperty(Expression<Func<T>> expr, ItemCollectionList.ItemCollectionList? list) : this(expr, 1, list) { }
 
     /// <summary>
     /// Anzeige als Textfeld, mit der angegeben Anzahl an Zeilen.
@@ -68,7 +68,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     public FlexiControlForProperty() : this(null, 1, null) { }
 
-    private FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList? list) : base() {
+    private FlexiControlForProperty(Expression<Func<T>>? expr, int rowCount, ItemCollectionList.ItemCollectionList? list) : base() {
         _accessor = new(expr);
 
         GenFehlerText();

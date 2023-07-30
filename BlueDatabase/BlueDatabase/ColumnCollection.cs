@@ -126,10 +126,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public string Add(ColumnItem column) {
         foreach (var thisc in this) {
-            if (thisc.Name.Equals(column.Name, StringComparison.OrdinalIgnoreCase)) { return "Hinzufügen fehlgeschlagen."; }
+            if (thisc.KeyName.Equals(column.KeyName, StringComparison.OrdinalIgnoreCase)) { return "Hinzufügen fehlgeschlagen."; }
         }
 
-        if (!_internal.TryAdd(column.Name, column)) { return "Hinzufügen fehlgeschlagen."; }
+        if (!_internal.TryAdd(column.KeyName, column)) { return "Hinzufügen fehlgeschlagen."; }
         OnColumnAdded(new ColumnEventArgs(column));
         return string.Empty;
     }
@@ -169,7 +169,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             return null;
         }
 
-        var l = Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed && !thisViewItem.Column.Name.StartsWith("SYS_"))?.Column;
+        var l = Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed && !thisViewItem.Column.KeyName.StartsWith("SYS_"))?.Column;
         if (l != null) { return l; }
 
         return Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed)?.Column;
@@ -259,7 +259,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             return null;
         }
 
-        item.Name = internalName;
+        item.KeyName = internalName;
         item.Caption = caption;
 
         item.GetStyleFrom(format);
@@ -291,7 +291,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 lfdn++;
                 da.RowBeginn();
                 da.CellAdd(lfdn.ToString());
-                da.CellAdd(thisColumnItem.Column.Name);
+                da.CellAdd(thisColumnItem.Column.KeyName);
                 da.CellAdd(thisColumnItem.Column.Caption.Replace("\r", "<br>"));
                 da.CellAdd((thisColumnItem.Column.CaptionGroup1 + "/" + thisColumnItem.Column.CaptionGroup2 + "/" + thisColumnItem.Column.CaptionGroup3 + "/").TrimEnd("/"));
                 var name = "{" + thisColumnItem.Column.Format.ToString() + "}";
@@ -333,7 +333,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem != null && thisColumnItem.IsSystemColumn()) {
-                switch (thisColumnItem.Name.ToUpper()) {
+                switch (thisColumnItem.KeyName.ToUpper()) {
                     case "SYS_LOCKED":
                         SysLocked = thisColumnItem;
                         break;
@@ -364,7 +364,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
                     default:
 
-                        Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.Name);
+                        Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.KeyName);
                         break;
                 }
             }
@@ -384,7 +384,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public bool Remove(ColumnItem column, string comment) {
         if (column == null || column.IsDisposed) { return false; }
-        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveColumn, column, null, string.Empty, column.Name, comment));
+        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveColumn, column, null, string.Empty, column.KeyName, comment));
     }
 
     public void Repair() {
@@ -491,7 +491,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Spalten, die zu viel sind, löschen
         var names = new List<ColumnItem>();
         foreach (var thisColumn in this) {
-            var l = sourceDatabase.Column.Exists(thisColumn.Name);
+            var l = sourceDatabase.Column.Exists(thisColumn.KeyName);
             if (l == null) { names.Add(thisColumn); }
         }
         foreach (var thisname in names) {
@@ -500,13 +500,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         // Spalten erzeugen und Format übertragen
         foreach (var thisColumn in sourceDatabase.Column) {
-            var l = Exists(thisColumn.Name) ??
-                GenerateAndAdd(thisColumn.Name, thisColumn.Caption, thisColumn.Suffix, null, thisColumn.Quickinfo);
+            var l = Exists(thisColumn.KeyName) ??
+                GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, thisColumn.Suffix, null, thisColumn.Quickinfo);
 
             if (l != null) {
                 l.CloneFrom(thisColumn, true, changeWidth);
 
-                if (l.Name != thisColumn.Name) {
+                if (l.KeyName != thisColumn.KeyName) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Name nicht korrekt!");
                 }
 
@@ -614,7 +614,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (sysname == "SYS_DATECREATED" && c == null) { c = Exists("SYS_CREATEDATE"); }
 
         if (c != null && !c.IsDisposed) {
-            c.Name = sysname; // Wegen der Namensverbiegung oben...
+            c.KeyName = sysname; // Wegen der Namensverbiegung oben...
             c.ResetSystemToDefault(false);
             return;
         }

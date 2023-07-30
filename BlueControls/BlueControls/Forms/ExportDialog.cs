@@ -29,8 +29,8 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
+using BlueControls.ItemCollectionPad;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
@@ -91,10 +91,10 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Methods
 
-    public static void AddLayoutsOff(ItemCollectionList addHere, DatabaseAbstract? database, bool addDiskLayouts) {
+    public static void AddLayoutsOff(ItemCollectionList.ItemCollectionList addHere, DatabaseAbstract? database, bool addDiskLayouts) {
         if (database != null && !database.IsDisposed) {
             foreach (var t in database.Layouts) {
-                ItemCollectionPad p = new(t, string.Empty);
+                ItemCollectionPad.ItemCollectionPad p = new(t, string.Empty);
                 _ = addHere.Add(p.Caption, p.KeyName, ImageCode.Stern);
             }
         }
@@ -131,19 +131,19 @@ public sealed partial class ExportDialog : IHasDatabase {
 
         if (rowsForExport == null || rowsForExport.Count < 1) { return -1; }
 
-        ItemCollectionPad tmp = new(layout, rowsForExport[0].Database, rowsForExport[0].KeyName);
+        ItemCollectionPad.ItemCollectionPad tmp = new(layout, rowsForExport[0].Database, rowsForExport[0].KeyName);
         var oneItem = tmp.MaxBounds(null);
         pad.Item.SheetStyle = tmp.SheetStyle;
         pad.Item.SheetStyleScale = tmp.SheetStyleScale;
         tmp?.Dispose();
         var druckB = pad.Item.DruckbereichRect();
-        var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.Dpi), 1);
+        var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.ItemCollectionPad.Dpi), 1);
         var tempVar = Math.Max(1, (int)Math.Floor((druckB.Width / (double)(oneItem.Width + abstand)) + 0.01));
         for (var x = 0; x < tempVar; x++) {
             var tempVar2 = Math.Max(1, (int)Math.Floor((druckB.Height / (double)(oneItem.Height + abstand)) + 0.01));
             for (var y = 0; y < tempVar2; y++) {
                 ChildPadItem it = new() {
-                    PadInternal = new CreativePad(new ItemCollectionPad(layout, rowsForExport[startNr].Database, rowsForExport[startNr].KeyName))
+                    PadInternal = new CreativePad(new ItemCollectionPad.ItemCollectionPad(layout, rowsForExport[startNr].Database, rowsForExport[startNr].KeyName))
                 };
                 pad.Item.Add(it);
                 it.SetCoordinates(oneItem with { X = druckB.Left + (x * (oneItem.Width + abstand)), Y = druckB.Top + (y * (oneItem.Height + abstand)) }, true);
@@ -242,7 +242,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
         if (Database != null && Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1) {
             padVorschau.ShowInPrintMode = true;
-            padVorschau.Item = new ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport[0].Database, _rowsForExport[0].KeyName);
+            padVorschau.Item = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport[0].Database, _rowsForExport[0].KeyName);
             padVorschau.ZoomFit();
         } else {
             padVorschau.Item.Clear();
@@ -255,7 +255,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             ? "Es ist genau ein Eintrag gewählt:<br> <b>-" + _rowsForExport[0].CellFirstString().Replace("\r\n", " ")
             : "Es sind <b>" + _rowsForExport.Count + "</b> Einträge gewählt.";
 
-    private void Exported_ItemClicked(object sender, BasicListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
+    private void Exported_ItemClicked(object sender, AbstractListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
 
     private string Fehler() {
         if (Database == null || Database.IsDisposed) { return "Datenbank verworfen"; }

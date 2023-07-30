@@ -120,7 +120,7 @@ public sealed class ColumnViewItem {
 
     public override string ToString() {
         var result = "{Type=" + (int)_viewType;
-        if (Column != null && !Column.IsDisposed) { result = result + ", ColumnName=" + Column.Name; }
+        if (Column != null && !Column.IsDisposed) { result = result + ", ColumnName=" + Column.KeyName; }
         return result + "}";
     }
 

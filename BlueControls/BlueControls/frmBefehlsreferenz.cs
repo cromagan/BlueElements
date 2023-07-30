@@ -1,6 +1,6 @@
 ﻿using System.Windows.Forms;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueScript;
 using BlueScript.Methods;
 
@@ -19,7 +19,7 @@ public partial class Befehlsreferenz : Form {
 
     #region Methods
 
-    private void lstComands_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void lstComands_ItemClicked(object sender, AbstractListItemEventArgs e) {
         var co = string.Empty;
         if (e.Item is ReadableListItem r && r.Item is Method thisc) {
             co += thisc.HintText();

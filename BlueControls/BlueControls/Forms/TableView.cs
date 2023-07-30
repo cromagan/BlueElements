@@ -32,7 +32,7 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -120,12 +120,12 @@ public partial class TableView : FormWithStatusBar {
                 foreach (var thisColumnItem in database.Column) {
                     while (!thisColumnItem.IsOk()) {
                         DebugPrint(FehlerArt.Info,
-                            "Datenbank:" + database.TableName + "\r\nSpalte:" + thisColumnItem.Name +
+                            "Datenbank:" + database.TableName + "\r\nSpalte:" + thisColumnItem.KeyName +
                             "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + UserName +
                             "\r\nGroup: " + UserGroup + "\r\nAdmins: " +
                             database.DatenbankAdmin.JoinWith(";"));
                         MessageBox.Show(
-                             "<b>Datenbank:" + database.TableName + "\r\nSpalte:" + thisColumnItem.Name +
+                             "<b>Datenbank:" + database.TableName + "\r\nSpalte:" + thisColumnItem.KeyName +
                             "<br></b>Die folgende Spalte enthält einen Fehler:<br>" + thisColumnItem.ErrorReason() +
                             "<br><br>Bitte reparieren.", ImageCode.Information, "OK");
                         OpenColumnEditor(thisColumnItem, null);
@@ -283,7 +283,7 @@ public partial class TableView : FormWithStatusBar {
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
 
-    protected virtual void btnDrucken_ItemClicked(object sender, BasicListItemEventArgs e) {
+    protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
 
@@ -366,11 +366,11 @@ public partial class TableView : FormWithStatusBar {
         cbxDoSript.Enabled = datenbankDa;
         btnSaveAs.Enabled = datenbankDa;
 
-        if (btnDrucken.Item["csv"] is BasicListItem bli1) {
+        if (btnDrucken.Item["csv"] is AbstractListItem bli1) {
             bli1.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         }
 
-        if (btnDrucken.Item["html"] is BasicListItem bli2) {
+        if (btnDrucken.Item["html"] is AbstractListItem bli2) {
             bli2.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         }
 
@@ -587,11 +587,11 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "SpaltenSortierungAZ":
-                if (column != null && !column.IsDisposed) { tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.Name, false); }
+                if (column != null && !column.IsDisposed) { tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.KeyName, false); }
                 break;
 
             case "SpaltenSortierungZA":
-                if (column != null && !column.IsDisposed) { tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.Name, true); }
+                if (column != null && !column.IsDisposed) { tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.KeyName, true); }
                 break;
 
             case "Skript":
@@ -763,7 +763,7 @@ public partial class TableView : FormWithStatusBar {
         OpenLayoutEditor(Table.Database, string.Empty);
     }
 
-    private void btnLetzteDateien_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
 
@@ -993,7 +993,7 @@ public partial class TableView : FormWithStatusBar {
         Table.CursorPos_Set(column, row, false);
     }
 
-    private void cbxColumnArr_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (string.IsNullOrEmpty(cbxColumnArr.Text)) {
             return;
         }
@@ -1001,7 +1001,7 @@ public partial class TableView : FormWithStatusBar {
         Table.Arrangement = int.Parse(e.Item.KeyName);
     }
 
-    private void cbxDoSript_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void cbxDoSript_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (Table.Database == null || !Table.Database.IsAdministrator()) { return; }
 
         if (e.Item is not ReadableListItem bli) { return; }

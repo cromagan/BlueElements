@@ -29,7 +29,8 @@ using BlueBasics.Interfaces;
 using BlueBasics.MultiUserFile;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
@@ -69,7 +70,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     private MultiUserFile? _muf;
 
-    private ItemCollectionPad? _padData;
+    private ItemCollectionPad.ItemCollectionPad? _padData;
 
     private bool _saved;
 
@@ -97,8 +98,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         _muf.ToListOfByte += ToListOfByte;
         _muf.Saving += _muf_Saving;
         _createDate = DateTime.Now.ToString(Constants.Format_Date5);
-        _creator = Generic.UserName;
-        PadData = new ItemCollectionPad();
+        _creator = UserName;
+        PadData = new ItemCollectionPad.ItemCollectionPad();
 
         if (FileExists(filename)) {
             _muf.Load(filename, true);
@@ -108,8 +109,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         if (_padData != null) {
             //_padData.SheetSizeInMm = new SizeF(PixelToMm(500, ItemCollectionPad.Dpi), PixelToMm(850, ItemCollectionPad.Dpi));
-            _padData.GridShow = PixelToMm(IAutosizableExtension.GridSize, ItemCollectionPad.Dpi);
-            _padData.GridSnap = PixelToMm(IAutosizableExtension.GridSize, ItemCollectionPad.Dpi);
+            _padData.GridShow = PixelToMm(IAutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
+            _padData.GridSnap = PixelToMm(IAutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
         }
     }
 
@@ -182,7 +183,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         }
     }
 
-    public ItemCollectionPad? PadData {
+    public ItemCollectionPad.ItemCollectionPad? PadData {
         get => _padData;
         private set {
             if (_padData == value) { return; }
@@ -451,7 +452,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         }
     }
 
-    public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPad padData, float newWidthPixel, float newhHeightPixel, string page) {
+    public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPad.ItemCollectionPad padData, float newWidthPixel, float newhHeightPixel, string page) {
 
         #region Items und Daten in einer sortierene Liste ermitteln, die es betrifft (its)
 
@@ -556,7 +557,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             #region Script ermitteln
 
             if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
+                DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
                 return new ScriptEndedFeedback("Event und Skript angekommen!", false, "Allgemein");
             }
 
@@ -584,7 +585,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
             return ExecuteScript(script);
         } catch {
-            Develop.CheckStackForOverflow();
+            CheckStackForOverflow();
             return ExecuteScript(eventname, scriptname, changevalues, row);
         }
     }
@@ -613,7 +614,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     public void Repair() {
         // Reparatur-Routine
 
-        PadData ??= new ItemCollectionPad();
+        PadData ??= new ItemCollectionPad.ItemCollectionPad();
 
         PadData.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
 
@@ -740,7 +741,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
             return scf;
         } catch {
-            Develop.CheckStackForOverflow();
+            CheckStackForOverflow();
             return ExecuteScript(s);
         }
     }
@@ -793,7 +794,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             }
         }
 
-        PadData.SheetSizeInMm = new SizeF(PixelToMm(newWidthPixel, ItemCollectionPad.Dpi), PixelToMm(newhHeightPixel, ItemCollectionPad.Dpi));
+        PadData.SheetSizeInMm = new SizeF(PixelToMm(newWidthPixel, ItemCollectionPad.ItemCollectionPad.Dpi), PixelToMm(newhHeightPixel, ItemCollectionPad.ItemCollectionPad.Dpi));
     }
 
     internal void SaveAsAndChangeTo(string fileName) => _muf?.SaveAsAndChangeTo(fileName);
@@ -852,7 +853,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                     break;
 
                 case "paditemdata":
-                    PadData = new ItemCollectionPad(pair.Value.FromNonCritical(), string.Empty);
+                    PadData = new ItemCollectionPad.ItemCollectionPad(pair.Value.FromNonCritical(), string.Empty);
                     break;
 
                 case "lastusedid":

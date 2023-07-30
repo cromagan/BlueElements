@@ -209,7 +209,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         Höhe.Text = Math.Round(h, 1).ToString(CultureInfo.InvariantCulture);
     }
 
-    private void Format_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void Format_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (_doing) { return; }
         _doing = true;
         if (Format.Text.Contains(";")) {

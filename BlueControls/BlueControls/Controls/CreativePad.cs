@@ -34,8 +34,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionPad.Abstract;
 using static BlueBasics.Geometry;
 using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 
@@ -50,7 +49,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     private readonly List<IMoveable> _itemsToMove = new();
     private string _currentPage = string.Empty;
     private IMouseAndKeyHandle? _givesMouseComandsTo;
-    private ItemCollectionPad? _item;
+    private ItemCollectionPad.ItemCollectionPad? _item;
     private BasicPadItem? _lastClickedItem;
     private string _lastQuickInfo = string.Empty;
     private bool _repairPrinterDataPrepaired;
@@ -60,7 +59,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     #region Constructors
 
-    public CreativePad(ItemCollectionPad itemCollectionPad) : base() {
+    public CreativePad(ItemCollectionPad.ItemCollectionPad itemCollectionPad) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
@@ -69,7 +68,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         MouseHighlight = false;
     }
 
-    public CreativePad() : this(new ItemCollectionPad()) { }
+    public CreativePad() : this(new ItemCollectionPad.ItemCollectionPad()) { }
 
     #endregion
 
@@ -127,7 +126,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ItemCollectionPad? Item {
+    public ItemCollectionPad.ItemCollectionPad? Item {
         get => _item;
         set {
             if (_item == value) { return; }
@@ -237,7 +236,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         }
         var multi = 1f;
         if (_item.SnapMode == SnapMode.SnapToGrid) {
-            multi = Converter.MmToPixel(_item.GridSnap, ItemCollectionPad.Dpi);
+            multi = Converter.MmToPixel(_item.GridSnap, ItemCollectionPad.ItemCollectionPad.Dpi);
         }
         if (multi < 1) { multi = 1f; }
         switch (e.KeyCode) {
@@ -270,7 +269,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         }
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? selectedHotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? selectedHotItem, ref bool cancel, ref bool translate) {
         CheckHotItem(e, true);
         selectedHotItem = HotItem;
         if (selectedHotItem != null) {
@@ -676,7 +675,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         if (_item == null || _item.SnapMode != SnapMode.SnapToGrid || Math.Abs(_item.GridSnap) < 0.001) { return mouseMovedTo; }
         if (movedPoint is null) { return 0f; }
 
-        var multi = Converter.MmToPixel(_item.GridSnap, ItemCollectionPad.Dpi);
+        var multi = Converter.MmToPixel(_item.GridSnap, ItemCollectionPad.ItemCollectionPad.Dpi);
         float value;
         if (doX) {
             value = movedPoint.X + mouseMovedTo;

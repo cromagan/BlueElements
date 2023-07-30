@@ -493,7 +493,7 @@ namespace BlueControls.Forms
             this.lstExported.Text = "Exported";
             this.lstExported.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.lstExported_ContextMenuInit);
             this.lstExported.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.lstExported_ContextMenuItemClicked);
-            this.lstExported.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.Exported_ItemClicked);
+            this.lstExported.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.Exported_ItemClicked);
             // 
             // ExportDialog
             // 

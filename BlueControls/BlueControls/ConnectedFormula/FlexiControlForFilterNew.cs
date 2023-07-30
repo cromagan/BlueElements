@@ -25,7 +25,6 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 
 namespace BlueControls.Controls;
@@ -98,7 +97,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
         base.OnControlAdded(e);
 
         if (e.Control is ComboBox cbx) {
-            ItemCollectionList item2 = new(true)
+            ItemCollectionList.ItemCollectionList item2 = new(true)
             {
                 { "Keine weiteren Einträge vorhanden", "|~" }
             };

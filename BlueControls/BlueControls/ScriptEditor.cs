@@ -26,7 +26,6 @@ using BlueBasics.Interfaces;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.EventArgs;
@@ -86,7 +85,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, BlueControls.ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
             _ = items.Add("Variableninhalt kopieren");
         }

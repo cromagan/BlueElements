@@ -20,7 +20,6 @@
 using System.Collections.Generic;
 using BlueBasics;
 using BlueControls.Enums;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 
 namespace BlueControls.Forms;
@@ -35,9 +34,9 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList(true), AddType.None, true) { }
+    private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList.ItemCollectionList(true), AddType.None, true) { }
 
-    private InputBoxListBoxStyle(string txt, ItemCollectionList itemsOriginal, AddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
+    private InputBoxListBoxStyle(string txt, ItemCollectionList.ItemCollectionList itemsOriginal, AddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
         InitializeComponent();
         if (itemsOriginal.Appearance != BlueListBoxAppearance.Listbox) {
             Develop.DebugPrint("Design nicht Listbox");
@@ -61,7 +60,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         if (items == null || items.Count == 0) {
             return InputBox.Show(txt, string.Empty, FormatHolder.Text);
         }
-        ItemCollectionList x = new(BlueListBoxAppearance.Listbox, true) {
+        ItemCollectionList.ItemCollectionList x = new(BlueListBoxAppearance.Listbox, true) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
         };
         x.AddRange(items);
@@ -70,7 +69,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         return erg is null || erg.Count != 1 ? string.Empty : erg[0];
     }
 
-    public static List<string>? Show(string txt, ItemCollectionList? items, AddType addNewAllowed, bool cancelErl) {
+    public static List<string>? Show(string txt, ItemCollectionList.ItemCollectionList? items, AddType addNewAllowed, bool cancelErl) {
         InputBoxListBoxStyle mb = new(txt, items, addNewAllowed, cancelErl);
         _ = mb.ShowDialog();
         return mb._giveBack;

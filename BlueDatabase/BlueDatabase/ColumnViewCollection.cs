@@ -102,7 +102,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     /// <param name="ca"></param>
     public static void Hide(string columnName, ColumnViewCollection ca) {
         foreach (var thisViewItem in ca) {
-            if (thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.Name, columnName, StringComparison.OrdinalIgnoreCase))) {
+            if (thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.KeyName, columnName, StringComparison.OrdinalIgnoreCase))) {
                 ca.Remove(thisViewItem);
                 Hide(columnName, ca);
                 return;
@@ -288,7 +288,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     public void Reduce(string[] columns) {
         foreach (var thiscv in _internal) {
             if (thiscv?.Column is ColumnItem ci) {
-                thiscv.TmpReduced = columns.Contains(ci.Name);
+                thiscv.TmpReduced = columns.Contains(ci.KeyName);
             }
         }
     }

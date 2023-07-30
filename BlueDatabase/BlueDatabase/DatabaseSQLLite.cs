@@ -261,7 +261,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     /// <param name="sql"></param>
 
     internal void GetColumnAttributesColumn(ColumnItem column, SqlBackAbstract sql) {
-        var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), column.Name);
+        var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), column.KeyName);
 
         if (l == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
@@ -286,7 +286,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 
         if (!isLoading) {
-            _ = _sql?.SetValueInternal(TableName, type, value, column?.Name, row?.KeyName);
+            _ = _sql?.SetValueInternal(TableName, type, value, column?.KeyName, row?.KeyName);
         }
 
         return base.SetValueInternal(type, value, column, row, isLoading);
@@ -299,7 +299,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (type.IsObsolete()) { return; }
         if (ReadOnly) { return; } // Sicherheitshalber!
 
-        var columnName = column?.Name ?? string.Empty;
+        var columnName = column?.KeyName ?? string.Empty;
         var rowkey = row?.KeyName ?? string.Empty;
 
         var err = _sql?.AddUndo(TableName, type, columnName, rowkey, previousValue, changedTo, comment);
@@ -375,7 +375,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             var rk = new List<string>();
 
             foreach (var thisWork in data) {
-                if (TableName == thisWork.TableName && thisWork.DateTimeUTC > IsInCache) {
+                if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
                     if (Undo.Count > 0) { Undo.Add(thisWork); }
 
                     //_ = Enum.TryParse(thisWork.Comand, out DatabaseDataType t);
@@ -448,7 +448,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                         if (r != null && c != null) {
                             // Kann sein, dass der Bentzer hier ja schon eine Zeile oder so geklscht hat
                             // hier geklscht, aber anderer PC mat bei der noch vorhanden Zeile eine Änderung
-                            if (thisWork.DateTimeUTC > r.IsInCache || thisWork.DateTimeUTC > c.IsInCache) {
+                            if (thisWork.DateTimeUtc > r.IsInCache || thisWork.DateTimeUtc > c.IsInCache) {
                                 _ = rk.AddIfNotExists(r.KeyName);
                                 c.Invalidate_ContentWidth();
                             }
@@ -469,7 +469,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                         var c = Column.Exists(thisWork.ColName);
                         if (c != null && !c.IsDisposed) {
-                            var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, c.Name);
+                            var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, c.KeyName);
                             if (v != null) { _ = SetValueInternal(thisWork.Comand, v, c, null, true); }
                         }
 
@@ -516,7 +516,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                 var columnsToDelete = new List<ColumnItem>();
                 foreach (var thiscol in Column) {
-                    if (!columnsToLoad.Contains(thiscol.Name.ToUpper())) {
+                    if (!columnsToLoad.Contains(thiscol.KeyName.ToUpper())) {
                         columnsToDelete.Add(thiscol);
                     }
                 }

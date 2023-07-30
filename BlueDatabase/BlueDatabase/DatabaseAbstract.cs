@@ -927,7 +927,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             vars.Add(new VariableDatabase("Database", this, true, true, "Die Datenbank, die zu dem Skript gehört"));
             vars.Add(new VariableString("Tablename", TableName, true, false, "Der aktuelle Tabellenname."));
             vars.Add(new VariableFloat("Rows", Row.Count, true, false, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
-            vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.Name ?? string.Empty, true, false, "Der Name der ersten Spalte"));
+            vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, false, "Der Name der ersten Spalte"));
             vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
 
             vars.Add(new VariableListString("Attributes", attributes, true, true, "Enthält - falls übergeben worden - die Attribute aus dem Skript, das dieses hier aufruft."));
@@ -1064,7 +1064,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             case FirstRow.ColumnInternalName:
                 for (var colNr = 0; colNr < columnList.Count; colNr++) {
                     if (columnList[colNr] != null) {
-                        _ = sb.Append(columnList[colNr].Name);
+                        _ = sb.Append(columnList[colNr].KeyName);
                         if (colNr < columnList.Count - 1) { _ = sb.Append(';'); }
                     }
                 }
@@ -1291,7 +1291,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             while (columns.Count < zeil[0].GetUpperBound(0) + 1) {
                 var newc = Column.GenerateAndAdd();
                 if (newc != null) {
-                    newc.Caption = newc.Name;
+                    newc.Caption = newc.KeyName;
                     newc.Format = DataFormat.Text;
                     newc.MultiLine = true;
                 }
@@ -1687,7 +1687,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 case DatabaseDataType.Comand_RemoveColumn:
                     var c = Column.Exists(value);
                     if (c == null) { return string.Empty; }
-                    return Column.SetValueInternal(type, isLoading, c.Name);
+                    return Column.SetValueInternal(type, isLoading, c.KeyName);
 
                 case DatabaseDataType.Comand_AddColumnByName:
                     var f2 = Column.SetValueInternal(type, isLoading, value);

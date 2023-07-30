@@ -115,7 +115,7 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
 
         foreach (var thisColumn in Columns) {
             if (thisColumn != null) {
-                result = result + ", ColumnName=" + thisColumn.Name;
+                result = result + ", ColumnName=" + thisColumn.KeyName;
             }
         }
 

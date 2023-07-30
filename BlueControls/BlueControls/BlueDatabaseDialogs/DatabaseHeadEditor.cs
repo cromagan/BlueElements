@@ -26,12 +26,11 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -85,12 +84,18 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
+
+        if (Database == null || Database.IsDisposed) { return; }
+
         PermissionGroups_NewRow.Item.Clear();
-        PermissionGroups_NewRow.Item.AddRange(Database?.PermissionGroupsNewRow);
+        PermissionGroups_NewRow.Item.AddRange(Database.PermissionGroupsNewRow);
+
         DatenbankAdmin.Item.Clear();
         DatenbankAdmin.Item.AddRange(Database.DatenbankAdmin);
+
         txbKennwort.Text = Database.GlobalShowPass;
         lbxSortierSpalten.Item.Clear();
+
         if (Database.SortDefinition != null) {
             btnSortRichtung.Checked = Database.SortDefinition.Reverse;
             if (Database.SortDefinition?.Columns != null) {
@@ -143,7 +148,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             r.CellSet("RowFirst", "[gelöscht]");
         }
         r.CellSet("Aenderer", work.User);
-        r.CellSet("AenderZeit", work.DateTimeUTC);
+        r.CellSet("AenderZeit", work.DateTimeUtc);
         r.CellSet("Kommentar", work.Comment);
 
         var symb = ImageCode.Fragezeichen;
@@ -275,11 +280,11 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         if (Database is DatabaseAbstract db) {
             if (db.Undo.Count == 0) {
-                FormWithStatusBar.UpdateStatusBar(FehlerArt.Info, "Lade Undo-Speicher", true);
+                UpdateStatusBar(FehlerArt.Info, "Lade Undo-Speicher", true);
 
                 db.GetUndoCache();
             }
-            FormWithStatusBar.UpdateStatusBar(FehlerArt.Info, "Erstelle Tabellen Ansicht des Undo-Speichers", true);
+            UpdateStatusBar(FehlerArt.Info, "Erstelle Tabellen Ansicht des Undo-Speichers", true);
 
             foreach (var thisUndo in db.Undo) {
                 AddUndoToTable(thisUndo);
@@ -326,11 +331,11 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         switch (e.ClickedComand) {
             case "SpaltenSortierungAZ":
-                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.Name, false);
+                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.KeyName, false);
                 break;
 
             case "SpaltenSortierungZA":
-                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.Name, true);
+                tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.KeyName, true);
                 break;
         }
     }
@@ -360,7 +365,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         #region Sortierung
 
-        var colnam = lbxSortierSpalten.Item.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item).Name).ToList();
+        var colnam = lbxSortierSpalten.Item.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item).KeyName).ToList();
         Database.SortDefinition = new RowSortDefinition(Database, colnam, btnSortRichtung.Checked);
 
         #endregion

@@ -125,7 +125,7 @@ public class GenericControl : Control {
                     return null;
 
                 default:
-                    o = o?.Parent; //Manchmal ist o null. MultiThreading?
+                    o = o.Parent; //Manchmal ist o null. MultiThreading?
                     break;
             }
         } while (true);
@@ -471,7 +471,7 @@ public class GenericControl : Control {
                     if (_bitmapOfControl != null) {
                         gr.DrawImage(_bitmapOfControl, 0, 0);
                     }
-                    tmpgr?.Dispose();
+                    tmpgr.Dispose();
                 } else {
                     DrawControl(gr, IsStatus());
                 }

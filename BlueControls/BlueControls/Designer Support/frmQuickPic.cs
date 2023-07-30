@@ -106,13 +106,13 @@ internal sealed class QuickPic : Panel {
 
     public void GeneratePreview() {
         try {
-            Preview.Image = QuickImage.Get(ICode());
+            Preview.Image = QuickImage.Get(ImgCode());
         } catch {
             Preview.Image = null;
         }
     }
 
-    public string ICode() {
+    public string ImgCode() {
         var e = (ImageCodeEffect)(((chkbGrauStufen.Checked ? -1 : 0) * -(int)ImageCodeEffect.Graustufen) | ((chkbDurchgestrichen.Checked ? -1 : 0) * -(int)ImageCodeEffect.Durchgestrichen) | ((chkbMEDisabled.Checked ? -1 : 0) * -(int)ImageCodeEffect.WindowsMEDisabled) | ((chkbXPDisabled.Checked ? -1 : 0) * -(int)ImageCodeEffect.WindowsXPDisabled));
         return QuickImage.GenerateCode(PicName.Text, IntParse(GrX.Text), IntParse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
     }

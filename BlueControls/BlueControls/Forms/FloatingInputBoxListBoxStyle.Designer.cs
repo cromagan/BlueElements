@@ -48,7 +48,7 @@ namespace BlueControls.Forms
             this.lstbx.TabIndex = 0;
             this.lstbx.TabStop = false;
             this.lstbx.Text = "lstbx";
-            this.lstbx.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.ListBox1_ItemClicked);
+            this.lstbx.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.ListBox1_ItemClicked);
             // 
             // timer1
             // 

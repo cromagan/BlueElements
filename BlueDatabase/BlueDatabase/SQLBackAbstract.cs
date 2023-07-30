@@ -92,7 +92,7 @@ public abstract class SqlBackAbstract {
             if (t.StartsWith("BAK_")) { return false; }
         }
 
-        if (!t.ContainsOnlyChars(Constants.Char_AZ + Constants.Char_Numerals + "_")) { return false; }
+        if (!t.ContainsOnlyChars(Char_AZ + Char_Numerals + "_")) { return false; }
 
         if (tablename == "ALL_TAB_COLS") { return false; } // system-name
 
@@ -103,7 +103,7 @@ public abstract class SqlBackAbstract {
     }
 
     public static string MakeValidTableName(string tablename) {
-        var tmp = tablename.RemoveChars(Constants.Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
+        var tmp = tablename.RemoveChars(Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
         tmp = tmp.FileNameWithoutSuffix().ToLower().Replace(" ", "_").Replace("-", "_");
         tmp = tmp.StarkeVereinfachung("_").ToUpper();
 
@@ -163,10 +163,10 @@ public abstract class SqlBackAbstract {
 
         if (!Directory.Exists(pathadditionalcsv)) { return "Backup-Verzeichniss existiert nicht."; }
 
-        var d = DateTime.UtcNow.ToString(Constants.Format_Date10);
+        var d = DateTime.UtcNow.ToString(Format_Date10);
 
         var file = pathadditionalcsv.CheckPath() + "SYS_STYLE_" + d + ".csv";
-        if (IO.FileExists(file)) { return string.Empty; }
+        if (FileExists(file)) { return string.Empty; }
 
         var dt = Fill_Table("SELECT * FROM " + SysStyle);
         if (!dt.WriteToCsvFile(file)) { return "Schreibzugriff fehlgeschlagen."; }
@@ -375,7 +375,7 @@ public abstract class SqlBackAbstract {
                 if (count > 0) { com.Append(", "); }
 
                 count++;
-                com.Append(thiscolumn.Name.ToUpper());
+                com.Append(thiscolumn.KeyName.ToUpper());
             }
         }
 
@@ -598,7 +598,7 @@ public abstract class SqlBackAbstract {
             c++;
             var tmp = utf8.CutToUtf8Length(maxPartStringLenght);
 
-            var cmdString = "INSERT INTO " + SysStyle + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + Dbval(tablename.ToUpper()) + ", " + Dbval(ty) + ", " + Dbval(columnName.ToUpper()) + ", " + Dbval(tmp) + ", " + Dbval(c.ToString(Constants.Format_Integer3)) + "); ";
+            var cmdString = "INSERT INTO " + SysStyle + " (TABLENAME, TYPE, COLUMNNAME, VALUE, PART)  VALUES (" + Dbval(tablename.ToUpper()) + ", " + Dbval(ty) + ", " + Dbval(columnName.ToUpper()) + ", " + Dbval(tmp) + ", " + Dbval(c.ToString(Format_Integer3)) + "); ";
 
             com += cmdString;
 
@@ -741,7 +741,7 @@ public abstract class SqlBackAbstract {
     //    if (allcols.Count > 0) {
     //        Develop.DebugPrint(FehlerArt.Fehler, "Zusätzliche Spalten dem Server vorhanden: " + allcols.JoinWith(", "));
     //    }
-    internal static string MakeValidColumnName(string columnname) => columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
+    internal static string MakeValidColumnName(string columnname) => columnname.ToUpper().Replace(" ", "_").ReduceToChars(AllowedCharsVariableName);
 
     /// <summary>
     ///
@@ -846,8 +846,8 @@ public abstract class SqlBackAbstract {
         var com = "SELECT RK, ";
 
         foreach (var thiscolumn in columnsToLoad) {
-            com = com + thiscolumn.Name.ToUpper() + ", ";
-            wh = wh + thiscolumn.Name.ToUpper() + " IS NOT NULL OR ";
+            com = com + thiscolumn.KeyName.ToUpper() + ", ";
+            wh = wh + thiscolumn.KeyName.ToUpper() + " IS NOT NULL OR ";
         }
         com = com.TrimEnd(", ");
         com = com + " FROM " + tablename.ToUpper();
@@ -899,7 +899,7 @@ public abstract class SqlBackAbstract {
 
         var l = new List<string>();
 
-        var d = compareDate.ToString(Constants.Format_Date10);
+        var d = compareDate.ToString(Format_Date10);
 
         foreach (var thist in tbl) {
             l.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -961,7 +961,7 @@ public abstract class SqlBackAbstract {
 
             #region Kopie des aktuellen Standes erstellen
 
-            var d = DateTime.UtcNow.ToString(Constants.Format_Date10);
+            var d = DateTime.UtcNow.ToString(Format_Date10);
 
             foreach (var thist in tbl) {
                 var ntc = "BAK_" + thist.ToUpper() + "_" + d;
@@ -1047,8 +1047,8 @@ public abstract class SqlBackAbstract {
 
     private string Dbval(DateTime date) =>
         "to_timestamp(" +
-        Dbval(date.ToString(Constants.Format_Date9)) + ", " +
-        Dbval(Constants.Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
+        Dbval(date.ToString(Format_Date9)) + ", " +
+        Dbval(Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
         ")";
 
     private string Dbval(string? original) {

@@ -24,7 +24,7 @@ using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using ComboBox = BlueControls.Controls.ComboBox;
@@ -53,7 +53,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
         _showformat = showFormat;
 
         if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First() is ColumnItem fc) {
-            _showformat = "~" + fc.Name + "~";
+            _showformat = "~" + fc.KeyName + "~";
         }
     }
 
@@ -143,7 +143,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
         if (cb == null) { return; }
 
-        List<BasicListItem> ex = new();
+        List<AbstractListItem> ex = new();
         ex.AddRange(cb.Item);
 
         #region Zeilen erzeugen

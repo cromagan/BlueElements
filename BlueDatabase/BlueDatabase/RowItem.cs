@@ -162,37 +162,37 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         switch (column.ScriptType) {
             case ScriptType.Bool:
-                vars.Add(new VariableBool(column.Name, wert == "+", ro, false, qi));
+                vars.Add(new VariableBool(column.KeyName, wert == "+", ro, false, qi));
                 break;
 
             case ScriptType.List:
-                vars.Add(new VariableListString(column.Name, wert.SplitAndCutByCrToList(), ro, false, qi));
+                vars.Add(new VariableListString(column.KeyName, wert.SplitAndCutByCrToList(), ro, false, qi));
                 break;
 
             case ScriptType.Numeral:
                 _ = FloatTryParse(wert, out var f);
-                vars.Add(new VariableFloat(column.Name, f, ro, false, qi));
+                vars.Add(new VariableFloat(column.KeyName, f, ro, false, qi));
                 break;
 
             case ScriptType.String:
-                vars.Add(new VariableString(column.Name, wert, ro, false, qi));
+                vars.Add(new VariableString(column.KeyName, wert, ro, false, qi));
                 break;
 
             case ScriptType.DateTime:
                 qi += "\r\nFalls die Zelle keinen gültiges Datum enthält, wird 01.01.0001 als Datum verwendet.";
                 if (DateTimeTryParse(wert, out var d)) {
-                    vars.Add(new VariableDateTime(column.Name, d, ro, false, qi));
+                    vars.Add(new VariableDateTime(column.KeyName, d, ro, false, qi));
                 } else {
-                    vars.Add(new VariableDateTime(column.Name, new DateTime(1, 1, 1), ro, false, qi));
+                    vars.Add(new VariableDateTime(column.KeyName, new DateTime(1, 1, 1), ro, false, qi));
                 }
                 break;
 
             case ScriptType.String_Readonly:
-                vars.Add(new VariableString(column.Name, wert, true, false, qi));
+                vars.Add(new VariableString(column.KeyName, wert, true, false, qi));
                 break;
 
             case ScriptType.Bool_Readonly:
-                vars.Add(new VariableBool(column.Name, wert == "+", true, false, qi));
+                vars.Add(new VariableBool(column.KeyName, wert == "+", true, false, qi));
                 break;
 
             default:
@@ -228,60 +228,60 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public double CellGetDouble(string columnName) => Database?.Cell.GetDouble(Database?.Column[columnName], this) ?? default;
 
-    public double CellGetDouble(ColumnItem? column) => Database?.Cell.GetDouble(column, this) ?? default;
+    public double CellGetDouble(ColumnItem column) => Database?.Cell.GetDouble(column, this) ?? default;
 
     public int CellGetInteger(string columnName) => Database?.Cell.GetInteger(Database?.Column[columnName], this) ?? default;
 
-    public int CellGetInteger(ColumnItem? column) => Database?.Cell.GetInteger(column, this) ?? default;
+    public int CellGetInteger(ColumnItem column) => Database?.Cell.GetInteger(column, this) ?? default;
 
     public List<string> CellGetList(string columnName) => Database?.Cell.GetList(Database?.Column[columnName], this) ?? new List<string>();
 
-    public List<string> CellGetList(ColumnItem? column) => Database?.Cell.GetList(column, this) ?? new List<string>();
+    public List<string> CellGetList(ColumnItem column) => Database?.Cell.GetList(column, this) ?? new List<string>();
 
     public Point CellGetPoint(string columnName) => Database?.Cell.GetPoint(Database?.Column[columnName], this) ?? Point.Empty;
 
-    public Point CellGetPoint(ColumnItem? column) => Database?.Cell.GetPoint(column, this) ?? Point.Empty;
+    public Point CellGetPoint(ColumnItem column) => Database?.Cell.GetPoint(column, this) ?? Point.Empty;
 
     public string CellGetString(string columnName) => Database?.Cell.GetString(Database?.Column[columnName], this) ?? string.Empty;
 
-    public string CellGetString(ColumnItem? column) {
-        if (Database == null || Database.IsDisposed || column == null) { return string.Empty; }
+    public string CellGetString(ColumnItem column) {
+        if (Database == null || Database.IsDisposed || column.IsDisposed) { return string.Empty; }
         return Database.Cell.GetString(column, this);
     }
 
-    public List<string> CellGetValuesReadable(ColumnItem? column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? new List<string>();
+    public List<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? new List<string>();
 
     public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database?.Column.Exists(columnName), this) ?? default;
 
-    public bool CellIsNullOrEmpty(ColumnItem? column) => Database?.Cell.IsNullOrEmpty(column, this) ?? default;
+    public bool CellIsNullOrEmpty(ColumnItem column) => Database?.Cell.IsNullOrEmpty(column, this) ?? default;
 
     public void CellSet(string columnName, bool value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, bool value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, bool value) => Database?.Cell.Set(column, this, value);
 
     public void CellSet(string columnName, string value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, string value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, string value) => Database?.Cell.Set(column, this, value);
 
     public void CellSet(string columnName, double value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, double value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, double value) => Database?.Cell.Set(column, this, value);
 
     public void CellSet(string columnName, int value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, int value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, int value) => Database?.Cell.Set(column, this, value);
 
     public void CellSet(string columnName, Point value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, Point value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, Point value) => Database?.Cell.Set(column, this, value);
 
     public void CellSet(string columnName, List<string>? value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, List<string>? value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, List<string>? value) => Database?.Cell.Set(column, this, value);
 
     public void CellSet(string columnName, DateTime value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
 
-    public void CellSet(ColumnItem? column, DateTime value) => Database?.Cell.Set(column, this, value);
+    public void CellSet(ColumnItem column, DateTime value) => Database?.Cell.Set(column, this, value);
 
     public void CheckRowDataIfNeeded() {
         if (Database is null || Database.IsDisposed) {
@@ -333,7 +333,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (nameAndKeyToo) { KeyName = source.KeyName; }
 
         foreach (var thisColumn in Database.Column) {
-            var value = sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.Name], source);
+            var value = sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source);
 
             _ = Database.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, string.Empty);
 
@@ -464,7 +464,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             if (!erg.Contains("~")) { return erg; }
 
             if (thisColumnItem != null) {
-                if (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper())) {
+                if (erg.ToUpper().Contains("~" + thisColumnItem.KeyName.ToUpper())) {
                     var replacewith = CellGetString(thisColumnItem);
                     if (replacedvalue) { replacewith = CellItem.ValueReadable(thisColumnItem, replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks); }
                     if (removeLineBreaks && !replacedvalue) {
@@ -472,7 +472,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                         replacewith = replacewith.Replace("\r", " ");
                     }
 
-                    erg = erg.Replace("~" + thisColumnItem.Name.ToUpper() + "~", replacewith, RegexOptions.IgnoreCase);
+                    erg = erg.Replace("~" + thisColumnItem.KeyName.ToUpper() + "~", replacewith, RegexOptions.IgnoreCase);
                     //while (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper() + "(")) {
                     //    var x = erg.IndexOf("~" + thisColumnItem.Name.ToUpper() + "(", StringComparison.OrdinalIgnoreCase);
                     //    var x2 = erg.IndexOf(")", x, StringComparison.Ordinal);
@@ -496,7 +496,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database == null || column == null) { return; }
 
-        var columnVar = vars.Get(column.Name);
+        var columnVar = vars.Get(column.KeyName);
         if (columnVar == null || columnVar.ReadOnly) { return; }
         if (!column.SaveContent || !column.Format.CanBeChangedByRules()) { return; }
 

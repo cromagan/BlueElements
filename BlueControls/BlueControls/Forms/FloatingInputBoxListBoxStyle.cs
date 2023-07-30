@@ -25,7 +25,6 @@ using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 
 namespace BlueControls.Forms;
 
@@ -44,7 +43,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
 
-    private FloatingInputBoxListBoxStyle(ItemCollectionList items, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
+    private FloatingInputBoxListBoxStyle(BlueControls.ItemCollectionList.ItemCollectionList items, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
         InitializeComponent();
         Tag = hotitem;
         // Design = Items.ControlDesign;
@@ -76,8 +75,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         Close(BlueListBoxAppearance.KontextMenu);
         Close(control);
 
-        ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu, false);
-        ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
+        ItemCollectionList.ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu, false);
+        ItemCollectionList.ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
 
         var cancel = false;
         var translate = true;
@@ -114,14 +113,14 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         }
     }
 
-    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList items, object tag, Control? connectedControl, bool translate) =>
+    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList.ItemCollectionList items, object tag, Control? connectedControl, bool translate) =>
         new(items, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag,
             connectedControl, translate);
 
-    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
+    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList.ItemCollectionList items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
         new(items, xpos, ypos, steuerWi, tag, connectedControl, translate);
 
-    public void Generate_ListBox1(ItemCollectionList items, int minWidth, AddType addNewAllowed, bool translate) {
+    public void Generate_ListBox1(ItemCollectionList.ItemCollectionList items, int minWidth, AddType addNewAllowed, bool translate) {
         var (biggestItemX, _, heightAdded, _) = items.ItemData();
         if (addNewAllowed != AddType.None) { heightAdded += 24; }
         lstbx.Appearance = (BlueListBoxAppearance)items.ControlDesign;
@@ -163,7 +162,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (e.HotItem == null) { return; }
 
         var infos = (List<object>)e.HotItem;
-        var userMmenu = (ItemCollectionList)infos[0];
+        var userMmenu = (ItemCollectionList.ItemCollectionList)infos[0];
         var hotItem = infos[1];
         //var tags = (List<string>)infos[2];
         var ob = (IContextMenu)infos[2];
@@ -191,7 +190,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         }
     }
 
-    private void ListBox1_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void ListBox1_ItemClicked(object sender, AbstractListItemEventArgs e) {
         // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
         // Nur Listboxen können überhaupt erst Checked werden!
         // Ob sie Checked wird, ist egal!

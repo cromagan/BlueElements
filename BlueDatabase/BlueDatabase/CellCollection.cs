@@ -109,21 +109,34 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <returns></returns>
     public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode) {
         if (mode == EditableErrorReasonType.OnlyRead) {
-            if (column == null || row == null) { return string.Empty; }
+            if (column == null || row == null) {
+                return string.Empty;
+            }
         }
 
-        if (column?.Database == null) { return "Es ist keine Spalte ausgewählt."; }
-        if (row != null && row.IsDisposed) { return "Die Zeile wurde verworfen."; }
+        if (column?.Database == null) {
+            return "Es ist keine Spalte ausgewählt.";
+        }
+
+        if (row != null && row.IsDisposed) {
+            return "Die Zeile wurde verworfen.";
+        }
 
         var f = column.EditableErrorReason(mode, checkEditmode);
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (!string.IsNullOrEmpty(f)) {
+            return f;
+        }
 
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, true, mode is EditableErrorReasonType.EditAcut or EditableErrorReasonType.EditGeneral);
 
-            if (!string.IsNullOrEmpty(info) && !canrepair) { return info; }
+            if (!string.IsNullOrEmpty(info) && !canrepair) {
+                return info;
+            }
 
-            if (lcolumn?.Database == null || lcolumn.Database.IsDisposed) { return "Verknüpfte Datenbank verworfen."; }
+            if (lcolumn?.Database == null || lcolumn.Database.IsDisposed) {
+                return "Verknüpfte Datenbank verworfen.";
+            }
 
             lcolumn.Database.PowerEdit = column.Database.PowerEdit;
 
@@ -142,14 +155,18 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (row == null) {
-            if (!column.IsFirst()) { return "Neue Zeilen müssen mit der ersten Spalte beginnen."; }
+            if (!column.IsFirst()) {
+                return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
+            }
 
             if (checkUserRights && !column.Database.PermissionCheck(column.Database.PermissionGroupsNewRow, null)) {
                 return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
             }
         } else {
             //if (row.IsDisposed) { return "Die Zeile wurde verworfen."; }
-            if (row.Database != column.Database) { return "Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft."; }
+            if (row.Database != column.Database) {
+                return "Interner Fehler: Bezug der Datenbank zur Zeile ist fehlerhaft.";
+            }
 
             if (column.Database.Column.SysLocked != null) {
                 if (column.Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds < 0) {
@@ -161,15 +178,22 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
 
-        if (checkUserRights && !column.Database.PermissionCheck(column.PermissionGroupsChangeCell, row)) { return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern."; }
+        if (checkUserRights && !column.Database.PermissionCheck(column.PermissionGroupsChangeCell, row)) {
+            return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
+        }
 
         return string.Empty;
     }
 
     public static (List<FilterItem>? filter, string info) GetFilterFromLinkedCellData(DatabaseAbstract? linkedDatabase, ColumnItem column, RowItem? row) {
         //if (row == null || row.IsDisposed) { return (null, "Zeile verworfen."); }
-        if (linkedDatabase == null || linkedDatabase.IsDisposed) { return (null, "Verlinkte Datenbank verworfen."); }
-        if (column.Database == null || column.IsDisposed || column.Database.IsDisposed) { return (null, "Datenbank verworfen."); }
+        if (linkedDatabase == null || linkedDatabase.IsDisposed) {
+            return (null, "Verlinkte Datenbank verworfen.");
+        }
+
+        if (column.Database == null || column.IsDisposed || column.Database.IsDisposed) {
+            return (null, "Datenbank verworfen.");
+        }
 
         //if (column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Falsches Spaltenformat."); }
         //Develop.CheckStackForOverflow();
@@ -177,16 +201,24 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var fi = new List<FilterItem>();
 
         foreach (var thisFi in column.LinkedCellFilter) {
-            if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
+            if (!thisFi.Contains("|")) {
+                return (null, "Veraltetes Filterformat");
+            }
 
             var x = thisFi.SplitBy("|");
             var c = linkedDatabase?.Column.Exists(x[0]);
-            if (c == null) { return (fi, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
+            if (c == null) {
+                return (fi, "Eine Spalte, nach der gefiltert werden soll, existiert nicht.");
+            }
 
-            if (x[1] != "=") { return (fi, "Nur 'Gleich'-Fiter wird unterstützt."); }
+            if (x[1] != "=") {
+                return (fi, "Nur 'Gleich'-Fiter wird unterstützt.");
+            }
 
             var value = x[2].FromNonCritical();
-            if (string.IsNullOrEmpty(value)) { return (fi, "Leere Suchwerte werden nicht unterstützt."); }
+            if (string.IsNullOrEmpty(value)) {
+                return (fi, "Leere Suchwerte werden nicht unterstützt.");
+            }
 
             if (row != null && !row.IsDisposed) {
                 // Es kann auch sein, dass nur mit Texten anstelle von Variablen gearbeitet wird,
@@ -209,21 +241,23 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         //    }
         //}
 
-        if (fi.Count == 0 && column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
+        if (fi.Count == 0 && column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
+            return (null, "Keine gültigen Suchkriterien definiert.");
+        }
 
         return (fi, string.Empty);
     }
 
-    public static string KeyOfCell(string colname, string? rowKey) => colname.ToUpper() + "|" + rowKey;
+    public static string KeyOfCell(string colname, string rowKey) => colname.ToUpper() + "|" + rowKey;
 
     public static string KeyOfCell(ColumnItem? column, RowItem? row) {
         // Alte verweise eleminieren.
-        column = column?.Database?.Column.Exists(column.Name);
+        column = column?.Database?.Column.Exists(column.KeyName);
         row = row?.Database?.Row.SearchByKey(row.KeyName);
 
-        if (column != null && row != null) { return KeyOfCell(column.Name, row.KeyName); }
+        if (column != null && row != null) { return KeyOfCell(column.KeyName, row.KeyName); }
         if (column == null && row != null) { return KeyOfCell(string.Empty, row.KeyName); }
-        if (column != null && row == null) { return KeyOfCell(column.Name, string.Empty); }
+        if (column != null && row == null) { return KeyOfCell(column.KeyName, string.Empty); }
 
         return string.Empty;
     }
@@ -300,7 +334,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     public void Delete(ColumnItem? column, string? rowKey) {
         if (column == null || rowKey == null) { return; }
 
-        var cellKey = KeyOfCell(column.Name, rowKey);
+        var cellKey = KeyOfCell(column.KeyName, rowKey);
         if (!ContainsKey(cellKey)) { return; }
 
         if (!TryRemove(cellKey, out _)) {
@@ -502,7 +536,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, false, false);
             return lcolumn == null || lrow == null || lrow.CellIsNullOrEmpty(lcolumn);
         }
-        var cellKey = KeyOfCell(column.Name, row.KeyName);
+        var cellKey = KeyOfCell(column.KeyName, row.KeyName);
         return !ContainsKey(cellKey) || string.IsNullOrEmpty(this[cellKey].Value);
     }
 
@@ -1223,7 +1257,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (column?.Database == null || column.Database.IsDisposed) { return null; }
 
         return column.Database.TableName + "|" +
-                    column.Name + "|" +
+                    column.KeyName + "|" +
                     text;
         //  row.CellGetString(column);
     }

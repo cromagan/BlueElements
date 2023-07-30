@@ -49,23 +49,17 @@ public abstract class Method_Database : Method {
 
         var db = MyDatabase(variables)?.ConnectionDataOfOtherTable(tableName, false);
         return DatabaseAbstract.GetById(db, null);
-
-        return null;
     }
 
     protected DatabaseAbstract? MyDatabase(VariableCollection variables) {
-        if (variables != null) {
-            var f = variables.GetSystem("Database");
-            if (f is VariableDatabase db) { return db.Database; }
-        }
+        var f = variables.GetSystem("Database");
+        if (f is VariableDatabase db) { return db.Database; }
         return null;
     }
 
     protected RowItem? MyRow(VariableCollection variables) {
-        if (variables != null) {
-            var f = variables.GetSystem("RowKey");
-            if (f is VariableRowItem db) { return db.RowItem; }
-        }
+        var f = variables.GetSystem("RowKey");
+        if (f is VariableRowItem db) { return db.RowItem; }
         return null;
     }
 

@@ -31,7 +31,7 @@ using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using static BlueBasics.IO;
 using static BlueBasics.Extensions;
 using Orientation = BlueBasics.Enums.Orientation;

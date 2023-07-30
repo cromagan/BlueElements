@@ -335,8 +335,8 @@ internal sealed partial class ColumnEditor {
             btnStandard.Enabled = true;
             capInfo.Text = "<Imagecode=" + _column.SymbolForReadableText() + "> System Spalte";
         }
-        txbName.Text = _column.Name;
-        txbName.Enabled = !_column.Name.StartsWith("SYS_");
+        txbName.Text = _column.KeyName;
+        txbName.Enabled = !_column.KeyName.StartsWith("SYS_");
 
         txbName.AllowedChars = Constants.AllowedCharsVariableName;
         txbCaption.Text = _column.Caption;
@@ -439,7 +439,7 @@ internal sealed partial class ColumnEditor {
         if (_column.IsDisposed) { return; }
 
         if (_column.ColumNameAllowed(txbName.Text)) {
-            _column.Name = txbName.Text;
+            _column.KeyName = txbName.Text;
         }
 
         _column.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
@@ -570,8 +570,8 @@ internal sealed partial class ColumnEditor {
 
             foreach (var thisColumn in _column.Database.Column) {
                 if (thisColumn.Format.CanBeCheckedByRules() && !thisColumn.MultiLine) {
-                    dd.Add("~" + thisColumn.Name.ToLower() + "~");
-                    or.Add("~" + thisColumn.Name.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
+                    dd.Add("~" + thisColumn.KeyName.ToLower() + "~");
+                    or.Add("~" + thisColumn.KeyName.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
                 }
             }
 
@@ -606,11 +606,11 @@ internal sealed partial class ColumnEditor {
         var spalteauDb = linkdb.Column.Exists(cbxTargetColumn.Text);
 
         foreach (var col in linkdb.Column) {
-            var r = tblFilterliste?.Database?.Row[col.Name] ?? tblFilterliste?.Database?.Row.GenerateAndAdd(col.Name, "Neue Spalte");
+            var r = tblFilterliste?.Database?.Row[col.KeyName] ?? tblFilterliste?.Database?.Row.GenerateAndAdd(col.KeyName, "Neue Spalte");
 
             if (r != null) {
                 r.CellSet("Spalte", col.ReadableText() + " = ");
-                r.CellSet("SpalteName", col.Name);
+                r.CellSet("SpalteName", col.KeyName);
 
                 if (col.Format.Autofilter_möglich() && !col.MultiLine && col != spalteauDb && !col.Format.NeedTargetDatabase() && !col.IsSystemColumn()) {
                     r.CellSet("visible", true);

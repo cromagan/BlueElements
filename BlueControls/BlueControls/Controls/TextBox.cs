@@ -31,7 +31,7 @@ using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase.EventArgs;
 using static BlueBasics.Converter;
 using Clipboard = System.Windows.Clipboard;
@@ -356,7 +356,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     //    base.Focus();
     //}
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         AbortSpellChecking();
 
         var tmp = Cursor_PosAt(e.X, e.Y);
@@ -816,7 +816,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var x = _cursorCharPos;
         MultiUserFileGiveBackEventArgs e = new();
         OnNeedDatabaseOfAdditinalSpecialChars(e);
-        ItemCollectionList i = new(BlueListBoxAppearance.Listbox, false)
+        ItemCollectionList.ItemCollectionList i = new(BlueListBoxAppearance.Listbox, false)
         {
             //if (e.File is Database DB && DB.Bins.Count > 0) {
             //    foreach (var bmp in DB.Bins) {

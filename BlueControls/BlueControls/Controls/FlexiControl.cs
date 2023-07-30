@@ -29,7 +29,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
@@ -640,7 +640,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         Allinitialized = false;
     }
 
-    protected void StyleComboBox(ComboBox control, ICollection<BasicListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
+    protected void StyleComboBox(ComboBox control, ICollection<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists) {
         //if (control == null) {
         //    if (removevalueIfNotExists) {
         //        ValueSet(string.Empty, true, true);
@@ -672,9 +672,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             return;
         }
 
-        ItemCollectionList item = new(true);
+        ItemCollectionList.ItemCollectionList item = new(true);
         if (column.DropdownBearbeitungErlaubt) {
-            ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+            ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
             if (!column.DropdownWerteAndererZellenAnzeigen) {
                 bool again;
                 do {
@@ -716,8 +716,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.Item.RemoveAll();
         control.Item.CheckBehavior = CheckBehavior.NoSelection;
         if (column == null || column.IsDisposed) { return; }
-        ItemCollectionList item = new(true);
-        ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
+        ItemCollectionList.ItemCollectionList item = new(true);
+        ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
         control.SuggestionsAdd(item);
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
             case EditTypeTable.Textfeld: control.AddAllowed = AddType.Text; break;
@@ -1080,7 +1080,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
     /// </summary>
-    private void UpdateValueTo_ListBox(ItemCollectionList main) => main.SetValuesTo(Value.SplitAndCutByCrToList());
+    private void UpdateValueTo_ListBox(ItemCollectionList.ItemCollectionList main) => main.SetValuesTo(Value.SplitAndCutByCrToList());
 
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.

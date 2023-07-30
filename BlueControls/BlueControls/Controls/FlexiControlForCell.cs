@@ -31,7 +31,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
+using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -142,7 +142,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         var (column, row) = GetTmpVariables();
         if (column?.Database != null && column.Database.IsAdministrator()) {
             _ = items.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
@@ -235,8 +235,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
         switch (e.Control) {
             case ComboBox comboBox:
-                ItemCollectionList item2 = new(true);
-                ItemCollectionList.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
+                ItemCollectionList.ItemCollectionList item2 = new(true);
+                ItemCollectionList.ItemCollectionList.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
                 if (column1 != null && column1.TextBearbeitungErlaubt) {
                     StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false);
                 } else {
@@ -408,7 +408,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         var newT = string.Empty;
         foreach (var thisString in e.ColumnsWithErrors) {
             var x = thisString.SplitAndCutBy("|");
-            if (column != null && string.Equals(x[0], column.Name, StringComparison.OrdinalIgnoreCase)) {
+            if (column != null && string.Equals(x[0], column.KeyName, StringComparison.OrdinalIgnoreCase)) {
                 if (!string.IsNullOrEmpty(InfoText)) { InfoText += "<br><hr><br>"; }
                 newT += x[1];
             }

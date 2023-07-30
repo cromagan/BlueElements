@@ -29,7 +29,6 @@ using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueDatabase;
 using static BlueBasics.Polygons;
 using Size = System.Drawing.Size;
@@ -1232,8 +1231,8 @@ public static class Skin {
     /// <param name="sheetStyle"></param>
     /// <returns></returns>
 
-    public static ItemCollectionList GetFonts(RowItem? sheetStyle) {
-        ItemCollectionList rahms = new(false)
+    public static BlueControls.ItemCollectionList.ItemCollectionList GetFonts(RowItem? sheetStyle) {
+        BlueControls.ItemCollectionList.ItemCollectionList rahms = new(false)
         {
             //   Rahms.GenerateAndAdd(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", ImageCode.Kreuz))
             { "Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolForReadableText() },
@@ -1248,8 +1247,8 @@ public static class Skin {
         return rahms;
     }
 
-    public static ItemCollectionList GetRahmenArt(RowItem? sheetStyle, bool mitOhne) {
-        ItemCollectionList rahms = new(false);
+    public static BlueControls.ItemCollectionList.ItemCollectionList GetRahmenArt(RowItem? sheetStyle, bool mitOhne) {
+        ItemCollectionList.ItemCollectionList rahms = new(false);
         if (mitOhne) {
             _ = rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), ImageCode.Kreuz);
         }
@@ -1778,7 +1777,7 @@ public static class Skin {
     private static BlueFont GetBlueFont(DatabaseAbstract styleDb, ColumnItem? column, RowItem? row) {
         var @string = styleDb.Cell.GetString(column, row);
         if (string.IsNullOrEmpty(@string)) {
-            Develop.DebugPrint("Schrift nicht definiert: " + styleDb.TableName + " - " + column.Name + " - " + row.CellFirstString());
+            Develop.DebugPrint("Schrift nicht definiert: " + styleDb.TableName + " - " + column.KeyName + " - " + row.CellFirstString());
             return BlueFont.DefaultFont; // BlueFont.Get("Arial", 7, false, false, false, false, false, Color.Black, Color.Transparent, false, false, false);
         }
         return BlueFont.Get(@string);

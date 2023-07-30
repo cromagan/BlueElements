@@ -472,7 +472,7 @@ namespace BlueControls.Forms {
             this.btnLetzteFormulare.Size = new System.Drawing.Size(104, 66);
             this.btnLetzteFormulare.TabIndex = 1;
             this.btnLetzteFormulare.Text = "zuletzt geöffnete Dateien";
-            this.btnLetzteFormulare.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
+            this.btnLetzteFormulare.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
             // 
             // btnOeffnen
             // 

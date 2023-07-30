@@ -225,7 +225,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.cbxInternalColumnArrangementSelector.Name = "cbxInternalColumnArrangementSelector";
             this.cbxInternalColumnArrangementSelector.Size = new System.Drawing.Size(216, 22);
             this.cbxInternalColumnArrangementSelector.TabIndex = 3;
-            this.cbxInternalColumnArrangementSelector.ItemClicked += new System.EventHandler<BlueControls.EventArgs.BasicListItemEventArgs>(this.cbxInternalColumnArrangementSelector_ItemClicked);
+            this.cbxInternalColumnArrangementSelector.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.cbxInternalColumnArrangementSelector_ItemClicked);
             // 
             // btnNeueAnsichtErstellen
             // 

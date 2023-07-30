@@ -201,7 +201,7 @@ public class Script {
 
         var scp = new ScriptProperties(AllowedMethods, ChangeValues, Attributes);
 
-        return Script.Parse(Variables, scp, ReducedScriptText, lineadd, subname);
+        return Parse(Variables, scp, ReducedScriptText, lineadd, subname);
     }
 
     #endregion

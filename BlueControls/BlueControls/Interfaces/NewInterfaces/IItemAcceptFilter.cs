@@ -24,7 +24,6 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
 using System.Collections.ObjectModel;
-using BlueControls.ItemCollection.ItemCollectionList;
 using BlueBasics.Enums;
 using System.ComponentModel;
 using BlueBasics.Interfaces;
@@ -82,7 +81,7 @@ public static class ItemAcceptFilterExtensions {
         //    }
         //}
 
-        var x = new ItemCollectionList(false);
+        var x = new ItemCollectionList.ItemCollectionList(false);
 
         // Die Items, die man noch wählen könnte
         foreach (var thisR in item.Parent) {

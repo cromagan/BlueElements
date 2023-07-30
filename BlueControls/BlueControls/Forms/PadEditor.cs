@@ -26,7 +26,9 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.ItemCollection;
+using BlueControls.ItemCollectionPad;
+using BlueControls.ItemCollectionPad.Abstract;
+using BlueControls.ItemCollectionPad.Temporär;
 using static BlueBasics.Converter;
 
 namespace BlueControls.Forms;
@@ -139,7 +141,7 @@ public partial class PadEditor : PadEditorReadOnly {
         Pad.Invalidate();
     }
 
-    private void cbxSchriftGröße_ItemClicked(object sender, BasicListItemEventArgs e) {
+    private void cbxSchriftGröße_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (Pad?.Item == null) { return; }
         Pad.Item.SheetStyleScale = FloatParse(cbxSchriftGröße.Text) / 100f;
     }
@@ -223,7 +225,7 @@ public partial class PadEditor : PadEditorReadOnly {
         }
     }
 
-    private void PadDesign_ItemClicked(object sender, BasicListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
+    private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) => Pad.Item.SheetStyle = Skin.StyleDb.Row[e.Item.KeyName];
 
     private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
         if (!txbRasterAnzeige.Text.IsNumeral()) { return; }

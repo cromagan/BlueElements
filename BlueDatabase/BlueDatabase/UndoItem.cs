@@ -38,12 +38,12 @@ public class UndoItem : IParseable {
         PreviousValue = previousValue;
         ChangedTo = changedTo;
         User = user;
-        DateTimeUTC = timeutc;
+        DateTimeUtc = timeutc;
         TableName = tablename;
         Comment = comment;
     }
 
-    public UndoItem(string tablename, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) : this(tablename, comand, column?.Name ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, comment, timeutc) { }
+    public UndoItem(string tablename, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) : this(tablename, comand, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, comment, timeutc) { }
 
     public UndoItem(string s) => Parse(s);
 
@@ -52,25 +52,24 @@ public class UndoItem : IParseable {
     #region Properties
 
     public string CellKey => CellCollection.KeyOfCell(ColName, RowKey);
-    public string ChangedTo { get; private set; }
-    public string ColName { get; private set; }
-    public DatabaseDataType Comand { get; private set; }
-    public string Comment { get; private set; }
-    public DateTime DateTimeUTC { get; private set; }
-    public string PreviousValue { get; private set; }
-    public string RowKey { get; private set; }
-    public string TableName { get; private set; }
-    public string User { get; private set; }
+    public string ChangedTo { get; private set; } = string.Empty;
+    public string ColName { get; private set; } = string.Empty;
+    public DatabaseDataType Comand { get; private set; } = 0;
+    public string Comment { get; private set; } = string.Empty;
+    public DateTime DateTimeUtc { get; private set; } = DateTime.MinValue;
+    public string PreviousValue { get; private set; } = string.Empty;
+    public string RowKey { get; private set; } = string.Empty;
+    public string TableName { get; private set; } = string.Empty;
+    public string User { get; private set; } = string.Empty;
 
     #endregion
 
     #region Methods
 
-    public string CompareKey() => DateTimeUTC.ToString(Constants.Format_Date) + ColName;
-
     public void Parse(string toParse) {
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
+                case "undotype":
                 case "st":
                     //_state = (ItemState)IntParse(pair.Value);
                     break;
@@ -87,15 +86,12 @@ public class UndoItem : IParseable {
                     RowKey = pair.Value;
                     break;
 
-                case "undotype":
-                    break;
-
                 case "cell":
                     break;
 
                 case "date":
                 case "d":
-                    DateTimeUTC = DateTimeParse(pair.Value);
+                    DateTimeUtc = DateTimeParse(pair.Value);
                     break;
 
                 case "user":
@@ -108,15 +104,12 @@ public class UndoItem : IParseable {
                     //  Group = pair.Value.FromNonCritical();
                     break;
 
-                case "previousvalue":
-                case "pv": // Todo: alt: 10.08.2021
-                    PreviousValue = pair.Value.FromNonCritical();
-                    break;
-
                 case "c":
                     ChangedTo = pair.Value.FromNonCritical();
                     break;
 
+                case "previousvalue":
+                case "pv": // Todo: alt: 10.08.2021
                 case "p":
                     PreviousValue = pair.Value.FromNonCritical();
                     break;
@@ -143,7 +136,7 @@ public class UndoItem : IParseable {
         l.ParseableAdd("CO", Comand);
         l.ParseableAdd("CN", ColName);
         l.ParseableAdd("RK", RowKey);
-        l.ParseableAdd("D", DateTimeUTC);
+        l.ParseableAdd("D", DateTimeUtc);
         l.ParseableAdd("U", User);
         l.ParseableAdd("P", PreviousValue);
         l.ParseableAdd("C", ChangedTo);
@@ -152,11 +145,11 @@ public class UndoItem : IParseable {
     }
 
     public string UndoTextTableMouseOver() {
-        var a = "'" + PreviousValue + "'";
-        var n = "'" + ChangedTo + "'";
+        var a = "'" + PreviousValue.Replace("\r", "|").Replace("\n", "|") + "'";
+        var n = "'" + ChangedTo.Replace("\r", "|").Replace("\n", "|") + "'";
         if (a == "''") { a = "<IMAGECODE=Stern|16>"; }
         if (n == "''") { n = "<IMAGECODE=Papierkorb|16>"; }
-        return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + DateTimeUTC + ", " + User + ")</i>";
+        return "<b>alt: </b>" + a + "<b> <IMAGECODE=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + DateTimeUtc + ", " + User + ")</i>";
     }
 
     internal bool LogsUndo(DatabaseAbstract database) => database.Column.Exists(ColName) is ColumnItem c && c.ShowUndo;
