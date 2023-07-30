@@ -140,7 +140,7 @@ internal class Method_WebPageClick : Method_WebPage {
 
             return new DoItFeedback(infos.Data, "Fehler beim Klicken des Buttons: " + task.Exception?.Message);
         } catch {
-            return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
+            return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des Button-Befehles.");
         }
     }
 

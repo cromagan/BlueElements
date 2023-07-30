@@ -60,23 +60,74 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
         if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
 
         try {
-            var script = "document.getElementById('" + attvar.ValueStringGet(1) + "').value = '" + attvar.ValueStringGet(2) + "'";
+
+
+            #region Versuch, Textbox per ID
+
+            var script = @"var element = document.getElementById('" + attvar.ValueStringGet(1) + "');" + @"
+                                 if (element) {
+                                     element.value = '" + attvar.ValueStringGet(2) + @"'
+                                     'success';
+                                  } else {
+                                     'error';
+                                  }";
+
             var task = DoTask(wb, script);
 
             if (!WaitLoaded(wb)) {
                 return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
             }
 
-            if (task.IsFaulted) {
-                var response = task.Result;
-                if (!response.Success) {
-                    // Es ist ein Fehler beim Ausführen des Skripts aufgetreten
-                    return new DoItFeedback(infos.Data, "Fehler beim Befüllen des Feldes: " + response.Message);
-                }
-                return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
+            if (!task.IsFaulted && task.Result.Success && task.Result.Result is string result) {
+                if (result == "success") { return DoItFeedback.Null(); }
             }
 
-            return DoItFeedback.Null();
+            #endregion
+
+            #region Versuch, Textbox per Klassenname
+
+            script = @"var element = document.querySelector('" + attvar.ValueStringGet(1) + "');" + @"
+                                 if (element) {
+                                     txt.value = '" + attvar.ValueStringGet(2) + @"'
+                                     'success';
+                                  } else {
+                                     'error';
+                                  }";
+
+            task = DoTask(wb, script);
+
+            if (!WaitLoaded(wb)) {
+                return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
+            }
+
+            if (!task.IsFaulted && task.Result.Success && task.Result.Result is string result3) {
+                if (result3 == "success") { return DoItFeedback.Null(); }
+                //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
+            }
+
+            #endregion
+
+
+
+            //var script = "document.getElementById('" + attvar.ValueStringGet(1) + "').value = '" + attvar.ValueStringGet(2) + "'";
+            //var task = DoTask(wb, script);
+
+            //if (!WaitLoaded(wb)) {
+            //    return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
+            //}
+
+            //if (!task.IsFaulted) {
+            //    var response = task.Result;
+            //    if (!response.Success) {
+            //        // Es ist ein Fehler beim Ausführen des Skripts aufgetreten
+            //        return new DoItFeedback(infos.Data, "Fehler beim Befüllen des Feldes: " + response.Message);
+            //    }
+            //    return DoItFeedback.Null();
+            //}
+            //return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
+            return new DoItFeedback(infos.Data, "Fehler beim Ausführen des TextBox-Befehles: " + task.Exception?.Message);
+
+
         } catch {
             return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
         }
