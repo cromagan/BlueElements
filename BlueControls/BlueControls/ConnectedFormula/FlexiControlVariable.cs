@@ -234,7 +234,10 @@ public partial class FlexiControlVariable : FlexiControl, IContextMenu, IDisable
         switch (e.Control) {
             case ComboBox comboBox:
                 ItemCollectionList.ItemCollectionList item2 = new(true);
-                ItemCollectionList.ItemCollectionList.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
+                if (column1 != null) {
+                    ItemCollectionList.ItemCollectionList.GetItemCollection(item2, column1, null, ShortenStyle.Replaced, 10000);
+                }
+
                 if (column1 != null && column1.TextBearbeitungErlaubt) {
                     StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false);
                 } else {
