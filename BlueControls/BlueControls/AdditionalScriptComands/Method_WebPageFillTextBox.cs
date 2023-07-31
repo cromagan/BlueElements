@@ -60,13 +60,30 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
         if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
 
         try {
+       //     var script = @"
+       //     var inputField = document.querySelector('.login_username input[type=""text""]');
+       //     if (inputField) {
+       //         inputField.value = 'Hallo';
+       //  var event = new Event('input', { bubbles: true });
+       //inputField.dispatchEvent(event);
+       //     }
+       // ";
 
+       //     var task = DoTask(wb, script);
+
+       //     if (!WaitLoaded(wb)) {
+       //         return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
+       //     }
+
+       //     return DoItFeedback.Null();
 
             #region Versuch, Textbox per ID
 
-            var script = @"var element = document.getElementById('" + attvar.ValueStringGet(1) + "');" + @"
-                                 if (element) {
-                                     element.value = '" + attvar.ValueStringGet(2) + @"'
+            var script = @"var inputField = document.getElementById('" + attvar.ValueStringGet(1) + "');" + @"
+                                 if (inputField) {
+                                     inputField.value = '" + attvar.ValueStringGet(2) + @"'
+                                     var event = new Event('input', { bubbles: true });
+                                     inputField.dispatchEvent(event);
                                      'success';
                                   } else {
                                      'error';
@@ -86,9 +103,11 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
 
             #region Versuch, Textbox per Klassenname
 
-            script = @"var element = document.querySelector('" + attvar.ValueStringGet(1) + "');" + @"
-                                 if (element) {
-                                     txt.value = '" + attvar.ValueStringGet(2) + @"'
+            script = @"var inputField = document.querySelector('" + attvar.ValueStringGet(1) + "');" + @"
+                                 if (inputField) {
+                                     inputField.value = '" + attvar.ValueStringGet(2) + @"'
+                                     var event = new Event('input', { bubbles: true });
+                                     inputField.dispatchEvent(event);
                                      'success';
                                   } else {
                                      'error';
@@ -107,8 +126,6 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
 
             #endregion
 
-
-
             //var script = "document.getElementById('" + attvar.ValueStringGet(1) + "').value = '" + attvar.ValueStringGet(2) + "'";
             //var task = DoTask(wb, script);
 
@@ -126,8 +143,6 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
             //}
             //return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
             return new DoItFeedback(infos.Data, "Fehler beim Ausführen des TextBox-Befehles: " + task.Exception?.Message);
-
-
         } catch {
             return new DoItFeedback(infos.Data, "Allgemeiner Fehler beim Ausführen des TextBox-Befehles.");
         }
