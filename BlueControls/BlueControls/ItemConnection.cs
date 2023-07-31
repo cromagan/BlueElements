@@ -35,9 +35,9 @@ public class ItemConnection : IStringable, IChangedFeedback {
 
     internal readonly bool ArrowOnItem1;
     internal readonly bool ArrowOnItem2;
-    internal readonly BasicPadItem Item1;
+    internal readonly AbstractPadItem Item1;
     internal readonly ConnectionType Item1Type;
-    internal readonly BasicPadItem Item2;
+    internal readonly AbstractPadItem Item2;
     internal readonly ConnectionType Item2Type;
 
     private bool _beiExportSichtbar;
@@ -46,7 +46,7 @@ public class ItemConnection : IStringable, IChangedFeedback {
 
     #region Constructors
 
-    public ItemConnection(BasicPadItem item1, ConnectionType item1Type, bool arrowOnItem1, BasicPadItem item2, ConnectionType item2Type, bool arrowOnItem2, bool showinPrintMode) {
+    public ItemConnection(AbstractPadItem item1, ConnectionType item1Type, bool arrowOnItem1, AbstractPadItem item2, ConnectionType item2Type, bool arrowOnItem2, bool showinPrintMode) {
         Item2 = item2;
         Item2Type = item2Type;
         Item1 = item1;
@@ -80,7 +80,7 @@ public class ItemConnection : IStringable, IChangedFeedback {
 
     #region Methods
 
-    public static PointF GetConnectionPoint(BasicPadItem item, ConnectionType itemc, BasicPadItem otherItem) {
+    public static PointF GetConnectionPoint(AbstractPadItem item, ConnectionType itemc, AbstractPadItem otherItem) {
         switch (itemc) {
             case ConnectionType.Top:
                 return item.UsedArea.PointOf(Alignment.Top_HorizontalCenter);

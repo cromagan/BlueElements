@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
 using BlueControls.Controls;
+using BlueControls.EventArgs;
 using Button = BlueControls.Controls.Button;
 using Form = BlueControls.Forms.Form;
 using GroupBox = BlueControls.Controls.GroupBox;
@@ -171,7 +172,7 @@ namespace BluePaint
             this.btnLetzteDateien.Size = new System.Drawing.Size(104, 66);
             this.btnLetzteDateien.TabIndex = 1;
             this.btnLetzteDateien.Text = "zuletzt geöffnete Dateien";
-            this.btnLetzteDateien.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
+            this.btnLetzteDateien.ItemClicked += new System.EventHandler<AbstractListItemEventArgs>(this.btnLetzteDateien_ItemClicked);
             // 
             // btnOeffnen
             // 

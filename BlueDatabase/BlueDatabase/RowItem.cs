@@ -137,7 +137,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         //    //case DataFormat.Verknüpfung_zu_anderer_Datenbank:
         //    //    //if (column.LinkedCell_RowKeyIsInColumn == -9999) {
         //    //    wert = string.Empty; // Beim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss.
-        //    //    //vars.GenerateAndAdd(new Variable(column.Name + "_link", string.Empty, VariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
+        //    //    //vars.GenerateAndAdd(new Variable(Column.KeyName + "_link", string.Empty, VariableDataType.String, true, true, "Dieser Wert kann nur mit SetLink verändert werden.\r\nBeim Skript-Start ist dieser Wert immer leer, da die Verlinkung erst erstellt werden muss."));
         //    //    //} else {
         //    //    //    qi = "Spalte: " + column.ReadableText() + "\r\nDer Inhalt wird zur Startzeit des Skripts festgelegt.";
         //    //    //    ro = true;
@@ -145,10 +145,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         //    //    break;
 
         //    //case DataFormat.Link_To_Filesystem:
-        //    //    qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + column.Name + "_FileName";
+        //    //    qi = "Spalte: " + column.ReadableText() + "\r\nFalls die Datei auf der Festplatte existiert, wird eine weitere\r\nVariable erzeugt: " + Column.KeyName + "_FileName";
         //    //    var f = column.Database.Cell.BestFile(column, row);
         //    //    if (f.FileType() == FileFormat.Image && IO.FileExists(f)) {
-        //    //        vars.GenerateAndAdd(new VariableString(column.Name + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
+        //    //        vars.GenerateAndAdd(new VariableString(Column.KeyName + "_FileName", f, true, false, "Spalte: " + column.ReadableText() + "\r\nEnthält den vollen Dateinamen der Datei der zugehörigen Zelle.\r\nDie Existenz der Datei wurde geprüft und die Datei existert.\r\nAuf die Datei kann evtl. mit LoadImage zugegriffen werden."));
         //    //    }
         //    //    break;
 
@@ -337,7 +337,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             _ = Database.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, string.Empty);
 
-            //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.Name], source), false);
+            //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source), false);
         }
     }
 
@@ -501,7 +501,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!column.SaveContent || !column.Format.CanBeChangedByRules()) { return; }
 
         //if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-        //    var columnLinkVar = vars.GetSystem(column.Name + "_Link");
+        //    var columnLinkVar = vars.GetSystem(Column.KeyName + "_Link");
         //    if (columnLinkVar != null) {
         //        column.Database.Cell.SetValueBehindLinkedValue(column, this, columnLinkVar.ValueString);
         //    }

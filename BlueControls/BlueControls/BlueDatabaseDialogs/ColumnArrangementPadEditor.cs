@@ -309,7 +309,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         var permanentPossible = true;
 
-        var itemsdone = new List<BasicPadItem>();
+        var itemsdone = new List<AbstractPadItem>();
 
         do {
             var leftestItem = LeftestItem(itemsdone);
@@ -425,7 +425,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     private void Item_ItemRemoved(object sender, System.EventArgs e) => Pad_MouseUp(null, null);
 
-    private ColumnPadItem? LeftestItem(ICollection<BasicPadItem> ignore) {
+    private ColumnPadItem? LeftestItem(ICollection<AbstractPadItem> ignore) {
         if (Database == null || Database.IsDisposed) { return null; }
         if (Pad?.Item == null) { return null; }
 
@@ -559,7 +559,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void SortColumns() {
         if (Sorting || Fixing > 0) { Develop.DebugPrint("Sorting falsch!"); }
         Sorting = true;
-        var done = new List<BasicPadItem>();
+        var done = new List<AbstractPadItem>();
         var left = 0f;
         do {
             var x = LeftestItem(done);

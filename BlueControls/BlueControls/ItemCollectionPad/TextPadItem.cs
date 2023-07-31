@@ -228,7 +228,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
         InvalidateText();
     }
 
-    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //protected override AbstractPadItem? TryCreate(string id, string name) {
     //    if (id.Equals("blueelements.clsitemtext", StringComparison.OrdinalIgnoreCase) ||
     //        id.Equals("blueelements.textitem", StringComparison.OrdinalIgnoreCase) ||
     //        id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {

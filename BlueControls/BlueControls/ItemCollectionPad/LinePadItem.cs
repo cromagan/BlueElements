@@ -32,7 +32,7 @@ using static BlueBasics.Geometry;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class LinePadItem : BasicPadItem {
+public class LinePadItem : AbstractPadItem {
 
     #region Fields
 
@@ -179,7 +179,7 @@ public class LinePadItem : BasicPadItem {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    private static bool SchneidetDas(BasicPadItem? thisBasicItem, PointM p1, PointM p2) {
+    private static bool SchneidetDas(AbstractPadItem? thisBasicItem, PointM p1, PointM p2) {
         if (thisBasicItem == null) { return false; }
         if (thisBasicItem is not LinePadItem) {
             var a = thisBasicItem.UsedArea;

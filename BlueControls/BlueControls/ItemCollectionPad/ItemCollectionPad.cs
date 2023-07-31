@@ -45,13 +45,13 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposableExtended, IHasKeyName {
+public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName {
 
     #region Fields
 
     public const int Dpi = 300;
 
-    public static List<BasicPadItem>? PadItemTypes;
+    public static List<AbstractPadItem>? PadItemTypes;
 
     internal string Caption;
 
@@ -79,7 +79,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     public ItemCollectionPad() : base() {
         BindingOperations.EnableCollectionSynchronization(this, new object());
 
-        PadItemTypes ??= GetInstaceOfType<BasicPadItem>("NAME");
+        PadItemTypes ??= GetInstaceOfType<AbstractPadItem>("NAME");
 
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         SheetSizeInMm = Size.Empty;
@@ -344,7 +344,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
     #region Indexers
 
-    public BasicPadItem? this[string @internal] {
+    public AbstractPadItem? this[string @internal] {
         get {
             if (string.IsNullOrEmpty(@internal)) {
                 return null;
@@ -354,9 +354,9 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         }
     }
 
-    public List<BasicPadItem> this[int x, int y] => this[new Point(x, y)];
+    public List<AbstractPadItem> this[int x, int y] => this[new Point(x, y)];
 
-    public List<BasicPadItem> this[Point p] => this.Where(thisItem => thisItem != null && thisItem.Contains(p, 1)).ToList();
+    public List<AbstractPadItem> this[Point p] => this.Where(thisItem => thisItem != null && thisItem.Contains(p, 1)).ToList();
 
     #endregion
 
@@ -385,7 +385,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
             sizeOfPaintArea.Height / maxBounds.Height);
     }
 
-    public new void Add(BasicPadItem? item) {
+    public new void Add(AbstractPadItem? item) {
         if (item == null) { Develop.DebugPrint(FehlerArt.Fehler, "Item ist null"); return; }
         if (Contains(item)) { Develop.DebugPrint(FehlerArt.Fehler, "Bereits vorhanden!"); return; }
         if (this[item.KeyName] != null) { Develop.DebugPrint(FehlerArt.Warnung, "Name bereits vorhanden: " + item.KeyName); return; }
@@ -417,7 +417,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
     }
 
     public new void Clear() {
-        var l = new List<BasicPadItem>(this);
+        var l = new List<AbstractPadItem>(this);
 
         foreach (var thisit in l) {
             Remove(thisit);
@@ -508,7 +508,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         gr.Dispose();
     }
 
-    public void EineEbeneNachHinten(BasicPadItem bpi) {
+    public void EineEbeneNachHinten(AbstractPadItem bpi) {
         var i2 = Previous(bpi);
         if (i2 != null) {
             var tempVar = bpi;
@@ -516,7 +516,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         }
     }
 
-    public void EineEbeneNachVorne(BasicPadItem bpi) {
+    public void EineEbeneNachVorne(AbstractPadItem bpi) {
         var i2 = Next(bpi);
         if (i2 != null) {
             var tempVar = bpi;
@@ -553,7 +553,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
     public void Remove(string internalname) => Remove(this[internalname]);
 
-    public new void Remove(BasicPadItem? item) {
+    public new void Remove(AbstractPadItem? item) {
         if (item == null || !Contains(item)) { return; }
         item.Changed -= Item_Changed;
         //item.CheckedChanged -= Item_CheckedChanged;
@@ -574,7 +574,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         OnChanged();
     }
 
-    public void RemoveRange(List<BasicPadItem> remove) {
+    public void RemoveRange(List<AbstractPadItem> remove) {
         foreach (var thisItem in remove) {
             Remove(thisItem);
         }
@@ -708,7 +708,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         return -1;
     }
 
-    internal void InDenHintergrund(BasicPadItem thisItem) {
+    internal void InDenHintergrund(AbstractPadItem thisItem) {
         if (IndexOf(thisItem) == 0) { return; }
         var g1 = thisItem.Gruppenzugehörigkeit;
         thisItem.Gruppenzugehörigkeit = string.Empty;
@@ -717,7 +717,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         thisItem.Gruppenzugehörigkeit = g1;
     }
 
-    internal void InDenVordergrund(BasicPadItem thisItem) {
+    internal void InDenVordergrund(AbstractPadItem thisItem) {
         if (IndexOf(thisItem) == Count - 1) { return; }
         var g1 = thisItem.Gruppenzugehörigkeit;
         thisItem.Gruppenzugehörigkeit = string.Empty;
@@ -726,7 +726,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         thisItem.Gruppenzugehörigkeit = g1;
     }
 
-    internal RectangleF MaxBounds(List<BasicPadItem>? zoomItems) {
+    internal RectangleF MaxBounds(List<AbstractPadItem>? zoomItems) {
         var r = MaximumBounds(zoomItems);
         if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
             var x1 = Math.Min(r.Left, 0);
@@ -738,7 +738,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         return r;
     }
 
-    internal BasicPadItem? Next(BasicPadItem bpi) {
+    internal AbstractPadItem? Next(AbstractPadItem bpi) {
         var itemCount = IndexOf(bpi);
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
         do {
@@ -748,7 +748,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         } while (true);
     }
 
-    internal BasicPadItem? Previous(BasicPadItem bpi) {
+    internal AbstractPadItem? Previous(AbstractPadItem bpi) {
         var itemCount = IndexOf(bpi);
         if (itemCount < 0) { Develop.DebugPrint(FehlerArt.Fehler, "Item im SortDefinition nicht enthalten"); }
         do {
@@ -760,7 +760,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
     protected RectangleF MaxBounds() => MaxBounds(null);
 
-    protected virtual void OnItemAdded(BasicPadItem item) {
+    protected virtual void OnItemAdded(AbstractPadItem item) {
         ItemAdded?.Invoke(this, new ListEventArgs(item));
         OnChanged();
     }
@@ -770,7 +770,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
         OnChanged();
     }
 
-    protected virtual void OnItemRemoving(BasicPadItem item) => ItemRemoving?.Invoke(this, new ListEventArgs(item));
+    protected virtual void OnItemRemoving(AbstractPadItem item) => ItemRemoving?.Invoke(this, new ListEventArgs(item));
 
     private void ApplyDesignToItems() {
         foreach (var thisItem in this) {
@@ -808,8 +808,8 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
         var x = toParse.GetAllTags();
 
-        BasicPadItem? item1 = null;
-        BasicPadItem? item2 = null;
+        AbstractPadItem? item1 = null;
+        AbstractPadItem? item2 = null;
         var arrow1 = false;
         var arrow2 = false;
         var con1 = ConnectionType.Auto;
@@ -860,7 +860,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
                     break;
 
                 case "item":
-                    var i = ParsebleItem.NewByParsing<BasicPadItem>(pair.Value);
+                    var i = ParsebleItem.NewByParsing<AbstractPadItem>(pair.Value);
                     if (i != null) { Add(i); }
                     break;
 
@@ -946,7 +946,7 @@ public class ItemCollectionPad : ObservableCollection<BasicPadItem>, IDisposable
 
     private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
 
-    private RectangleF MaximumBounds(ICollection<BasicPadItem>? zoomItems) {
+    private RectangleF MaximumBounds(ICollection<AbstractPadItem>? zoomItems) {
         var x1 = float.MaxValue;
         var y1 = float.MaxValue;
         var x2 = float.MinValue;

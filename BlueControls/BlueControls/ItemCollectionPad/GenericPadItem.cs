@@ -83,7 +83,7 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
 
     #endregion
 
-    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //protected override AbstractPadItem? TryCreate(string id, string name) {
     //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
     //        return new GenericPadItem(name);
     //    }

@@ -50,7 +50,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     private string _currentPage = string.Empty;
     private IMouseAndKeyHandle? _givesMouseComandsTo;
     private ItemCollectionPad.ItemCollectionPad? _item;
-    private BasicPadItem? _lastClickedItem;
+    private AbstractPadItem? _lastClickedItem;
     private string _lastQuickInfo = string.Empty;
     private bool _repairPrinterDataPrepaired;
     private bool _showInPrintMode;
@@ -121,7 +121,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     [DefaultValue(true)]
     public bool EditAllowed { get; set; } = true;
 
-    public BasicPadItem? HotItem { get; private set; }
+    public AbstractPadItem? HotItem { get; private set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -148,7 +148,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         }
     }
 
-    public BasicPadItem? LastClickedItem {
+    public AbstractPadItem? LastClickedItem {
         get => _lastClickedItem;
         private set {
             if (_lastClickedItem != value) {
@@ -177,9 +177,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     #region Methods
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-        BasicPadItem? thisItem = null;
+        AbstractPadItem? thisItem = null;
 
-        if (e.HotItem is BasicPadItem item) { thisItem = item; }
+        if (e.HotItem is AbstractPadItem item) { thisItem = item; }
         var done = false;
         if (thisItem != null) {
             switch (e.ClickedComand.ToLower()) {
@@ -205,7 +205,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
                 case "#duplicate":
                     done = true;
-                    _item?.Add((BasicPadItem)((ICloneable)thisItem).Clone());
+                    _item?.Add((AbstractPadItem)((ICloneable)thisItem).Clone());
 
                     break;
             }
@@ -243,9 +243,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             case Keys.Delete:
 
             case Keys.Back:
-                List<BasicPadItem> itemsDoDelete = new();
+                List<AbstractPadItem> itemsDoDelete = new();
                 foreach (var thisit in _itemsToMove) {
-                    if (thisit is BasicPadItem bi) { itemsDoDelete.Add(bi); }
+                    if (thisit is AbstractPadItem bi) { itemsDoDelete.Add(bi); }
                 }
                 Unselect();
                 _item.RemoveRange(itemsDoDelete);
@@ -285,8 +285,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         }
     }
 
-    public List<BasicPadItem> HotItems(MouseEventArgs? e) {
-        if (e == null || _item == null) { return new List<BasicPadItem>(); }
+    public List<AbstractPadItem> HotItems(MouseEventArgs? e) {
+        if (e == null || _item == null) { return new List<AbstractPadItem>(); }
         Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
         return _item.Where(thisItem => thisItem != null &&
                                         thisItem.IsVisibleOnPage(CurrentPage) &&
@@ -362,7 +362,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         Invalidate();
     }
 
-    internal void AddCentered(BasicPadItem it) {
+    internal void AddCentered(AbstractPadItem it) {
         var pos = MiddleOfVisiblesScreen();
         var wid = (int)((Width + Zoom) * 0.8);
         var he = (int)((Height + Zoom) * 0.8);
@@ -393,7 +393,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             var p = KoordinatesUnscaled(e);
             if (_itemsToMove.Count > 0) {
                 foreach (var thisItem in _itemsToMove) {
-                    if (thisItem is BasicPadItem bpi) {
+                    if (thisItem is AbstractPadItem bpi) {
                         foreach (var thisPoint in bpi.MovablePoint) {
                             if (Länge(thisPoint, p) < 5f / Zoom) {
                                 SelectItem(thisPoint, false);
@@ -463,9 +463,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             case MouseButtons.Left:
                 if (!EditAllowed) { return; }
                 // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
-                BasicPadItem? select = null;
+                AbstractPadItem? select = null;
                 if (_itemsToMove.Count == 1 && _itemsToMove[0] is PointM thispoint) {
-                    if (thispoint.Parent is BasicPadItem item) {
+                    if (thispoint.Parent is AbstractPadItem item) {
                         select = item;
                     }
                 } else {
@@ -499,13 +499,13 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         #region Dann die selektierten Punkte
 
         foreach (var thisItem in _itemsToMove) {
-            if (thisItem is BasicPadItem bpi) {
+            if (thisItem is AbstractPadItem bpi) {
                 foreach (var p in bpi.MovablePoint) {
                     p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 }
             }
             if (thisItem is PointM p2) {
-                if (p2.Parent is BasicPadItem bpi2) {
+                if (p2.Parent is AbstractPadItem bpi2) {
                     foreach (var p in bpi2.MovablePoint) {
                         p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
                     }
@@ -513,7 +513,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                 p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
             }
         }
-        if (_givesMouseComandsTo is BasicPadItem pa) {
+        if (_givesMouseComandsTo is AbstractPadItem pa) {
             var drawingCoordinates = pa.UsedArea.ZoomAndMoveRect(Zoom, ShiftX, ShiftY, false);
             gr.DrawRectangle(new Pen(Brushes.Red, 3), drawingCoordinates);
         }
@@ -547,7 +547,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         if (_item == null || _item.Count == 0 || Fitting) { ZoomFit(); }
         Invalidate();
 
-        var it = (BasicPadItem)e.Item;
+        var it = (AbstractPadItem)e.Item;
 
         if (string.IsNullOrEmpty(it.Page)) { it.Page = CurrentPage; }
 
@@ -610,7 +610,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         }
         if (pointToMove == null) {
             foreach (var thisIt in _itemsToMove) {
-                if (thisIt is BasicPadItem bpi && bpi.PointsForSuccesfullyMove.Count > 0) {
+                if (thisIt is AbstractPadItem bpi && bpi.PointsForSuccesfullyMove.Count > 0) {
                     pointToMove = bpi.PointsForSuccesfullyMove[0];
                     break;
                 }

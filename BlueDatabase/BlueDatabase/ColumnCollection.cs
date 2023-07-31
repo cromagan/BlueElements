@@ -468,7 +468,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.KeyName == key);
     //}
 
-    //internal static string ParsableColumnName(ColumnItem? column) => column == null ? "ColumnName=?" : "ColumnName=" + column.Name;
+    //internal static string ParsableColumnName(ColumnItem? column) => column == null ? "ColumnName=?" : "ColumnName=" + Column.KeyName;
 
     internal bool ChangeName(string oldName, string newName) {
         if (oldName == newName) { return true; }

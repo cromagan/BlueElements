@@ -162,7 +162,7 @@ public partial class PadEditor : PadEditorReadOnly {
 
         #endregion
 
-        if (Pad.LastClickedItem is not BasicPadItem bpi) { return; }
+        if (Pad.LastClickedItem is not AbstractPadItem bpi) { return; }
 
         var stdWidth = tabElementEigenschaften.Width - (Skin.Padding * 4);
 

@@ -3011,7 +3011,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _ = ComputeAllColumnPositions();
         if (viewItem.ViewType == ViewType.PermanentColumn) {
             if (viewItem.OrderTmpSpalteX1 + Column_DrawWidth(viewItem, r) <= r.Width) { return true; }
-            //Develop.DebugPrint(enFehlerArt.Info,"Unsichtbare Wiederholungsspalte: " + ViewItem.Column.Name);
+            //Develop.DebugPrint(enFehlerArt.Info,"Unsichtbare Wiederholungsspalte: " + ViewItem.Column.KeyName);
             return false;
         }
         if (viewItem.OrderTmpSpalteX1 < _wiederHolungsSpaltenWidth) {

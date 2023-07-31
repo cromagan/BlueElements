@@ -24,7 +24,7 @@ using BlueControls.ItemCollectionPad.Temporär;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPhysicPadItem : BasicPadItem {
+public abstract class AbstractPhysicPadItem : AbstractPadItem {
 
     #region Constructors
 

@@ -191,7 +191,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //    //var it = new List<BasicItem>();
     //    //it.AddRange(Pad.Item);
     //    //if (it == null || it.Count < 2) { return; }
-    //    //foreach (BasicPadItem ThisItem in it)
+    //    //foreach (AbstractPadItem ThisItem in it)
     //    //{
     //    //    if (ThisItem != null && ThisItem is RowFormulaPadItem tempVar)
     //    //    {

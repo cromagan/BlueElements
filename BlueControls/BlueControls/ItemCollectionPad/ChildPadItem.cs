@@ -38,7 +38,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     #region Fields
 
     public string Seite;
-    public List<BasicPadItem>? ZoomItems;
+    public List<AbstractPadItem>? ZoomItems;
     private string _name;
     private CreativePad? _padInternal;
     private Bitmap? _tmpBmp;
@@ -355,7 +355,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //protected override AbstractPadItem? TryCreate(string id, string name) {
     //    if (id.Equals("blueelements.clsitempad", StringComparison.OrdinalIgnoreCase) ||
     //        id.Equals("blueelements.itempad", StringComparison.OrdinalIgnoreCase) ||
     //        id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {

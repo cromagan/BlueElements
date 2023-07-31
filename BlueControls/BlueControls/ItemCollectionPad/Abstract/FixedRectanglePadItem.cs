@@ -22,7 +22,7 @@ using BlueControls.EventArgs;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class FixedRectanglePadItem : BasicPadItem {
+public abstract class FixedRectanglePadItem : AbstractPadItem {
 
     #region Fields
 

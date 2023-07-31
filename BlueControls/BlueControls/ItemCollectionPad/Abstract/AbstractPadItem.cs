@@ -36,7 +36,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName {
+public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IChangedFeedback, IMoveable, IDisposableExtended, IComparable, IHasKeyName {
 
     #region Fields
 
@@ -66,7 +66,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     #region Constructors
 
-    protected BasicPadItem(string internalname) : base(internalname) => MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
+    protected AbstractPadItem(string internalname) : base(internalname) => MovablePoint.CollectionChanged += MovablePoint_CollectionChanged;
 
     #endregion
 
@@ -113,7 +113,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     }
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~BasicPadItem()
+    // ~AbstractPadItem()
     // {
     //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
     //     Dispose(disposing: false);
@@ -182,7 +182,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     public object? Clone() {
         var x = ToString();
 
-        var i = NewByParsing<BasicPadItem>(x);
+        var i = NewByParsing<AbstractPadItem>(x);
         i?.Parse(x);
 
         return i;
@@ -197,7 +197,7 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
     //    return null;
     //}
     public int CompareTo(object obj) {
-        if (obj is BasicPadItem v) {
+        if (obj is AbstractPadItem v) {
             return SaveOrder.CompareTo(v.SaveOrder);
         }
 
@@ -572,5 +572,5 @@ public abstract class BasicPadItem : ParsebleItem, IParseable, ICloneable, IChan
 
     #endregion
 
-    //protected abstract BasicPadItem? TryCreate(string id, string name);
+    //protected abstract AbstractPadItem? TryCreate(string id, string name);
 }

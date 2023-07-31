@@ -289,7 +289,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     #endregion
 
-    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //protected override AbstractPadItem? TryCreate(string id, string name) {
     //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
     //        return new BitmapPadItem(name);
     //    }

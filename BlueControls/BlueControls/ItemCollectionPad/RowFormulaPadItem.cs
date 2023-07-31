@@ -200,7 +200,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         GeneratedBitmap = generatedBitmap;
     }
 
-    //protected override BasicPadItem? TryCreate(string id, string name) {
+    //protected override AbstractPadItem? TryCreate(string id, string name) {
     //    if (id.Equals(ClassId, StringComparison.OrdinalIgnoreCase)) {
     //        return new RowFormulaPadItem(name);
     //    }

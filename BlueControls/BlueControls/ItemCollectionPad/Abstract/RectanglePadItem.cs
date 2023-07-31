@@ -27,7 +27,7 @@ using BlueControls.EventArgs;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
-public abstract class RectanglePadItem : BasicPadItem {
+public abstract class RectanglePadItem : AbstractPadItem {
 
     #region Fields
 
