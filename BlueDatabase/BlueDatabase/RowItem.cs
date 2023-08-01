@@ -113,6 +113,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public static VariableCollection? CellToVariable(ColumnItem? column, RowItem? row) {
         if (column == null || row == null) { return null; }
+        if (column.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { return null; }
+
         if (!column.Format.CanBeCheckedByRules()) { return null; }
         if (!column.SaveContent) { return null; }
 
@@ -124,9 +126,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         //if (column == column.Database.Column.SysRowChangeDate) { ro = true; }
 
         #endregion
-
-        //if (column.MultiLine && column.Format == DataFormat.Link_To_Filesystem) { return null; }
-        if (column.ScriptType == ScriptType.Nicht_vorhanden) { return null; }
 
         var wert = row.CellGetString(column);
         var qi = "Spalte: " + column.ReadableText();

@@ -864,7 +864,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal void SetValueBehindLinkedValue(ColumnItem? column, RowItem? row, string value, bool changeSysColumns) {
         var dbtmp = Database;
-        if (dbtmp == null || dbtmp.IsDisposed) { return; }
+        if (dbtmp == null || dbtmp.IsDisposed) {
+            dbtmp.DevelopWarnung("Datenbank ungültig!");
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!<br>" + dbtmp.ConnectionData.TableName);
+            return;
+        }
 
         if (column == null || column.IsDisposed) {
             dbtmp.DevelopWarnung("Spalte ungültig!");
@@ -882,6 +886,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var cellKey = KeyOfCell(column, row);
         var oldValue = string.Empty;
         if (ContainsKey(cellKey)) { oldValue = this[cellKey].Value; }
+
+        //if(string.IsNullOrEmpty(value) && column.KeyName is "HAUPT" or "VARIANTE"  ) {  return; }
+
         if (value == oldValue) { return; }
 
         var message = dbtmp.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, string.Empty);

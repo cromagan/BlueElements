@@ -576,6 +576,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (!string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
             item.CellSet(db.Column.First(), valueOfCellInFirstColumn);
         }
+        else {
+            Develop.DebugPrint(FehlerArt.Warnung, "Null!");
+        }
+
+        if(item.CellFirstString() != valueOfCellInFirstColumn) {
+            Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
+        }
+
 
         if (runScriptOfNewRow) {
             _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f);
