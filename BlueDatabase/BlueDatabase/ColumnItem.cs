@@ -1757,7 +1757,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _ignoreAtRowFilter = true;
 
                 this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-
+                MaxCellLenght = MaxTextLenght;
                 if (setOpticalToo) {
                     Caption = "Erstell-Datum";
                     ForeColor = Color.FromArgb(0, 0, 128);
@@ -1772,8 +1772,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _ignoreAtRowFilter = true;
                 _showUndo = false;
 
-                this.GetStyleFrom(FormatHolder.DateTime); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-
+                this.GetStyleFrom(FormatHolder.DateTimeWithMilliSeconds); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+                MaxCellLenght = MaxTextLenght;
                 _textBearbeitungErlaubt = false;
                 _spellCheckingEnabled = false;
                 _dropdownBearbeitungErlaubt = false;

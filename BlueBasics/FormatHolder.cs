@@ -69,6 +69,19 @@ public class FormatHolder : IInputFormat, IReadableText {
         MaxTextLenght = 19
     };
 
+    public static readonly FormatHolder DateTimeWithMilliSeconds = new("DateTimeWithMilliSeconds") {
+        Image = QuickImage.Get(ImageCode.Uhr, 16),
+        Regex = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9][.][0-9][0-9][0-9]$",
+        AllowedChars = Constants.Char_Numerals + ":. ",
+        Suffix = string.Empty,
+        Prefix = string.Empty,
+        FormatierungErlaubt = false,
+        AdditionalFormatCheck = AdditionalCheck.DateTime,
+        SpellCheckingEnabled = false,
+        MultiLine = false,
+        MaxTextLenght = 23
+    };
+
     public static readonly FormatHolder Email = new("EMail") {
         Image = QuickImage.Get(ImageCode.Brief, 16),
         //http://emailregex.com/

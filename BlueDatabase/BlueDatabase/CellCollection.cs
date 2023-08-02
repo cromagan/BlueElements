@@ -910,7 +910,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (changeSysColumns) {
             DoSpecialFormats(column, row, oldValue, false);
             if (dbtmp.Column.SysRowChanger is ColumnItem src) { SystemSet(src, row, UserName); }
-            if (dbtmp.Column.SysRowChangeDate is ColumnItem scd) { SystemSet(scd, row, DateTime.UtcNow.ToString(Constants.Format_Date5)); }
+            if (dbtmp.Column.SysRowChangeDate is ColumnItem scd) { SystemSet(scd, row, DateTime.UtcNow.ToString(Constants.Format_Date7)); }
         }
 
         column.Invalidate_ContentWidth();
