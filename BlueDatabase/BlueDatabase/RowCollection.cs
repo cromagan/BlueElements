@@ -581,7 +581,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.DebugPrint(FehlerArt.Warnung, "Null!");
         }
 
-        if (item.CellFirstString() != valueOfCellInFirstColumn) {
+        if (item.CellFirstString() != db.Column.First().AutoCorrect(valueOfCellInFirstColumn, true)) {
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
         }
 

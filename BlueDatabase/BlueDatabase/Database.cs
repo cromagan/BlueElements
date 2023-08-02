@@ -1,7 +1,7 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
-// Copyright (column) 2023 Christian Peter
+// Copyright (c) 2023 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -63,7 +63,7 @@ public sealed class Database : DatabaseAbstract {
         _tablename = SqlBackAbstract.MakeValidTableName(tablename);
 
         if (!SqlBackAbstract.IsValidTableName(_tablename, false)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungÃ¼ltig: " + tablename);
         }
 
         Initialize();
@@ -149,7 +149,8 @@ public sealed class Database : DatabaseAbstract {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
                     rowKey = NummerCode7(bLoaded, pointer + 5).ToString();
-                    var b = new Span<byte>(bLoaded, pointer + 12, les).ToArray();
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 12, b, 0, les);
                     value = b.ToStringUtf8();
                     pointer += 12 + les;
                     //colKey = -1;
@@ -173,7 +174,8 @@ public sealed class Database : DatabaseAbstract {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
                     var les = NummerCode3(bLoaded, pointer + 2);
                     rowKey = string.Empty;
-                    var b = new Span<byte>(bLoaded, pointer + 5, les).ToArray();
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
                     value = b.ToStringUtf8();
                     //width = 0;
                     //height = 0;
@@ -223,11 +225,13 @@ public sealed class Database : DatabaseAbstract {
                     type = (DatabaseDataType)bLoaded[pointer + 1];
 
                     var cles = NummerCode1(bLoaded, pointer + 2);
-                    var cb = new Span<byte>(bLoaded, pointer + 3, cles).ToArray();
+                    var cb = new byte[cles];
+                    Buffer.BlockCopy(bLoaded, pointer + 3, cb, 0, cles);
                     colName = cb.ToStringUtf8();
 
                     var les = NummerCode3(bLoaded, pointer + 3 + cles);
-                    var b = new Span<byte>(bLoaded, pointer + 6 + cles, les).ToArray();
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 6 + cles, b, 0, les);
                     value = b.ToStringUtf8();
 
                     pointer += 6 + les + cles;
@@ -238,11 +242,13 @@ public sealed class Database : DatabaseAbstract {
                     type = DatabaseDataType.UTF8Value_withoutSizeData;
 
                     var lenghtRowKey = NummerCode1(bLoaded, pointer + 1);
-                    var rowKeyByte = new Span<byte>(bLoaded, pointer + 2, lenghtRowKey).ToArray();
+                    var rowKeyByte = new byte[lenghtRowKey];
+                    Buffer.BlockCopy(bLoaded, pointer + 2, rowKeyByte, 0, lenghtRowKey);
                     rowKey = rowKeyByte.ToStringUtf8();
 
                     var lenghtValue = NummerCode2(bLoaded, pointer + 2 + lenghtRowKey);
-                    var valueByte = new Span<byte>(bLoaded, pointer + 2 + lenghtRowKey + 2, lenghtValue).ToArray();
+                    var valueByte = new byte[lenghtValue];
+                    Buffer.BlockCopy(bLoaded, pointer + 2 + lenghtRowKey + 2, valueByte, 0, lenghtValue);
                     value = valueByte.ToStringUtf8();
 
                     pointer += 2 + lenghtRowKey + 2 + lenghtValue;
@@ -291,7 +297,7 @@ public sealed class Database : DatabaseAbstract {
                         row = db.Row.SearchByKey(rowKey);
                     }
                     if (row == null || row.IsDisposed) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
+                        Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufÃ¼gen Fehler");
                         db.SetReadOnly();
                         return;
                     }
@@ -310,7 +316,7 @@ public sealed class Database : DatabaseAbstract {
                 //        column = db.Column.SearchByKey(colKey);
                 //    }
                 //    if (Column  ==null || Column .IsDisposed) {
-                //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
+                //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufÃ¼gen Fehler");
                 //        db.SetReadOnly();
                 //        return;
                 //    }
@@ -326,7 +332,7 @@ public sealed class Database : DatabaseAbstract {
                         column = db.Column.Exists(columname);
                     }
                     if (column == null || column.IsDisposed) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
+                        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufÃ¼gen Fehler");
                         db.SetReadOnly();
                         return;
                     }
@@ -336,7 +342,7 @@ public sealed class Database : DatabaseAbstract {
 
                 #endregion
 
-                #region Bei verschlüsselten Datenbanken das Passwort abfragen
+                #region Bei verschlÃ¼sselten Datenbanken das Passwort abfragen
 
                 if (type == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
                     var pwd = string.Empty;
@@ -361,7 +367,7 @@ public sealed class Database : DatabaseAbstract {
             }
         } while (true);
 
-        #region unbenutzte (gelöschte) Spalten entfernen
+        #region unbenutzte (gelÃ¶schte) Spalten entfernen
 
         var l = new List<ColumnItem>();
         foreach (var thisColumn in db.Column) {
@@ -430,7 +436,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.OpticalTextReplace, c.OpticalReplace.JoinWithCr(), name);
         SaveToByteList(l, DatabaseDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), name);
         SaveToByteList(l, DatabaseDataType.RegexCheck, c.Regex, name);
-        SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, c.DropdownAllesAbwählenErlaubt.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, c.DropdownAllesAbwÃ¤hlenErlaubt.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.Quickinfo, name);
         SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, name);
@@ -482,11 +488,11 @@ public sealed class Database : DatabaseAbstract {
         try {
             var x = db.LastChange;
             List<byte> l = new();
-            // Wichtig, Reihenfolge und Länge NIE verändern!
+            // Wichtig, Reihenfolge und LÃ¤nge NIE verÃ¤ndern!
             SaveToByteList(l, DatabaseDataType.Formatkennung, "BlueDatabase");
             SaveToByteList(l, DatabaseDataType.Version, DatabaseVersion);
             SaveToByteList(l, DatabaseDataType.Werbung, "                                                                    BlueDataBase - (c) by Christian Peter                                                                                        "); // Die Werbung dient als Dummy-Platzhalter, falls doch mal was vergessen wurde...
-            // Passwörter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden können
+            // PasswÃ¶rter ziemlich am Anfang speicher, dass ja keinen Weiteren Daten geladen werden kÃ¶nnen
             //if (string.IsNullOrEmpty(GlobalShowPass)) {
             //    SaveToByteList(l, DatabaseDataType.CryptionState, false.ToPlusMinus());
             //} else {
@@ -530,9 +536,9 @@ public sealed class Database : DatabaseAbstract {
             //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
             SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
 
-            if (x != db.LastChange) { return null; } // Works haben sich evtl. geändert
+            if (x != db.LastChange) { return null; } // Works haben sich evtl. geÃ¤ndert
 
-            // Beim Erstellen des Undo-Speichers die Undos nicht verändern, da auch bei einem nicht
+            // Beim Erstellen des Undo-Speichers die Undos nicht verÃ¤ndern, da auch bei einem nicht
             // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
             List<string> works2 = new();
             foreach (var thisWorkItem in db.Undo) {
@@ -622,14 +628,14 @@ public sealed class Database : DatabaseAbstract {
         var m = base.EditableErrorReason(mode);
         if (!string.IsNullOrEmpty(m)) { return m; }
 
-        //----------Load, vereinfachte Prüfung ------------------------------------------------------------------------
+        //----------Load, vereinfachte PrÃ¼fung ------------------------------------------------------------------------
         if (mode.HasFlag(EditableErrorReasonType.Load) || mode.HasFlag(EditableErrorReasonType.LoadForCheckingOnly)) {
             if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
         }
 
         //----------Alle Edits und Save ------------------------------------------------------------------------
-        //  Generelle Prüfung, die eigentlich immer benötigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell ändern
-        //  und eine Prüfung, die nicht auf die Sekunde genau wichtig ist.
+        //  Generelle PrÃ¼fung, die eigentlich immer benÃ¶tigt wird. Mehr allgemeine Fehler, wo sich nicht so schnell Ã¤ndern
+        //  und eine PrÃ¼fung, die nicht auf die Sekunde genau wichtig ist.
         if (CheckForLastError(ref _editNormalyNextCheckUtc, ref _editNormalyError)) { return _editNormalyError; }
         if (!string.IsNullOrEmpty(Filename)) {
             if (!CanWriteInDirectory(Filename.FilePath())) {
@@ -640,8 +646,8 @@ public sealed class Database : DatabaseAbstract {
 
         //---------- Save ------------------------------------------------------------------------------------------
         if (mode.HasFlag(EditableErrorReasonType.Save)) {
-            if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
-            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
+            if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "KÃ¼rzlich vorgenommene Ã„nderung muss verarbeitet werden."; }
+            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. MassenÃ¤nderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden fÃ¼r ein zca4
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
             if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------
             if (CheckForLastError(ref _canWriteNextCheckUtc, ref _canWriteError) && !string.IsNullOrEmpty(_canWriteError)) {
@@ -665,7 +671,7 @@ public sealed class Database : DatabaseAbstract {
         }
         return string.Empty;
 
-        // Gibt true zurück, wenn die letzte Prüfung noch gülig ist
+        // Gibt true zurÃ¼ck, wenn die letzte PrÃ¼fung noch gÃ¼lig ist
         static bool CheckForLastError(ref DateTime nextCheckUtc, ref string lastMessage) {
             if (DateTime.UtcNow.Subtract(nextCheckUtc).TotalSeconds < 0) { return true; }
             lastMessage = string.Empty;
@@ -678,7 +684,7 @@ public sealed class Database : DatabaseAbstract {
 
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
+        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien kÃ¶nnen nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
         //fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
         if (!createWhenNotExisting && !CanWriteInDirectory(fileNameToLoad.FilePath())) { SetReadOnly(); }
@@ -909,9 +915,9 @@ public sealed class Database : DatabaseAbstract {
     private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 
     /// <summary>
-    /// Diese Routine lädt die Datei von der Festplatte. Zur Not wartet sie bis zu 5 Minuten.
-    /// Hier wird auch nochmal geprüft, ob ein Laden überhaupt möglich ist.
-    /// Es kann auch NULL zurück gegeben werden, wenn es ein Reload ist und die Daten inzwischen aktuell sind.
+    /// Diese Routine lÃ¤dt die Datei von der Festplatte. Zur Not wartet sie bis zu 5 Minuten.
+    /// Hier wird auch nochmal geprÃ¼ft, ob ein Laden Ã¼berhaupt mÃ¶glich ist.
+    /// Es kann auch NULL zurÃ¼ck gegeben werden, wenn es ein Reload ist und die Daten inzwischen aktuell sind.
     /// </summary>
     /// <param name="checkmode"></param>
     /// <returns></returns>
@@ -926,7 +932,7 @@ public sealed class Database : DatabaseAbstract {
                     bLoaded = File.ReadAllBytes(Filename);
                     //tmpLastSaveCode2 = GetFileInfo(Filename, true);
                     //if (tmpLastSaveCode1 == tmpLastSaveCode2) { break; }
-                    //f = "Datei wurde während des Ladens verändert.";
+                    //f = "Datei wurde wÃ¤hrend des Ladens verÃ¤ndert.";
                     break;
                 }
 

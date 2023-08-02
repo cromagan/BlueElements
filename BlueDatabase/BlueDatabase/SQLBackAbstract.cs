@@ -80,6 +80,41 @@ public abstract class SqlBackAbstract {
 
     #endregion
 
+    //public int SizeOf(string tablename, string columnname) {
+    //    if (!IsValidTableName(tablename, true)) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
+    //        return -1;
+    //    }
+
+    //    if (!ColumnItem.IsValidColumnName(columnname)) {
+    //        Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + columnname);
+    //        return -1;
+    //    }
+
+    //    if (!OpenConnection()) { return -1; }
+
+    //    var = Exception
+
+    //        OracleCommand command = new OracleCommand();
+    //        command.Connection = connection;
+    //        command.CommandText = "SELECT * FROM " + tableName + " WHERE 1 = 0";
+
+    //        OracleDataReader reader = command.ExecuteReader();
+    //        reader.Read();
+
+    //        int maxLength = reader.GetSchemaTable()
+    //        .Rows
+    //        .Cast<System.Data.DataRow>()
+    //        .Where(row => row["ColumnName"].ToString() == columnName)
+    //        .Select(row => (int)row["ColumnSize"])
+    //        .FirstOrDefault();
+
+    //        Console.WriteLine("Maximale Länge der Spalte " + columnName + " in Tabelle " + tableName + " ist " + maxLength);
+
+    //        reader.Close();
+
+    //}
+
     #region Methods
 
     public static bool IsValidTableName(string tablename, bool allowSystemnames) {
@@ -1106,6 +1141,11 @@ public abstract class SqlBackAbstract {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
 
             return "Tabellenname ungültig: " + tablename;
+        }
+
+        if (!ColumnItem.IsValidColumnName(column)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + column);
+            return "Spaltenname ungültig: " + column;
         }
 
         var b = ExecuteCommand("ALTER TABLE " + tablename.ToUpper() + " drop column " + column.ToUpper(), true);
