@@ -32,7 +32,7 @@ public partial class Progressbar : FloatingForm {
     private int _count;
     private int _eProgressbarLastCalulatedSeconds = int.MinValue;
     private int _eProgressbarLastCurrent = int.MaxValue;
-    private DateTime _eProgressbarLastTimeUpdate = DateTime.Now;
+    private DateTime _eProgressbarLastTimeUpdate = DateTime.UtcNow;
 
     #endregion
 
@@ -88,7 +88,7 @@ public partial class Progressbar : FloatingForm {
     private string CalculateText(string baseText, int current, int count) {
         if (current < _eProgressbarLastCurrent) {
             _eProgressbarTimeDic.Clear();
-            _eProgressbarLastTimeUpdate = DateTime.Now;
+            _eProgressbarLastTimeUpdate = DateTime.UtcNow;
             _eProgressbarLastCalulatedSeconds = int.MinValue;
         }
         var pr = current / (double)count;
@@ -99,7 +99,7 @@ public partial class Progressbar : FloatingForm {
         if (current > 0) {
             if (_eProgressbarTimeDic.ContainsKey(Math.Max(0, current - 100))) {
                 var d = _eProgressbarTimeDic[Math.Max(0, current - 100)];
-                var ts = DateTime.Now.Subtract(d).TotalSeconds;
+                var ts = DateTime.UtcNow.Subtract(d).TotalSeconds;
                 tmpCalculatedSeconds = (int)(ts / Math.Min(current, 100) * (count - current));
             } else {
                 tmpCalculatedSeconds = int.MinValue;
@@ -109,10 +109,10 @@ public partial class Progressbar : FloatingForm {
         }
         _eProgressbarLastCurrent = current;
         if (!_eProgressbarTimeDic.ContainsKey(current)) {
-            _eProgressbarTimeDic.Add(current, DateTime.Now);
+            _eProgressbarTimeDic.Add(current, DateTime.UtcNow);
         }
-        if (_eProgressbarLastCalulatedSeconds != tmpCalculatedSeconds && DateTime.Now.Subtract(_eProgressbarLastTimeUpdate).TotalSeconds > 5) {
-            _eProgressbarLastTimeUpdate = DateTime.Now;
+        if (_eProgressbarLastCalulatedSeconds != tmpCalculatedSeconds && DateTime.UtcNow.Subtract(_eProgressbarLastTimeUpdate).TotalSeconds > 5) {
+            _eProgressbarLastTimeUpdate = DateTime.UtcNow;
             if (current < 2) {
                 _eProgressbarLastCalulatedSeconds = tmpCalculatedSeconds;
             }

@@ -918,7 +918,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public bool TextBearbeitungErlaubt {
-        get => Database?.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0 || _textBearbeitungErlaubt;
+        get => Database?.PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds > 0 || _textBearbeitungErlaubt;
         set {
             if (_textBearbeitungErlaubt == value) { return; }
 

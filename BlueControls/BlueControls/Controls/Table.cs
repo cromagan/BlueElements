@@ -1101,7 +1101,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
     public void OpenSearchAndReplace() {
-        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditGeneral) || Database == null) { return; }
+        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditCurrently) || Database == null) { return; }
 
         if (!Database.IsAdministrator()) { return; }
 
@@ -1502,7 +1502,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             switch (e.KeyCode) {
                 case Keys.Oemcomma: // normales ,
                     if (e.Modifiers == Keys.Control) {
-                        var lp = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditGeneral, true, false, true);
+                        var lp = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true);
                         Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
                         if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
                         if (string.IsNullOrEmpty(lp) && newRow?.Row != null) {
@@ -1520,7 +1520,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                             _isinKeyDown = false;
                             return;
                         }
-                        var l2 = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditGeneral, true, false, true);
+                        var l2 = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true);
                         if (string.IsNullOrEmpty(l2)) {
                             UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true);
                         } else {
@@ -1534,7 +1534,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         _isinKeyDown = false;
                         return;
                     }
-                    var l = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditGeneral, true, false, true);
+                    var l = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true);
                     if (string.IsNullOrEmpty(l)) {
                         UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true);
                     } else {
@@ -1892,7 +1892,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private static void UserEdited(Table table, string newValue, ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool formatWarnung) {
-        var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditGeneral, true, false, true);
+        var er = table.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, false, true);
         if (!string.IsNullOrEmpty(er)) { NotEditableInfo(er); return; }
 
         if (cellInThisDatabaseColumn == null) { return; } // Dummy prüfung
@@ -1926,7 +1926,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (cellInThisDatabaseRow == null) {
             if (string.IsNullOrEmpty(newValue)) { return; }
 
-            var fe = table.EditableErrorReason(cellInThisDatabaseColumn.Database?.Column.First(), null, EditableErrorReasonType.EditGeneral, true, false, true);
+            var fe = table.EditableErrorReason(cellInThisDatabaseColumn.Database?.Column.First(), null, EditableErrorReasonType.EditCurrently, true, false, true);
             if (!string.IsNullOrEmpty(fe)) {
                 NotEditableInfo(fe);
                 return;
@@ -1953,7 +1953,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (contentHolderCellRow != null) {
             if (newValue == contentHolderCellRow.CellGetString(contentHolderCellColumn)) { return; }
 
-            var f = CellCollection.EditableErrorReason(contentHolderCellColumn, contentHolderCellRow, EditableErrorReasonType.EditGeneral, true, false);
+            var f = CellCollection.EditableErrorReason(contentHolderCellColumn, contentHolderCellRow, EditableErrorReasonType.EditCurrently, true, false);
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue);
 
@@ -2218,7 +2218,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void BTB_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = Database;
 
     private void Cell_Edit(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, bool preverDropDown) {
-        var f = EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditGeneral, true, true, true);
+        var f = EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow, EditableErrorReasonType.EditCurrently, true, true, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
         if (cellInThisDatabaseColumn == null) { return; }// Klick ins Leere
 
@@ -3313,7 +3313,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (Database.ColumnArrangements.Count == 0) { return false; }
         if (CurrentArrangement?[fc] == null) { return false; }
 
-        if (Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
+        if (Database.PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds > 0) { return true; }
 
         if (!Database.PermissionCheck(Database.PermissionGroupsNewRow, null)) { return false; }
 

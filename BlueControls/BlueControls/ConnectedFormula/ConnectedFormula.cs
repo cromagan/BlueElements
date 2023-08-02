@@ -97,7 +97,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         _muf.ParseExternal += ParseExternal;
         _muf.ToListOfByte += ToListOfByte;
         _muf.Saving += _muf_Saving;
-        _createDate = DateTime.Now.ToString(Constants.Format_Date5);
+        _createDate = DateTime.UtcNow.ToString(Constants.Format_Date5);
         _creator = UserName;
         PadData = new ItemCollectionPad.ItemCollectionPad();
 
@@ -550,7 +550,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, "Allgemein"); }
 
-            //var m = EditableErrorReason(EditableErrorReasonType.EditGeneral);
+            //var m = EditableErrorReason(EditableErrorReasonType.EditCurrently);
 
             //if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
 

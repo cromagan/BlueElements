@@ -37,7 +37,7 @@ public partial class Notification : FloatingForm {
     private const bool UserClicked = false;
 
     // Wegen Recheoperation
-    private readonly DateTime _firstTimer = DateTime.Now;
+    private readonly DateTime _firstTimer = DateTime.UtcNow;
 
     private readonly int _lowestY;
     private readonly int _screenTime = -999;
@@ -83,7 +83,7 @@ public partial class Notification : FloatingForm {
             if (_hiddenNow) { return; }
         }
 
-        _firstTimer = DateTime.Now;
+        _firstTimer = DateTime.UtcNow;
         timNote.Enabled = true;
     }
 
@@ -117,7 +117,7 @@ public partial class Notification : FloatingForm {
         _isIn = true;
 
         try {
-            var ms = DateTime.Now.Subtract(_firstTimer).TotalMilliseconds;
+            var ms = DateTime.UtcNow.Subtract(_firstTimer).TotalMilliseconds;
 
             #region Anzeige-Status (Richtung, Prozent) bestimmen
 
@@ -142,9 +142,9 @@ public partial class Notification : FloatingForm {
             } else if (ms > _screenTime - SpeedIn) {
                 // War lange genug da, darf wieder raus
                 if (!hasBelow) {
-                    if (_outime.Ticks == 0) { _outime = DateTime.Now; }
+                    if (_outime.Ticks == 0) { _outime = DateTime.UtcNow; }
 
-                    var mSo = DateTime.Now.Subtract(_outime).TotalMilliseconds;
+                    var mSo = DateTime.UtcNow.Subtract(_outime).TotalMilliseconds;
 
                     Opacity = 1 - (mSo / SpeedOut);
                     //Top = (int)(lowestY + pixelfromLower * (MSo / SpeedOut)) + 1;
@@ -168,7 +168,7 @@ public partial class Notification : FloatingForm {
                 //Develop.DoEvents();
             }
 
-            if (_firstTimer.Subtract(DateTime.Now).TotalMinutes > 2 || UserClicked) { _hiddenNow = true; }
+            if (_firstTimer.Subtract(DateTime.UtcNow).TotalMinutes > 2 || UserClicked) { _hiddenNow = true; }
         } catch { }
 
         if (_hiddenNow) {
@@ -230,7 +230,7 @@ public partial class Notification : FloatingForm {
 
     //private void _Timer_Tick(object sender, System.EventArgs e)
     //{
-    //    var MS = DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds;
+    //    var MS = DateTime.UtcNow.Subtract(_FirstTimer).TotalMilliseconds;
     //    var Going = false;
     //    _Timer_Tick_count++;
     //    if (Tag is System.Windows.Forms.Control tempVar)
@@ -248,13 +248,13 @@ public partial class Notification : FloatingForm {
     //        if (_Timer_Tick_count == 6)
     //        {
     //            _Timer_Tick_WasVisible = false;
-    //            _FirstTimer = DateTime.Now;
+    //            _FirstTimer = DateTime.UtcNow;
     //        }
     //        if (_Timer_Tick_count < 7) { return; }
     //    }
     //    if (UnloadAfterSek > 0)
     //    {
-    //        if (DateTime.Now.Subtract(_FirstTimer).TotalSeconds > UnloadAfterSek)
+    //        if (DateTime.UtcNow.Subtract(_FirstTimer).TotalSeconds > UnloadAfterSek)
     //        {
     //            Close();
     //            OnCancel();
@@ -266,7 +266,7 @@ public partial class Notification : FloatingForm {
     //        double _Proz = 0;
     //        if (MS > UpDownSpeed + FloatInAndOutMilliSek * 0.3 && !_Timer_Tick_WasVisible)
     //        {
-    //            _FirstTimer = DateTime.Now.Subtract(new TimeSpan(0, 0, 0, 0, UpDownSpeed));
+    //            _FirstTimer = DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 0, 0, UpDownSpeed));
     //            MS = UpDownSpeed;
     //        }
     //        if (MS < UpDownSpeed)
@@ -308,8 +308,8 @@ public partial class Notification : FloatingForm {
     //}
     //public void FadeOut() {
     //    if (FloatInAndOutMilliSek > 300) {
-    //        if (DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds > UpDownSpeed && DateTime.Now.Subtract(_FirstTimer).TotalMilliseconds < FloatInAndOutMilliSek + UpDownSpeed) {
-    //            _FirstTimer = DateTime.Now.Subtract(new TimeSpan(0, 0, 0, 0, UpDownSpeed + 10));
+    //        if (DateTime.UtcNow.Subtract(_FirstTimer).TotalMilliseconds > UpDownSpeed && DateTime.UtcNow.Subtract(_FirstTimer).TotalMilliseconds < FloatInAndOutMilliSek + UpDownSpeed) {
+    //            _FirstTimer = DateTime.UtcNow.Subtract(new TimeSpan(0, 0, 0, 0, UpDownSpeed + 10));
     //        }
     //        FloatInAndOutMilliSek = 300;
     //    }

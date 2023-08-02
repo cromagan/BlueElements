@@ -93,7 +93,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         hotItem = _lastWord;
     }
 
-    public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.Now.ToLongTimeString() + "] " + txt;
+    public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
 
     public virtual void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 

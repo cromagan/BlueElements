@@ -39,7 +39,7 @@ public static class IO {
     private const int CanWriteTryintervall = 10;
     private static readonly List<string> NoWriteAccess = new();
     private static readonly List<string> WriteAccess = new();
-    private static DateTime _canWriteLastCheck = DateTime.Now.Subtract(new TimeSpan(10, 10, 10));
+    private static DateTime _canWriteLastCheck = DateTime.UtcNow.Subtract(new TimeSpan(10, 10, 10));
     private static string _canWriteLastFile = string.Empty;
     private static bool _canWriteLastResult;
     private static string _lastFilePath = string.Empty;
@@ -64,11 +64,11 @@ public static class IO {
 
     public static bool CanWrite(string filename, double tryItForSeconds) {
         if (!CanWriteInDirectory(filename.FilePath())) { return false; }
-        var s = DateTime.Now;
+        var s = DateTime.UtcNow;
         while (true) {
             if (CanWrite(filename)) { return true; }
             if (tryItForSeconds < CanWriteTryintervall) { return false; }
-            if (DateTime.Now.Subtract(s).TotalSeconds > tryItForSeconds) { return false; }
+            if (DateTime.UtcNow.Subtract(s).TotalSeconds > tryItForSeconds) { return false; }
         }
     }
 
@@ -421,7 +421,7 @@ public static class IO {
     public static string TempFile(string pfad, string wunschname, string suffix) {
         if (string.IsNullOrEmpty(pfad)) { pfad = Path.GetTempPath(); }
         if (string.IsNullOrEmpty(suffix)) { suffix = "tmp"; }
-        if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName + DateTime.Now.ToString(Constants.Format_Date6); }
+        if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName + DateTime.UtcNow.ToString(Constants.Format_Date6); }
         var z = -1;
         pfad = pfad.CheckPath();
         if (!DirectoryExists(pfad)) { _ = Directory.CreateDirectory(pfad); }
@@ -452,7 +452,7 @@ public static class IO {
             if (executeAfter) { _ = ExecuteFile(filename); }
             return true;
         } catch {
-          //  Develop.DebugPrint(FehlerArt.Info, "Fehler beim Speichern der Datei: " + filename, ex);
+            //  Develop.DebugPrint(FehlerArt.Info, "Fehler beim Speichern der Datei: " + filename, ex);
             return false;
         }
     }
@@ -462,22 +462,22 @@ public static class IO {
         // Aber das andere prüft zusätzlich die Schreibrechte im Verzeichnis
         // http://www.vbarchiv.net/tipps/tipp_1281.html
         if (_canWriteLastResult) { _canWriteLastFile = string.Empty; }
-        if (DateTime.Now.Subtract(_canWriteLastCheck).TotalSeconds > CanWriteTryintervall) { _canWriteLastFile = string.Empty; }
+        if (DateTime.UtcNow.Subtract(_canWriteLastCheck).TotalSeconds > CanWriteTryintervall) { _canWriteLastFile = string.Empty; }
         if (_canWriteLastFile != file.ToUpper()) {
-            var startTime = DateTime.Now;
+            var startTime = DateTime.UtcNow;
             if (FileExists(file)) {
                 try {
                     // Versuch, Datei EXKLUSIV zu öffnen
                     using (FileStream obFi = new(file, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                         obFi.Close();
                     }
-                    _canWriteLastResult = DateTime.Now.Subtract(startTime).TotalSeconds < 1;
+                    _canWriteLastResult = DateTime.UtcNow.Subtract(startTime).TotalSeconds < 1;
                 } catch {
                     // Bei Fehler ist die Datei in Benutzung
                     _canWriteLastResult = false;
                 }
             }
-            _canWriteLastCheck = DateTime.Now;
+            _canWriteLastCheck = DateTime.UtcNow;
         }
         _canWriteLastFile = file.ToUpper();
         return _canWriteLastResult;
@@ -493,12 +493,12 @@ public static class IO {
     /// <returns>True bei Erfolg</returns>
     private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {
         var tries = 0;
-        var startTime = DateTime.Now;
+        var startTime = DateTime.UtcNow;
         while (!processMethod(file1, file2)) {
             tries++;
             if (tries > 5) {
                 if (!toBeSure) { return false; }
-                if (DateTime.Now.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(FehlerArt.Fehler, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + file1 + "\r\n" + file2); }
+                if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(FehlerArt.Fehler, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + file1 + "\r\n" + file2); }
             }
             Pause(0.2, false);
         }

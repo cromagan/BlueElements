@@ -753,7 +753,7 @@ public class BitmapExt : IDisposableExtended {
             return;
         }
 
-        var tim = DateTime.Now;
+        var tim = DateTime.UtcNow;
 
         do {
             try { // wird an anderer stelle verwendet
@@ -765,7 +765,7 @@ public class BitmapExt : IDisposableExtended {
                 using var gr = Graphics.FromImage(_bitmap);
                 gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
             } catch (Exception ex) {
-                if (DateTime.Now.Subtract(tim).TotalSeconds > 5) {
+                if (DateTime.UtcNow.Subtract(tim).TotalSeconds > 5) {
                     Develop.DebugPrint("Bild konnte nicht geklont werden", ex);
                     Width = -1;
                     Height = -1;

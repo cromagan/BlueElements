@@ -420,7 +420,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem>? pinned, bool fullCheck, bool changevalues) {
-        var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditGeneral);
+        var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditCurrently);
         if (!string.IsNullOrEmpty(m) || Database == null) { return m; }
 
         var rows = CalculateVisibleRows(filter, pinned);
@@ -453,6 +453,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public void ExecuteValueChanged() {
         if (_pendingChangedRows.Count == 0) { return; }
+        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return; }
+
         if (_executingchangedrows) { return; }
         _executingchangedrows = true;
 
@@ -463,16 +465,17 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 var key = _pendingChangedRows[0];
 
                 var r = SearchByKey(key);
-                _pendingChangedRows.RemoveAt(0);
-
                 if (r != null && !r.IsDisposed) {
-                    _ = r.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2);
+                    var ok = r.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2);
+
+                    if (!ok.AllOk) { return; }
+
                     r.InvalidateCheckData();
                     r.CheckRowDataIfNeeded();
+                    _pendingChangedBackgroundRow.Add(key);
                 }
 
-                _ = _pendingChangedRows.Remove(key); // Evtl.duch das Script erneut hinzugekommen.
-                _pendingChangedBackgroundRow.Add(key);
+                _ = _pendingChangedRows.Remove(key);
             } catch { }
         }
 
@@ -554,7 +557,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             throw new Exception();
         }
 
-
         item = SearchByKey(key);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen, ID Fehler");
@@ -575,15 +577,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (!string.IsNullOrEmpty(valueOfCellInFirstColumn)) {
             item.CellSet(db.Column.First(), valueOfCellInFirstColumn);
-        }
-        else {
+        } else {
             Develop.DebugPrint(FehlerArt.Warnung, "Null!");
         }
 
-        if(item.CellFirstString() != valueOfCellInFirstColumn) {
+        if (item.CellFirstString() != valueOfCellInFirstColumn) {
             Develop.DebugPrint(FehlerArt.Warnung, "Fehler!!");
         }
-
 
         if (runScriptOfNewRow) {
             _ = item.ExecuteScript(ScriptEventTypes.new_row, string.Empty, true, true, true, 0.1f);
@@ -649,13 +649,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public bool RemoveOlderThan(float inHours, string comment) {
         if (Database?.Column.SysRowCreateDate is not ColumnItem src) { return false; }
 
-        var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(src) where DateTime.Now.Subtract(d).TotalHours > inHours select thisrowitem.KeyName).Select(dummy => dummy).ToList();
+        var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(src) where DateTime.UtcNow.Subtract(d).TotalHours > inHours select thisrowitem.KeyName).Select(dummy => dummy).ToList();
         //foreach (var thisrowitem in _Internal.Values)
         //{
         //    if (thisrowitem != null)
         //    {
         //        var D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate());
-        //        if (DateTime.Now.Subtract(D).TotalHours > InHours) { x.GenerateAndAdd(thisrowitem.KeyName); }
+        //        if (DateTime.UtcNow.Subtract(D).TotalHours > InHours) { x.GenerateAndAdd(thisrowitem.KeyName); }
         //    }
         //}
         if (x.Count == 0) { return false; }
@@ -891,11 +891,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         var rk = (string)e.Argument;
-
         var r = SearchByKey(rk);
         if (r == null || r.IsDisposed) { return; }
-
-        _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 5);
+        var _ = r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, false, false, false, 10);
     }
 
     private void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => _pendingworker.Remove((BackgroundWorker)sender);

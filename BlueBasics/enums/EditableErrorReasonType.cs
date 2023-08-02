@@ -41,7 +41,7 @@ public enum EditableErrorReasonType {
     /// Es ist noch Zeit, der Benutzer kann ausgesperrt werden
     /// Auf Zellebene werden hier bereits schon die Zeilen für LinkedCells angelegt
     /// </summary>
-    EditGeneral = 8,
+    EditCurrently = 8,
 
     Save = 16,
 

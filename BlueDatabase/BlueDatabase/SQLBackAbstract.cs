@@ -480,8 +480,6 @@ public abstract class SqlBackAbstract {
         }
     }
 
-    //    row.Clear();
-    //    var ti = DateTime.Now;
     public void RepairAll(string tablename) {
         Develop.StartService();
 

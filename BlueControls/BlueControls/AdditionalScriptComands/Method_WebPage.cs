@@ -42,10 +42,10 @@ public abstract class Method_WebPage : Method {
 
         #region  Warten, bis der Ladevorgang gestartet ist
 
-        var d = DateTime.Now;
+        var d = DateTime.UtcNow;
         while (!browser.IsLoading) {
             Develop.DoEvents();
-            if (DateTime.Now.Subtract(d).TotalSeconds > 10) {
+            if (DateTime.UtcNow.Subtract(d).TotalSeconds > 10) {
                 return true;
             }
         }
@@ -54,10 +54,10 @@ public abstract class Method_WebPage : Method {
 
         #region  Warten, bis der Ladevorgang abgeschlossen ist
 
-        d = DateTime.Now;
+        d = DateTime.UtcNow;
         while (browser.IsLoading) {
             Generic.Pause(1, true);
-            if (DateTime.Now.Subtract(d).TotalSeconds > 30) {
+            if (DateTime.UtcNow.Subtract(d).TotalSeconds > 30) {
                 return false;
             }
         }

@@ -51,7 +51,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private bool _cursorVisible;
     private bool _formatierungErlaubt;
     private string _lastCheckedText = string.Empty;
-    private DateTime _lastUserActionForSpellChecking = DateTime.Now;
+    private DateTime _lastUserActionForSpellChecking = DateTime.UtcNow;
     private int _markEnd = -1;
     private int _markStart = -1;
     private int _maxTextLenght = 4000;
@@ -638,7 +638,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     protected override void OnDoubleClick(System.EventArgs e) {
         base.OnDoubleClick(e);
         Selection_WortMarkieren(_markStart);
-        _lastUserActionForSpellChecking = DateTime.Now;
+        _lastUserActionForSpellChecking = DateTime.UtcNow;
         _mouseValue = 9999;
         Invalidate();
     }
@@ -655,7 +655,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (!FloatingForm.IsShowing(this)) {
             SetCursorToEnd();
             if (!_eTxt.Multiline) { if (!ContainsMouse() || !MousePressing()) { MarkAll(); } }
-            _lastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
+            _lastUserActionForSpellChecking = DateTime.UtcNow.AddSeconds(-30);
         }
         Blinker.Enabled = true;
     }
@@ -666,7 +666,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         base.OnKeyDown(e);
 
         if (!Enabled) { return; }
-        _lastUserActionForSpellChecking = DateTime.Now;
+        _lastUserActionForSpellChecking = DateTime.UtcNow;
         if (_mouseValue != 0 || e == null) { return; }
 
         switch (e.KeyCode) {
@@ -698,7 +698,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     protected override void OnKeyPress(KeyPressEventArgs e) {
         base.OnKeyPress(e);
-        _lastUserActionForSpellChecking = DateTime.Now;
+        _lastUserActionForSpellChecking = DateTime.UtcNow;
         if (!Enabled) {
             if (e.KeyChar != (int)AsciiKey.StrgX) { e.KeyChar = (char)AsciiKey.StrgC; }
             if (e.KeyChar != (int)AsciiKey.StrgC) { return; }
@@ -729,7 +729,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     // Fokus
     protected override void OnLostFocus(System.EventArgs e) {
         base.OnLostFocus(e);
-        _lastUserActionForSpellChecking = DateTime.Now.AddSeconds(-30);
+        _lastUserActionForSpellChecking = DateTime.UtcNow.AddSeconds(-30);
         if (!FloatingForm.IsShowing(this)) { MarkClear(); }
         Blinker.Enabled = false;
         CursorClear();
@@ -739,7 +739,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     // Mouse
     protected override void OnMouseDown(MouseEventArgs e) {
         base.OnMouseDown(e);
-        _lastUserActionForSpellChecking = DateTime.Now;
+        _lastUserActionForSpellChecking = DateTime.UtcNow;
         if (!Enabled) { return; }
         if (e.Button == MouseButtons.Right) { return; }
         _mouseValue = 1;
@@ -755,7 +755,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (_eTxt == null) { return; }
         if (e.Button != MouseButtons.Left) { return; }
         if (!Enabled) { return; }
-        _lastUserActionForSpellChecking = DateTime.Now;
+        _lastUserActionForSpellChecking = DateTime.UtcNow;
         CursorClear();
         _markEnd = Cursor_PosAt(e.X, e.Y);
         Selection_Repair(false);
@@ -764,7 +764,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        _lastUserActionForSpellChecking = DateTime.Now;
+        _lastUserActionForSpellChecking = DateTime.UtcNow;
         if (Enabled) {
             if (_mouseValue == 9999) {
                 //es Wurde Doppelgeklickt
@@ -793,7 +793,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
         if (_sliderY == null || !_sliderY.Visible) { return; }
-        _lastUserActionForSpellChecking = DateTime.Now;
+        _lastUserActionForSpellChecking = DateTime.UtcNow;
         _sliderY.DoMouseWheel(e);
     }
 
@@ -1099,7 +1099,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private void SpellChecker_DoWork(object sender, DoWorkEventArgs e) {
         try {
             if (Dictionary.IsSpellChecking) { return; }
-            if (DateTime.Now.Subtract(_lastUserActionForSpellChecking).TotalSeconds < 2) { return; }
+            if (DateTime.UtcNow.Subtract(_lastUserActionForSpellChecking).TotalSeconds < 2) { return; }
 
             Dictionary.IsSpellChecking = true;
             if (!_spellChecking) { return; }

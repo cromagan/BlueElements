@@ -50,7 +50,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     #region Constructors
 
     public ColumnArrangementPadEditor(DatabaseAbstract? database) : this() {
-        var m = DatabaseAbstract.EditableErrorReason(database, EditableErrorReasonType.EditGeneral);
+        var m = DatabaseAbstract.EditableErrorReason(database, EditableErrorReasonType.EditCurrently);
         if (!string.IsNullOrEmpty(m)) {
             MessageBox.Show(m, ImageCode.Information, "OK");
             Close();

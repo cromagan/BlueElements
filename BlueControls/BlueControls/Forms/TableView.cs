@@ -607,7 +607,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "ZeileLöschen":
-                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditGeneral)) { return; }
+                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditCurrently)) { return; }
                 if (!tbl.Database.IsAdministrator()) { return; }
                 if (row == null || row.IsDisposed) { return; }
 
@@ -619,7 +619,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "ContentDelete":
-                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditGeneral)) { return; }
+                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditCurrently)) { return; }
 
                 tbl.Database.Cell.Delete(column, row?.KeyName);
                 break;
@@ -665,7 +665,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "VorherigenInhaltWiederherstellen":
-                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditGeneral)) { return; }
+                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditCurrently)) { return; }
 
                 Table.DoUndo(column, row);
                 break;
@@ -832,7 +832,7 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
         Notification.Show("20 Sekunden (fast) rechtefreies<br>bearbeiten akiviert.", ImageCode.Stift);
-        Table.PowerEdit = DateTime.Now.AddSeconds(20);
+        Table.PowerEdit = DateTime.UtcNow.AddSeconds(20);
     }
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
@@ -1051,7 +1051,7 @@ public partial class TableView : FormWithStatusBar {
             return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
         }
 
-        var m = DatabaseAbstract.EditableErrorReason(Table.Database, EditableErrorReasonType.EditGeneral);
+        var m = DatabaseAbstract.EditableErrorReason(Table.Database, EditableErrorReasonType.EditCurrently);
 
         if (Table.Design != BlueTableAppearance.Standard || !Table.Enabled || !string.IsNullOrEmpty(m)) {
             enTabellenAnsicht = false;

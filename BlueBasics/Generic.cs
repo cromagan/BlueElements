@@ -263,10 +263,10 @@ public static class Generic {
             return;
         }
         TimeSpan akTimer;
-        var firstTimer = DateTime.Now;
+        var firstTimer = DateTime.UtcNow;
         do {
             Develop.DoEvents();
-            akTimer = DateTime.Now.Subtract(firstTimer);
+            akTimer = DateTime.UtcNow.Subtract(firstTimer);
         } while (akTimer.TotalSeconds < sekunden);
     }
 

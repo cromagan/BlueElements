@@ -285,8 +285,8 @@ public sealed class MultiUserFile : IDisposableExtended {
             }
         }
 
-        //----------EditAcut, EditGeneral ----------------------------------------------------------------------
-        if (mode.HasFlag(EditableErrorReasonType.EditAcut) || mode.HasFlag(EditableErrorReasonType.EditGeneral)) {
+        //----------EditAcut, EditCurrently ----------------------------------------------------------------------
+        if (mode.HasFlag(EditableErrorReasonType.EditAcut) || mode.HasFlag(EditableErrorReasonType.EditCurrently)) {
             if (AgeOfBlockDatei > 60) {
                 _editNormalyError = "Eine Blockdatei ist anscheinend dauerhaft vorhanden. Administrator verständigen.";
                 return _editNormalyError;
@@ -298,8 +298,8 @@ public sealed class MultiUserFile : IDisposableExtended {
             if (IsLoading) { return "Aktuell werden Daten geladen."; }
         }
 
-        //----------EditGeneral, Save------------------------------------------------------------------------------------------
-        if (mode.HasFlag(EditableErrorReasonType.EditGeneral) || mode.HasFlag(EditableErrorReasonType.Save)) {
+        //----------EditCurrently, Save------------------------------------------------------------------------------------------
+        if (mode.HasFlag(EditableErrorReasonType.EditCurrently) || mode.HasFlag(EditableErrorReasonType.Save)) {
             if (ReloadNeeded) { return "Die Datei muss neu eingelesen werden."; }
         }
 
@@ -874,11 +874,11 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// <param name="hardmode"></param>
     private void WaitLoaded(bool hardmode) {
         //if (_loadingThreadId == Thread.CurrentThread.ManagedThreadId) { return; }
-        var x = DateTime.Now;
+        var x = DateTime.UtcNow;
         while (_lockload > 0) {
             Develop.DoEvents();
             if (!hardmode) { return; }
-            if (DateTime.Now.Subtract(x).TotalMinutes > 1) {
+            if (DateTime.UtcNow.Subtract(x).TotalMinutes > 1) {
                 if (hardmode) {
                     Develop.DebugPrint(FehlerArt.Warnung, "WaitLoaded hängt: " + Filename);
                 }

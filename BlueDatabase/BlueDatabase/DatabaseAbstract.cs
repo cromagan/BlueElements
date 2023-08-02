@@ -380,7 +380,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     #region Methods
 
     public static List<ConnectionInfo> AllAvailableTables() {
-        if (DateTime.Now.Subtract(_lastTableCheck).TotalMinutes < 1) {
+        if (DateTime.UtcNow.Subtract(_lastTableCheck).TotalMinutes < 1) {
             return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
 
@@ -417,7 +417,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             }
         }
 
-        _lastTableCheck = DateTime.Now;
+        _lastTableCheck = DateTime.UtcNow;
         return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
@@ -869,7 +869,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         if (ReadOnly && mode.HasFlag(EditableErrorReasonType.Save)) { return "Datenbank schreibgeschützt!"; }
 
-        if (mode.HasFlag(EditableErrorReasonType.EditGeneral) || mode.HasFlag(EditableErrorReasonType.Save)) {
+        if (mode.HasFlag(EditableErrorReasonType.EditCurrently) || mode.HasFlag(EditableErrorReasonType.Save)) {
             if (Row.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
         }
 
@@ -903,12 +903,18 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, "Allgemein"); }
 
         try {
+            var timestamp = string.Empty;
 
             #region Variablen für Skript erstellen
 
             VariableCollection vars = new();
 
             if (row != null && !row.IsDisposed) {
+                if (Column.SysRowChangeDate is not ColumnItem column) {
+                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, s.Name);
+                }
+
+                timestamp = row.CellGetString(column);
                 foreach (var thisCol in Column) {
                     var v = RowItem.CellToVariable(thisCol, row);
                     if (v != null) { vars.AddRange(v); }
@@ -969,6 +975,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             if (sc.ChangeValues && changevalues && scf.AllOk) {
                 if (row != null && !row.IsDisposed) {
+                    if (Column.SysRowChangeDate is not ColumnItem column) {
+                        return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, s.Name);
+                    }
+
+                    if (row.CellGetString(column) != timestamp) {
+                        return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, s.Name);
+                    }
+
                     foreach (var thisCol in Column) {
                         row.VariableToCell(thisCol, vars);
                     }
@@ -994,7 +1008,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, "Allgemein"); }
 
-            var m = EditableErrorReason(EditableErrorReasonType.EditGeneral);
+            var m = EditableErrorReason(EditableErrorReasonType.EditCurrently);
 
             if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
 
@@ -1514,7 +1528,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public bool PermissionCheck(IList<string>? allowed, RowItem? row) {
         try {
             if (IsAdministrator()) { return true; }
-            if (PowerEdit.Subtract(DateTime.Now).TotalSeconds > 0) { return true; }
+            if (PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds > 0) { return true; }
             if (allowed == null || allowed.Count == 0) { return false; }
             if (allowed.Any(thisString => PermissionCheckWithoutAdmin(thisString, row))) {
                 return true;
@@ -1663,7 +1677,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (type.IsObsolete()) { return string.Empty; }
 
-        LastChange = DateTime.Now;
+        LastChange = DateTime.UtcNow;
 
         if (type.IsCellValue()) {
             if (column == null || row == null) {
@@ -1941,7 +1955,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         _datenbankAdmin.Clear();
         _globalShowPass = string.Empty;
         _creator = UserName;
-        _createDate = DateTime.Now.ToString(Constants.Format_Date5);
+        _createDate = DateTime.UtcNow.ToString(Constants.Format_Date5);
         _caption = string.Empty;
         LoadedVersion = DatabaseVersion;
         _globalScale = 1f;
@@ -1966,6 +1980,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     private void Checker_Tick(object state) {
         if (IsDisposed) { return; }
+
+        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 5) { return; }
+        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return; }
 
         Row.ExecuteValueChanged();
 
@@ -2039,7 +2056,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 if (FileExists(fullhashname)) {
                     FileInfo f = new(fullhashname);
-                    if (DateTime.Now.Subtract(f.CreationTime).TotalDays < VorhalteZeit && Constants.GlobalRND.Next(0, VorhalteZeit * 20) != 1) {
+                    if (DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalDays < VorhalteZeit && Constants.GlobalRND.Next(0, VorhalteZeit * 20) != 1) {
                         if (f.Length < 5) { return; }
                         e.Bmp = new BitmapExt(fullhashname);
                         return;
@@ -2054,10 +2071,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 if (!string.IsNullOrWhiteSpace(CachePfad)) {
                     _ = CopyFile(fullname, fullhashname, false);
                     try {
-                        //File.SetLastWriteTime(fullhashname, DateTime.Now);
-                        File.SetCreationTime(fullhashname, DateTime.Now);
+                        //File.SetLastWriteTime(fullhashname, DateTime.UtcNow);
+                        File.SetCreationTime(fullhashname, DateTime.UtcNow);
                         //var x = new FileInfo(fullname);
-                        //x.CreationTime = DateTime.Now;
+                        //x.CreationTime = DateTime.UtcNow;
                     } catch { }
                 }
                 return;

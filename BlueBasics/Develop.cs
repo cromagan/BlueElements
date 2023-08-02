@@ -41,7 +41,7 @@ public static class Develop {
 
     public static DateTime LastUserActionUtc = new(1900, 1, 1);
 
-    private static readonly DateTime ProgrammStarted = DateTime.Now;
+    private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
 
     private static readonly object SyncLockObject = new();
 
@@ -53,9 +53,7 @@ public static class Develop {
 
     private static string _lastDebugMessage = string.Empty;
 
-    private static DateTime _lastDebugTime = DateTime.Now;
-
-    private static DateTime _stopUhr = DateTime.Now;
+    private static DateTime _lastDebugTime = DateTime.UtcNow;
 
     private static TextWriterTraceListener? _traceListener;
 
@@ -127,14 +125,14 @@ public static class Develop {
                 }
                 _isTraceLogging = true;
                 if (art == FehlerArt.Fehler) { _lastDebugMessage = string.Empty; }
-                if (DateTime.Now.Subtract(_lastDebugTime).TotalSeconds > 5) { _lastDebugMessage = string.Empty; }
+                if (DateTime.UtcNow.Subtract(_lastDebugTime).TotalSeconds > 5) { _lastDebugMessage = string.Empty; }
                 var net = art + (";" + meldung);
                 if (net == _lastDebugMessage) {
                     _isTraceLogging = false;
                     return;
                 }
                 _lastDebugMessage = net;
-                _lastDebugTime = DateTime.Now;
+                _lastDebugTime = DateTime.UtcNow;
                 var first = true;
                 var tmp = _currentTraceLogFile;
                 StackTrace strace = new(true);
@@ -174,7 +172,7 @@ public static class Develop {
                         _deleteTraceLog = false;
                         break;
                 }
-                Trace.WriteLine("<br>" + DateTime.Now.ToString(Constants.Format_Date) + "<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
+                Trace.WriteLine("<br>" + DateTime.UtcNow.ToString(Constants.Format_Date) + " UTC<br>Thread-Id: " + Thread.CurrentThread.ManagedThreadId + "</th>");
                 Trace.WriteLine("<th ALIGN=LEFT>");
                 for (var z = 0; z <= Math.Min(nr + 2, strace.FrameCount - 2); z++) {
                     if (!strace.GetFrame(z).GetMethod().Name.Contains("DebugPrint")) {
@@ -305,19 +303,6 @@ public static class Develop {
         check.Enabled = true;
     }
 
-    /// <summary>
-    /// Schreibt die vergangene Zeit in MS in die Konsole.
-    /// Wir kein Text angegeben, wird nur die Zeit zurückgesetzt, ohne einer Ausgabe.
-    /// </summary>
-    /// <param name="txt"></param>
-    public static void StopUhr(string txt) {
-        if (!string.IsNullOrEmpty(txt)) {
-            var x = DateTime.Now.Subtract(_stopUhr);
-            Console.WriteLine("### STOPUHR ### " + x.TotalMilliseconds.ToString(Constants.Format_Float5_1) + " ms ----> " + txt);
-        }
-        _stopUhr = DateTime.Now;
-    }
-
     public static void TraceLogging_End() {
         try {
             if (!string.IsNullOrEmpty(_currentTraceLogFile)) {
@@ -363,7 +348,7 @@ public static class Develop {
     }
 
     private static void CloseAfter12Hours(object sender, System.EventArgs e) {
-        if (DateTime.Now.Subtract(ProgrammStarted).TotalHours > 12) {
+        if (DateTime.UtcNow.Subtract(ProgrammStarted).TotalHours > 12) {
             if (IsHostRunning()) { return; }
             DebugPrint(FehlerArt.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
             TraceLogging_End();

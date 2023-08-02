@@ -39,7 +39,7 @@ public class LinePadItem : AbstractPadItem {
     private readonly PointM _point1;
     private readonly PointM _point2;
     private string _calcTempPointsCode = string.Empty;
-    private DateTime _lastRecalc = DateTime.Now.AddHours(-1);
+    private DateTime _lastRecalc = DateTime.UtcNow.AddHours(-1);
     private List<PointF>? _tempPoints;
 
     #endregion
@@ -227,15 +227,15 @@ public class LinePadItem : AbstractPadItem {
             _tempPoints = null;
         }
         if (Linien_Verhalten != ConectorStyle.Direct && _tempPoints != null) {
-            if (DateTime.Now.Subtract(_lastRecalc).TotalSeconds > 5) {
-                if (DateTime.Now.Subtract(_lastRecalc).TotalSeconds > 5 + Constants.GlobalRND.Next(10)) {
+            if (DateTime.UtcNow.Subtract(_lastRecalc).TotalSeconds > 5) {
+                if (DateTime.UtcNow.Subtract(_lastRecalc).TotalSeconds > 5 + Constants.GlobalRND.Next(10)) {
                     _tempPoints = null;
                 }
                 // r = Nothing
             }
         }
         if (_tempPoints != null && _tempPoints.Count > 1) { return; }
-        _lastRecalc = DateTime.Now;
+        _lastRecalc = DateTime.UtcNow;
         _calcTempPointsCode = newCode;
         _tempPoints = new List<PointF>
         {

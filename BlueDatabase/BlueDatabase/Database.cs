@@ -640,6 +640,7 @@ public sealed class Database : DatabaseAbstract {
 
         //---------- Save ------------------------------------------------------------------------------------------
         if (mode.HasFlag(EditableErrorReasonType.Save)) {
+            if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Aktuell werden vom Benutzer Daten bearbeitet."; } // Evtl. Massenänderung. Da hat ein Reload fatale auswirkungen. SAP braucht manchmal 6 sekunden für ein zca4
             if (string.IsNullOrEmpty(Filename)) { return string.Empty; } // EXIT -------------------
             if (!FileExists(Filename)) { return string.Empty; } // EXIT -------------------

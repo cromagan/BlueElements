@@ -386,11 +386,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database == null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
 
-        var t = DateTime.Now;
+        var t = DateTime.UtcNow;
         do {
             var erg = ExecuteScript(eventname, scriptname, doFemdZelleInvalidate, fullCheck, changevalues);
             if (erg.AllOk) { return erg; }
-            if (!erg.GiveItAnotherTry || DateTime.Now.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
+            if (!erg.GiveItAnotherTry || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) { return erg; }
         } while (true);
     }
 

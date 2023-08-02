@@ -128,7 +128,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, true, mode is EditableErrorReasonType.EditAcut or EditableErrorReasonType.EditGeneral);
+            var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, true, mode is EditableErrorReasonType.EditAcut or EditableErrorReasonType.EditCurrently);
 
             if (!string.IsNullOrEmpty(info) && !canrepair) {
                 return info;
@@ -169,7 +169,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
 
             if (column.Database.Column.SysLocked != null) {
-                if (column.Database.PowerEdit.Subtract(DateTime.Now).TotalSeconds < 0) {
+                if (column.Database.PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds < 0) {
                     column.Database.RefreshColumnsData(column.Database.Column.SysLocked);
                     if (column != column.Database.Column.SysLocked && row.CellGetBoolean(column.Database.Column.SysLocked) && !column.EditAllowedDespiteLock) {
                         return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
