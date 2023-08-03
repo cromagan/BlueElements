@@ -129,6 +129,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public event EventHandler<MessageEventArgs>? DropMessage;
 
+    public event EventHandler? InvalidateView;
+
     public event EventHandler? Loaded;
 
     public event EventHandler? Loading;
@@ -1467,6 +1469,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
 
         return true;
+    }
+
+    public void OnInvalidateView() {
+        if (IsDisposed) { return; }
+        InvalidateView?.Invoke(this, System.EventArgs.Empty);
     }
 
     //    foreach (var thisExport in ex) {

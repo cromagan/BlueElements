@@ -276,6 +276,11 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 }
             }
         }
+
+        var mcl = sql.ColumnLenght(TableName.FileNameWithoutSuffix(), column.KeyName);
+        column.MaxCellLenght = mcl;
+
+        //_ = column.SetValueInternal(DatabaseDataType.MaxCellLenght, mcl.ToString(), false);
     }
 
     internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
@@ -534,13 +539,16 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                     if (column == null || column.IsDisposed) {
                         _ = Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, true, thisCol);
                         column = Column.Exists(thisCol);
-                        if (Column == null || Column.IsDisposed) {
+
+                        if (column == null || column.IsDisposed) {
                             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht gefunden");
                             return;
                         }
                     }
 
-                    if (_sql != null) GetColumnAttributesColumn(column, _sql);
+                    if (_sql != null) {
+                        GetColumnAttributesColumn(column, _sql);
+                    }
                 }
             }
 
@@ -570,7 +578,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             #endregion
 
-            #region  Alle ZEILEN laden
+            #region  Alle ZEILENKEYS laden
 
             _sql?.LoadAllRowKeys(TableName, Row);
 

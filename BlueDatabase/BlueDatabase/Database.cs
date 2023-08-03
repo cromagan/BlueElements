@@ -783,6 +783,7 @@ public sealed class Database : DatabaseAbstract {
         _isIn_Save = true;
         var v = SaveInternal();
         _isIn_Save = false;
+        OnInvalidateView();
         return v;
     }
 
@@ -802,6 +803,7 @@ public sealed class Database : DatabaseAbstract {
         x.Write(l.ToArray(), 0, l.ToArray().Length);
         x.Flush();
         x.Close();
+        OnInvalidateView();
     }
 
     internal static void SaveToByteList(List<byte> list, ColumnItem column, RowItem row) {

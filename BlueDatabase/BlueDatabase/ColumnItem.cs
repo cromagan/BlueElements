@@ -948,6 +948,11 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (name.ToUpper() == "USER") { return false; } // SQL System-Name
         if (name.ToUpper() == "COMMENT") { return false; } // SQL System-Name
+        if (name.ToUpper() == "TABLE_NAME") { return false; } // SQL System-Name
+        if (name.ToUpper() == "COLUMN_NAME") { return false; } // SQL System-Name
+        if (name.ToUpper() == "OWNER") { return false; } // SQL System-Name
+        if (name.ToUpper() == "DATA_TYPE") { return false; } // SQL System-Name
+        if (name.ToUpper() == "DATA_LENGTH") { return false; } // SQL System-Name
 
         if (name.ToUpper() == TmpNewDummy) { return false; } // BlueDatabase name bei neuen Spalten
 

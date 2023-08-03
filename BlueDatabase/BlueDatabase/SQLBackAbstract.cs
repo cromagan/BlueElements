@@ -247,6 +247,8 @@ public abstract class SqlBackAbstract {
         }
     }
 
+    public abstract int ColumnLenght(string tablename, string columnname);
+
     /// <summary>
     /// Provider ist immer NULL!
     /// </summary>
@@ -966,6 +968,22 @@ public abstract class SqlBackAbstract {
     //        using var q = _connection.CreateCommand();
     protected abstract string CreateTable(string tablename, List<string> keycolumns, bool allowSystemTableNames);
 
+    protected string Dbval(long original) => Dbval(original.ToString());
+
+    protected string Dbval(DateTime date) =>
+        "to_timestamp(" +
+        Dbval(date.ToString(Format_Date9)) + ", " +
+        Dbval(Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
+        ")";
+
+    protected string Dbval(string? original) {
+        if (original == null) { return "''"; }
+
+        original = original.CutToUtf8Length(MaxStringLenght);
+        original = original.Replace("'", "''");
+        return "'" + original + "'";
+    }
+
     protected abstract string DeleteTable(string tablename, bool allowSystemTableNames);
 
     /// <summary>
@@ -1074,22 +1092,6 @@ public abstract class SqlBackAbstract {
         var s = "CREATE TABLE " + newtablename + " AS SELECT * FROM " + tablename;
 
         return string.IsNullOrEmpty(ExecuteCommand(s, false));
-    }
-
-    private string Dbval(long original) => Dbval(original.ToString());
-
-    private string Dbval(DateTime date) =>
-        "to_timestamp(" +
-        Dbval(date.ToString(Format_Date9)) + ", " +
-        Dbval(Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
-        ")";
-
-    private string Dbval(string? original) {
-        if (original == null) { return "''"; }
-
-        original = original.CutToUtf8Length(MaxStringLenght);
-        original = original.Replace("'", "''");
-        return "'" + original + "'";
     }
 
     private string ExecuteCommand(IDbCommand command, bool abort) {

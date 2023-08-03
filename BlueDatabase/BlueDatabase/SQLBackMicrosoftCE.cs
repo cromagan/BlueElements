@@ -45,7 +45,7 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
         Connection = sql.Connection;
         RepairAll(tablename.ToUpper());
         DoBackUp();
-//        CompareBackUp(new DateTime(2023, 6, 29));
+        //        CompareBackUp(new DateTime(2023, 6, 29));
     }
 
     public SQLBackMicrosoftCE(string filename, bool create) : base() {
@@ -86,6 +86,8 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
     #endregion
 
     #region Methods
+
+    public override int ColumnLenght(string tablename, string columnname) => throw new NotImplementedException();
 
     /// <summary>
     /// Dateiendung wird immer mdf benutzt!

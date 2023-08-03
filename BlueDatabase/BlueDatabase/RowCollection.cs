@@ -476,6 +476,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
 
                 _ = _pendingChangedRows.Remove(key);
+                Database?.OnInvalidateView();
             } catch { }
         }
 
@@ -613,6 +614,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisRow in this) {
             thisRow.InvalidateCheckData();
         }
+    }
+
+    public bool IsWorkPendung(RowItem r) {
+        if (_pendingChangedRows.Contains(r.KeyName)) { return true; }
+        if (_pendingChangedBackgroundRow.Contains(r.KeyName)) { return true; }
+        return false;
     }
 
     public bool Remove(string key, string comment) {

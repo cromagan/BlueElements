@@ -63,6 +63,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
+    public static readonly SolidBrush RedYellowTransparent = new(Color.FromArgb(180, 255, 128, 128));
     public static readonly int RowCaptionSizeY = 50;
     private readonly List<IControlAcceptRow> _childs = new();
     private readonly List<string> _collapsed = new();
@@ -768,6 +769,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Database.Column.ColumnAdded -= _Database_ViewChanged;
             Database.ProgressbarInfo -= _Database_ProgressbarInfo;
             Database.Disposing -= _Database_Disposing;
+            Database.InvalidateView -= Database_InvalidateView;
             DatabaseAbstract.ForceSaveAll();
             MultiUserFile.ForceLoadSaveAll();
             //_database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
@@ -794,6 +796,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Database.Column.ColumnRemoved += _Database_ViewChanged;
             Database.ProgressbarInfo += _Database_ProgressbarInfo;
             Database.Disposing += _Database_Disposing;
+            Database.InvalidateView += Database_InvalidateView;
         }
 
         ParseView(viewCode);
@@ -2559,6 +2562,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
     }
 
+    private void Database_InvalidateView(object sender, System.EventArgs e) => Invalidate();
+
     private Rectangle DisplayRectangleWithoutSlider() => _design == BlueTableAppearance.Standard
             ? new Rectangle(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height)
             : new Rectangle(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height);
@@ -2711,6 +2716,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (currentRow.Expanded) {
                 if (currentRow.MarkYellow) {
                     gr.FillRectangle(BrushYellowTransparent, cellrectangle);
+                }
+
+                if (Database.Row.IsWorkPendung(currentRow.Row)) {
+                    gr.FillRectangle(RedYellowTransparent, cellrectangle);
                 }
 
                 gr.DrawLine(Skin.PenLinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Right - 1, cellrectangle.Bottom - 1);
