@@ -200,7 +200,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         } while (true);
     }
 
-    public void AddRowWithChangedValue(string rowkey) => _ = _pendingChangedRows.AddIfNotExists(rowkey);
+    public void AddRowWithChangedValue(string rowkey) {
+        if (Database == null || Database.IsDisposed) { return; }
+
+        if (!Database.isRowScriptPossible()) { return; }
+
+        _ = _pendingChangedRows.AddIfNotExists(rowkey);
+    }
 
     /// <summary>
     /// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Datenbanken einzigartig ist.
@@ -305,7 +311,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
             var added = markYellow;
 
-            var caps = thisRow.CellGetList(thisRow.Database?.Column.SysChapter);
+            List<string> caps;
+            if (db.Column.SysChapter is ColumnItem sc) {
+                caps = thisRow.CellGetList(sc);
+            } else {
+                caps = new();
+            }
 
             if (caps.Count > 0) {
                 if (caps.Contains(string.Empty)) {

@@ -911,6 +911,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             DoSpecialFormats(column, row, oldValue, false);
             if (dbtmp.Column.SysRowChanger is ColumnItem src) { SystemSet(src, row, UserName); }
             if (dbtmp.Column.SysRowChangeDate is ColumnItem scd) { SystemSet(scd, row, DateTime.UtcNow.ToString(Constants.Format_Date7)); }
+            if (dbtmp.Column.SysRowState is ColumnItem srs) { SystemSet(srs, row, string.Empty); }
         }
 
         column.Invalidate_ContentWidth();
@@ -925,8 +926,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return;
         }
 
-        if (!column.SaveContent) { return; }
-        if (!column.IsSystemColumn()) { Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + ToString()); return; }
+        //if (!column.SaveContent) { return; }
+        if (!column.IsSystemColumn()) { Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + column.ToString()); return; }
 
         if (row == null || row.IsDisposed) {
             Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + Database?.ConnectionData.TableName);

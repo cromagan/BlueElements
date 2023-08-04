@@ -119,7 +119,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Caption17 = new BlueControls.Controls.Caption();
             this.btnQI_Vorschau = new BlueControls.Controls.Button();
             this.tabSonstiges = new System.Windows.Forms.TabPage();
-            this.butSaveContent = new BlueControls.Controls.Button();
             this.txbTags = new BlueControls.Controls.TextBox();
             this.Caption8 = new BlueControls.Controls.Caption();
             this.cbxSort = new BlueControls.Controls.ComboBox();
@@ -1072,7 +1071,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // tabSonstiges
             // 
             this.tabSonstiges.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabSonstiges.Controls.Add(this.butSaveContent);
             this.tabSonstiges.Controls.Add(this.txbTags);
             this.tabSonstiges.Controls.Add(this.Caption8);
             this.tabSonstiges.Location = new System.Drawing.Point(4, 25);
@@ -1081,15 +1079,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSonstiges.Size = new System.Drawing.Size(993, 483);
             this.tabSonstiges.TabIndex = 4;
             this.tabSonstiges.Text = "Sonstiges allgemein";
-            // 
-            // butSaveContent
-            // 
-            this.butSaveContent.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.butSaveContent.Location = new System.Drawing.Point(16, 408);
-            this.butSaveContent.Name = "butSaveContent";
-            this.butSaveContent.Size = new System.Drawing.Size(352, 24);
-            this.butSaveContent.TabIndex = 34;
-            this.butSaveContent.Text = "Inhalte der Zellen auf Festplatte speichern und laden";
             // 
             // txbTags
             // 
@@ -1690,7 +1679,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private GroupBox grpAuswahlmenuOptionen;
         private TextBox txbAutoRemove;
         private Caption capAutoRemove;
-        private Button butSaveContent;
         private Caption caption5;
         private Button butAktuellVor;
         private Button butAktuellZurueck;

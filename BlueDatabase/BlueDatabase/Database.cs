@@ -417,7 +417,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.MaxCellLenght, c.MaxCellLenght.ToString(), name);
         SaveToByteList(l, DatabaseDataType.FixedColumnWidth, c.FixedColumnWidth.ToString(), name);
         SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, c.AutoRemove, name);
-        SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
+        //SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)c.FilterOptions).ToString(), name);
         SaveToByteList(l, DatabaseDataType.AutoFilterJoker, c.AutoFilterJoker, name);
         SaveToByteList(l, DatabaseDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
@@ -532,7 +532,9 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements.ToString(false));
             SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
             //SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
+
             SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));
+            SaveToByteList(l, DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString());
             //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
             SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
 
@@ -807,7 +809,7 @@ public sealed class Database : DatabaseAbstract {
     }
 
     internal static void SaveToByteList(List<byte> list, ColumnItem column, RowItem row) {
-        if (!column.SaveContent) { return; }
+        //if (!column.SaveContent) { return; }
 
         var cellContent = column.Database?.Cell.GetStringBehindLinkedValue(column, row);
         if (cellContent == null || string.IsNullOrEmpty(cellContent)) { return; }
@@ -995,7 +997,7 @@ public sealed class Database : DatabaseAbstract {
         var f = EditableErrorReason(EditableErrorReasonType.Save);
         if (!string.IsNullOrEmpty(f)) { return string.Empty; }
 
-        var dataUncompressed = ToListOfByte(this, 5000)?.ToArray();
+        var dataUncompressed = ToListOfByte(this, 1200)?.ToArray();
 
         if (dataUncompressed == null) { return string.Empty; }
 

@@ -34,6 +34,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.eventScriptEditor = new BlueControls.ScriptEditor();
             this.panel1 = new System.Windows.Forms.Panel();
             this.grpZeile = new BlueControls.Controls.GroupBox();
+            this.chkChangeValuesInTest = new BlueControls.Controls.Button();
             this.cpZeile = new BlueControls.Controls.Caption();
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.grpEigenschaften = new BlueControls.Controls.GroupBox();
@@ -55,7 +56,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts = new BlueControls.Controls.ListBox();
             this.tabVariablen = new System.Windows.Forms.TabPage();
             this.variableEditor = new BlueControls.VariableEditor();
-            this.chkChangeValuesInTest = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.tabScripts.SuspendLayout();
@@ -142,6 +142,17 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpZeile.TabIndex = 8;
             this.grpZeile.TabStop = false;
             this.grpZeile.Text = "Zeile";
+            // 
+            // chkChangeValuesInTest
+            // 
+            this.chkChangeValuesInTest.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.chkChangeValuesInTest.Location = new System.Drawing.Point(112, 40);
+            this.chkChangeValuesInTest.Name = "chkChangeValuesInTest";
+            this.chkChangeValuesInTest.QuickInfo = "<i>Tests im Skript Editor ‰ndern keine Werte,\r\nauﬂer dieses H‰kchen ist gesetzt.";
+            this.chkChangeValuesInTest.Size = new System.Drawing.Size(376, 24);
+            this.chkChangeValuesInTest.TabIndex = 15;
+            this.chkChangeValuesInTest.Text = "<Imagecode=Warnung|16> Das Skript darf auch im Test Werte der Datenbank ver‰ndern" +
+    "";
             // 
             // cpZeile
             // 
@@ -390,16 +401,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.variableEditor.Name = "variableEditor";
             this.variableEditor.Size = new System.Drawing.Size(1283, 618);
             this.variableEditor.TabIndex = 0;
-            // 
-            // chkChangeValuesInTest
-            // 
-            this.chkChangeValuesInTest.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkChangeValuesInTest.Location = new System.Drawing.Point(112, 40);
-            this.chkChangeValuesInTest.Name = "chkChangeValuesInTest";
-            this.chkChangeValuesInTest.QuickInfo = "<i>Tests im Skript Editor ‰ndern keine Werte,\r\nauﬂer dieses H‰kchen ist gesetzt.";
-            this.chkChangeValuesInTest.Size = new System.Drawing.Size(376, 24);
-            this.chkChangeValuesInTest.TabIndex = 15;
-            this.chkChangeValuesInTest.Text = "<Imagecode=Warnung|16> Das Skript darf auch im Test Werte der Datenbank ver‰ndern";
             // 
             // DatabaseScriptEditor
             // 

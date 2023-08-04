@@ -220,9 +220,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         OnDropMessage(FehlerArt.Info, string.Empty);
     }
 
-    //    LoadFromSQLBack();
-    //}
-
     public override (bool didreload, string errormessage) RefreshRowData(List<RowItem> rows, bool refreshAlways, List<RowItem>? sortedRows) {
         if (rows == null || rows.Count == 0) { return (false, string.Empty); }
 
@@ -251,7 +248,11 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
+    //    LoadFromSQLBack();
+    //}
     public override bool Save() => _sql != null;
+
+    public List<string> SQLLog() => _sql?.Log ?? new List<string>();
 
     /// <summary>
     /// Liest die Spaltenattribute aus der Style-Datenbank und schreibt sie in die Spalte

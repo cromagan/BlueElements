@@ -116,7 +116,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (column.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { return null; }
 
         if (!column.Format.CanBeCheckedByRules()) { return null; }
-        if (!column.SaveContent) { return null; }
+        //if (!column.SaveContent) { return null; }
 
         #region ReadOnly bestimmen
 
@@ -288,6 +288,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return;
         }
 
+        if (!Database.isRowScriptPossible()) {
+            LastCheckedMessage = "Zeilenprüfung deaktiviert";
+            return;
+        }
+
         if (LastCheckedEventArgs != null) { return; }
 
         var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0);
@@ -312,7 +317,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
         }
 
-        if (Database?.Column.SysCorrect != null && Database.Column.SysCorrect.SaveContent) {
+        if (Database?.Column.SysCorrect != null) {
             if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
                 CellSet(Database.Column.SysCorrect, cols.Count == 0);
             }
@@ -497,7 +502,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var columnVar = vars.Get(column.KeyName);
         if (columnVar == null || columnVar.ReadOnly) { return; }
-        if (!column.SaveContent || !column.Format.CanBeChangedByRules()) { return; }
+        if (!column.Format.CanBeChangedByRules()) { return; }
 
         //if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
         //    var columnLinkVar = vars.GetSystem(Column.KeyName + "_Link");

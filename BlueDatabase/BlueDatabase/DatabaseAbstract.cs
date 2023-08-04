@@ -75,6 +75,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private string _createDate = string.Empty;
     private string _creator = string.Empty;
     private string _eventScriptTmp = string.Empty;
+
+    //private string _timeCode = string.Empty;
+    private int _eventScriptVersion;
+
     private double _globalScale;
     private string _globalShowPass = string.Empty;
     private RowSortDefinition? _sortDefinition;
@@ -83,9 +87,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
     /// </summary>
     private string _standardFormulaFile = string.Empty;
-
-    //private string _timeCode = string.Empty;
-    //private int _undoCount;
 
     private string _variableTmp = string.Empty;
     private string _zeilenQuickInfo = string.Empty;
@@ -233,6 +234,20 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             if (_eventScriptTmp == l.ToString(false)) { return; }
             _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), string.Empty);
+
+            var tmp = EventScriptVersion;
+            tmp++;
+            if (tmp == int.MaxValue) { tmp = 0; }
+            EventScriptVersion = tmp;
+        }
+    }
+
+    [Browsable(false)]
+    public int EventScriptVersion {
+        get => _eventScriptVersion;
+        set {
+            if (_eventScriptVersion == value) { return; }
+            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion.ToString(), value.ToString(), string.Empty);
         }
     }
 
@@ -341,15 +356,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             _ = ChangeData(DatabaseDataType.Tags, null, null, _tags.JoinWithCr(), value.JoinWithCr(), string.Empty);
         }
     }
-
-    //[Browsable(false)]
-    //public int UndoCount {
-    //    get => _undoCount;
-    //    set {
-    //        if (_undoCount == value) { return; }
-    //        _ = ChangeData(DatabaseDataType.UndoCount, null, null, _undoCount.ToString(), value.ToString(), string.Empty);
-    //    }
-    //}
 
     public VariableCollection Variables {
         get => new(_variables);
@@ -798,7 +804,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
 
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
-        //UndoCount = sourceDatabase.UndoCount;
+        EventScriptVersion = sourceDatabase.EventScriptVersion;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
         if (tagsToo) {
             Tags = new(sourceDatabase.Tags.Clone());
@@ -879,6 +885,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
             : string.Empty;
     }
+
+    public void EnableScript() => Column.GenerateAndAddSystem("SYS_ROWSTATE", "SYS_DATECHANGED");
 
     public void EventScript_Add(DatabaseScript ev, bool isLoading) {
         _eventScript.Add(ev);
@@ -1471,6 +1479,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return true;
     }
 
+    public bool isRowScriptPossible() {
+        if (Column.SysRowChangeDate == null) { return false; }
+        if (Column.SysRowState == null) { return false; }
+        return true;
+    }
+
     public void OnInvalidateView() {
         if (IsDisposed) { return; }
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
@@ -1876,9 +1890,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             //    //_rulesScript = value;
             //    break;
 
-            //case DatabaseDataType.UndoCount:
-            //    _undoCount = IntParse(value);
-            //    break;
+            case DatabaseDataType.EventScriptVersion:
+                _eventScriptVersion = IntParse(value);
+                break;
 
             case DatabaseDataType.UndoInOne:
                 // Muss eine übergeordnete Routine bei Befarf abfangen

@@ -399,7 +399,7 @@ internal sealed partial class ColumnEditor {
         //txbLinkedKeyKennung.Text = _column.LinkedKeyKennung;
 
         txbAutoRemove.Text = _column.AutoRemove;
-        butSaveContent.Checked = _column.SaveContent;
+        //butSaveContent.Checked = _column.SaveContent;
 
         //cbxSchlüsselspalte.Item.Clear();
         //cbxSchlüsselspalte.Item.Add("#Ohne", "-1");
@@ -523,7 +523,6 @@ internal sealed partial class ColumnEditor {
         _column.DoOpticalTranslation = (TranslationType)IntParse(cbxTranslate.Text);
         _column.SortType = (SortierTyp)IntParse(cbxSort.Text);
         _column.AutoRemove = txbAutoRemove.Text;
-        _column.SaveContent = butSaveContent.Checked;
         _column.Invalidate_ColumAndContent();
         GetLinkedCellFilter();
 

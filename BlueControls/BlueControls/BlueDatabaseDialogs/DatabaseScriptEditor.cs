@@ -182,6 +182,27 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void chkZeile_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
+
+        if (Database == null || Database.IsDisposed) { return; }
+
+        if (chkZeile.Checked && !Database.isRowScriptPossible()) {
+            var s = MessageBox.Show("Dazu werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
+
+            if (s == 1) {
+                chkZeile.Checked = false;
+                return;
+            }
+
+            Database.EnableScript();
+
+            if (!Database.isRowScriptPossible()) {
+                MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
+
+                chkZeile.Checked = false;
+                return;
+            }
+        }
+
         Item.NeedRow = chkZeile.Checked;
         txbTestZeile.Enabled = chkZeile.Checked;
     }

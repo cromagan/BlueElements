@@ -100,6 +100,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? SysRowCreator { get; private set; }
 
+    public ColumnItem? SysRowState { get; private set; }
+
     public bool ThrowEvents {
         get => !IsDisposed && _throwEvents;
         set {
@@ -130,6 +132,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
 
         if (!_internal.TryAdd(column.KeyName, column)) { return "Hinzufügen fehlgeschlagen."; }
+
+        GetSystems();
+
         OnColumnAdded(new ColumnEventArgs(column));
         return string.Empty;
     }
@@ -268,6 +273,14 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return item;
     }
 
+    public void GenerateAndAddSystem(params string[] sysnames) {
+        foreach (var thisstring in sysnames) {
+            if (Exists(thisstring) == null) {
+                GenerateAndAddSystem(thisstring);
+            }
+        }
+    }
+
     public void GenerateOverView() {
         if (Database == null || Database.IsDisposed) { return; }
         Html da = new(Database.TableName);
@@ -330,6 +343,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         SysRowChanger = null;
         SysRowChangeDate = null;
         SysChapter = null;
+        SysRowState = null;
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem != null && thisColumnItem.IsSystemColumn()) {
@@ -362,6 +376,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                         SysChapter = thisColumnItem;
                         break;
 
+                    case "SYS_ROWSTATE":
+                        SysRowState = thisColumnItem;
+                        break;
+
                     default:
 
                         Develop.DebugPrint(FehlerArt.Fehler, "Unbekannte Kennung: " + thisColumnItem.KeyName);
@@ -388,24 +406,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public void Repair() {
-        List<string> w = new()
-        {
-            "SYS_CHAPTER",
-            "SYS_DATECHANGED",
-            "SYS_CHANGER",
-            "SYS_DATECREATED",
-            "SYS_CREATOR",
-            "SYS_CORRECT",
-            "SYS_LOCKED"
-        };
-
-        foreach (var thisstring in w) {
-            if (Exists(thisstring) == null) {
-                GenerateAndAddSystem(thisstring);
-            }
-        }
-
         GetSystems();
+
         //for (var s1 = 0; s1 < Count; s1++) {
         //    if (this[s1] != null) {
         //        for (var s2 = s1 + 1; s2 < Count; s2++) {
@@ -455,21 +457,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    //public ColumnItem? SearchByKey(long? key) {
-    //    if (Database == null || Database.IsDisposed) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Database ist null bei " + key.ToString());
-    //        return null;
-    //    }
-    //    if (key is null or < 0) {
-    //        //             Develop.DebugPrint(enFehlerArt.Warnung, "Leerer Spaltenname"); Neue Spalten haben noch keinen Namen
-    //        return null;
-    //    }
-
-    //    return this.FirstOrDefault(thisColumn => thisColumn != null && thisColumn.KeyName == key);
-    //}
-
-    //internal static string ParsableColumnName(ColumnItem? column) => column == null ? "ColumnName=?" : "ColumnName=" + Column.KeyName;
-
     internal bool ChangeName(string oldName, string newName) {
         if (oldName == newName) { return true; }
         if (Database == null || Database.IsDisposed) { return false; }
@@ -518,17 +505,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             }
         }
     }
-
-    //internal long NextColumnKey() {
-    //    var tmp = 0;
-    //    long key;
-
-    //    do {
-    //        key = Generic.GetUniqueKey(tmp, "column");
-    //        tmp++;
-    //    } while (SearchByKey(key) != null);
-    //    return key;
-    //}
 
     internal void OnColumnRemoving(ColumnEventArgs e) {
         e.Column.Changed -= OnColumnChanged;

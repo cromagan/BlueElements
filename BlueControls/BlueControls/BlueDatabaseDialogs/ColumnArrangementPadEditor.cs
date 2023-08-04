@@ -380,8 +380,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                 #region Code für Ansicht 0
 
                 var col = thisColumnViewCollection[thisColumnViewCollection.Count - 1]?.Column;
-                if (col != null && !col.IsSystemColumn() &&
-                    MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
+                if (col != null && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
                         "Ja", "Nein") == 0) {
                     Database.Column.Remove(col, "Benutzer löscht im ColArrangement Editor");
                     did = true;

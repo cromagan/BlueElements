@@ -69,6 +69,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnClipboard = new BlueControls.Controls.Button();
             this.tblUndo = new BlueControls.Controls.Table();
             this.capBinInfo = new BlueControls.Controls.Caption();
+            this.butSystemspaltenErstellen = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -299,6 +300,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAllgemein.Controls.Add(this.butSystemspaltenErstellen);
             this.tabAllgemein.Controls.Add(this.btnOptimize);
             this.tabAllgemein.Controls.Add(this.txbStandardFormulaFile);
             this.tabAllgemein.Controls.Add(this.capStandardFormulaFile);
@@ -494,6 +496,17 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capBinInfo.Text = "Die hier aufgeführten Binärdaten können - falls es ein Bild ist - mit DB_Dateinam" +
     "e mit Suffix angesprochen werden.";
             // 
+            // butSystemspaltenErstellen
+            // 
+            this.butSystemspaltenErstellen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.butSystemspaltenErstellen.ImageCode = "Spalte|16";
+            this.butSystemspaltenErstellen.Location = new System.Drawing.Point(8, 632);
+            this.butSystemspaltenErstellen.Name = "butSystemspaltenErstellen";
+            this.butSystemspaltenErstellen.Size = new System.Drawing.Size(200, 32);
+            this.butSystemspaltenErstellen.TabIndex = 49;
+            this.butSystemspaltenErstellen.Text = "Alle Systemspalten erstellen";
+            this.butSystemspaltenErstellen.Click += new System.EventHandler(this.butSystemspaltenErstellen_Click);
+            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1244, 756);
@@ -553,5 +566,6 @@ namespace BlueControls.BlueDatabaseDialogs
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;
         private Button btnOptimize;
+        private Button butSystemspaltenErstellen;
     }
 }

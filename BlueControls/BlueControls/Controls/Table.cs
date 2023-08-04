@@ -60,10 +60,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     #region Fields
 
     public static readonly int AutoFilterSize = 22;
+    public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(180, 255, 128, 128));
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
-    public static readonly SolidBrush RedYellowTransparent = new(Color.FromArgb(180, 255, 128, 128));
     public static readonly int RowCaptionSizeY = 50;
     private readonly List<IControlAcceptRow> _childs = new();
     private readonly List<string> _collapsed = new();
@@ -2701,7 +2701,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Draw_Border(gr, cellInThisDatabaseColumn, displayRectangleWoSlider, false);
     }
 
-    private void Draw_Column_Cells(Graphics gr, IReadOnlyList<RowData?>? sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen) {
+    private void Draw_Column_Cells(Graphics gr, IReadOnlyList<RowData> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen) {
         if (UserEdit_NewRowAllowed() && viewItem == CurrentArrangement[Database?.Column.First()]) {
             Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle((int)viewItem.OrderTmpSpalteX1 + 1, (int)(-SliderY.Value + HeadSize() + 1), (int)viewItem.TmpDrawWidth - 2, 16 - 2), this, false, _newRowFont, Translate);
         }
@@ -2718,8 +2718,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     gr.FillRectangle(BrushYellowTransparent, cellrectangle);
                 }
 
-                if (Database.Row.IsWorkPendung(currentRow.Row)) {
-                    gr.FillRectangle(RedYellowTransparent, cellrectangle);
+                if (Database?.Column.SysRowState is ColumnItem srs && currentRow.Row.CellGetInteger(srs) != Database.EventScriptVersion) {
+                    gr.FillRectangle(BrushRedTransparent, cellrectangle);
                 }
 
                 gr.DrawLine(Skin.PenLinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Right - 1, cellrectangle.Bottom - 1);

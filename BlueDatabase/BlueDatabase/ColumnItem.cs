@@ -111,8 +111,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     private string _quickInfo;
     private string _regex = string.Empty;
     private int _roundAfterEdit;
-    private bool _saveContent;
+
+    //private bool _saveContent;
     private ScriptType _scriptType;
+
     private bool _showMultiLineInOneLine;
     private bool _showUndo;
     private SortierTyp _sortType;
@@ -190,7 +192,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         _scriptType = ScriptType.undefiniert;
         _autoRemove = string.Empty;
         _autoFilterJoker = string.Empty;
-        _saveContent = true;
+        //_saveContent = true;
         //_AutoFilter_Dauerfilter = enDauerfilter.ohne;
         _spellCheckingEnabled = false;
         //_CompactView = true;
@@ -832,15 +834,15 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public bool SaveContent {
-        get => _saveContent;
-        set {
-            if (_saveContent == value) { return; }
+    //public bool SaveContent {
+    //    get => _saveContent;
+    //    set {
+    //        if (_saveContent == value) { return; }
 
-            _ = Database?.ChangeData(DatabaseDataType.SaveContent, this, null, _saveContent.ToPlusMinus(), value.ToPlusMinus(), string.Empty);
-            OnChanged();
-        }
-    }
+    //        _ = Database?.ChangeData(DatabaseDataType.SaveContent, this, null, _saveContent.ToPlusMinus(), value.ToPlusMinus(), string.Empty);
+    //        OnChanged();
+    //    }
+    //}
 
     public ScriptType ScriptType {
         get => _scriptType;
@@ -1157,7 +1159,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         AfterEditDoUCase = source.AfterEditDoUCase;
         AfterEditAutoCorrect = source.AfterEditAutoCorrect;
         AutoRemove = source.AutoRemove;
-        SaveContent = source.SaveContent;
+        //SaveContent = source.SaveContent;
         CellInitValue = source.CellInitValue;
         AutoFilterJoker = source.AutoFilterJoker;
         //KeyColumnKey = source.KeyColumnKey;
@@ -1302,8 +1304,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
 
         if (string.IsNullOrEmpty(_caption)) { return "Spalten Beschriftung fehlt."; }
-        if (!_saveContent && !IsSystemColumn()) { return "Inhalt der Spalte muss gespeichert werden."; }
-        if (!_saveContent && _showUndo) { return "Wenn der Inhalt der Spalte nicht gespeichert wird, darf auch kein Undo geloggt werden."; }
+        //if (!_saveContent && !IsSystemColumn()) { return "Inhalt der Spalte muss gespeichert werden."; }
+        //if (!_saveContent && _showUndo) { return "Wenn der Inhalt der Spalte nicht gespeichert wird, darf auch kein Undo geloggt werden."; }
         if (((int)_format).ToString() == _format.ToString()) { return "Format fehlerhaft."; }
         if (_format.NeedTargetDatabase()) {
             if (LinkedDatabase == null) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
@@ -1494,7 +1496,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             "SYS_CHAPTER" or
             "SYS_DATECREATED" or
             "SYS_DATECHANGED" or
-            "SYS_LOCKED";
+            "SYS_LOCKED" or
+            "SYS_ROWSTATE";
 
     public void OnChanged() => Changed?.Invoke(this, new ColumnEventArgs(this));
 
@@ -1768,6 +1771,21 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                     ForeColor = Color.FromArgb(0, 0, 128);
                     BackColor = Color.FromArgb(185, 185, 255);
                     LineLeft = ColumnLineStyle.Dick;
+                }
+
+                break;
+
+            case "SYS_ROWSTATE":
+                _spellCheckingEnabled = false;
+                _ignoreAtRowFilter = true;
+
+                this.GetStyleFrom(FormatHolder.IntegerPositive); // Ja, FormatHolder, da wird der Script-Type nicht verändert
+
+                if (setOpticalToo) {
+                    Caption = "Zeilen-Status";
+                    ForeColor = Color.FromArgb(128, 0, 0);
+                    BackColor = Color.FromArgb(255, 185, 185);
+                    //LineLeft = ColumnLineStyle.Dick;
                 }
 
                 break;
@@ -2168,7 +2186,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (mode == EditableErrorReasonType.OnlyRead) { return string.Empty; }
 
-        if (!SaveContent) { return "Der Spalteninhalt wird nicht gespeichert."; }
+        //if (!SaveContent) { return "Der Spalteninhalt wird nicht gespeichert."; }
 
         if (checkEditmode) {
             if (!TextBearbeitungErlaubt && !DropdownBearbeitungErlaubt) {
@@ -2420,9 +2438,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _afterEditAutoCorrect = newvalue.FromPlusMinus();
                 break;
 
-            case DatabaseDataType.SaveContent:
-                _saveContent = newvalue.FromPlusMinus();
-                break;
+            //case DatabaseDataType.SaveContent:
+            //    _saveContent = newvalue.FromPlusMinus();
+            //    break;
 
             case DatabaseDataType.AutoRemoveCharAfterEdit:
                 _autoRemove = newvalue;

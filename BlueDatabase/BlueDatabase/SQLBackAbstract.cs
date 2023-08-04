@@ -44,12 +44,11 @@ public abstract class SqlBackAbstract {
     public const string SysStyle = "SYS_STYLE";
     public const string SysUndo = "SYS_UNDO";
     public static List<SqlBackAbstract> ConnectedSqlBack = new();
-
     public DbConnection? Connection;
+    public List<string> Log = new();
     private static bool _didBackup;
     private readonly object _fill = new();
     private readonly object _getChanges = new();
-
     private readonly object _openclose = new();
 
     #endregion
@@ -678,7 +677,7 @@ public abstract class SqlBackAbstract {
             case DatabaseDataType.Werbung:
             //case DatabaseDataType.CryptionState:
             //case DatabaseDataType.CryptionTest:
-            case DatabaseDataType.SaveContent:
+            //case DatabaseDataType.SaveContent:
             case DatabaseDataType.EOF:
                 return string.Empty;
         }
@@ -1100,6 +1099,8 @@ public abstract class SqlBackAbstract {
         if (Connection == null || !OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
 
         try {
+            if (Log.Count > 2000) { Log.RemoveAt(0); }
+            Log.Add("[" + DateTime.UtcNow.ToString(Constants.Format_Date ) + "]\r\n" + command.CommandText);
             _ = command.ExecuteNonQuery();
             return string.Empty;
         } catch (Exception ex) {
