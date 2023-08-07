@@ -84,6 +84,12 @@ internal class Method_BerechneVariable : Method {
         var attvar = SplitAttributeToVars(varCol, value, Sargs, SEndlessArgs, infos.Data, scp);
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, new Method_BerechneVariable(), attvar); }
+
+        if (attvar.Attributes[0] is VariableUnknown) {
+            return DoItFeedback.AttributFehler(infos.Data, new Method_BerechneVariable(), attvar);
+        }
+
+
         if (attvar.Attributes[0] is Variable v) {
             if (generateVariable) {
                 v.KeyName = varnam.ToLower();

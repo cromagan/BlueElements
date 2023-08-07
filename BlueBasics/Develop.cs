@@ -297,6 +297,9 @@ public static class Develop {
         } catch { }
 
         TraceLogging_Start(TempFile(string.Empty, AppName() + "-Trace.html"));
+
+        Generic.LoadAllAssemblies(Application.StartupPath);
+
         Timer check = new();
         check.Tick += CloseAfter12Hours;
         check.Interval = 60000;

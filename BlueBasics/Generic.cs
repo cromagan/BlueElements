@@ -256,6 +256,21 @@ public static class Generic {
         return d[l1, l2];
     }
 
+    public static void LoadAllAssemblies(string assemblyDirectory) {
+        // Alle Dateien mit der Erweiterung ".dll" im Verzeichnis abrufen
+        string[] assemblyFiles = Directory.GetFiles(assemblyDirectory, "*.dll");
+
+        // Alle Assemblys laden und instanziieren
+        foreach (string assemblyFile in assemblyFiles) {
+            try {
+                Assembly assembly = Assembly.LoadFrom(assemblyFile);
+                //Console.WriteLine(assembly.FullName);
+            } catch (Exception ex) {
+                //Console.WriteLine($"Fehler beim Laden der Assembly: {ex.Message}");
+            }
+        }
+    }
+
     public static void Pause(double sekunden, bool doEvents) {
         if (sekunden <= 0) { return; }
         if (!doEvents) {

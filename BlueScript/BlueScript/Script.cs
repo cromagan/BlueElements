@@ -119,13 +119,13 @@ public class Script {
 
     public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string redScriptText, int lineadd, string subname) {
         var pos = 0;
-        var EndScript = false;
+        var endScript = false;
 
         var ld = new LogData(subname, lineadd + 1);
 
         do {
-            if (pos >= redScriptText.Length || EndScript) {
-                return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, EndScript);
+            if (pos >= redScriptText.Length || endScript) {
+                return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, endScript);
             }
 
             if (redScriptText.Substring(pos, 1) == "¶") {
@@ -137,7 +137,7 @@ public class Script {
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false);
                 }
 
-                EndScript = f.EndSkript;
+                endScript = f.EndSkript;
 
                 pos = f.Position;
                 ld.LineAdd(Line(redScriptText, pos) - ld.Line + lineadd);

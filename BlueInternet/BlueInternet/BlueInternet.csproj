@@ -8,11 +8,11 @@
     <LangVersion>latest</LangVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{6A9CFA8B-DDF5-4FA2-A110-C87A0CE34347}</ProjectGuid>
+    <ProjectGuid>{7F05B524-A65B-46F7-A798-E5BB27938F6E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BlueControls</RootNamespace>
-    <AssemblyName>BlueControls</AssemblyName>
+    <RootNamespace>BlueInternet</RootNamespace>
+    <AssemblyName>BlueInternet</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -102,10 +102,6 @@
     </Reference>
     <Reference Include="CefSharp.WinForms, Version=115.3.110.0, Culture=neutral, PublicKeyToken=40c4b6fc221f4138, processorArchitecture=MSIL">
       <HintPath>..\packages\CefSharp.WinForms.115.3.110\lib\net462\CefSharp.WinForms.dll</HintPath>
-    </Reference>
-    <Reference Include="FastColoredTextBox, Version=2.16.24.0, Culture=neutral, PublicKeyToken=fb8aa12b994ef61b, processorArchitecture=MSIL">
-      <HintPath>..\packages\FCTB.2.16.24\lib\FastColoredTextBox.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />

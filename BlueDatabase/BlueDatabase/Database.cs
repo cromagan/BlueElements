@@ -43,7 +43,7 @@ public sealed class Database : DatabaseAbstract {
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _editNormalyError = string.Empty;
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
-    private bool _isIn_Save;
+    private bool _isInSave;
 
     #endregion
 
@@ -555,9 +555,9 @@ public sealed class Database : DatabaseAbstract {
                 }
             }
 
-            var UndoCount = 5000;
+            var undoCount = 5000;
             //SaveToByteList(l, DatabaseDataType.UndoCount, db.UndoCount.ToString());
-            if (works2.Count > UndoCount) { works2.RemoveRange(0, works2.Count - UndoCount); }
+            if (works2.Count > undoCount) { works2.RemoveRange(0, works2.Count - undoCount); }
             SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
             SaveToByteList(l, DatabaseDataType.EOF, "END");
 
@@ -780,11 +780,11 @@ public sealed class Database : DatabaseAbstract {
     }
 
     public override bool Save() {
-        if (_isIn_Save) { return false; }
+        if (_isInSave) { return false; }
 
-        _isIn_Save = true;
+        _isInSave = true;
         var v = SaveInternal();
-        _isIn_Save = false;
+        _isInSave = false;
         OnInvalidateView();
         return v;
     }
