@@ -551,11 +551,11 @@ public partial class TableView : FormWithStatusBar {
 
         _ = e.UserMenu.Add("Zeile", true);
         _ = e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && tbl.Database.IsAdministrator());
-        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null);
+        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null && tbl.Database.isRowScriptPossible());
 
         foreach (var thiss in tbl.Database.EventScript) {
             if (thiss != null && thiss.ManualExecutable && thiss.NeedRow) {
-                _ = e.UserMenu.Add("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, ImageCode.Skript, row != null);
+                _ = e.UserMenu.Add("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, ImageCode.Skript, row != null && tbl.Database.isRowScriptPossible()) ;
             }
         }
     }

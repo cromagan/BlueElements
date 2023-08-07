@@ -1780,7 +1780,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _ignoreAtRowFilter = true;
 
                 this.GetStyleFrom(FormatHolder.IntegerPositive); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-
+                MaxCellLenght = MaxTextLenght;
                 if (setOpticalToo) {
                     Caption = "Zeilen-Status";
                     ForeColor = Color.FromArgb(128, 0, 0);

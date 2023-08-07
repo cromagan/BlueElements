@@ -30,6 +30,7 @@ using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
+using System.Runtime.CompilerServices;
 
 namespace BlueDatabase;
 
@@ -44,8 +45,8 @@ public abstract class SqlBackAbstract {
     public const string SysStyle = "SYS_STYLE";
     public const string SysUndo = "SYS_UNDO";
     public static List<SqlBackAbstract> ConnectedSqlBack = new();
+    public static List<string> Log = new();
     public DbConnection? Connection;
-    public List<string> Log = new();
     private static bool _didBackup;
     private readonly object _fill = new();
     private readonly object _getChanges = new();
@@ -78,41 +79,6 @@ public abstract class SqlBackAbstract {
     public abstract int MaxStringLenght { get; }
 
     #endregion
-
-    //public int SizeOf(string tablename, string columnname) {
-    //    if (!IsValidTableName(tablename, true)) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
-    //        return -1;
-    //    }
-
-    //    if (!ColumnItem.IsValidColumnName(columnname)) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + columnname);
-    //        return -1;
-    //    }
-
-    //    if (!OpenConnection()) { return -1; }
-
-    //    var = Exception
-
-    //        OracleCommand command = new OracleCommand();
-    //        command.Connection = connection;
-    //        command.CommandText = "SELECT * FROM " + tableName + " WHERE 1 = 0";
-
-    //        OracleDataReader reader = command.ExecuteReader();
-    //        reader.Read();
-
-    //        int maxLength = reader.GetSchemaTable()
-    //        .Rows
-    //        .Cast<System.Data.DataRow>()
-    //        .Where(row => row["ColumnName"].ToString() == columnName)
-    //        .Select(row => (int)row["ColumnSize"])
-    //        .FirstOrDefault();
-
-    //        Console.WriteLine("Maximale Länge der Spalte " + columnName + " in Tabelle " + tableName + " ist " + maxLength);
-
-    //        reader.Close();
-
-    //}
 
     #region Methods
 
@@ -188,6 +154,12 @@ public abstract class SqlBackAbstract {
     }
 
     /// <summary>
+    /// Gibt alle verfügbaren Tabellen - einschließlich der Systemtabellen - zurück
+    /// </summary>
+    /// <returns></returns>
+    public abstract List<string>? AllTables();
+
+    /// <summary>
     /// Gibt empty zurück, wenn das Backup erstellt wurde ODER die Datei bereits existiert
     /// </summary>
     /// <param name="pathadditionalcsv"></param>
@@ -222,7 +194,7 @@ public abstract class SqlBackAbstract {
             return;
         }
 
-        var s = (DataFormat)IntParse(GetStyleData(tablename, DatabaseDataType.ColumnFormat, column));
+        var s = (DataFormat)IntParse(GetStyleData(tablename, DatabaseDataType.ColumnFormat, column, SysStyle));
 
         if (s == DataFormat.Verknüpfung_zu_anderer_Datenbank) { charlenght = Math.Max(charlenght, 35); }
         if (s == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { charlenght = Math.Max(charlenght, 15); }
@@ -248,12 +220,41 @@ public abstract class SqlBackAbstract {
 
     public abstract int ColumnLenght(string tablename, string columnname);
 
+    public List<string>? ColumnValues(string tablename, string columnname) {
+        if (!IsValidTableName(tablename, true)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+            return null;
+        }
+
+        if (!ColumnItem.IsValidColumnName(columnname)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "ColumnName ungültig: " + columnname);
+            return null;
+        }
+
+        var dt = Fill_Table("SELECT DISTINCT " + columnname + "  FROM " + tablename);
+
+        var l = new List<string>();
+
+        foreach (var thisrow in dt.Rows) {
+            l.Add(((DataRow)thisrow)[0].ToString());
+        }
+
+        return l.SortedDistinctList();
+    }
+
     /// <summary>
     /// Provider ist immer NULL!
     /// </summary>
     /// <param name="tablename"></param>
     /// <returns></returns>
     public ConnectionInfo ConnectionData(string tablename) => new(tablename, null, ConnectionString, string.Empty);
+
+    public string ExecuteCommand(string commandtext, bool abort) {
+        if (Connection == null || !OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
+        using var command = Connection.CreateCommand();
+        command.CommandText = commandtext;
+        return ExecuteCommand(command, abort);
+    }
 
     /// <summary>
     /// Datentabelle befüllen
@@ -274,6 +275,7 @@ public abstract class SqlBackAbstract {
                 var tbl = new DataTable();
                 PauseSystem();
                 if (OpenConnection()) {
+                    //  Log.Add(commandtext);
                     tbl.Load(command.ExecuteReader());
                     _ = CloseConnection();
                     LastLoadUtc = DateTime.UtcNow;
@@ -296,7 +298,7 @@ public abstract class SqlBackAbstract {
     /// <returns></returns>
     public abstract List<string> GetColumnNames(string tablename);
 
-    public string GetStyleData(string tablename, DatabaseDataType type, string columnName) {
+    public string GetStyleData(string tablename, DatabaseDataType type, string columnName, string styleDB) {
         if (!IsValidTableName(tablename, true)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
             throw new Exception();
@@ -309,7 +311,7 @@ public abstract class SqlBackAbstract {
             throw new Exception();
         }
 
-        var cmd = @"select VALUE, PART from " + SysStyle + " " +
+        var cmd = @"select VALUE, PART from " + styleDB + " " +
                         "where TABLENAME = " + Dbval(tablename.ToUpper()) + " " +
                         "and TYPE = " + Dbval(type.ToString()) + " " +
                         "and COLUMNNAME = " + Dbval(columnName.ToUpper()) + " " +
@@ -509,7 +511,7 @@ public abstract class SqlBackAbstract {
         cmdString = "UPDATE " + SysStyle + " SET COLUMNNAME = " + Dbval(newname) + " WHERE TABLENAME = " + Dbval(tablename.ToUpper()) + " AND COLUMNNAME = " + Dbval(oldname.ToUpper());
         _ = ExecuteCommand(cmdString, true);
 
-        var test = GetStyleData(tablename, DatabaseDataType.ColumnName, newname);
+        var test = GetStyleData(tablename, DatabaseDataType.ColumnName, newname, SysStyle);
 
         if (test != newname) {
             Develop.DebugPrint(FehlerArt.Fehler, "Fataler Umbenennungs-Fehler!");
@@ -617,7 +619,7 @@ public abstract class SqlBackAbstract {
             return "Spaltenname ungültig";
         }
 
-        var isVal = GetStyleData(tablename, type, columnName);
+        var isVal = GetStyleData(tablename, type, columnName, SysStyle);
         if (isVal == null) { return "Kein Wert angekommen!"; }
         if (isVal == newValue) { return string.Empty; }
 
@@ -916,12 +918,6 @@ public abstract class SqlBackAbstract {
         }
     }
 
-    /// <summary>
-    /// Gibt alle verfügbaren Tabellen - einschließlich der Systemtabellen - zurück
-    /// </summary>
-    /// <returns></returns>
-    protected abstract List<string>? AllTables();
-
     protected void CompareBackUp(DateTime compareDate) {
         var tbl = Tables();
         if (tbl == null) { return; }
@@ -1049,13 +1045,6 @@ public abstract class SqlBackAbstract {
         } catch { }
     }
 
-    protected string ExecuteCommand(string commandtext, bool abort) {
-        if (Connection == null || !OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
-        using var command = Connection.CreateCommand();
-        command.CommandText = commandtext;
-        return ExecuteCommand(command, abort);
-    }
-
     private void AddColumn(string tablename, string column, bool nullable, bool allowSystemTableNames) => AddColumn(tablename, column, ColumnTypeVarChar255, nullable, allowSystemTableNames);
 
     private void AddColumn(string tablename, string column, string type, bool nullable, bool allowSystemTableNames) {
@@ -1100,7 +1089,7 @@ public abstract class SqlBackAbstract {
 
         try {
             if (Log.Count > 2000) { Log.RemoveAt(0); }
-            Log.Add("[" + DateTime.UtcNow.ToString(Constants.Format_Date ) + "]\r\n" + command.CommandText);
+            Log.Add("[" + DateTime.UtcNow.ToString(Constants.Format_Date) + "]\r\n" + command.CommandText);
             _ = command.ExecuteNonQuery();
             return string.Empty;
         } catch (Exception ex) {

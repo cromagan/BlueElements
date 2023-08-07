@@ -87,6 +87,22 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
 
     #region Methods
 
+    public override List<string>? AllTables() {
+        List<string> tables = new();
+
+        if (Connection == null || !OpenConnection()) { return null; }
+
+        var dt = Connection.GetSchema("Tables");
+        foreach (DataRow row in dt.Rows) {
+            var tablename = (string)row[2];
+            tables.Add(tablename);
+        }
+
+        _ = CloseConnection();
+
+        return tables;
+    }
+
     public override int ColumnLenght(string tablename, string columnname) => throw new NotImplementedException();
 
     /// <summary>
@@ -167,22 +183,6 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
     public override SqlBackAbstract OtherTable(string tablename) => new SQLBackMicrosoftCE(this, tablename);
 
     public override string VarChar(int lenght) => "VARCHAR(" + lenght + ")";
-
-    protected override List<string>? AllTables() {
-        List<string> tables = new();
-
-        if (Connection == null || !OpenConnection()) { return null; }
-
-        var dt = Connection.GetSchema("Tables");
-        foreach (DataRow row in dt.Rows) {
-            var tablename = (string)row[2];
-            tables.Add(tablename);
-        }
-
-        _ = CloseConnection();
-
-        return tables;
-    }
 
     protected override string CreateTable(string tablename, bool allowSystemTableNames) {
         var b = DeleteTable(tablename, allowSystemTableNames);

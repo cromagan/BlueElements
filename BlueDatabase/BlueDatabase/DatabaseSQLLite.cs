@@ -25,6 +25,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System.Linq;
+using static BlueDatabase.SqlBackAbstract;
 
 namespace BlueDatabase;
 
@@ -94,6 +95,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
+    public SqlBackAbstract? SQL => _sql;
     public override string TableName => _tablename;
 
     #endregion
@@ -252,7 +254,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     //}
     public override bool Save() => _sql != null;
 
-    public List<string> SQLLog() => _sql?.Log ?? new List<string>();
+    public List<string> SQLLog() => SqlBackAbstract.Log;
 
     /// <summary>
     /// Liest die Spaltenattribute aus der Style-Datenbank und schreibt sie in die Spalte
@@ -465,7 +467,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                         #region Datenbank-Styles
 
-                        var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, SqlBackAbstract.DatabaseProperty);
+                        var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, SqlBackAbstract.DatabaseProperty, SysStyle);
                         if (v != null) { _ = SetValueInternal(thisWork.Comand, v, null, null, true); }
 
                         #endregion
@@ -475,7 +477,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                         var c = Column.Exists(thisWork.ColName);
                         if (c != null && !c.IsDisposed) {
-                            var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, c.KeyName);
+                            var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, c.KeyName, SysStyle);
                             if (v != null) { _ = SetValueInternal(thisWork.Comand, v, c, null, true); }
                         }
 

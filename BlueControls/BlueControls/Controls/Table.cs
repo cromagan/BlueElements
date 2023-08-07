@@ -2718,8 +2718,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     gr.FillRectangle(BrushYellowTransparent, cellrectangle);
                 }
 
-                if (Database?.Column.SysRowState is ColumnItem srs && currentRow.Row.CellGetInteger(srs) != Database.EventScriptVersion) {
-                    gr.FillRectangle(BrushRedTransparent, cellrectangle);
+                if (Database?.IsAdministrator() ?? false) {
+                    if (Database?.Column.SysRowState is ColumnItem srs && currentRow.Row.CellGetInteger(srs) != Database.EventScriptVersion) {
+                        gr.FillRectangle(BrushRedTransparent, cellrectangle);
+
+                        if (Database?.Column.SysRowChanger is ColumnItem src && currentRow.Row.CellGetString(src) == Generic.UserName) {
+                            Database?.Row.AddRowWithChangedValue(currentRow.Row.KeyName);
+                        }
+                    }
                 }
 
                 gr.DrawLine(Skin.PenLinieDünn, cellrectangle.Left, cellrectangle.Bottom - 1, cellrectangle.Right - 1, cellrectangle.Bottom - 1);

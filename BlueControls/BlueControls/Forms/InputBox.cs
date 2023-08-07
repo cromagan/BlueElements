@@ -48,6 +48,14 @@ public partial class InputBox : DialogWithOkAndCancel {
 
     public static string Show(string txt) => Show(txt, string.Empty, FormatHolder.Text, false);
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="txt"></param>
+    /// <param name="vorschlagsText"></param>
+    /// <param name="textformat">Beispiel: BlueDatabase.FormatHolder.Text</param>
+    /// <returns></returns>
+
     public static string Show(string txt, string vorschlagsText, IInputFormat textformat) => Show(txt, vorschlagsText, textformat, false);
 
     public static string Show(string txt, string vorschlagsText, IInputFormat textformat, bool bigMultiLineBox) {

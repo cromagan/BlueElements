@@ -627,6 +627,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             }
         }
 
+        if (eventname is not null and ScriptEventTypes.value_changed) {
+            Database.Cell.SystemSet(Database.Column.SysRowState, this, Database.EventScriptVersion.ToString());
+        }
+
         return script;
     }
 

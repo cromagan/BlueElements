@@ -477,14 +477,33 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
     /// <param name="type"></param>
     /// <returns></returns>
     public void AddRange(Type type) {
-        foreach (int z1 in Enum.GetValues(type)) {
-            if (this[z1.ToString()] == null) {
-                var n = Enum.GetName(type, z1);
-                if (n != null) {
-                    _ = Add(n.Replace("_", " "), z1.ToString());
+        Type underlyingType = Enum.GetUnderlyingType(type);
+
+        if (underlyingType == typeof(int)) {
+            foreach (int z1 in Enum.GetValues(type)) {
+                if (this[z1.ToString()] == null) {
+                    var n = Enum.GetName(type, z1);
+                    if (n != null) {
+                        _ = Add(n.Replace("_", " "), z1.ToString());
+                    }
                 }
             }
+            return;
         }
+
+        if (underlyingType == typeof(byte)) {
+            foreach (byte z1 in Enum.GetValues(type)) {
+                if (this[z1.ToString()] == null) {
+                    var n = Enum.GetName(type, z1);
+                    if (n != null) {
+                        _ = Add(n.Replace("_", " "), z1.ToString());
+                    }
+                }
+            }
+            return;
+        }
+
+        Develop.DebugPrint(FehlerArt.Fehler, "Typ unbekannt");
     }
 
     public void AddRange(IEnumerable<string>? list) {
