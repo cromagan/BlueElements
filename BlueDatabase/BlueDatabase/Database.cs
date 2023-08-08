@@ -856,6 +856,17 @@ public sealed class Database : DatabaseAbstract {
         list.AddRange(b);
     }
 
+    internal override string NextRowKey() {
+        var tmp = 0;
+        string key;
+
+        do {
+            key = Generic.GetUniqueKey(tmp, "row");
+            tmp++;
+        } while (Row.SearchByKey(key) != null);
+        return key;
+    }
+
     internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 

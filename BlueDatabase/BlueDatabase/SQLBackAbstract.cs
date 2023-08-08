@@ -62,11 +62,12 @@ public abstract class SqlBackAbstract {
 
     #region Properties
 
-    public static DateTime LastLoadUtc { get; private set; } = DateTime.UtcNow;
+    public static DateTime LastLoadUtc { get; protected set; } = DateTime.UtcNow;
 
     public abstract string ColumnPropertyPrimary { get; }
     public abstract string ColumnTypeDate { get; }
     public string ColumnTypeVarChar15 => VarChar(15);
+    public string ColumnTypeVarChar18 => VarChar(18);
     public string ColumnTypeVarChar255 => VarChar(255);
     public string ColumnTypeVarChar4000 => VarChar(4000);
     public string ConnectionString { get; protected set; } = string.Empty;
@@ -293,6 +294,13 @@ public abstract class SqlBackAbstract {
     }
 
     /// <summary>
+    /// Gibt NULL oder die RowId zurück
+    /// </summary>
+    /// <param name="tablename"></param>
+    /// <returns></returns>
+    public abstract string? GenerateRow(string tablename);
+
+    /// <summary>
     /// Gibt die Spaltennamen in Grosschreibung zurück
     /// </summary>
     /// <returns></returns>
@@ -370,7 +378,7 @@ public abstract class SqlBackAbstract {
             throw new Exception();
         }
 
-        var com = "SELECT RK ";
+        var com = "SELECT ROWID ";
         com = com + " FROM " + tablename.ToUpper();
 
         var dt = Fill_Table(com);
@@ -402,7 +410,7 @@ public abstract class SqlBackAbstract {
         if (db == null || db.IsDisposed) { return "Datenbank verworfen"; }
 
         var com = new StringBuilder();
-        com.Append("SELECT RK, ");
+        com.Append("SELECT ROWID, ");
 
         #region Spalten wählen
 
@@ -536,8 +544,8 @@ public abstract class SqlBackAbstract {
 
         if (!string.IsNullOrEmpty(tablename)) {
             if (!x.Contains(tablename.ToUpper())) {
-                _ = CreateTable(tablename.ToUpper(), new List<string> { "RK" }, false);
-                ChangeDataType(tablename.ToUpper(), "RK", 15, false);
+                _ = CreateTable(tablename.ToUpper(), false);
+                //ChangeDataType(tablename.ToUpper(), "RK", 15, false);
             }
         }
 
@@ -571,7 +579,7 @@ public abstract class SqlBackAbstract {
         if (!colUndo.Contains("TABLENAME")) { AddColumn(SysUndo, "TABLENAME", ColumnTypeVarChar255, false, true); }
         if (!colUndo.Contains("COMAND")) { AddColumn(SysUndo, "COMAND", false, true); }
         //if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", ColumnTypeVarChar15, true, true); }
-        if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", ColumnTypeVarChar15, true, true); }
+        if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", ColumnTypeVarChar18, true, true); }
         if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SysUndo, "PREVIOUSVALUE", ColumnTypeVarChar4000, true, true); }
         if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SysUndo, "CHANGEDTO", ColumnTypeVarChar4000, true, true); }
         if (!colUndo.Contains("USERNAME")) { AddColumn(SysUndo, "USERNAME", false, true); }
@@ -957,7 +965,7 @@ public abstract class SqlBackAbstract {
         l.WriteAllText(TempFile("", "", "txt"), Win1252, true);
     }
 
-    protected abstract string CreateTable(string tablename, bool allowSystemTableNames);
+    protected string CreateTable(string tablename, bool allowSystemTableNames) => CreateTable(tablename, new List<string>(), allowSystemTableNames);
 
     //    try {
     //        using var q = _connection.CreateCommand();
@@ -1110,7 +1118,7 @@ public abstract class SqlBackAbstract {
     //            return (null, "Tabellenname ungültig: " + tablename);
     //        }
 
-    //        var comm = @"select " + columnname.ToUpper() + " from " + tablename.ToUpper() + " where RK = " + Dbval(rowkey);
+    //        var comm = @"select " + columnname.ToUpper() + " from " + tablename.ToUpper() + " where ROWID = " + Dbval(rowkey);
 
     //        var dt = Fill_Table(comm);
 
@@ -1154,7 +1162,7 @@ public abstract class SqlBackAbstract {
             return "Tabellenname ungültig: " + tablename;
         }
 
-        var b = ExecuteCommand("DELETE FROM " + tablename.ToUpper() + " WHERE RK = " + Dbval(key.ToString()), true);
+        var b = ExecuteCommand("DELETE FROM " + tablename.ToUpper() + " WHERE ROWID = " + Dbval(key.ToString()), true);
         if (!string.IsNullOrEmpty(b)) { return "Löschen fehgeschlagen: " + b; }
         return string.Empty;
     }
@@ -1182,10 +1190,10 @@ public abstract class SqlBackAbstract {
         string cmdString;
 
         //if (value is null) {
-        //    cmdString = "INSERT INTO " + tablename.ToUpper() + " (RK, " + columnname.ToUpper() + " ) VALUES (" + Dbval(rowkey) + ", " + Dbval(newValue) + " )";
+        //    cmdString = "INSERT INTO " + tablename.ToUpper() + " (ROWID, " + columnname.ToUpper() + " ) VALUES (" + Dbval(rowkey) + ", " + Dbval(newValue) + " )";
         //    Develop.DebugPrint(FehlerArt.Warnung, "Insert-Befehl: " + cmdString);
         //} else if (value != newValue) {
-        cmdString = "UPDATE " + tablename.ToUpper() + " SET " + columnname.ToUpper() + " = " + Dbval(newValue) + " WHERE RK = " + Dbval(rowkey);
+        cmdString = "UPDATE " + tablename.ToUpper() + " SET " + columnname.ToUpper() + " = " + Dbval(newValue) + " WHERE ROWID = " + Dbval(rowkey);
         //} else {
         //    return string.Empty;
         //}

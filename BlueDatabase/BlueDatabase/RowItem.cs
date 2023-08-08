@@ -59,7 +59,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    public RowItem(DatabaseAbstract database) : this(database, database.Row.NextRowKey()) { }
+    public RowItem(DatabaseAbstract database) : this(database, database.NextRowKey()) { }
 
     #endregion
 

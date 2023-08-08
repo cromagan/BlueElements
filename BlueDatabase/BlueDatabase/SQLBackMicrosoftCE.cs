@@ -149,6 +149,8 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
         return ok;
     }
 
+    public override string? GenerateRow(string tablename) => throw new NotImplementedException();
+
     /// <summary>
     /// Gibt die Spaltenname in Grosschreibung zurück
     /// </summary>
@@ -184,12 +186,12 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
 
     public override string VarChar(int lenght) => "VARCHAR(" + lenght + ")";
 
-    protected override string CreateTable(string tablename, bool allowSystemTableNames) {
-        var b = DeleteTable(tablename, allowSystemTableNames);
-        if (!string.IsNullOrEmpty(b)) { return b; }
+    //protected override string CreateTable(string tablename, bool allowSystemTableNames) {
+    //    var b = DeleteTable(tablename, allowSystemTableNames);
+    //    if (!string.IsNullOrEmpty(b)) { return b; }
 
-        return ExecuteCommand(@"CREATE TABLE " + tablename + "(RK " + ColumnPropertyPrimary + " NOT NULL PRIMARY KEY)", true);
-    }
+    //    return ExecuteCommand(@"CREATE TABLE " + tablename + "(RK " + ColumnPropertyPrimary + " NOT NULL PRIMARY KEY)", true);
+    //}
 
     protected override string CreateTable(string tablename, List<string> keycolumns, bool allowSystemTableNames) {
         if (!IsValidTableName(tablename, allowSystemTableNames)) {
@@ -203,22 +205,28 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
 
         // http://www.sql-server-helper.com/error-messages/msg-8110.aspx
 
-        var t = @"CREATE TABLE " + tablename + "(";
+        var t = @"CREATE TABLE " + tablename;
 
-        foreach (var thiskey in keycolumns) {
-            t += thiskey.ToUpper() + " VARCHAR(255) default '' NOT NULL, ";
+        if (keycolumns.Count > 0) {
+            t = t + "(";
+
+            foreach (var thiskey in keycolumns) {
+                t += thiskey.ToUpper() + " VARCHAR(255) default '' NOT NULL, ";
+            }
+            t = t.TrimEnd(", ");
+            t += ")";
         }
-        t = t.TrimEnd(", ");
-        t += ")";
 
         b = ExecuteCommand(t, true);
 
         if (!string.IsNullOrEmpty(b)) { return b; }
-        //if (!ExecuteCommand("SET IDENTITY_INSERT " + name + " ON")) { return false; }
 
-        t = "ALTER TABLE " + tablename + " ADD CONSTRAINT PK_" + tablename.ToUpper() + " PRIMARY KEY CLUSTERED(" + keycolumns.JoinWith(", ").ToUpper() + ")";
+        if (keycolumns.Count > 0) {
+            t = "ALTER TABLE " + tablename + " ADD CONSTRAINT PK_" + tablename.ToUpper() + " PRIMARY KEY CLUSTERED(" + keycolumns.JoinWith(", ").ToUpper() + ")";
 
-        return ExecuteCommand(t, true);
+            return ExecuteCommand(t, true);
+        }
+        return string.Empty;
     }
 
     protected override string DeleteTable(string tablename, bool allowSystemTableNames) {

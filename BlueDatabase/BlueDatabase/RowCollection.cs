@@ -169,7 +169,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (first == null) { return null; }
 
-        var row = database.Row.GenerateAndAdd(database.Row.NextRowKey(), first.JoinWithCr(), false, true, comment);
+        var row = database.Row.GenerateAndAdd(database.NextRowKey(), first.JoinWithCr(), false, true, comment);
 
         if (row == null || row.IsDisposed) { return null; }
 
@@ -604,7 +604,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return item;
     }
 
-    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) => GenerateAndAdd(NextRowKey(), valueOfCellInFirstColumn, true, true, comment);
+    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) => GenerateAndAdd(Database.NextRowKey(), valueOfCellInFirstColumn, true, true, comment);
 
     //    List<DatabaseAbstract> done = new();
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
@@ -749,16 +749,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    }
     //    return string.Empty;
     //}
-    internal string NextRowKey() {
-        var tmp = 0;
-        string key;
-
-        do {
-            key = Generic.GetUniqueKey(tmp, "row");
-            tmp++;
-        } while (SearchByKey(key) != null);
-        return key;
-    }
 
     //internal string SetValueInternal(enDatabaseDataType type, string value) {
     //    switch (type) {

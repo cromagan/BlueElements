@@ -286,6 +286,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         //_ = column.SetValueInternal(DatabaseDataType.MaxCellLenght, mcl.ToString(), false);
     }
 
+    internal override string? NextRowKey() => _sql?.GenerateRow(TableName);
+
     internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 

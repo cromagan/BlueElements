@@ -1647,6 +1647,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
 
+    internal abstract string? NextRowKey();
+
     internal void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }
         if (!DropMessages) { return; }
