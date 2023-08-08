@@ -2722,7 +2722,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     if (Database?.Column.SysRowState is ColumnItem srs && currentRow.Row.CellGetInteger(srs) != Database.EventScriptVersion) {
                         gr.FillRectangle(BrushRedTransparent, cellrectangle);
 
-                        if (Database?.Column.SysRowChanger is ColumnItem src && currentRow.Row.CellGetString(src) == Generic.UserName) {
+                        if (Database?.Column.SysRowChanger is ColumnItem src && currentRow.Row.CellGetString(src).Equals( Generic.UserName, StringComparison.OrdinalIgnoreCase  )) {
                             Database?.Row.AddRowWithChangedValue(currentRow.Row.KeyName);
                         }
                     }

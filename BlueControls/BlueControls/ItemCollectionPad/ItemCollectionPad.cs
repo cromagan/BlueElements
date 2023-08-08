@@ -993,7 +993,9 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
                     break;
 
                 case "item":
-                    var x = pair.Value.GetAllTags();
+                    var t = pair.Value;
+                    if (t.StartsWith("[I]")) { t = t.FromNonCritical(); }
+                    var x = t.GetAllTags();
                     foreach (var thisIt in x) {
                         switch (thisIt.Key) {
                             case "internalname":

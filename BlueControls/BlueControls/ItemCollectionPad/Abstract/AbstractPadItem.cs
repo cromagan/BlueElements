@@ -383,6 +383,9 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
                     if (value.Contains("Name=" + thisPoint.KeyName + ",")) {
                         thisPoint.Parse(value);
                     }
+                    if (value.Contains("Name=\"" + thisPoint.KeyName + "\",")) {
+                        thisPoint.Parse(value);
+                    }
                 }
 
                 return true;
