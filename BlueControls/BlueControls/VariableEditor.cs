@@ -101,8 +101,8 @@ public partial class VariableEditor : UserControl {
                 ro.CellSet("System", thisv.SystemVariable);
 
                 var tmpi = thisv.ReadableText;
-                if (!Editabe && tmpi.Length > 500) {
-                    tmpi = tmpi.Substring(0, 500) + "...";
+                if (!Editabe && tmpi.Length > 3990) {
+                    tmpi = tmpi.Substring(0, 3990) + "...";
                 }
 
                 ro.CellSet("Inhalt", tmpi);

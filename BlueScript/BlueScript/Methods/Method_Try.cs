@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Windows;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -27,36 +26,31 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_ClipboardText : Method {
+internal class Method_Try : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new();
-    public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.\r\nMit SetClipoard kann ein Wert in das Clipboard geschrieben werden.";
+    public override string Description => "Führt den Codeblock aus. Wenn ein Fehler ausgelöst wird, wird der Codeblock verlassen, das restlichs Sript wird aber ausgeführt. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
-    public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
-    public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "ClipboardText()";
+    public override string EndSequence => string.Empty;
+    public override bool GetCodeBlockAfter => true;
+    public override MethodType MethodType => MethodType.Standard;
+    public override string Returns => string.Empty;
+    public override string StartSequence => string.Empty;
+    public override string Syntax => "Try { }";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "clipboardtext" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "try" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
-        }
-
-        if (Clipboard.ContainsText()) {
-            return new DoItFeedback(Clipboard.GetText());
-        }
-        return DoItFeedback.Null();
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+        var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "Try-Befehl", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, null);
+        return new DoItFeedback(scx.BreakFired, scx.EndScript);
     }
 
     #endregion

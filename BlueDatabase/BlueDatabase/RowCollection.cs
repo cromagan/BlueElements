@@ -462,15 +462,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return string.Empty;
     }
 
-    public void ExecuteValueChanged() {
+    public void ExecuteValueChanged(bool ignoreUserAction) {
         if (_pendingChangedRows.Count == 0) { return; }
-        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return; }
+        if (!ignoreUserAction && DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return; }
 
         if (_executingchangedrows) { return; }
         _executingchangedrows = true;
 
         while (_pendingChangedRows.Count > 0) {
-            if (IsDisposed) { return; }
+            if (IsDisposed) { _executingchangedrows = false; return; }
 
             try {
                 var key = _pendingChangedRows[0];
@@ -479,7 +479,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (r != null && !r.IsDisposed) {
                     var ok = r.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2);
 
-                    if (!ok.AllOk) { return; }
+                    if (!ok.AllOk) { _executingchangedrows = false; return; }
 
                     r.InvalidateCheckData();
                     r.CheckRowDataIfNeeded();

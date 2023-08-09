@@ -18,44 +18,42 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Windows;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_ClipboardText : Method {
+internal class Method_SetClipboard : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
-    public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.\r\nMit SetClipoard kann ein Wert in das Clipboard geschrieben werden.";
+    public override List<List<string>> Args => new() { StringVal };
+    public override string Description => "Speichert den Text im Clipboard.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
-    public override string Returns => VariableString.ShortName_Plain;
+    public override MethodType MethodType => MethodType.IO | MethodType.ManipulatesUser;
+    public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "ClipboardText()";
+    public override string Syntax => "SetClipboard(Text);";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "clipboardtext" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "setclipboard" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
-        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
-            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
-        }
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        if (Clipboard.ContainsText()) {
-            return new DoItFeedback(Clipboard.GetText());
-        }
+        var vs = attvar.ValueStringGet(0);
+        _ = CopytoClipboard(vs);
+
         return DoItFeedback.Null();
     }
 

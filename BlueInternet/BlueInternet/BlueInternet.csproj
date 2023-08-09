@@ -120,6 +120,7 @@
     <Compile Include="AdditionalScriptComands\Method_WebPageGetAllLinks.cs" />
     <Compile Include="AdditionalScriptComands\Method_WebPageGetAllIds.cs" />
     <Compile Include="AdditionalScriptComands\Method_WebPageFillTextBox.cs" />
+    <Compile Include="AdditionalScriptComands\Method_WebPageSourceCoder.cs" />
     <Compile Include="AdditionalScriptComands\Method_WebPageScreenShot.cs" />
     <Compile Include="AdditionalScriptComands\Method_LoadUrl.cs" />
     <Compile Include="AdditionalScriptComands\VariableWebpage.cs" />

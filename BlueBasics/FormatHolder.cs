@@ -100,7 +100,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         Image = QuickImage.Get(ImageCode.Ordner, 16),
         //    https://regex101.com/r/S2CbwM/1
         Regex = @"^[A-Za-z]:\\.*\\$",
-        AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "\\&#:.,+-_ ",
+        AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "\\!&#:.,+-_ ",
         Suffix = string.Empty,
         Prefix = string.Empty,
         FormatierungErlaubt = false,
@@ -114,7 +114,7 @@ public class FormatHolder : IInputFormat, IReadableText {
         Image = QuickImage.Get(ImageCode.Ordner, 16),
         //    https://regex101.com/r/S2CbwM/1
         Regex = @"^[A-Za-z]:\\.*[.].*$",
-        AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "\\&#:.,+-_ ",
+        AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpper() + "\\!&#:.,+-_ ",
         Suffix = string.Empty,
         Prefix = string.Empty,
         FormatierungErlaubt = false,

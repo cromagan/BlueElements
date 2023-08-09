@@ -2004,10 +2004,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private void Checker_Tick(object state) {
         if (IsDisposed) { return; }
 
-        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 5) { return; }
+        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 6) { return; }
         if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return; }
 
-        Row.ExecuteValueChanged();
+        Row.ExecuteValueChanged(false);
 
         if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) { return; }
         if (!LogUndo) { return; }

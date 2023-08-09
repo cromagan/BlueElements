@@ -56,13 +56,14 @@
     <Compile Include="Methods\Method_AddSuffix.cs" />
     <Compile Include="Methods\Method_BitmapToBase64.cs" />
     <Compile Include="Methods\Method_BackupControl.cs" />
+    <Compile Include="Methods\Method_Try.cs" />
     <Compile Include="Methods\Method_ForEach.cs" />
     <Compile Include="Methods\Method_DownloadImage.cs" />
     <Compile Include="Methods\Method_DownloadWebPage.cs" />
     <Compile Include="Methods\Method_RemoveDoubleSpaces.cs" />
     <Compile Include="Methods\Method_Return.cs" />
     <Compile Include="Methods\Method_SaveImage.cs" />
-    <Compile Include="Methods\Method_SetClipbard.cs" />
+    <Compile Include="Methods\Method_SetClipboard.cs" />
     <Compile Include="Methods\Method_CallByFilename.cs" />
     <Compile Include="Methods\Method_ContainsWhich.cs" />
     <Compile Include="Methods\Method_DirectoryExists.cs" />
