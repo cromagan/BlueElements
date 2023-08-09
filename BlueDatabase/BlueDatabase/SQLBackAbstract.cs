@@ -453,7 +453,7 @@ public abstract class SqlBackAbstract {
                 if (count > 0) { com.Append(" OR "); }
 
                 count++;
-                com.Append("RK = " + Dbval(thisr.KeyName));
+                com.Append("ROWID = " + Dbval(thisr.KeyName));
             }
         }
 
@@ -741,7 +741,7 @@ public abstract class SqlBackAbstract {
                     return RemoveRow(tablename, LongParse(value), false);
 
                 case DatabaseDataType.Comand_AddRow:
-                    return AddRow(tablename, LongParse(value));
+                    return string.Empty;//  AddRow(tablename, LongParse(value));
 
                 default:
                     Develop.DebugPrint(FehlerArt.Fehler, type + " nicht definiert!");
@@ -887,7 +887,7 @@ public abstract class SqlBackAbstract {
 
         var wh = string.Empty;
 
-        var com = "SELECT RK, ";
+        var com = "SELECT ROWID, ";
 
         foreach (var thiscolumn in columnsToLoad) {
             com = com + thiscolumn.KeyName.ToUpper() + ", ";
@@ -1072,7 +1072,7 @@ public abstract class SqlBackAbstract {
         _ = ExecuteCommand("ALTER TABLE " + tablename.ToUpper() + " add " + column + " " + type + " default ''" + n, true);
     }
 
-    private string AddRow(string tablename, long key) => ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + Dbval(key) + ")", true);
+    //private string AddRow(string tablename, long key) => ExecuteCommand("INSERT INTO " + tablename.ToUpper() + " (RK) VALUES (" + Dbval(key) + ")", true);
 
     private bool CopyTable(string tablename, string newtablename) {
         if (!IsValidTableName(tablename, true)) {
