@@ -113,6 +113,41 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return new DatabaseSqlLite(ci);
     }
 
+    public static void CheckSysUndoNow() {
+        if (_isInTimer) { return; }
+        _isInTimer = true;
+
+        var fd = DateTime.UtcNow;
+
+        try {
+            var done = new List<DatabaseAbstract>();
+
+            foreach (var thisDb in AllFiles) {
+                if (!done.Contains(thisDb)) {
+                    if (thisDb is DatabaseSqlLite thisDbSqlLite) {
+                        if (thisDbSqlLite._sql != null) {
+                            var db = LoadedDatabasesWithThisSql(thisDbSqlLite._sql);
+                            done.AddRange(db);
+
+                            var erg = thisDbSqlLite._sql.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd, false);
+                            if (erg == null) { _isInTimer = false; return; } // Später ein neuer Versuch
+
+                            foreach (var thisdb in db) {
+                                thisdb.DoLastChanges(erg);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch {
+            _isInTimer = false;
+            return;
+        }
+
+        _timerTimeStamp = fd;
+        _isInTimer = false;
+    }
+
     public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
@@ -256,13 +291,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     public List<string> SQLLog() => SqlBackAbstract.Log;
 
-    /// <summary>
-    /// Liest die Spaltenattribute aus der Style-Datenbank und schreibt sie in die Spalte
-    /// Achtung: Die Connection wird nicht geschlossen!
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="sql"></param>
-
     internal void GetColumnAttributesColumn(ColumnItem column, SqlBackAbstract sql) {
         var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), column.KeyName);
 
@@ -286,6 +314,12 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         //_ = column.SetValueInternal(DatabaseDataType.MaxCellLenght, mcl.ToString(), false);
     }
 
+    /// <summary>
+    /// Liest die Spaltenattribute aus der Style-Datenbank und schreibt sie in die Spalte
+    /// Achtung: Die Connection wird nicht geschlossen!
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="sql"></param>
     internal override string? NextRowKey() => _sql?.GenerateRow(TableName);
 
     internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
@@ -324,39 +358,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (DateTime.UtcNow.Subtract(SqlBackAbstract.LastLoadUtc).TotalSeconds < 5) { return; }
 
         if (CriticalState()) { return; }
-
-        if (_isInTimer) { return; }
-        _isInTimer = true;
-
-        var fd = DateTime.UtcNow;
-
-        try {
-            var done = new List<DatabaseAbstract>();
-
-            foreach (var thisDb in AllFiles) {
-                if (!done.Contains(thisDb)) {
-                    if (thisDb is DatabaseSqlLite thisDbSqlLite) {
-                        if (thisDbSqlLite._sql != null) {
-                            var db = LoadedDatabasesWithThisSql(thisDbSqlLite._sql);
-                            done.AddRange(db);
-
-                            var erg = thisDbSqlLite._sql.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd, false);
-                            if (erg == null) { _isInTimer = false; return; } // Später ein neuer Versuch
-
-                            foreach (var thisdb in db) {
-                                thisdb.DoLastChanges(erg);
-                            }
-                        }
-                    }
-                }
-            }
-        } catch {
-            _isInTimer = false;
-            return;
-        }
-
-        _timerTimeStamp = fd;
-        _isInTimer = false;
+        CheckSysUndoNow();
     }
 
     private static List<DatabaseSqlLite> LoadedDatabasesWithThisSql(SqlBackAbstract sql) {
@@ -520,7 +522,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             var columnsToLoad = _sql?.GetColumnNames(TableName.ToUpper());
             if (columnsToLoad != null) {
-                _ = columnsToLoad.Remove("RK");
+                //_ = columnsToLoad.Remove("RK");
 
                 #region Nicht mehr vorhandene Spalten löschen
 

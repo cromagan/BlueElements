@@ -61,6 +61,7 @@ public static class Generic {
             if (_gotUserName.Contains("\\")) { _gotUserName = _gotUserName.FileNameWithSuffix(); }
             return _gotUserName;
         }
+        set => _gotUserName = value;
     }
 
     #endregion

@@ -738,7 +738,7 @@ public abstract class SqlBackAbstract {
                     return RemoveColumn(tablename, columname, false);
 
                 case DatabaseDataType.Comand_RemoveRow:
-                    return RemoveRow(tablename, LongParse(value), false);
+                    return RemoveRow(tablename, value, false);
 
                 case DatabaseDataType.Comand_AddRow:
                     return string.Empty;//  AddRow(tablename, LongParse(value));
@@ -1156,7 +1156,7 @@ public abstract class SqlBackAbstract {
         return string.Empty;
     }
 
-    private string RemoveRow(string tablename, long key, bool allowSystemTableNames) {
+    private string RemoveRow(string tablename, string key, bool allowSystemTableNames) {
         if (!IsValidTableName(tablename, allowSystemTableNames)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
             return "Tabellenname ungültig: " + tablename;

@@ -60,7 +60,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     #region Fields
 
     public static readonly int AutoFilterSize = 22;
-    public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(180, 255, 128, 128));
+    public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(40, 255, 128, 128));
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
@@ -2722,7 +2722,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     if (Database?.Column.SysRowState is ColumnItem srs && currentRow.Row.CellGetInteger(srs) != Database.EventScriptVersion) {
                         gr.FillRectangle(BrushRedTransparent, cellrectangle);
 
-                        if (Database?.Column.SysRowChanger is ColumnItem src && currentRow.Row.CellGetString(src).Equals( Generic.UserName, StringComparison.OrdinalIgnoreCase  )) {
+                        if (Database?.Column.SysRowChanger is ColumnItem src && currentRow.Row.CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase)) {
                             Database?.Row.AddRowWithChangedValue(currentRow.Row.KeyName);
                         }
                     }

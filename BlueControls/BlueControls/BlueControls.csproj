@@ -174,6 +174,12 @@
     <Compile Include="ConnectedFormula\ButtonAddRow.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Controls\TextGenerator.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TextGenerator.Designer.cs">
+      <DependentUpon>TextGenerator.cs</DependentUpon>
+    </Compile>
     <Compile Include="Enums\FilterTypeRowInputItem.cs" />
     <Compile Include="FormManager.cs" />
     <Compile Include="Forms\FormulaView.cs">
@@ -729,6 +735,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\SwapListBox.resx">
       <DependentUpon>SwapListBox.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TextGenerator.resx">
+      <DependentUpon>TextGenerator.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Designer Support\frmQuickPic.resx">
       <DependentUpon>frmQuickPic.cs</DependentUpon>

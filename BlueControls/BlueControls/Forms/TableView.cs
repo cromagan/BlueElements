@@ -555,7 +555,7 @@ public partial class TableView : FormWithStatusBar {
 
         foreach (var thiss in tbl.Database.EventScript) {
             if (thiss != null && thiss.ManualExecutable && thiss.NeedRow) {
-                _ = e.UserMenu.Add("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, ImageCode.Skript, row != null && tbl.Database.isRowScriptPossible()) ;
+                _ = e.UserMenu.Add("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, ImageCode.Skript, row != null && tbl.Database.isRowScriptPossible());
             }
         }
     }
@@ -861,6 +861,7 @@ public partial class TableView : FormWithStatusBar {
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(true);
         DatabaseAbstract.ForceSaveAll();
+        DatabaseSqlLite.CheckSysUndoNow();
     }
 
     private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
