@@ -17,23 +17,21 @@
 
 #nullable enable
 
+using BlueDatabase.Enums;
+
 namespace BlueDatabase.EventArgs;
 
-public class CellExtEventArgs : System.EventArgs {
+public class CellChangedEventArgs : CellEventArgs {
 
     #region Constructors
 
-    public CellExtEventArgs(ColumnItem? column, RowData? row) {
-        Column = column;
-        RowData = row;
-    }
+    public CellChangedEventArgs(ColumnItem column, RowItem row, Reason reason) : base(column, row) => Reason = reason;
 
     #endregion
 
     #region Properties
 
-    public ColumnItem? Column { get; }
-    public RowData? RowData { get; }
+    public Reason Reason { get; }
 
     #endregion
 }

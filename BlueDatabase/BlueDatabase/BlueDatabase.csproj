@@ -108,7 +108,9 @@
     <Compile Include="ConnetionInfo.cs" />
     <Compile Include="DatabaseAbstract.cs" />
     <Compile Include="DatabaseSQLLite.cs" />
+    <Compile Include="Enums\Reason.cs" />
     <Compile Include="EventArgs\CellEditBlockReasonEventArgs.cs" />
+    <Compile Include="EventArgs\CellChangedEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="ColumnFormatHolder.cs" />
     <Compile Include="DatabaseScript.cs" />

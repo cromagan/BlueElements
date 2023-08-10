@@ -357,6 +357,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
+    public abstract bool UndoLoaded { get; }
+
     public VariableCollection Variables {
         get => new(_variables);
         set {
@@ -1932,9 +1934,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (type.IsObsolete()) { return; }
         // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
 
-        if (Undo.Count > 0) {
-            Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, comment, DateTime.UtcNow));
-        }
+        Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, comment, DateTime.UtcNow));
     }
 
     protected void CreateWatcher() {

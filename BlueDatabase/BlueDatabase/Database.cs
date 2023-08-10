@@ -85,6 +85,8 @@ public sealed class Database : DatabaseAbstract {
     public string Filename { get; private set; } = string.Empty;
     public override string TableName => _tablename;
 
+    public override bool UndoLoaded => true;
+
     #endregion
 
     #region Methods
@@ -268,6 +270,8 @@ public sealed class Database : DatabaseAbstract {
 
         return (pointer, type, value, colName, rowKey);
     }
+
+    // Dateibasierte Systeme haben immer den Undo-Speicher
 
     public static void Parse(byte[] data, DatabaseAbstract db, NeedPassword? needPassword) {
         db.Column.ThrowEvents = false;

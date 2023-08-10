@@ -2565,15 +2565,16 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //            l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
     //        }
     //    }
-    private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellEventArgs e) {
+    private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellChangedEventArgs e) {
         if (Database == null || Database.IsDisposed) { return; }
 
-        var tKey = CellCollection.KeyOfCell(e.Column, e.Row);
+        if (e.Column.KeyName != LinkedCell_ColumnNameOfLinkedDatabase) { return; }
+
         foreach (var thisRow in Database.Row) {
-            if (Database.Cell.GetStringBehindLinkedValue(this, thisRow) == tKey) {
+            if (Database.Cell.GetStringBehindLinkedValue(this, thisRow) == e.Row.KeyName) {
                 //CellCollection.Invalidate_CellContentSize(this, thisRow);
                 Invalidate_ContentWidth();
-                Database.Cell.OnCellValueChanged(new CellEventArgs(this, thisRow));
+                Database.Cell.OnCellValueChanged(new CellChangedEventArgs(this, thisRow, e.Reason));
                 //_ = thisRow.ExecuteScript(EventTypes.value_changedx, string.Empty, true, false, true, 5);
                 thisRow.Database?.Row.AddRowWithChangedValue(thisRow.KeyName);
             }

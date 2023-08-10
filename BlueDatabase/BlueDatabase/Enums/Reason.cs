@@ -15,25 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
+namespace BlueDatabase.Enums;
 
-namespace BlueDatabase.EventArgs;
-
-public class CellEventArgs : System.EventArgs {
-
-    #region Constructors
-
-    public CellEventArgs(ColumnItem column, RowItem row) {
-        Column = column;
-        Row = row;
-    }
-
-    #endregion
-
-    #region Properties
-
-    public ColumnItem Column { get; }
-    public RowItem Row { get; }
-
-    #endregion
+public enum Reason {
+    SetComand = 0,
+    LoadReload = 1
 }

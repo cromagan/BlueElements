@@ -64,7 +64,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     #region Events
 
-    public event EventHandler<CellEventArgs>? CellValueChanged;
+    public event EventHandler<CellChangedEventArgs>? CellValueChanged;
 
     #endregion
 
@@ -819,7 +819,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     //    }
     //    return Size.Empty;
     //}
-    internal void OnCellValueChanged(CellEventArgs e) {
+    internal void OnCellValueChanged(CellChangedEventArgs e) {
         if (e.Column == null) { return; }
         e.Column.UcaseNamesSortedByLenght = null;
         CellValueChanged?.Invoke(this, e);
@@ -862,11 +862,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="value"></param>
     /// <param name="changeSysColumns"></param>
 
-    internal void SetValueBehindLinkedValue(ColumnItem? column, RowItem? row, string value, bool changeSysColumns) {
+    internal void SetValueBehindLinkedValue(ColumnItem column, RowItem row, string value, bool changeSysColumns) {
         var dbtmp = Database;
         if (dbtmp == null || dbtmp.IsDisposed) {
-            dbtmp.DevelopWarnung("Datenbank ungültig!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!<br>" + dbtmp.ConnectionData.TableName);
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!");
             return;
         }
 
@@ -916,7 +915,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         column.Invalidate_ContentWidth();
         row.InvalidateCheckData();
-        OnCellValueChanged(new CellEventArgs(column, row));
+        OnCellValueChanged(new CellChangedEventArgs(column, row, Reason.SetComand));
     }
 
     internal void SystemSet(ColumnItem? column, RowItem? row, string value) {

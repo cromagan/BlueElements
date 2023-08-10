@@ -295,7 +295,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         tblUndo.Arrangement = 1;
 
         if (Database is DatabaseAbstract db) {
-            if (db.Undo.Count == 0) {
+            if (!db.UndoLoaded) {
                 UpdateStatusBar(FehlerArt.Info, "Lade Undo-Speicher", true);
 
                 db.GetUndoCache();

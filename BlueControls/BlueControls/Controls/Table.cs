@@ -151,7 +151,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public event EventHandler<CellEventArgs>? ButtonCellClicked;
 
-    public event EventHandler<CellEventArgs>? CellValueChanged;
+    public event EventHandler<CellChangedEventArgs>? CellValueChanged;
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
@@ -159,7 +159,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public event EventHandler? DatabaseChanged;
 
-    public new event EventHandler<CellEventArgs>? DoubleClick;
+    public new event EventHandler<CellExtEventArgs>? DoubleClick;
 
     public event EventHandler? FilterChanged;
 
@@ -1478,7 +1478,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (_isinDoubleClick) { return; }
             _isinDoubleClick = true;
             CellOnCoordinate(MousePos().X, MousePos().Y, out _mouseOverColumn, out _mouseOverRow);
-            CellEventArgs ea = new(_mouseOverColumn, _mouseOverRow?.Row);
+            CellExtEventArgs ea = new(_mouseOverColumn, _mouseOverRow);
             DoubleClick?.Invoke(this, ea);
 
             if (!Mouse_IsInHead()) {
@@ -1964,7 +1964,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void _Database_CellValueChanged(object sender, CellEventArgs e) {
+    private void _Database_CellValueChanged(object sender, CellChangedEventArgs e) {
         if (_filteredRows != null) {
             var f = Filter;
             var rsd = SortUsed();
@@ -2738,6 +2738,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                 Draw_CellTransparent(gr, viewItem, currentRow, cellrectangle, _cellFont, state);
 
+                //if (viewItem == CurrentArrangement[Database?.Column.First()]) {
+                //    gr.FillRectangle(BrushYellowTransparent, cellrectangle);
+                //    //gr.FillRectangle(BrushYellowTransparent, cellrectangle);
+                //    Skin.Draw_FormatedText(gr, currentRow.Row.KeyName, null, Alignment.Left, cellrectangle, this, false, _newRowFont, false);
+                //}
+
                 if (_unterschiede != null && _unterschiede != currentRow?.Row) {
                     if (currentRow?.Row.CellGetString(viewItem.Column) != _unterschiede.CellGetString(viewItem.Column)) {
                         Rectangle tmpr = new((int)viewItem.OrderTmpSpalteX1 + 1, DrawY(currentRow) + 1,
@@ -3145,7 +3151,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnButtonCellClicked(CellEventArgs e) => ButtonCellClicked?.Invoke(this, e);
 
-    private void OnCellValueChanged(CellEventArgs e) => CellValueChanged?.Invoke(this, e);
+    private void OnCellValueChanged(CellChangedEventArgs e) => CellValueChanged?.Invoke(this, e);
 
     private void OnDatabaseChanged() => DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
 

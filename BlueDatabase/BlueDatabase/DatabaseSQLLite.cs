@@ -54,6 +54,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     private readonly string _tablename = string.Empty;
 
+    private bool _undoLoaded = false;
+
     #endregion
 
     #region Constructors
@@ -97,6 +99,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     public SqlBackAbstract? SQL => _sql;
     public override string TableName => _tablename;
+
+    public override bool UndoLoaded => _undoLoaded;
 
     #endregion
 
@@ -213,14 +217,14 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     }
 
     public override void GetUndoCache() {
-
-        #region Undo Speicher einlesen
+        if (UndoLoaded) { return; }
 
         var undos = _sql?.GetLastChanges(new List<DatabaseSqlLite> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1), true);
 
+        Undo.Clear();
         Undo.AddRange(undos);
 
-        #endregion
+        _undoLoaded = true;
     }
 
     public override void RefreshColumnsData(List<ColumnItem> columns) {
@@ -385,10 +389,11 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         try {
             var rk = new List<string>();
+            var cek = new List<string>();
 
             foreach (var thisWork in data) {
                 if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
-                    if (Undo.Count > 0) { Undo.Add(thisWork); }
+                    Undo.Add(thisWork);
 
                     //_ = Enum.TryParse(thisWork.Comand, out DatabaseDataType t);
 
@@ -451,7 +456,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                         #endregion
                     } else if (!string.IsNullOrEmpty(thisWork.RowKey)) {
 
-                        #region Zeilen zum neu Einlesen merken uns Spaltenbreite invalidierne
+                        #region Zeilen zum neu Einlesen merken uns Spaltenbreite invalidieren
 
                         var c = Column.Exists(thisWork.ColName);
                         var r = Row.SearchByKey(thisWork.RowKey);
@@ -462,6 +467,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                             // hier geklscht, aber anderer PC mat bei der noch vorhanden Zeile eine Änderung
                             if (thisWork.DateTimeUtc > r.IsInCache || thisWork.DateTimeUtc > c.IsInCache) {
                                 _ = rk.AddIfNotExists(r.KeyName);
+                                _ = cek.AddIfNotExists(CellCollection.KeyOfCell(c, r));
                                 c.Invalidate_ContentWidth();
                             }
                         }
@@ -494,6 +500,15 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             if (!string.IsNullOrEmpty(errormessage)) {
                 OnDropMessage(FehlerArt.Fehler, errormessage);
             }
+
+            foreach (var thisc in cek) {
+                Cell.DataOfCellKey(thisc, out var c, out var r);
+                if (c != null && r != null) {
+                    Cell.OnCellValueChanged(new EventArgs.CellChangedEventArgs(c, r, Reason.LoadReload));
+                }
+            }
+
+            OnInvalidateView();
         } catch {
             Develop.CheckStackForOverflow();
             DoLastChanges(data);

@@ -133,6 +133,9 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
 
         var myCommand = new SqlCommand(str, myConn);
         var ok = false;
+
+        if (isBlocked(myCommand)) { return false; }
+
         try {
             myConn.Open();
             _ = myCommand.ExecuteNonQuery();

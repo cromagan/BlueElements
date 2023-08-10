@@ -31,6 +31,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using System.Runtime.CompilerServices;
+using System.Data.SqlClient;
 
 namespace BlueDatabase;
 
@@ -44,6 +45,7 @@ public abstract class SqlBackAbstract {
     public const string DatabaseProperty = "~DATABASE~";
     public const string SysStyle = "SYS_STYLE";
     public const string SysUndo = "SYS_UNDO";
+    public static List<string>? Blocked;
     public static List<SqlBackAbstract> ConnectedSqlBack = new();
     public static List<string> Log = new();
     public DbConnection? Connection;
@@ -272,6 +274,11 @@ public abstract class SqlBackAbstract {
                 using var command = Connection.CreateCommand();
                 command.CommandText = commandtext;
                 command.CommandTimeout = 10;
+
+                if (isBlocked(command)) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Keine Connection vorhanden");
+                    throw new Exception();
+                }
 
                 var tbl = new DataTable();
                 PauseSystem();
@@ -1053,6 +1060,18 @@ public abstract class SqlBackAbstract {
         } catch { }
     }
 
+    protected bool isBlocked(IDbCommand command) {
+        if (Blocked == null || Blocked.Count == 0) { return false; }
+
+        foreach (var thisb in Blocked) {
+            if (command.CommandText.Contains(thisb)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Blockierte Sequenz entdeckt: " + thisb);
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void AddColumn(string tablename, string column, bool nullable, bool allowSystemTableNames) => AddColumn(tablename, column, ColumnTypeVarChar255, nullable, allowSystemTableNames);
 
     private void AddColumn(string tablename, string column, string type, bool nullable, bool allowSystemTableNames) {
@@ -1094,6 +1113,8 @@ public abstract class SqlBackAbstract {
         LastLoadUtc = DateTime.UtcNow;
 
         if (Connection == null || !OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
+
+        if (isBlocked(command)) { return "Befehl blockiert!"; }
 
         try {
             if (Log.Count > 2000) { Log.RemoveAt(0); }

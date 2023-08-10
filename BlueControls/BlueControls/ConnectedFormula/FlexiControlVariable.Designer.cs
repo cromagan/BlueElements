@@ -32,19 +32,10 @@ namespace BlueControls.Controls {
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
         private void InitializeComponent() {
-            this.Marker = new BackgroundWorker();
             this.SuspendLayout();
-            // 
-            // Marker
-            // 
-            this.Marker.WorkerReportsProgress = true;
-            this.Marker.WorkerSupportsCancellation = true;
-            this.Marker.DoWork += new DoWorkEventHandler(this.Marker_DoWork);
-            this.Marker.ProgressChanged += new ProgressChangedEventHandler(this.Marker_ProgressChanged);
             this.ResumeLayout(false);
         }
         #endregion
 
-        private BackgroundWorker Marker;
     }
 }

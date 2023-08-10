@@ -371,7 +371,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         }
     }
 
-    private void Database_CellValueChanged(object sender, CellEventArgs e) {
+    private void Database_CellValueChanged(object sender, CellChangedEventArgs e) {
         try {
             if (InvokeRequired) {
                 _ = Invoke(new Action(() => Database_CellValueChanged(sender, e)));
@@ -380,17 +380,11 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
             var (column, row) = GetTmpVariables();
 
-            if (e.Row != row) {
-                return;
-            }
+            if (e.Row != row) { return; }
 
-            if (e.Column == column) {
-                SetValueFromCell();
-            }
+            if (e.Column == column) { SetValueFromCell(); }
 
-            if (e.Column == column || e.Column == e.Column?.Database?.Column.SysLocked) {
-                CheckEnabledState();
-            }
+            if (e.Column == column || e.Column == e.Column?.Database?.Column.SysLocked) { CheckEnabledState(); }
         } catch {
             // Invoke: auf das verworfene Ojekt blah blah
             if (!IsDisposed) {
