@@ -50,6 +50,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         eventScriptEditor.Enabled = false;
         Database = database;
         Database.Disposing += Database_Disposing;
+        Database.CanDoScript += Database_CanDoScript;
 
         FormManager.Current.RegisterForm(this);
     }
@@ -207,6 +208,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         txbTestZeile.Enabled = chkZeile.Checked;
     }
 
+    private void Database_CanDoScript(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
+
     private void Database_Disposing(object sender, System.EventArgs e) {
         RemoveDatabase();
         Close();
@@ -284,6 +287,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         if (Database == null || Database.IsDisposed) { return; }
         Item = null;
         Database.Disposing -= Database_Disposing;
+        Database.CanDoScript -= Database_CanDoScript;
         Database = null;
     }
 

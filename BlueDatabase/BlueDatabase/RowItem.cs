@@ -202,7 +202,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (name.Length > 18) { return false; }
         if (name.Length < 2) { return false; }
 
-        if (!name.ContainsOnlyChars(Constants.AllowedCharsVariableName + "/")) { return false; }
+        if (!name.ContainsOnlyChars(Constants.AllowedCharsVariableName + "/+")) { return false; }
 
         if (!Constants.Char_AZ.Contains(name.Substring(0, 1).ToUpper())) { return false; }
 

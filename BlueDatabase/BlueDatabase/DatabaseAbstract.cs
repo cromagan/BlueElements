@@ -147,6 +147,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     #region Events
 
+    public event EventHandler<CancelEventArgs>? CanDoScript;
+
     public event EventHandler? Disposing;
 
     public event EventHandler<MessageEventArgs>? DropMessage;
@@ -1077,9 +1079,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, "Allgemein"); }
 
+            var e = new CancelEventArgs(false);
+            OnCanDoScript(e);
+            if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich", false, "Allgemein"); }
+
             var m = EditableErrorReason(EditableErrorReasonType.EditCurrently);
 
-            if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
+            if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, "Allgemein"); }
 
             #region Script ermitteln
 
@@ -1542,6 +1548,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
         return true;
+    }
+
+    public void OnCanDoScript(CancelEventArgs e) {
+        if (IsDisposed) { return; }
+        CanDoScript?.Invoke(this, e);
     }
 
     public void OnInvalidateView() {
