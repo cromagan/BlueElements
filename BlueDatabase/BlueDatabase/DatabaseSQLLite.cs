@@ -70,9 +70,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         _sql = sql.OtherTable(tablename);
 
-        _tablename = SqlBackAbstract.MakeValidTableName(tablename);
+        _tablename = MakeValidTableName(tablename);
 
-        if (!SqlBackAbstract.IsValidTableName(_tablename, false)) {
+        if (!IsValidTableName(_tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
         }
 
@@ -307,7 +307,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             foreach (var thisstyle in l) {
                 _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
                 if (!t.IsObsolete()) {
-                    _ = column.SetValueInternal(t, thisstyle.Value, true);
+                    _ = column.SetValueInternal(t, thisstyle.Value, Reason.LoadReload);
                 }
             }
         }
@@ -326,18 +326,18 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     /// <param name="sql"></param>
     internal override string? NextRowKey() => _sql?.GenerateRow(TableName);
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 
-        if (!isLoading) {
+        if (reason != Reason.LoadReload) {
             _ = _sql?.SetValueInternal(TableName, type, value, column?.KeyName, row?.KeyName);
         }
 
-        return base.SetValueInternal(type, value, column, row, isLoading);
+        return base.SetValueInternal(type, value, column, row, reason);
     }
 
     protected override void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) {
@@ -418,7 +418,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                         switch (thisWork.Comand) {
                             case DatabaseDataType.Comand_RemoveColumn:
-                                _ = Column.SetValueInternal(thisWork.Comand, true, thisWork.ColName);
+                                _ = Column.SetValueInternal(thisWork.Comand, Reason.LoadReload, thisWork.ColName);
                                 break;
 
                             //case DatabaseDataType.Comand_AddColumnByKey:
@@ -431,7 +431,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                             //    break;
 
                             case DatabaseDataType.Comand_AddColumnByName:
-                                _ = Column.SetValueInternal(thisWork.Comand, true, thisWork.ChangedTo); // ColumName kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Spalte bekannt ist und nicht gespeichert wird
+                                _ = Column.SetValueInternal(thisWork.Comand, Reason.LoadReload, thisWork.ChangedTo); // ColumName kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Spalte bekannt ist und nicht gespeichert wird
                                 var c2 = Column.Exists(thisWork.ChangedTo);
                                 //var columnname = _sql.GetLastColumnName(TableName, c.KeyName);
                                 //_ = SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
@@ -439,13 +439,13 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                                 break;
 
                             case DatabaseDataType.Comand_AddRow:
-                                _ = Row.SetValueInternal(thisWork.Comand, thisWork.ChangedTo, null, true); // RowKey kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Zeile bekannt ist und nicht gespeichert wird
+                                _ = Row.SetValueInternal(thisWork.Comand, thisWork.ChangedTo, null, Reason.LoadReload); // RowKey kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Zeile bekannt ist und nicht gespeichert wird
                                 _ = rk.AddIfNotExists(thisWork.ChangedTo); // Nachher auch laden
                                 break;
 
                             case DatabaseDataType.Comand_RemoveRow:
                                 var r = Row.SearchByKey(thisWork.RowKey);
-                                _ = Row.SetValueInternal(thisWork.Comand, r?.KeyName, r, true);
+                                _ = Row.SetValueInternal(thisWork.Comand, r?.KeyName, r, Reason.LoadReload);
                                 break;
 
                             default:
@@ -478,7 +478,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                         #region Datenbank-Styles
 
                         var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, SqlBackAbstract.DatabaseProperty, SysStyle);
-                        if (v != null) { _ = SetValueInternal(thisWork.Comand, v, null, null, true); }
+                        if (v != null) { _ = SetValueInternal(thisWork.Comand, v, null, null, Reason.LoadReload); }
 
                         #endregion
                     } else if (thisWork.Comand.IsColumnTag()) {
@@ -488,7 +488,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                         var c = Column.Exists(thisWork.ColName);
                         if (c != null && !c.IsDisposed) {
                             var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, c.KeyName, SysStyle);
-                            if (v != null) { _ = SetValueInternal(thisWork.Comand, v, c, null, true); }
+                            if (v != null) { _ = SetValueInternal(thisWork.Comand, v, c, null, Reason.LoadReload); }
                         }
 
                         #endregion
@@ -559,7 +559,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 foreach (var thisCol in columnsToLoad) {
                     var column = Column.Exists(thisCol);
                     if (column == null || column.IsDisposed) {
-                        _ = Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, true, thisCol);
+                        _ = Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, Reason.LoadReload, thisCol);
                         column = Column.Exists(thisCol);
 
                         if (column == null || column.IsDisposed) {
@@ -593,7 +593,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 foreach (var thisstyle in l) {
                     _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
                     if (!t.IsObsolete()) {
-                        _ = SetValueInternal(t, thisstyle.Value, null, null, true);
+                        _ = SetValueInternal(t, thisstyle.Value, null, null, Reason.LoadReload);
                     }
                 }
             }

@@ -41,6 +41,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using Timer = System.Threading.Timer;
+using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
@@ -51,7 +52,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     #region Fields
 
     public const string DatabaseVersion = "4.02";
+
     public static readonly ObservableCollection<DatabaseAbstract> AllFiles = new();
+
     public static List<Type>? DatabaseTypes;
 
     /// <summary>
@@ -60,27 +63,44 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public readonly List<UndoItem> Undo;
 
     private static DateTime _lastTableCheck = new(1900, 1, 1);
+
     private readonly List<ColumnViewCollection> _columnArrangements = new();
+
     private readonly List<string> _datenbankAdmin = new();
+
     private readonly List<DatabaseScript> _eventScript = new();
+
     private readonly LayoutCollection _layouts = new();
+
     private readonly List<string> _permissionGroupsNewRow = new();
+
     private readonly List<string> _tags = new();
+
     private readonly List<Variable> _variables = new();
+
     private string _additionalFilesPfad = string.Empty;
+
     private string _cachePfad = string.Empty;
+
     private string _caption = string.Empty;
+
     private Timer? _checker;
+
     private int _checkerTickCount = -5;
+
     private string _createDate = string.Empty;
+
     private string _creator = string.Empty;
+
     private string _eventScriptTmp = string.Empty;
 
     //private string _timeCode = string.Empty;
     private int _eventScriptVersion;
 
     private double _globalScale;
+
     private string _globalShowPass = string.Empty;
+
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -89,6 +109,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private string _standardFormulaFile = string.Empty;
 
     private string _variableTmp = string.Empty;
+
     private string _zeilenQuickInfo = string.Empty;
 
     #endregion
@@ -183,6 +204,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public CellCollection Cell { get; }
+
     public ColumnCollection Column { get; }
 
     public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
@@ -305,6 +327,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public string LoadedVersion { get; private set; } = "0.00";
+
     public bool LogUndo { get; set; } = true;
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
@@ -316,7 +339,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public DateTime PowerEdit { get; set; }
+
     public bool ReadOnly { get; private set; }
+
     public RowCollection Row { get; }
 
     [Browsable(false)]
@@ -540,6 +565,26 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return null;
     }
 
+    public static bool IsValidTableName(string tablename, bool allowSystemnames) {
+        if (string.IsNullOrEmpty(tablename)) { return false; }
+
+        var t = tablename.ToUpper();
+
+        if (!allowSystemnames) {
+            if (t.StartsWith("SYS_")) { return false; }
+            if (t.StartsWith("BAK_")) { return false; }
+        }
+
+        if (!t.ContainsOnlyChars(Char_AZ + Char_Numerals + "_")) { return false; }
+
+        if (tablename == "ALL_TAB_COLS") { return false; } // system-name
+
+        // eigentlich 128, aber minus BAK_ und _2023_03_28
+        if (t.Length > 100) { return false; }
+
+        return true;
+    }
+
     /// <summary>
     /// Sucht die Datenbank im Speicher. Wird sie nicht gefunden, wird sie geladen.
     /// </summary>
@@ -610,6 +655,18 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return null;
     }
 
+    public static string MakeValidTableName(string tablename) {
+        var tmp = tablename.RemoveChars(Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
+        tmp = tmp.FileNameWithoutSuffix().ToLower().Replace(" ", "_").Replace("-", "_");
+        tmp = tmp.StarkeVereinfachung("_").ToUpper();
+
+        while (tmp.Contains("__")) {
+            tmp = tmp.Replace("__", "_");
+        }
+
+        return tmp;
+    }
+
     public static ConnectionInfo? ProviderOf(string tablename) {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(AllFiles);
@@ -651,7 +708,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + " _.");
             var ok = true;
 
-            if (SqlBackAbstract.IsValidTableName(unique, false)) {
+            if (IsValidTableName(unique, false)) {
                 foreach (var thisfile in AllFiles) {
                     if (string.Equals(unique, thisfile.TableName)) { ok = false; break; }
                 }
@@ -713,7 +770,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public string ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var f = SetValueInternal(comand, changedTo, column, row, false);
+        var f = SetValueInternal(comand, changedTo, column, row, Reason.SetComand);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -1231,7 +1288,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public DatabaseAbstract? GetOtherTable(string tablename) {
-        if (!SqlBackAbstract.IsValidTableName(tablename, false)) {
+        if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Ungültiger Tabellenname: " + tablename);
             return null;
         }
@@ -1698,7 +1755,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// <param name="row"></param>
     /// <param name="isLoading"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
+    internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (type.IsObsolete()) { return string.Empty; }
 
@@ -1710,7 +1767,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 return "Wert nicht gesetzt!";
             }
 
-            return Cell.SetValueInternal(column, row, value, isLoading);
+            return Cell.SetValueInternal(column, row, value, reason);
         }
 
         if (type.IsColumnTag()) {
@@ -1718,7 +1775,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
                 return "Wert nicht gesetzt!";
             }
-            return column.SetValueInternal(type, value, isLoading);
+            return column.SetValueInternal(type, value, reason);
         }
 
         if (type.IsCommand()) {
@@ -1726,12 +1783,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 case DatabaseDataType.Comand_RemoveColumn:
                     var c = Column.Exists(value);
                     if (c == null) { return string.Empty; }
-                    return Column.SetValueInternal(type, isLoading, c.KeyName);
+                    return Column.SetValueInternal(type, reason, c.KeyName);
 
                 case DatabaseDataType.Comand_AddColumnByName:
-                    var f2 = Column.SetValueInternal(type, isLoading, value);
+                    var f2 = Column.SetValueInternal(type, reason, value);
 
-                    if (!isLoading) {
+                    if (reason != Reason.LoadReload) {
                         var thisColumn = Column.Exists(value);
                         if (thisColumn != null) { thisColumn.IsInCache = DateTime.UtcNow; }
                     }
@@ -1739,12 +1796,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                     return f2;
 
                 case DatabaseDataType.Comand_RemoveRow:
-                    return Row.SetValueInternal(type, row?.KeyName, row, isLoading);
+                    return Row.SetValueInternal(type, row?.KeyName, row, reason);
 
                 case DatabaseDataType.Comand_AddRow:
-                    var f1 = Row.SetValueInternal(type, value, null, isLoading);
+                    var f1 = Row.SetValueInternal(type, value, null, reason);
 
-                    if (!isLoading) {
+                    if (reason != Reason.LoadReload) {
                         var thisRow = Row.SearchByKey(value);
                         if (thisRow != null && !thisRow.IsDisposed) { thisRow.IsInCache = DateTime.UtcNow; }
                     }

@@ -60,9 +60,9 @@ public sealed class Database : DatabaseAbstract {
     private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : base(readOnly) {
         //Develop.StartService();
 
-        _tablename = SqlBackAbstract.MakeValidTableName(tablename);
+        _tablename = MakeValidTableName(tablename);
 
-        if (!SqlBackAbstract.IsValidTableName(_tablename, false)) {
+        if (!IsValidTableName(_tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
         }
 
@@ -297,7 +297,7 @@ public sealed class Database : DatabaseAbstract {
                 if (!string.IsNullOrEmpty(rowKey)) {
                     row = db.Row.SearchByKey(rowKey);
                     if (row == null || row.IsDisposed) {
-                        _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, null, true);
+                        _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, null, Reason.LoadReload);
                         row = db.Row.SearchByKey(rowKey);
                     }
                     if (row == null || row.IsDisposed) {
@@ -332,7 +332,7 @@ public sealed class Database : DatabaseAbstract {
                     column = db.Column.Exists(columname);
                     if (column == null || column.IsDisposed) {
                         if (type != DatabaseDataType.ColumnName) { Develop.DebugPrint(type + " an erster Stelle!"); }
-                        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, true, columname);
+                        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, Reason.LoadReload, columname);
                         column = db.Column.Exists(columname);
                     }
                     if (column == null || column.IsDisposed) {
@@ -360,7 +360,7 @@ public sealed class Database : DatabaseAbstract {
 
                 #endregion
 
-                var fehler = db.SetValueInternal(type, value, column, row, true);
+                var fehler = db.SetValueInternal(type, value, column, row, Reason.LoadReload);
 
                 if (type == DatabaseDataType.EOF) { break; }
 
@@ -380,7 +380,7 @@ public sealed class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.KeyName, thisColumn, null, true);
+                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload);
             }
         }
 
@@ -627,7 +627,7 @@ public sealed class Database : DatabaseAbstract {
 
         if (checkExists && !File.Exists(f)) { return null; }
 
-        return new ConnectionInfo(SqlBackAbstract.MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
+        return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
     }
 
     public override string EditableErrorReason(EditableErrorReasonType mode) {
@@ -777,7 +777,7 @@ public sealed class Database : DatabaseAbstract {
         base.RepairAfterParse();
 
         if (!string.IsNullOrEmpty(Filename)) {
-            if (!string.Equals(TableName, SqlBackAbstract.MakeValidTableName(Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
+            if (!string.Equals(TableName, MakeValidTableName(Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Tabellenname stimmt nicht: " + Filename);
             }
         }
@@ -871,10 +871,10 @@ public sealed class Database : DatabaseAbstract {
         return key;
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, bool isLoading) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var r = base.SetValueInternal(type, value, column, row, isLoading);
+        var r = base.SetValueInternal(type, value, column, row, reason);
 
         if (type == DatabaseDataType.UndoInOne) {
             Undo.Clear();
@@ -885,7 +885,7 @@ public sealed class Database : DatabaseAbstract {
             }
         }
 
-        if (!isLoading) {
+        if (reason != Reason.LoadReload) {
             HasPendingChanges = true;
         }
 

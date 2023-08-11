@@ -25,6 +25,7 @@ using BlueControls.Forms;
 using BlueDatabase;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using static BlueDatabase.DatabaseAbstract;
 
 namespace BlueControls.Interfaces;
 
@@ -185,7 +186,7 @@ public class ItemSendSomething {
                 var na = value.FromNonCritical();
 
                 if (na.IsFormat(FormatHolder.FilepathAndName)) {
-                    na = na.FilePath() + SqlBackAbstract.MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
+                    na = na.FilePath() + MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
                 _outputDatabase = DatabaseAbstract.GetById(new ConnectionInfo(na, null), null);

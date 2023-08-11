@@ -712,7 +712,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         _ = Sizes.TryAdd(key, contentSize);
     }
 
-    public string SetValueInternal(ColumnItem column, RowItem row, string value, bool isLoading) {
+    public string SetValueInternal(ColumnItem column, RowItem row, string value, Reason reason) {
         if (row is null) { return "Row konnte nicht generiert werden."; }
         if (column is null) { return "Column konnte nicht generiert werden."; }
 
@@ -725,19 +725,19 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (string.IsNullOrEmpty(value)) {
                 if (!TryRemove(cellKey, out _)) {
                     Develop.CheckStackForOverflow();
-                    return SetValueInternal(column, row, value, isLoading);
+                    return SetValueInternal(column, row, value, reason);
                 }
             }
         } else {
             if (!string.IsNullOrEmpty(value)) {
                 if (!TryAdd(cellKey, new CellItem(value))) {
                     Develop.CheckStackForOverflow();
-                    return SetValueInternal(column, row, value, isLoading);
+                    return SetValueInternal(column, row, value, reason);
                 }
             }
         }
 
-        if (!isLoading) {
+        if (reason != Reason.LoadReload) {
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {
                 Database?.Row.AddRowWithChangedValue(row.KeyName);
             }

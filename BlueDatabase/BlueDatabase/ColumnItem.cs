@@ -33,6 +33,7 @@ using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
+using static BlueDatabase.DatabaseAbstract;
 
 namespace BlueDatabase;
 
@@ -2258,7 +2259,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// <param name="type"></param>
     /// <param name="newvalue"></param>
     /// <returns></returns>
-    internal string SetValueInternal(DatabaseDataType type, string newvalue, bool isLoading) {
+    internal string SetValueInternal(DatabaseDataType type, string newvalue, Reason reason) {
         if (type.IsObsolete()) { return string.Empty; }
 
         switch (type) {
@@ -2278,7 +2279,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
                 var nname = newvalue.ToUpper();
 
-                if (isLoading && nname != _name) {
+                if (reason == Reason.LoadReload && nname != _name) {
                     return "Namen Inkonsistent: " + nname + " " + _name;
                 }
 
@@ -2636,10 +2637,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (!_linkedDatabaseFile.Contains("|") && !_linkedDatabaseFile.IsFormat(FormatHolder.FilepathAndName)) {
             _linkedDatabaseFile = _linkedDatabaseFile.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB");
-            _linkedDatabaseFile = SqlBackAbstract.MakeValidTableName(_linkedDatabaseFile);
+            _linkedDatabaseFile = MakeValidTableName(_linkedDatabaseFile);
         }
 
-        if (SqlBackAbstract.IsValidTableName(_linkedDatabaseFile, false)) {
+        if (IsValidTableName(_linkedDatabaseFile, false)) {
             _linkedDatabase = Database.GetOtherTable(_linkedDatabaseFile);
         }
 

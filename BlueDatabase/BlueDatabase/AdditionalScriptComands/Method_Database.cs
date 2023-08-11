@@ -22,6 +22,7 @@ using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
+using static BlueDatabase.DatabaseAbstract;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -45,7 +46,7 @@ public abstract class Method_Database : Method {
     }
 
     protected DatabaseAbstract? DatabaseOf(VariableCollection variables, string tableName) {
-        if (!SqlBackAbstract.IsValidTableName(tableName, false)) { return null; }
+        if (!IsValidTableName(tableName, false)) { return null; }
 
         var db = MyDatabase(variables)?.ConnectionDataOfOtherTable(tableName, false);
         return DatabaseAbstract.GetById(db, null);

@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using static BlueDatabase.DatabaseAbstract;
 
 namespace BlueDatabase;
 
@@ -65,7 +66,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
                 }
             }
 
-            TableName = SqlBackAbstract.MakeValidTableName(uniqueId.FileNameWithoutSuffix());
+            TableName = MakeValidTableName(uniqueId.FileNameWithoutSuffix());
             Provider = null;
             DatabaseID = preveredFileFormatId ?? Database.DatabaseId;
             AdditionalData = uniqueId;
@@ -79,7 +80,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
 
         #region Prüfen, ob eine ConnectionInfo als String übergeben wurde
 
-        if (SqlBackAbstract.IsValidTableName(x[0], false) && !string.IsNullOrEmpty(x[1])) {
+        if (IsValidTableName(x[0], false) && !string.IsNullOrEmpty(x[1])) {
             TableName = x[0];
             Provider = null;
             DatabaseID = x[1];
@@ -163,7 +164,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
     public string TableName {
         get => _tablename;
         set {
-            if (!SqlBackAbstract.IsValidTableName(value, false)) {
+            if (!IsValidTableName(value, false)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + value);
             }
 

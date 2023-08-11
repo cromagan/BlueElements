@@ -71,13 +71,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public event EventHandler<DoRowAutomaticEventArgs>? DoSpecialRules;
 
-    public event EventHandler<RowEventArgs>? RowAdded;
+    public event EventHandler<RowReasonEventArgs>? RowAdded;
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
     public event EventHandler? RowRemoved;
 
-    public event EventHandler<RowEventArgs>? RowRemoving;
+    public event EventHandler<RowReasonEventArgs>? RowRemoving;
 
     #endregion
 
@@ -755,7 +755,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //        case enDatabaseDataType.LastRowKey:
     //            //_LastRowKey = LongParse(value);
     //            break;
-    internal void OnRowRemoving(RowEventArgs e) {
+    internal void OnRowRemoving(RowReasonEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
         e.Row.DoSpecialRules -= OnDoSpecialRules;
 
@@ -765,7 +765,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
-    internal string SetValueInternal(DatabaseDataType type, string? rowkey, RowItem? row, bool isLoading) {
+    internal string SetValueInternal(DatabaseDataType type, string? rowkey, RowItem? row, Reason reason) {
         if (rowkey is null || string.IsNullOrWhiteSpace(rowkey)) { return "Schlüsselfehler"; }
 
         var db = Database;
@@ -774,14 +774,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (type == DatabaseDataType.Comand_AddRow) {
             var c = new RowItem(db, rowkey);
 
-            return Add(c);
+            return Add(c, reason);
         }
 
         if (type == DatabaseDataType.Comand_RemoveRow) {
             //var row = SearchByKey(key);
             if (row == null || row.IsDisposed) { return "Zeile nicht vorhanden"; }
 
-            OnRowRemoving(new RowEventArgs(row));
+            OnRowRemoving(new RowReasonEventArgs(row, reason));
             foreach (var thisColumnItem in db.Column) {
                 if (thisColumnItem != null) {
                     db.Cell.Delete(thisColumnItem, row.KeyName);
@@ -801,9 +801,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// </summary>
     /// <param name="row"></param>
     /// <returns></returns>
-    private string Add(RowItem row) {
+    private string Add(RowItem row, Reason reason) {
         if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
-        OnRowAdded(new RowEventArgs(row));
+        OnRowAdded(new RowReasonEventArgs(row, reason));
         return string.Empty;
     }
 
@@ -879,7 +879,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         DoSpecialRules?.Invoke(this, e);
     }
 
-    private void OnRowAdded(RowEventArgs e) {
+    private void OnRowAdded(RowReasonEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
         e.Row.DoSpecialRules += OnDoSpecialRules;
 

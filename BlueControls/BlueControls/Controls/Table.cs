@@ -167,7 +167,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public event EventHandler? PinnedChanged;
 
-    public event EventHandler<RowEventArgs>? RowAdded;
+    public event EventHandler<RowReasonEventArgs>? RowAdded;
 
     public event EventHandler<CellExtEventArgs>? SelectedCellChanged;
 
@@ -2027,7 +2027,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _pg.Update(e.Current);
     }
 
-    private void _Database_Row_RowAdded(object sender, RowEventArgs e) {
+    private void _Database_Row_RowAdded(object sender, RowReasonEventArgs e) {
         OnRowAdded(sender, e);
         Invalidate_FilteredRows();
     }
@@ -2458,7 +2458,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return (int)viewItem.TmpDrawWidth;
     }
 
-    private void Column_ItemRemoving(object sender, ColumnEventArgs e) {
+    private void Column_ItemRemoving(object sender, ColumnReasonEventArgs e) {
         if (e.Column == CursorPosColumn) {
             CursorPos_Reset();
         }
@@ -3161,7 +3161,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnPinnedChanged() => PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnRowAdded(object sender, RowEventArgs e) => RowAdded?.Invoke(sender, e);
+    private void OnRowAdded(object sender, RowReasonEventArgs e) => RowAdded?.Invoke(sender, e);
 
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
 

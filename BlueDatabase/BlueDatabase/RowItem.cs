@@ -89,7 +89,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public static bool DoingScript { get; private set; }
 
     public DatabaseAbstract? Database { get; private set; }
+
     public bool IsDisposed { get; private set; }
+
     public string KeyName { get; private set; }
 
     public string QuickInfo {
@@ -101,13 +103,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     #endregion
-
-    /// <summary>
-    /// Diese Routine konvertiert den Inhalt der Zelle in eine vom Skript lesbaren Variable
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <returns></returns>
 
     #region Methods
 
@@ -200,6 +195,18 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         return vars;
+    }
+
+    public static bool IsValidRowKey(string name) {
+        if (string.IsNullOrWhiteSpace(name)) { return false; }
+        if (name.Length > 18) { return false; }
+        if (name.Length < 2) { return false; }
+
+        if (!name.ContainsOnlyChars(Constants.AllowedCharsVariableName + "/")) { return false; }
+
+        if (!Constants.Char_AZ.Contains(name.Substring(0, 1).ToUpper())) { return false; }
+
+        return true;
     }
 
     public string CellFirstString() {

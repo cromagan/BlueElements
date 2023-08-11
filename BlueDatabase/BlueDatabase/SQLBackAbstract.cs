@@ -32,6 +32,7 @@ using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using System.Runtime.CompilerServices;
 using System.Data.SqlClient;
+using static BlueDatabase.DatabaseAbstract;
 
 namespace BlueDatabase;
 
@@ -45,7 +46,6 @@ public abstract class SqlBackAbstract {
     public const string DatabaseProperty = "~DATABASE~";
     public const string SysStyle = "SYS_STYLE";
     public const string SysUndo = "SYS_UNDO";
-    public static List<string>? Blocked;
     public static List<SqlBackAbstract> ConnectedSqlBack = new();
     public static List<string> Log = new();
     public DbConnection? Connection;
@@ -84,38 +84,6 @@ public abstract class SqlBackAbstract {
     #endregion
 
     #region Methods
-
-    public static bool IsValidTableName(string tablename, bool allowSystemnames) {
-        if (string.IsNullOrEmpty(tablename)) { return false; }
-
-        var t = tablename.ToUpper();
-
-        if (!allowSystemnames) {
-            if (t.StartsWith("SYS_")) { return false; }
-            if (t.StartsWith("BAK_")) { return false; }
-        }
-
-        if (!t.ContainsOnlyChars(Char_AZ + Char_Numerals + "_")) { return false; }
-
-        if (tablename == "ALL_TAB_COLS") { return false; } // system-name
-
-        // eigentlich 128, aber minus BAK_ und _2023_03_28
-        if (t.Length > 100) { return false; }
-
-        return true;
-    }
-
-    public static string MakeValidTableName(string tablename) {
-        var tmp = tablename.RemoveChars(Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
-        tmp = tmp.FileNameWithoutSuffix().ToLower().Replace(" ", "_").Replace("-", "_");
-        tmp = tmp.StarkeVereinfachung("_").ToUpper();
-
-        while (tmp.Contains("__")) {
-            tmp = tmp.Replace("__", "_");
-        }
-
-        return tmp;
-    }
 
     /// <summary>
     /// Erstellt eine Spalte nur bei Bedarf.
@@ -275,11 +243,6 @@ public abstract class SqlBackAbstract {
                 command.CommandText = commandtext;
                 command.CommandTimeout = 10;
 
-                if (isBlocked(command)) {
-                    Develop.DebugPrint(FehlerArt.Fehler, "Keine Connection vorhanden");
-                    throw new Exception();
-                }
-
                 var tbl = new DataTable();
                 PauseSystem();
                 if (OpenConnection()) {
@@ -393,7 +356,7 @@ public abstract class SqlBackAbstract {
 
         foreach (var thisRow in dt.Rows) {
             var rk = ((DataRow)thisRow)[0].ToString();
-            _ = row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, true);
+            _ = row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, Reason.LoadReload);
         }
     }
 
@@ -477,7 +440,7 @@ public abstract class SqlBackAbstract {
                 for (var z = 1; z < dt.Columns.Count; z++) {
                     var cx = db.Column.Exists(dt.Columns[z].ColumnName);
                     if (cx != null) {
-                        _ = db.Cell.SetValueInternal(cx, r, reader[z].ToString(), true);
+                        _ = db.Cell.SetValueInternal(cx, r, reader[z].ToString(), Reason.LoadReload);
                     }
                 }
 
@@ -915,7 +878,7 @@ public abstract class SqlBackAbstract {
             var row = db.Row.SearchByKey(rk);
 
             if (row == null || row.IsDisposed) {
-                _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, true);
+                _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, Reason.LoadReload);
                 row = db.Row.SearchByKey(rk);
             }
 
@@ -923,7 +886,7 @@ public abstract class SqlBackAbstract {
 
             if (row != null && !row.IsDisposed) {
                 for (var z = 1; z < dt.Columns.Count; z++) {
-                    _ = db.Cell.SetValueInternal(columnsToLoad[z - 1], row, reader[z].ToString(), true);
+                    _ = db.Cell.SetValueInternal(columnsToLoad[z - 1], row, reader[z].ToString(), Reason.LoadReload);
                 }
             }
         }
@@ -1060,18 +1023,6 @@ public abstract class SqlBackAbstract {
         } catch { }
     }
 
-    protected bool isBlocked(IDbCommand command) {
-        if (Blocked == null || Blocked.Count == 0) { return false; }
-
-        foreach (var thisb in Blocked) {
-            if (command.CommandText.Contains(thisb)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Blockierte Sequenz entdeckt: " + thisb);
-                return true;
-            }
-        }
-        return false;
-    }
-
     private void AddColumn(string tablename, string column, bool nullable, bool allowSystemTableNames) => AddColumn(tablename, column, ColumnTypeVarChar255, nullable, allowSystemTableNames);
 
     private void AddColumn(string tablename, string column, string type, bool nullable, bool allowSystemTableNames) {
@@ -1113,8 +1064,6 @@ public abstract class SqlBackAbstract {
         LastLoadUtc = DateTime.UtcNow;
 
         if (Connection == null || !OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
-
-        if (isBlocked(command)) { return "Befehl blockiert!"; }
 
         try {
             if (Log.Count > 2000) { Log.RemoveAt(0); }
@@ -1177,13 +1126,18 @@ public abstract class SqlBackAbstract {
         return string.Empty;
     }
 
-    private string RemoveRow(string tablename, string key, bool allowSystemTableNames) {
+    private string RemoveRow(string tablename, string rowkey, bool allowSystemTableNames) {
         if (!IsValidTableName(tablename, allowSystemTableNames)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
             return "Tabellenname ungültig: " + tablename;
         }
 
-        var b = ExecuteCommand("DELETE FROM " + tablename.ToUpper() + " WHERE ROWID = " + Dbval(key.ToString()), true);
+        if (!RowItem.IsValidRowKey(rowkey)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Zeilenschlüssel ungültig: " + rowkey);
+            return "Zeilenschlüssel ungültig: " + rowkey;
+        }
+
+        var b = ExecuteCommand("DELETE FROM " + tablename.ToUpper() + " WHERE ROWID = " + Dbval(rowkey), true);
         if (!string.IsNullOrEmpty(b)) { return "Löschen fehgeschlagen: " + b; }
         return string.Empty;
     }
@@ -1197,11 +1151,20 @@ public abstract class SqlBackAbstract {
     /// <param name="newValue"></param>
     /// <param name="columnname"></param>
     /// <returns></returns>
-    private string SetCellValue(string tablename, string columnname, string? rowkey, string newValue) {
+    private string SetCellValue(string tablename, string columnname, string rowkey, string newValue) {
         if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
-
             return "Tabellenname ungültig: " + tablename;
+        }
+
+        if (!RowItem.IsValidRowKey(rowkey)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Zeilenschlüssel ungültig: " + rowkey);
+            return "Zeilenschlüssel ungültig: " + rowkey;
+        }
+
+        if (!ColumnItem.IsValidColumnName(columnname)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + columnname);
+            return "Spaltenname ungültig: " + rowkey;
         }
 
         //(string? value, string error) = GetCellValue(tablename, columnname, rowkey);

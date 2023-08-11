@@ -284,7 +284,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         if (_generated) { SetInputRow(); }
     }
 
-    private void Row_RowRemoving(object sender, RowEventArgs e) {
+    private void Row_RowRemoving(object sender, RowReasonEventArgs e) {
         if (e.Row != null && RowKey == e.Row.KeyName) {
             SetData(ConnectedFormula, Database, string.Empty);
         }

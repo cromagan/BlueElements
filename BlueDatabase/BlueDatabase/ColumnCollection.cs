@@ -53,13 +53,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Events
 
-    public event EventHandler<ColumnEventArgs>? ColumnAdded;
+    public event EventHandler<ColumnReasonEventArgs>? ColumnAdded;
 
     public event EventHandler<ColumnEventArgs>? ColumnInternalChanged;
 
     public event EventHandler? ColumnRemoved;
 
-    public event EventHandler<ColumnEventArgs>? ColumnRemoving;
+    public event EventHandler<ColumnReasonEventArgs>? ColumnRemoving;
 
     #endregion
 
@@ -126,7 +126,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Methods
 
-    public string Add(ColumnItem column) {
+    public string Add(ColumnItem column, Reason reason) {
         foreach (var thisc in this) {
             if (thisc.KeyName.Equals(column.KeyName, StringComparison.OrdinalIgnoreCase)) { return "Hinzufügen fehlgeschlagen."; }
         }
@@ -135,7 +135,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         GetSystems();
 
-        OnColumnAdded(new ColumnEventArgs(column));
+        OnColumnAdded(new ColumnReasonEventArgs(column, reason));
         return string.Empty;
     }
 
@@ -506,14 +506,14 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    internal void OnColumnRemoving(ColumnEventArgs e) {
+    internal void OnColumnRemoving(ColumnReasonEventArgs e) {
         e.Column.Changed -= OnColumnChanged;
 
         if (!_throwEvents) { return; }
         ColumnRemoving?.Invoke(this, e);
     }
 
-    internal string SetValueInternal(DatabaseDataType type, bool isLoading, string name) {
+    internal string SetValueInternal(DatabaseDataType type, Reason reason, string name) {
         if (Database == null || Database.IsDisposed) { return "Datenbank verworfen!"; }
         //if (key is null or < 0) { return "Schlüsselfehler"; }
 
@@ -537,9 +537,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (c != null && !c.IsDisposed) { return "Bereits vorhanden!"; }
 
             c = new ColumnItem(Database, name);
-            _ = Add(c);
+            _ = Add(c, reason);
 
-            if (!isLoading) {
+            if (reason != Reason.LoadReload) {
                 Database.RepairColumnArrangements();
                 Database.RepairViews();
             }
@@ -551,11 +551,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             var c = Exists(name);
             if (c == null) { return "Spalte nicht gefunden!"; }
 
-            OnColumnRemoving(new ColumnEventArgs(c));
+            OnColumnRemoving(new ColumnReasonEventArgs(c, reason));
             if (!_internal.TryRemove(name.ToUpper(), out _)) { return "Löschen nicht erfolgreich"; }
             OnColumnRemoved();
 
-            if (!isLoading) {
+            if (reason != Reason.LoadReload) {
                 Database.RepairColumnArrangements();
                 Database.RepairViews();
             }
@@ -601,7 +601,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
 
-    private void OnColumnAdded(ColumnEventArgs e) {
+    private void OnColumnAdded(ColumnReasonEventArgs e) {
         e.Column.Changed += OnColumnChanged;
 
         if (!_throwEvents) { return; }

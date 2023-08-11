@@ -582,7 +582,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         }
     }
 
-    private void Row_RowRemoving(object sender, RowEventArgs e) {
+    private void Row_RowRemoving(object sender, RowReasonEventArgs e) {
         if (e.Row.KeyName == _rowKey) {
             _rowKey = string.Empty;
             _tmpRow = null;
