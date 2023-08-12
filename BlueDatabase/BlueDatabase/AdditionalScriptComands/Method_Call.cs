@@ -62,8 +62,11 @@ internal class Method_Call : Method_Database {
         var sc = db.EventScript.Get(vs);
         if (sc == null) { return new DoItFeedback(infos.Data, "Skript nicht vorhanden: " + vs); }
 
-        if (sc.Attributes() != scp.ScriptAttributes && scp.ScriptAttributes != "*") {
-            return new DoItFeedback(infos.Data, "Aufzurufendes Skript hat andere Bedingungen.");
+        var newat = sc.Attributes();
+        foreach (var thisAt in scp.ScriptAttributes) {
+            if (!newat.Contains(thisAt)) {
+                return new DoItFeedback(infos.Data, "Aufzurufendes Skript hat andere Bedingungen.");
+            }
         }
 
         (string f, string error) = Script.ReduceText(sc.Script);

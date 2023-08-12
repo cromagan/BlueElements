@@ -65,7 +65,7 @@ public class Script {
     #region Properties
 
     public MethodType AllowedMethods { get; }
-    public string Attributes { get; }
+    public List<string> Attributes { get; }
 
     public bool ChangeValues { get; }
 

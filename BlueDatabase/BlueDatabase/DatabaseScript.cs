@@ -321,10 +321,10 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
         }
     }
 
-    internal string Attributes() {
-        var s = string.Empty;
-        if (NeedRow) { s += "NeedRow"; }
-        if (ChangeValues) { s += "ChangeValues"; }
+    internal List<string> Attributes() {
+        var s = new List<string>();
+        if (NeedRow) { s.Add("NeedRow"); }
+        if (!ChangeValues) { s.Add("NeverChangesValues"); }
         return s;
     }
 

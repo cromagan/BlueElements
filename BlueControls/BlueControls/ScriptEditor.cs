@@ -165,7 +165,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         OnExecuteScript(ex);
 
         if (ex.Feedback == null) {
-            var scp = new ScriptProperties(MethodType.Standard, false, "*");
+            var scp = new ScriptProperties(MethodType.Standard, false, new List<string>());
             var s = new Script(null, string.Empty, scp);
             ex.Feedback = s.Parse(0, "Main");
         }

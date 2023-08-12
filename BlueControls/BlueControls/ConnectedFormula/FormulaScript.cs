@@ -303,9 +303,9 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
         }
     }
 
-    internal string Attributes() {
-        var s = string.Empty;
-        if (ChangeValues) { s += "ChangeValues"; }
+    internal List<string> Attributes() {
+        var s = new List<string>();
+        if (!ChangeValues) { s.Add("NeverChangesValues"); }
         return s;
     }
 

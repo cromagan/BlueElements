@@ -28,28 +28,29 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_ExtractText : Method {
+internal class Method_ExtractFirstText : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal };
+    public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
 
-    public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt eine Liste mit allen Funden zurück.\r\n" +
+    public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt einen String mit dem ersten Fund zurück.\r\n" +
+                                          "Wird kein Text gefunden, wird der Defaultwert zurück gegeben.\r\n" +
                                           "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";
 
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
-    public override string Returns => VariableListString.ShortName_Plain;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "ExtractText(String, SearchPattern);";
+    public override string Syntax => "ExtractFirstText(String, SearchPattern, Default);";
 
     #endregion
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "extracttext" };
+    public override List<string> Comand(VariableCollection? currentvariables) => new() { "extractfirsttext" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
@@ -57,11 +58,11 @@ internal class Method_ExtractText : Method {
 
         var tags = attvar.ValueStringGet(0).ReduceToMulti(attvar.ValueStringGet(1), StringComparison.OrdinalIgnoreCase);
 
-        if (tags == null) {
-            return new DoItFeedback(infos.Data, "Nichts extrahiert - Searchpattern fehlerhaft?");
+        if (tags == null || tags.Count == 0) {
+            return new DoItFeedback(attvar.ValueStringGet(2));
         }
 
-        return new DoItFeedback(tags);
+        return new DoItFeedback(tags[0]);
     }
 
     #endregion

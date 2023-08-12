@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueScript.Enums;
 
 namespace BlueScript.Structures;
@@ -25,7 +26,7 @@ public class ScriptProperties {
 
     #region Constructors
 
-    public ScriptProperties(MethodType allowedMethods, bool changeValues, string scriptAttributes) {
+    public ScriptProperties(MethodType allowedMethods, bool changeValues, List<string> scriptAttributes) {
         AllowedMethods = allowedMethods;
         ChangeValues = changeValues;
         ScriptAttributes = scriptAttributes;
@@ -42,7 +43,12 @@ public class ScriptProperties {
     #region Properties
 
     public bool ChangeValues { get; }
-    public string ScriptAttributes { get; }
+
+    /// <summary>
+    /// Diese Attriute muss das nachfolgende Script mindestens erfüllen
+    /// </summary>
+    public List<string> ScriptAttributes { get; }
+
     internal MethodType AllowedMethods { get; }
 
     #endregion
