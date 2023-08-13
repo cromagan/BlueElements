@@ -43,7 +43,7 @@ public abstract class Method_WebPage : Method {
         #region  Warten, bis der Ladevorgang gestartet ist
 
         var d = DateTime.UtcNow;
-        while (!browser.IsLoading) {
+        while (!browser.IsLoading ) {
             Develop.DoEvents();
             if (DateTime.UtcNow.Subtract(d).TotalSeconds > 10) {
                 return true;
@@ -54,10 +54,12 @@ public abstract class Method_WebPage : Method {
 
         #region  Warten, bis der Ladevorgang abgeschlossen ist
 
+
+
         d = DateTime.UtcNow;
-        while (browser.IsLoading) {
+        while (browser.IsLoading || !AllImagesLoaded(browser)) {
             Generic.Pause(1, true);
-            if (DateTime.UtcNow.Subtract(d).TotalSeconds > 30) {
+            if (DateTime.UtcNow.Subtract(d).TotalSeconds > 60) {
                 return false;
             }
         }
@@ -67,7 +69,26 @@ public abstract class Method_WebPage : Method {
         return true;
     }
 
-    public System.Threading.Tasks.Task<JavascriptResponse> DoTask(ChromiumWebBrowser wb, string script) {
+    public static bool AllImagesLoaded(ChromiumWebBrowser wb) {
+
+        JavascriptResponse response = wb.EvaluateScriptAsync("document.readyState === 'complete'").GetAwaiter().GetResult();
+
+
+        if (response.Success && response.Result is bool allImagesLoaded && allImagesLoaded) {
+            return true;    
+        }
+
+        //var result = DoTask(wb, "document.images.length === document.images.filter(img => img.complete).length");
+
+
+
+        return false;
+
+
+
+    }
+
+    public static System.Threading.Tasks.Task<JavascriptResponse> DoTask(ChromiumWebBrowser wb, string script) {
         Generic.CollectGarbage();
 
         var task = wb.EvaluateScriptAsync(script);
