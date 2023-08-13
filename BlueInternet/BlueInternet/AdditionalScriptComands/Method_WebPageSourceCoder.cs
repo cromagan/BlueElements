@@ -19,14 +19,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Threading;
 using BlueBasics;
 using BlueDatabase.AdditionalScriptComands;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using CefSharp;
 
 //using CefSharp.WinForms;
 using CefSharp.OffScreen;

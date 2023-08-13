@@ -15,13 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
-using System.ComponentModel;
-using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
-using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueDatabase;
 using System.Collections.Generic;
 

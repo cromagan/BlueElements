@@ -183,11 +183,11 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         }
 
         CreativePad pad = new(new ItemCollectionPad(_layoutId, Database, _rowKey));
-        var re = pad.Item.MaxBounds(null);
+        var re = pad.Item.MaxBounds(string.Empty);
 
         var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);
 
-        var mb = pad.Item.MaxBounds(null);
+        var mb = pad.Item.MaxBounds(string.Empty);
         var zoomv = ItemCollectionPad.ZoomFitValue(mb, generatedBitmap.Size);
         var centerpos = ItemCollectionPad.CenterPos(mb, generatedBitmap.Size, zoomv);
         var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);

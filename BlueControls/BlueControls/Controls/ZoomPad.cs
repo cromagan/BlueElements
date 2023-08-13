@@ -109,6 +109,7 @@ public partial class ZoomPad : GenericControl {
     }
 
     public void ZoomFit() {
+        if (IsDisposed) { return; }
         var mb = MaxBounds();
         var x = AvailablePaintArea();
         x.Inflate(-16, -16);

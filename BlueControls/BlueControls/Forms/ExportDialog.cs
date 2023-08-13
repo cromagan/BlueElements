@@ -132,10 +132,10 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (rowsForExport == null || rowsForExport.Count < 1) { return -1; }
 
         ItemCollectionPad.ItemCollectionPad tmp = new(layout, rowsForExport[0].Database, rowsForExport[0].KeyName);
-        var oneItem = tmp.MaxBounds(null);
+        var oneItem = tmp.MaxBounds(string.Empty);
         pad.Item.SheetStyle = tmp.SheetStyle;
         pad.Item.SheetStyleScale = tmp.SheetStyleScale;
-        tmp?.Dispose();
+        tmp.Dispose();
         var druckB = pad.Item.DruckbereichRect();
         var abstand = (float)Math.Round(MmToPixel(abstandMm, ItemCollectionPad.ItemCollectionPad.Dpi), 1);
         var tempVar = Math.Max(1, (int)Math.Floor((druckB.Width / (double)(oneItem.Width + abstand)) + 0.01));
@@ -219,7 +219,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
             var x = TempFile(_zielPfad, _rowsForExport[0].Database.Caption + "_" + b + "x" + h + "_" + ab, "png");
             padSchachteln.Item.BackColor = Color.Transparent;
-            padSchachteln.Item.SaveAsBitmap(x);
+            padSchachteln.Item.SaveAsBitmap(x, string.Empty);
             l.Add(x);
             if (nr == _itemNrForPrint) { break; }
             if (_itemNrForPrint >= _rowsForExport.Count) { break; }

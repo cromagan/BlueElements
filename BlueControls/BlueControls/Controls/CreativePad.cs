@@ -489,36 +489,46 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         return new((int)(valx / Zoom), (int)(valy / Zoom));
     }
 
+    protected override void Dispose(bool disposing) {
+        Item = null;
+        base.Dispose(disposing);
+    }
+
     protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+
         base.DrawControl(gr, state);
 
         LinearGradientBrush lgb = new(ClientRectangle, Color.White, Color.LightGray, LinearGradientMode.Vertical);
         gr.FillRectangle(lgb, ClientRectangle);
-        _ = _item?.DrawCreativePadTo(gr, Size, state, Zoom, ShiftX, ShiftY, _currentPage, _showInPrintMode);
+        if (_item != null) {
+            var l = _item.ItemsOnPage(_currentPage);
+            _ = _item.DrawCreativePadTo(gr, l, Zoom, ShiftX, ShiftY, Size, _showInPrintMode, state);
 
-        #region Dann die selektierten Punkte
+            #region Dann die selektierten Punkte
 
-        foreach (var thisItem in _itemsToMove) {
-            if (thisItem is AbstractPadItem bpi) {
-                foreach (var p in bpi.MovablePoint) {
-                    p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
-                }
-            }
-            if (thisItem is PointM p2) {
-                if (p2.Parent is AbstractPadItem bpi2) {
-                    foreach (var p in bpi2.MovablePoint) {
-                        p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
+            foreach (var thisItem in _itemsToMove) {
+                if (thisItem is AbstractPadItem bpi) {
+                    foreach (var p in bpi.MovablePoint) {
+                        p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                     }
                 }
-                p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
+                if (thisItem is PointM p2) {
+                    if (p2.Parent is AbstractPadItem bpi2) {
+                        foreach (var p in bpi2.MovablePoint) {
+                            p.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber_Phantom, States.Standard);
+                        }
+                    }
+                    p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
+                }
             }
-        }
-        if (_givesMouseComandsTo is AbstractPadItem pa) {
-            var drawingCoordinates = pa.UsedArea.ZoomAndMoveRect(Zoom, ShiftX, ShiftY, false);
-            gr.DrawRectangle(new Pen(Brushes.Red, 3), drawingCoordinates);
-        }
+            if (_givesMouseComandsTo is AbstractPadItem pa) {
+                var drawingCoordinates = pa.UsedArea.ZoomAndMoveRect(Zoom, ShiftX, ShiftY, false);
+                gr.DrawRectangle(new Pen(Brushes.Red, 3), drawingCoordinates);
+            }
 
-        #endregion
+            #endregion
+        }
 
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }
@@ -531,8 +541,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     protected override RectangleF MaxBounds() {
         if (_item == null) { return new RectangleF(0, 0, 0, 0); }
-
-        return _item.MaxBounds(null);
+        return _item.MaxBounds(_currentPage);
     }
 
     protected override void OnKeyUp(KeyEventArgs e) => DoKeyUp(e, true);
@@ -544,6 +553,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     protected override void OnMouseUp(MouseEventArgs e) => DoMouseUp(e);
 
     private void _Item_ItemAdded(object sender, ListEventArgs e) {
+        if (IsDisposed) { return; }
         if (_item == null || _item.Count == 0 || Fitting) { ZoomFit(); }
         Invalidate();
 
@@ -555,6 +565,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     }
 
     private void _Item_ItemRemoved(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
         if (Fitting) { ZoomFit(); }
 
         CheckHotItem(null, true);
@@ -564,7 +575,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         OnItemRemoved();
     }
 
-    private void _Item_ItemRemoving(object sender, ListEventArgs e) => OnItemRemoving(e);
+    private void _Item_ItemRemoving(object sender, ListEventArgs e) {
+        if (IsDisposed) { return; }
+        OnItemRemoving(e);
+    }
 
     private void CheckHotItem(MouseEventArgs? e, bool doLastClicked) {
         var l = HotItems(e);
@@ -593,12 +607,13 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
         e.HasMorePages = false;
         OnPrintPage(e);
-        var i = _item?.ToBitmap(3);
+        var i = _item?.ToBitmap(3, string.Empty);
         if (i == null) { return; }
         e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
 
     private void Item_Changed(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
         Invalidate();
         OnChanged();
     }
@@ -648,7 +663,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     private void PicsSave_FileOk(object sender, CancelEventArgs e) {
         if (e.Cancel || _item == null) { return; }
-        _item.SaveAsBitmap(PicsSave.FileName);
+        _item.SaveAsBitmap(PicsSave.FileName, CurrentPage);
     }
 
     private void RepairPrinterData() {

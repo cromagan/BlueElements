@@ -146,7 +146,7 @@ public class RowFormulaListItem : AbstractListItem {
             return;
         }
         ItemCollectionPad.ItemCollectionPad pad = new(_layoutId, Row.Database, Row.KeyName);
-        var mb = pad.MaxBounds(null);
+        var mb = pad.MaxBounds(string.Empty).ToRect();
         if (_tmpBmp != null) {
             if (_tmpBmp.Width != mb.Width || _tmpBmp.Height != mb.Height) {
                 RemovePic();

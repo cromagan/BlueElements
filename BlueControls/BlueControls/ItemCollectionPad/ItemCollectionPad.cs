@@ -431,7 +431,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         GC.SuppressFinalize(this);
     }
 
-    public bool DrawCreativePadTo(Graphics gr, Size sizeOfParentControl, States state, float zoom, float shiftX, float shiftY, string seite, bool showinprintmode) {
+    public bool DrawCreativePadTo(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool showinprintmode, States state) {
         try {
             gr.PixelOffsetMode = PixelOffsetMode.None;
 
@@ -489,22 +489,22 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
 
             #region Items selbst
 
-            if (!DrawItems(gr, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, seite)) {
-                return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, seite, showinprintmode);
+            if (!DrawItems(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode)) {
+                return DrawCreativePadTo(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, state);
             }
 
             #endregion
         } catch {
             Develop.CheckStackForOverflow();
-            return DrawCreativePadTo(gr, sizeOfParentControl, state, zoom, shiftX, shiftY, seite, showinprintmode);
+            return DrawCreativePadTo(gr, items, zoom, shiftX, shiftY, sizeOfParentControl, showinprintmode, state);
         }
         return true;
     }
 
-    public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, string seite) {
+    public void DrawCreativePadToBitmap(Bitmap? bmp, States vState, float zoomf, float x, float y, string page) {
         if (bmp == null) { return; }
         var gr = Graphics.FromImage(bmp);
-        _ = DrawCreativePadTo(gr, bmp.Size, vState, zoomf, x, y, seite, true);
+        _ = DrawCreativePadTo(gr, ItemsOnPage(page), zoomf, x, y, bmp.Size, true, vState);
         gr.Dispose();
     }
 
@@ -522,6 +522,20 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
             var tempVar = bpi;
             Swap(IndexOf(tempVar), IndexOf(i2));
         }
+    }
+
+    public List<AbstractPadItem> ItemsOnPage(string page) {
+        var l = new List<AbstractPadItem>();
+
+        foreach (var thisItem in this) {
+            if (thisItem != null) {
+                if (string.IsNullOrEmpty(page) || thisItem.Page.Equals(page, StringComparison.OrdinalIgnoreCase)) {
+                    l.Add(thisItem);
+                }
+            }
+        }
+
+        return l;
     }
 
     public void OnChanged() {
@@ -591,8 +605,8 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         return did;
     }
 
-    public void SaveAsBitmap(string filename) {
-        var i = ToBitmap(1);
+    public void SaveAsBitmap(string filename, string page) {
+        var i = ToBitmap(1, page);
         if (i == null) { return; }
         switch (filename.FileSuffix().ToUpper()) {
             case "JPG":
@@ -623,8 +637,10 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         //OnChanged();
     }
 
-    public Bitmap? ToBitmap(float scale) {
-        var r = MaxBounds(null);
+    public Bitmap? ToBitmap(float scale, string page) {
+        var l = ItemsOnPage(page);
+
+        var r = MaxBounds(l);
         if (r.Width == 0) { return null; }
 
         CollectGarbage();
@@ -645,8 +661,8 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
 
         using var gr = Graphics.FromImage(I);
         gr.Clear(BackColor);
-        if (!DrawCreativePadTo(gr, I.Size, States.Standard, scale, r.Left * scale, r.Top * scale, string.Empty, true)) {
-            return ToBitmap(scale);
+        if (!DrawCreativePadTo(gr, l, scale, r.Left * scale, r.Top * scale, I.Size, true, States.Standard)) {
+            return ToBitmap(scale, page);
         }
 
         return I;
@@ -726,6 +742,8 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         thisItem.Gruppenzugehörigkeit = g1;
     }
 
+    internal RectangleF MaxBounds(string page) => MaxBounds(ItemsOnPage(page));
+
     internal RectangleF MaxBounds(List<AbstractPadItem>? zoomItems) {
         var r = MaximumBounds(zoomItems);
         if (SheetSizeInMm.Width > 0 && SheetSizeInMm.Height > 0) {
@@ -757,8 +775,6 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
             if (this[itemCount] != null) { return this[itemCount]; }
         } while (true);
     }
-
-    protected RectangleF MaxBounds() => MaxBounds(null);
 
     protected virtual void OnItemAdded(AbstractPadItem item) {
         ItemAdded?.Invoke(this, new ListEventArgs(item));
@@ -886,19 +902,14 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         Connections.RemoveAll();
     }
 
-    private bool DrawItems(Graphics gr, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting, string seite) {
+    private bool DrawItems(Graphics gr, List<AbstractPadItem> items, float zoom, float shiftX, float shiftY, Size sizeOfParentControl, bool forPrinting) {
         try {
             if (SheetStyle == null || SheetStyleScale < 0.1d) { return true; }
 
-            foreach (var thisItem in this) {
-                if (thisItem != null) {
-                    gr.PixelOffsetMode = PixelOffsetMode.None;
-                    if (string.IsNullOrEmpty(seite) || thisItem.Page.Equals(seite, StringComparison.OrdinalIgnoreCase)) {
-                        thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
-                    }
-                }
+            foreach (var thisItem in items) {
+                gr.PixelOffsetMode = PixelOffsetMode.None;
+                thisItem.Draw(gr, zoom, shiftX, shiftY, sizeOfParentControl, forPrinting);
             }
-
             return true;
         } catch {
             CollectGarbage();

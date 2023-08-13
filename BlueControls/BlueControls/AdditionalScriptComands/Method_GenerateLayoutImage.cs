@@ -76,7 +76,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         var l = new ItemCollectionPad.ItemCollectionPad(r, ind);
 
-        var bmp = l.ToBitmap((float)sc);
+        var bmp = l.ToBitmap((float)sc, string.Empty);
 
         if (bmp == null) { return new DoItFeedback(infos.Data, "Generierung fehlgeschlagen"); }
 

@@ -18,25 +18,17 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Text.RegularExpressions;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
-using static BlueBasics.IO;
 
 namespace BlueControls.Controls;
 
@@ -45,7 +37,6 @@ public partial class FlexiControlVariable : FlexiControl, IDisabledReason, IHasD
 
     #region Fields
 
-    private string _columnName = string.Empty;
     private IControlSendRow? _getRowFrom;
     private string _rowKey = string.Empty;
     private RowItem? _tmpRow;
@@ -184,20 +175,6 @@ public partial class FlexiControlVariable : FlexiControl, IDisabledReason, IHasD
         //InfoText = newT;
     }
 
-    private ColumnItem? GetRealColumn(ColumnItem? column, RowItem? row) {
-        ColumnItem? gbColumn;
-
-        if (column?.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            (gbColumn, _, _, _) = CellCollection.LinkedCellData(column, row, true, false);
-        } else {
-            gbColumn = column;
-        }
-
-        if (gbColumn != null) { this.GetStyleFrom(gbColumn); }
-
-        return gbColumn;
-    }
-
     private RowItem? GetTmpVariables() {
         try {
             if (_tmpRow != null) { return _tmpRow; }
@@ -213,27 +190,6 @@ public partial class FlexiControlVariable : FlexiControl, IDisabledReason, IHasD
             // Multitasking sei dank kann _database trotzem null sein...
             Develop.CheckStackForOverflow();
             return GetTmpVariables();
-        }
-    }
-
-    private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        switch (e.ClickedComand.ToLower()) {
-            case "dateiöffnen":
-                if (e.HotItem is TextListItem t) {
-                    if (FileExists(t.KeyName)) {
-                        _ = ExecuteFile(t.KeyName);
-                    }
-                }
-                break;
-
-            case "bild öffnen":
-                if (e.HotItem is BitmapListItem bi) {
-                    if (bi.ImageLoaded()) {
-                        PictureView x = new(bi.Bitmap);
-                        x.Show();
-                    }
-                }
-                break;
         }
     }
 
@@ -267,8 +223,6 @@ public partial class FlexiControlVariable : FlexiControl, IDisabledReason, IHasD
         //        break;
         //}
     }
-
-    private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = Database;
 
     #endregion
 }

@@ -30,8 +30,6 @@ using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
-using System.Runtime.CompilerServices;
-using System.Data.SqlClient;
 using static BlueDatabase.DatabaseAbstract;
 
 namespace BlueDatabase;
