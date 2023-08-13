@@ -37,13 +37,35 @@ public abstract class Method_WebPage : Method {
 
     #region Methods
 
+    public static bool AllImagesLoaded(ChromiumWebBrowser wb) {
+        JavascriptResponse response = wb.EvaluateScriptAsync("document.readyState === 'complete'").GetAwaiter().GetResult();
+
+        if (response.Success && response.Result is bool allImagesLoaded && allImagesLoaded) {
+            return true;
+        }
+
+        //var result = DoTask(wb, "document.images.length === document.images.filter(img => img.complete).length");
+
+        return false;
+    }
+
+    public static System.Threading.Tasks.Task<JavascriptResponse> DoTask(ChromiumWebBrowser wb, string script) {
+        Generic.CollectGarbage();
+
+        var task = wb.EvaluateScriptAsync(script);
+
+        while (!task.IsCompleted) { Generic.Pause(0.1, false); }
+
+        return task;
+    }
+
     public static bool WaitLoaded(ChromiumWebBrowser browser) {
         Generic.Pause(0.1, false); // Um au jeden Fall das IsLoading zu erfassen
 
         #region  Warten, bis der Ladevorgang gestartet ist
 
         var d = DateTime.UtcNow;
-        while (!browser.IsLoading ) {
+        while (!browser.IsLoading) {
             Develop.DoEvents();
             if (DateTime.UtcNow.Subtract(d).TotalSeconds > 10) {
                 return true;
@@ -53,8 +75,6 @@ public abstract class Method_WebPage : Method {
         #endregion
 
         #region  Warten, bis der Ladevorgang abgeschlossen ist
-
-
 
         d = DateTime.UtcNow;
         while (browser.IsLoading || !AllImagesLoaded(browser)) {
@@ -67,35 +87,6 @@ public abstract class Method_WebPage : Method {
         #endregion
 
         return true;
-    }
-
-    public static bool AllImagesLoaded(ChromiumWebBrowser wb) {
-
-        JavascriptResponse response = wb.EvaluateScriptAsync("document.readyState === 'complete'").GetAwaiter().GetResult();
-
-
-        if (response.Success && response.Result is bool allImagesLoaded && allImagesLoaded) {
-            return true;    
-        }
-
-        //var result = DoTask(wb, "document.images.length === document.images.filter(img => img.complete).length");
-
-
-
-        return false;
-
-
-
-    }
-
-    public static System.Threading.Tasks.Task<JavascriptResponse> DoTask(ChromiumWebBrowser wb, string script) {
-        Generic.CollectGarbage();
-
-        var task = wb.EvaluateScriptAsync(script);
-
-        while (!task.IsCompleted) { Generic.Pause(0.1, false); }
-
-        return task;
     }
 
     #endregion
