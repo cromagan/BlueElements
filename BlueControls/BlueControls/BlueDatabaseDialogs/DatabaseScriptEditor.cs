@@ -49,6 +49,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         grpEigenschaften.Enabled = false;
         eventScriptEditor.Enabled = false;
         Database = database;
+        Database.EventScriptOk = true;
         Database.Disposing += Database_Disposing;
         Database.CanDoScript += Database_CanDoScript;
 

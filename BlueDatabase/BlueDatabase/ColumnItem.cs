@@ -1008,6 +1008,12 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public string AutoCorrect(string value, bool exitifLinkedFormat) {
+
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return value; }
+
+        if (IsSystemColumn()) { return value; }
+
+
         if (exitifLinkedFormat) {
             if (_format is DataFormat.Verknüpfung_zu_anderer_Datenbank or
                 DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return value; }
@@ -1737,7 +1743,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _textBearbeitungErlaubt = false;
                 _dropdownBearbeitungErlaubt = false;
                 _showUndo = false;
-                _scriptType = ScriptType.String_Readonly;
+                _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
                 _permissionGroupsChangeCell.Clear();
                 _maxTextLenght = 20;
                 _maxCellLenght = 20;
@@ -1788,6 +1794,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                     BackColor = Color.FromArgb(255, 185, 185);
                     //LineLeft = ColumnLineStyle.Dick;
                 }
+                _scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
 
                 break;
 
@@ -1801,7 +1808,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _textBearbeitungErlaubt = false;
                 _spellCheckingEnabled = false;
                 _dropdownBearbeitungErlaubt = false;
-                _scriptType = ScriptType.String_Readonly;
+                _scriptType = ScriptType.Nicht_vorhanden; // um Script-Prüfung zu reduzieren
                 _permissionGroupsChangeCell.Clear();
 
                 if (setOpticalToo) {

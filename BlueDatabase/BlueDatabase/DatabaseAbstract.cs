@@ -92,6 +92,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     private string _creator = string.Empty;
 
+    private bool _eventScriptOk;
     private string _eventScriptTmp = string.Empty;
 
     //private string _timeCode = string.Empty;
@@ -263,6 +264,16 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             tmp++;
             if (tmp == int.MaxValue) { tmp = 0; }
             EventScriptVersion = tmp;
+            EventScriptOk = true;
+        }
+    }
+
+    [Browsable(false)]
+    public bool EventScriptOk {
+        get => _eventScriptOk;
+        set {
+            if (_eventScriptOk == value) { return; }
+            _ = ChangeData(DatabaseDataType.EventScriptOk, null, null, _eventScriptOk.ToPlusMinus(), value.ToPlusMinus(), string.Empty);
         }
     }
 
@@ -866,6 +877,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
         EventScriptVersion = sourceDatabase.EventScriptVersion;
+        EventScriptOk = sourceDatabase.EventScriptOk;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
         if (tagsToo) {
             Tags = new(sourceDatabase.Tags.Clone());
@@ -1023,7 +1035,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
                 !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.loaded)) {
+                !s.EventTypes.HasFlag(ScriptEventTypes.loaded) &&
+                !s.EventTypes.HasFlag(ScriptEventTypes.value_changed)) {
                 allowedMethods |= MethodType.ManipulatesUser;
             }
 
@@ -1547,6 +1560,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public bool isRowScriptPossible() {
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
+        if (!EventScriptOk) { return false; }
         return true;
     }
 
@@ -1966,6 +1980,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 _eventScriptVersion = IntParse(value);
                 break;
 
+            case DatabaseDataType.EventScriptOk:
+                _eventScriptOk = value.FromPlusMinus();
+                break;
+
             case DatabaseDataType.UndoInOne:
                 // Muss eine übergeordnete Routine bei Befarf abfangen
                 break;
@@ -2074,6 +2092,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 6) { return; }
         if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return; }
+
+        var e = new CancelEventArgs(false);
+        OnCanDoScript(e);
+        if (e.Cancel) { return; }
+
 
         Row.ExecuteValueChanged(false);
 

@@ -1977,7 +1977,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Invalidate_FilteredRows();
             }
         }
-        Invalidate_sortedRowData(); // Zeichenhöhe kann sich ändern...
+
+        if (CurrentArrangement is ColumnViewCollection cvc) {
+            if (cvc[e.Column] != null) {
+                Invalidate_sortedRowData(); // Zeichenhöhe kann sich ändern...
+            }
+        }
 
         Invalidate_DrawWidth(e.Column);
 
@@ -2719,7 +2724,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
 
                 if (Database?.IsAdministrator() ?? false) {
-                    if (Database?.Column.SysRowState is ColumnItem srs && currentRow.Row.CellGetInteger(srs) != Database.EventScriptVersion) {
+                    if (Database?.Column.SysRowState is ColumnItem srs && currentRow.Row.CellGetInteger(srs) != Database.EventScriptVersion && Database.EventScriptOk) {
                         gr.FillRectangle(BrushRedTransparent, cellrectangle);
 
                         if (Database?.Column.SysRowChanger is ColumnItem src && currentRow.Row.CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase)) {

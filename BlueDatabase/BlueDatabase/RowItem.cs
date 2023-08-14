@@ -596,6 +596,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (!script.AllOk) {
             Database.OnScriptError(new RowCancelEventArgs(this, script.ProtocolText));
+            Database.EventScriptOk = false;
             DoingScript = false;
             return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
         }
@@ -604,6 +605,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
             DoRowAutomaticEventArgs e = new(this, eventname);
             OnDoSpecialRules(e);
+
+            if (eventname is not null and ScriptEventTypes.value_changed) {
+                Database.Cell.SystemSet(Database.Column.SysRowState, this, Database.EventScriptVersion.ToString());
+            } else {
+                var l = Database.EventScript.Get(ScriptEventTypes.value_changed);
+                if (l.Count == 1 && l[0].Name == scriptname) {
+                    Database.Cell.SystemSet(Database.Column.SysRowState, this, Database.EventScriptVersion.ToString());
+                }
+            }
         }
 
         DoingScript = false;
@@ -632,10 +642,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                     thisColum.Invalidate_ContentWidth();
                 }
             }
-        }
-
-        if (eventname is not null and ScriptEventTypes.value_changed) {
-            Database.Cell.SystemSet(Database.Column.SysRowState, this, Database.EventScriptVersion.ToString());
         }
 
         return script;

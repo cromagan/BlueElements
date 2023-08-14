@@ -471,6 +471,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         while (_pendingChangedRows.Count > 0) {
             if (IsDisposed) { _executingchangedrows = false; return; }
+            if (Database == null || Database.IsDisposed) { _executingchangedrows = false; return; }
+
+            if (!Database.isRowScriptPossible()) { _executingchangedrows = false; return; }
+
+            var e = new CancelEventArgs(false);
+            Database.OnCanDoScript(e);
+            if (e.Cancel) { _executingchangedrows = false; return; }
 
             try {
                 var key = _pendingChangedRows[0];

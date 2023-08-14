@@ -663,7 +663,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return;
         }
 
-        SetValueBehindLinkedValue(column, row, value, true);
+        SetValueBehindLinkedValue(column, row, value);
     }
 
     public void Set(string columnName, RowItem? row, bool value) => Set(Database?.Column[columnName], row, value.ToPlusMinus());
@@ -862,7 +862,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="value"></param>
     /// <param name="changeSysColumns"></param>
 
-    internal void SetValueBehindLinkedValue(ColumnItem column, RowItem row, string value, bool changeSysColumns) {
+    internal void SetValueBehindLinkedValue(ColumnItem column, RowItem row, string value) {
         var dbtmp = Database;
         if (dbtmp == null || dbtmp.IsDisposed) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!");
@@ -906,12 +906,15 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return;
         }
 
-        if (changeSysColumns) {
-            DoSpecialFormats(column, row, oldValue, false);
-            if (dbtmp.Column.SysRowChanger is ColumnItem src) { SystemSet(src, row, UserName); }
-            if (dbtmp.Column.SysRowChangeDate is ColumnItem scd) { SystemSet(scd, row, DateTime.UtcNow.ToString(Constants.Format_Date7)); }
+        //if (changeSysColumns) {
+        DoSpecialFormats(column, row, oldValue, false);
+        if (dbtmp.Column.SysRowChanger is ColumnItem src) { SystemSet(src, row, UserName); }
+        if (dbtmp.Column.SysRowChangeDate is ColumnItem scd) { SystemSet(scd, row, DateTime.UtcNow.ToString(Constants.Format_Date7)); }
+
+        if (column.ScriptType != ScriptType.Nicht_vorhanden) {
             if (dbtmp.Column.SysRowState is ColumnItem srs) { SystemSet(srs, row, string.Empty); }
         }
+        //}
 
         column.Invalidate_ContentWidth();
         row.InvalidateCheckData();
@@ -1061,11 +1064,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
             if (targetColumn != null && targetRow != null && string.IsNullOrEmpty(fehler) && column != null && row != null) {
-                column.Database?.Cell.SetValueBehindLinkedValue(column, row, targetRow.KeyName, true);
+                column.Database?.Cell.SetValueBehindLinkedValue(column, row, targetRow.KeyName);
                 return (targetColumn, targetRow, fehler, cr);
             }
 
-            if (column != null && row != null) { column.Database?.Cell.SetValueBehindLinkedValue(column, row, string.Empty, true); }
+            if (column != null && row != null) { column.Database?.Cell.SetValueBehindLinkedValue(column, row, string.Empty); }
             return (targetColumn, targetRow, fehler, cr);
         }
 
