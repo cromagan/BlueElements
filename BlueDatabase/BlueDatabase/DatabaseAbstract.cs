@@ -980,10 +980,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public ScriptEndedFeedback ExecuteScript(DatabaseScript s, bool changevalues, RowItem? row, List<string>? attributes) {
-        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, s.Name); }
+        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, s.Name); }
 
         var sce = CheckScriptError();
-        if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, "Allgemein"); }
+        if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, "Allgemein"); }
 
         try {
             var timestamp = string.Empty;
@@ -994,7 +994,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             if (row != null && !row.IsDisposed) {
                 if (Column.SysRowChangeDate is not ColumnItem column) {
-                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, s.Name);
+                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.Name);
                 }
 
                 timestamp = row.CellGetString(column);
@@ -1060,11 +1060,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             if (sc.ChangeValues && changevalues && scf.AllOk) {
                 if (row != null && !row.IsDisposed) {
                     if (Column.SysRowChangeDate is not ColumnItem column) {
-                        return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, s.Name);
+                        return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.Name);
                     }
 
                     if (row.CellGetString(column) != timestamp) {
-                        return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, s.Name);
+                        return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, s.Name);
                     }
 
                     foreach (var thisCol in Column) {
@@ -1090,38 +1090,38 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row, List<string>? attributes) {
         try {
-            if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, "Allgemein"); }
+            if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
             var e = new CancelEventArgs(false);
             OnCanDoScript(e);
-            if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich", false, "Allgemein"); }
+            if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich", false, false, "Allgemein"); }
 
             var m = EditableErrorReason(EditableErrorReasonType.EditCurrently);
 
-            if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, "Allgemein"); }
+            if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + m, false, false, "Allgemein"); }
 
             #region Script ermitteln
 
             if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
-                return new ScriptEndedFeedback("Event und Skript angekommen!", false, "Allgemein");
+                return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
             }
 
-            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, "Allgemein"); }
+            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, false, "Allgemein"); }
 
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
                 var l = EventScript.Get((ScriptEventTypes)eventname);
                 if (l.Count == 1) { scriptname = l[0].Name; }
-                if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, string.Empty); }
+                if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, false, string.Empty); }
             }
 
-            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Kein Skriptname angekommen", false, "Allgemein"); }
+            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Kein Skriptname angekommen", false, false, "Allgemein"); }
 
             var script = EventScript.Get(scriptname);
 
-            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, scriptname); }
+            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
 
-            if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, scriptname); }
+            if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, scriptname); }
 
             if (!script.NeedRow) { row = null; }
 
@@ -2096,7 +2096,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         var e = new CancelEventArgs(false);
         OnCanDoScript(e);
         if (e.Cancel) { return; }
-
 
         Row.ExecuteValueChanged(false);
 

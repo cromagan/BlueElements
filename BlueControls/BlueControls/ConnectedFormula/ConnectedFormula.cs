@@ -548,7 +548,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
         try {
-            if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, "Allgemein"); }
+            if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, false, "Allgemein"); }
 
             //var m = EditableErrorReason(EditableErrorReasonType.EditCurrently);
 
@@ -558,22 +558,22 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
             if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
                 DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
-                return new ScriptEndedFeedback("Event und Skript angekommen!", false, "Allgemein");
+                return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
             }
 
-            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, "Allgemein"); }
+            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, false, "Allgemein"); }
 
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
                 var l = EventScript.Get((ScriptEventTypes)eventname);
                 if (l.Count == 1) { scriptname = l[0].Name; }
-                if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, string.Empty); }
+                if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, false, string.Empty); }
             }
 
-            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Kein Skriptname angekommen", false, "Allgemein"); }
+            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Kein Skriptname angekommen", false, false, "Allgemein"); }
 
             var script = EventScript.Get(scriptname);
 
-            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, scriptname); }
+            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
 
             //if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, scriptname); }
 
@@ -675,10 +675,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     }
 
     internal ScriptEndedFeedback ExecuteScript(FormulaScript s) {
-        if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, s.Name); }
+        if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, false, s.Name); }
 
         var sce = CheckScriptError();
-        if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, "Allgemein"); }
+        if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, "Allgemein"); }
 
         try {
 

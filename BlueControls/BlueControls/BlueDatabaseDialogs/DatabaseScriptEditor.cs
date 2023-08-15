@@ -218,17 +218,17 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void eventScriptEditor_ExecuteScript(object sender, BlueScript.EventArgs.ScriptEventArgs e) {
         if (Database == null || Database.IsDisposed) {
-            e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false, "Allgemein");
+            e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
             return;
         }
 
         if (_item == null) {
-            e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.", false, "Allgemein");
+            e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
             return;
         }
 
         if (!_item.IsOk()) {
-            e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, "Allgemein");
+            e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
             return;
         }
 
@@ -238,7 +238,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         if (_item.NeedRow) {
             if (Database.Row.Count == 0) {
-                e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, "Allgemein");
+                e.Feedback = new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
                 return;
             }
             if (string.IsNullOrEmpty(txbTestZeile.Text)) {
@@ -247,7 +247,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
             r = Database?.Row[txbTestZeile.Text];
             if (r == null || r.IsDisposed) {
-                e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, "Allgemein");
+                e.Feedback = new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
                 return;
             }
         }

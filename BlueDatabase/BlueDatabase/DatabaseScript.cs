@@ -323,7 +323,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
     internal List<string> Attributes() {
         var s = new List<string>();
-        if (NeedRow) { s.Add("NeedRow"); }
+        if (!NeedRow) { s.Add("Rowless"); }
         if (!ChangeValues) { s.Add("NeverChangesValues"); }
         return s;
     }

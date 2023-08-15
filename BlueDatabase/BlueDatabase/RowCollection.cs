@@ -387,8 +387,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public void ExecuteExtraThread() {
+        if(_pendingChangedRows.Count >0) {return;}
         if (_pendingChangedBackgroundRow.Count == 0) { return; }
         if (Database == null || Database.IsDisposed) { return; }
+        if (!Database.EventScriptOk) { return; }
+
         if (_executingbackgroundworks) { return; }
         _executingbackgroundworks = true;
 
@@ -407,6 +410,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (Database == null || Database.IsDisposed || IsDisposed) { break; }
                 if (!Database.LogUndo) { break; }
                 if (_pendingChangedBackgroundRow.Count == 0) { break; }
+                if (_pendingChangedRows.Count > 0) { break; }
+                if(!Database.EventScriptOk) { break; }
 
                 var key = _pendingChangedBackgroundRow.First();
                 _ = _pendingChangedBackgroundRow.Remove(key);

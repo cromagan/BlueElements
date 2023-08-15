@@ -27,7 +27,7 @@ public class ScriptEndedFeedback {
 
     #region Constructors
 
-    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool breakFired, bool endscript) {
+    public ScriptEndedFeedback(VariableCollection variables, List<string> protocol, bool allOk, bool scriptfehleraft, bool breakFired, bool endscript) {
         Variables = variables;
         GiveItAnotherTry = false;
         Protocol = protocol;
@@ -35,6 +35,7 @@ public class ScriptEndedFeedback {
         ProtocolText = GenNiceProtokoll(protocol);
         BreakFired = breakFired;
         EndScript = endscript;
+        ScriptHasSystaxError = scriptfehleraft;
     }
 
     /// <summary>
@@ -43,7 +44,9 @@ public class ScriptEndedFeedback {
     /// </summary>
     /// <param name="errormessage"></param>
     /// <param name="giveitanothertry"></param>
-    public ScriptEndedFeedback(string errormessage, bool giveitanothertry, string scriptname) {
+    /// <param name="scriptfehleraft"></param>
+    /// <param name="scriptname"></param>
+    public ScriptEndedFeedback(string errormessage, bool giveitanothertry, bool scriptfehleraft, string scriptname) {
         Variables = null;
 
         GiveItAnotherTry = giveitanothertry;
@@ -53,6 +56,7 @@ public class ScriptEndedFeedback {
 
         ProtocolText = GenNiceProtokoll(Protocol);
         AllOk = false;
+        ScriptHasSystaxError = scriptfehleraft;
     }
 
     #endregion
@@ -64,11 +68,9 @@ public class ScriptEndedFeedback {
     public bool EndScript { get; }
 
     public bool GiveItAnotherTry { get; }
-
     public List<string> Protocol { get; }
-
     public string ProtocolText { get; }
-
+    public bool ScriptHasSystaxError { get; }
     public VariableCollection? Variables { get; }
 
     #endregion

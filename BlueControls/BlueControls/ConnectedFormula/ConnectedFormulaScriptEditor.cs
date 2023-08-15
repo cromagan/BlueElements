@@ -160,17 +160,17 @@ public sealed partial class ConnectedFormulaScriptEditor {
 
     private void eventScriptEditor_ExecuteScript(object sender, BlueScript.EventArgs.ScriptEventArgs e) {
         if (Formula == null || Formula.IsDisposed) {
-            e.Feedback = new ScriptEndedFeedback("Keine Formular geladen.", false, "Allgemein");
+            e.Feedback = new ScriptEndedFeedback("Keine Formular geladen.", false, false, "Allgemein");
             return;
         }
 
         if (_item == null) {
-            e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.", false, "Allgemein");
+            e.Feedback = new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
             return;
         }
 
         if (!_item.IsOk()) {
-            e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, "Allgemein");
+            e.Feedback = new ScriptEndedFeedback("Bitte zuerst den Fehler korrigieren: " + _item.ErrorReason(), false, false, "Allgemein");
             return;
         }
 
