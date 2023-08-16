@@ -140,6 +140,8 @@ public partial class VariableEditor : UserControl {
             }
         }
 
+        x.Column.GenerateAndAddSystem();
+
         if (Editabe) {
             var l = new List<ColumnItem?> { na, inh, kom };
 

@@ -1008,11 +1008,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public string AutoCorrect(string value, bool exitifLinkedFormat) {
-
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return value; }
 
         if (IsSystemColumn()) { return value; }
-
 
         if (exitifLinkedFormat) {
             if (_format is DataFormat.Verknüpfung_zu_anderer_Datenbank or

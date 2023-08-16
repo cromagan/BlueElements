@@ -302,7 +302,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         set {
             if (Database == null || Database.IsDisposed) { return; }
             Database.PowerEdit = value;
-            Invalidate_sortedRowData(); // Neue Zeilen können nun erlaubt sein
+            Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
         }
     }
 
@@ -710,7 +710,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (Database != null && !Database.IsDisposed && sc != null) {
             _collapsed.AddRange(sc.Contents());
         }
-        Invalidate_sortedRowData();
+        Invalidate_SortedRowData();
     }
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
@@ -1018,7 +1018,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         _collapsed.Clear();
         CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
-        Invalidate_sortedRowData();
+        Invalidate_SortedRowData();
     }
 
     public string Export_CSV(FirstRow firstRow) => Database == null ? string.Empty : Database.Export_CSV(firstRow, CurrentArrangement, SortedRows());
@@ -1088,7 +1088,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _filteredRows = null;
         ////CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
         Invalidate_Filterinfo();
-        Invalidate_sortedRowData();
+        Invalidate_SortedRowData();
         Invalidate();
     }
 
@@ -1124,21 +1124,21 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         PinnedRows.Clear();
         PinnedRows.AddRange(rows);
-        Invalidate_sortedRowData();
+        Invalidate_SortedRowData();
         OnPinnedChanged();
     }
 
     public void PinAdd(RowItem? row) {
         if (row == null || row.IsDisposed) { return; }
         PinnedRows.Add(row);
-        Invalidate_sortedRowData();
+        Invalidate_SortedRowData();
         OnPinnedChanged();
     }
 
     public void PinRemove(RowItem? row) {
         if (row == null || row.IsDisposed) { return; }
         _ = PinnedRows.Remove(row);
-        Invalidate_sortedRowData();
+        Invalidate_SortedRowData();
         OnPinnedChanged();
     }
 
@@ -1253,7 +1253,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         } catch {
             // Komisch, manchmal wird die Variable _sortedRowDatax verworfen.
             Develop.CheckStackForOverflow();
-            Invalidate_sortedRowData();
+            Invalidate_SortedRowData();
             return SortedRows();
         }
     }
@@ -1413,7 +1413,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
 
                 if (!didreload || count > 15) { break; }
-                Invalidate_sortedRowData();
+                Invalidate_SortedRowData();
             } while (true);
 
             switch (_design) {
@@ -1664,7 +1664,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     } else {
                         _collapsed.Add(rc);
                     }
-                    Invalidate_sortedRowData();
+                    Invalidate_SortedRowData();
                 }
             }
             _ = EnsureVisible(_mouseOverColumn, _mouseOverRow);
@@ -1820,7 +1820,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             CurrentArrangement?.Invalidate_DrawWithOfAllItems();
             _isinSizeChanged = false;
         }
-        Invalidate_sortedRowData(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
+        Invalidate_SortedRowData(); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
@@ -1927,7 +1927,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         #region neue Zeile anlegen? (Das ist niemals in der ein LinkedCell-Datenbank)
 
         if (cellInThisDatabaseRow == null) {
-            if (string.IsNullOrEmpty(newValue)) { return; }
+            if (string.IsNullOrEmpty(newValue) || !table.Database.Row.NewRowPossible()) { return; }
 
             var fe = table.EditableErrorReason(cellInThisDatabaseColumn.Database?.Column.First(), null, EditableErrorReasonType.EditCurrently, true, false, true);
             if (!string.IsNullOrEmpty(fe)) {
@@ -1980,7 +1980,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (CurrentArrangement is ColumnViewCollection cvc) {
             if (cvc[e.Column] != null) {
-                Invalidate_sortedRowData(); // Zeichenhöhe kann sich ändern...
+                if (e.Column.MultiLine ||
+                    e.Column.BehaviorOfImageAndText == BildTextVerhalten.Nur_Bild ||
+                    e.Column.BehaviorOfImageAndText == BildTextVerhalten.Wenn_möglich_Bild_und_immer_Text) {
+                    Invalidate_SortedRowData(); // Zeichenhöhe kann sich ändern...
+                }
             }
         }
 
@@ -2039,7 +2043,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void _Database_RowRemoved(object sender, System.EventArgs e) => Invalidate_FilteredRows();
 
-    private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_sortedRowData();
+    private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
 
     private void _Database_StoreView(object sender, System.EventArgs e) =>
             //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
@@ -2724,7 +2728,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
 
                 if (Database?.IsAdministrator() ?? false) {
-                    if (Database?.Column.SysRowState is ColumnItem srs && currentRow.Row.CellGetInteger(srs) != Database.EventScriptVersion && Database.EventScriptOk) {
+                    if (Database?.Column.SysRowState is ColumnItem srs && currentRow.Row.CellGetInteger(srs) != Database.EventScriptVersion && Database.isRowScriptPossible(true)) {
                         gr.FillRectangle(BrushRedTransparent, cellrectangle);
 
                         if (Database?.Column.SysRowChanger is ColumnItem src && currentRow.Row.CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase)) {
@@ -3095,7 +3099,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void Invalidate_sortedRowData() {
+    private void Invalidate_SortedRowData() {
         _sortedRowData = null;
         Invalidate();
     }
@@ -3174,7 +3178,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnViewChanged() {
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
-        Invalidate_sortedRowData(); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
+        Invalidate_SortedRowData(); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
     }
 
     private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
@@ -3338,6 +3342,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return false; }
         if (Database.ColumnArrangements.Count == 0) { return false; }
         if (CurrentArrangement?[fc] == null) { return false; }
+        if (!Database.Row.NewRowPossible()) { return false; }
 
         if (Database.PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds > 0) { return true; }
 

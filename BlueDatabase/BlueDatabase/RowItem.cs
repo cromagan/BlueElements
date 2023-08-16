@@ -295,7 +295,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return;
         }
 
-        if (!Database.isRowScriptPossible()) {
+        if (!Database.isRowScriptPossible(true)) {
             LastCheckedMessage = "Zeilenprüfung deaktiviert";
             return;
         }
@@ -596,7 +596,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (!script.AllOk) {
             Database.OnScriptError(new RowCancelEventArgs(this, script.ProtocolText));
-            Database.EventScriptOk = !script.ScriptHasSystaxError;
+            if (script.ScriptHasSystaxError) {
+                Database.EventScriptErrorMessage = script.ProtocolText;
+            }
+
             DoingScript = false;
             return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
         }

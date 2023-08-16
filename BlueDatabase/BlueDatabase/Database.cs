@@ -539,7 +539,7 @@ public sealed class Database : DatabaseAbstract {
 
             SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));
             SaveToByteList(l, DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString());
-            SaveToByteList(l, DatabaseDataType.EventScriptOk, db.EventScriptOk.ToPlusMinus());
+            SaveToByteList(l, DatabaseDataType.EventScriptErrorMessage, db.EventScriptErrorMessage);
             //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
             SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
 

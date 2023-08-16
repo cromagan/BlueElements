@@ -318,13 +318,12 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         //_ = column.SetValueInternal(DatabaseDataType.MaxCellLenght, mcl.ToString(), false);
     }
 
-    /// <summary>
-    /// Liest die Spaltenattribute aus der Style-Datenbank und schreibt sie in die Spalte
-    /// Achtung: Die Connection wird nicht geschlossen!
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="sql"></param>
-    internal override string? NextRowKey() => _sql?.GenerateRow(TableName);
+    internal override string? NextRowKey() {
+        if (!Row.NewRowPossible()) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Systemspalte Correct fehlt!");
+        }
+        return _sql?.GenerateRow(TableName);
+    }
 
     internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason) {
         if (IsDisposed) { return "Datenbank verworfen!"; }

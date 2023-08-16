@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
@@ -49,7 +50,16 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         grpEigenschaften.Enabled = false;
         eventScriptEditor.Enabled = false;
         Database = database;
-        Database.EventScriptOk = true;
+
+        if (!string.IsNullOrEmpty(Database.EventScriptErrorMessage)) {
+            var l = new List<string>();
+            l.Add("Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:");
+            l.Add(" ");
+            l.Add(Database.EventScriptErrorMessage);
+            l.WriteAllText(TempFile("", "", "txt"), Constants.Win1252, true);
+        }
+
+        Database.EventScriptErrorMessage = string.Empty;
         Database.Disposing += Database_Disposing;
         Database.CanDoScript += Database_CanDoScript;
 
@@ -187,7 +197,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         if (Database == null || Database.IsDisposed) { return; }
 
-        if (chkZeile.Checked && !Database.isRowScriptPossible()) {
+        if (chkZeile.Checked && !Database.isRowScriptPossible(false)) {
             var s = MessageBox.Show("Dazu werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
 
             if (s == 1) {
@@ -197,7 +207,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
             Database.EnableScript();
 
-            if (!Database.isRowScriptPossible()) {
+            if (!Database.isRowScriptPossible(false)) {
                 MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
 
                 chkZeile.Checked = false;
@@ -339,6 +349,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         var t2 = new List<DatabaseScript>();
         t2.AddRange(lstEventScripts.Item.Select(thisItem => (DatabaseScript)((ReadableListItem)thisItem).Item));
         Database.EventScript = new(t2);
+        Database.EventScriptErrorMessage = string.Empty;
 
         #endregion
 

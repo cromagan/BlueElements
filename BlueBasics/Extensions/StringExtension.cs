@@ -865,11 +865,20 @@ public static partial class Extensions {
         return tXt;
     }
 
-    public static byte[] Unicode_ToByte(this string tXt) => Encoding.Unicode.GetBytes(tXt);
+    public static byte[] Unicode_ToByte(this string? tXt) {
+        if (tXt == null || string.IsNullOrEmpty(tXt)) { return new byte[0]; }
+        return Encoding.Unicode.GetBytes(tXt);
+    }
 
-    public static byte[] UTF8_ToByte(this string tXt) => Encoding.UTF8.GetBytes(tXt);
+    public static byte[] UTF8_ToByte(this string? tXt) {
+        if (tXt == null || string.IsNullOrEmpty(tXt)) { return new byte[0]; }
+        return Encoding.UTF8.GetBytes(tXt);
+    }
 
-    public static byte[] WIN1252_toByte(this string tXt) => Encoding.GetEncoding(1252).GetBytes(tXt);
+    public static byte[] WIN1252_toByte(this string? tXt) {
+        if (tXt == null || string.IsNullOrEmpty(tXt)) { return new byte[0]; }
+        return Encoding.GetEncoding(1252).GetBytes(tXt);
+    }
 
     #endregion
 

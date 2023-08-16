@@ -138,7 +138,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Methods
 
     /// <summary>
-    /// Erstellt eine neue Spalte mit den aus den Filterkriterien. Nur Fiter IstGleich wird unterstützt.
+    /// Erstellt eine neue Spalte mit den aus den Filterkriterien. Nur Filter IstGleich wird unterstützt.
     /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
     /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
     /// Am Schluß wird noch das Skript ausgeführt.
@@ -167,14 +167,21 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (database == null || database.IsDisposed) { return null; }
 
+        if (database.Row.NewRowPossible()) { return null; }
+
         if (first == null) { return null; }
 
-        var row = database.Row.GenerateAndAdd(database.NextRowKey(), first.JoinWithCr(), false, true, comment);
+        var s = database.NextRowKey();
+        if (s == null || string.IsNullOrEmpty(s)) { return null; }
+
+        var row = database.Row.GenerateAndAdd(s, first.JoinWithCr(), false, true, comment);
 
         if (row == null || row.IsDisposed) { return null; }
 
         foreach (var thisfi in fi) {
-            row.CellSet(thisfi.Column, thisfi.SearchValue.ToList());
+            if (thisfi.Column is ColumnItem c) {
+                row.CellSet(c, thisfi.SearchValue.ToList());
+            }
         }
 
         _ = row.ExecuteScript(ScriptEventTypes.new_row, string.Empty, false, false, true, 1);
@@ -203,7 +210,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public void AddRowWithChangedValue(string rowkey) {
         if (Database == null || Database.IsDisposed) { return; }
 
-        if (!Database.isRowScriptPossible()) { return; }
+        if (!Database.isRowScriptPossible(true)) { return; }
 
         _ = _pendingChangedRows.AddIfNotExists(rowkey);
     }
@@ -387,10 +394,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public void ExecuteExtraThread() {
-        if(_pendingChangedRows.Count >0) {return;}
+        if (_pendingChangedRows.Count > 0) { return; }
         if (_pendingChangedBackgroundRow.Count == 0) { return; }
         if (Database == null || Database.IsDisposed) { return; }
-        if (!Database.EventScriptOk) { return; }
+        if (!Database.isRowScriptPossible(true)) { return; }
 
         if (_executingbackgroundworks) { return; }
         _executingbackgroundworks = true;
@@ -411,7 +418,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (!Database.LogUndo) { break; }
                 if (_pendingChangedBackgroundRow.Count == 0) { break; }
                 if (_pendingChangedRows.Count > 0) { break; }
-                if(!Database.EventScriptOk) { break; }
+                if (!Database.isRowScriptPossible(true)) { break; }
 
                 var key = _pendingChangedBackgroundRow.First();
                 _ = _pendingChangedBackgroundRow.Remove(key);
@@ -478,7 +485,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (IsDisposed) { _executingchangedrows = false; return; }
             if (Database == null || Database.IsDisposed) { _executingchangedrows = false; return; }
 
-            if (!Database.isRowScriptPossible()) { _executingchangedrows = false; return; }
+            if (!Database.isRowScriptPossible(true)) { _executingchangedrows = false; return; }
 
             var e = new CancelEventArgs(false);
             Database.OnCanDoScript(e);
@@ -552,6 +559,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //                }
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null && !thisRowItem.IsDisposed);
 
+    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
+        if (Database == null || Database.IsDisposed) { return null; }
+        if (!Database.Row.NewRowPossible()) { return null; }
+
+        var s = Database.NextRowKey();
+        if (s == null || string.IsNullOrEmpty(s)) { return null; }
+
+        return GenerateAndAdd(s, valueOfCellInFirstColumn, true, true, comment);
+    }
+
     //                foreach (var thisRow in row) {
     //                    var s = Database.Cell.GetStringBehindLinkedValue(thisColumn, thisRow);
     /// <summary>
@@ -567,6 +584,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var db = Database;
         if (db == null || db.IsDisposed) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank verworfen!");
+            throw new Exception();
+        }
+
+        if (!NewRowPossible()) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich");
             throw new Exception();
         }
 
@@ -616,8 +638,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return item;
     }
 
-    public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) => GenerateAndAdd(Database.NextRowKey(), valueOfCellInFirstColumn, true, true, comment);
-
     //    List<DatabaseAbstract> done = new();
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
@@ -643,6 +663,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (_pendingChangedRows.Contains(r.KeyName)) { return true; }
         if (_pendingChangedBackgroundRow.Contains(r.KeyName)) { return true; }
         return false;
+    }
+
+    public bool NewRowPossible() {
+        if (Database == null || Database.IsDisposed) { return false; }
+
+        if (Database.Column.SysCorrect == null) { return false; }
+        return true;
     }
 
     public bool Remove(string key, string comment) {
@@ -732,6 +759,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal void CloneFrom(DatabaseAbstract sourceDatabase) {
+        if (NewRowPossible()) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht erlaubt");
+        }
+
         // Zeilen, die zu viel sind, löschen
         foreach (var thisRow in this) {
             var l = sourceDatabase.Row.SearchByKey(thisRow.KeyName);

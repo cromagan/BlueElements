@@ -144,7 +144,7 @@ public enum DatabaseDataType : byte {
     DatabaseVariables = 71,
 
     EventScriptVersion = 72,
-    EventScriptOk = 73,
+    EventScriptErrorMessage = 73,
 
     //Info_ColumDataSart = 100,
     //Info_ColumnDataEnd = 199,

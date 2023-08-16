@@ -228,18 +228,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
         if (Database == null || Database.IsDisposed) { return; }
-        string[] w = {
-            "SYS_ROWSTATE",
-            "SYS_CHAPTER",
-            "SYS_DATECHANGED",
-            "SYS_CHANGER",
-            "SYS_DATECREATED",
-            "SYS_CREATOR",
-            "SYS_CORRECT",
-            "SYS_LOCKED",
-        };
 
-        Database.Column.GenerateAndAddSystem(w);
+        Database.Column.GenerateAndAddSystem();
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) {

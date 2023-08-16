@@ -273,6 +273,20 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return item;
     }
 
+    public void GenerateAndAddSystem() {
+        string[] w = {
+            "SYS_ROWSTATE",
+            "SYS_CHAPTER",
+            "SYS_DATECHANGED",
+            "SYS_CHANGER",
+            "SYS_DATECREATED",
+            "SYS_CREATOR",
+            "SYS_CORRECT",
+            "SYS_LOCKED",
+        };
+        GenerateAndAddSystem(w);
+    }
+
     public void GenerateAndAddSystem(params string[] sysnames) {
         foreach (var thisstring in sysnames) {
             if (Exists(thisstring) == null) {

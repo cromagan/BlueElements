@@ -50,13 +50,25 @@ public class ScriptEndedFeedback {
         Variables = null;
 
         GiveItAnotherTry = giveitanothertry;
-        Protocol = new List<string> {
-           "[" + scriptname + ", Start abgebrochen]@" + errormessage
-        };
 
+        Protocol = new List<string> { "[" + scriptname + ", Start abgebrochen]@" + errormessage };
         ProtocolText = GenNiceProtokoll(Protocol);
+
         AllOk = false;
         ScriptHasSystaxError = scriptfehleraft;
+    }
+
+    /// <summary>
+    /// Wird verwendet, wenn ein Script beendet wird, ohne weiter Vorkommnisse
+    /// </summary>
+    public ScriptEndedFeedback() {
+        GiveItAnotherTry = false;
+
+        Protocol = new List<string>();
+        ProtocolText = string.Empty;
+
+        AllOk = true;
+        ScriptHasSystaxError = false;
     }
 
     #endregion

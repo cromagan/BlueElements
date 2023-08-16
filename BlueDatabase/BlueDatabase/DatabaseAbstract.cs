@@ -92,7 +92,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     private string _creator = string.Empty;
 
-    private bool _eventScriptOk;
+    private string _eventScriptErrorMessage;
     private string _eventScriptTmp = string.Empty;
 
     //private string _timeCode = string.Empty;
@@ -264,16 +264,16 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             tmp++;
             if (tmp == int.MaxValue) { tmp = 0; }
             EventScriptVersion = tmp;
-            EventScriptOk = true;
+            EventScriptErrorMessage = string.Empty;
         }
     }
 
     [Browsable(false)]
-    public bool EventScriptOk {
-        get => _eventScriptOk;
+    public string EventScriptErrorMessage {
+        get => _eventScriptErrorMessage;
         set {
-            if (_eventScriptOk == value) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptOk, null, null, _eventScriptOk.ToPlusMinus(), value.ToPlusMinus(), string.Empty);
+            if (_eventScriptErrorMessage == value) { return; }
+            _ = ChangeData(DatabaseDataType.EventScriptErrorMessage, null, null, _eventScriptErrorMessage, value, string.Empty);
         }
     }
 
@@ -877,7 +877,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         StandardFormulaFile = sourceDatabase.StandardFormulaFile;
         EventScriptVersion = sourceDatabase.EventScriptVersion;
-        EventScriptOk = sourceDatabase.EventScriptOk;
+        EventScriptErrorMessage = sourceDatabase.EventScriptErrorMessage;
         ZeilenQuickInfo = sourceDatabase.ZeilenQuickInfo;
         if (tagsToo) {
             Tags = new(sourceDatabase.Tags.Clone());
@@ -1323,6 +1323,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public abstract void GetUndoCache();
 
     public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
+        if (!Row.NewRowPossible()) {
+            OnDropMessage(FehlerArt.Warnung, "Abbruch, Datenbank unterstützt keine neuen Zeilen.");
+            return "Abbruch, Datenbank unterstützt keine neuen Zeilen.";
+        }
 
         #region Text vorbereiten
 
@@ -1557,10 +1561,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return true;
     }
 
-    public bool isRowScriptPossible() {
+    public bool isRowScriptPossible(bool checkMessageTo) {
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
-        if (!EventScriptOk) { return false; }
+        if (checkMessageTo && !string.IsNullOrEmpty(_eventScriptErrorMessage)) { return false; }
         return true;
     }
 
@@ -1980,8 +1984,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 _eventScriptVersion = IntParse(value);
                 break;
 
-            case DatabaseDataType.EventScriptOk:
-                _eventScriptOk = value.FromPlusMinus();
+            case DatabaseDataType.EventScriptErrorMessage:
+                _eventScriptErrorMessage = value;
                 break;
 
             case DatabaseDataType.UndoInOne:
