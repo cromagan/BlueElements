@@ -167,7 +167,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (database == null || database.IsDisposed) { return null; }
 
-        if (database.Row.NewRowPossible()) { return null; }
+        if (database.Row.IsNewRowPossible()) { return null; }
 
         if (first == null) { return null; }
 
@@ -561,7 +561,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
         if (Database == null || Database.IsDisposed) { return null; }
-        if (!Database.Row.NewRowPossible()) { return null; }
+        if (!Database.Row.IsNewRowPossible()) { return null; }
 
         var s = Database.NextRowKey();
         if (s == null || string.IsNullOrEmpty(s)) { return null; }
@@ -587,7 +587,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             throw new Exception();
         }
 
-        if (!NewRowPossible()) {
+        if (!IsNewRowPossible()) {
             Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht möglich");
             throw new Exception();
         }
@@ -663,17 +663,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
+    public bool IsNewRowPossible() {
+        if (Database == null || Database.IsDisposed) { return false; }
+
+        return Database.IsNewRowPossible();
+    }
+
     public bool IsWorkPendung(RowItem r) {
         if (_pendingChangedRows.Contains(r.KeyName)) { return true; }
         if (_pendingChangedBackgroundRow.Contains(r.KeyName)) { return true; }
         return false;
-    }
-
-    public bool NewRowPossible() {
-        if (Database == null || Database.IsDisposed) { return false; }
-
-        if (Database.Column.SysCorrect == null) { return false; }
-        return true;
     }
 
     public bool Remove(string key, string comment) {
@@ -763,7 +762,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal void CloneFrom(DatabaseAbstract sourceDatabase) {
-        if (NewRowPossible()) {
+        if (IsNewRowPossible()) {
             Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht erlaubt");
         }
 

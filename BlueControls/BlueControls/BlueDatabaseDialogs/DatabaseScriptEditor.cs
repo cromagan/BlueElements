@@ -169,6 +169,16 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
+    private void btnVersionErhöhen_Click(object sender, System.EventArgs e) {
+        if (Database == null || Database.IsDisposed) { return; }
+        btnVersionErhöhen.Enabled = false;
+
+        var tmp = Database.EventScriptVersion;
+        tmp++;
+        if (tmp == int.MaxValue) { tmp = 0; }
+        Database.EventScriptVersion = tmp;
+    }
+
     private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
         Item.ChangeValues = chkAendertWerte.Checked;

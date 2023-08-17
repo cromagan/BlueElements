@@ -1927,7 +1927,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         #region neue Zeile anlegen? (Das ist niemals in der ein LinkedCell-Datenbank)
 
         if (cellInThisDatabaseRow == null) {
-            if (string.IsNullOrEmpty(newValue) || !table.Database.Row.NewRowPossible()) { return; }
+            if (string.IsNullOrEmpty(newValue) || !table.Database.Row.IsNewRowPossible()) { return; }
 
             var fe = table.EditableErrorReason(cellInThisDatabaseColumn.Database?.Column.First(), null, EditableErrorReasonType.EditCurrently, true, false, true);
             if (!string.IsNullOrEmpty(fe)) {
@@ -3342,7 +3342,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return false; }
         if (Database.ColumnArrangements.Count == 0) { return false; }
         if (CurrentArrangement?[fc] == null) { return false; }
-        if (!Database.Row.NewRowPossible()) { return false; }
+        if (!Database.Row.IsNewRowPossible()) { return false; }
 
         if (Database.PowerEdit.Subtract(DateTime.UtcNow).TotalSeconds > 0) { return true; }
 

@@ -861,6 +861,8 @@ public sealed class Database : DatabaseAbstract {
         list.AddRange(b);
     }
 
+    internal override bool IsNewRowPossible() => true;
+
     internal override string NextRowKey() {
         var tmp = 0;
         string key;

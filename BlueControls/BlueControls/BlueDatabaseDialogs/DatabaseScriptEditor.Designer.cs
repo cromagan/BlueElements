@@ -56,6 +56,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.lstEventScripts = new BlueControls.Controls.ListBox();
             this.tabVariablen = new System.Windows.Forms.TabPage();
             this.variableEditor = new BlueControls.VariableEditor();
+            this.btnVersionErhöhen = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.GlobalTab.SuspendLayout();
             this.tabScripts.SuspendLayout();
@@ -174,6 +175,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // grpEigenschaften
             // 
             this.grpEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpEigenschaften.Controls.Add(this.btnVersionErhöhen);
             this.grpEigenschaften.Controls.Add(this.btnSpaltenuebersicht);
             this.grpEigenschaften.Controls.Add(this.chkAendertWerte);
             this.grpEigenschaften.Controls.Add(this.btnSave);
@@ -193,9 +195,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnSpaltenuebersicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnSpaltenuebersicht.ImageCode = "Spalte|16";
-            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(568, 48);
+            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(440, 48);
             this.btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
-            this.btnSpaltenuebersicht.Size = new System.Drawing.Size(152, 24);
+            this.btnSpaltenuebersicht.Size = new System.Drawing.Size(136, 24);
             this.btnSpaltenuebersicht.TabIndex = 36;
             this.btnSpaltenuebersicht.Text = "Spaltenübersicht";
             this.btnSpaltenuebersicht.Click += new System.EventHandler(this.btnSpaltenuebersicht_Click);
@@ -216,7 +218,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.btnSave.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnSave.ImageCode = "Diskette|16";
-            this.btnSave.Location = new System.Drawing.Point(727, 48);
+            this.btnSave.Location = new System.Drawing.Point(728, 48);
             this.btnSave.Name = "btnSave";
             this.btnSave.QuickInfo = "Datenbank und die änderungen am Skript\r\nfest auf den Datenträger speichern.";
             this.btnSave.Size = new System.Drawing.Size(112, 24);
@@ -402,6 +404,18 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.variableEditor.Size = new System.Drawing.Size(1283, 618);
             this.variableEditor.TabIndex = 0;
             // 
+            // btnVersionErhöhen
+            // 
+            this.btnVersionErhöhen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnVersionErhöhen.ImageCode = "Pfeil_Oben|16|||||85|0";
+            this.btnVersionErhöhen.Location = new System.Drawing.Point(584, 48);
+            this.btnVersionErhöhen.Name = "btnVersionErhöhen";
+            this.btnVersionErhöhen.QuickInfo = "Skript-Version erhöhen bewirkt,\r\ndass alle Zeilen neu durchgerechnet\r\nwerden.";
+            this.btnVersionErhöhen.Size = new System.Drawing.Size(136, 24);
+            this.btnVersionErhöhen.TabIndex = 37;
+            this.btnVersionErhöhen.Text = "Version erhöhen";
+            this.btnVersionErhöhen.Click += new System.EventHandler(this.btnVersionErhöhen_Click);
+            // 
             // DatabaseScriptEditor
             // 
             this.ClientSize = new System.Drawing.Size(1297, 677);
@@ -453,5 +467,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button chkAuslöser_export;
         private Button btnSpaltenuebersicht;
         private Button chkChangeValuesInTest;
+        private Button btnVersionErhöhen;
     }
 }

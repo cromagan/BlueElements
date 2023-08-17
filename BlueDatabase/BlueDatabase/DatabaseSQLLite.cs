@@ -319,8 +319,10 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         //_ = column.SetValueInternal(DatabaseDataType.MaxCellLenght, mcl.ToString(), false);
     }
 
+    internal override bool IsNewRowPossible() => Column.SysCorrect != null;
+
     internal override string? NextRowKey() {
-        if (!Row.NewRowPossible()) {
+        if (!Row.IsNewRowPossible()) {
             Develop.DebugPrint(FehlerArt.Fehler, "Systemspalte Correct fehlt!");
         }
         return _sql?.GenerateRow(TableName);

@@ -260,10 +260,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             if (_eventScriptTmp == l.ToString(false)) { return; }
             _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), string.Empty, UserName, DateTime.UtcNow);
 
-            var tmp = EventScriptVersion;
-            tmp++;
-            if (tmp == int.MaxValue) { tmp = 0; }
-            EventScriptVersion = tmp;
             EventScriptErrorMessage = string.Empty;
         }
     }
@@ -1114,7 +1110,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
                 var l = EventScript.Get((ScriptEventTypes)eventname);
                 if (l.Count == 1) { scriptname = l[0].Name; }
-                if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, false, string.Empty); }
+                if (string.IsNullOrEmpty(scriptname)) {
+                    // Script nicht definiert. Macht nix. ist eben keines gewünscht
+                    return new ScriptEndedFeedback();
+                }
             }
 
             if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Kein Skriptname angekommen", false, false, "Allgemein"); }
@@ -1325,7 +1324,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public abstract void GetUndoCache();
 
     public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
-        if (!Row.NewRowPossible()) {
+        if (!Row.IsNewRowPossible()) {
             OnDropMessage(FehlerArt.Warnung, "Abbruch, Datenbank unterstützt keine neuen Zeilen.");
             return "Abbruch, Datenbank unterstützt keine neuen Zeilen.";
         }
@@ -1736,6 +1735,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         } catch { }
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
+
+    internal abstract bool IsNewRowPossible();
 
     internal abstract string? NextRowKey();
 
