@@ -597,7 +597,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
             throw new Exception();
         }
-        var s = db.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key.ToString(), comment);
+
+        var u = Generic.UserName;
+        var d = DateTime.UtcNow;
+
+        var s = db.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key.ToString(), comment, u, d);
         if (!string.IsNullOrEmpty(s)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen: " + s);
             throw new Exception();
@@ -610,8 +614,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (fullprocessing) {
-            if (db.Column.SysRowCreator is ColumnItem src) { db.Cell.SystemSet(src, item, Generic.UserName); }
-            if (db.Column.SysRowCreateDate is ColumnItem scd) { db.Cell.SystemSet(scd, item, DateTime.UtcNow.ToString(Constants.Format_Date5)); }
+            if (db.Column.SysRowCreator is ColumnItem src) { db.Cell.SystemSet(src, item, u, u, d); }
+            if (db.Column.SysRowCreateDate is ColumnItem scd) { db.Cell.SystemSet(scd, item, d.ToString(Constants.Format_Date5), u, d); }
 
             // Dann die Inital-Werte reinschreiben
             foreach (var thisColum in db.Column) {
@@ -676,7 +680,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var r = SearchByKey(key);
 
         if (r == null || r.IsDisposed) { return false; }
-        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, r, string.Empty, key.ToString(), comment));
+        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, r, string.Empty, key.ToString(), comment, Generic.UserName, DateTime.UtcNow));
     }
 
     public bool Remove(FilterItem filter, List<RowItem>? pinned, string comment) {

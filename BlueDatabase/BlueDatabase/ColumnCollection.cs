@@ -257,7 +257,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
         //    return null;
         //}
-        _ = Database?.ChangeData(DatabaseDataType.Comand_AddColumnByName, null, null, string.Empty, internalName, string.Empty);
+        _ = Database?.ChangeData(DatabaseDataType.Comand_AddColumnByName, null, null, string.Empty, internalName, string.Empty, Generic.UserName, DateTime.UtcNow);
         var item = Exists(internalName);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
@@ -416,7 +416,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public bool Remove(ColumnItem column, string comment) {
         if (column == null || column.IsDisposed) { return false; }
-        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveColumn, column, null, string.Empty, column.KeyName, comment));
+        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveColumn, column, null, string.Empty, column.KeyName, comment, Generic.UserName, DateTime.UtcNow));
     }
 
     public void Repair() {

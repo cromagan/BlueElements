@@ -48,7 +48,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
     /// <param name="preveredFileFormatId"></param>
     public ConnectionInfo(string uniqueId, string? preveredFileFormatId) {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
-        alf.AddRange(DatabaseAbstract.AllFiles);
+        alf.AddRange(AllFiles);
 
         #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine preveredFileFormatID zurück geben
 

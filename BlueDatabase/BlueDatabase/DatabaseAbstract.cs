@@ -181,7 +181,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         set {
             if (_additionalFilesPfad == value) { return; }
             AdditionalFilesPfadtmp = null;
-            _ = ChangeData(DatabaseDataType.AdditionalFilesPath, null, null, _additionalFilesPfad, value, string.Empty);
+            _ = ChangeData(DatabaseDataType.AdditionalFilesPath, null, null, _additionalFilesPfad, value, string.Empty, UserName, DateTime.UtcNow);
             Cell.InvalidateAllSizes();
         }
     }
@@ -202,7 +202,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => _caption;
         set {
             if (_caption == value) { return; }
-            _ = ChangeData(DatabaseDataType.Caption, null, null, _caption, value, string.Empty);
+            _ = ChangeData(DatabaseDataType.Caption, null, null, _caption, value, string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -214,7 +214,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => new(_columnArrangements);
         set {
             if (_columnArrangements.ToString(false) == value.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements.ToString(false), value.ToString(false), string.Empty);
+            _ = ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements.ToString(false), value.ToString(false), string.Empty, UserName, DateTime.UtcNow);
             OnViewChanged();
         }
     }
@@ -226,7 +226,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => _createDate;
         set {
             if (_createDate == value) { return; }
-            _ = ChangeData(DatabaseDataType.CreateDateUTC, null, null, _createDate, value, string.Empty);
+            _ = ChangeData(DatabaseDataType.CreateDateUTC, null, null, _createDate, value, string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -235,7 +235,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => _creator.Trim();
         set {
             if (_creator == value) { return; }
-            _ = ChangeData(DatabaseDataType.Creator, null, null, _creator, value, string.Empty);
+            _ = ChangeData(DatabaseDataType.Creator, null, null, _creator, value, string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -243,7 +243,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => new(_datenbankAdmin);
         set {
             if (!_datenbankAdmin.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr(), string.Empty);
+            _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr(), string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -258,7 +258,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             l.Sort();
 
             if (_eventScriptTmp == l.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), string.Empty);
+            _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), string.Empty, UserName, DateTime.UtcNow);
 
             var tmp = EventScriptVersion;
             tmp++;
@@ -273,7 +273,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => _eventScriptErrorMessage;
         set {
             if (_eventScriptErrorMessage == value) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptErrorMessage, null, null, _eventScriptErrorMessage, value, string.Empty);
+            _ = ChangeData(DatabaseDataType.EventScriptErrorMessage, null, null, _eventScriptErrorMessage, value, string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -282,7 +282,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => _eventScriptVersion;
         set {
             if (_eventScriptVersion == value) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion.ToString(), value.ToString(), string.Empty);
+            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion.ToString(), value.ToString(), string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -291,7 +291,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => _globalScale;
         set {
             if (Math.Abs(_globalScale - value) < 0.0001) { return; }
-            _ = ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture), string.Empty);
+            _ = ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture), string.Empty, UserName, DateTime.UtcNow);
             Cell.InvalidateAllSizes();
         }
     }
@@ -300,7 +300,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => _globalShowPass;
         set {
             if (_globalShowPass == value) { return; }
-            _ = ChangeData(DatabaseDataType.GlobalShowPass, null, null, _globalShowPass, value, string.Empty);
+            _ = ChangeData(DatabaseDataType.GlobalShowPass, null, null, _globalShowPass, value, string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -335,7 +335,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => _layouts;
         set {
             if (!_layouts.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.Layouts, null, null, _layouts.JoinWithCr(), value.JoinWithCr(), string.Empty);
+            _ = ChangeData(DatabaseDataType.Layouts, null, null, _layouts.JoinWithCr(), value.JoinWithCr(), string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -347,7 +347,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => new(_permissionGroupsNewRow);
         set {
             if (!_permissionGroupsNewRow.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.PermissionGroupsNewRow, null, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr(), string.Empty);
+            _ = ChangeData(DatabaseDataType.PermissionGroupsNewRow, null, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr(), string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -366,7 +366,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             if (_sortDefinition != null) { alt = _sortDefinition.ToString(); }
             if (value != null) { neu = value.ToString(); }
             if (alt == neu) { return; }
-            _ = ChangeData(DatabaseDataType.SortDefinition, null, null, alt, neu, string.Empty);
+            _ = ChangeData(DatabaseDataType.SortDefinition, null, null, alt, neu, string.Empty, UserName, DateTime.UtcNow);
 
             OnSortParameterChanged();
         }
@@ -381,7 +381,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => _standardFormulaFile;
         set {
             if (_standardFormulaFile == value) { return; }
-            _ = ChangeData(DatabaseDataType.StandardFormulaFile, null, null, _standardFormulaFile, value, string.Empty);
+            _ = ChangeData(DatabaseDataType.StandardFormulaFile, null, null, _standardFormulaFile, value, string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -391,7 +391,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => new(_tags);
         set {
             if (!_tags.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.Tags, null, null, _tags.JoinWithCr(), value.JoinWithCr(), string.Empty);
+            _ = ChangeData(DatabaseDataType.Tags, null, null, _tags.JoinWithCr(), value.JoinWithCr(), string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -405,7 +405,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             l.Sort();
 
             if (_variableTmp == l.ToString(true)) { return; }
-            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, l.ToString(true), string.Empty);
+            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, l.ToString(true), string.Empty, UserName, DateTime.UtcNow);
             //OnViewChanged();
         }
     }
@@ -417,7 +417,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         get => _zeilenQuickInfo;
         set {
             if (_zeilenQuickInfo == value) { return; }
-            _ = ChangeData(DatabaseDataType.RowQuickInfo, null, null, _zeilenQuickInfo, value, string.Empty);
+            _ = ChangeData(DatabaseDataType.RowQuickInfo, null, null, _zeilenQuickInfo, value, string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -718,7 +718,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             x += 1;
             if (x > 99999) { Develop.DebugPrint(FehlerArt.Fehler, "Unique ID konnte nicht erzeugt werden"); }
 
-            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + " _.");
+            var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToString(Format_Integer5)).RemoveChars(Char_DateiSonderZeichen + " _.");
             var ok = true;
 
             if (IsValidTableName(unique, false)) {
@@ -780,10 +780,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
     /// <param name="comment"></param>
-    public string ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string comment) {
+    /// <param name="user"></param>
+    /// <param name="datetimeutc"></param>
+    public string ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string comment, string user, DateTime datetimeutc) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var f = SetValueInternal(comand, changedTo, column, row, Reason.SetComand);
+        var f = SetValueInternal(comand, changedTo, column, row, Reason.SetComand, user, datetimeutc);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -799,7 +801,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         //}
 
         if (LogUndo) {
-            AddUndo(comand, column, row, previousValue, changedTo, UserName, comment);
+            AddUndo(comand, column, row, previousValue, changedTo, user, datetimeutc, comment);
         }
 
         //if (comand != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
@@ -1501,7 +1503,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 Save();
             }
 
-            if (no % Constants.GlobalRND.Next(40, 60) == 0) {
+            if (no % GlobalRND.Next(40, 60) == 0) {
                 OnDropMessage(FehlerArt.Info, "Import: Zeile " + no + " von " + zeil.Count);
             }
 
@@ -1517,7 +1519,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public string ImportCsv(string filename) {
         if (!FileExists(filename)) { return "Datei nicht gefunden"; }
-        var importText = File.ReadAllText(filename, Constants.Win1252);
+        var importText = File.ReadAllText(filename, Win1252);
 
         if (string.IsNullOrEmpty(importText)) { return "Dateiinhalt leer"; }
 
@@ -1538,9 +1540,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public bool IsAdministrator() {
-        if (string.Equals(UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
+        if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
         if (_datenbankAdmin == null || _datenbankAdmin.Count == 0) { return false; }
-        if (_datenbankAdmin.Contains(Constants.Everybody, false)) { return true; }
+        if (_datenbankAdmin.Contains(Everybody, false)) { return true; }
         if (!string.IsNullOrEmpty(UserName) && _datenbankAdmin.Contains("#User: " + UserName, false)) { return true; }
         return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
     }
@@ -1622,14 +1624,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         //foreach (var thisArrangement in OldFormulaViews) {
         //    e.AddRange(thisArrangement.PermissionGroups_Show);
         //}
-        e.Add(Constants.Everybody);
+        e.Add(Everybody);
         e.Add("#User: " + UserName);
         if (cellLevel) {
             e.Add("#RowCreator");
         } else {
             e.RemoveString("#RowCreator", false);
         }
-        e.RemoveString(Constants.Administrator, false);
+        e.RemoveString(Administrator, false);
         if (!IsAdministrator()) { e.Add(UserGroup); }
         return e.SortedDistinctList();
     }
@@ -1784,7 +1786,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// <param name="row"></param>
     /// <param name="isLoading"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason) {
+    internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (type.IsObsolete()) { return string.Empty; }
 
@@ -2019,12 +2021,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// <param name="changedTo"></param>
     /// <param name="userName"></param>
     /// <param name="comment"></param>
-    protected virtual void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) {
+    protected virtual void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment) {
         if (IsDisposed) { return; }
         if (type.IsObsolete()) { return; }
         // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
 
-        Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, comment, DateTime.UtcNow));
+        if (type == DatabaseDataType.SystemValue) { return; }
+
+        Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, comment, datetimeutc));
     }
 
     protected void CreateWatcher() {
@@ -2068,7 +2072,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         _datenbankAdmin.Clear();
         _globalShowPass = string.Empty;
         _creator = UserName;
-        _createDate = DateTime.UtcNow.ToString(Constants.Format_Date5);
+        _createDate = DateTime.UtcNow.ToString(Format_Date5);
         _caption = string.Empty;
         LoadedVersion = DatabaseVersion;
         _globalScale = 1f;
@@ -2138,7 +2142,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
         var tmpName = UserName.ToUpper();
         var tmpGroup = UserGroup.ToUpper();
-        if (string.Equals(allowed, Constants.Everybody, StringComparison.OrdinalIgnoreCase)) {
+        if (string.Equals(allowed, Everybody, StringComparison.OrdinalIgnoreCase)) {
             return true;
         }
 
@@ -2164,7 +2168,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 return;
             }
 
-            var name = e.Name.RemoveChars(Constants.Char_DateiSonderZeichen);
+            var name = e.Name.RemoveChars(Char_DateiSonderZeichen);
             var hashname = name.GetHashString();
 
             var fullname = AdditionalFilesPfadWhole() + name + ".png";
@@ -2173,7 +2177,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 if (FileExists(fullhashname)) {
                     FileInfo f = new(fullhashname);
-                    if (DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalDays < VorhalteZeit && Constants.GlobalRND.Next(0, VorhalteZeit * 20) != 1) {
+                    if (DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalDays < VorhalteZeit && GlobalRND.Next(0, VorhalteZeit * 20) != 1) {
                         if (f.Length < 5) { return; }
                         e.Bmp = new BitmapExt(fullhashname);
                         return;

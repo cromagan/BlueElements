@@ -346,7 +346,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisColumn in Database.Column) {
             var value = sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source);
 
-            _ = Database.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, string.Empty);
+            _ = Database.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, string.Empty, Generic.UserName, DateTime.UtcNow);
 
             //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source), false);
         }
@@ -604,17 +604,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
         }
 
-        if (changevalues) {
+        if (changevalues && Database.Column.SysRowState is ColumnItem srs) {
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
             DoRowAutomaticEventArgs e = new(this, eventname);
             OnDoSpecialRules(e);
 
             if (eventname is not null and ScriptEventTypes.value_changed) {
-                Database.Cell.SystemSet(Database.Column.SysRowState, this, Database.EventScriptVersion.ToString());
+                CellSet(srs, Database.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
             } else {
                 var l = Database.EventScript.Get(ScriptEventTypes.value_changed);
                 if (l.Count == 1 && l[0].Name == scriptname) {
-                    Database.Cell.SystemSet(Database.Column.SysRowState, this, Database.EventScriptVersion.ToString());
+                    CellSet(srs, Database.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
                 }
             }
         }

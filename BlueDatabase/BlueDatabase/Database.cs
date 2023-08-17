@@ -360,7 +360,7 @@ public sealed class Database : DatabaseAbstract {
 
                 #endregion
 
-                var fehler = db.SetValueInternal(type, value, column, row, Reason.LoadReload);
+                var fehler = db.SetValueInternal(type, value, column, row, Reason.LoadReload, UserName, DateTime.UtcNow);
 
                 if (type == DatabaseDataType.EOF) { break; }
 
@@ -380,7 +380,7 @@ public sealed class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload);
+                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload, UserName, DateTime.UtcNow);
             }
         }
 
@@ -866,16 +866,16 @@ public sealed class Database : DatabaseAbstract {
         string key;
 
         do {
-            key = Generic.GetUniqueKey(tmp, "row");
+            key = GetUniqueKey(tmp, "row");
             tmp++;
         } while (Row.SearchByKey(key) != null);
         return key;
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var r = base.SetValueInternal(type, value, column, row, reason);
+        var r = base.SetValueInternal(type, value, column, row, reason, user, datetimeutc);
 
         if (type == DatabaseDataType.UndoInOne) {
             Undo.Clear();

@@ -21,7 +21,7 @@ public static class DatabaseDataTypeExtension {
 
     #region Methods
 
-    public static bool IsCellValue(this DatabaseDataType type) => (int)type is >= 200 and <= 205;
+    public static bool IsCellValue(this DatabaseDataType type) => (int)type is >= 200 and <= 206;
 
     public static bool IsColumnTag(this DatabaseDataType type) => (int)type is >= 100 and <= 199;
 
@@ -297,6 +297,8 @@ public enum DatabaseDataType : byte {
     UTF8Value_withSizeData = 203,
 
     //Dummy_ce_ValueWithoutSizeUncrypted = 204,
+
+    SystemValue = 205,
 
     Comand_RemoveRow = 220,
     Comand_AddRow = 221,

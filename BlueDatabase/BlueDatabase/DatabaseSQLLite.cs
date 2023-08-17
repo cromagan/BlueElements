@@ -26,6 +26,7 @@ using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System.Linq;
 using static BlueDatabase.SqlBackAbstract;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 
 namespace BlueDatabase;
 
@@ -293,7 +294,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     //}
     public override bool Save() => _sql != null;
 
-    public List<string> SQLLog() => SqlBackAbstract.Log;
+    public List<string> SQLLog() => Log;
 
     internal void GetColumnAttributesColumn(ColumnItem column, SqlBackAbstract sql) {
         var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), column.KeyName);
@@ -325,7 +326,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return _sql?.GenerateRow(TableName);
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
@@ -333,32 +334,34 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 
         if (reason != Reason.LoadReload) {
-            _ = _sql?.SetValueInternal(TableName, type, value, column?.KeyName, row?.KeyName);
+            _ = _sql?.SetValueInternal(this, type, value, column, row, user, datetimeutc);
         }
 
-        return base.SetValueInternal(type, value, column, row, reason);
+        return base.SetValueInternal(type, value, column, row, reason, user, datetimeutc);
     }
 
-    protected override void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, string comment) {
-        base.AddUndo(type, column, row, previousValue, changedTo, userName, comment);
+    protected override void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment) {
+        base.AddUndo(type, column, row, previousValue, changedTo, userName, datetimeutc, comment);
 
         if (IsDisposed) { return; }
         if (type.IsObsolete()) { return; }
         if (ReadOnly) { return; } // Sicherheitshalber!
 
+        if (type == DatabaseDataType.SystemValue) { return; }
+
         var columnName = column?.KeyName ?? string.Empty;
         var rowkey = row?.KeyName ?? string.Empty;
 
-        var err = _sql?.AddUndo(TableName, type, columnName, rowkey, previousValue, changedTo, comment);
+        var err = _sql?.AddUndo(TableName, type, columnName, rowkey, previousValue, changedTo, userName, datetimeutc, comment);
         if (!string.IsNullOrEmpty(err)) {
             Develop.CheckStackForOverflow();
-            AddUndo(type, column, row, previousValue, changedTo, userName, comment);
+            AddUndo(type, column, row, previousValue, changedTo, userName, datetimeutc, comment);
         }
     }
 
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
-        if (DateTime.UtcNow.Subtract(SqlBackAbstract.LastLoadUtc).TotalSeconds < 5) { return; }
+        if (DateTime.UtcNow.Subtract(LastLoadUtc).TotalSeconds < 5) { return; }
 
         if (CriticalState()) { return; }
         CheckSysUndoNow();
@@ -476,8 +479,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                         #region Datenbank-Styles
 
-                        var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, SqlBackAbstract.DatabaseProperty, SysStyle);
-                        if (v != null) { _ = SetValueInternal(thisWork.Comand, v, null, null, Reason.LoadReload); }
+                        var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, DatabaseProperty, SysStyle);
+                        if (v != null) { _ = SetValueInternal(thisWork.Comand, v, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow); }
 
                         #endregion
                     } else if (thisWork.Comand.IsColumnTag()) {
@@ -487,7 +490,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                         var c = Column.Exists(thisWork.ColName);
                         if (c != null && !c.IsDisposed) {
                             var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, c.KeyName, SysStyle);
-                            if (v != null) { _ = SetValueInternal(thisWork.Comand, v, c, null, Reason.LoadReload); }
+                            if (v != null) { _ = SetValueInternal(thisWork.Comand, v, c, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow); }
                         }
 
                         #endregion
@@ -581,7 +584,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             #region Datenbank Eigenschaften laden
 
-            var l = _sql?.GetStyleDataAll(TableName, SqlBackAbstract.DatabaseProperty);
+            var l = _sql?.GetStyleDataAll(TableName, DatabaseProperty);
 
             if (l == null) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
@@ -592,7 +595,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 foreach (var thisstyle in l) {
                     _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
                     if (!t.IsObsolete()) {
-                        _ = SetValueInternal(t, thisstyle.Value, null, null, Reason.LoadReload);
+                        _ = SetValueInternal(t, thisstyle.Value, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow);
                     }
                 }
             }

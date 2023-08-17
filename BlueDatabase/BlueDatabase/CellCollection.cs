@@ -663,7 +663,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return;
         }
 
-        SetValueBehindLinkedValue(column, row, value);
+        SetValueBehindLinkedValue(column, row, value, UserName, DateTime.UtcNow);
     }
 
     public void Set(string columnName, RowItem? row, bool value) => Set(Database?.Column[columnName], row, value.ToPlusMinus());
@@ -862,7 +862,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="value"></param>
     /// <param name="changeSysColumns"></param>
 
-    internal void SetValueBehindLinkedValue(ColumnItem column, RowItem row, string value) {
+    internal void SetValueBehindLinkedValue(ColumnItem column, RowItem row, string value, string user, DateTime datetimeutc) {
         var dbtmp = Database;
         if (dbtmp == null || dbtmp.IsDisposed) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!");
@@ -890,7 +890,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (value == oldValue) { return; }
 
-        var message = dbtmp.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, string.Empty);
+        var message = dbtmp.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, string.Empty, user, datetimeutc);
 
         if (!string.IsNullOrEmpty(message)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Wert nicht gesetzt: " + message);
@@ -908,11 +908,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         //if (changeSysColumns) {
         DoSpecialFormats(column, row, oldValue, false);
-        if (dbtmp.Column.SysRowChanger is ColumnItem src) { SystemSet(src, row, UserName); }
-        if (dbtmp.Column.SysRowChangeDate is ColumnItem scd) { SystemSet(scd, row, DateTime.UtcNow.ToString(Constants.Format_Date7)); }
+        if (dbtmp.Column.SysRowChanger is ColumnItem src) { SystemSet(src, row, user, user, datetimeutc); }
+        if (dbtmp.Column.SysRowChangeDate is ColumnItem scd) { SystemSet(scd, row, datetimeutc.ToString(Constants.Format_Date7), user, datetimeutc); }
 
         if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-            if (dbtmp.Column.SysRowState is ColumnItem srs) { SystemSet(srs, row, string.Empty); }
+            if (dbtmp.Column.SysRowState is ColumnItem srs) { SystemSet(srs, row, string.Empty, user, datetimeutc); }
         }
         //}
 
@@ -921,7 +921,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         OnCellValueChanged(new CellChangedEventArgs(column, row, Reason.SetComand));
     }
 
-    internal void SystemSet(ColumnItem? column, RowItem? row, string value) {
+    internal void SystemSet(ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc) {
         if (column == null || column.IsDisposed) {
             Database?.DevelopWarnung("Spalte ungültig!");
             Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + Database?.ConnectionData.TableName);
@@ -943,12 +943,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         } else {
             if (!TryAdd(cellKey, new CellItem(string.Empty))) {
                 Develop.CheckStackForOverflow();
-                SystemSet(column, row, value);
+                SystemSet(column, row, value, user, datetimeutc);
                 return;
             }
         }
         if (value == oldval) { return; }
-        _ = Database?.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldval, value, "SystemSet");
+        _ = Database?.ChangeData(DatabaseDataType.SystemValue, column, row, oldval, value, "SystemSet", user, datetimeutc);
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {
@@ -1064,11 +1064,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
             if (targetColumn != null && targetRow != null && string.IsNullOrEmpty(fehler) && column != null && row != null) {
-                column.Database?.Cell.SetValueBehindLinkedValue(column, row, targetRow.KeyName);
+                column.Database?.Cell.SetValueBehindLinkedValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow);
                 return (targetColumn, targetRow, fehler, cr);
             }
 
-            if (column != null && row != null) { column.Database?.Cell.SetValueBehindLinkedValue(column, row, string.Empty); }
+            if (column != null && row != null) { column.Database?.Cell.SetValueBehindLinkedValue(column, row, string.Empty, UserName, DateTime.UtcNow); }
             return (targetColumn, targetRow, fehler, cr);
         }
 

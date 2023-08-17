@@ -31,6 +31,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using static BlueDatabase.DatabaseAbstract;
+using BlueDatabase.EventArgs;
 
 namespace BlueDatabase;
 
@@ -100,8 +101,11 @@ public abstract class SqlBackAbstract {
         return SetStyleData(tablename, DatabaseDataType.ColumnName, columnName.ToUpper(), columnName.ToUpper());
     }
 
-    public string AddUndo(string tablename, DatabaseDataType comand, string? columname, string? rowKey, string previousValue, string changedTo, string comment) {
+    public string AddUndo(string tablename, DatabaseDataType comand, string? columname, string? rowKey, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment) {
         if (!OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
+
+        if (comand == DatabaseDataType.SystemValue) { return "System-Values werden nicht geloggt."; }
+        if (comand.IsObsolete()) { return "Obsoloete Befehle werden nicht geloggt."; }
 
         //var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
         var rk = rowKey ?? string.Empty;
@@ -114,9 +118,8 @@ public abstract class SqlBackAbstract {
              Dbval(rk) + "," +
              Dbval(previousValue) + "," +
              Dbval(changedTo) + "," +
-             Dbval(Generic.UserName) + "," +
-             //DBVAL(dt.ToString(Constants.Format_Date)) + "," +
-             Dbval(DateTime.UtcNow) + "," +
+             Dbval(user) + "," +
+             Dbval(datetimeutc) + "," +
              Dbval(comment) + ")";
 
         return ExecuteCommand(cmdString, false);
@@ -642,17 +645,18 @@ public abstract class SqlBackAbstract {
     /// <param name="columname"></param>
     /// <param name="rowkey"></param>
     /// <returns></returns>
-    public string SetValueInternal(string tablename, DatabaseDataType type, string value, string? columname, string? rowkey) {
-        if (!IsValidTableName(tablename, false)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
-            return "Tabellenname ungültig: " + tablename;
+    public string SetValueInternal(DatabaseSqlLite db, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc) {
+        if (!IsValidTableName(db.TableName, false)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + db.TableName);
+            return "Tabellenname ungültig: " + db.TableName;
         }
 
-        #region Ignorieren
+        #region Ignorieren !!!! AUCH SYSTEMVALUE !!!
 
         switch (type) {
             case DatabaseDataType.Formatkennung:
             case DatabaseDataType.Werbung:
+            case DatabaseDataType.SystemValue:
             //case DatabaseDataType.CryptionState:
             //case DatabaseDataType.CryptionTest:
             //case DatabaseDataType.SaveContent:
@@ -669,23 +673,33 @@ public abstract class SqlBackAbstract {
         #region Datenbank Eigenschaften
 
         if (type.IsDatabaseTag()) {
-            return SetStyleData(tablename, type, string.Empty, value);
+            return SetStyleData(db.TableName, type, string.Empty, value);
         }
 
         #endregion
 
         #region Spalten Eigenschaften
 
-        if (type.IsColumnTag() && columname != null) {
-            return SetStyleData(tablename, type, columname.ToUpper(), value);
+        if (type.IsColumnTag() && column != null) {
+            return SetStyleData(db.TableName, type, column.KeyName.ToUpper(), value);
         }
 
         #endregion
 
         #region Zellen-Wert
 
-        if (type.IsCellValue() && columname != null && rowkey != null) {
-            return SetCellValue(tablename, columname, rowkey, value);
+        if (type.IsCellValue() && column != null && row != null) {
+            if (type != DatabaseDataType.SystemValue) {
+                var l = new List<CellValueEventArgs>();
+                l.Add(new CellValueEventArgs(column, value));
+                if (db.Column.SysRowChangeDate is ColumnItem srd) { l.Add(new CellValueEventArgs(srd, datetimeutc.ToString(Format_Date7))); }
+                if (db.Column.SysRowChanger is ColumnItem src) { l.Add(new CellValueEventArgs(src, user)); }
+
+                if (column.ScriptType != ScriptType.Nicht_vorhanden) {
+                    if (db.Column.SysRowState is ColumnItem srs) { l.Add(new CellValueEventArgs(srs, string.Empty)); }
+                }
+                return SetCellValue(db.TableName, row.KeyName, l);
+            }
         }
 
         #endregion
@@ -699,17 +713,17 @@ public abstract class SqlBackAbstract {
                 //    return AddColumnToMain(tablename, ColumnItem.TmpNewDummy, (long)columnkey);
 
                 case DatabaseDataType.Comand_AddColumnByName:
-                    return AddColumnToMain(tablename, value, false);
+                    return AddColumnToMain(db.TableName, value, false);
 
                 case DatabaseDataType.Comand_RemoveColumn:
-                    if (columname == null) { return "Spalte nicht definiert!"; }
-                    return RemoveColumn(tablename, columname, false);
+                    if (column == null) { return "Spalte nicht definiert!"; }
+                    return RemoveColumn(db.TableName, column.KeyName.ToUpper(), false);
 
                 case DatabaseDataType.Comand_RemoveRow:
-                    return RemoveRow(tablename, value, false);
+                    return RemoveRow(db.TableName, value, false);
 
                 case DatabaseDataType.Comand_AddRow:
-                    return string.Empty;//  AddRow(tablename, LongParse(value));
+                    return string.Empty;//  AddRow(db.TableName, LongParse(value));
 
                 default:
                     Develop.DebugPrint(FehlerArt.Fehler, type + " nicht definiert!");
@@ -1065,7 +1079,7 @@ public abstract class SqlBackAbstract {
 
         try {
             if (Log.Count > 2000) { Log.RemoveAt(0); }
-            Log.Add("[" + DateTime.UtcNow.ToString(Constants.Format_Date) + "]\r\n" + command.CommandText);
+            Log.Add("[" + DateTime.UtcNow.ToString(Format_Date) + "]\r\n" + command.CommandText);
             _ = command.ExecuteNonQuery();
             return string.Empty;
         } catch (Exception ex) {
@@ -1147,9 +1161,8 @@ public abstract class SqlBackAbstract {
     /// <param name="tablename"></param>
     /// <param name="rowkey"></param>
     /// <param name="newValue"></param>
-    /// <param name="columnname"></param>
     /// <returns></returns>
-    private string SetCellValue(string tablename, string columnname, string rowkey, string newValue) {
+    private string SetCellValue(string tablename, string rowkey, List<CellValueEventArgs> values) {
         if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
             return "Tabellenname ungültig: " + tablename;
@@ -1160,27 +1173,29 @@ public abstract class SqlBackAbstract {
             return "Zeilenschlüssel ungültig: " + rowkey;
         }
 
-        if (!ColumnItem.IsValidColumnName(columnname)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + columnname);
-            return "Spaltenname ungültig: " + rowkey;
+        var sc = string.Empty;
+
+        foreach (var thisv in values) {
+            if (thisv.Column.Database is not DatabaseSqlLite db || db.IsDisposed) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig");
+                return "Datenbank ungültig";
+            }
+
+            if (!ColumnItem.IsValidColumnName(thisv.Column.KeyName)) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname ungültig: " + thisv.Column.KeyName);
+                return "Spaltenname ungültig: " + thisv.Column.KeyName;
+            }
+
+            if (db.TableName != tablename) {
+                Develop.DebugPrint(FehlerArt.Fehler, "Tabelle ungültig: " + tablename);
+                return "Tabelle ungültig: " + tablename;
+            }
+
+            if (!string.IsNullOrEmpty(sc)) { sc += ", "; }
+            sc = sc + thisv.Column.KeyName.ToUpper() + " = " + Dbval(thisv.NewValue);
         }
 
-        //(string? value, string error) = GetCellValue(tablename, columnname, rowkey);
-
-        //if (!string.IsNullOrEmpty(error)) { return error; }
-
-        string cmdString;
-
-        //if (value is null) {
-        //    cmdString = "INSERT INTO " + tablename.ToUpper() + " (ROWID, " + columnname.ToUpper() + " ) VALUES (" + Dbval(rowkey) + ", " + Dbval(newValue) + " )";
-        //    Develop.DebugPrint(FehlerArt.Warnung, "Insert-Befehl: " + cmdString);
-        //} else if (value != newValue) {
-        cmdString = "UPDATE " + tablename.ToUpper() + " SET " + columnname.ToUpper() + " = " + Dbval(newValue) + " WHERE ROWID = " + Dbval(rowkey);
-        //} else {
-        //    return string.Empty;
-        //}
-
-        return ExecuteCommand(cmdString, false);
+        return ExecuteCommand("UPDATE " + tablename.ToUpper() + " SET " + sc + " WHERE ROWID = " + Dbval(rowkey), false);
     }
 
     private void SysUndoAufräumen() {
