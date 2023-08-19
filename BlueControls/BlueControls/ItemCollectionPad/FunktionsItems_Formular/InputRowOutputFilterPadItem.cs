@@ -84,6 +84,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
     public string Eingangs_Wert_Spalte {
         get => _eingangsWertSpalte;
         set {
+            if (IsDisposed) { return; }
             if (value == _eingangsWertSpalte) { return; }
             _eingangsWertSpalte = value;
             this.RaiseVersion();
@@ -97,6 +98,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
     public FilterTypeRowInputItem Filter {
         get => _filtertype;
         set {
+            if (IsDisposed) { return; }
             if (value == _filtertype) { return; }
             _filtertype = value;
             this.RaiseVersion();
@@ -110,6 +112,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
     public string Filter_Spalte {
         get => _filterSpalte;
         set {
+            if (IsDisposed) { return; }
             if (value == _filterSpalte) { return; }
             _filterSpalte = value;
             this.RaiseVersion();

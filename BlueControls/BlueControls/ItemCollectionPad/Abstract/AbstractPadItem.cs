@@ -84,6 +84,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
     public bool Bei_Export_sichtbar {
         get => _beiExportSichtbar;
         set {
+            if (IsDisposed) { return; }
             if (_beiExportSichtbar == value) { return; }
             _beiExportSichtbar = value;
             OnChanged();

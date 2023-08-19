@@ -62,6 +62,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
         get => _bei_Bedarf_Erzeugen;
 
         set {
+            if (IsDisposed) { return; }
             if (value == _bei_Bedarf_Erzeugen) { return; }
             _bei_Bedarf_Erzeugen = value;
             this.RaiseVersion();
@@ -85,6 +86,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
         get => _leere_Ordner_Löschen;
 
         set {
+            if (IsDisposed) { return; }
             if (value == _leere_Ordner_Löschen) { return; }
             _leere_Ordner_Löschen = value;
             this.RaiseVersion();
@@ -99,6 +101,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
         get => _pfad;
 
         set {
+            if (IsDisposed) { return; }
             if (value == _pfad) { return; }
             _pfad = value;
             this.RaiseVersion();

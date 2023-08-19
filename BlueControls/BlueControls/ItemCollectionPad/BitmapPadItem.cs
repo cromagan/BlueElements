@@ -161,6 +161,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
     }
 
     public bool ReplaceVariable(Variable variable) {
+        if (IsDisposed) { return false; }
         if (string.IsNullOrEmpty(Platzhalter_Für_Layout)) { return false; }
         if ("~" + variable.KeyName.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
         if (variable is not VariableBitmap vbmp) { return false; }
@@ -175,6 +176,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
     }
 
     public bool ResetVariables() {
+        if (IsDisposed) { return false; }
         if (!string.IsNullOrEmpty(Platzhalter_Für_Layout) && Bitmap != null) {
             Bitmap?.Dispose();
             Bitmap = null;

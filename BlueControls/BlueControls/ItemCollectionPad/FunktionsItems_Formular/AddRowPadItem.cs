@@ -60,6 +60,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
     public string Anzeige {
         get => _anzeige;
         set {
+            if (IsDisposed) { return; }
             if (_anzeige == value) { return; }
             _anzeige = value;
             OnChanged();

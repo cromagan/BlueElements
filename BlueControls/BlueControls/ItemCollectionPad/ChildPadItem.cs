@@ -73,6 +73,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     public string Name {
         get => _name;
         set {
+            if (IsDisposed) { return; }
             if (value == _name) { return; }
             _name = value;
             OnChanged();
@@ -254,6 +255,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public bool ReplaceVariable(Variable variable) {
+        if (IsDisposed) { return false; }
         if (PadInternal?.Item == null) { return false; }
         var b = PadInternal.Item.ParseVariable(variable);
         if (b) { OnChanged(); }
@@ -261,6 +263,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     }
 
     public bool ResetVariables() {
+        if (IsDisposed) { return false; }
         if (PadInternal?.Item == null) { return false; }
         var b = PadInternal.Item.ResetVariables();
         if (b) { OnChanged(); }

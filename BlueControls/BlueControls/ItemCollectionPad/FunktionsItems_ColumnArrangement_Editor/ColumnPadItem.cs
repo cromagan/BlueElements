@@ -197,6 +197,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     //}
 
     private void Column_Changed(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
         RemovePic();
         OnChanged();
     }

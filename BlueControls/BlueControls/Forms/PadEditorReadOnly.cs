@@ -54,6 +54,8 @@ public partial class PadEditorReadOnly : FormWithStatusBar {
             return;
         }
 
+        if (IsDisposed) { return; }
+
         var x = new List<string>();
 
         if (Pad?.Item != null) { x.AddRange(Pad.Item.AllPages()); }

@@ -101,6 +101,7 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
     public bool ChangeValues {
         get => _changeValues;
         set {
+            if (IsDisposed) { return; }
             if (_changeValues == value) { return; }
             _changeValues = value;
             OnChanged();
@@ -112,6 +113,7 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
     public ScriptEventTypes EventTypes {
         get => _eventTypes;
         set {
+            if (IsDisposed) { return; }
             if (_eventTypes == value) { return; }
             _eventTypes = value;
             OnChanged();
@@ -126,6 +128,7 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
     public bool ManualExecutable {
         get => _executable;
         set {
+            if (IsDisposed) { return; }
             if (_executable == value) { return; }
             _executable = value;
             OnChanged();
@@ -135,6 +138,7 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
     public string Name {
         get => KeyName;
         set {
+            if (IsDisposed) { return; }
             if (KeyName == value) { return; }
             KeyName = value;
             OnChanged();
@@ -144,6 +148,7 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
     public string Script {
         get => _script;
         set {
+            if (IsDisposed) { return; }
             if (_script == value) { return; }
             _script = value;
             OnChanged();

@@ -167,7 +167,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (database == null || database.IsDisposed) { return null; }
 
-        if (database.Row.IsNewRowPossible()) { return null; }
+        if (!database.Row.IsNewRowPossible()) { return null; }
 
         if (first == null) { return null; }
 

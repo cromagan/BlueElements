@@ -75,6 +75,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     public string Anzeige {
         get => _anzeige;
         set {
+            if (IsDisposed) { return; }
             if (_anzeige == value) { return; }
             _anzeige = value;
             OnChanged();
@@ -86,6 +87,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     public ÜberschriftAnordnung CaptionPosition {
         get => _überschriftanordung;
         set {
+            if (IsDisposed) { return; }
             if (_überschriftanordung == value) { return; }
             _überschriftanordung = value;
             OnChanged();
@@ -123,6 +125,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     public string Überschrift {
         get => _überschrift;
         set {
+            if (IsDisposed) { return; }
             if (_überschrift == value) { return; }
             _überschrift = value;
             OnChanged();

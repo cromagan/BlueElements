@@ -162,6 +162,8 @@ public class ItemAcceptFilter : ItemAcceptSomething {
     #region Methods
 
     public void CalculateInputColorIds(IItemAcceptFilter item) {
+        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
+
         var nl = item.CalculateColorIds();
 
         if (nl.IsDifferentTo(_inputColorId)) {

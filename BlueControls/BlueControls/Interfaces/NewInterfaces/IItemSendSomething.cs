@@ -128,6 +128,7 @@ public class ItemSendSomething {
     public ReadOnlyCollection<string> ChildIdsGet() => new(_childIds);
 
     public void ChildIdsSet(ReadOnlyCollection<string> value, IItemSendSomething item) {
+        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (!_childIds.IsDifferentTo(value)) { return; }
 
         _childIds.Clear();
@@ -138,6 +139,7 @@ public class ItemSendSomething {
     }
 
     public void DoCreativePadAddedToCollection(IItemSendSomething item) {
+        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (item.Parent != null) {
             item.OutputColorId = -1;
             item.OutputColorId = item.Parent.GetFreeColorId(item.Page);
@@ -149,6 +151,7 @@ public class ItemSendSomething {
     public int OutputColorIdGet() => _outputColorId;
 
     public void OutputColorIdSet(int value, IItemSendSomething item) {
+        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (_outputColorId == value) { return; }
 
         _outputColorId = value;
@@ -158,6 +161,7 @@ public class ItemSendSomething {
     public DatabaseAbstract? OutputDatabaseGet() => _outputDatabase;
 
     public void OutputDatabaseSet(DatabaseAbstract? value, IItemSendSomething item) {
+        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (value == _outputDatabase) { return; }
 
         _outputDatabase = value;

@@ -137,6 +137,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     }
 
     public override void OnChanged() {
+        if (IsDisposed) { return; }
         base.OnChanged();
         this.RaiseVersion();
     }
@@ -170,6 +171,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     }
 
     public void Sichtbarkeit() {
+        if (IsDisposed) { return; }
         ItemCollectionList.ItemCollectionList aa = new(true);
         aa.AddRange(Permission_AllUsed());
 

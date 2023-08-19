@@ -81,6 +81,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public ÜberschriftAnordnung CaptionPosition {
         get => _überschriftanordung;
         set {
+            if (IsDisposed) { return; }
             if (_überschriftanordung == value) { return; }
             this.RaiseVersion();
             _überschriftanordung = value;
@@ -95,6 +96,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             return _column;
         }
         set {
+            if (IsDisposed) { return; }
             var tmpn = value?.KeyName ?? string.Empty;
             if (_columnName == tmpn) { return; }
             _columnName = tmpn;
@@ -108,6 +110,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public EditTypeFormula EditType {
         get => _bearbeitung;
         set {
+            if (IsDisposed) { return; }
             if (_bearbeitung == value) { return; }
             this.RaiseVersion();
             _bearbeitung = value;
@@ -286,6 +289,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public void Spalte_bearbeiten() {
+        if (IsDisposed) { return; }
         if (Column == null || Column.IsDisposed) { return; }
         TableView.OpenColumnEditor(Column, null, null);
 
@@ -295,6 +299,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     //public bool Hintergrund_Weiß_Füllen { get; set; }
     [Description("Wählt die Spalte, die angezeigt werden soll.\r\nDiese bestimmt maßgeblich die Eigenschaften")]
     public void Spalte_wählen() {
+        if (IsDisposed) { return; }
+
         if (GetRowFrom == null) {
             MessageBox.Show("Zuerst Datenquelle wählen.");
             return;

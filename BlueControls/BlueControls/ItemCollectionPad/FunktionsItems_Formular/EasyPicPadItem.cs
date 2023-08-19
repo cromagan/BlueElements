@@ -60,6 +60,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         get => _bild_Dateiname;
 
         set {
+            if (IsDisposed) { return; }
             if (value == _bild_Dateiname) { return; }
             _bild_Dateiname = value;
             this.RaiseVersion();

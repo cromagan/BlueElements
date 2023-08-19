@@ -253,6 +253,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     public float GridShow {
         get => _gridShow;
         set {
+            if (IsDisposed) { return; }
             if (Math.Abs(_gridShow - value) < 0.00001) { return; }
             _gridShow = value;
             OnChanged();
@@ -266,6 +267,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     public float GridSnap {
         get => _gridsnap;
         set {
+            if (IsDisposed) { return; }
             if (Math.Abs(_gridsnap - value) < 0.00001) { return; }
             _gridsnap = value;
             OnChanged();
@@ -290,6 +292,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     public SizeF SheetSizeInMm {
         get => _sheetSizeInMm;
         set {
+            if (IsDisposed) { return; }
             if (Math.Abs(value.Width - _sheetSizeInMm.Width) < 0.0001 &&
                 Math.Abs(value.Height - _sheetSizeInMm.Height) < 0.0001) { return; }
             _sheetSizeInMm = new SizeF(value.Width, value.Height);
@@ -311,6 +314,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     public RowItem? SheetStyle {
         get => _sheetStyle;
         set {
+            if (IsDisposed) { return; }
             if (_sheetStyle == value) { return; }
             _sheetStyle = value;
             ApplyDesignToItems();
@@ -322,6 +326,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     public float SheetStyleScale {
         get => _sheetStyleScale;
         set {
+            if (IsDisposed) { return; }
             if (value < 0.1d) { value = 0.1f; }
             if (Math.Abs(_sheetStyleScale - value) < 0.0001) { return; }
             _sheetStyleScale = value;
@@ -334,6 +339,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     public SnapMode SnapMode {
         get => _snapMode;
         set {
+            if (IsDisposed) { return; }
             if (_snapMode == value) { return; }
             _snapMode = value;
             OnChanged();
@@ -568,6 +574,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     public void Remove(string internalname) => Remove(this[internalname]);
 
     public new void Remove(AbstractPadItem? item) {
+        if (IsDisposed) { return; }
         if (item == null || !Contains(item)) { return; }
         item.Changed -= Item_Changed;
         //item.CheckedChanged -= Item_CheckedChanged;
@@ -595,6 +602,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     }
 
     public bool ResetVariables() {
+        if (IsDisposed) { return false; }
         var did = false;
         foreach (var thisItem in this) {
             if (thisItem is ICanHaveVariablesItemLevel variables) {
@@ -629,6 +637,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     }
 
     public void Swap(int index1, int index2) {
+        if (IsDisposed) { return; }
         if (index1 == index2) { return; }
         //var l = ItemOrder.ToList();
         (this[index1], this[index2]) = (this[index2], this[index1]);
@@ -777,18 +786,21 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     }
 
     protected virtual void OnItemAdded(AbstractPadItem item) {
+        if (IsDisposed) { return; }
         ItemAdded?.Invoke(this, new ListEventArgs(item));
         OnChanged();
     }
 
     protected virtual void OnItemRemoved() {
         ItemRemoved?.Invoke(this, System.EventArgs.Empty);
+        if (IsDisposed) { return; }
         OnChanged();
     }
 
     protected virtual void OnItemRemoving(AbstractPadItem item) => ItemRemoving?.Invoke(this, new ListEventArgs(item));
 
     private void ApplyDesignToItems() {
+        if (IsDisposed) { return; }
         foreach (var thisItem in this) {
             thisItem?.ProcessStyleChange();
         }
@@ -816,6 +828,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
             Develop.DebugPrint_NichtImplementiert();
         }
 
+        if (IsDisposed) { return; }
         OnChanged();
     }
 

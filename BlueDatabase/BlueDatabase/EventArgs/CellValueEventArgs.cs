@@ -17,9 +17,6 @@
 
 #nullable enable
 
-using BlueDatabase.Enums;
-using System.Runtime.CompilerServices;
-
 namespace BlueDatabase.EventArgs;
 
 public class CellValueEventArgs : ColumnEventArgs {

@@ -78,6 +78,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
     public Alignment Ausrichtung {
         get => _ausrichtung;
         set {
+            if (IsDisposed) { return; }
             if (value == _ausrichtung) { return; }
             _ausrichtung = value;
             InvalidateText();
@@ -98,6 +99,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
     public string Text {
         get => _textOriginal;
         set {
+            if (IsDisposed) { return; }
             if (value == _textOriginal) { return; }
             _textOriginal = value;
             _textReplaced = value;
@@ -165,6 +167,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
     /// <param name="variable"></param>
     /// <returns></returns>
     public bool ReplaceVariable(Variable variable) {
+        if (IsDisposed) { return false; }
         var nt = variable.ReplaceInText(_textReplaced);
 
         if (nt is string txt) {
@@ -179,6 +182,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
     }
 
     public bool ResetVariables() {
+        if (IsDisposed) { return false; }
         if (_textOriginal == _textReplaced) { return false; }
         _textReplaced = _textOriginal;
         InvalidateText();

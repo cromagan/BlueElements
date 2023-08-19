@@ -402,6 +402,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     }
 
     private void Childs_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+        if (IsDisposed) { return; }
         _childs.Clear();
         _childs.AddRange(((ListBox)sender).Item.ToListOfString());
         OnChanged();
@@ -434,6 +435,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     }
 
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
         if (CFormula == null) { return; }
 
         foreach (var thisl in CFormula.NotAllowedChilds) {

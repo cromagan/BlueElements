@@ -931,6 +931,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     }
 
     private void PadData_Changed(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
         if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
         _saved = false;

@@ -137,6 +137,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public ColumnItem? Column {
         get => _column;
         set {
+            if (IsDisposed) { return; }
             if (value == _column) { return; }
             _column = value;
             OnChanged();
@@ -151,6 +152,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public FilterType FilterType {
         get => _filterType;
         set {
+            if (IsDisposed) { return; }
             if (value == _filterType) { return; }
             _filterType = value;
             OnChanged();
@@ -166,6 +168,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     #region Methods
 
     public void Changeto(FilterType type, IEnumerable<string> searchvalue) {
+        if (IsDisposed) { return; }
         var l = new List<string>();
         l.AddRange(searchvalue);
 
@@ -176,6 +179,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     }
 
     public void Changeto(FilterType type, string searchvalue) {
+        if (IsDisposed) { return; }
         SearchValue = new List<string> { searchvalue }.AsReadOnly();
 
         _filterType = type;

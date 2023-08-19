@@ -95,6 +95,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     #region Methods
 
     public new void Add(FilterItem filter) {
+        if (IsDisposed) { return; }
         filter.Changed += Filter_Changed;
         base.Add(filter);
         OnChanged();
@@ -205,6 +206,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     }
 
     public void Remove(FilterItem filterItem, bool throwChangedEvent) {
+        if (IsDisposed) { return; }
         if (Remove(filterItem)) {
             if (throwChangedEvent) {
                 OnChanged();
@@ -236,6 +238,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     }
 
     public void RemoveRange(List<FilterItem> filter) {
+        if (IsDisposed) { return; }
         var did = false;
         foreach (var thisItem in filter) {
             if (Contains(thisItem)) {
@@ -277,7 +280,10 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         }
     }
 
-    private void Filter_Changed(object sender, System.EventArgs e) => OnChanged();
+    private void Filter_Changed(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        OnChanged();
+    }
 
     #endregion
 }

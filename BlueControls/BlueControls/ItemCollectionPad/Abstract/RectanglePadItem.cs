@@ -74,6 +74,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
     public int Drehwinkel {
         get => _drehwinkel;
         set {
+            if (IsDisposed) { return; }
             if (_drehwinkel == value) { return; }
             _drehwinkel = value;
             OnChanged();

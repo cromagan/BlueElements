@@ -59,6 +59,7 @@ public static class ItemAcceptRowExtensions {
 
     [Description("Wählt ein Zeilen-Objekt, aus der die Werte kommen.")]
     public static void Datenquelle_wählen(this IItemAcceptRow item) {
+        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (item.Parent is null) { return; }
 
         var x = new ItemCollectionList.ItemCollectionList(false);
@@ -106,6 +107,7 @@ public class ItemAcceptRow : ItemAcceptSomething {
     #region Methods
 
     public void CalculateInputColorIds(IItemAcceptRow item) {
+        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         var nl = item.CalculateColorIds();
 
         if (nl.IsDifferentTo(_inputColorId)) {
@@ -115,6 +117,7 @@ public class ItemAcceptRow : ItemAcceptSomething {
     }
 
     public void DoCreativePadAddedToCollection(IItemAcceptRow item) {
+        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         GetRowFromGet(item)?.DoChilds();
         item.OnChanged();
     }
@@ -138,6 +141,7 @@ public class ItemAcceptRow : ItemAcceptSomething {
     }
 
     public void GetRowFromSet(IItemSendRow? value, IItemAcceptRow item) {
+        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         var f = GetRowFromGet(item);
 
         if (f == value) { return; }

@@ -76,6 +76,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     public ÜberschriftAnordnung CaptionPosition {
         get => _überschriftanordung;
         set {
+            if (IsDisposed) { return; }
             if (_überschriftanordung == value) { return; }
             _überschriftanordung = value;
             OnChanged();
@@ -98,6 +99,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     public string Überschrift {
         get => _überschrift;
         set {
+            if (IsDisposed) { return; }
             if (_überschrift == value) { return; }
             _überschrift = value;
             OnChanged();
@@ -109,6 +111,7 @@ public class VariableFieldPadItem : FakeControlPadItem, IReadableText, IItemAcce
     public string Variable {
         get => _variable;
         set {
+            if (IsDisposed) { return; }
             if (_variable == value) { return; }
             _variable = value;
             OnChanged();

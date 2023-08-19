@@ -120,6 +120,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     public Design Design {
         get => _design;
         set {
+            if (IsDisposed) { return; }
             if (value == _design) { return; }
             _design = value;
 
@@ -152,6 +153,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
             return _tmpHtmlText;
         }
         set {
+            if (IsDisposed) { return; }
             if (HtmlText == value) { return; }
             ConvertTextToChar(value, true);
             OnChanged();
@@ -180,6 +182,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     public States State {
         get => _state;
         set {
+            if (IsDisposed) { return; }
             if (value == _state) { return; }
             _state = value;
 
@@ -198,6 +201,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     public Size TextDimensions {
         get => _textDimensions;
         set {
+            if (IsDisposed) { return; }
             if (_textDimensions.Width == value.Width && _textDimensions.Height == value.Height) { return; }
             _textDimensions = value;
             ResetPosition(false);
@@ -208,6 +212,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     public float Zeilenabstand {
         get => _zeilenabstand;
         set {
+            if (IsDisposed) { return; }
             if (Math.Abs(value - _zeilenabstand) < 0.01) { return; }
             _zeilenabstand = value;
             ResetPosition(false);
@@ -968,6 +973,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     }
 
     private void ResetPosition(bool andTmpText) {
+        if (IsDisposed) { return; }
         _width = null;
         _height = null;
 
