@@ -1676,12 +1676,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         foreach (var thisRow in rowdata) {
             if (thisRow.Row != null) { r.Add(thisRow.Row); }
         }
-        return RefreshRowData(r, refreshAlways, null);
+        return RefreshRowData(r, refreshAlways);
     }
 
-    public abstract (bool didreload, string errormessage) RefreshRowData(List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows);
+    public abstract (bool didreload, string errormessage) RefreshRowData(List<RowItem> row, bool refreshAlways);
 
-    public (bool didreload, string errormessage) RefreshRowData(List<string> keys, bool refreshAlways, List<RowItem>? sortedRows) {
+    public (bool didreload, string errormessage) RefreshRowData(List<string> keys, bool refreshAlways) {
         if (keys.Count == 0) { return (false, string.Empty); }
 
         var r = new List<RowItem>();
@@ -1689,10 +1689,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             var ro = Row.SearchByKey(thisK);
             if (ro != null) { r.Add(ro); }
         }
-        return RefreshRowData(r, refreshAlways, sortedRows);
+        return RefreshRowData(r, refreshAlways);
     }
 
-    public (bool didreload, string errormessage) RefreshRowData(RowItem row, bool refreshAlways, List<RowItem>? sortedRows) => RefreshRowData(new List<RowItem> { row }, refreshAlways, sortedRows);
+    public (bool didreload, string errormessage) RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem> { row }, refreshAlways);
 
     public virtual void RepairAfterParse() {
         Column.Repair();

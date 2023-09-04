@@ -1393,26 +1393,29 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 foreach (var thisRow in sortedRowData) {
                     if (thisRow?.Row is RowItem r) {
                         if (IsOnScreen(thisRow, displayRectangleWoSlider)) {
-                            _ = rowsToRefreh.AddIfNotExists(r);
+                            if (r.IsInCache == null) { _ = rowsToRefreh.AddIfNotExists(r); }
+
                             var T = sortedRowData.IndexOf(thisRow);
                             firstVisibleRow = Math.Min(T, firstVisibleRow);
                             lastVisibleRow = Math.Max(T, lastVisibleRow);
                         }
 
-                        if (sortedRows.Count < 300) {
-                            // 300 reichen, sonst dauerts so lange
-                            _ = sortedRows.AddIfNotExists(r);
-                        }
+                        //if (sortedRows.Count < 300) {
+                        //    // 300 reichen, sonst dauerts so lange
+                        //    _ = sortedRows.AddIfNotExists(r);
+                        //}
                     }
                 }
 
-                (bool didreload, string errormessage) = Database.RefreshRowData(rowsToRefreh, false, sortedRows);
+                _ = RowCollection.FillUp100(rowsToRefreh, sortedRowData);
+
+                (bool didreload, string errormessage) = Database.RefreshRowData(rowsToRefreh, false);
 
                 if (!string.IsNullOrEmpty(errormessage)) {
                     FormWithStatusBar.UpdateStatusBar(FehlerArt.Warnung, errormessage, true);
                 }
-
                 if (!didreload || count > 15) { break; }
+
                 Invalidate_SortedRowData();
             } while (true);
 

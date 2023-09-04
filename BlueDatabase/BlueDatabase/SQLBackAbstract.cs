@@ -369,7 +369,7 @@ public abstract class SqlBackAbstract {
     /// <param name="refreshAlways">Bei TRUE wird die gesamte Zeile aktualistert, weil evtl. eine Änderung aufgetreten ist. Bei FLASE werden nur die fehlenden Daten der noch nicht geladenen Spalten nachgeladen.</param>
     /// <param name="sortedRows"></param>
     /// <param name="trycount"></param>
-    public string LoadRow(string tablename, List<RowItem> row, bool refreshAlways, List<RowItem>? sortedRows) {
+    public string LoadRow(string tablename, List<RowItem> row, bool refreshAlways) {
         if (!IsValidTableName(tablename, true)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
             throw new Exception();
@@ -397,8 +397,6 @@ public abstract class SqlBackAbstract {
         }
 
         #endregion
-
-        _ = db.Row.FillUp100(row, sortedRows);
 
         #region Alle spalten da?
 

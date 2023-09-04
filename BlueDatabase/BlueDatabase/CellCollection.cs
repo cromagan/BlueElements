@@ -507,7 +507,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var cellKey = KeyOfCell(column, row);
 
             if (column.IsInCache == null) {
-                var (_, errormessage) = Database.RefreshRowData(row, false, null);
+                var (_, errormessage) = Database.RefreshRowData(row, false);
                 if (!string.IsNullOrEmpty(errormessage)) {
                     Database.OnDropMessage(FehlerArt.Fehler, errormessage);
                 }

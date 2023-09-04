@@ -597,7 +597,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!script.AllOk) {
             Database.OnScriptError(new RowCancelEventArgs(this, script.ProtocolText));
             if (script.ScriptHasSystaxError) {
-                Database.EventScriptErrorMessage = script.ProtocolText;
+                Database.EventScriptErrorMessage = "Zeile: " + CellFirstString() + "\r\n\r\n" + script.ProtocolText;
             }
 
             DoingScript = false;

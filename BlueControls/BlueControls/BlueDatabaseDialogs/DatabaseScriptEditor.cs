@@ -53,6 +53,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         if (!string.IsNullOrEmpty(Database.EventScriptErrorMessage)) {
             var l = new List<string>();
+            l.Add("### ACHTUNG - EINMALIGE ANZEIGE ###");
+            l.Add("Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.");
+            l.Add("Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.");
+            l.Add(" ");
+            l.Add(" ");
             l.Add("Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:");
             l.Add(" ");
             l.Add(Database.EventScriptErrorMessage);

@@ -249,6 +249,13 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         if (!need) { return; }
 
+        foreach (var thisColumn in Column) {
+            if (thisColumn.IsInCache == null && !columns.Contains(thisColumn)) {
+                columns.Add(thisColumn);
+                if (columns.Count > 2) { break; }
+            }
+        }
+
         OnDropMessage(FehlerArt.Info, "Lade " + columns.Count + " Spalte(n) der Datenbank '" + TableName + "' nach.");
 
         try {
@@ -261,7 +268,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         OnDropMessage(FehlerArt.Info, string.Empty);
     }
 
-    public override (bool didreload, string errormessage) RefreshRowData(List<RowItem> rows, bool refreshAlways, List<RowItem>? sortedRows) {
+    public override (bool didreload, string errormessage) RefreshRowData(List<RowItem> rows, bool refreshAlways) {
         if (rows == null || rows.Count == 0) { return (false, string.Empty); }
 
         var l = new List<RowItem>();
@@ -275,6 +282,15 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (l.Count == 0) { return (false, string.Empty); }
         l = l.Distinct().ToList();
 
+        if (!refreshAlways || l.Count > 50) {
+            foreach (var thisr in Row) {
+                if (thisr.IsInCache == null && !l.Contains(thisr)) {
+                    l.Add(thisr);
+                    if (l.Count > 50) { break; }
+                }
+            }
+        }
+
         //Row.DoLinkedDatabase(rows);
 
         OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) der Datenbank '" + TableName + "' nach.");
@@ -282,10 +298,10 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (_sql == null) { return (false, "SQL Verbindung fehlerhaft"); }
 
         try {
-            return (true, _sql.LoadRow(TableName, l, refreshAlways, sortedRows));
+            return (true, _sql.LoadRow(TableName, l, refreshAlways));
         } catch {
             Develop.CheckStackForOverflow();
-            return RefreshRowData(rows, refreshAlways, sortedRows);
+            return RefreshRowData(rows, refreshAlways);
         }
     }
 
@@ -499,7 +515,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 }
             }
 
-            var (_, errormessage) = RefreshRowData(rk, true, null);
+            var (_, errormessage) = RefreshRowData(rk, true);
             if (!string.IsNullOrEmpty(errormessage)) {
                 OnDropMessage(FehlerArt.Fehler, errormessage);
             }

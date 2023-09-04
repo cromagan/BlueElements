@@ -127,7 +127,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             return _internal.Values.FirstOrDefault(thisRow => thisRow != null && thisRow.MatchesTo(filter));
 
-            //FilterCollection d = new(filter[0].Database);
+            //FilterCollection d = new(filter[0].database);
             //d.AddRange(filter);
             //return this[d];
         }
@@ -136,6 +136,33 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Füllt die Liste rowsToExpand auf, bis sie 100 Einträge enthält.
+    /// </summary>
+    /// <param name="rowsToExpand"></param>
+    /// <param name="sortedRows"></param>
+    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
+    public static bool FillUp100(List<RowItem> rowsToExpand, List<RowData> sortedRows) {
+        if (rowsToExpand.Count is > 99 or 0) { return false; }
+
+        if (rowsToExpand[0].IsDisposed) { return false; }
+        if (rowsToExpand[0].Database is not DatabaseAbstract db) { return false; }
+        if (db.IsDisposed) { return false; }
+
+        if (sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
+
+        var tmpRowsToExpand = new List<RowItem>();
+        tmpRowsToExpand.AddRange(rowsToExpand);
+
+        foreach (var thisRow in tmpRowsToExpand) {
+            var all = FillUp(rowsToExpand, thisRow, sortedRows, (100 / tmpRowsToExpand.Count) + 1);
+            if (all) { return true; }
+            if (rowsToExpand.Count > 200) { return false; }
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// Erstellt eine neue Spalte mit den aus den Filterkriterien. Nur Filter IstGleich wird unterstützt.
@@ -374,7 +401,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         });
 
-        //foreach (var thisRowItem in Database.Row) {
+        //foreach (var thisRowItem in database.Row) {
         //    if (thisRowItem != null) {
         //        if (thisRowItem.MatchesTo(filter) || pinnedRows.Contains(thisRowItem)) {
         //            _tmpVisibleRows.GenerateAndAdd(thisRowItem);
@@ -449,7 +476,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var rows = CalculateVisibleRows(filter, pinned);
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
-        Database.RefreshRowData(rows, false, null);
+        Database.RefreshRowData(rows, false);
 
         var txt = "Skript wird ausgeführt: " + scriptname;
 
@@ -513,48 +540,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         _executingchangedrows = false;
     }
 
-    //                var x = dbl.RefreshRowData(key, false, null);
-    //                if (!string.IsNullOrEmpty(x.Item2)) {
-    //                    Database.OnDropMessage(FehlerArt.Fehler, x.Item2);
-    //                    return x.Item2;
-    //                }
-    //            }
-    //        }
-    //    }
-    //    return string.Empty;
-    //}
-    /// <summary>
-    /// Füllt die Liste row auf, bis sie 100 Einträge enthält.
-    /// </summary>
-    /// <param name="row"></param>
-    /// <param name="sortedRows"></param>
-    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
-    public bool FillUp100(List<RowItem> row, List<RowItem>? sortedRows) {
-        if (row.Count is > 99 or 0) { return false; }
-
-        if (Database is not DatabaseAbstract db) { return false; }
-        if (db.IsDisposed) { return false; }
-
-        sortedRows ??= new List<RowItem>();
-
-        sortedRows.AddRange(db.Row.CalculateFilteredRows(null)); // ALLE Zeilen hinzufügen, nicht dass der Filter auf nein paar beschränkt ist und mehr laden könnte.
-
-        if (sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
-
-        var r = new List<RowItem>();
-        r.AddRange(row);
-
-        foreach (var thisRow in r) {
-            var all = FillUp(row, thisRow, sortedRows, (100 / r.Count) + 1);
-            if (all) {
-                //DoLinkedDatabase(row);
-                return true;
-            }
-        }
-        //DoLinkedDatabase(row);
-        return false;
-    }
-
     //                    if (LongTryParse(s, out var v)) { key.Add(v); }
     //                }
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null && !thisRowItem.IsDisposed);
@@ -569,8 +554,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return GenerateAndAdd(s, valueOfCellInFirstColumn, true, true, comment);
     }
 
-    //                foreach (var thisRow in row) {
-    //                    var s = Database.Cell.GetStringBehindLinkedValue(thisColumn, thisRow);
+    //                foreach (var thisRow in rowsToExpand) {
+    //                    var s = database.Cell.GetStringBehindLinkedValue(thisColumn, thisRow);
     /// <summary>
     ///
     /// </summary>
@@ -645,7 +630,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    List<DatabaseAbstract> done = new();
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
-    //    if (Database is not DatabaseAbstract db) { return "Verlinkung zur Datenbank fehlhlerhaft"; }
+    //    if (database is not DatabaseAbstract db) { return "Verlinkung zur Datenbank fehlhlerhaft"; }
     //    if (db.IsDisposed) { return "Datenbank verworfen"; }
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
@@ -655,8 +640,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return false;
     }
 
-    //public string DoLinkedDatabase(List<RowItem> row) {
-    //    if (row.Count == 0) { return string.Empty; }
+    //public string DoLinkedDatabase(List<RowItem> rowsToExpand) {
+    //    if (rowsToExpand.Count == 0) { return string.Empty; }
     public void InvalidateAllCheckData() {
         foreach (var thisRow in this) {
             thisRow.InvalidateCheckData();
@@ -714,7 +699,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         //{
         //    if (thisrowitem != null)
         //    {
-        //        var D = thisrowitem.CellGetDateTime(Database.Column.SysRowCreateDate());
+        //        var D = thisrowitem.CellGetDateTime(database.Column.SysRowCreateDate());
         //        if (DateTime.UtcNow.Subtract(D).TotalHours > InHours) { x.GenerateAndAdd(thisrowitem.KeyName); }
         //    }
         //}
@@ -787,7 +772,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     //        default:
     //            if (type.ToString(false) == ((int)type).ToString(false)) {
-    //                Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + Database.Filename);
+    //                Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + database.Filename);
     //            } else {
     //                return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
     //            }
@@ -824,7 +809,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (type == DatabaseDataType.Comand_RemoveRow) {
-            //var row = SearchByKey(key);
+            //var rowsToExpand = SearchByKey(key);
             if (row == null || row.IsDisposed) { return "Zeile nicht vorhanden"; }
 
             OnRowRemoving(new RowReasonEventArgs(row, reason));
@@ -840,6 +825,61 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         return "Befehl unbekannt";
+    }
+
+    /// <summary>
+    /// Füllt die Liste rowsToExpand um expandCount Einträge auf. Ausgehend von rowToCheck
+    /// </summary>
+    /// <param name="rowsToExpand"></param>
+    /// <param name="rowToCheck"></param>
+    /// <param name="sortedRows"></param>
+    /// <param name="expandCount"></param>
+    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
+    private static bool FillUp(List<RowItem> rowsToExpand, RowItem rowToCheck, List<RowData> sortedRows, int expandCount) {
+        var indexPosition = -1;
+
+        for (var z = 0; z < sortedRows.Count; z++) {
+            var tmpr = sortedRows[z];
+            if (!tmpr.MarkYellow && tmpr.Row == rowToCheck) { indexPosition = z; break; }
+        }
+
+        if (indexPosition == -1) { return false; } // Wie bitte?
+
+        var modi = 0;
+
+        while (expandCount > 0) {
+            modi++;
+            var n1 = indexPosition - modi;
+            var n2 = indexPosition + modi;
+
+            if (n1 < 0 && n2 >= sortedRows.Count) { return true; }
+
+            #region Zeile "vorher" prüfen und aufnehmen
+
+            if (n1 >= 0) {
+                var tmpr = sortedRows[n1].Row;
+                if (!tmpr.IsDisposed && tmpr.IsInCache == null && !rowsToExpand.Contains(tmpr)) {
+                    rowsToExpand.Add(tmpr);
+                    expandCount--;
+                }
+            }
+
+            #endregion
+
+            #region Zeile "nachher" prüfen und aufnehmen
+
+            if (n2 < sortedRows.Count) {
+                var tmpr = sortedRows[n2].Row;
+                if (tmpr.IsInCache == null && !rowsToExpand.Contains(tmpr)) {
+                    rowsToExpand.Add(tmpr);
+                    expandCount--;
+                }
+            }
+
+            #endregion
+        }
+
+        return false;
     }
 
     /// <summary>
@@ -868,46 +908,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             // TODO: Große Felder auf NULL setzen
             IsDisposed = true;
         }
-    }
-
-    /// <summary>
-    /// Füllt die Liste row um count Einträge auf. Ausgehend von thisrow
-    /// </summary>
-    /// <param name="row"></param>
-    /// <param name="thisrow"></param>
-    /// <param name="sortedRows"></param>
-    /// <param name="count"></param>
-    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
-    private bool FillUp(List<RowItem> row, RowItem thisrow, List<RowItem> sortedRows, int count) {
-        var num = sortedRows.IndexOf(thisrow);
-        if (num == -1) { return false; } // Wie bitte?
-
-        var c = 1;
-
-        while (count > 0) {
-            var n1 = num - c;
-
-            if (n1 >= 0) {
-                if (sortedRows[n1].IsInCache == null && !row.Contains(sortedRows[n1])) {
-                    row.Add(sortedRows[n1]);
-                    count--;
-                }
-            }
-
-            var n2 = num + c;
-
-            if (n2 < sortedRows.Count) {
-                if (sortedRows[n2].IsInCache == null && !row.Contains(sortedRows[n2])) {
-                    row.Add(sortedRows[n2]);
-                    count--;
-                }
-            } else {
-                return true;
-            }
-            c++;
-        }
-
-        return false;
     }
 
     //internal void Repair() {
