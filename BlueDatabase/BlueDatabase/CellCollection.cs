@@ -908,11 +908,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         //if (changeSysColumns) {
         DoSpecialFormats(column, row, oldValue, false);
-        if (dbtmp.Column.SysRowChanger is ColumnItem src) { SystemSet(src, row, user, user, datetimeutc); }
-        if (dbtmp.Column.SysRowChangeDate is ColumnItem scd) { SystemSet(scd, row, datetimeutc.ToString(Constants.Format_Date7), user, datetimeutc); }
+        if (dbtmp.Column.SysRowChanger is ColumnItem src && src != column) { SystemSet(src, row, user, user, datetimeutc); }
+        if (dbtmp.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SystemSet(scd, row, datetimeutc.ToString(Constants.Format_Date7), user, datetimeutc); }
 
         if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-            if (dbtmp.Column.SysRowState is ColumnItem srs) { SystemSet(srs, row, string.Empty, user, datetimeutc); }
+            if (dbtmp.Column.SysRowState is ColumnItem srs && srs != column) { SystemSet(srs, row, string.Empty, user, datetimeutc); }
         }
         //}
 

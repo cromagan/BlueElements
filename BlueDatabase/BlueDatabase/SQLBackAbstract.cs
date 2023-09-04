@@ -692,11 +692,12 @@ public abstract class SqlBackAbstract {
             if (type != DatabaseDataType.SystemValue) {
                 var l = new List<CellValueEventArgs>();
                 l.Add(new CellValueEventArgs(column, value));
-                if (db.Column.SysRowChangeDate is ColumnItem srd) { l.Add(new CellValueEventArgs(srd, datetimeutc.ToString(Format_Date7))); }
-                if (db.Column.SysRowChanger is ColumnItem src) { l.Add(new CellValueEventArgs(src, user)); }
+
+                if (db.Column.SysRowChangeDate is ColumnItem srd && column != srd) { l.Add(new CellValueEventArgs(srd, datetimeutc.ToString(Format_Date7))); }
+                if (db.Column.SysRowChanger is ColumnItem src && column != src) { l.Add(new CellValueEventArgs(src, user)); }
 
                 if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                    if (db.Column.SysRowState is ColumnItem srs) { l.Add(new CellValueEventArgs(srs, string.Empty)); }
+                    if (db.Column.SysRowState is ColumnItem srs && column != srs) { l.Add(new CellValueEventArgs(srs, string.Empty)); }
                 }
                 return SetCellValue(db.TableName, row.KeyName, l);
             }

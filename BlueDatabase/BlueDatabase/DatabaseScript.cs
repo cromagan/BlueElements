@@ -225,6 +225,8 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
             if (_needRow) { return "Routinen nach dem Laden einer Datenbank, dürfen sich nicht auf Zeilen beziehen."; }
         }
 
+        if (_needRow && !Database.isRowScriptPossible(false)) { return "Zeilenskripte in dieser Datenbank nicht möglich"; }
+
         return string.Empty;
     }
 

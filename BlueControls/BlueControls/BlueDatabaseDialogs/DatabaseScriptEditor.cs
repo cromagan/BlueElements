@@ -75,7 +75,6 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     public DatabaseScript? Item {
         get {
             if (Database == null || Database.IsDisposed) { return null; }
-
             return _item;
         }
         set {
@@ -145,12 +144,19 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
 
+        var didMessage = false;
+
         lstEventScripts.Item.Clear();
         if (Database == null || Database.IsDisposed) { return; }
 
         foreach (var thisSet in Database.EventScript) {
             if (thisSet != null) {
                 _ = lstEventScripts.Item.Add(thisSet);
+
+                if (!didMessage && thisSet.NeedRow && !Database.isRowScriptPossible(false)) {
+                    didMessage = true;
+                    EnableScript();
+                }
             }
         }
     }
@@ -208,21 +214,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         if (Database == null || Database.IsDisposed) { return; }
 
         if (chkZeile.Checked && !Database.isRowScriptPossible(false)) {
-            var s = MessageBox.Show("Dazu werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
-
-            if (s == 1) {
-                chkZeile.Checked = false;
-                return;
-            }
-
-            Database.EnableScript();
-
-            if (!Database.isRowScriptPossible(false)) {
-                MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
-
-                chkZeile.Checked = false;
-                return;
-            }
+            if (!EnableScript()) { chkZeile.Checked = false; }
+            return;
         }
 
         Item.NeedRow = chkZeile.Checked;
@@ -234,6 +227,22 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void Database_Disposing(object sender, System.EventArgs e) {
         RemoveDatabase();
         Close();
+    }
+
+    private bool EnableScript() {
+        if (Database == null || Database.IsDisposed) { return false; }
+
+        var s = MessageBox.Show("Für Zeilenskripte werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
+
+        if (s == 1) { return false; }
+
+        Database.EnableScript();
+
+        if (!Database.isRowScriptPossible(false)) {
+            MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
+            return false;
+        }
+        return true;
     }
 
     private void eventScriptEditor_ExecuteScript(object sender, BlueScript.EventArgs.ScriptEventArgs e) {

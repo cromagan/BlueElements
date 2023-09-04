@@ -17,6 +17,7 @@
 
 #nullable enable
 
+
 namespace BlueDatabase.EventArgs;
 
 public class CellValueEventArgs : ColumnEventArgs {

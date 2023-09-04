@@ -482,14 +482,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         _executingchangedrows = true;
 
         while (_pendingChangedRows.Count > 0) {
-            if (IsDisposed) { _executingchangedrows = false; return; }
-            if (Database == null || Database.IsDisposed) { _executingchangedrows = false; return; }
+            if (IsDisposed) { break; }
+            if (Database == null || Database.IsDisposed) { break; }
 
-            if (!Database.isRowScriptPossible(true)) { _executingchangedrows = false; return; }
+            if (!Database.isRowScriptPossible(true)) { break; }
 
             var e = new CancelEventArgs(false);
             Database.OnCanDoScript(e);
-            if (e.Cancel) { _executingchangedrows = false; return; }
+            if (e.Cancel) { break; }
 
             try {
                 var key = _pendingChangedRows[0];
@@ -498,7 +498,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (r != null && !r.IsDisposed) {
                     var ok = r.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, true, true, 2);
 
-                    if (!ok.AllOk) { _executingchangedrows = false; return; }
+                    if (!ok.AllOk) { break; }
 
                     r.InvalidateCheckData();
                     r.CheckRowDataIfNeeded();
