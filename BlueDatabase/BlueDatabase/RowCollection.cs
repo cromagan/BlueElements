@@ -599,8 +599,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (fullprocessing) {
-            if (db.Column.SysRowCreator is ColumnItem src) { db.Cell.SystemSet(src, item, u, u, d); }
-            if (db.Column.SysRowCreateDate is ColumnItem scd) { db.Cell.SystemSet(scd, item, d.ToString(Constants.Format_Date5), u, d); }
+            if (db.Column.SysRowCreator is ColumnItem src) { item.CellSet(src,  u); }
+            if (db.Column.SysRowCreateDate is ColumnItem scd) { item.CellSet(scd, d.ToString(Constants.Format_Date5)); }
 
             // Dann die Inital-Werte reinschreiben
             foreach (var thisColum in db.Column) {
