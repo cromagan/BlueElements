@@ -45,7 +45,6 @@ using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
-[Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanDropMessages {
 
@@ -91,7 +90,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private string _createDate = string.Empty;
 
     private string _creator = string.Empty;
-
     private string _eventScriptErrorMessage;
     private string _eventScriptTmp = string.Empty;
 
@@ -99,9 +97,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private int _eventScriptVersion;
 
     private double _globalScale;
-
     private string _globalShowPass = string.Empty;
-
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -109,6 +105,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
+    private string _temporaryDatabaseMasterTimeUTC = string.Empty;
+    private string _temporaryDatabaseMasterUser = string.Empty;
     private string _variableTmp = string.Empty;
 
     private string _zeilenQuickInfo = string.Empty;
@@ -174,7 +172,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public static List<ConnectionInfo> Allavailabletables { get; } = new();
 
-    [Browsable(false)]
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
     public string AdditionalFilesPfad {
         get => _additionalFilesPfad;
@@ -186,7 +183,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    [Browsable(false)]
     public string CachePfad {
         get => _cachePfad;
         set {
@@ -196,7 +192,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    [Browsable(false)]
     [Description("Der Name der Datenbank.")]
     public string Caption {
         get => _caption;
@@ -221,7 +216,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public abstract ConnectionInfo ConnectionData { get; }
 
-    [Browsable(false)]
     public string CreateDate {
         get => _createDate;
         set {
@@ -230,7 +224,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    [Browsable(false)]
     public string Creator {
         get => _creator.Trim();
         set {
@@ -264,7 +257,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    [Browsable(false)]
     public string EventScriptErrorMessage {
         get => _eventScriptErrorMessage;
         set {
@@ -273,7 +265,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    [Browsable(false)]
     public int EventScriptVersion {
         get => _eventScriptVersion;
         set {
@@ -282,7 +273,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    [Browsable(false)]
     public double GlobalScale {
         get => _globalScale;
         set {
@@ -300,15 +290,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    //[Browsable(false)]
-    //[Description("Welche Spalte bei Columnfirst zurückgegeben wird")]
-    //public string FirstColumn {
-    //    get => _firstColumn;
-    //    set {
-    //        if (_firstColumn == value) { return; }
-    //        ChangeData(DatabaseDataType.FirstColumn, null, null, _firstColumn, value, string.Empty);
-    //    }
-    //}
     public bool HasPendingChanges { get; protected set; } = false;
 
     public bool IsDisposed { get; private set; }
@@ -353,7 +334,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public RowCollection Row { get; }
 
-    [Browsable(false)]
     public RowSortDefinition? SortDefinition {
         get => _sortDefinition;
         set {
@@ -371,7 +351,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// <summary>
     /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
     /// </summary>
-    [Browsable(false)]
     [Description("Das standardmäßige Formular - dessen Dateiname -, das angezeigt werden soll.")]
     public string StandardFormulaFile {
         get => _standardFormulaFile;
@@ -388,6 +367,22 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         set {
             if (!_tags.IsDifferentTo(value)) { return; }
             _ = ChangeData(DatabaseDataType.Tags, null, null, _tags.JoinWithCr(), value.JoinWithCr(), string.Empty, UserName, DateTime.UtcNow);
+        }
+    }
+
+    public string TemporaryDatabaseMasterTimeUTC {
+        get => _temporaryDatabaseMasterTimeUTC;
+        private set {
+            if (_temporaryDatabaseMasterTimeUTC == value) { return; }
+            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, null, null, _temporaryDatabaseMasterTimeUTC, value, string.Empty, UserName, DateTime.UtcNow);
+        }
+    }
+
+    public string TemporaryDatabaseMasterUser {
+        get => _temporaryDatabaseMasterUser.Trim();
+        private set {
+            if (_temporaryDatabaseMasterUser == value) { return; }
+            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterUser, null, null, _temporaryDatabaseMasterUser, value, string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -408,7 +403,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public int VorhalteZeit { get; set; } = 30;
 
-    [Browsable(false)]
     public string ZeilenQuickInfo {
         get => _zeilenQuickInfo;
         set {
@@ -765,6 +759,17 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
+
+    public bool AmITemporaryMaster() {
+        if (TemporaryDatabaseMasterUser != UserName) { return false; }
+
+        var d = DateTimeParse(TemporaryDatabaseMasterTimeUTC);
+
+        // Info:
+        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
+        // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
+        return DateTime.UtcNow.Subtract(d).TotalMinutes is > 5 and < 55;
+    }
 
     /// <summary>
     /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
@@ -1138,8 +1143,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>
-                //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-                Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
+                    //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+                    Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
     public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, List<RowData>? sortedRows) {
         columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
@@ -1884,6 +1889,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 _createDate = value;
                 break;
 
+            case DatabaseDataType.TemporaryDatabaseMasterUser:
+                _temporaryDatabaseMasterUser = value;
+                break;
+
+            case DatabaseDataType.TemporaryDatabaseMasterTimeUTC:
+                _temporaryDatabaseMasterTimeUTC = value;
+                break;
+
             case DatabaseDataType.DatabaseAdminGroups:
                 _datenbankAdmin.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                 break;
@@ -2094,6 +2107,24 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     protected void OnLoading() {
         if (IsDisposed) { return; }
         Loading?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    /// <summary>
+    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Datenbank von der Festplatte eingelesen wurden.
+    /// </summary>
+    protected void TryToSetMeTemporaryMaster() {
+        if (ReadOnly) { return; }
+        if (!IsAdministrator()) { return; }
+        if (!isRowScriptPossible(true)) { return; }
+
+        if (AmITemporaryMaster()) { return; }
+
+        var d = DateTimeParse(TemporaryDatabaseMasterTimeUTC);
+
+        if (DateTime.UtcNow.Subtract(d).TotalMinutes < 60 && !string.IsNullOrEmpty(TemporaryDatabaseMasterUser)) { return; }
+
+        TemporaryDatabaseMasterUser = UserName;
+        TemporaryDatabaseMasterTimeUTC = DateTime.UtcNow.ToString(Format_Date5);
     }
 
     private void Checker_Tick(object state) {

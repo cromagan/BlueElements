@@ -228,9 +228,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public string CellGetCompareKey(ColumnItem column) => Database?.Cell.CompareKey(column, this) ?? string.Empty;
 
-    public DateTime CellGetDateTime(string columnName) => Database?.Cell.GetDateTime(Database?.Column[columnName], this) ?? default;
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="columnName"></param>
+    /// <returns>DateTime.MinValue bei Fehlern</returns>
+    public DateTime CellGetDateTime(string columnName) => Database?.Cell.GetDateTime(Database?.Column[columnName], this) ?? DateTime.MinValue;
 
-    public DateTime CellGetDateTime(ColumnItem? column) => Database?.Cell.GetDateTime(column, this) ?? default;
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="columnName"></param>
+    /// <returns>DateTime.MinValue bei Fehlern</returns>
+    public DateTime CellGetDateTime(ColumnItem? column) => Database?.Cell.GetDateTime(column, this) ?? DateTime.MinValue;
 
     public double CellGetDouble(string columnName) => Database?.Cell.GetDouble(Database?.Column[columnName], this) ?? default;
 
@@ -549,6 +559,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
     }
 
+    internal bool AmIChanger() {
+        if (IsDisposed) { return false; }
+        if (Database == null || Database.IsDisposed) { return false; }
+
+        return Database.Column.SysRowChanger is ColumnItem src && CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase);
+    }
+
     internal bool NeedDataCheck() {
         if (Database == null || Database.IsDisposed) { return false; }
         return Database.Row.NeedDataCheck(KeyName);
@@ -557,6 +574,18 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
     internal void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
+
+    internal double RowChangedXMinutesAgo() {
+        if (IsDisposed) { return -1; }
+        if (Database == null || Database.IsDisposed) { return -1; }
+
+        if (Database.Column.SysRowChangeDate is not ColumnItem src) { return -1; }
+
+        var v = CellGetDateTime(src);
+        if (v == DateTime.MinValue) { return -1; }
+
+        return DateTime.UtcNow.Subtract(v).TotalMinutes;
+    }
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
         if (e.Row != this) { return; }

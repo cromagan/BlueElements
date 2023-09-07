@@ -116,14 +116,15 @@ public static class Converter {
     }
 
     /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird DateTime.Now zurückgegeben.
+    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird DateTime.UtcNow zurückgegeben.
     /// </summary>
     /// <param name="s"></param>
     /// <returns></returns>
     public static DateTime DateTimeParse(string s) {
+        if (string.IsNullOrEmpty(s)) { return DateTime.UtcNow; }
         if (DateTimeTryParse(s, out var result)) { return result; }
         Develop.DebugPrint(FehlerArt.Warnung, "Datum kann nicht geparsed werden: " + s);
-        return DateTime.Now;
+        return DateTime.UtcNow;
     }
 
     public static bool DateTimeTryParse(string? s, out DateTime result) {

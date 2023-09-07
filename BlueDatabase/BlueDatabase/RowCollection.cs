@@ -43,7 +43,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private readonly List<BackgroundWorker> _pendingworker = new();
     private bool _executingbackgroundworks;
     private bool _executingchangedrows;
-    private bool _throwEvents = true;
 
     #endregion
 
@@ -88,14 +87,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public DatabaseAbstract? Database { get; private set; }
 
     public bool IsDisposed { get; private set; }
-
-    public bool ThrowEvents {
-        get => !IsDisposed && _throwEvents;
-        set {
-            if (_throwEvents == value) { Develop.DebugPrint(FehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
-            _throwEvents = value;
-        }
-    }
 
     public long VisibleRowCount { get; private set; }
 
@@ -234,12 +225,29 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         } while (true);
     }
 
-    public void AddRowWithChangedValue(string rowkey) {
+    public void AddRowWithChangedValue(RowItem? row, bool onlyIfMaster) {
         if (Database == null || Database.IsDisposed) { return; }
+        if (row == null || row.IsDisposed) { return; }
 
         if (!Database.isRowScriptPossible(true)) { return; }
 
-        _ = _pendingChangedRows.AddIfNotExists(rowkey);
+        if (!onlyIfMaster) {
+            _ = _pendingChangedRows.AddIfNotExists(row.KeyName);
+            return;
+        }
+
+        var IsMyRow = row.AmIChanger();
+        var Age = row.RowChangedXMinutesAgo();
+
+        if (IsMyRow && Age > 0 && Age < 60) {
+            _ = _pendingChangedRows.AddIfNotExists(row.KeyName);
+            return;
+        }
+
+        if (Database.AmITemporaryMaster() && Age is < 0 or > 120) {
+            _ = _pendingChangedRows.AddIfNotExists(row.KeyName);
+            return;
+        }
     }
 
     /// <summary>
@@ -599,7 +607,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (fullprocessing) {
-            if (db.Column.SysRowCreator is ColumnItem src) { item.CellSet(src,  u); }
+            if (db.Column.SysRowCreator is ColumnItem src) { item.CellSet(src, u); }
             if (db.Column.SysRowCreateDate is ColumnItem scd) { item.CellSet(scd, d.ToString(Constants.Format_Date5)); }
 
             // Dann die Inital-Werte reinschreiben
@@ -789,8 +797,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     internal void OnRowRemoving(RowReasonEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
         e.Row.DoSpecialRules -= OnDoSpecialRules;
-
-        if (!_throwEvents) { return; }
         RowRemoving?.Invoke(this, e);
     }
 
@@ -902,7 +908,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
             if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
             Database = null;
-            _throwEvents = false;
             _internal.Clear();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
@@ -920,28 +925,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //}
     private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
 
-    private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) {
-        if (!_throwEvents) { return; }
-        DoSpecialRules?.Invoke(this, e);
-    }
+    private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
     private void OnRowAdded(RowReasonEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
         e.Row.DoSpecialRules += OnDoSpecialRules;
 
-        if (!_throwEvents) { return; }
         RowAdded?.Invoke(this, e);
     }
 
-    private void OnRowChecked(object sender, RowCheckedEventArgs e) {
-        if (!_throwEvents) { return; }
-        RowChecked?.Invoke(this, e);
-    }
+    private void OnRowChecked(object sender, RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
 
-    private void OnRowRemoved() {
-        if (!_throwEvents) { return; }
-        RowRemoved?.Invoke(this, System.EventArgs.Empty);
-    }
+    private void OnRowRemoved() => RowRemoved?.Invoke(this, System.EventArgs.Empty);
 
     private void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         var rk = (string)e.Argument;

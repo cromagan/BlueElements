@@ -74,6 +74,8 @@ public sealed class Database : DatabaseAbstract {
         } else if (stream != null) {
             LoadFromStream(stream);
         }
+
+        TryToSetMeTemporaryMaster();
     }
 
     #endregion
@@ -274,8 +276,6 @@ public sealed class Database : DatabaseAbstract {
     // Dateibasierte Systeme haben immer den Undo-Speicher
 
     public static void Parse(byte[] data, DatabaseAbstract db, NeedPassword? needPassword) {
-        db.Column.ThrowEvents = false;
-        db.Row.ThrowEvents = false;
         var pointer = 0;
 
         ColumnItem? column = null;
@@ -391,8 +391,6 @@ public sealed class Database : DatabaseAbstract {
         //Works?.AddRange(oldPendings);
         //oldPendings?.Clear();
         //ExecutePending();
-        db.Column.ThrowEvents = true;
-        db.Row.ThrowEvents = true;
 
         //if (db != null && db.Column.Count > 0 && string.IsNullOrEmpty(db.FirstColumn)) {
         //    db.FirstColumn = Col
@@ -508,6 +506,10 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.Creator, db.Creator);
             SaveToByteList(l, DatabaseDataType.CreateDateUTC, db.CreateDate);
             SaveToByteList(l, DatabaseDataType.Caption, db.Caption);
+
+            SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
+            SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUTC);
+
             //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString(false));
             //SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString(false));
             SaveToByteList(l, DatabaseDataType.Tags, db.Tags.JoinWithCr());

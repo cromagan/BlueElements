@@ -417,11 +417,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         //}
     }
 
-    public bool GetBoolean(string columnName, RowItem? row) => GetBoolean(Database?.Column[columnName], row);
-
     public bool GetBoolean(ColumnItem? column, RowItem? row) => GetString(column, row).FromPlusMinus();// Main Method
-
-    public Color GetColor(string columnName, RowItem? row) => GetColor(Database?.Column[columnName], row);
 
     public Color GetColor(ColumnItem? column, RowItem? row) => Color.FromArgb(GetInteger(column, row)); // Main Method
 
@@ -433,35 +429,26 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return (colorBlue << 16) | (colorGreen << 8) | colorRed;
     }
 
-    public DateTime GetDateTime(string columnName, RowItem? row) => GetDateTime(Database?.Column[columnName], row);
-
-    public DateTime GetDateTime(ColumnItem? column, RowItem? row) // Main Method
-    {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <returns>DateTime.MinValue bei Fehlern</returns>
+    public DateTime GetDateTime(ColumnItem? column, RowItem? row) {
         var @string = GetString(column, row);
-        return string.IsNullOrEmpty(@string) ? default : DateTimeTryParse(@string, out var d) ? d : default;
+        return string.IsNullOrEmpty(@string) ? default : DateTimeTryParse(@string, out var d) ? d : DateTime.MinValue;
     }
 
-    public double GetDouble(string columnName, RowItem? row) => GetDouble(Database?.Column[columnName], row);
-
-    public double GetDouble(ColumnItem? column, RowItem? row) // Main Method
-    {
+    public double GetDouble(ColumnItem? column, RowItem? row) {
         var x = GetString(column, row);
         return string.IsNullOrEmpty(x) ? 0 : DoubleParse(x);
     }
 
-    public int GetInteger(string columnName, RowItem? row) => GetInteger(Database?.Column[columnName], row);
-
-    public int GetInteger(ColumnItem? column, RowItem? row) // Main Method
-    {
+    public int GetInteger(ColumnItem? column, RowItem? row) {
         var x = GetString(column, row);
         return string.IsNullOrEmpty(x) ? 0 : IntParse(x);
     }
 
-    public List<string> GetList(string columnName, RowItem? row) => GetList(Database?.Column[columnName], row);
-
     public List<string> GetList(ColumnItem? column, RowItem? row) => GetString(column, row).SplitAndCutByCrToList();// Main Method
-
-    public Point GetPoint(string columnName, RowItem? row) => GetPoint(Database?.Column[columnName], row);
 
     public Point GetPoint(ColumnItem? column, RowItem? row) // Main Method
     {
@@ -478,8 +465,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         return null;
     }
-
-    public string GetString(string columnName, RowItem? row) => GetString(Database?.Column[columnName], row);
 
     public string GetString(ColumnItem? column, RowItem? row) // Main Method
     {
@@ -539,8 +524,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var cellKey = KeyOfCell(column.KeyName, row.KeyName);
         return !ContainsKey(cellKey) || string.IsNullOrEmpty(this[cellKey].Value);
     }
-
-    public bool IsNullOrEmpty(string columnName, RowItem? row) => IsNullOrEmpty(Database?.Column[columnName], row);
 
     public bool IsNullOrEmpty(string cellKey) {
         DataOfCellKey(cellKey, out var column, out var row);
@@ -637,8 +620,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    public void Set(string columnName, RowItem? row, string value) => Set(Database?.Column[columnName], row, value);
-
     public void Set(ColumnItem? column, RowItem? row, string value) // Main Method
     {
         if (Database == null || Database.IsDisposed) {
@@ -666,29 +647,15 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         SetValueBehindLinkedValue(column, row, value, UserName, DateTime.UtcNow);
     }
 
-    public void Set(string columnName, RowItem? row, bool value) => Set(Database?.Column[columnName], row, value.ToPlusMinus());
-
     public void Set(ColumnItem? column, RowItem? row, bool value) => Set(column, row, value.ToPlusMinus());
-
-    public void Set(string columnName, RowItem? row, DateTime value) => Set(Database?.Column[columnName], row, value.ToString(Constants.Format_Date5));
 
     public void Set(ColumnItem? column, RowItem? row, DateTime value) => Set(column, row, value.ToString(Constants.Format_Date5));
 
-    public void Set(string columnName, RowItem? row, List<string>? value) => Set(Database?.Column[columnName], row, value);
-
     public void Set(ColumnItem? column, RowItem? row, List<string>? value) => Set(column, row, value.JoinWithCr());
-
-    public void Set(string columnName, RowItem? row, Point value) => Set(Database?.Column[columnName], row, value);
 
     public void Set(ColumnItem? column, RowItem? row, Point value) => Set(column, row, value.ToString());
 
-    public void Set(string columnName, RowItem? row, int value) => Set(Database?.Column[columnName], row, value.ToString());
-
-    // Main Method// {X=253,Y=194} MUSS ES SEIN, prüfen
-
     public void Set(ColumnItem? column, RowItem? row, int value) => Set(column, row, value.ToString());
-
-    public void Set(string columnName, RowItem? row, double value) => Set(Database?.Column[columnName], row, value.ToString(Constants.Format_Float1));
 
     public void Set(ColumnItem? column, RowItem? row, double value) => Set(column, row, value.ToString(Constants.Format_Float1));
 
@@ -739,7 +706,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (reason != Reason.LoadReload) {
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                Database?.Row.AddRowWithChangedValue(row.KeyName);
+                Database?.Row.AddRowWithChangedValue(row, false);
             }
             //if (!row.NeedDataCheck()) {
             //    DoSpecialFormats(column, row);

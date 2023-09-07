@@ -38,8 +38,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     private readonly ConcurrentDictionary<string, ColumnItem> _internal = new();
 
-    private bool _throwEvents = true;
-
     #endregion
 
     #region Constructors
@@ -92,6 +90,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? SysLocked { get; private set; }
 
+    /// <summary>
+    /// Wichtige Spalte auch für Zeilenskripte:
+    /// Vor einem Zeilenskript wird der Status der Zeile geloggt. Wird die Zeile während es Skriptes
+    /// verändert, wird das Skript abgebrochen
+    /// </summary>
     public ColumnItem? SysRowChangeDate { get; private set; }
 
     public ColumnItem? SysRowChanger { get; private set; }
@@ -101,14 +104,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public ColumnItem? SysRowCreator { get; private set; }
 
     public ColumnItem? SysRowState { get; private set; }
-
-    public bool ThrowEvents {
-        get => !IsDisposed && _throwEvents;
-        set {
-            if (_throwEvents == value) { Develop.DebugPrint(FehlerArt.Fehler, "Set ThrowEvents-Fehler! " + value.ToPlusMinus()); }
-            _throwEvents = value;
-        }
-    }
 
     #endregion
 
@@ -522,8 +517,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     internal void OnColumnRemoving(ColumnReasonEventArgs e) {
         e.Column.Changed -= OnColumnChanged;
-
-        if (!_throwEvents) { return; }
         ColumnRemoving?.Invoke(this, e);
     }
 
@@ -589,7 +582,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             }
             if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
             Database = null;
-            _throwEvents = false;
             _internal.Clear();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
@@ -617,20 +609,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     private void OnColumnAdded(ColumnReasonEventArgs e) {
         e.Column.Changed += OnColumnChanged;
-
-        if (!_throwEvents) { return; }
         ColumnAdded?.Invoke(this, e);
     }
 
-    private void OnColumnChanged(object sender, System.EventArgs e) {
-        if (!_throwEvents) { return; }
-        ColumnInternalChanged?.Invoke(this, new ColumnEventArgs((ColumnItem)sender));
-    }
+    private void OnColumnChanged(object sender, System.EventArgs e) => ColumnInternalChanged?.Invoke(this, new ColumnEventArgs((ColumnItem)sender));
 
-    private void OnColumnRemoved() {
-        if (!_throwEvents) { return; }
-        ColumnRemoved?.Invoke(this, System.EventArgs.Empty);
-    }
+    private void OnColumnRemoved() => ColumnRemoved?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

@@ -78,6 +78,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         Initialize();
         LoadFromSqlBack();
+
+        TryToSetMeTemporaryMaster();
     }
 
     #endregion
@@ -138,6 +140,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                             foreach (var thisdb in db) {
                                 thisdb.DoLastChanges(erg);
+                                thisdb.TryToSetMeTemporaryMaster();
                             }
                         }
                     }
@@ -249,12 +252,12 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         if (!need) { return; }
 
-        foreach (var thisColumn in Column) {
-            if (thisColumn.IsInCache == null && !columns.Contains(thisColumn)) {
-                columns.Add(thisColumn);
-                if (columns.Count > 2) { break; }
-            }
-        }
+        //foreach (var thisColumn in Column) {
+        //    if (thisColumn.IsInCache == null && !columns.Contains(thisColumn)) {
+        //        columns.Add(thisColumn);
+        //        if (columns.Count > 2) { break; }
+        //    }
+        //}
 
         OnDropMessage(FehlerArt.Info, "Lade " + columns.Count + " Spalte(n) der Datenbank '" + TableName + "' nach.");
 
@@ -282,11 +285,11 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (l.Count == 0) { return (false, string.Empty); }
         l = l.Distinct().ToList();
 
-        if (!refreshAlways || l.Count > 50) {
+        if (l.Count < 50) {
             foreach (var thisr in Row) {
                 if (thisr.IsInCache == null && !l.Contains(thisr)) {
                     l.Add(thisr);
-                    if (l.Count > 50) { break; }
+                    if (l.Count >= 100) { break; }
                 }
             }
         }
@@ -549,8 +552,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         //Develop.DebugPrint(FehlerArt.DevelopInfo, "Loading++");
 
         try {
-            Column.ThrowEvents = false;
-            Row.ThrowEvents = false;
 
             #region Spalten richtig stellen
 
@@ -631,17 +632,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             _ = _sql?.CloseConnection();
 
-            //Row.RemoveNullOrEmpty();
             Cell.RemoveOrphans();
-
-            //_checkedAndReloadNeed = false;
-            Column.ThrowEvents = true;
-            Row.ThrowEvents = true;
         } catch {
-            //if (_loadingCount < 1) { Develop.DebugPrint("Loading <0!"); }
-            //_loadingCount--;
-            Column.ThrowEvents = true;
-            Row.ThrowEvents = true;
             LoadFromSqlBack();
             return;
         }

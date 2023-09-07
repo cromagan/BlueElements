@@ -2734,9 +2734,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     if (Database?.Column.SysRowState is ColumnItem srs && currentRow.Row.CellGetInteger(srs) != Database.EventScriptVersion && Database.isRowScriptPossible(true)) {
                         gr.FillRectangle(BrushRedTransparent, cellrectangle);
 
-                        if (Database?.Column.SysRowChanger is ColumnItem src && currentRow.Row.CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase)) {
-                            Database?.Row.AddRowWithChangedValue(currentRow.Row.KeyName);
-                        }
+                        Database?.Row.AddRowWithChangedValue(currentRow.Row, true);
                     }
                 }
 
@@ -2925,6 +2923,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             if (Database?.HasPendingChanges ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
             if (Database?.ReadOnly ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8); }
+            if (Database?.AmITemporaryMaster() ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0,0); }
         } catch {
             Invalidate();
             //Develop.DebugPrint(ex);
