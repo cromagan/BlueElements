@@ -358,7 +358,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         if (IsDisposed) { return string.Empty; }
 
         try {
-            if (!this.IsOk()) { return string.Empty; }
+            // Für FlexiForFilter werden auch "ungültige" Filter benötigt
+            // z.B. Instr ohn Text
+            //if (!this.IsOk()) { return string.Empty; }
 
             var result = new List<string>();
             result.ParseableAdd("ID", KeyName);

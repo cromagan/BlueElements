@@ -350,15 +350,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
 
     #region Indexers
 
-    public AbstractPadItem? this[string @internal] {
-        get {
-            if (string.IsNullOrEmpty(@internal)) {
-                return null;
-            }
-
-            return this.FirstOrDefault(thisItem => thisItem != null && string.Equals(@internal, thisItem.KeyName, StringComparison.OrdinalIgnoreCase));
-        }
-    }
+    public AbstractPadItem? this[string keyname] => this.Get(keyname);
 
     public List<AbstractPadItem> this[int x, int y] => this[new Point(x, y)];
 

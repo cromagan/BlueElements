@@ -122,9 +122,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         }
         if (_isFilling) { return; }
         _isFilling = true;
-        //btnAdmin.Visible = _TableView != null && _TableView.Database != null && _TableView.Database.IsAdministrator();
-        //btnPin.Enabled = !_AutoPin;
-        //btnPin.Visible = !_AutoPin;
+
         btnPinZurück.Enabled = _tableView?.Database != null && _tableView.PinnedRows != null && _tableView.PinnedRows.Count > 0;
 
         #region ZeilenFilter befüllen
@@ -136,7 +134,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             ? _tableView.Filter.RowFilterText
             : string.Empty;
 
-        #endregion ZeilenFilter befüllen
+        #endregion
 
         var consthe = btnAlleFilterAus.Height;
 
@@ -149,10 +147,8 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         var right = constwi + Skin.PaddingSmal;
         var anchor = AnchorStyles.Top | AnchorStyles.Left;
         var down = 0;
-        //breakafter = btnAdmin.Left;
-        //afterBreakAddY = txbZeilenFilter.Height + Skin.Padding;
 
-        #endregion Variablen für Waagerecht / Senkrecht bestimmen
+        #endregion
 
         List<FlexiControlForFilter> flexsToDelete = new();
 
@@ -162,7 +158,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             if (thisControl is FlexiControlForFilter flx) { flexsToDelete.Add(flx); }
         }
 
-        #endregion Vorhandene Flexis ermitteln
+        #endregion
 
         var cu = _tableView?.CurrentArrangement;
 
@@ -170,37 +166,27 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         if (_tableView?.Database != null && _tableView.Filter != null) {
             List<ColumnItem> columSort = new();
-            ColumnViewCollection? orderArrangement = null;
-            foreach (var thisArr in _tableView.Database.ColumnArrangements) {
-                if (string.Equals(thisArr.KeyName, AnsichtName, StringComparison.OrdinalIgnoreCase)) {
-                    orderArrangement = thisArr;
-                }
-            }
-
-            orderArrangement ??= cu;
+            ColumnViewCollection? orderArrangement = _tableView.Database.ColumnArrangements.Get(AnsichtName);
 
             #region Reihenfolge der Spalten bestimmen
 
             if (orderArrangement != null) {
                 foreach (var thisclsVitem in orderArrangement) {
-                    if (thisclsVitem?.Column != null) {
-                        _ = columSort.AddIfNotExists(thisclsVitem.Column);
-                    }
+                    if (thisclsVitem?.Column is ColumnItem ci) { _ = columSort.AddIfNotExists(ci); }
                 }
             }
 
             if (cu != null) {
                 foreach (var thisclsVitem in cu) {
-                    if (thisclsVitem?.Column != null) {
-                        _ = columSort.AddIfNotExists(thisclsVitem.Column);
-                    }
+                    if (thisclsVitem?.Column is ColumnItem ci) { _ = columSort.AddIfNotExists(ci); }
                 }
             }
+
             foreach (var thisColumn in _tableView.Database.Column) {
                 _ = columSort.AddIfNotExists(thisColumn);
             }
 
-            #endregion Reihenfolge der Spalten bestimmen
+            #endregion
 
             foreach (var thisColumn in columSort) {
                 var showMe = false;
@@ -215,7 +201,9 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                     if (viewItemCurrent != null && filterItem != null && Filtertypes.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { showMe = true; }
                 }
 
-                #endregion Sichtbarkeit des Filterelemts bestimmen
+                #endregion
+
+
 
                 if (filterItem == null && showMe) {
                     // Dummy-Filter, nicht in der Collection
@@ -223,6 +211,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                         : thisColumn.FilterOptions == FilterOptions.Enabled_OnlyOrAllowed ? new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroßKleinEgal, string.Empty)
                         : new FilterItem(thisColumn, FilterType.Instr_GroßKleinEgal, string.Empty);
                 }
+
                 if (filterItem != null && showMe) {
                     var flx = FlexiItemOf(filterItem);
                     if (flx != null) {
@@ -247,7 +236,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             }
         }
 
-        #endregion Neue Flexis erstellen / updaten
+        #endregion
 
         #region Unnötige Flexis löschen
 
@@ -470,14 +459,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     }
 
     private void GetÄhnlich() {
-        _ähnliche = null;
-        if (_tableView?.Database != null && !string.IsNullOrEmpty(_ähnlicheAnsichtName)) {
-            foreach (var thisArr in _tableView.Database.ColumnArrangements) {
-                if (string.Equals(thisArr.KeyName, _ähnlicheAnsichtName, StringComparison.OrdinalIgnoreCase)) {
-                    _ähnliche = thisArr;
-                }
-            }
-        }
+        _ähnliche = _tableView?.Database?.ColumnArrangements.Get(_ähnlicheAnsichtName);
         DoÄhnlich();
     }
 

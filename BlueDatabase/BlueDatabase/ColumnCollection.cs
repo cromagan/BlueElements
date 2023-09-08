@@ -122,9 +122,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     #region Methods
 
     public string Add(ColumnItem column, Reason reason) {
-        foreach (var thisc in this) {
-            if (thisc.KeyName.Equals(column.KeyName, StringComparison.OrdinalIgnoreCase)) { return "Hinzufügen fehlgeschlagen."; }
-        }
+        if (Exists(column.KeyName) != null) { return "Hinzufügen fehlgeschlagen."; }
 
         if (!_internal.TryAdd(column.KeyName, column)) { return "Hinzufügen fehlgeschlagen."; }
 
@@ -146,6 +144,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //}
     public ColumnItem? Exists(string? columnName) {
         if (Database == null || Database.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
+
         try {
             columnName = columnName.ToUpper();
             var col = _internal.ContainsKey(columnName) ? _internal[columnName] : null;

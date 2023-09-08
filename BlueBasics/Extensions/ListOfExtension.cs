@@ -114,6 +114,8 @@ public static partial class Extensions {
     }
 
     public static T? Get<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
+        if(string.IsNullOrEmpty(name)) { return default; }
+
         if (items != null) {
             return items.FirstOrDefault(thisp =>
                 thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase));
