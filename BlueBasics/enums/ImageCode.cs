@@ -71,7 +71,6 @@ public enum ImageCode {
     InDenHintergrund,
     InDenVordergrund,
     Information,
-    Istgleich,
     Kalender,
     Kamera,
     Kamm,

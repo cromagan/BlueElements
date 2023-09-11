@@ -124,7 +124,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public bool FormatierungErlaubt {
         get => _formatierungErlaubt;
         set {
-            if (value == FormatierungErlaubt) { return; }
+            if (value == _formatierungErlaubt) { return; }
             _formatierungErlaubt = value;
             GenerateEtxt(false);
         }
@@ -192,7 +192,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     [DefaultValue("")]
     public new string Text {
-        get => _eTxt == null || IsDisposed ? string.Empty : _formatierungErlaubt ? _eTxt.HtmlText : _eTxt.PlainText;
+        get => IsDisposed ? string.Empty : _formatierungErlaubt ? _eTxt.HtmlText : _eTxt.PlainText;
         set {
             if (IsDisposed) { return; }
             if (!string.IsNullOrEmpty(value)) {
@@ -201,19 +201,22 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             }
 
             if (_formatierungErlaubt) {
-                if (_eTxt != null && value == _eTxt.HtmlText) { return; }
+                if (value == _eTxt.HtmlText) { return; }
             } else {
-                if (_eTxt != null && value == _eTxt.PlainText) { return; }
+                if (value == _eTxt.PlainText) { return; }
             }
+
             AbortSpellChecking();
 
             lock (Dictionary.LockSpellChecking) {
                 GenerateEtxt(true);
+
                 if (_formatierungErlaubt) {
                     _eTxt.HtmlText = value;
                 } else {
                     _eTxt.PlainText = value;
                 }
+
                 Invalidate();
                 CheckIfTextIsChanded(value);
             }
@@ -350,11 +353,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         return false;
     }
 
-    //public new void Focus() {
-    //    if (Focused()) { return; }
-    //    base.Focus();
-    //}
-
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         AbortSpellChecking();
 
@@ -420,7 +418,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         CheckIfTextIsChanded(_eTxt.HtmlText);
     }
 
-    public void Mark(MarkState markstate, int first, int last) => _eTxt?.Mark(markstate, first, last);
+    public void Mark(MarkState markstate, int first, int last) => _eTxt.Mark(markstate, first, last);
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
@@ -441,9 +439,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         return true;
     }
 
-    public void Unmark(MarkState markstate) => _eTxt?.Unmark(markstate);
-
-    // Tastatur
+    public void Unmark(MarkState markstate) => _eTxt.Unmark(markstate);
 
     internal new void KeyPress(AsciiKey keyAscii) {
         // http://www.manderby.com/informatik/allgemeines/ascii.php
@@ -506,8 +502,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             return (bool)Invoke(new Func<bool>(() => WordStarts(word, position)));
         }
         try {
-            //if (_eTxt == null) { GenerateEtxt(true); }
-            //if (_eTxt == null) { return false; }
             if (position + word.Length > _eTxt.Count + 1) { return false; }
             if (position > 0 && !_eTxt[position - 1].IsWordSeperator()) { return false; }
             if (position + word.Length < _eTxt.Count && !_eTxt[position + word.Length].IsWordSeperator()) { return false; }
@@ -520,7 +514,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        //if (_eTxt == null) { GenerateETXT(true); }
         //if (state == enStates.Checked_Disabled) {
         //    Develop.DebugPrint("Checked Disabled");
         //    state = enStates.Checked_Disabled;
@@ -591,14 +584,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
 
         if (sliderVisible) {
-            GetSlider();
-            _sliderY.Visible = true;
-            _sliderY.Width = 18;
-            _sliderY.Height = Height;
-            _sliderY.Left = Width - _sliderY.Width;
-            _sliderY.Top = 0;
-            _eTxt.DrawingPos = _eTxt.DrawingPos with { Y = (int)-_sliderY.Value };
-            _sliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
+            GenerateSlider();
+            if (_sliderY != null) {
+                _sliderY.Visible = true;
+                _sliderY.Width = 18;
+                _sliderY.Height = Height;
+                _sliderY.Left = Width - _sliderY.Width;
+                _sliderY.Top = 0;
+                _eTxt.DrawingPos = _eTxt.DrawingPos with { Y = (int)-_sliderY.Value };
+                _sliderY.Maximum = _eTxt.Height() + 16 - DisplayRectangle.Height;
+            }
         } else {
             if (_sliderY != null) {
                 _sliderY.Visible = false;
@@ -651,7 +646,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     protected override void OnGotFocus(System.EventArgs e) {
         base.OnGotFocus(e);
         if (!Enabled) { return; }
-        if (_eTxt == null) { GenerateEtxt(true); }
+
         if (!FloatingForm.IsShowing(this)) {
             SetCursorToEnd();
             if (!_eTxt.Multiline) { if (!ContainsMouse() || !MousePressing()) { MarkAll(); } }
@@ -752,7 +747,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
-        if (_eTxt == null) { return; }
         if (e.Button != MouseButtons.Left) { return; }
         if (!Enabled) { return; }
         _lastUserActionForSpellChecking = DateTime.UtcNow;
@@ -857,9 +851,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    private void CheckIfTextIsChanded(string newPlainText) {
-        if (newPlainText == _lastCheckedText) { return; }
-        _lastCheckedText = newPlainText;
+    private void CheckIfTextIsChanded(string newText) {
+        if (newText == _lastCheckedText) { return; }
+        _lastCheckedText = newText;
         if (Dictionary.DictionaryRunning(!DesignMode)) { _mustCheck = true; }
         OnTextChanged();
     }
@@ -877,7 +871,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private void Clipboard_Paste() {
         // VORSICHT!
         // Seltsames Verhalten von VB.NET
-        // Anscheinend wird bei den Clipboard operationen ein DoEventXsx ausgelöst.
+        // Anscheinend wird bei den Clipboard operationen ein DoEvents ausgelöst.
         // Dadurch kommt es zum Refresh des übergeordneten Steuerelementes, warscheinlich der Textbox.
         // Deshalb  muss 'Char_DelBereich' NACH den Clipboard-Operationen stattfinden.
         if (!Clipboard.ContainsText()) { return; }
@@ -891,7 +885,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// </summary>
     /// <remarks></remarks>
     private int Cursor_PosAt(double pixX, double pixY) {
-        if (_eTxt == null) { return -1; }
         // Das geht am Einfachsten....
         if (pixX < _eTxt.DrawingPos.X && pixY < _eTxt.DrawingPos.Y) { return 0; }
         pixX = Math.Max(pixX, _eTxt.DrawingPos.X);
@@ -977,10 +970,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    private void GetSlider() {
-        if (_sliderY != null) {
-            return;
-        }
+    private void GenerateSlider() {
+        if (_sliderY != null) { return; }
+
         _sliderY = new Slider {
             Dock = DockStyle.Right,
             LargeChange = 10f,
@@ -1059,7 +1051,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// <param name="swapThem">Bei True werden MarkStart und MarkEnd richtig angeordnet. (Start kleiner/gleich End) </param>
     /// <remarks></remarks>
     private void Selection_Repair(bool swapThem) {
-        if (_eTxt == null || _eTxt.Count == 0) { MarkClear(); }
+        if (_eTxt.Count == 0) { MarkClear(); }
         if (_markStart < 0 && _markEnd < 0) { return; }
 
         _markStart = Math.Max(_markStart, 0);
@@ -1067,14 +1059,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         _markEnd = Math.Max(_markEnd, 0);
         _markEnd = Math.Min(_markEnd, _eTxt.Count);
-
         if (swapThem && _markStart > _markEnd) {
             Generic.Swap(ref _markStart, ref _markEnd);
         }
     }
 
     private void Selection_WortMarkieren(int pos) {
-        if (_eTxt == null || _eTxt.Count == 0) {
+        if (_eTxt.Count == 0) {
             MarkClear();
             return;
         }
@@ -1085,12 +1076,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void SetCursorToEnd() {
-        if (_eTxt == null) {
-            // Beim Durchtabben...
-            _cursorCharPos = -1;
-        } else {
-            _cursorCharPos = _eTxt.Count;
-        }
+        _cursorCharPos = _eTxt.Count;
+
         _cursorVisible = true;
     }
 
@@ -1105,7 +1092,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (!_spellChecking) { return; }
 
             if (!Dictionary.DictionaryRunning(!DesignMode)) { return; }
-            if (_eTxt == null) { return; }
 
             var pos = 0;
             var woEnd = -1;
@@ -1118,7 +1104,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                         if (SpellChecker.CancellationPending) { return; }
 
                         pos = Math.Max(woEnd + 1, pos + 1);
-                        if (_eTxt == null) { return; }// Das Textfeld ist spontan geschlossen worden.
 
                         if (pos >= _eTxt.Count) { break; }
 

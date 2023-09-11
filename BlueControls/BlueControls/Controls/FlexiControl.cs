@@ -58,25 +58,42 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected DateTime? LastTextChange;
 
     private readonly bool _translateCaption = true;
+
     private AdditionalCheck _additionalCheck = AdditionalCheck.None;
+
     private string _allowedChars = string.Empty;
+
+    private bool _alwaysInstantChange = false;
+
     private string _caption = string.Empty;
+
     private Caption? _captionObject;
+
     private ÜberschriftAnordnung _captionPosition = ÜberschriftAnordnung.ohne;
 
     // None ist -1 und muss gesetzt sein!
     private int _controlX = -1;
 
     private string _disabledReason = string.Empty;
+
     private EditTypeFormula _editType;
+
     private bool _formatierungErlaubt;
+
     private Caption? _infoCaption;
+
     private string _infoText = string.Empty;
+
     private int _maxTextLenght = 4000;
+
     private bool _multiLine;
+
     private string _regex = string.Empty;
+
     private bool _showInfoWhenDisabled;
+
     private bool _spellChecking;
+
     private string _suffix = string.Empty;
 
     #endregion
@@ -141,6 +158,19 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (_allowedChars == value) { return; }
             _allowedChars = value;
             UpdateControls();
+        }
+    }
+
+    /// <summary>
+    /// Falls das Steuerelement Multiline unterstützt, wird dieser angezeigt
+    /// </summary>
+    [DefaultValue(false)]
+    public bool AlwaysInstantChange {
+        get => _alwaysInstantChange;
+        set {
+            if (_alwaysInstantChange == value) { return; }
+            _alwaysInstantChange = value;
+            RaiseEventIfChanged();
         }
     }
 
@@ -348,48 +378,22 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public void DeleteValue() => ValueSet(string.Empty, true, true);
 
-    //public bool ParseVariables(VariableCollection list) {
-    //    var ct = string.Empty;
-
-    //    if (list != null) {
-    //        ct = list.ReplaceInText(OriginalText);
-    //    }
-
-    //    ValueSet(ct, true, true);
-    //    return ct == OriginalText;
-    //}
-
-    //public void StyleComboBox(ItemCollectionList? list, ComboBoxStyle style, bool removevalueIfNotExists) {
-    //    if (!Allinitialized) { _ = CreateSubControls(); }
-    //    foreach (var thiscb in Controls) {
-    //        if (thiscb is ComboBox cb) { StyleComboBox(cb, list, style, removevalueIfNotExists); }
-    //    }
-    //}
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="newvalue"></param>
-    /// <param name="updateControls"></param>
-    /// <param name="alwaysValueChanged">Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
-
-    public void ValueSet(string? newvalue, bool updateControls, bool alwaysValueChanged) {
+    public void ValueSet(string? newvalue, bool updateControls, bool doInstantChangedValue) {
         if (IsDisposed) { return; }
         newvalue ??= string.Empty;
-        //if (string.IsNullOrEmpty(newvalue)) { return; }
+
         if (Value == newvalue) { return; }
 
         LastTextChange = DateTime.UtcNow;
         Value = newvalue;
         if (updateControls) { UpdateValueToControl(); }
-        if (alwaysValueChanged || InvokeRequired || !Focused) { RaiseEventIfChanged(); }
+        if (doInstantChangedValue || InvokeRequired || !Focused || _alwaysInstantChange) { RaiseEventIfChanged(); }
     }
 
     /// <summary>
     /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
     /// Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
-
     protected GenericControl? CreateSubControls() {
         if (Allinitialized) {
             Develop.DebugPrint(FehlerArt.Warnung, "Bereits initialisiert");
@@ -452,6 +456,16 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         return c;
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="newvalue"></param>
+    /// <param name="updateControls"></param>
+    /// <param name="doInstantChangedValue">Löst bei einer Werteänderung ValueChanged aus. Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
+    /// <summary>
+    /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
+    /// Die Events werden Registriert und auch der Wert gesetzt.
+    /// </summary>
     protected override void DrawControl(Graphics gr, States state) {
         // Enabled wurde verdeckt!
         if (!Enabled) { state = States.Standard_Disabled; }
@@ -490,6 +504,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 DoInfoTextCaption(string.Empty);
             }
         }
+    }
+
+    protected ComboBox? GetComboBox() {
+        foreach (var thisc in Controls) {
+            if (thisc is ComboBox cbx) { return cbx; }
+        }
+        return null;
     }
 
     protected virtual void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);

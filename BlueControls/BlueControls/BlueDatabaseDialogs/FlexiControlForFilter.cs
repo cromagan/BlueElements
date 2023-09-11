@@ -43,10 +43,12 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
     public FlexiControlForFilter(Table? tableView, FilterItem filter) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
+
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        Size = new Size(300, 300);
+        Size = new Size(204, 24);
         TableView = tableView;
         Filter = filter;
+        AlwaysInstantChange = true;
         UpdateFilterData();
         Filter.Changed += Filter_Changed;
     }
@@ -82,38 +84,6 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
                     Forms.TableView.OpenColumnEditor(col, null);
                 }
                 return true;
-
-                //case "#filterverschieben":
-                //    if (e.HotItem is ColumnItem col2) {
-                //        var pc = (Filterleiste)Parent; // Parent geht verlren, wenn der Filter selbst disposed und neu erzeugt wird
-                //        while (true) {
-                //            var nx = InputBox.Show("X, von 0 bis 10000", col2.DauerFilterPos.X.ToString(), enFormatHolder.Integer);
-                //            if (string.IsNullOrEmpty(nx)) { return true; }
-                //            var nxi = Converter.IntParse(nx);
-                //            nxi = Math.Max(nxi, 0);
-                //            nxi = Math.Min(nxi, 10000);
-                //            var ny = InputBox.Show("Y, von 0 bis 10000", col2.DauerFilterPos.Y.ToString(), enFormatHolder.Integer);
-                //            if (string.IsNullOrEmpty(ny)) { return true; }
-                //            var nyi = Converter.IntParse(ny);
-                //            nyi = Math.Max(nyi, 0);
-                //            nyi = Math.Min(nyi, 10000);
-                //            col2.DauerFilterPos = new Point(nxi, nyi);
-                //            pc.FillFilters();
-                //        }
-                //    }
-                //    return true;
-
-                //case "#bildpfad":
-                //    var p = (string)((Filterleiste)Parent).pic.Tag;
-                //    ExecuteFile(p.FilePath());
-                //    MessageBox.Show("Aktuelle Datei:<br>" + p);
-                //    return true;
-
-                //default:
-                //    //if (Parent is Formula f) {
-                //    //    return f.ContextMenuItemClickedInternalProcessig(sender, e);
-                //    //}
-                //    break;
         }
         return false;
     }
@@ -124,27 +94,11 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
         hotItem = Filter.Column;
         _ = items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));
-
-        //if (Parent is Filterleiste f) {
-        //    if (f.pic.Visible) {
-        //        Items.GenerateAndAdd("Filter verschieben", "#FilterVerschieben", QuickImage.Get(ImageCode.Trichter));
-        //        Items.GenerateAndAdd("Bild-Pfad öffnen", "#BildPfad", QuickImage.Get(ImageCode.Ordner));
-        //    }
-        //}
     }
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
-    internal ComboBox? GetComboBox() {
-        foreach (var thisc in Controls) {
-            if (thisc is ComboBox cbx) {
-                return cbx;
-            }
-        }
-        return null;
-    }
 
     internal bool WasThisValueClicked() {
         var cb = GetComboBox();
@@ -167,6 +121,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
             StyleComboBox(cbx, item2, ComboBoxStyle.DropDown, false);
             cbx.DropDownShowing += Cbx_DropDownShowing;
         }
+
         if (e.Control is Button btn) {
             btn.Translate = false;
 
@@ -228,31 +183,47 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
             ValueSet(string.Empty, true, true);
         } else {
             DisabledReason = !string.IsNullOrEmpty(Filter.Herkunft) ? "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;
+
             var qi = Filter.Column.QuickInfoText(string.Empty);
             if (string.IsNullOrEmpty(qi)) {
-                QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false);
+                QuickInfo = "<b><u>Filter:</u></b><br>" + Filter.ReadableText().CreateHtmlCodes(false);
             } else {
-                QuickInfo = "<b>Filter:</b><br>" + Filter.ReadableText().CreateHtmlCodes(false) +
-                            "<br><br><b>Info:</b><br>" + qi.CreateHtmlCodes(false);
+                QuickInfo = "<b><u>Filter:</u></b><br>" + Filter.ReadableText().CreateHtmlCodes(false) +
+                            "<br><br><b>Info:</b><br>" + qi;
             }
 
             if (!Filter.Column.AutoFilterSymbolPossible()) {
                 EditType = EditTypeFormula.None;
             } else {
                 var showDelFilterButton = true;
-                if (Filter.FilterType == FilterType.Instr_GroßKleinEgal && Filter.SearchValue != null && Filter.SearchValue.Count == 1) {
+                var showWählen = Filter.Column.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed) ||
+                     Filter.Column.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
+
+                var texteingabe = Filter.Column.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
+
+
+
+                if (Filter.FilterType == FilterType.Instr_GroßKleinEgal && Filter.SearchValue.Count == 1) {
                     CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
-                    showDelFilterButton = false;
                     Caption = Filter.Column.ReadableText() + ":";
                     EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
                     ValueSet(Filter.SearchValue[0], true, true);
+                    showDelFilterButton = false;
+                    showWählen = false;
                 }
-                if (Filter.Column.FilterOptions is FilterOptions.Enabled_OnlyAndAllowed or FilterOptions.Enabled_OnlyOrAllowed) {
+
+                if (showWählen && Filter.FilterType != FilterType.Instr_GroßKleinEgal) {
+                    showDelFilterButton = false;
+                }
+
+
+                if ((showWählen || !texteingabe) && !showDelFilterButton) {
                     showDelFilterButton = false;
                     CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
                     Caption = Filter.Column.ReadableText() + ":";
                     EditType = EditTypeFormula.Button;
                 }
+
                 if (showDelFilterButton) {
                     CaptionPosition = ÜberschriftAnordnung.ohne;
                     EditType = EditTypeFormula.Button;

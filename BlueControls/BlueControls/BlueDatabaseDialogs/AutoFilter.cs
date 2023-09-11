@@ -252,7 +252,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         {
             e.Item.KeyName
         };
-        if (doJoker) { l.Add(_column.AutoFilterJoker); }
+        if (doJoker) { l.AddIfNotExists(_column.AutoFilterJoker); }
         if (_negativAuswahl) {
             // Nur Ohne Multirow
             CloseAndDispose("Filter", new FilterItem(_column, FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal, l));

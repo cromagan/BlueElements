@@ -95,7 +95,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnÄhnliche
             // 
-            this.btnÄhnliche.ImageCode = "Fernglas|16|||||||||Istgleich";
+            this.btnÄhnliche.ImageCode = "Fernglas|16|||||||||HäkchenDoppelt";
             this.btnÄhnliche.Location = new Point(8, 40);
             this.btnÄhnliche.Margin = new Padding(4);
             this.btnÄhnliche.Name = "btnÄhnliche";

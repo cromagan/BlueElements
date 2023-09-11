@@ -293,7 +293,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     }
 
     public string ReadableText() {
-        if (!this.IsOk()) { return "#### Filter-Fehler ####"; }
+
+        // Bei Nich OK schön en Text zurück geben für FlexiControlForFilter
+        if (!this.IsOk()) { return "Filter ohne Funktion"; }
 
         if (_column == null) { return "Zeilen-Filter"; }
         var nam = _column.ReadableText();

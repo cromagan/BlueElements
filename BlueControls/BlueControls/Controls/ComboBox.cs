@@ -54,7 +54,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     /// </summary>
     private string _initialtext = string.Empty;
 
-    private string _lastClickedText = string.Empty;
+    private string? _lastClickedText = null;
 
     #endregion
 
@@ -159,7 +159,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         _btnDropDownIsIn = false;
     }
 
-    internal bool WasThisValueClicked() => Text == _lastClickedText;
+    internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
     protected override void DrawControl(Graphics gr, States state) {
         if (_drawStyle != ComboboxStyle.TextBox) {

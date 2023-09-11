@@ -54,48 +54,50 @@ public partial class PadEditorReadOnly : FormWithStatusBar {
             return;
         }
 
-        if (IsDisposed) { return; }
+        try {
+            if (IsDisposed) { return; }
 
-        var x = new List<string>();
+            var x = new List<string>();
 
-        if (Pad?.Item != null) { x.AddRange(Pad.Item.AllPages()); }
+            if (Pad?.Item != null) { x.AddRange(Pad.Item.AllPages()); }
 
-        if (Pad != null) { _ = x.AddIfNotExists(Pad.CurrentPage); }
+            if (Pad != null) { _ = x.AddIfNotExists(Pad.CurrentPage); }
 
-        TabPage? later = null;
+            TabPage? later = null;
 
-        if (x.Count == 1 && string.IsNullOrEmpty(x[0])) { x.Clear(); }
+            if (x.Count == 1 && string.IsNullOrEmpty(x[0])) { x.Clear(); }
 
-        if (x.Count > 0) {
-            tabSeiten.Visible = true;
+            if (x.Count > 0) {
+                tabSeiten.Visible = true;
 
-            foreach (var thisTab in tabSeiten.TabPages) {
-                var tb = (TabPage)thisTab;
+                foreach (var thisTab in tabSeiten.TabPages) {
+                    var tb = (TabPage)thisTab;
 
-                if (!x.Contains(tb.Text)) {
-                    tabSeiten.TabPages.Remove(tb);
-                    DoPages();
-                    return;
+                    if (!x.Contains(tb.Text)) {
+                        tabSeiten.TabPages.Remove(tb);
+                        DoPages();
+                        return;
+                    }
+
+                    _ = x.Remove(tb.Text);
+                    if (Pad != null && tb.Text == Pad.CurrentPage) { later = tb; }
                 }
 
-                _ = x.Remove(tb.Text);
-                if (Pad != null && tb.Text == Pad.CurrentPage) { later = tb; }
+                foreach (var thisn in x) {
+                    var t = new TabPage(thisn) {
+                        Name = "Seite_" + thisn
+                    };
+                    tabSeiten.TabPages.Add(t);
+
+                    if (Pad != null && t.Text == Pad.CurrentPage) { later = t; }
+                }
+            } else {
+                tabSeiten.Visible = false;
+                tabSeiten.TabPages.Clear();
             }
 
-            foreach (var thisn in x) {
-                var t = new TabPage(thisn) {
-                    Name = "Seite_" + thisn
-                };
-                tabSeiten.TabPages.Add(t);
-
-                if (Pad != null && t.Text == Pad.CurrentPage) { later = t; }
-            }
-        } else {
-            tabSeiten.Visible = false;
-            tabSeiten.TabPages.Clear();
-        }
-
-        tabSeiten.SelectedTab = later;
+            tabSeiten.SelectedTab = later;
+        } catch { }
     }
 
     private void Pad_Changed(object sender, System.EventArgs e) => DoPages();

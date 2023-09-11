@@ -203,13 +203,9 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
                 #endregion
 
-
-
                 if (filterItem == null && showMe) {
                     // Dummy-Filter, nicht in der Collection
-                    filterItem = thisColumn.FilterOptions == FilterOptions.Enabled_OnlyAndAllowed ? new FilterItem(thisColumn, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty)
-                        : thisColumn.FilterOptions == FilterOptions.Enabled_OnlyOrAllowed ? new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroßKleinEgal, string.Empty)
-                        : new FilterItem(thisColumn, FilterType.Instr_GroßKleinEgal, string.Empty);
+                    filterItem = new FilterItem(thisColumn, FilterType.Instr_GroßKleinEgal, string.Empty);
                 }
 
                 if (filterItem != null && showMe) {
@@ -223,6 +219,11 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                         flx.ValueChanged += Flx_ValueChanged;
                         flx.ButtonClicked += Flx_ButtonClicked;
                         Controls.Add(flx);
+                    }
+
+                    if (leftpos + constwi > Width) {
+                        leftpos = beginnx;
+                        toppos = toppos + consthe + Skin.PaddingSmal;
                     }
 
                     flx.Top = toppos;
