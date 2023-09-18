@@ -50,11 +50,15 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
     #region Fields
 
+    private string _admininfo;
     private bool _changeValues;
     private ScriptEventTypes _eventTypes = 0;
     private bool _executable;
+    private string _imagecode;
     private bool _needRow;
+    private string _quickinfo;
     private string _script;
+    private List<string> _usergroups;
 
     #endregion
 
@@ -100,6 +104,16 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
     #region Properties
 
+    public string AdminInfo {
+        get => _admininfo;
+        set {
+            if (IsDisposed) { return; }
+            if (_admininfo == value) { return; }
+            _admininfo = value;
+            OnChanged();
+        }
+    }
+
     public bool ChangeValues {
         get => _changeValues;
         set {
@@ -119,6 +133,16 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
             if (IsDisposed) { return; }
             if (_eventTypes == value) { return; }
             _eventTypes = value;
+            OnChanged();
+        }
+    }
+
+    public string Image {
+        get => _imagecode;
+        set {
+            if (IsDisposed) { return; }
+            if (_imagecode == value) { return; }
+            _imagecode = value;
             OnChanged();
         }
     }
@@ -157,12 +181,32 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
         }
     }
 
+    public string QuickInfo {
+        get => _quickinfo;
+        set {
+            if (IsDisposed) { return; }
+            if (_quickinfo == value) { return; }
+            _quickinfo = value;
+            OnChanged();
+        }
+    }
+
     public string Script {
         get => _script;
         set {
             if (IsDisposed) { return; }
             if (_script == value) { return; }
             _script = value;
+            OnChanged();
+        }
+    }
+
+    public List<string> UserGroups {
+        get => _usergroups;
+        set {
+            if (IsDisposed) { return; }
+            if (!_usergroups.IsDifferentTo(value)) { return; }
+            _usergroups = value;
             OnChanged();
         }
     }
@@ -262,6 +306,22 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
                     _eventTypes = (ScriptEventTypes)IntParse(pair.Value);
                     break;
 
+                case "quickinfo":
+                    _quickinfo = pair.Value.FromNonCritical();
+                    break;
+
+                case "admininfo":
+                    _admininfo = pair.Value.FromNonCritical();
+                    break;
+
+                case "image":
+                    _imagecode = pair.Value.FromNonCritical();
+                    break;
+
+                case "usergroups":
+                    _usergroups = pair.Value.FromNonCritical().SplitAndCutByCrToList();
+                    break;
+
                 //case "lastdone":
 
                 //    _lastUsed = pair.Value.FromNonCritical();
@@ -321,6 +381,10 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
             result.ParseableAdd("NeedRow", NeedRow);
             result.ParseableAdd("ChangeValues", ChangeValues);
             result.ParseableAdd("Events", EventTypes);
+            result.ParseableAdd("QuickInfo", QuickInfo);
+            result.ParseableAdd("AdminInfo", AdminInfo);
+            result.ParseableAdd("Image", Image);
+            result.ParseableAdd("UserGroups", UserGroups);
 
             return result.Parseable();
         } catch {
