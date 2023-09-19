@@ -670,6 +670,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     }
 
     public new string ToString() {
+        if (IsDisposed) { return string.Empty; }
         List<string> result = new();
         result.ParseableAdd("ID", KeyName);
         result.ParseableAdd("Caption", Caption);

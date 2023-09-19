@@ -17,15 +17,17 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewItem {
+public sealed class ColumnViewItem : IParseable {
 
     #region Fields
 
@@ -41,12 +43,58 @@ public sealed class ColumnViewItem {
     }
 
     public ColumnViewItem(DatabaseAbstract database, string toParse, ColumnViewCollection parent) : this(parent) {
+        Parse(toParse);
+    }
+
+    private ColumnViewItem(ColumnViewCollection parent) : base() {
+        Parent = parent;
+        _viewType = ViewType.None;
+        Column = null;
+        OrderTmpSpalteX1 = null;
+        TmpAutoFilterLocation = Rectangle.Empty;
+        TmpReduceLocation = Rectangle.Empty;
+        TmpDrawWidth = null;
+        TmpReduced = false;
+    }
+
+    #endregion
+
+    #region Properties
+
+    public ColumnItem? Column { get; private set; }
+    public int? OrderTmpSpalteX1 { get; set; }
+    public ColumnViewCollection Parent { get; }
+
+    public Rectangle TmpAutoFilterLocation { get; set; }
+    public int? TmpDrawWidth { get; set; }
+    public bool TmpReduced { get; set; }
+    public Rectangle TmpReduceLocation { get; set; }
+
+    public ViewType ViewType {
+        get => _viewType;
+        set {
+            if (value == _viewType) { return; }
+            _viewType = value;
+        }
+    }
+
+    #endregion
+
+    #region Methods
+
+    public void Invalidate_DrawWidth() => TmpDrawWidth = null;
+
+    public ColumnViewItem? NextVisible() => Parent.NextVisible(this);
+
+    public void Parse(string toParse) {
+        if (Parent?.Database is not DatabaseAbstract db) { return; }
+
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key) {
                 case "column":
 
                 case "columnname":// ColumnName wichtg, wegen CopyLayout
-                    Column = database.Column.Exists(pair.Value);
+                    Column = db.Column.Exists(pair.Value);
                     Column?.Repair(); // Alte Formate reparieren
                     break;
 
@@ -76,52 +124,13 @@ public sealed class ColumnViewItem {
         if (Column != null && _viewType == ViewType.None) { _viewType = ViewType.Column; }
     }
 
-    private ColumnViewItem(ColumnViewCollection parent) : base() {
-        Parent = parent;
-        _viewType = ViewType.None;
-        Column = null;
-        OrderTmpSpalteX1 = null;
-        TmpAutoFilterLocation = Rectangle.Empty;
-        TmpReduceLocation = Rectangle.Empty;
-        TmpDrawWidth = null;
-        TmpReduced = false;
-    }
-
-    #endregion
-
-    #region Properties
-
-    public ColumnItem? Column { get; }
-    public int? OrderTmpSpalteX1 { get; set; }
-    public ColumnViewCollection Parent { get; }
-
-    public Rectangle TmpAutoFilterLocation { get; set; }
-    public int? TmpDrawWidth { get; set; }
-    public bool TmpReduced { get; set; }
-    public Rectangle TmpReduceLocation { get; set; }
-
-    public ViewType ViewType {
-        get => _viewType;
-        set {
-            if (value == _viewType) { return; }
-            _viewType = value;
-        }
-    }
-
-    #endregion
-
-    #region Methods
-
-    public void Invalidate_DrawWidth() => TmpDrawWidth = null;
-
-    public ColumnViewItem? NextVisible() => Parent.NextVisible(this);
-
     public ColumnViewItem? PreviewsVisible() => Parent.PreviousVisible(this);
 
     public override string ToString() {
-        var result = "{Type=" + (int)_viewType;
-        if (Column != null && !Column.IsDisposed) { result = result + ", ColumnName=" + Column.KeyName; }
-        return result + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Type", _viewType);
+        result.ParseableAdd("ColumnName", Column);
+        return result.Parseable();
     }
 
     internal bool NonPermanentPossible() {

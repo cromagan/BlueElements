@@ -28,7 +28,7 @@ public static partial class Extensions {
     #region Methods
 
     public static List<string> SortedDistinctList(this IEnumerable<string>? arr) {
-        if (arr == null || !arr.Any()) { return new List<string>(); }
+        if (arr == null || !arr.Any()) { return new(); }
 
         var arr2 = arr.Distinct().ToList();
         if (arr2.Contains(string.Empty)) { _ = arr2.Remove(string.Empty); }

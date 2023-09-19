@@ -215,11 +215,11 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <param name="name"></param>
     public List<string> GetList(string name) {
         var v = _internal.Get(name);
-        if (v == null) { return new List<string>(); }
+        if (v == null) { return new(); }
 
         if (v is not VariableListString vf) {
             Develop.DebugPrint("Falscher Datentyp");
-            return new List<string>();
+            return new();
         }
 
         return vf.ValueList;

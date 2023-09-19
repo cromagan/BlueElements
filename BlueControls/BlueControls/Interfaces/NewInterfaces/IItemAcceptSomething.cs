@@ -73,7 +73,7 @@ public abstract class ItemAcceptSomething {
     #region Methods
 
     public virtual List<string> ParsableTags() {
-        var result = new List<string>();
+        List<string> result = new();
 
         //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
 

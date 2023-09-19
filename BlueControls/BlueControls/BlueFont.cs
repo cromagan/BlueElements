@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Text;
-using System.Globalization;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -524,18 +523,24 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName {
         //http://csharphelper.com/blog/2014/09/understand-font-aliasing-issues-in-c/
         gr.TextRenderingHint = font.Size < 11 ? TextRenderingHint.ClearTypeGridFit : TextRenderingHint.AntiAlias;
 
-    private static string ToString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool vKapitälchen, bool vonlyuppe, bool vonlylower) {
-        var c = "{Name=" + fontName + ", Size=" + fontSize.ToString(CultureInfo.InvariantCulture).ToNonCritical();
-        if (bold) { c += ", Bold=True"; }
-        if (italic) { c += ", Italic=True"; }
-        if (underline) { c += ", Underline=True"; }
-        if (strikeout) { c += ", Strikeout=True"; }
-        if (vKapitälchen) { c += ", Capitals=True"; }
-        if (vonlyuppe) { c += ", OnlyUpper=True"; }
-        if (vonlylower) { c += ", OnlyLower=True"; }
-        if (outLine) { c = c + ", Outline=True, OutlineColor=" + colorOutline; }
-        if (colorMain != "000000") { c = c + ", Color=" + colorMain; }
-        return c + "}";
+    private static string ToString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool capitals, bool onlyupper, bool onlylower) {
+        var result = new List<string>();
+
+        result.ParseableAdd("Name", fontName);
+        result.ParseableAdd("Size", fontSize);
+        if (bold) { result.ParseableAdd("Bold", bold); }
+        if (italic) { result.ParseableAdd("Italic", italic); }
+        if (underline) { result.ParseableAdd("Underline", underline); }
+        if (strikeout) { result.ParseableAdd("Strikeout", strikeout); }
+        if (capitals) { result.ParseableAdd("Capitals", capitals); }
+        if (onlyupper) { result.ParseableAdd("OnlyUpper", onlyupper); }
+        if (onlylower) { result.ParseableAdd("OnlyLower", onlylower); }
+        if (outLine) {
+            result.ParseableAdd("Outline", outLine);
+            result.ParseableAdd("OutlineColor", colorOutline);
+        }
+        if (colorMain != "000000") { result.ParseableAdd("Color", colorMain); }
+        return result.Parseable();
     }
 
     private Pen GeneratePen(float zoom) {

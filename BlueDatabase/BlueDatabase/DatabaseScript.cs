@@ -148,7 +148,6 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
     }
 
     public bool IsDisposed { get; private set; }
-
     public string KeyName { get; private set; }
 
     public bool ManualExecutable {
@@ -372,9 +371,9 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
     public override string ToString() {
         try {
-            var result = new List<string>();
+            if (IsDisposed) { return string.Empty; }
+            List<string> result = new();
 
-            //result.ParseableAdd("Database", Database);
             result.ParseableAdd("Name", Name);
             result.ParseableAdd("Script", Script);
             result.ParseableAdd("ManualExecutable", ManualExecutable);

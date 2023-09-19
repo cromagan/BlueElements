@@ -2076,7 +2076,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //            SetFormatForUrl();
     //            break;
     public override string ToString() {
-        if (IsDisposed) { return "Disposed"; }
+        if (IsDisposed) { return string.Empty; }
         return _name + " -> " + Caption;
     }
 

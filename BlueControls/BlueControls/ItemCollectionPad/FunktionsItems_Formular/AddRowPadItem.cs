@@ -152,7 +152,8 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
 
         result.AddRange(_itemAccepts.ParsableTags());
 

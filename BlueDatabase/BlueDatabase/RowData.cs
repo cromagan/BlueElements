@@ -142,7 +142,7 @@ public class RowData : IComparable, IDisposableExtended {
         MarkYellow = thisRowData.MarkYellow;
     }
 
-    public override string ToString() => Row == null ? Chapter + " -> null" : Chapter + " -> " + Row.CellFirstString();
+    public override string ToString() => Row == null || Row.IsDisposed ? Chapter + " -> null" : Chapter + " -> " + Row.CellFirstString();
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {

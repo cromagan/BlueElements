@@ -187,7 +187,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
 
         result.ParseableAdd("Modus", Bild_Modus);
         result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);

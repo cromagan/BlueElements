@@ -51,7 +51,8 @@ public abstract class RectanglePadItemWithVersion : RectanglePadItem, IHasVersio
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.ParseableAdd("Version", Version);
         return result.Parseable(base.ToString());
     }

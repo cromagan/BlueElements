@@ -88,10 +88,20 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
                     Reverse = pair.Value == "Z-A";
                     break;
 
+                case "reverse":
+                    Reverse = pair.Value.FromPlusMinus();
+                    break;
+
                 case "column":
                 case "columnname": // ColumnName wichtig wegen CopyLayout
                     if (Database.Column.Exists(pair.Value) is ColumnItem c) { Columns.Add(c); }
+                    break;
 
+                case "columns":
+                    var cols = pair.Value.FromNonCritical().SplitBy("|");
+                    foreach (var thisc in cols) {
+                        if (Database.Column.Exists(thisc) is ColumnItem c2) { Columns.Add(c2); }
+                    }
                     break;
 
                 case "columnkey":
@@ -106,20 +116,10 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
     }
 
     public override string ToString() {
-        var result = "{";
-        if (Reverse) {
-            result += "Direction=Z-A";
-        } else {
-            result += "Direction=A-Z";
-        }
-
-        foreach (var thisColumn in Columns) {
-            if (thisColumn != null) {
-                result = result + ", ColumnName=" + thisColumn.KeyName;
-            }
-        }
-
-        return result + "}";
+        var result = new List<string>();
+        result.ParseableAdd("Reverse", Reverse);
+        result.ParseableAdd("Columns", Columns);
+        return result.Parseable();
     }
 
     public bool UsedForRowSort(ColumnItem? vcolumn) {

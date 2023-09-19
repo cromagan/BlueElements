@@ -61,7 +61,8 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
     public override void ProcessStyleChange() => RemovePic();
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.ParseableAdd("Text", _text.ToNonCritical());
         result.ParseableAdd("Size", Size);
         return result.Parseable(base.ToString());

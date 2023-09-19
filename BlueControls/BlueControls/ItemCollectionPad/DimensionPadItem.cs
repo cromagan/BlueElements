@@ -236,7 +236,8 @@ public class DimensionPadItem : AbstractPadItem {
     public override void PointMoved(object sender, MoveEventArgs e) => CalculateOtherPoints();
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.ParseableAdd("Text1", Text_Oben);
         result.ParseableAdd("Text2", Text_Unten);
         result.ParseableAdd("Decimal", Nachkommastellen);

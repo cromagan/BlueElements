@@ -235,7 +235,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.AddRange(_itemAccepts.ParsableTags());
         result.AddRange(_itemSends.ParsableTags());
 

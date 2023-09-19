@@ -967,7 +967,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         t.ParseableAdd("Version", Version);
         t.ParseableAdd("CreateDate", _createDate);
         t.ParseableAdd("CreateName", _creator);
-        //t.GenerateAndAdd("FilePath=" + FilePath.ToNonCritical());
         t.ParseableAdd("LastUsedID", _id);
         t.ParseableAdd("DatabaseFiles", _databaseFiles);
         t.ParseableAdd("NotAllowedChilds", _notAllowedChilds);

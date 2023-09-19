@@ -25,7 +25,7 @@ public class ColumnReasonEventArgs : ColumnEventArgs {
 
     #region Constructors
 
-    public ColumnReasonEventArgs(ColumnItem column, Reason reason) : base(column) => this.Reason = reason;
+    public ColumnReasonEventArgs(ColumnItem column, Reason reason) : base(column) => Reason = reason;
 
     #endregion
 

@@ -1290,17 +1290,17 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public string ViewToString() {
-        var x = new List<string>();
-        x.ParseableAdd("ArrangementNr", _arrangementNr);
-        x.ParseableAdd("Filters", (IStringable?)Filter);
-        x.ParseableAdd("SliderX", SliderX.Value);
-        x.ParseableAdd("SliderY", SliderY.Value);
-        x.ParseableAdd("Pin", PinnedRows);
-        x.ParseableAdd("Collapsed", _collapsed);
-        x.ParseableAdd("Reduced", CurrentArrangement?.ReducedColumns());
-        x.ParseableAdd("TempSort", _sortDefinitionTemporary);
-        x.ParseableAdd("CursorPos", CellCollection.KeyOfCell(CursorPosColumn, CursorPosRow?.Row));
-        return x.Parseable();
+        List<string> result = new();
+        result.ParseableAdd("ArrangementNr", _arrangementNr);
+        result.ParseableAdd("Filters", (IStringable?)Filter);
+        result.ParseableAdd("SliderX", SliderX.Value);
+        result.ParseableAdd("SliderY", SliderY.Value);
+        result.ParseableAdd("Pin", PinnedRows);
+        result.ParseableAdd("Collapsed", _collapsed);
+        result.ParseableAdd("Reduced", CurrentArrangement?.ReducedColumns());
+        result.ParseableAdd("TempSort", _sortDefinitionTemporary);
+        result.ParseableAdd("CursorPos", CellCollection.KeyOfCell(CursorPosColumn, CursorPosRow?.Row));
+        return result.Parseable();
     }
 
     public List<RowItem> VisibleUniqueRows() {
@@ -2923,7 +2923,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             if (Database?.HasPendingChanges ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
             if (Database?.ReadOnly ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8); }
-            if (Database?.AmITemporaryMaster() ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0,0); }
+            if (Database?.AmITemporaryMaster() ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, 0); }
         } catch {
             Invalidate();
             //Develop.DebugPrint(ex);

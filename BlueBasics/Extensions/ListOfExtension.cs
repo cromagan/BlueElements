@@ -114,7 +114,7 @@ public static partial class Extensions {
     }
 
     public static T? Get<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
-        if(string.IsNullOrEmpty(name)) { return default; }
+        if (string.IsNullOrEmpty(name)) { return default; }
 
         if (items != null) {
             return items.FirstOrDefault(thisp =>
@@ -191,7 +191,7 @@ public static partial class Extensions {
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, SizeF value) => col.Add(tagname + "=" + value.ToString().ToNonCritical());
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToString(CultureInfo.InvariantCulture).ToNonCritical());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToString(CultureInfo.InvariantCulture).Replace(",", ".").ToNonCritical());
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IHasKeyName? value) {
         if (value == null) { return; }
@@ -205,7 +205,7 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Fügt nur die Key-Namen in die Liste hinzu
+    /// Fügt nur die Key-Namen in die Liste hinzu, getrennt mit |
     /// </summary>
     /// <param name="col"></param>
     /// <param name="tagname"></param>
@@ -215,6 +215,12 @@ public static partial class Extensions {
         ParseableAdd(col, tagname, value.ToListOfString());
     }
 
+    /// <summary>
+    /// Fügt die Einträge der Liste hinzu, getrennt mit |
+    /// </summary>
+    /// <param name="col"></param>
+    /// <param name="tagname"></param>
+    /// <param name="value"></param>
     public static void ParseableAdd(this ICollection<string> col, string tagname, ICollection<string>? value) {
         if (value == null || value.Count == 0) { return; }
 
@@ -449,7 +455,6 @@ public static partial class Extensions {
         col.Add(n);
     }
 
-    //public static double TagGetDouble(this ICollection<string>? col, string tagname) => DoubleParse(TagGet(col, tagname));
     /// <summary>
     /// Führt bei allem Typen ein ToString aus und addiert diese mittels \r. Enthält ein ToString ein \r, dann wird abgebrochen.
     /// </summary>

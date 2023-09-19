@@ -317,7 +317,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public string LoadedVersion { get; private set; } = "0.00";
-
     public bool LogUndo { get; set; } = true;
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
@@ -329,9 +328,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public DateTime PowerEdit { get; set; }
-
     public bool ReadOnly { get; private set; }
-
     public RowCollection Row { get; }
 
     public RowSortDefinition? SortDefinition {
@@ -1712,7 +1709,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public void SetReadOnly() => ReadOnly = true;
 
-    public override string ToString() => base.ToString() + " " + TableName;
+    public override string ToString() {
+        if (IsDisposed) { return string.Empty; }
+        return base.ToString() + " " + TableName;
+    }
 
     public void Variables_Add(VariableString va, bool isLoading) {
         _variables.Add(va);

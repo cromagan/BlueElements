@@ -51,7 +51,7 @@ public class BackupVerwalter {
         get {
             if (_deletable == null) { CalculateDeleteable(_multi, _maxfiles); }
 
-            return new ReadOnlyCollection<string>(_deletable ?? new List<string>());
+            return new ReadOnlyCollection<string>(_deletable ?? new());
         }
     }
 

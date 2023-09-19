@@ -109,7 +109,7 @@ internal class Method_BerechneVariable : Method {
         return new DoItFeedback(infos.Data, "Interner Fehler");
     }
 
-    public override List<string> Comand(VariableCollection? currentvariables) => currentvariables?.AllNames() ?? new List<string>();
+    public override List<string> Comand(VariableCollection? currentvariables) => currentvariables?.AllNames() ?? new();
 
     /// <summary>
     /// Berechnet z.B.   X = 5;

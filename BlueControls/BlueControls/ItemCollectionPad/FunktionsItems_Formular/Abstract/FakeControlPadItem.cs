@@ -211,7 +211,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     public abstract QuickImage? SymbolForReadableText();
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
 
         if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Everybody); }
 

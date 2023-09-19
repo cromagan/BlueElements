@@ -122,7 +122,6 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
 
     public ConnectedFormula? Formula { get; private set; }
     public bool IsDisposed { get; private set; }
-
     public string KeyName { get; private set; }
 
     public bool ManualExecutable {
@@ -293,15 +292,13 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
 
     public override string ToString() {
         try {
-            var result = new List<string>();
-
-            //result.ParseableAdd("Database", Database);
+            if (IsDisposed) { return string.Empty; }
+            List<string> result = new();
             result.ParseableAdd("Name", Name);
             result.ParseableAdd("Script", Script);
             result.ParseableAdd("ManualExecutable", ManualExecutable);
             result.ParseableAdd("ChangeValues", ChangeValues);
             result.ParseableAdd("Events", EventTypes);
-
             return result.Parseable();
         } catch {
             return ToString();

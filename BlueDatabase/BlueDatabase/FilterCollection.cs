@@ -252,14 +252,15 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     }
 
     public override string ToString() {
-        var l = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
 
         foreach (var thisFilterItem in this) {
             if (thisFilterItem != null && !thisFilterItem.IsDisposed && thisFilterItem.IsOk()) {
-                l.ParseableAdd("Filter", thisFilterItem as IStringable);
+                result.ParseableAdd("Filter", thisFilterItem as IStringable);
             }
         }
-        return l.Parseable();
+        return result.Parseable();
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();

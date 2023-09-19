@@ -287,7 +287,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.AddRange(_itemAccepts.ParsableTags());
 
         result.ParseableAdd("Parent", CFormula);

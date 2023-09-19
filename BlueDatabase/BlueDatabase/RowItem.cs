@@ -250,9 +250,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public int CellGetInteger(ColumnItem column) => Database?.Cell.GetInteger(column, this) ?? default;
 
-    public List<string> CellGetList(string columnName) => Database?.Cell.GetList(Database?.Column[columnName], this) ?? new List<string>();
+    public List<string> CellGetList(string columnName) => Database?.Cell.GetList(Database?.Column[columnName], this) ?? new();
 
-    public List<string> CellGetList(ColumnItem column) => Database?.Cell.GetList(column, this) ?? new List<string>();
+    public List<string> CellGetList(ColumnItem column) => Database?.Cell.GetList(column, this) ?? new();
 
     public Point CellGetPoint(string columnName) => Database?.Cell.GetPoint(Database?.Column[columnName], this) ?? Point.Empty;
 
@@ -265,7 +265,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return Database.Cell.GetString(column, this);
     }
 
-    public List<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? new List<string>();
+    public List<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? new();
 
     public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database?.Column.Exists(columnName), this) ?? default;
 

@@ -196,7 +196,8 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.ParseableAdd("ReadableText", _textOriginal);
         result.ParseableAdd("Alignment", _ausrichtung);
         result.ParseableAdd("AdditionalScale", Skalierung);

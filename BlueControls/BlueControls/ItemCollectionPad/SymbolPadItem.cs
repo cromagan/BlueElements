@@ -107,7 +107,8 @@ public class SymbolPadItem : RectanglePadItem {
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.ParseableAdd("Symbol", Symbol);
         result.ParseableAdd("Backcolor", Hintergrundfarbe.ToArgb());
         result.ParseableAdd("BorderColor", Randfarbe.ToArgb());

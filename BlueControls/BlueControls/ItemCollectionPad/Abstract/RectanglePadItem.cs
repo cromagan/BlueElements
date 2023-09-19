@@ -183,7 +183,8 @@ public abstract class RectanglePadItem : AbstractPadItem {
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.ParseableAdd("Rotation", Drehwinkel);
         return result.Parseable(base.ToString());
     }

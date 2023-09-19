@@ -279,7 +279,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     public new string ToString() {
         if (!ToStringPossible) { return string.Empty; }
 
-        var result = new List<string>();
+        List<string> result = new();
         //result.ParseableAdd("Type", ShortName);
         //result.ParseableAdd("Name", Name);
         result.ParseableAdd("Value", ValueForReplace);

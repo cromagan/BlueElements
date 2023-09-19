@@ -131,17 +131,17 @@ public class UndoItem : IParseable {
     }
 
     public new string ToString() {
-        var l = new List<string>();
+        List<string> result = new();
 
-        l.ParseableAdd("CO", Comand);
-        l.ParseableAdd("CN", ColName);
-        l.ParseableAdd("RK", RowKey);
-        l.ParseableAdd("D", DateTimeUtc);
-        l.ParseableAdd("U", User);
-        l.ParseableAdd("P", PreviousValue);
-        l.ParseableAdd("C", ChangedTo);
-        l.ParseableAdd("CMT", Comment);
-        return l.Parseable();
+        result.ParseableAdd("CO", Comand);
+        result.ParseableAdd("CN", ColName);
+        result.ParseableAdd("RK", RowKey);
+        result.ParseableAdd("D", DateTimeUtc);
+        result.ParseableAdd("U", User);
+        result.ParseableAdd("P", PreviousValue);
+        result.ParseableAdd("C", ChangedTo);
+        result.ParseableAdd("CMT", Comment);
+        return result.Parseable();
     }
 
     public string UndoTextTableMouseOver() {

@@ -145,7 +145,8 @@ public class LinePadItem : AbstractPadItem {
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.ParseableAdd("Connection", Linien_Verhalten);
         return result.Parseable(base.ToString());
     }

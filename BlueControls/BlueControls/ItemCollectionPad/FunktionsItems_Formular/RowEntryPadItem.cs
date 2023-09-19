@@ -157,7 +157,8 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.AddRange(_itemSends.ParsableTags());
         return result.Parseable(base.ToString());
     }

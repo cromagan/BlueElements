@@ -168,7 +168,8 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public override void ProcessStyleChange() => RemovePic();
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.ParseableAdd("LayoutID", _layoutId);
         result.ParseableAdd("Database", Database);
         if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }

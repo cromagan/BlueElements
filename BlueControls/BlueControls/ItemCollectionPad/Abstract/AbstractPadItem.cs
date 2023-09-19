@@ -100,7 +100,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
     public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
     public bool IsDisposed { get; private set; }
-
     public ObservableCollection<PointM> MovablePoint { get; } = new();
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
@@ -133,7 +132,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
     }
 
     public List<PointM> PointsForSuccesfullyMove { get; } = new();
-
     public virtual string QuickInfo { get; set; } = string.Empty;
 
     public PadStyles Stil {
@@ -446,6 +444,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
     public virtual void ProcessStyleChange() { }
 
     public override string ToString() {
+        if (IsDisposed) { return string.Empty; }
         List<string> result = new();
 
         result.ParseableAdd("Style", _style);

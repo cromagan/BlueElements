@@ -364,7 +364,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             // z.B. Instr ohn Text
             //if (!this.IsOk()) { return string.Empty; }
 
-            var result = new List<string>();
+            List<string> result = new();
             result.ParseableAdd("ID", KeyName);
             result.ParseableAdd("Type", _filterType);
 

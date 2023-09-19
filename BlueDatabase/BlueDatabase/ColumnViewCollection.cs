@@ -247,8 +247,21 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
 
                     break;
 
+                case "columns":
+                    if (Database != null) {
+                        foreach (var pair2 in pair.Value.GetAllTags()) {
+                            _internal.Add(new ColumnViewItem(Database, pair2.Value.FromNonCritical(), this)); // BAse, um Events zu vermeiden
+                        }
+                    }
+                    break;
+
                 case "permissiongroup":
                     _permissionGroups_Show.Add(pair.Value);
+                    break;
+
+                case "permissiongroups":
+                    _permissionGroups_Show.Clear();
+                    _permissionGroups_Show.AddRange(pair.Value.FromNonCritical().SplitByCrToList());
                     break;
 
                 default:
@@ -337,20 +350,16 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        var result = "{Name=" + KeyName.ToNonCritical();
-        foreach (var thisViewItem in _internal) {
-            if (thisViewItem != null) {
-                result = result + ", Columndata=" + thisViewItem;
-            }
-        }
+
+        var result = new List<string>();
+        result.ParseableAdd("Name", (IHasKeyName)this);
+        result.ParseableAdd("Columns", "Column", _internal);
+
         var tmp = PermissionGroups_Show.SortedDistinctList();
         tmp.RemoveString(Constants.Administrator, false);
-        foreach (var t in tmp) {
-            if (!string.IsNullOrEmpty(t)) {
-                result = result + ", Permissiongroup=" + t;
-            }
-        }
-        return result + "}";
+        result.ParseableAdd("Permissiongroups", tmp);
+
+        return result.Parseable();
     }
 
     private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);//columnViewItem.Changed += ColumnViewItem_Changed;

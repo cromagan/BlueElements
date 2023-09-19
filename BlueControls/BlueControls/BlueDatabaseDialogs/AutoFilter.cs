@@ -68,7 +68,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     #region Methods
 
     public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? filter, List<RowItem>? pinned) {
-        if (column == null || column.IsDisposed) { return new List<string>(); }
+        if (column == null || column.IsDisposed) { return new(); }
 
         if (filter == null || filter.Count < 0) { return column.Contents(); }
         FilterCollection tfilter = new(column.Database);

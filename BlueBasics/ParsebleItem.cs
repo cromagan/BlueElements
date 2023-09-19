@@ -131,7 +131,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IChangedFeedback {
     public abstract void Parse(string toParse);
 
     public override string ToString() {
-        var result = new List<string>();
+        List<string> result = new();
 
         var ci = (string)GetType().GetProperty("ClassId").GetValue(null, null);
 

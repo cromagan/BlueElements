@@ -683,12 +683,13 @@ public partial class TableView : FormWithStatusBar {
 
     protected virtual string ViewToString() {
         //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
-        var s = "{" +
-                "Ansicht=" + (int)_ansicht + ", " +
-                "MainTab=" + ribMain.SelectedIndex + ", " +
-                "TableView=" + Table.ViewToString().ToNonCritical() +
-                "}";
-        return s;
+
+        List<string> result = new();
+        result.ParseableAdd("Ansicht", _ansicht);
+        result.ParseableAdd("MainTab", ribMain.SelectedIndex);
+        result.ParseableAdd("TableView", Table.ViewToString());
+
+        return result.Parseable();
     }
 
     //    Table.Database = db;

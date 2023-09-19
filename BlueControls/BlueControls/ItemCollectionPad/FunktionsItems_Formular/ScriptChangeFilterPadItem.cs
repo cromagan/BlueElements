@@ -164,7 +164,8 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
     }
 
     public override string ToString() {
-        var result = new List<string>();
+        if (IsDisposed) { return string.Empty; }
+        List<string> result = new();
         result.AddRange(_itemAccepts.ParsableTags());
         result.AddRange(_itemSends.ParsableTags());
         return result.Parseable(base.ToString());

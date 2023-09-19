@@ -172,7 +172,7 @@ public class ItemSendSomething {
     }
 
     public virtual List<string> ParsableTags() {
-        var result = new List<string>();
+        List<string> result = new();
 
         result.ParseableAdd("OutputDatabase", _outputDatabase);
 
