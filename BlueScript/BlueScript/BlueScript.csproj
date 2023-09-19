@@ -47,6 +47,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ScriptDescription.cs" />
     <Compile Include="Enums\MethodType.cs" />
     <Compile Include="Enums\ScriptIssueType.cs" />
     <Compile Include="EventArgs\ScriptEventArgs.cs" />

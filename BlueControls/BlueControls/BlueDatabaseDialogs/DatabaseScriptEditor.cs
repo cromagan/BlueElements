@@ -104,7 +104,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
                 chkExternVerfügbar.Checked = value.ManualExecutable;
                 chkAendertWerte.Checked = value.ChangeValues;
-                eventScriptEditor.ScriptText = value.Script;
+                eventScriptEditor.ScriptText = value.ScriptText;
 
                 _item = value;
             } else {
@@ -328,7 +328,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void ScriptEditor_Changed(object sender, System.EventArgs e) {
         if (Item == null) { return; }
-        Item.Script = eventScriptEditor.ScriptText;
+        Item.ScriptText = eventScriptEditor.ScriptText;
     }
 
     private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
@@ -365,7 +365,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null) { return; }
 
         if (_item != null) {
-            _item.Script = eventScriptEditor.ScriptText;
+            _item.ScriptText = eventScriptEditor.ScriptText;
         }
 
         #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst

@@ -69,7 +69,7 @@ internal class Method_Call : Method_Database {
             }
         }
 
-        (string f, string error) = Script.ReduceText(sc.Script);
+        (string f, string error) = Script.ReduceText(sc.ScriptText);
 
         if (!string.IsNullOrEmpty(error)) {
             return new DoItFeedback(infos.Data, "Fehler in Unter-Skript " + vs + ": " + error);

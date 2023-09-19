@@ -2786,7 +2786,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (Database == null || Database.IsDisposed) { return false; }
 
         foreach (var thiss in Database.EventScript) {
-            if (thiss.Script.ContainsWord(_name, RegexOptions.IgnoreCase)) { return true; }
+            if (thiss.ScriptText.ContainsWord(_name, RegexOptions.IgnoreCase)) { return true; }
         }
 
         return false;

@@ -53,11 +53,11 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
     private string _admininfo;
     private bool _changeValues;
     private ScriptEventTypes _eventTypes = 0;
-    private bool _executable;
     private string _imagecode;
+    private bool _manualexecutable;
     private bool _needRow;
     private string _quickinfo;
-    private string _script;
+    private string _scripttext;
     private List<string> _usergroups;
 
     #endregion
@@ -66,7 +66,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
     public DatabaseScript(DatabaseAbstract database, string name, string script) : this(database) {
         KeyName = name;
-        _script = script;
+        _scripttext = script;
     }
 
     public DatabaseScript(DatabaseAbstract? database, string toParse) : this(database) => Parse(toParse);
@@ -79,8 +79,8 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
         }
 
         KeyName = string.Empty;
-        _script = string.Empty;
-        _executable = false;
+        _scripttext = string.Empty;
+        _manualexecutable = false;
         _needRow = false;
     }
 
@@ -151,11 +151,11 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
     public string KeyName { get; private set; }
 
     public bool ManualExecutable {
-        get => _executable;
+        get => _manualexecutable;
         set {
             if (IsDisposed) { return; }
-            if (_executable == value) { return; }
-            _executable = value;
+            if (_manualexecutable == value) { return; }
+            _manualexecutable = value;
             OnChanged();
         }
     }
@@ -190,12 +190,12 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
         }
     }
 
-    public string Script {
-        get => _script;
+    public string ScriptText {
+        get => _scripttext;
         set {
             if (IsDisposed) { return; }
-            if (_script == value) { return; }
-            _script = value;
+            if (_scripttext == value) { return; }
+            _scripttext = value;
             OnChanged();
         }
     }
@@ -241,7 +241,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
             if (_changeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
             if (!_needRow) { return "Routinen, die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
-            if (_executable) { return "Routinen, die das Formular vorbereiten, können nicht so von außerhalb benutzt werden."; }
+            if (_manualexecutable) { return "Routinen, die das Formular vorbereiten, können nicht so von außerhalb benutzt werden."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.export)) {
@@ -284,7 +284,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
                 case "script":
 
-                    _script = pair.Value.FromNonCritical();
+                    _scripttext = pair.Value.FromNonCritical();
                     break;
 
                 case "needrow":
@@ -294,7 +294,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
                 case "manualexecutable":
 
-                    _executable = pair.Value.FromPlusMinus();
+                    _manualexecutable = pair.Value.FromPlusMinus();
                     break;
 
                 case "changevalues":
@@ -352,7 +352,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
         var symb = ImageCode.Formel;
         var c = Color.Transparent;
 
-        if (_executable) {
+        if (_manualexecutable) {
             c = Color.Yellow;
             symb = ImageCode.Person;
         }
@@ -375,7 +375,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
             List<string> result = new();
 
             result.ParseableAdd("Name", Name);
-            result.ParseableAdd("Script", Script);
+            result.ParseableAdd("Script", ScriptText);
             result.ParseableAdd("ManualExecutable", ManualExecutable);
             result.ParseableAdd("NeedRow", NeedRow);
             result.ParseableAdd("ChangeValues", ChangeValues);

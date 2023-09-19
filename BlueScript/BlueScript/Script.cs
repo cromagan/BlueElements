@@ -205,9 +205,4 @@ public class Script {
     }
 
     #endregion
-
-    //internal int AddBitmapToCache(Bitmap? bmp) {
-    //    BitmapCache.Add(bmp);
-    //    return BitmapCache.IndexOf(bmp);
-    //}
 }

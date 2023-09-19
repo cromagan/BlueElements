@@ -721,7 +721,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
             var scp = new ScriptProperties(allowedMethods, true, s.Attributes());
             Script sc = new(vars, string.Empty, scp) {
-                ScriptText = s.Script
+                ScriptText = s.ScriptText
             };
             var scf = sc.Parse(0, s.Name);
 

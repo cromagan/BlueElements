@@ -303,11 +303,11 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
 
     public SizeF SheetSizeInPix {
         get {
-            if (_prRu == null || _prLo == null || _prRu == null || _prLo == null) {
+            if (_sheetSizeInMm.Width < 0.01 || _sheetSizeInMm.Height < 0.01) {
                 return SizeF.Empty;
             }
 
-            return new(_prRu.X - _prLo.X, _prRu.Y - _prLo.Y);
+            return new(MmToPixel(_sheetSizeInMm.Width, ItemCollectionPad.Dpi), MmToPixel(_sheetSizeInMm.Height, ItemCollectionPad.Dpi));
         }
     }
 
@@ -436,11 +436,19 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
             #region Hintergrund und evtl. Zeichenbereich
 
             if (_prLo != null && _prRu != null) {
+                if (BackColor.A > 0) {
+                    var p = SheetSizeInPix;
+                    var rLo2 = new PointM(0, 0).ZoomAndMove(zoom, shiftX, shiftY);
+                    var rRu2 = new PointM(p.Width, p.Height).ZoomAndMove(zoom, shiftX, shiftY);
+                    Rectangle rr2 = new((int)rLo2.X, (int)rLo2.Y, (int)(rRu2.X - rLo2.X), (int)(rRu2.Y - rLo2.Y));
+
+                    gr.FillRectangle(new SolidBrush(BackColor), rr2);
+                    if (!showinprintmode) { gr.DrawRectangle(ZoomPad.PenGray, rr2); }
+                }
+
                 var rLo = _prLo.ZoomAndMove(zoom, shiftX, shiftY);
                 var rRu = _prRu.ZoomAndMove(zoom, shiftX, shiftY);
                 Rectangle rr = new((int)rLo.X, (int)rLo.Y, (int)(rRu.X - rLo.X), (int)(rRu.Y - rLo.Y));
-
-                if (BackColor.A > 0) { gr.FillRectangle(new SolidBrush(BackColor), rr); }
                 if (!showinprintmode) { gr.DrawRectangle(ZoomPad.PenGray, rr); }
             } else {
                 if (BackColor.A > 0) { gr.Clear(BackColor); }
