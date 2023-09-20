@@ -31,7 +31,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
 
     #region Fields
 
-    private FormulaScript? _item;
+    private FormulaScriptDescription? _item;
 
     #endregion
 
@@ -54,7 +54,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
 
     public ConnectedFormula? Formula { get; }
 
-    public FormulaScript? Item {
+    public FormulaScriptDescription? Item {
         get {
             if (Formula == null || Formula.IsDisposed) { return null; }
 
@@ -188,7 +188,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (Formula == null || Formula.IsDisposed) { return; }
 
-        var newScriptItem = lstEventScripts.Item.Add(new FormulaScript(Formula));
+        var newScriptItem = lstEventScripts.Item.Add(new FormulaScriptDescription(Formula));
 
         WriteInfosBack();
 
@@ -201,7 +201,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
             return;
         }
 
-        var selectedlstEventScripts = (FormulaScript)((ReadableListItem)lstEventScripts.Item.Checked()[0]).Item;
+        var selectedlstEventScripts = (FormulaScriptDescription)((ReadableListItem)lstEventScripts.Item.Checked()[0]).Item;
         Item = selectedlstEventScripts;
     }
 
@@ -222,8 +222,8 @@ public sealed partial class ConnectedFormulaScriptEditor {
 
         #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
 
-        var t2 = new List<FormulaScript>();
-        t2.AddRange(lstEventScripts.Item.Select(thisItem => (FormulaScript)((ReadableListItem)thisItem).Item));
+        var t2 = new List<FormulaScriptDescription>();
+        t2.AddRange(lstEventScripts.Item.Select(thisItem => (FormulaScriptDescription)((ReadableListItem)thisItem).Item));
         Formula.EventScript = new(t2);
 
         #endregion

@@ -115,7 +115,7 @@
     <Compile Include="EventArgs\ColumnReasonEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="ColumnFormatHolder.cs" />
-    <Compile Include="DatabaseScript.cs" />
+    <Compile Include="DatabaseScriptDescription.cs" />
     <Compile Include="EventArgs\RowReasonEventArgs.cs" />
     <Compile Include="Interfaces\IColumnInputFormat.cs" />
     <Compile Include="Interfaces\IHasChangeabelDatabase.cs" />

@@ -38,7 +38,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     #region Fields
 
-    private DatabaseScript? _item;
+    private DatabaseScriptDescription? _item;
 
     #endregion
 
@@ -77,7 +77,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     public DatabaseAbstract? Database { get; private set; }
 
-    public DatabaseScript? Item {
+    public DatabaseScriptDescription? Item {
         get {
             if (Database == null || Database.IsDisposed) { return null; }
             return _item;
@@ -298,7 +298,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (Database == null || Database.IsDisposed) { return; }
 
-        var newScriptItem = lstEventScripts.Item.Add(new DatabaseScript(Database));
+        var newScriptItem = lstEventScripts.Item.Add(new DatabaseScriptDescription(Database));
 
         WriteInfosBack();
 
@@ -314,7 +314,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             Item = null;
             return;
         }
-        var selectedlstEventScripts = (DatabaseScript)((ReadableListItem)lstEventScripts.Item.Checked()[0]).Item;
+        var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts.Item.Checked()[0]).Item;
         Item = selectedlstEventScripts;
     }
 
@@ -370,8 +370,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         #region Items sicherheitshalber in die Datenbank zurück schreiben, nur so werden die gelöschten und neuen erfasst
 
-        var t2 = new List<DatabaseScript>();
-        t2.AddRange(lstEventScripts.Item.Select(thisItem => (DatabaseScript)((ReadableListItem)thisItem).Item));
+        var t2 = new List<DatabaseScriptDescription>();
+        t2.AddRange(lstEventScripts.Item.Select(thisItem => (DatabaseScriptDescription)((ReadableListItem)thisItem).Item));
         Database.EventScript = new(t2);
         Database.EventScriptErrorMessage = string.Empty;
 

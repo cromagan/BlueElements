@@ -143,7 +143,7 @@
     <Compile Include="ConnectedFormula\ConnectedFormulaScriptEditor.Designer.cs">
       <DependentUpon>ConnectedFormulaScriptEditor.cs</DependentUpon>
     </Compile>
-    <Compile Include="ConnectedFormula\FormulaScript.cs" />
+    <Compile Include="ConnectedFormula\FormulaScriptDescription.cs" />
     <Compile Include="ConnectedFormula\FilterChangeControl.cs">
       <SubType>Component</SubType>
     </Compile>

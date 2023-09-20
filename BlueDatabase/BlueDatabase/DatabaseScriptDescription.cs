@@ -33,8 +33,8 @@ public static class EventScriptExtension {
 
     #region Methods
 
-    public static List<DatabaseScript> Get(this ReadOnlyCollection<DatabaseScript> scripts, ScriptEventTypes type) {
-        var l = new List<DatabaseScript>();
+    public static List<DatabaseScriptDescription> Get(this ReadOnlyCollection<DatabaseScriptDescription> scripts, ScriptEventTypes type) {
+        var l = new List<DatabaseScriptDescription>();
 
         foreach (var thisScript in scripts) {
             if (thisScript.EventTypes.HasFlag(type)) { l.Add(thisScript); }
@@ -46,7 +46,7 @@ public static class EventScriptExtension {
     #endregion
 }
 
-public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase, IComparable, IChangedFeedback {
+public sealed class DatabaseScriptDescription : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IHasDatabase, IComparable, IChangedFeedback {
 
     #region Fields
 
@@ -64,14 +64,14 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
     #region Constructors
 
-    public DatabaseScript(DatabaseAbstract database, string name, string script) : this(database) {
+    public DatabaseScriptDescription(DatabaseAbstract database, string name, string script) : this(database) {
         KeyName = name;
         _scripttext = script;
     }
 
-    public DatabaseScript(DatabaseAbstract? database, string toParse) : this(database) => Parse(toParse);
+    public DatabaseScriptDescription(DatabaseAbstract? database, string toParse) : this(database) => Parse(toParse);
 
-    public DatabaseScript(DatabaseAbstract? database) {
+    public DatabaseScriptDescription(DatabaseAbstract? database) {
         Database = database;
 
         if (Database != null && !Database.IsDisposed) {
@@ -89,7 +89,7 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
     #region Destructors
 
     // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    ~DatabaseScript() {
+    ~DatabaseScriptDescription() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(false);
     }
@@ -214,10 +214,10 @@ public sealed class DatabaseScript : IParseable, IReadableTextWithChangingAndKey
 
     #region Methods
 
-    public object Clone() => new DatabaseScript(Database, ToString());
+    public object Clone() => new DatabaseScriptDescription(Database, ToString());
 
     public int CompareTo(object obj) {
-        if (obj is DatabaseScript v) {
+        if (obj is DatabaseScriptDescription v) {
             return CompareKey.CompareTo(v.CompareKey);
         }
 

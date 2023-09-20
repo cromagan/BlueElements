@@ -1007,7 +1007,7 @@ public partial class TableView : FormWithStatusBar {
         if (Table.Database == null || !Table.Database.IsAdministrator()) { return; }
 
         if (e.Item is not ReadableListItem bli) { return; }
-        if (bli.Item is not DatabaseScript sc) { return; }
+        if (bli.Item is not DatabaseScriptDescription sc) { return; }
 
         string m;
 

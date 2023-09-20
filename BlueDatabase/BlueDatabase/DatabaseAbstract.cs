@@ -67,7 +67,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     private readonly List<string> _datenbankAdmin = new();
 
-    private readonly List<DatabaseScript> _eventScript = new();
+    private readonly List<DatabaseScriptDescription> _eventScript = new();
 
     private readonly LayoutCollection _layouts = new();
 
@@ -243,10 +243,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
 
-    public ReadOnlyCollection<DatabaseScript> EventScript {
+    public ReadOnlyCollection<DatabaseScriptDescription> EventScript {
         get => new(_eventScript);
         set {
-            var l = new List<DatabaseScript>();
+            var l = new List<DatabaseScriptDescription>();
             l.AddRange(value);
             l.Sort();
 
@@ -961,7 +961,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public void EnableScript() => Column.GenerateAndAddSystem("SYS_ROWSTATE", "SYS_DATECHANGED");
 
-    public void EventScript_Add(DatabaseScript ev, bool isLoading) {
+    public void EventScript_Add(DatabaseScriptDescription ev, bool isLoading) {
         _eventScript.Add(ev);
         ev.Changed += EventScript_Changed;
 
@@ -979,7 +979,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
     }
 
-    public ScriptEndedFeedback ExecuteScript(DatabaseScript s, bool changevalues, RowItem? row, List<string>? attributes) {
+    public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool changevalues, RowItem? row, List<string>? attributes) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, s.Name); }
 
         var sce = CheckScriptError();
@@ -1957,7 +1957,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 EventScript_RemoveAll(true);
                 List<string> ai = new(value.SplitAndCutByCr());
                 foreach (var t in ai) {
-                    EventScript_Add(new DatabaseScript(this, t), true);
+                    EventScript_Add(new DatabaseScriptDescription(this, t), true);
                 }
 
                 //CheckScriptError();

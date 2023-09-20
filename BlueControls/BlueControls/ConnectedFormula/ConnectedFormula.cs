@@ -55,7 +55,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     private readonly List<string> _databaseFiles = new();
 
-    private readonly List<FormulaScript> _eventScript = new();
+    private readonly List<FormulaScriptDescription> _eventScript = new();
     private readonly List<string> _notAllowedChilds = new();
 
     private readonly List<Variable> _variables = new();
@@ -137,10 +137,10 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     [DefaultValue(true)]
     public bool DropMessages { get; set; } = true;
 
-    public ReadOnlyCollection<FormulaScript> EventScript {
+    public ReadOnlyCollection<FormulaScriptDescription> EventScript {
         get => new(_eventScript);
         set {
-            var l = new List<FormulaScript>();
+            var l = new List<FormulaScriptDescription>();
             l.AddRange(value);
             l.Sort();
 
@@ -528,7 +528,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         GC.SuppressFinalize(this);
     }
 
-    public void EventScript_Add(FormulaScript ev, bool isLoading) {
+    public void EventScript_Add(FormulaScriptDescription ev, bool isLoading) {
         _eventScript.Add(ev);
         ev.Changed += EventScript_Changed;
 
@@ -674,7 +674,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         if (!isLoading) { Variables_Changed(); }
     }
 
-    internal ScriptEndedFeedback ExecuteScript(FormulaScript s) {
+    internal ScriptEndedFeedback ExecuteScript(FormulaScriptDescription s) {
         if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, false, s.Name); }
 
         var sce = CheckScriptError();
@@ -865,7 +865,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                     EventScript_RemoveAll(true);
                     List<string> ai = new(pair.Value.FromNonCritical().SplitAndCutByCr());
                     foreach (var t in ai) {
-                        EventScript_Add(new FormulaScript(this, t.FromNonCritical()), true);
+                        EventScript_Add(new FormulaScriptDescription(this, t.FromNonCritical()), true);
                     }
 
                     break;

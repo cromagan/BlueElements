@@ -56,7 +56,7 @@ public partial class FormulaView : FormWithStatusBar {
     private void Btb_Click(object sender, System.EventArgs e) {
         if (CFormula.ConnectedFormula == null || CFormula.ConnectedFormula.IsDisposed) { return; }
 
-        if (sender is Button btb && btb.Tag is FormulaScript fs) {
+        if (sender is Button btb && btb.Tag is FormulaScriptDescription fs) {
             CFormula.ConnectedFormula.ExecuteScript(fs);
         }
     }
@@ -176,7 +176,7 @@ public partial class FormulaView : FormWithStatusBar {
         FormulaSet(LoadTab.FileName);
     }
 
-    private void UpdateScripts(ReadOnlyCollection<FormulaScript>? scripts, GroupBox groupBox) {
+    private void UpdateScripts(ReadOnlyCollection<FormulaScriptDescription>? scripts, GroupBox groupBox) {
 
         #region Vorhanden Buttons löschen
 

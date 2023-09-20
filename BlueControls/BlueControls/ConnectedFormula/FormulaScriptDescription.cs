@@ -33,8 +33,8 @@ public static class FormulaScriptExtension {
 
     #region Methods
 
-    public static List<FormulaScript> Get(this ReadOnlyCollection<FormulaScript> scripts, ScriptEventTypes type) {
-        var l = new List<FormulaScript>();
+    public static List<FormulaScriptDescription> Get(this ReadOnlyCollection<FormulaScriptDescription> scripts, ScriptEventTypes type) {
+        var l = new List<FormulaScriptDescription>();
 
         foreach (var thisScript in scripts) {
             if (thisScript.EventTypes.HasFlag(type)) { l.Add(thisScript); }
@@ -46,7 +46,7 @@ public static class FormulaScriptExtension {
     #endregion
 }
 
-public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IComparable, IChangedFeedback {
+public sealed class FormulaScriptDescription : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IComparable, IChangedFeedback {
 
     #region Fields
 
@@ -59,14 +59,14 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
 
     #region Constructors
 
-    public FormulaScript(ConnectedFormula formula, string name, string script) : this(formula) {
+    public FormulaScriptDescription(ConnectedFormula formula, string name, string script) : this(formula) {
         KeyName = name;
         _scriptText = script;
     }
 
-    public FormulaScript(ConnectedFormula? formula, string toParse) : this(formula) => Parse(toParse);
+    public FormulaScriptDescription(ConnectedFormula? formula, string toParse) : this(formula) => Parse(toParse);
 
-    public FormulaScript(ConnectedFormula? formula) {
+    public FormulaScriptDescription(ConnectedFormula? formula) {
         Formula = formula;
 
         //if (Database != null && !Database.IsDisposed) {
@@ -83,7 +83,7 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
     #region Destructors
 
     // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    ~FormulaScript() {
+    ~FormulaScriptDescription() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(false);
     }
@@ -158,10 +158,10 @@ public sealed class FormulaScript : IParseable, IReadableTextWithChangingAndKey,
 
     #region Methods
 
-    public object Clone() => new FormulaScript(Formula, ToString());
+    public object Clone() => new FormulaScriptDescription(Formula, ToString());
 
     public int CompareTo(object obj) {
-        if (obj is FormulaScript v) {
+        if (obj is FormulaScriptDescription v) {
             return CompareKey.CompareTo(v.CompareKey);
         }
 
