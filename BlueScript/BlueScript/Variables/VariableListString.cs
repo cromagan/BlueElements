@@ -23,6 +23,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
@@ -102,7 +103,7 @@ public class VariableListString : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableListString(Name);
+        var v = new VariableListString(KeyName);
         v.Parse(ToString());
         return v;
     }

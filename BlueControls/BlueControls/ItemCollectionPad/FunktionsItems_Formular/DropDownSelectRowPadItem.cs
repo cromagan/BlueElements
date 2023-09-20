@@ -50,7 +50,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     #region Constructors
 
-    public DropDownSelectRowPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => Parse(toParse);
+    public DropDownSelectRowPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => this.Parse(toParse);
 
     public DropDownSelectRowPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
@@ -269,8 +269,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
-    protected override void ParseFinished() {
-        base.ParseFinished();
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
         _itemAccepts.ParseFinished(this);
     }

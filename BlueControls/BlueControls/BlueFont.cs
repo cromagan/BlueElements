@@ -164,10 +164,6 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName {
                 case "onlyupper":
                     OnlyUpper = true;
                     break;
-
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
             }
         }
         _font = new Font(FontName, FontSize / Skin.Scale, ftst);

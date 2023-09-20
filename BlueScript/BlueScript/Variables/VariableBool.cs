@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Extensions;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
@@ -74,7 +75,7 @@ public class VariableBool : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableBool(Name);
+        var v = new VariableBool(KeyName);
         v.Parse(ToString());
         return v;
     }

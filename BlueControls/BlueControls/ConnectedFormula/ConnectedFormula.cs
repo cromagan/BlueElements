@@ -484,11 +484,11 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         foreach (var thissc in _eventScript) {
             if (!thissc.IsOk()) {
-                return thissc.Name + ": " + thissc.ErrorReason();
+                return thissc.KeyName + ": " + thissc.ErrorReason();
             }
 
-            if (names.Contains(thissc.Name, false)) {
-                return "Skriptname '" + thissc.Name + "' mehrfach vorhanden";
+            if (names.Contains(thissc.KeyName, false)) {
+                return "Skriptname '" + thissc.KeyName + "' mehrfach vorhanden";
             }
         }
 
@@ -565,7 +565,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
                 var l = EventScript.Get((ScriptEventTypes)eventname);
-                if (l.Count == 1) { scriptname = l[0].Name; }
+                if (l.Count == 1) { scriptname = l[0].KeyName; }
                 if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, false, string.Empty); }
             }
 
@@ -675,7 +675,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     }
 
     internal ScriptEndedFeedback ExecuteScript(FormulaScriptDescription s) {
-        if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, false, s.Name); }
+        if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, false, s.KeyName); }
 
         var sce = CheckScriptError();
         if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, "Allgemein"); }
@@ -687,7 +687,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             VariableCollection vars = new();
 
             foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("Formula_" + thisvar.Name, thisvar.ValueString, false, false, "Formular-Kopf-Variable\r\n" + thisvar.Comment);
+                var v = new VariableString("Formula_" + thisvar.KeyName, thisvar.ValueString, false, false, "Formular-Kopf-Variable\r\n" + thisvar.Comment);
                 vars.Add(v);
             }
 
@@ -723,7 +723,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             Script sc = new(vars, string.Empty, scp) {
                 ScriptText = s.ScriptText
             };
-            var scf = sc.Parse(0, s.Name);
+            var scf = sc.Parse(0, s.KeyName);
 
             #endregion
 
@@ -734,7 +734,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             }
 
             if (!scf.AllOk) {
-                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.Name + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
+                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
             }
 
             #endregion
@@ -880,10 +880,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                         l.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
                         Variables_Add(l, true);
                     }
-                    break;
-
-                default:
-                    DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                     break;
             }
         }

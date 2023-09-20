@@ -29,6 +29,7 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueControls;
 
@@ -37,8 +38,11 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
     #region Fields
 
     private object? _parent;
+
     private string _tag = string.Empty;
+
     private float _x;
+
     private float _y;
 
     #endregion
@@ -57,7 +61,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
 
     public PointM(PointF startPoint, float laenge, float alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
 
-    public PointM(object? parent, string toParse) : this(parent) => Parse(toParse);
+    public PointM(object? parent, string toParse) : this(parent) => this.Parse(toParse);
 
     public PointM(object? parent, string name, float x, float y) {
         Parent = parent;
@@ -100,6 +104,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
     #region Properties
 
     public string KeyName { get; private set; }
+
     public float Magnitude => (float)Math.Sqrt((_x * _x) + (_y * _y));
 
     public object? Parent {
@@ -181,45 +186,43 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
 
     public void OnMoving(MoveEventArgs e) => Moving?.Invoke(this, e);
 
-    public void Parse(string toParse) {
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "parentname":
-                    break;
+    public void ParseFinished(string parsed) { }
 
-                case "name":
-                    KeyName = pair.Value.FromNonCritical();
-                    break;
+    public bool ParseThis(string key, string value) {
+        switch (key) {
+            case "parentname":
+                return true;
 
-                case "tag":
-                    _tag = pair.Value.FromNonCritical();
-                    break;
+            case "name":
+                KeyName = value.FromNonCritical();
+                return true;
 
-                case "x":
-                    _x = FloatParse(pair.Value);
-                    break;
+            case "tag":
+                _tag = value.FromNonCritical();
+                return true;
 
-                case "y":
-                    _y = FloatParse(pair.Value);
-                    break;
+            case "x":
+                _x = FloatParse(value);
+                return true;
 
-                case "fix": // TODO: Entfernt, 24.05.2021
-                    break;
+            case "y":
+                _y = FloatParse(value);
+                return true;
 
-                case "moveable": // TODO: Entfernt, 24.05.2021
-                    break;
+            case "fix": // TODO: Entfernt, 24.05.2021
+                return true;
 
-                case "getsnapped": // TODO: Entfernt, 24.05.2021
-                    break;
+            case "moveable": // TODO: Entfernt, 24.05.2021
+                return true;
 
-                case "primarygridsnappoint": // TODO: Entfernt, 24.05.2021
-                    break;
+            case "getsnapped": // TODO: Entfernt, 24.05.2021
+                return true;
 
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
+            case "primarygridsnappoint": // TODO: Entfernt, 24.05.2021
+                return true;
         }
+
+        return false;
     }
 
     public void SetTo(float x, float y) {

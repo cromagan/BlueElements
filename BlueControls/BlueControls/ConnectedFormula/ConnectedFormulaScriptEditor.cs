@@ -70,7 +70,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
             if (value != null) {
                 grpEigenschaften.Enabled = true;
                 eventScriptEditor.Enabled = true;
-                txbName.Text = value.Name;
+                txbName.Text = value.KeyName;
 
                 chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
                 chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
@@ -212,7 +212,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
-        Item.Name = txbName.Text;
+        Item.KeyName = txbName.Text;
     }
 
     private void WriteInfosBack() {

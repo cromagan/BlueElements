@@ -23,6 +23,7 @@ using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 // ReSharper disable All
 
@@ -33,6 +34,7 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
     #region Fields
 
     public List<ColumnItem> Columns = new();
+
     public DatabaseAbstract Database;
 
     #endregion
@@ -41,7 +43,7 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
 
     public RowSortDefinition(DatabaseAbstract database, string toParse) {
         Database = database;
-        Parse(toParse);
+        this.Parse(toParse);
     }
 
     public RowSortDefinition(DatabaseAbstract database, string columnName, bool reverse) {
@@ -76,43 +78,40 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-    public void Parse(string toParse) {
-        Initialize();
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "identifier":
-                    if (pair.Value != "SortDefinition") { Develop.DebugPrint(FehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value); }
-                    break;
+    public void ParseFinished(string parsed) { }
 
-                case "direction":
-                    Reverse = pair.Value == "Z-A";
-                    break;
+    public bool ParseThis(string key, string value) {
+        switch (key) {
+            case "identifier":
+                if (value != "SortDefinition") { Develop.DebugPrint(FehlerArt.Fehler, "Identifier fehlerhaft: " + value); }
+                return true;
 
-                case "reverse":
-                    Reverse = pair.Value.FromPlusMinus();
-                    break;
+            case "direction":
+                Reverse = value == "Z-A";
+                return true;
 
-                case "column":
-                case "columnname": // ColumnName wichtig wegen CopyLayout
-                    if (Database.Column.Exists(pair.Value) is ColumnItem c) { Columns.Add(c); }
-                    break;
+            case "reverse":
+                Reverse = value.FromPlusMinus();
+                return true;
 
-                case "columns":
-                    var cols = pair.Value.FromNonCritical().SplitBy("|");
-                    foreach (var thisc in cols) {
-                        if (Database.Column.Exists(thisc) is ColumnItem c2) { Columns.Add(c2); }
-                    }
-                    break;
+            case "column":
+            case "columnname": // ColumnName wichtig wegen CopyLayout
+                if (Database.Column.Exists(value) is ColumnItem c) { Columns.Add(c); }
+                return true;
 
-                case "columnkey":
-                    //if (Database.Column.SearchByKey(LongParse(pair.Value)) is ColumnItem c2) { Columns.Add(c2); }
-                    break;
+            case "columns":
+                var cols = value.FromNonCritical().SplitBy("|");
+                foreach (var thisc in cols) {
+                    if (Database.Column.Exists(thisc) is ColumnItem c2) { Columns.Add(c2); }
+                }
+                return true;
 
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
+            case "columnkey":
+                //if (Database.Column.SearchByKey(LongParse(pair.Value)) is ColumnItem c2) { Columns.Add(c2); }
+                return true;
         }
+
+        return false;
     }
 
     public override string ToString() {

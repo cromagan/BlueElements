@@ -20,6 +20,7 @@
 using System;
 using BlueBasics;
 using BlueScript.Structures;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
@@ -72,7 +73,7 @@ public class VariableDateTime : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableDateTime(Name);
+        var v = new VariableDateTime(KeyName);
         v.Parse(ToString());
         return v;
     }

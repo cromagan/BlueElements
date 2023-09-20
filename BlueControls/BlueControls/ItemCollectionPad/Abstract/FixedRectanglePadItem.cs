@@ -80,6 +80,11 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         SetLeftTopPoint(x - (ua.Width / 2) + (width / 2), y - (ua.Height / 2) + (height / 2));
     }
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        SizeChanged();
+    }
+
     public override void PointMoved(object sender, MoveEventArgs e) {
         base.PointMoved(sender, e);
         var x = 0f;
@@ -160,11 +165,6 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     protected override RectangleF CalculateUsedArea() {
         if (_pLo == null) { return RectangleF.Empty; }
         return new RectangleF(_pLo.X, _pLo.Y, Size.Width, Size.Height);
-    }
-
-    protected override void ParseFinished() {
-        base.ParseFinished();
-        SizeChanged();
     }
 
     #endregion

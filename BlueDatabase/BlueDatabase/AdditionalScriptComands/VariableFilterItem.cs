@@ -20,6 +20,7 @@
 using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript;
 
@@ -65,7 +66,7 @@ public class VariableFilterItem : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableFilterItem(Name);
+        var v = new VariableFilterItem(KeyName);
         v.Parse(ToString());
         return v;
     }

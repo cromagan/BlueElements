@@ -26,6 +26,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using static BlueBasics.Converter;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -46,37 +47,21 @@ public static class FormulaScriptExtension {
     #endregion
 }
 
-public sealed class FormulaScriptDescription : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IComparable, IChangedFeedback {
+public sealed class FormulaScriptDescription : ScriptDescription, IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, ICloneable, IErrorCheckable, IHasKeyName, IChangedFeedback {
 
     #region Fields
 
-    private bool _changeValues;
     private ScriptEventTypes _eventTypes = 0;
-    private bool _manualexecutable;
-    private string _scriptText;
 
     #endregion
 
     #region Constructors
 
-    public FormulaScriptDescription(ConnectedFormula formula, string name, string script) : this(formula) {
-        KeyName = name;
-        _scriptText = script;
-    }
+    public FormulaScriptDescription(ConnectedFormula formula, string name, string script) : base(name, script) => Formula = formula;
 
-    public FormulaScriptDescription(ConnectedFormula? formula, string toParse) : this(formula) => Parse(toParse);
+    public FormulaScriptDescription(ConnectedFormula? formula, string toParse) : this(formula) => this.Parse(toParse);
 
-    public FormulaScriptDescription(ConnectedFormula? formula) {
-        Formula = formula;
-
-        //if (Database != null && !Database.IsDisposed) {
-        //    Database.Disposing += Database_Disposing;
-        //}
-
-        KeyName = string.Empty;
-        _scriptText = string.Empty;
-        _manualexecutable = false;
-    }
+    public FormulaScriptDescription(ConnectedFormula? formula) : base(string.Empty, string.Empty) => Formula = formula;
 
     #endregion
 
@@ -90,25 +75,7 @@ public sealed class FormulaScriptDescription : IParseable, IReadableTextWithChan
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? Changed;
-
-    #endregion
-
     #region Properties
-
-    public bool ChangeValues {
-        get => _changeValues;
-        set {
-            if (IsDisposed) { return; }
-            if (_changeValues == value) { return; }
-            _changeValues = value;
-            OnChanged();
-        }
-    }
-
-    public string CompareKey => Name.ToString();
 
     public ScriptEventTypes EventTypes {
         get => _eventTypes;
@@ -121,46 +88,20 @@ public sealed class FormulaScriptDescription : IParseable, IReadableTextWithChan
     }
 
     public ConnectedFormula? Formula { get; private set; }
-    public bool IsDisposed { get; private set; }
-    public string KeyName { get; private set; }
-
-    public bool ManualExecutable {
-        get => _manualexecutable;
-        set {
-            if (IsDisposed) { return; }
-            if (_manualexecutable == value) { return; }
-            _manualexecutable = value;
-            OnChanged();
-        }
-    }
-
-    public string Name {
-        get => KeyName;
-        set {
-            if (IsDisposed) { return; }
-            if (KeyName == value) { return; }
-            KeyName = value;
-            OnChanged();
-        }
-    }
-
-    public string ScriptText {
-        get => _scriptText;
-        set {
-            if (IsDisposed) { return; }
-            if (_scriptText == value) { return; }
-            _scriptText = value;
-            OnChanged();
-        }
-    }
 
     #endregion
 
     #region Methods
 
+    public override List<string> Attributes() {
+        var s = new List<string>();
+        if (!ChangeValues) { s.Add("NeverChangesValues"); }
+        return s;
+    }
+
     public object Clone() => new FormulaScriptDescription(Formula, ToString());
 
-    public int CompareTo(object obj) {
+    public override int CompareTo(object obj) {
         if (obj is FormulaScriptDescription v) {
             return CompareKey.CompareTo(v.CompareKey);
         }
@@ -169,111 +110,36 @@ public sealed class FormulaScriptDescription : IParseable, IReadableTextWithChan
         return 0;
     }
 
-    public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    public string ErrorReason() {
+    public override string ErrorReason() {
         if (Formula?.IsDisposed ?? true) { return "Formular verworfen"; }
 
-        if (string.IsNullOrEmpty(KeyName)) { return "Kein Name angegeben."; }
+        var b = base.ErrorReason();
 
-        if (!KeyName.IsFormat(FormatHolder.Text)) { return "Ungültiger Name"; }
-
-        //if (_eventTypes.HasFlag(DatabaseEventTypes.prepare_formula)) {
-        //    if (_changeValues) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
-        //    if (!_needRow) { return "Routinen, die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
-        //    if (_executable) { return "Routinen, die das Formular vorbereiten, können nicht so von außerhalb benutzt werden."; }
-        //}
-
-        //if (_eventTypes.HasFlag(DatabaseEventTypes.export)) {
-        //    if (_changeValues) { return "Routinen für Export können keine Werte ändern."; }
-        //    if (!_needRow) { return "Routinen für Export müssen sich auf Zeilen beziehen."; }
-        //}
-
-        //if (_eventTypes.HasFlag(DatabaseEventTypes.value_changed_extra_thread)) {
-        //    if (_changeValues) { return "Routinen aus einem ExtraThread, können keine Werte ändern."; }
-        //    if (!_needRow) { return "Routinen aus einem ExtraThread, müssen sich auf Zeilen beziehen."; }
-        //}
-
-        //if (_eventTypes.HasFlag(DatabaseEventTypes.value_changed)) {
-        //    if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
-        //    if (!_changeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen"; }
-        //}
-
-        //if (_eventTypes.HasFlag(DatabaseEventTypes.new_row)) {
-        //    if (!_needRow) { return "Routinen, die neue Zeilen überwachen, müssen sich auf Zeilen beziehen."; }
-        //    if (!_changeValues) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen"; }
-        //}
-
-        //if (_eventTypes.HasFlag(DatabaseEventTypes.database_loaded)) {
-        //    if (_needRow) { return "Routinen nach dem Laden einer Datenbank, dürfen sich nicht auf Zeilen beziehen."; }
-        //}
+        if (!string.IsNullOrEmpty(b)) { return b; }
 
         return string.Empty;
     }
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public override bool ParseThis(string key, string value) {
+        if (base.ParseThis(key, value)) { return true; }
 
-    public void Parse(string toParse) {
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "name":
-                    KeyName = pair.Value.FromNonCritical();
-                    break;
-
-                case "script":
-
-                    _scriptText = pair.Value.FromNonCritical();
-                    break;
-
-                case "manualexecutable":
-
-                    _manualexecutable = pair.Value.FromPlusMinus();
-                    break;
-
-                case "changevalues":
-                    _changeValues = pair.Value.FromPlusMinus();
-                    break;
-
-                case "events":
-                    _eventTypes = (ScriptEventTypes)IntParse(pair.Value);
-                    break;
-
-                //case "lastdone":
-
-                //    _lastUsed = pair.Value.FromNonCritical();
-                //    break;
-
-                case "database":
-                    //Database = DatabaseAbstract.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
-                    break;
-
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
-        }
-    }
-
-    public string ReadableText() {
-        var t = ErrorReason();
-        if (!string.IsNullOrEmpty(t)) {
-            return "Fehler: " + t;
+        switch (key) {
+            case "events":
+                _eventTypes = (ScriptEventTypes)IntParse(value);
+                break;
         }
 
-        return Name;
+        return false;
     }
 
-    public QuickImage SymbolForReadableText() {
-        if (!this.IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
+    public override QuickImage? SymbolForReadableText() {
+        var i = base.SymbolForReadableText();
+        if (i != null) { return i; }
 
         var symb = ImageCode.Formel;
         var c = Color.Transparent;
 
-        if (_manualexecutable) {
+        if (ManualExecutable) {
             c = Color.Yellow;
             symb = ImageCode.Person;
         }
@@ -285,8 +151,6 @@ public sealed class FormulaScriptDescription : IParseable, IReadableTextWithChan
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { symb = ImageCode.Wolke; }
         if (_eventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { symb = ImageCode.Textfeld; }
 
-        if (!_changeValues) { }
-
         return QuickImage.Get(symb, 16, c, Color.Transparent);
     }
 
@@ -294,35 +158,23 @@ public sealed class FormulaScriptDescription : IParseable, IReadableTextWithChan
         try {
             if (IsDisposed) { return string.Empty; }
             List<string> result = new();
-            result.ParseableAdd("Name", Name);
-            result.ParseableAdd("Script", ScriptText);
-            result.ParseableAdd("ManualExecutable", ManualExecutable);
-            result.ParseableAdd("ChangeValues", ChangeValues);
-            result.ParseableAdd("Events", EventTypes);
-            return result.Parseable();
+            result.ParseableAdd("Events", _eventTypes);
+            return result.Parseable(base.ToString());
         } catch {
             return ToString();
         }
     }
 
-    internal List<string> Attributes() {
-        var s = new List<string>();
-        if (!ChangeValues) { s.Add("NeverChangesValues"); }
-        return s;
-    }
-
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-
-    private void Dispose(bool disposing) {
+    protected override void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
             //if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
             Formula = null;
-
-            IsDisposed = true;
         }
+
+        base.Dispose(disposing);
     }
 
     #endregion

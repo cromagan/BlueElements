@@ -27,6 +27,7 @@ using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueDatabase;
 
@@ -83,7 +84,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
         SearchValue = new List<string>().AsReadOnly();
 
-        Parse(filterCode);
+        this.Parse(filterCode);
 
         _column?.RefreshColumnsData();
     }
@@ -96,7 +97,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public FilterItem(string filterCode) {
         KeyName = Generic.UniqueInternal();
         SearchValue = new List<string>().AsReadOnly();
-        Parse(filterCode);
+        this.Parse(filterCode);
         _column?.RefreshColumnsData();
     }
 
@@ -236,64 +237,62 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-    public void Parse(string toParse) {
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "identifier":
-                    if (pair.Value != "Filter") {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Identifier fehlerhaft: " + pair.Value);
-                    }
-                    break;
+    public void ParseFinished(string parsed) {
+        if (parsed.Contains(", Value=}") || parsed.Contains(", Value=,")) { _ = SearchValue.AddIfNotExists(""); }
+    }
 
-                case "database":
-                    if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
-                    Database = DatabaseAbstract.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
+    public bool ParseThis(string key, string value) {
+        switch (key) {
+            case "identifier":
+                if (value != "Filter") {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Identifier fehlerhaft: " + value);
+                }
+                return true;
 
-                    if (Database != null && !Database.IsDisposed) { Database.Disposing += Database_Disposing; }
+            case "database":
+                if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+                Database = DatabaseAbstract.GetById(new ConnectionInfo(value.FromNonCritical(), null), null);
 
-                    break;
+                if (Database != null && !Database.IsDisposed) { Database.Disposing += Database_Disposing; }
 
-                case "type":
-                    _filterType = (FilterType)IntParse(pair.Value);
-                    break;
+                return true;
 
-                case "columnname":
-                case "column":
-                    _column = Database?.Column.Exists(pair.Value);
-                    break;
+            case "type":
+                _filterType = (FilterType)IntParse(value);
+                return true;
 
-                case "columnkey":
-                    //_column = Database.Column.SearchByKey(LongParse(pair.Value));
-                    break;
+            case "columnname":
+            case "column":
+                _column = Database?.Column.Exists(value);
+                return true;
 
-                case "values":
+            case "columnkey":
+                //_column = Database.Column.SearchByKey(LongParse(pair.Value));
+                return true;
 
-                    if (string.IsNullOrEmpty(pair.Value)) {
-                        SearchValue = new List<string> { string.Empty }.AsReadOnly();
-                    } else {
-                        SearchValue = pair.Value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
-                    }
+            case "values":
 
-                    break;
+                if (string.IsNullOrEmpty(value)) {
+                    SearchValue = new List<string> { string.Empty }.AsReadOnly();
+                } else {
+                    SearchValue = value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
+                }
 
-                case "herkunft":
-                    Herkunft = pair.Value.FromNonCritical();
-                    break;
+                return true;
 
-                case "id":
-                    KeyName = pair.Value.FromNonCritical();
-                    break;
+            case "herkunft":
+                Herkunft = value.FromNonCritical();
+                return true;
 
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
+            case "id":
+                KeyName = value.FromNonCritical();
+                return true;
         }
-        if (toParse.Contains(", Value=}") || toParse.Contains(", Value=,")) { _ = SearchValue.AddIfNotExists(""); }
+
+        return false;
     }
 
     public string ReadableText() {
-
         // Bei Nich OK schön en Text zurück geben für FlexiControlForFilter
         if (!this.IsOk()) { return "Filter ohne Funktion"; }
 

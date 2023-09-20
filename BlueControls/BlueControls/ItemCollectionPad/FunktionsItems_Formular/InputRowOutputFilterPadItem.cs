@@ -53,7 +53,7 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
 
     #region Constructors
 
-    public InputRowOutputFilterPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => Parse(toParse);
+    public InputRowOutputFilterPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => this.Parse(toParse);
 
     public InputRowOutputFilterPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
@@ -291,8 +291,8 @@ public class InputRowOutputFilterPadItem : FakeControlPadItem, IReadableText, II
         }
     }
 
-    protected override void ParseFinished() {
-        base.ParseFinished();
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
         _itemAccepts.ParseFinished(this);
     }

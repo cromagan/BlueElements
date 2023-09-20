@@ -21,6 +21,7 @@ using BlueScript.Structures;
 
 //using CefSharp.WinForms;
 using CefSharp.OffScreen;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
@@ -69,7 +70,7 @@ public class VariableWebpage : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableWebpage(Name);
+        var v = new VariableWebpage(KeyName);
         v.Parse(ToString());
         return v;
     }

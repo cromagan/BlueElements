@@ -54,6 +54,11 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
     #region Methods
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        SizeChanged();
+    }
+
     protected override RectangleF CalculateUsedArea() {
         if (_generatedBitmap == null) { GeneratePic(); } // Um die Size zu erhalten
 
@@ -98,11 +103,6 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
     }
 
     protected abstract void GeneratePic();
-
-    protected override void ParseFinished() {
-        base.ParseFinished();
-        SizeChanged();
-    }
 
     protected void RemovePic() {
         _generatedBitmap?.Dispose();

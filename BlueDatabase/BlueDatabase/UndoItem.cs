@@ -24,6 +24,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueDatabase;
 
@@ -45,89 +46,96 @@ public class UndoItem : IParseable {
 
     public UndoItem(string tablename, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) : this(tablename, comand, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, comment, timeutc) { }
 
-    public UndoItem(string s) => Parse(s);
+    public UndoItem(string s) => this.Parse(s);
 
     #endregion
 
     #region Properties
 
     public string CellKey => CellCollection.KeyOfCell(ColName, RowKey);
+
     public string ChangedTo { get; private set; } = string.Empty;
+
     public string ColName { get; private set; } = string.Empty;
+
     public DatabaseDataType Comand { get; private set; } = 0;
+
     public string Comment { get; private set; } = string.Empty;
+
     public DateTime DateTimeUtc { get; private set; } = DateTime.MinValue;
+
     public string PreviousValue { get; private set; } = string.Empty;
+
     public string RowKey { get; private set; } = string.Empty;
+
     public string TableName { get; private set; } = string.Empty;
+
     public string User { get; private set; } = string.Empty;
 
     #endregion
 
     #region Methods
 
-    public void Parse(string toParse) {
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "undotype":
-                case "st":
-                    //_state = (ItemState)IntParse(pair.Value);
-                    break;
+    public void ParseFinished(string parsed) { }
 
-                case "co":
-                    Comand = (DatabaseDataType)IntParse(pair.Value);
-                    break;
+    public bool ParseThis(string key, string value) {
+        switch (key) {
+            case "undotype":
+            case "st":
+                //_state = (ItemState)IntParse(pair.Value);
+                return true;
 
-                case "cn":
-                    ColName = pair.Value;
-                    break;
+            case "co":
+                Comand = (DatabaseDataType)IntParse(value);
+                return true;
 
-                case "rk":
-                    RowKey = pair.Value;
-                    break;
+            case "cn":
+                ColName = value;
+                return true;
 
-                case "cell":
-                    break;
+            case "rk":
+                RowKey = value;
+                return true;
 
-                case "date":
-                case "d":
-                    DateTimeUtc = DateTimeParse(pair.Value);
-                    break;
+            case "cell":
+                return true;
 
-                case "user":
-                case "u":
-                    User = pair.Value.FromNonCritical();
-                    break;
+            case "date":
+            case "d":
+                DateTimeUtc = DateTimeParse(value);
+                return true;
 
-                case "group":
-                case "g":
-                    //  Group = pair.Value.FromNonCritical();
-                    break;
+            case "user":
+            case "u":
+                User = value.FromNonCritical();
+                return true;
 
-                case "c":
-                    ChangedTo = pair.Value.FromNonCritical();
-                    break;
+            case "group":
+            case "g":
+                //  Group = value.FromNonCritical();
+                return true;
 
-                case "previousvalue":
-                case "pv": // Todo: alt: 10.08.2021
-                case "p":
-                    PreviousValue = pair.Value.FromNonCritical();
-                    break;
+            case "c":
+                ChangedTo = value.FromNonCritical();
+                return true;
 
-                case "changedto":
-                case "ct": // Todo: alt: 10.08.2021
-                    ChangedTo = pair.Value.FromNonCritical();
-                    break;
+            case "previousvalue":
+            case "pv": // Todo: alt: 10.08.2021
+            case "p":
+                PreviousValue = value.FromNonCritical();
+                return true;
 
-                case "cmt":
-                    Comment = pair.Value.FromNonCritical();
-                    break;
+            case "changedto":
+            case "ct": // Todo: alt: 10.08.2021
+                ChangedTo = value.FromNonCritical();
+                return true;
 
-                default:
-                    Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
+            case "cmt":
+                Comment = value.FromNonCritical();
+                return true;
         }
+
+        return false;
     }
 
     public new string ToString() {

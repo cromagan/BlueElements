@@ -31,6 +31,7 @@ using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -46,7 +47,7 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     #region Constructors
 
-    public AddRowPaditem(string keyname, string toParse) : this(keyname) => Parse(toParse);
+    public AddRowPaditem(string keyname, string toParse) : this(keyname) => this.Parse(toParse);
 
     public AddRowPaditem(string intern) : base(intern) => _itemAccepts = new();
 
@@ -120,6 +121,12 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         return l;
     }
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
+    }
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
 
@@ -177,12 +184,6 @@ public class AddRowPaditem : FakeControlPadItem, IReadableText, IItemToControl, 
         Controls.Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(ImageCode.PlusZeichen), Alignment.Top_HorizontalCenter, false, _eTxt, "xxx", positionModified.ToRect(), false);
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-    }
-
-    protected override void ParseFinished() {
-        base.ParseFinished();
-        //_itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

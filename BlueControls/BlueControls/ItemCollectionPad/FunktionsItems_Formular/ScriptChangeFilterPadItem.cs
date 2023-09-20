@@ -42,7 +42,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     #region Constructors
 
-    public ScriptChangeFilterPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => Parse(toParse);
+    public ScriptChangeFilterPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => this.Parse(toParse);
 
     public ScriptChangeFilterPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
@@ -187,8 +187,8 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", null);
     }
 
-    protected override void ParseFinished() {
-        base.ParseFinished();
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
         _itemAccepts.ParseFinished(this);
     }

@@ -15,13 +15,37 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Enums;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+
 namespace BlueBasics.Interfaces;
+
+public static class IParseableExtension {
+
+    #region Methods
+
+    public static void Parse(this IParseable parsable, string toParse) {
+        foreach (var pair in toParse.GetAllTags()) {
+            var i = parsable.ParseThis(pair.Key.ToLower(), pair.Value);
+
+            if (!i) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
+            }
+        }
+        parsable.ParseFinished(toParse);
+    }
+
+    #endregion
+}
 
 public interface IParseable : IStringable {
 
     #region Methods
 
-    void Parse(string toParse);
+    public void ParseFinished(string parsed);
+
+    bool ParseThis(string key, string value);
 
     #endregion
 }

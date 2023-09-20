@@ -189,6 +189,11 @@ public class DimensionPadItem : AbstractPadItem {
         _textPoint.SetTo(x + (width / 2), y);
     }
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        CalculateOtherPoints();
+    }
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
@@ -310,11 +315,6 @@ public class DimensionPadItem : AbstractPadItem {
             gr.Restore(x);
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-    }
-
-    protected override void ParseFinished() {
-        base.ParseFinished();
-        CalculateOtherPoints();
     }
 
     //protected override AbstractPadItem? TryCreate(string id, string name) {

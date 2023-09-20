@@ -42,7 +42,7 @@ public abstract class Method_Database : Method {
         var c = attvar.Attributes[no];
         if (c == null) { return null; }
 
-        return MyDatabase(variables)?.Column.Exists(c.Name);
+        return MyDatabase(variables)?.Column.Exists(c.KeyName);
     }
 
     protected DatabaseAbstract? DatabaseOf(VariableCollection variables, string tableName) {

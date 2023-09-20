@@ -71,7 +71,7 @@ public partial class VariableEditor : UserControl {
 
     public RowItem? RowOfVariable(Variable variable) {
         if (tableVariablen?.Database == null) { return null; }
-        return tableVariablen.Database.Row[variable.Name];
+        return tableVariablen.Database.Row[variable.KeyName];
     }
 
     public void WriteVariablesToTable(IReadOnlyCollection<Variable> variables) {
@@ -93,7 +93,7 @@ public partial class VariableEditor : UserControl {
         if (variables == null) { return; }
 
         foreach (var thisv in variables) {
-            var ro = RowOfVariable(thisv) ?? tableVariablen.Database.Row.GenerateAndAdd(thisv.Name, "Neue Variable");
+            var ro = RowOfVariable(thisv) ?? tableVariablen.Database.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");
 
             if (ro != null) {
                 ro.CellSet("typ", thisv.MyClassId);

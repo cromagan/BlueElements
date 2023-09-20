@@ -97,6 +97,11 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     public override void InitialPosition(int x, int y, int width, int height) => SetCoordinates(new RectangleF(x, y, width, height), true);
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        SizeChanged();
+    }
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
@@ -193,11 +198,6 @@ public abstract class RectanglePadItem : AbstractPadItem {
                                                                Math.Min(_pLo.Y, _pRu.Y),
                                                                Math.Abs(_pRu.X - _pLo.X),
                                                                Math.Abs(_pRu.Y - _pLo.Y));
-
-    protected override void ParseFinished() {
-        base.ParseFinished();
-        SizeChanged();
-    }
 
     #endregion
 }

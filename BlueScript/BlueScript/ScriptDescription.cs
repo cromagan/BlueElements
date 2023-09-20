@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Xml.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -27,35 +28,41 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public abstract class ScriptDescription : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, IErrorCheckable, IHasKeyName, IChangedFeedback {
+public abstract class ScriptDescription : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, IErrorCheckable, IHasKeyName, IChangedFeedback, IComparable {
 
     #region Fields
 
     private string _admininfo;
-    private string _imagecode;
+
+    private bool _changeValues;
+
+    private string _image;
+
+    private string _keyName;
+
     private bool _manualexecutable;
+
     private string _quickinfo;
-    private string _script;
+
+    private string _scriptText;
+
     private List<string> _usergroups;
 
     #endregion
 
     #region Constructors
 
-    public ScriptDescription(string name, string script) : this() {
-        KeyName = name;
-        _script = script;
-    }
-
-    public ScriptDescription() {
-        KeyName = string.Empty;
-        _script = string.Empty;
+    public ScriptDescription(string name, string script) {
+        _keyName = name;
+        _scriptText = script;
         _manualexecutable = false;
         _admininfo = string.Empty;
         _quickinfo = string.Empty;
         _usergroups = new List<string>();
-        _imagecode = string.Empty;
+        _image = string.Empty;
     }
+
+    public ScriptDescription() : this(string.Empty, string.Empty) { }
 
     #endregion
 
@@ -87,12 +94,24 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
         }
     }
 
-    public string ImageCode {
-        get => _imagecode;
+    public bool ChangeValues {
+        get => _changeValues;
         set {
             if (IsDisposed) { return; }
-            if (_imagecode == value) { return; }
-            _imagecode = value;
+            if (_changeValues == value) { return; }
+            _changeValues = value;
+            OnChanged();
+        }
+    }
+
+    public string CompareKey => KeyName.ToString();
+
+    public string Image {
+        get => _image;
+        set {
+            if (IsDisposed) { return; }
+            if (_image == value) { return; }
+            _image = value;
             OnChanged();
         }
     }
@@ -100,11 +119,11 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
     public bool IsDisposed { get; private set; }
 
     public string KeyName {
-        get => KeyName;
-        private set {
+        get => _keyName;
+        set {
             if (IsDisposed) { return; }
-            if (KeyName == value) { return; }
-            KeyName = value;
+            if (_keyName == value) { return; }
+            _keyName = value;
             OnChanged();
         }
     }
@@ -130,11 +149,11 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
     }
 
     public string ScriptText {
-        get => _script;
+        get => _scriptText;
         set {
             if (IsDisposed) { return; }
-            if (_script == value) { return; }
-            _script = value;
+            if (_scriptText == value) { return; }
+            _scriptText = value;
             OnChanged();
         }
     }
@@ -155,60 +174,64 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
 
     public abstract List<string> Attributes();
 
+    public abstract int CompareTo(object obj);
+
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
-    public string ErrorReason() {
+    public virtual string ErrorReason() {
         if (string.IsNullOrEmpty(KeyName)) { return "Kein Name angegeben."; }
-
         if (!KeyName.IsFormat(FormatHolder.Text)) { return "Ungültiger Name"; }
-
         return string.Empty;
     }
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-    public virtual void Parse(string toParse) {
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "name":
-                    KeyName = pair.Value.FromNonCritical();
-                    break;
+    public void ParseFinished(string parsed) { }
 
-                case "script":
+    public virtual bool ParseThis(string key, string value) {
+        switch (key) {
+            case "name":
+                _keyName = value.FromNonCritical();
+                return true;
 
-                    _script = pair.Value.FromNonCritical();
-                    break;
+            case "script":
 
-                case "manualexecutable":
+                _scriptText = value.FromNonCritical();
+                return true;
 
-                    _manualexecutable = pair.Value.FromPlusMinus();
-                    break;
+            case "manualexecutable":
 
-                case "quickinfo":
-                    _quickinfo = pair.Value.FromNonCritical();
-                    break;
+                _manualexecutable = value.FromPlusMinus();
+                return true;
 
-                case "admininfo":
-                    _admininfo = pair.Value.FromNonCritical();
-                    break;
+            case "quickinfo":
+                _quickinfo = value.FromNonCritical();
+                return true;
 
-                case "image":
-                    _imagecode = pair.Value.FromNonCritical();
-                    break;
+            case "admininfo":
+                _admininfo = value.FromNonCritical();
+                return true;
 
-                case "usergroups":
-                    _usergroups = pair.Value.FromNonCritical().SplitAndCutByCrToList();
-                    break;
+            case "image":
+                _image = value.FromNonCritical();
+                return true;
 
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
+            case "usergroups":
+                _usergroups = value.FromNonCritical().SplitAndCutByCrToList();
+                return true;
+
+
+            case "changevalues":
+                _changeValues = value.FromPlusMinus();
+                return true;
+
         }
+
+        return false;
     }
 
     public string ReadableText() {
@@ -220,18 +243,11 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
         return KeyName;
     }
 
-    public QuickImage SymbolForReadableText() {
+    public virtual QuickImage? SymbolForReadableText() {
         if (!this.IsOk()) { return QuickImage.Get(BlueBasics.Enums.ImageCode.Kritisch); }
-
-        var symb = BlueBasics.Enums.ImageCode.Formel;
-        var c = Color.Transparent;
-
-        if (_manualexecutable) {
-            c = Color.Yellow;
-            symb = BlueBasics.Enums.ImageCode.Person;
-        }
-
-        return QuickImage.Get(symb, 16, c, Color.Transparent);
+        if (!string.IsNullOrEmpty(_image)) { return QuickImage.Get(_image); }
+        //if (_manualexecutable) {            return QuickImage.Get(ImageCode.Person, 16, Color.Yellow, Color.Transparent);        }
+        return null;
     }
 
     public override string ToString() {
@@ -244,7 +260,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
             result.ParseableAdd("ManualExecutable", ManualExecutable);
             result.ParseableAdd("QuickInfo", QuickInfo);
             result.ParseableAdd("AdminInfo", AdminInfo);
-            result.ParseableAdd("Image", ImageCode);
+            result.ParseableAdd("Image", Image);
             result.ParseableAdd("UserGroups", UserGroups);
 
             return result.Parseable();

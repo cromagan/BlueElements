@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueBasics;
 
@@ -128,7 +129,9 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IChangedFeedback {
 
     public virtual void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-    public abstract void Parse(string toParse);
+    public virtual void ParseFinished(string parsed) { }
+
+    public abstract bool ParseThis(string key, string value);
 
     public override string ToString() {
         List<string> result = new();

@@ -58,7 +58,7 @@ public readonly struct SplittedAttributesFeedback {
     public string Name(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
-        if (Attributes[varno] is Variable vs) { return vs.Name; }
+        if (Attributes[varno] is Variable vs) { return vs.KeyName; }
         return string.Empty;
     }
 

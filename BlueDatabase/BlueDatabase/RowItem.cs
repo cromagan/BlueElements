@@ -642,7 +642,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 CellSet(srs, Database.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
             } else {
                 var l = Database.EventScript.Get(ScriptEventTypes.value_changed);
-                if (l.Count == 1 && l[0].Name == scriptname) {
+                if (l.Count == 1 && l[0].KeyName == scriptname) {
                     CellSet(srs, Database.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
                 }
             }

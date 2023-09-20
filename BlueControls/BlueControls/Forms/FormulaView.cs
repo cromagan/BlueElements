@@ -203,10 +203,10 @@ public partial class FormulaView : FormWithStatusBar {
             if (script.ManualExecutable) {
                 var btb = new BlueControls.Controls.Button();
                 btb.Click += Btb_Click;
-                btb.Name = "BTB_" + script.Name;
+                btb.Name = "BTB_" + script.KeyName;
                 groupBox.Controls.Add(btb);
 
-                btb.Text = script.Name;
+                btb.Text = script.KeyName;
                 btb.Tag = script;
                 btb.ButtonStyle = ButtonStyle.Button_Big_Borderless;
                 btb.Size = new Size(56, 66);

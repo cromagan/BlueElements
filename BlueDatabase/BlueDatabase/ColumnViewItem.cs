@@ -43,7 +43,7 @@ public sealed class ColumnViewItem : IParseable {
     }
 
     public ColumnViewItem(DatabaseAbstract database, string toParse, ColumnViewCollection parent) : this(parent) {
-        Parse(toParse);
+        this.Parse(toParse);
     }
 
     private ColumnViewItem(ColumnViewCollection parent) : base() {
@@ -86,42 +86,41 @@ public sealed class ColumnViewItem : IParseable {
 
     public ColumnViewItem? NextVisible() => Parent.NextVisible(this);
 
-    public void Parse(string toParse) {
-        if (Parent?.Database is not DatabaseAbstract db) { return; }
+    public void ParseFinished(string parsed) { }
 
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "column":
-
-                case "columnname":// ColumnName wichtg, wegen CopyLayout
-                    Column = db.Column.Exists(pair.Value);
-                    Column?.Repair(); // Alte Formate reparieren
-                    break;
-
-                case "columnkey":
-                    //Column = database.Column.SearchByKey(LongParse(pair.Value));
-                    //Column?.Repair(); // Alte Formate reparieren
-                    break;
-
-                case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
-                    _viewType = ViewType.PermanentColumn;
-                    break;
-
-                case "type":
-                    _viewType = (ViewType)IntParse(pair.Value);
-                    break;
-
-                case "edittype":
-                    //    _editType = (EditTypeFormula)IntParse(pair.Value);
-                    break;
-
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
+    public bool ParseThis(string key, string value) {
+        if (Parent?.Database is not DatabaseAbstract db) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank unbekannt");
+            return false;
         }
 
-        if (Column != null && _viewType == ViewType.None) { _viewType = ViewType.Column; }
+        switch (key) {
+            case "column":
+            case "columnname":// ColumnName wichtg, wegen CopyLayout
+                Column = db.Column.Exists(value);
+                Column?.Repair(); // Alte Formate reparieren
+                return true;
+
+            case "columnkey":
+                //Column = database.Column.SearchByKey(LongParse(value));
+                //Column?.Repair(); // Alte Formate reparieren
+                return true;
+
+            case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
+                _viewType = ViewType.PermanentColumn;
+                return true;
+
+            case "type":
+                _viewType = (ViewType)IntParse(value);
+                if (Column != null && _viewType == ViewType.None) { _viewType = ViewType.Column; }
+                return true;
+
+            case "edittype":
+                //    _editType = (EditTypeFormula)IntParse(value);
+                return true;
+        }
+
+        return false;
     }
 
     public ColumnViewItem? PreviewsVisible() => Parent.PreviousVisible(this);

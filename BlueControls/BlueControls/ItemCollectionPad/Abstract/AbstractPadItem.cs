@@ -33,6 +33,7 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using static BlueBasics.Converter;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
@@ -76,8 +77,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
 
     #endregion
 
-    //public List<FlexiControl>? AdditionalStyleOptions { get; set; } = null;
-
     #region Properties
 
     [Description("Wird bei einem Export (wie z. B. Drucken) nur angezeigt, wenn das Häkchen gesetzt ist.")]
@@ -91,6 +90,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         }
     }
 
+    //public List<FlexiControl>? AdditionalStyleOptions { get; set; } = null;
     public abstract string Description { get; }
 
     /// <summary>
@@ -100,6 +100,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
     public string Gruppenzugehörigkeit { get; set; } = string.Empty;
 
     public bool IsDisposed { get; private set; }
+
     public ObservableCollection<PointM> MovablePoint { get; } = new();
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
@@ -132,6 +133,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
     }
 
     public List<PointM> PointsForSuccesfullyMove { get; } = new();
+
     public virtual string QuickInfo { get; set; } = string.Empty;
 
     public PadStyles Stil {
@@ -347,20 +349,20 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         base.OnChanged();
     }
 
-    public void Parse(List<KeyValuePair<string, string>> toParse) {
-        foreach (var pair in toParse) {
-            if (!ParseThis(pair.Key, pair.Value)) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
-            }
-        }
+    //public void Parse(List<KeyValuePair<string, string>> toParse, string parsestring) {
+    //    foreach (var pair in toParse) {
+    //        if (!ParseThis(pair.Key, pair.Value)) {
+    //            Develop.DebugPrint(FehlerArt.Warnung, "Kann nicht geparsed werden: " + pair.Key + "/" + pair.Value + "/" + toParse);
+    //        }
+    //    }
 
-        ParseFinished();
-    }
+    //    ParseFinished(parsestring);
+    //}
 
-    public override void Parse(string toParse) => Parse(toParse.GetAllTags());
+    public override void ParseFinished(string parsed) => base.ParseFinished(parsed);
 
-    public virtual bool ParseThis(string tag, string value) {
-        switch (tag.ToLower()) {
+    public override bool ParseThis(string key, string value) {
+        switch (key) {
             case "classid": // Wurde bereits abgefragt, dadurch st erst die Routine aufgerufen worden
             case "type":
             case "enabled":
@@ -427,10 +429,9 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
                 Tags.Clear();
                 Tags.AddRange(value.SplitBy("|").ToList().FromNonCritical());
                 return true;
-
-            default:
-                return false;
         }
+
+        return false;
     }
 
     public virtual void PointMoved(object sender, MoveEventArgs e) => OnChanged();
@@ -544,8 +545,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         sizeOfParentControl.Width == 0 ||
         sizeOfParentControl.Height == 0 ||
         drawingKoordinates.IntersectsWith(new Rectangle(Point.Empty, sizeOfParentControl));
-
-    protected virtual void ParseFinished() { }
 
     private void MovablePoint_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {

@@ -20,6 +20,7 @@
 using BlueBasics.Enums;
 using BlueBasics;
 using BlueScript.Structures;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
@@ -84,7 +85,7 @@ public class VariableUnknown : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableUnknown(Name);
+        var v = new VariableUnknown(KeyName);
         v.Parse(ToString());
         return v;
     }

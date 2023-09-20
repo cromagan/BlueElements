@@ -26,6 +26,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueDatabase;
 
@@ -40,7 +41,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         }
     }
 
-    public FilterCollection(DatabaseAbstract? database, string toParse) : this(database) => Parse(toParse);
+    public FilterCollection(DatabaseAbstract? database, string toParse) : this(database) => this.Parse(toParse);
 
     #endregion
 
@@ -147,11 +148,11 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
     public void Dispose() =>
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
-        Dispose(true);// TODO: Auskommentierung der folgenden Zeile aufheben, wenn der Finalizer weiter oben überschrieben wird.//GC.SuppressFinalize(this);
+        Dispose(true);
 
     void IDisposable.Dispose() =>
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(disposing: true);//GC.SuppressFinalize(this);
+        Dispose(disposing: true);
 
     public bool Exists(FilterItem filterItem) {
         foreach (var thisFilter in this) {
@@ -160,28 +161,26 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         return false;
     }
 
+    //GC.SuppressFinalize(this);
     public bool IsRowFilterActiv() => this[null] != null;
 
+    // TODO: Auskommentierung der folgenden Zeile aufheben, wenn der Finalizer weiter oben überschrieben wird.//GC.SuppressFinalize(this);
     public bool MayHasRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-    public void Parse(string toParse) {
-        // Initialize();
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "filter":
-                    if (Database != null && !Database.IsDisposed) {
-                        AddIfNotExists(new FilterItem(Database, pair.Value.FromNonCritical()));
-                    }
+    public void ParseFinished(string parsed) { }
 
-                    break;
+    public bool ParseThis(string key, string value) {
+        switch (key) {
+            case "filter":
+                if (Database != null && !Database.IsDisposed) {
+                    AddIfNotExists(new FilterItem(Database, value.FromNonCritical()));
+                }
 
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
+                return true;
         }
+        return false;
     }
 
     public void Remove(ColumnItem? column) {

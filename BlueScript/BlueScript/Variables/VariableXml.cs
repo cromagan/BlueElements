@@ -20,6 +20,7 @@
 using System.Xml.Linq;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript;
 
@@ -68,7 +69,7 @@ public class VariableXml : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableXml(Name);
+        var v = new VariableXml(KeyName);
         v.Parse(ToString());
         return v;
     }

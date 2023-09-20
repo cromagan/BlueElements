@@ -377,8 +377,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
-    protected override void ParseFinished() {
-        base.ParseFinished();
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
         //_itemSends.ParseFinished(this);
         _itemAccepts.ParseFinished(this);
     }

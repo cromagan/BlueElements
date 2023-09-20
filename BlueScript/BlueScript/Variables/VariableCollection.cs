@@ -23,6 +23,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
@@ -87,7 +88,7 @@ public class VariableCollection : IEnumerable<Variable> {
         if (ReadOnly) { return false; }
         if (variable == null) { return false; }
 
-        if (_internal.Get(variable.Name) != null) { return false; }
+        if (_internal.Get(variable.KeyName) != null) { return false; }
 
         _internal.Add(variable);
         return true;
@@ -121,13 +122,13 @@ public class VariableCollection : IEnumerable<Variable> {
         return f;
     }
 
-    public List<string> AllNames() => _internal != null ? _internal.Select(thisvar => thisvar.Name).ToList() : new List<string>();
+    public List<string> AllNames() => _internal != null ? _internal.Select(thisvar => thisvar.KeyName).ToList() : new List<string>();
 
     public List<string> AllStringableNames() {
         var l = new List<string>();
         if (_internal != null) {
             foreach (var thisvar in _internal) {
-                if (thisvar.ToStringPossible) { l.Add(thisvar.Name); }
+                if (thisvar.ToStringPossible) { l.Add(thisvar.KeyName); }
             }
         }
         return l;
@@ -153,7 +154,7 @@ public class VariableCollection : IEnumerable<Variable> {
         if (_internal.Count == 0) { return null; }
 
         return _internal.FirstOrDefault(thisv =>
-            !thisv.SystemVariable && string.Equals(thisv.Name, name, StringComparison.OrdinalIgnoreCase));
+            !thisv.SystemVariable && string.Equals(thisv.KeyName, name, StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
@@ -243,7 +244,7 @@ public class VariableCollection : IEnumerable<Variable> {
     }
 
     public Variable? GetSystem(string name) => _internal.FirstOrDefault(thisv =>
-        thisv.SystemVariable && thisv.Name.ToUpper() == "*" + name.ToUpper());
+        thisv.SystemVariable && thisv.KeyName.ToUpper() == "*" + name.ToUpper());
 
     public bool Remove(Variable v) {
         if (ReadOnly) { return false; }

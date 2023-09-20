@@ -19,6 +19,7 @@
 
 using System.Drawing;
 using BlueScript.Structures;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
@@ -67,7 +68,7 @@ public class VariableBitmap : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableBitmap(Name);
+        var v = new VariableBitmap(KeyName);
         v.Parse(ToString());
         return v;
     }

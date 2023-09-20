@@ -46,7 +46,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     #region Constructors
 
-    public RowEntryPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => Parse(toParse);
+    public RowEntryPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => this.Parse(toParse);
 
     public RowEntryPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
@@ -184,8 +184,8 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
-    protected override void ParseFinished() {
-        base.ParseFinished();
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
         //_itemAccepts.ParseFinished(this);
     }

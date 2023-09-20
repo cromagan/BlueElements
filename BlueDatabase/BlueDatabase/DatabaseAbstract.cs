@@ -317,6 +317,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public string LoadedVersion { get; private set; } = "0.00";
+
     public bool LogUndo { get; set; } = true;
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
@@ -725,7 +726,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         vaa.AddRange(existingVars.ToListVariableString());
 
         foreach (var thisvar in vaa) {
-            var v = scriptVars.Get(suffix + thisvar.Name);
+            var v = scriptVars.Get(suffix + thisvar.KeyName);
 
             if (v is VariableString vs) {
                 thisvar.ReadOnly = false; // weil kein OnChanged vorhanden ist
@@ -812,11 +813,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         foreach (var thissc in _eventScript) {
             if (!thissc.IsOk()) {
-                return thissc.Name + ": " + thissc.ErrorReason();
+                return thissc.KeyName + ": " + thissc.ErrorReason();
             }
 
-            if (names.Contains(thissc.Name, false)) {
-                return "Skriptname '" + thissc.Name + "' mehrfach vorhanden";
+            if (names.Contains(thissc.KeyName, false)) {
+                return "Skriptname '" + thissc.KeyName + "' mehrfach vorhanden";
             }
         }
 
@@ -980,7 +981,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool changevalues, RowItem? row, List<string>? attributes) {
-        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, s.Name); }
+        if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, s.KeyName); }
 
         var sce = CheckScriptError();
         if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, "Allgemein"); }
@@ -994,7 +995,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             if (row != null && !row.IsDisposed) {
                 if (Column.SysRowChangeDate is not ColumnItem column) {
-                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.Name);
+                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);
                 }
 
                 timestamp = row.CellGetString(column);
@@ -1006,7 +1007,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             }
 
             foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("DB_" + thisvar.Name, thisvar.ValueString, false, false, "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
+                var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, false, "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
                 vars.Add(v);
             }
 
@@ -1051,7 +1052,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             Script sc = new(vars, AdditionalFilesPfadWhole(), scp) {
                 ScriptText = s.ScriptText
             };
-            var scf = sc.Parse(0, s.Name);
+            var scf = sc.Parse(0, s.KeyName);
 
             #endregion
 
@@ -1060,11 +1061,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             if (sc.ChangeValues && changevalues && scf.AllOk) {
                 if (row != null && !row.IsDisposed) {
                     if (Column.SysRowChangeDate is not ColumnItem column) {
-                        return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.Name);
+                        return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);
                     }
 
                     if (row.CellGetString(column) != timestamp) {
-                        return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, s.Name);
+                        return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, s.KeyName);
                     }
 
                     foreach (var thisCol in Column) {
@@ -1076,7 +1077,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             }
 
             if (!scf.AllOk) {
-                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.Name + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
+                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
             }
 
             #endregion
@@ -1111,7 +1112,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             if (string.IsNullOrEmpty(scriptname) && eventname != null) {
                 var l = EventScript.Get((ScriptEventTypes)eventname);
-                if (l.Count == 1) { scriptname = l[0].Name; }
+                if (l.Count == 1) { scriptname = l[0].KeyName; }
                 if (string.IsNullOrEmpty(scriptname)) {
                     // Script nicht definiert. Macht nix. ist eben keines gewünscht
                     return new ScriptEndedFeedback();

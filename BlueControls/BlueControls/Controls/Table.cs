@@ -3241,10 +3241,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         var cols = pair.Value.FromNonCritical().SplitBy("|");
                         CurrentArrangement?.Reduce(cols);
                         break;
-
-                    default:
-                        Develop.DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
-                        break;
                 }
             }
         }

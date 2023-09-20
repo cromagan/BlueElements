@@ -89,7 +89,6 @@ internal class Method_BerechneVariable : Method {
             return DoItFeedback.AttributFehler(infos.Data, new Method_BerechneVariable(), attvar);
         }
 
-
         if (attvar.Attributes[0] is Variable v) {
             if (generateVariable) {
                 v.KeyName = varnam.ToLower();

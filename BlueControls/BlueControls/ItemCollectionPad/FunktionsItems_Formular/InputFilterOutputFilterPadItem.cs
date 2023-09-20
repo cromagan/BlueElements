@@ -52,7 +52,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     #region Constructors
 
-    public InputFilterOutputFilterPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => Parse(toParse);
+    public InputFilterOutputFilterPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => this.Parse(toParse);
 
     public InputFilterOutputFilterPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
@@ -264,8 +264,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", InputColorId);
     }
 
-    protected override void ParseFinished() {
-        base.ParseFinished();
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
         _itemAccepts.ParseFinished(this);
     }

@@ -417,8 +417,6 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override void ParseFinished() => base.ParseFinished();
-
     // Return the dot product AB · BC.
     // Note that AB · BC = |AB| * |BC| * Cos(theta).
     private static float DotProduct(float ax, float ay, float bx, float by, float cx, float cy) {

@@ -35,6 +35,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     #region Fields
 
     private readonly List<ColumnViewItem> _internal = new();
+
     private readonly List<string> _permissionGroups_Show = new();
 
     #endregion
@@ -48,7 +49,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         }
 
         KeyName = string.Empty;
-        Parse(toParse);
+        this.Parse(toParse);
     }
 
     public ColumnViewCollection(DatabaseAbstract database, string toParse, string newname) : this(database, toParse) => KeyName = newname;
@@ -58,6 +59,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     #region Properties
 
     public int Count => _internal.Count;
+
     public DatabaseAbstract? Database { get; private set; }
 
     //public event EventHandler? Changed;
@@ -233,42 +235,40 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         } while (true);
     }
 
-    public void Parse(string toParse) {
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "name":
-                    KeyName = pair.Value;
-                    break;
+    public void ParseFinished(string parsed) { }
 
-                case "columndata":
-                    if (Database != null) {
-                        _internal.Add(new ColumnViewItem(Database, pair.Value, this)); // BAse, um Events zu vermeiden
+    public bool ParseThis(string key, string value) {
+        switch (key) {
+            case "name":
+                KeyName = value;
+                return true;
+
+            case "columndata":
+                if (Database != null) {
+                    _internal.Add(new ColumnViewItem(Database, value, this)); // BAse, um Events zu vermeiden
+                }
+
+                return true;
+
+            case "columns":
+                if (Database != null) {
+                    foreach (var pair2 in value.GetAllTags()) {
+                        _internal.Add(new ColumnViewItem(Database, pair2.Value.FromNonCritical(), this)); // BAse, um Events zu vermeiden
                     }
+                }
+                return true;
 
-                    break;
+            case "permissiongroup":
+                _permissionGroups_Show.Add(value);
+                return true;
 
-                case "columns":
-                    if (Database != null) {
-                        foreach (var pair2 in pair.Value.GetAllTags()) {
-                            _internal.Add(new ColumnViewItem(Database, pair2.Value.FromNonCritical(), this)); // BAse, um Events zu vermeiden
-                        }
-                    }
-                    break;
-
-                case "permissiongroup":
-                    _permissionGroups_Show.Add(pair.Value);
-                    break;
-
-                case "permissiongroups":
-                    _permissionGroups_Show.Clear();
-                    _permissionGroups_Show.AddRange(pair.Value.FromNonCritical().SplitByCrToList());
-                    break;
-
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
+            case "permissiongroups":
+                _permissionGroups_Show.Clear();
+                _permissionGroups_Show.AddRange(value.FromNonCritical().SplitByCrToList());
+                return true;
         }
+
+        return false;
     }
 
     public ColumnItem? PreviousVisible(ColumnItem? column) {

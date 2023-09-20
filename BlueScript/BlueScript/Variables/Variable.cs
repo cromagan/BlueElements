@@ -26,6 +26,7 @@ using BlueBasics.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Extensions;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
@@ -67,14 +68,12 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         }
     }
 
-    public string CompareKey => CheckOrder.ToString(Constants.Format_Integer3) + "|" + Name.ToUpper();
+    public string CompareKey => CheckOrder.ToString(Constants.Format_Integer3) + "|" + KeyName.ToUpper();
     public abstract bool GetFromStringPossible { get; }
 
     public abstract bool IsNullOrEmpty { get; }
 
     public abstract string MyClassId { get; }
-    public string Name => KeyName;
-
     public virtual string ReadableText => "Objekt: " + MyClassId;
 
     public bool ReadOnly {
@@ -101,7 +100,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         get {
             if (ToStringPossible) { Develop.DebugPrint(FehlerArt.Fehler, "Routine muss überschrieben werden!"); }
 
-            return "\"" + MyClassId + ";" + Name + "\"";
+            return "\"" + MyClassId + ";" + KeyName + "\"";
         }
         set {
             var x = TryParse(value, null, null);
@@ -225,55 +224,41 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     public abstract DoItFeedback GetValueFrom(Variable variable, LogData ld);
 
-    public override void Parse(string toParse) {
-        //ThrowEvents = false;
-        //PermissionGroups_Show.ThrowEvents = false;
-        //Initialize();
-        foreach (var pair in toParse.GetAllTags()) {
-            switch (pair.Key) {
-                case "key":
-                case "name":
-                    //if (pair.Value.FromNonCritical() != KeyName) {
-                    //    Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler: " + toParse);
-                    //}
-                    KeyName = pair.Value.FromNonCritical();
-                    break;
+    public override bool ParseThis(string key, string value) {
+        switch (key) {
+            case "key":
+            case "name":
+                KeyName = value.FromNonCritical();
+                return true;
 
-                case "classid":
-                case "type":
-                    if (pair.Value.ToNonCritical() != MyClassId) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Variablenfehler: " + toParse);
-                    }
-                    break;
+            case "classid":
+            case "type":
+                if (value.ToNonCritical() != MyClassId) { return false; }
+                return true;
 
-                case "value":
-                    ValueForReplace = pair.Value.FromNonCritical();
-                    break;
+            case "value":
+                ValueForReplace = value.FromNonCritical();
+                return true;
 
-                case "comment":
-                    _comment = pair.Value.FromNonCritical();
-                    break;
+            case "comment":
+                _comment = value.FromNonCritical();
+                return true;
 
-                case "readonly":
-                    ReadOnly = pair.Value.FromPlusMinus();
-                    break;
+            case "readonly":
+                ReadOnly = value.FromPlusMinus();
+                return true;
 
-                case "system":
-                    SystemVariable = pair.Value.FromPlusMinus();
-                    break;
-
-                default:
-                    Develop.DebugPrint(FehlerArt.Fehler, "Tag unbekannt: " + pair.Key);
-                    break;
-            }
+            case "system":
+                SystemVariable = value.FromPlusMinus();
+                return true;
         }
-        //PermissionGroups_Show.ThrowEvents = true;
-        //ThrowEvents = true;
+
+        return false;
     }
 
     public string ReplaceInText(string txt) {
-        if (!txt.ToLower().Contains("~" + Name.ToLower() + "~")) { return txt; }
-        return txt.Replace("~" + Name + "~", ReadableText, RegexOptions.IgnoreCase);
+        if (!txt.ToLower().Contains("~" + KeyName.ToLower() + "~")) { return txt; }
+        return txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
     }
 
     public new string ToString() {

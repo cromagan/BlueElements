@@ -1025,7 +1025,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
                         switch (thisIt.Key) {
                             case "internalname":
                                 var it = this[thisIt.Value];
-                                it?.Parse(x);
+                                it?.Parse(t);
                                 break;
                         }
                     }

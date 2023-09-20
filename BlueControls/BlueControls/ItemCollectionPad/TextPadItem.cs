@@ -228,8 +228,8 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
-    protected override void ParseFinished() {
-        base.ParseFinished();
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
         InvalidateText();
     }
 

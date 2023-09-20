@@ -47,7 +47,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     #region Constructors
 
-    public TableSelectRowPadItem(string keyname, string toParse) : this(keyname) => Parse(toParse);
+    public TableSelectRowPadItem(string keyname, string toParse) : this(keyname) => this.Parse(toParse);
 
     public TableSelectRowPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
@@ -193,8 +193,8 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
     }
 
-    protected override void ParseFinished() {
-        base.ParseFinished();
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
         _itemAccepts.ParseFinished(this);
     }

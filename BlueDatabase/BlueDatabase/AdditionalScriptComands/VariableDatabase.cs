@@ -20,6 +20,7 @@
 using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript;
 
@@ -65,7 +66,7 @@ public class VariableDatabase : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableDatabase(Name);
+        var v = new VariableDatabase(KeyName);
         v.Parse(ToString());
         return v;
     }

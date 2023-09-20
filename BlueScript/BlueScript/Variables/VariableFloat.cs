@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueScript.Structures;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
+using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
@@ -84,7 +85,7 @@ public class VariableFloat : Variable {
     #region Methods
 
     public override object Clone() {
-        var v = new VariableFloat(Name);
+        var v = new VariableFloat(KeyName);
         v.Parse(ToString());
         return v;
     }

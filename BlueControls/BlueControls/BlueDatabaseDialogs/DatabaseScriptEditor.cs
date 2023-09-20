@@ -92,7 +92,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             if (value != null) {
                 grpEigenschaften.Enabled = true;
                 eventScriptEditor.Enabled = true;
-                txbName.Text = value.Name;
+                txbName.Text = value.KeyName;
 
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
@@ -358,7 +358,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
-        Item.Name = txbName.Text;
+        Item.KeyName = txbName.Text;
     }
 
     private void WriteInfosBack() {
