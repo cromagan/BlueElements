@@ -139,7 +139,7 @@ public class VariableListString : Variable {
         if (txt.Length > 1 && txt.StartsWith("{") && txt.EndsWith("}")) {
             var t = txt.DeKlammere(false, true, false, true);
 
-            if (string.IsNullOrEmpty(t)) { return new(); } // Leere Liste
+            if (string.IsNullOrEmpty(t)) { return new List<string>(); } // Leere Liste
 
             //var infos = new CanDoFeedback(t, 0, string.Empty, string.Empty, string.Empty, null);
 

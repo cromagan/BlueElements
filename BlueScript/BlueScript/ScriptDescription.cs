@@ -188,7 +188,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
         return string.Empty;
     }
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
 
     public void ParseFinished(string parsed) { }
 
@@ -224,11 +224,9 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
                 _usergroups = value.FromNonCritical().SplitAndCutByCrToList();
                 return true;
 
-
             case "changevalues":
                 _changeValues = value.FromPlusMinus();
                 return true;
-
         }
 
         return false;
@@ -244,7 +242,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
     }
 
     public virtual QuickImage? SymbolForReadableText() {
-        if (!this.IsOk()) { return QuickImage.Get(BlueBasics.Enums.ImageCode.Kritisch); }
+        if (!this.IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
         if (!string.IsNullOrEmpty(_image)) { return QuickImage.Get(_image); }
         //if (_manualexecutable) {            return QuickImage.Get(ImageCode.Person, 16, Color.Yellow, Color.Transparent);        }
         return null;
@@ -255,13 +253,14 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
             if (IsDisposed) { return string.Empty; }
             List<string> result = new();
 
-            result.ParseableAdd("Name", KeyName);
-            result.ParseableAdd("Script", ScriptText);
-            result.ParseableAdd("ManualExecutable", ManualExecutable);
-            result.ParseableAdd("QuickInfo", QuickInfo);
-            result.ParseableAdd("AdminInfo", AdminInfo);
-            result.ParseableAdd("Image", Image);
-            result.ParseableAdd("UserGroups", UserGroups);
+            result.ParseableAdd("Name", _keyName);
+            result.ParseableAdd("Script", _scriptText);
+            result.ParseableAdd("ManualExecutable", _manualexecutable);
+            result.ParseableAdd("ChangeValues", _changeValues);
+            result.ParseableAdd("QuickInfo", _quickinfo);
+            result.ParseableAdd("AdminInfo", _admininfo);
+            result.ParseableAdd("Image", _image);
+            result.ParseableAdd("UserGroups", _usergroups);
 
             return result.Parseable();
         } catch {

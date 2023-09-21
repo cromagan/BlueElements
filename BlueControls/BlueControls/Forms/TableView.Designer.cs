@@ -49,6 +49,8 @@ namespace BlueControls.Forms {
             this.chkAnsichtTableFormular = new BlueControls.Controls.Button();
             this.chkAnsichtFormular = new BlueControls.Controls.Button();
             this.chkAnsichtNurTabelle = new BlueControls.Controls.Button();
+            this.grpAufgaben = new BlueControls.Controls.GroupBox();
+            this.lstAufgaben = new BlueControls.Controls.ListBox();
             this.grpAnsicht = new BlueControls.Controls.GroupBox();
             this.btnUnterschiede = new BlueControls.Controls.Button();
             this.btnAlleSchließen = new BlueControls.Controls.Button();
@@ -69,7 +71,6 @@ namespace BlueControls.Forms {
             this.btnZurück = new BlueControls.Controls.Button();
             this.tabAdmin = new System.Windows.Forms.TabPage();
             this.grpAdminZeilen = new BlueControls.Controls.GroupBox();
-            this.cbxDoSript = new BlueControls.Controls.ComboBox();
             this.btnSuchenUndErsetzen = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
@@ -108,6 +109,7 @@ namespace BlueControls.Forms {
             this.grpDatei.SuspendLayout();
             this.tabAllgemein.SuspendLayout();
             this.grpAnsichtWahl.SuspendLayout();
+            this.grpAufgaben.SuspendLayout();
             this.grpAnsicht.SuspendLayout();
             this.grpHilfen.SuspendLayout();
             this.grpFormularSteuerung.SuspendLayout();
@@ -276,6 +278,7 @@ namespace BlueControls.Forms {
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabAllgemein.Controls.Add(this.grpAnsichtWahl);
+            this.tabAllgemein.Controls.Add(this.grpAufgaben);
             this.tabAllgemein.Controls.Add(this.grpAnsicht);
             this.tabAllgemein.Controls.Add(this.grpHilfen);
             this.tabAllgemein.Controls.Add(this.grpFormularSteuerung);
@@ -294,9 +297,9 @@ namespace BlueControls.Forms {
             this.grpAnsichtWahl.Controls.Add(this.chkAnsichtNurTabelle);
             this.grpAnsichtWahl.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAnsichtWahl.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAnsichtWahl.Location = new System.Drawing.Point(954, 0);
+            this.grpAnsichtWahl.Location = new System.Drawing.Point(1176, 0);
             this.grpAnsichtWahl.Name = "grpAnsichtWahl";
-            this.grpAnsichtWahl.Size = new System.Drawing.Size(260, 81);
+            this.grpAnsichtWahl.Size = new System.Drawing.Size(238, 81);
             this.grpAnsichtWahl.TabIndex = 5;
             this.grpAnsichtWahl.TabStop = false;
             this.grpAnsichtWahl.Text = "Ansichten-Auswahl";
@@ -306,7 +309,7 @@ namespace BlueControls.Forms {
             this.chkAnsichtTableFormular.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
             this.chkAnsichtTableFormular.Location = new System.Drawing.Point(8, 46);
             this.chkAnsichtTableFormular.Name = "chkAnsichtTableFormular";
-            this.chkAnsichtTableFormular.Size = new System.Drawing.Size(240, 22);
+            this.chkAnsichtTableFormular.Size = new System.Drawing.Size(224, 22);
             this.chkAnsichtTableFormular.TabIndex = 14;
             this.chkAnsichtTableFormular.Text = "Tabelle und Formular nebeneinander";
             this.chkAnsichtTableFormular.Click += new System.EventHandler(this.Ansicht_Click);
@@ -330,6 +333,34 @@ namespace BlueControls.Forms {
             this.chkAnsichtNurTabelle.TabIndex = 12;
             this.chkAnsichtNurTabelle.Text = "Nur Tabelle";
             this.chkAnsichtNurTabelle.Click += new System.EventHandler(this.Ansicht_Click);
+            // 
+            // grpAufgaben
+            // 
+            this.grpAufgaben.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpAufgaben.CausesValidation = false;
+            this.grpAufgaben.Controls.Add(this.lstAufgaben);
+            this.grpAufgaben.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAufgaben.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpAufgaben.Location = new System.Drawing.Point(954, 0);
+            this.grpAufgaben.Name = "grpAufgaben";
+            this.grpAufgaben.Size = new System.Drawing.Size(222, 81);
+            this.grpAufgaben.TabIndex = 7;
+            this.grpAufgaben.TabStop = false;
+            this.grpAufgaben.Text = "Aufgaben";
+            // 
+            // lstAufgaben
+            // 
+            this.lstAufgaben.AddAllowed = BlueControls.Enums.AddType.None;
+            this.lstAufgaben.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lstAufgaben.AutoSort = false;
+            this.lstAufgaben.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
+            this.lstAufgaben.Location = new System.Drawing.Point(8, 2);
+            this.lstAufgaben.Name = "lstAufgaben";
+            this.lstAufgaben.Size = new System.Drawing.Size(208, 66);
+            this.lstAufgaben.TabIndex = 0;
+            this.lstAufgaben.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstAufgaben_ItemClicked);
             // 
             // grpAnsicht
             // 
@@ -570,31 +601,16 @@ namespace BlueControls.Forms {
             // 
             this.grpAdminZeilen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminZeilen.CausesValidation = false;
-            this.grpAdminZeilen.Controls.Add(this.cbxDoSript);
             this.grpAdminZeilen.Controls.Add(this.btnSuchenUndErsetzen);
             this.grpAdminZeilen.Controls.Add(this.btnZeileLöschen);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAdminZeilen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminZeilen.Location = new System.Drawing.Point(520, 0);
             this.grpAdminZeilen.Name = "grpAdminZeilen";
-            this.grpAdminZeilen.Size = new System.Drawing.Size(232, 81);
+            this.grpAdminZeilen.Size = new System.Drawing.Size(168, 81);
             this.grpAdminZeilen.TabIndex = 8;
             this.grpAdminZeilen.TabStop = false;
             this.grpAdminZeilen.Text = "Zeilen";
-            // 
-            // cbxDoSript
-            // 
-            this.cbxDoSript.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.cbxDoSript.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
-            this.cbxDoSript.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxDoSript.Enabled = false;
-            this.cbxDoSript.ImageCode = "Skript||||||||||Abspielen";
-            this.cbxDoSript.Location = new System.Drawing.Point(88, 2);
-            this.cbxDoSript.Name = "cbxDoSript";
-            this.cbxDoSript.Size = new System.Drawing.Size(64, 66);
-            this.cbxDoSript.TabIndex = 41;
-            this.cbxDoSript.Text = "Skript ausführen";
-            this.cbxDoSript.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.cbxDoSript_ItemClicked);
             // 
             // btnSuchenUndErsetzen
             // 
@@ -611,7 +627,7 @@ namespace BlueControls.Forms {
             // 
             this.btnZeileLöschen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnZeileLöschen.ImageCode = "Zeile||||||||||Kreuz";
-            this.btnZeileLöschen.Location = new System.Drawing.Point(152, 2);
+            this.btnZeileLöschen.Location = new System.Drawing.Point(88, 2);
             this.btnZeileLöschen.Name = "btnZeileLöschen";
             this.btnZeileLöschen.QuickInfo = "Angezeigte Zeilen löschen";
             this.btnZeileLöschen.Size = new System.Drawing.Size(72, 66);
@@ -844,6 +860,7 @@ namespace BlueControls.Forms {
             // tbcDatabaseSelector
             // 
             this.tbcDatabaseSelector.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tbcDatabaseSelector.GetRowFrom = null;
             this.tbcDatabaseSelector.HotTrack = true;
             this.tbcDatabaseSelector.Location = new System.Drawing.Point(0, 0);
             this.tbcDatabaseSelector.Name = "tbcDatabaseSelector";
@@ -884,8 +901,10 @@ namespace BlueControls.Forms {
             // 
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Table.DropMessages = false;
+            this.Table.InputDatabase = null;
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
+            this.Table.OutputDatabase = null;
             this.Table.ShowWaitScreen = true;
             this.Table.Size = new System.Drawing.Size(972, 531);
             this.Table.TabIndex = 0;
@@ -924,6 +943,7 @@ namespace BlueControls.Forms {
             // 
             this.tbcSidebar.Controls.Add(this.tabFormula);
             this.tbcSidebar.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.tbcSidebar.GetRowFrom = null;
             this.tbcSidebar.HotTrack = true;
             this.tbcSidebar.Location = new System.Drawing.Point(0, 0);
             this.tbcSidebar.Name = "tbcSidebar";
@@ -944,7 +964,7 @@ namespace BlueControls.Forms {
             this.tabFormula.TabIndex = 1;
             this.tabFormula.Text = "Formular";
             // 
-            // Formula
+            // CFO
             // 
             this.CFO.Dock = System.Windows.Forms.DockStyle.Fill;
             this.CFO.Location = new System.Drawing.Point(0, 0);
@@ -993,6 +1013,7 @@ namespace BlueControls.Forms {
             this.grpDatei.ResumeLayout(false);
             this.tabAllgemein.ResumeLayout(false);
             this.grpAnsichtWahl.ResumeLayout(false);
+            this.grpAufgaben.ResumeLayout(false);
             this.grpAnsicht.ResumeLayout(false);
             this.grpHilfen.ResumeLayout(false);
             this.grpFormularSteuerung.ResumeLayout(false);
@@ -1082,7 +1103,8 @@ namespace BlueControls.Forms {
         private Button btnSuchFenster;
         protected GroupBox grpAnsichtWahl;
         private Button btnSaveLoad;
-        private ComboBox cbxDoSript;
         private Button btnSkripteBearbeiten;
+        protected GroupBox grpAufgaben;
+        private Controls.ListBox lstAufgaben;
     }
 }

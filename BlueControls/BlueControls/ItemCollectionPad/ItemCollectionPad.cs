@@ -307,7 +307,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
                 return SizeF.Empty;
             }
 
-            return new(MmToPixel(_sheetSizeInMm.Width, ItemCollectionPad.Dpi), MmToPixel(_sheetSizeInMm.Height, ItemCollectionPad.Dpi));
+            return new(MmToPixel(_sheetSizeInMm.Width, Dpi), MmToPixel(_sheetSizeInMm.Height, Dpi));
         }
     }
 

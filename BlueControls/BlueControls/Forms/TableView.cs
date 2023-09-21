@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using BlueBasics;
@@ -48,7 +49,6 @@ public partial class TableView : FormWithStatusBar {
 
     private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
     private bool _firstOne = true;
-    private DatabaseAbstract? _originalDb;
     private List<string> _settings = new();
     private string _settingsfilename = string.Empty;
 
@@ -110,44 +110,6 @@ public partial class TableView : FormWithStatusBar {
     #endregion
 
     #region Methods
-
-    public static void CheckDatabase(object? sender, System.EventArgs e) {
-        if (sender is DatabaseAbstract database && string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(database, EditableErrorReasonType.EditAcut))) {
-            if (database.IsAdministrator()) {
-
-                #region Spalten reparieren
-
-                foreach (var thisColumnItem in database.Column) {
-                    while (!thisColumnItem.IsOk()) {
-                        DebugPrint(FehlerArt.Info,
-                            "Datenbank:" + database.TableName + "\r\nSpalte:" + thisColumnItem.KeyName +
-                            "\r\nSpaltenfehler: " + thisColumnItem.ErrorReason() + "\r\nUser: " + UserName +
-                            "\r\nGroup: " + UserGroup + "\r\nAdmins: " +
-                            database.DatenbankAdmin.JoinWith(";"));
-                        MessageBox.Show(
-                             "<b>Datenbank:" + database.TableName + "\r\nSpalte:" + thisColumnItem.KeyName +
-                            "<br></b>Die folgende Spalte enthält einen Fehler:<br>" + thisColumnItem.ErrorReason() +
-                            "<br><br>Bitte reparieren.", ImageCode.Information, "OK");
-                        OpenColumnEditor(thisColumnItem, null);
-                    }
-                }
-
-                #endregion
-
-                #region Skripte Reparieren
-
-                while (!string.IsNullOrEmpty(database.CheckScriptError())) {
-                    MessageBox.Show(
-                    "<b>Datenbank:" + database.TableName +
-                    "<br></b>Die Skripte enthalten einen Fehler:<br>" + database.CheckScriptError() +
-                    "<br><br>Bitte reparieren.", ImageCode.Information, "OK");
-                    OpenScriptEditor(database);
-                }
-
-                #endregion
-            }
-        }
-    }
 
     /// <summary>
     /// Gibt TRUE zuück, wenn eine Fehlernachricht angezeigt wurde.
@@ -363,7 +325,7 @@ public partial class TableView : FormWithStatusBar {
         //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         //Datenüberprüfung.Enabled = datenbankDa;
         btnZeileLöschen.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-        cbxDoSript.Enabled = datenbankDa;
+        lstAufgaben.Enabled = datenbankDa;
         btnSaveAs.Enabled = datenbankDa;
 
         if (btnDrucken.Item["csv"] is AbstractListItem bli1) {
@@ -700,7 +662,7 @@ public partial class TableView : FormWithStatusBar {
     //    tbcDatabaseSelector.Enabled = true;
     //    Table.Enabled = true;
     //}
-    private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
+    //private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
 
     private void Ansicht_Click(object sender, System.EventArgs e) {
         if (chkAnsichtFormular.Checked) {
@@ -1003,42 +965,15 @@ public partial class TableView : FormWithStatusBar {
         Table.Arrangement = int.Parse(e.Item.KeyName);
     }
 
-    private void cbxDoSript_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Table.Database == null || !Table.Database.IsAdministrator()) { return; }
+    //private void ChangeDatabase(DatabaseAbstract? database) {
+    //    if (_originalDb != null) {
+    //        _originalDb.Disposing -= _originalDB_Disposing;
+    //    }
 
-        if (e.Item is not ReadableListItem bli) { return; }
-        if (bli.Item is not DatabaseScriptDescription sc) { return; }
-
-        string m;
-
-        if (sc.NeedRow) {
-            if (MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
-                m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
-            } else {
-                m = "Durch Benutzer abgebrochen";
-            }
-        } else {
-            //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-            var s = Table.Database.ExecuteScript(sc, sc.ChangeValues, null, null);
-            m = s.Protocol.JoinWithCr();
-        }
-
-        if (!string.IsNullOrEmpty(m)) {
-            MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
-        } else {
-            MessageBox.Show("Skript erfolgreich!", ImageCode.Häkchen, "OK");
-        }
-    }
-
-    private void ChangeDatabase(DatabaseAbstract? database) {
-        if (_originalDb != null) {
-            _originalDb.Disposing -= _originalDB_Disposing;
-        }
-
-        _originalDb = null;
-        CheckDatabase(database, System.EventArgs.Empty);
-        Check_OrderButtons();
-    }
+    //    _originalDb = null;
+    //    //CheckDatabase(database, System.EventArgs.Empty);
+    //    Check_OrderButtons();
+    //}
 
     private void Check_OrderButtons() {
         if (InvokeRequired) {
@@ -1158,6 +1093,68 @@ public partial class TableView : FormWithStatusBar {
         _ = SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName, PreveredDatabaseID));
     }
 
+    private void lstAufgaben_ItemClicked(object sender, AbstractListItemEventArgs e) {
+        if (Table.Database == null) { return; }
+
+        lstAufgaben.Enabled = false;
+
+        if (e.Item is TextListItem tli) {
+            var com = (tli.Internal + "|||").SplitBy("|");
+
+            switch (com[0].ToLower()) {
+                case "#repairscript":
+                    OpenScriptEditor(Table.Database);
+                    UpdateScripts(Table.Database);
+                    return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
+
+                case "#enablerowscript":
+                    Table.Database.EnableScript();
+                    UpdateScripts(Table.Database);
+                    return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
+
+                case "#repaircolumn":
+                    var c = Table.Database.Column.Exists(com[1]);
+                    OpenColumnEditor(c, null);
+                    UpdateScripts(Table.Database);
+                    return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
+            }
+
+            lstAufgaben.Enabled = true;
+            return;
+        }
+
+        if (e.Item is not ReadableListItem bli) {
+            lstAufgaben.Enabled = true;
+            return;
+        }
+        if (bli.Item is not DatabaseScriptDescription sc) {
+            lstAufgaben.Enabled = true;
+            return;
+        }
+
+        string m;
+
+        if (sc.NeedRow) {
+            if (MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
+                m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
+            } else {
+                m = "Durch Benutzer abgebrochen";
+            }
+        } else {
+            //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
+            var s = Table.Database.ExecuteScript(sc, sc.ChangeValues, null, null);
+            m = s.Protocol.JoinWithCr();
+        }
+
+        lstAufgaben.Enabled = true;
+
+        if (!string.IsNullOrEmpty(m)) {
+            MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
+        } else {
+            MessageBox.Show("Skript erfolgreich!", ImageCode.Häkchen, "OK");
+        }
+    }
+
     private string NameRepair(string istName, RowItem? vRow) {
         var newName = istName;
         var istZ = 0;
@@ -1251,7 +1248,7 @@ public partial class TableView : FormWithStatusBar {
 
     private void TableView_DatabaseChanged(object sender, System.EventArgs e) {
         Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
-        ChangeDatabase(Table.Database);
+        //ChangeDatabase(Table.Database);
         Check_OrderButtons();
         CheckButtons();
     }
@@ -1327,18 +1324,54 @@ public partial class TableView : FormWithStatusBar {
     private void txbTextSuche_TextChanged(object sender, System.EventArgs e) => Check_SuchButton();
 
     private void UpdateScripts(DatabaseAbstract? db) {
-        cbxDoSript.Item.Clear();
+        lstAufgaben.Item.Clear();
 
-        if (db == null || db.IsDisposed || db.EventScript.Count == 0) {
-            cbxDoSript.Enabled = false;
+        if (db == null || db.IsDisposed) {
+            lstAufgaben.Enabled = false;
+            return;
+        }
+
+        var ok = true;
+        foreach (var thisColumnItem in db.Column) {
+            if (!thisColumnItem.IsOk()) {
+                var d = lstAufgaben.Item.Add("Spalte ' " + thisColumnItem.KeyName + " ' reparieren", "#repaircolumn|" + thisColumnItem.KeyName, ImageCode.Kritisch);
+                d.Enabled = db.IsAdministrator();
+                ok = false;
+            }
+            if (!ok) {
+                lstAufgaben.Enabled = true;
+                return;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(db.EventScriptErrorMessage) || !string.IsNullOrEmpty(db.CheckScriptError())) {
+            var d = lstAufgaben.Item.Add("Skripte reparieren", "#repairscript", ImageCode.Kritisch);
+            d.Enabled = db.IsAdministrator();
+            lstAufgaben.Enabled = true;
+            return;
+        }
+
+        if (!db.isRowScriptPossible(false)) {
+            var d = lstAufgaben.Item.Add("Zeilen-Skripte erlauben", "#enablerowscript", ImageCode.Spalte);
+            d.Enabled = db.IsAdministrator();
+            lstAufgaben.Enabled = true;
             return;
         }
 
         foreach (var thiss in db.EventScript) {
             if (thiss != null && thiss.ManualExecutable) {
-                _ = cbxDoSript.Item.Add(thiss);
+                var d = lstAufgaben.Item.Add(thiss);
+                d.Enabled = db.PermissionCheck(thiss.UserGroups, null) && thiss.IsOk();
+
+                if (d.Enabled && thiss.NeedRow && !db.isRowScriptPossible(true)) {
+                    d.Enabled = false;
+                }
+
+                //d.QuickInfo = thiss.QuickInfo;
             }
         }
+
+        lstAufgaben.Enabled = lstAufgaben.Item.Count > 0;
     }
 
     #endregion

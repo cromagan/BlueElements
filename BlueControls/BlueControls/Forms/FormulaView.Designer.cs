@@ -56,7 +56,6 @@
             this.btnZurück = new BlueControls.Controls.Button();
             this.tabAdmin = new System.Windows.Forms.TabPage();
             this.grpAdminZeilen = new BlueControls.Controls.GroupBox();
-            this.cbxDoSript = new BlueControls.Controls.ComboBox();
             this.btnSuchenUndErsetzen = new BlueControls.Controls.Button();
             this.btnZeileLöschen = new BlueControls.Controls.Button();
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
@@ -495,7 +494,6 @@
             // 
             this.grpAdminZeilen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAdminZeilen.CausesValidation = false;
-            this.grpAdminZeilen.Controls.Add(this.cbxDoSript);
             this.grpAdminZeilen.Controls.Add(this.btnSuchenUndErsetzen);
             this.grpAdminZeilen.Controls.Add(this.btnZeileLöschen);
             this.grpAdminZeilen.Dock = System.Windows.Forms.DockStyle.Left;
@@ -507,19 +505,6 @@
             this.grpAdminZeilen.TabIndex = 8;
             this.grpAdminZeilen.TabStop = false;
             this.grpAdminZeilen.Text = "Zeilen";
-            // 
-            // cbxDoSript
-            // 
-            this.cbxDoSript.Cursor = System.Windows.Forms.Cursors.Arrow;
-            this.cbxDoSript.DrawStyle = BlueControls.Enums.ComboboxStyle.RibbonBar;
-            this.cbxDoSript.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbxDoSript.Enabled = false;
-            this.cbxDoSript.ImageCode = "Skript||||||||||Abspielen";
-            this.cbxDoSript.Location = new System.Drawing.Point(88, 2);
-            this.cbxDoSript.Name = "cbxDoSript";
-            this.cbxDoSript.Size = new System.Drawing.Size(64, 66);
-            this.cbxDoSript.TabIndex = 41;
-            this.cbxDoSript.Text = "Skript ausführen";
             // 
             // btnSuchenUndErsetzen
             // 
@@ -846,7 +831,6 @@
         private Controls.Button btnZurück;
         protected System.Windows.Forms.TabPage tabAdmin;
         private Controls.GroupBox grpAdminZeilen;
-        private Controls.ComboBox cbxDoSript;
         private Controls.Button btnSuchenUndErsetzen;
         private Controls.Button btnZeileLöschen;
         private Controls.GroupBox grpAdminAllgemein;

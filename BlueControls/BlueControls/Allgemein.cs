@@ -93,9 +93,9 @@ public static class Allgemein {
                     dm.DropMessage += FormWithStatusBar.GotMessageDropMessage;
                 }
 
-                if (thisit is DatabaseAbstract db) {
-                    db.Loaded += TableView.CheckDatabase;
-                }
+                //if (thisit is DatabaseAbstract db) {
+                //    db.Loaded += TableView.CheckDatabase;
+                //}
             }
         }
 
@@ -105,9 +105,9 @@ public static class Allgemein {
                     dm.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
                 }
 
-                if (thisit is DatabaseAbstract db) {
-                    db.Loaded -= TableView.CheckDatabase;
-                }
+                //if (thisit is DatabaseAbstract db) {
+                //    db.Loaded -= TableView.CheckDatabase;
+                //}
             }
         }
 
