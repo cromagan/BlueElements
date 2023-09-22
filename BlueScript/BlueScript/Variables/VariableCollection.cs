@@ -23,7 +23,6 @@ using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
-using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 

@@ -1089,6 +1089,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
+    public bool hasErrorCheckScript() {
+
+        if(!isRowScriptPossible(true)) {return false;} 
+
+        var e=  EventScript.Get(ScriptEventTypes.prepare_formula);
+        return e.Count == 1;
+    }
+
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row, List<string>? attributes) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }

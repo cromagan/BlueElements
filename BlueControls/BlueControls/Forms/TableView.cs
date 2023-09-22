@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using BlueBasics;
@@ -513,7 +512,7 @@ public partial class TableView : FormWithStatusBar {
 
         _ = e.UserMenu.Add("Zeile", true);
         _ = e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && tbl.Database.IsAdministrator());
-        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null);
+        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null && tbl.Database.hasErrorCheckScript());
 
         foreach (var thiss in tbl.Database.EventScript) {
             if (thiss != null && thiss.ManualExecutable && thiss.NeedRow) {
@@ -1098,11 +1097,37 @@ public partial class TableView : FormWithStatusBar {
 
         lstAufgaben.Enabled = false;
 
+        if (e.Item is ReadableListItem bli && bli.Item is DatabaseScriptDescription sc) {
+            string m;
+
+            if (sc.NeedRow) {
+                if (MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
+                    m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
+                } else {
+                    m = "Durch Benutzer abgebrochen";
+                }
+            } else {
+                //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
+                var s = Table.Database.ExecuteScript(sc, sc.ChangeValues, null, null);
+                m = s.Protocol.JoinWithCr();
+            }
+
+            lstAufgaben.Enabled = true;
+
+            if (!string.IsNullOrEmpty(m)) {
+                MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
+            } else {
+                MessageBox.Show("Skript erfolgreich!", ImageCode.Häkchen, "OK");
+            }
+            return;
+        }
+
         if (e.Item is TextListItem tli) {
             var com = (tli.Internal + "|||").SplitBy("|");
 
             switch (com[0].ToLower()) {
                 case "#repairscript":
+                case "#editscript":
                     OpenScriptEditor(Table.Database);
                     UpdateScripts(Table.Database);
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
@@ -1117,42 +1142,22 @@ public partial class TableView : FormWithStatusBar {
                     OpenColumnEditor(c, null);
                     UpdateScripts(Table.Database);
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
+
+                case "#datenüberprüfung":
+                    var rows = Table.Database.Row.CalculateVisibleRows(Table.Filter, Table.PinnedRows);
+
+                    foreach (var thisR in rows) {
+                        thisR.InvalidateCheckData();
+                        thisR.CheckRowDataIfNeeded();
+                    }
+                    MessageBox.Show("Alle angezeigten Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
+                    lstAufgaben.Enabled = true;
+                    return;
             }
-
-            lstAufgaben.Enabled = true;
-            return;
         }
 
-        if (e.Item is not ReadableListItem bli) {
-            lstAufgaben.Enabled = true;
-            return;
-        }
-        if (bli.Item is not DatabaseScriptDescription sc) {
-            lstAufgaben.Enabled = true;
-            return;
-        }
-
-        string m;
-
-        if (sc.NeedRow) {
-            if (MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
-                m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
-            } else {
-                m = "Durch Benutzer abgebrochen";
-            }
-        } else {
-            //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-            var s = Table.Database.ExecuteScript(sc, sc.ChangeValues, null, null);
-            m = s.Protocol.JoinWithCr();
-        }
-
+        MessageBox.Show("Befehl unbekannt!", ImageCode.Kritisch, "OK");
         lstAufgaben.Enabled = true;
-
-        if (!string.IsNullOrEmpty(m)) {
-            MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
-        } else {
-            MessageBox.Show("Skript erfolgreich!", ImageCode.Häkchen, "OK");
-        }
     }
 
     private string NameRepair(string istName, RowItem? vRow) {
@@ -1369,6 +1374,17 @@ public partial class TableView : FormWithStatusBar {
 
                 //d.QuickInfo = thiss.QuickInfo;
             }
+        }
+
+        if (db.hasErrorCheckScript()) {
+            _ = lstAufgaben.Item.Add("Zeilen auf Fehler prüfen", "#datenüberprüfung", ImageCode.HäkchenDoppelt);
+        }
+
+        if (db.IsAdministrator()) {
+            var d = lstAufgaben.Item.Add("Skripte bearbeiten", "#editscript", ImageCode.Skript);
+            d.Enabled = db.IsAdministrator();
+            lstAufgaben.Enabled = true;
+            return;
         }
 
         lstAufgaben.Enabled = lstAufgaben.Item.Count > 0;
