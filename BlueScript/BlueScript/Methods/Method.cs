@@ -56,7 +56,18 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     public abstract bool EndlessArgs { get; }
 
-    public abstract string EndSequence { get; }
+    public string EndSequence {
+        get {
+            if (StartSequence == "(") {
+                if (!string.IsNullOrEmpty(Returns)) { return ")"; } //  max(10,20)
+                if (GetCodeBlockAfter) { return ")"; } // if
+            }
+            if (GetCodeBlockAfter) { return string.Empty; } // do {}
+            if (StartSequence == "(") { return ");"; } // call("kk");
+
+            return ";"; // break;
+        }
+    }
 
     public abstract bool GetCodeBlockAfter { get; }
 

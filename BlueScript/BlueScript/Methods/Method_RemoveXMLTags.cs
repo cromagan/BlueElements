@@ -35,7 +35,7 @@ internal class Method_RemoveXMLTags : Method {
     public override string Comand => "removexmltags";
     public override string Description => "Entfernt aus dem Text < > Tags.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;

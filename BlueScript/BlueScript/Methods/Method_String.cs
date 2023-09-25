@@ -34,7 +34,7 @@ internal class Method_String : Method {
     public override string Comand => "string";
     public override string Description => "Wandelt die Zahl in einen Text um. Kulanterweise werden Strings einfach als String weitergegeben.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;

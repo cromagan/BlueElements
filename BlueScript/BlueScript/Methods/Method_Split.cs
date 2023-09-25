@@ -35,7 +35,7 @@ internal class Method_Split : Method {
     public override string Comand => "split";
     public override string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.\r\nEs wird dabei immer eine Liste mit mindestens einen Eintrag erzeugt,\r\ndieser kann aber leer sein.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableListString.ShortName_Plain;

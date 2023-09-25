@@ -34,7 +34,7 @@ internal class Method_Count : Method {
     public override string Comand => "count";
     public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableFloat.ShortName_Plain;

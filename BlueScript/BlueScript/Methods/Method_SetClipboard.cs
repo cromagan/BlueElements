@@ -35,7 +35,7 @@ internal class Method_SetClipboard : Method {
     public override string Comand => "setclipboard";
     public override string Description => "Speichert den Text im Clipboard.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.ManipulatesUser;
     public override string Returns => string.Empty;

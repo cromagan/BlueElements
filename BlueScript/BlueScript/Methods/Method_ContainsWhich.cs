@@ -36,7 +36,7 @@ internal class Method_ContainsWhitch : Method {
     public override string Comand => "containswhich";
     public override string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann als Liste alle gefundenen Strings zurück.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableListString.ShortName_Plain;

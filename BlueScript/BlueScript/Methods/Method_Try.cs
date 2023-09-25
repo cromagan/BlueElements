@@ -34,7 +34,6 @@ internal class Method_Try : Method {
     public override string Comand => "try";
     public override string Description => "Führt den Codeblock aus. Wenn ein Fehler ausgelöst wird, wird der Codeblock verlassen, das restlichs Sript wird aber ausgeführt. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => string.Empty;
     public override bool GetCodeBlockAfter => true;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;

@@ -37,7 +37,7 @@ public class Method_WriteBackDBVariables : Method_Database {
                                     "So kann mit Routinen, die separate Skripte aufrufen, auf die Datenbank Variablen zugegriffen werden.";
 
     public override bool EndlessArgs => true;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
     public override string Returns => string.Empty;

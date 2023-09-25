@@ -35,7 +35,7 @@ internal class Method_Round : Method {
     public override string Comand => "round";
     public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableFloat.ShortName_Plain;

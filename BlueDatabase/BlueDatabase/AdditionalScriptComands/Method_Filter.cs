@@ -35,13 +35,10 @@ public class Method_Filter : Method_Database {
     public override string Comand => "filter";
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann. Aktuell werden nur die FilterTypen 'is' und 'isnot' unterstützt. Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableFilterItem.ShortName_Variable;
-
     public override string StartSequence => "(";
-
     public override string Syntax => "Filter(Datenbank, Spalte, Filtertyp, Wert)";
 
     #endregion

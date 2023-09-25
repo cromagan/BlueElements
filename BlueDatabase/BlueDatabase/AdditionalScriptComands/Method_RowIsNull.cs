@@ -35,13 +35,10 @@ public class Method_RowIsNull : Method {
     public override string Comand => "rowisnull";
     public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;
-
     public override string StartSequence => "(";
-
     public override string Syntax => "RowIsNull(Row)";
 
     #endregion

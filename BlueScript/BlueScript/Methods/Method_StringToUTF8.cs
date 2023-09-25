@@ -35,7 +35,7 @@ internal class Method_StringToUTF8 : Method {
     public override string Comand => "stringtoutf8";
     public override string Description => "Ersetzt einen ASCII-String nach UTF8.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;

@@ -35,7 +35,7 @@ internal class Method_CountString : Method {
     public override string Comand => "countstring";
     public override string Description => "Zählt wie oft der Suchstring im Text vorkommt.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableFloat.ShortName_Plain;

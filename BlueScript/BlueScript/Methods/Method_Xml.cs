@@ -36,7 +36,7 @@ public class Method_Xml : Method {
     public override string Comand => "xml";
     public override string Description => "Erstellt ein XML-Dokument, der für andere Befehle verwendet werden kann.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableXml.ShortName_Variable;

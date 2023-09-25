@@ -40,7 +40,7 @@ internal class Method_ExtractTags : Method {
                                           "Beispiel: ExtractTags(\"Farbe: Blau\", \":\"); erstellt eine neue Variable 'extracted_farbe' mit dem Inhalt 'Blau'";
 
     public override bool EndlessArgs => true;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;

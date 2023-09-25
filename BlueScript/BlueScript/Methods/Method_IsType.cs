@@ -35,7 +35,7 @@ internal class Method_IsType : Method {
     public override string Comand => "istype";
     public override string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;

@@ -34,7 +34,6 @@ internal class Method_Do : Method {
     public override string Comand => "do";
     public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => string.Empty;
     public override bool GetCodeBlockAfter => true;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;

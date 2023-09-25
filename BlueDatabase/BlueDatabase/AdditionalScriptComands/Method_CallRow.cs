@@ -41,7 +41,7 @@ public class Method_CallRow : Method {
         "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override string Returns => string.Empty;

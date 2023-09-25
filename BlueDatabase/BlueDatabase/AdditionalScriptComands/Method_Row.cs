@@ -36,19 +36,16 @@ public class Method_Row : Method {
     public override string Comand => "row";
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
-                                              "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt. Es wird keine neue Zeile erstellt.\r\n" +
+                                          "Wird keine Zeile gefunden, wird ein leeres Zeilenobjekt erstellt. Es wird keine neue Zeile erstellt.\r\n" +
                                           "Mit RowIsNull kann abgefragt werden, ob die Zeile gefunden wurde.\r\n" +
                                           "Werden mehrere Zeilen gefunden, wird das Programm abgebrochen. Um das zu verhindern, kann RowCount benutzt werden.\r\n" +
                                           "Alternative: Der Befehl RowUnique kümmert sich darum, das immer eine Zeile zurückgegeben wird.";
 
     public override bool EndlessArgs => true;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableRowItem.ShortName_Variable;
-
     public override string StartSequence => "(";
-
     public override string Syntax => "Row(Filter, ...)";
 
     #endregion

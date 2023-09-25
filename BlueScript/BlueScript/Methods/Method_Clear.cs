@@ -34,7 +34,7 @@ internal class Method_Clear : Method {
     public override string Comand => "clear";
     public override string Description => "Entfernt alle Einträge einer Liste";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;

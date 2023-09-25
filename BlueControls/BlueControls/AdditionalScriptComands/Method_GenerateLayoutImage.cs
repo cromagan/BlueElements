@@ -30,9 +30,9 @@ public class Method_GenerateLayoutImage : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, FloatVal };
+    public override string Comand => "generatelayoutimage";
     public override string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.MyDatabaseRow | MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableBitmap.ShortName_Variable;
@@ -42,8 +42,6 @@ public class Method_GenerateLayoutImage : Method_Database {
     #endregion
 
     #region Methods
-
-    public override string Comand => "generatelayoutimage";
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

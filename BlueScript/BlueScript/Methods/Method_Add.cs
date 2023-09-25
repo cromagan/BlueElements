@@ -34,7 +34,7 @@ internal class Method_Add : Method {
     public override string Comand => "add";
     public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;

@@ -34,7 +34,7 @@ internal class Method_Exists : Method {
     public override string Comand => "exists";
     public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;

@@ -34,7 +34,7 @@ internal class Method_StartsWith : Method {
     public override string Comand => "startswith";
     public override string Description => "Prüft, ob der String mit einem der angegeben Strings startet.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;

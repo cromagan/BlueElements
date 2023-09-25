@@ -33,7 +33,7 @@ internal class Method_Max : Method {
     public override string Comand => "max";
     public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableFloat.ShortName_Plain;

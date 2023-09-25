@@ -34,7 +34,7 @@ internal class Method_EndsWith : Method {
     public override string Comand => "endswith";
     public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;

@@ -34,13 +34,10 @@ internal class Method_Return : Method {
     public override string Comand => "return";
     public override string Description => "Beendet das Skript oder Unterskript ohne Fehler.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ";";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
-
-    public override string StartSequence => "";
-
+    public override string StartSequence => string.Empty;
     public override string Syntax => "Return;";
 
     #endregion

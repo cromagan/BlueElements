@@ -32,7 +32,6 @@ public class Method_CellGetRow : Method_Database {
     public override string Comand => "cellgetrow";
     public override string Description => "Gibt den Wert einer Zelle zurück\r\nÄhnlicher Befehl: Lookup";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
     public override string Returns => VariableListString.ShortName_Plain;

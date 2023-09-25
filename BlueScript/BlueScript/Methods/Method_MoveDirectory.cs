@@ -35,7 +35,7 @@ internal class Method_MoveDirectory : Method {
     public override string Comand => "movedirectory";
     public override string Description => "Verschiebt einen Ordner.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;

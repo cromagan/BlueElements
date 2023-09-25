@@ -34,11 +34,10 @@ internal class Method_Break : Method {
     public override string Comand => "break";
     public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ";";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard | MethodType.Break;
     public override string Returns => string.Empty;
-    public override string StartSequence => "";
+    public override string StartSequence => string.Empty;
 
     public override string Syntax => "Break;";
 

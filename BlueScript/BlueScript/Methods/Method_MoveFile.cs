@@ -35,7 +35,7 @@ internal class Method_MoveFile : Method {
     public override string Comand => "movefile";
     public override string Description => "Verschiebt eine Datei.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;

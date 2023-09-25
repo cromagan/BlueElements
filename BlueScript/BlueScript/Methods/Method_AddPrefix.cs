@@ -34,7 +34,7 @@ internal class Method_AddPrefix : Method {
     public override string Comand => "addprefix";
     public override string Description => "Fügt am Anfang jedes Listenobjekts einen Text hinzu.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;

@@ -34,12 +34,10 @@ public class Method_CellSetRow : Method_Database {
     public override string Comand => "cellsetrow";
     public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
-
     public override string Syntax => "CellSetRow(Value, Column, Row)";
 
     #endregion

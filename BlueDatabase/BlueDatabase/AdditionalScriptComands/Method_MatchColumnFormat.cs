@@ -35,7 +35,6 @@ internal class Method_MatchColumnFormat : Method_Database {
     public override string Comand => "matchcolumnformat";
     public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database;
     public override string Returns => VariableBool.ShortName_Plain;

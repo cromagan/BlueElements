@@ -34,11 +34,10 @@ internal class Method_Var : Method {
     public override string Comand => "var";
     public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ";";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
-    public override string StartSequence => "";
+    public override string StartSequence => string.Empty;
     public override string Syntax => "var VariablenName = Wert;";
 
     #endregion

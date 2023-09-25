@@ -34,7 +34,7 @@ internal class Method_AddSuffix : Method {
     public override string Comand => "addsuffix";
     public override string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;

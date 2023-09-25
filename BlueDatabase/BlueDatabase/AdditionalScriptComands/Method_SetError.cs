@@ -34,7 +34,7 @@ public class Method_SetError : Method_Database {
 
     public override bool EndlessArgs => true;
 
-    public override string EndSequence => ");";
+  
 
     public override bool GetCodeBlockAfter => false;
 

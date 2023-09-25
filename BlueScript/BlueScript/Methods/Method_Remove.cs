@@ -35,7 +35,7 @@ internal class Method_Remove : Method {
     public override string Comand => "remove";
     public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;

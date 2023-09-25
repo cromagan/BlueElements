@@ -32,13 +32,10 @@ public class Method_UniqueRowID : Method_Database {
     public override string Comand => "uniquerowid";
     public override string Description => "Gibt eine systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override string Returns => VariableString.ShortName_Plain;
-
     public override string StartSequence => "(";
-
     public override string Syntax => "UniqueRowID()";
 
     #endregion

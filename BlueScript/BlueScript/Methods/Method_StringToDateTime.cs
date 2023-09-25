@@ -17,7 +17,7 @@ public class Method_StringToDateTime : Method {
     public override string Comand => "stringtodatetime";
     public override string Description => "Wandelt einen Time-String ein Datum um.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableDateTime.ShortName_Variable;

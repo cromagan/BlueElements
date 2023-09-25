@@ -36,7 +36,7 @@ internal class Method_GetFiles : Method {
     public override string Comand => "getfiles";
     public override string Description => "Gibt alle Dateien im angegebenen Verzeichnis zurück. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO;
     public override string Returns => VariableListString.ShortName_Plain;

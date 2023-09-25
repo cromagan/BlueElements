@@ -36,7 +36,7 @@ internal class Method_Export : Method_Database {
     public override string Comand => "export";
     public override string Description => "Exportiert die Datenbank im angegeben Format. Achtung, bei BDB wird immer die gesamte Datenbank exportiert und die angegebenen Attribute ingnoriert.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;

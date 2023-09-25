@@ -33,13 +33,10 @@ public class Method_CellSetFilter : Method_Database {
     public override string Comand => "cellsetfilter";
     public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und setzt den Wert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override string Returns => VariableBool.ShortName_Plain;
-
     public override string StartSequence => "(";
-
     public override string Syntax => "CellSetFilter(Value, Column, Filter,...)";
 
     #endregion

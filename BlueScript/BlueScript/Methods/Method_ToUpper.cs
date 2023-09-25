@@ -34,7 +34,7 @@ internal class Method_ToUpper : Method {
     public override string Comand => "toupper";
     public override string Description => "Gibt den Text in Großbuchstaben zurück";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;

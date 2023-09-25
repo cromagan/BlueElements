@@ -35,7 +35,7 @@ internal class Method_TrimEnd : Method {
     public override string Comand => "trimend";
     public override string Description => "Entfernt die angegebenen Texte am Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ")";
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;

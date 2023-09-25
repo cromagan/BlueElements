@@ -37,7 +37,7 @@ internal class Method_SaveImage : Method {
     public override string Comand => "saveimage";
     public override string Description => "Speichert das Bild auf die Festplatte";
     public override bool EndlessArgs => true;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;

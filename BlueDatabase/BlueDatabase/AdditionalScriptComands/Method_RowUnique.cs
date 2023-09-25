@@ -36,18 +36,15 @@ public class Method_RowUnique : Method {
     public override string Comand => "rowunique";
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
-                                              "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
+                                          "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
                                           "Werden mehrere Zeilen gefunden, werden die Zeilen bis auf eine gelöscht.\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
 
     public override bool EndlessArgs => true;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableRowItem.ShortName_Variable;
-
     public override string StartSequence => "(";
-
     public override string Syntax => "RowUnique( Filter, ...)";
 
     #endregion

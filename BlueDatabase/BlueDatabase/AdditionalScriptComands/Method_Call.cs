@@ -39,7 +39,7 @@ internal class Method_Call : Method_Database {
         "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database;
     public override string Returns => string.Empty;

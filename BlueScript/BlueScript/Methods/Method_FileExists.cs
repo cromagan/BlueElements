@@ -37,7 +37,7 @@ internal class Method_FileExists : Method {
     public override string Comand => "fileexists";
     public override string Description => "Prüft, ob eine Datei existiert";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableBool.ShortName_Plain;

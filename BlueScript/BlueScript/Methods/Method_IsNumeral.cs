@@ -35,7 +35,7 @@ internal class Method_IsNumeral : Method {
     public override string Comand => "isnumeral";
     public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
+    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableBool.ShortName_Plain;

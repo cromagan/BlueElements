@@ -34,7 +34,7 @@ internal class Method_Exception : Method {
     public override string Comand => "Exception";
     public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
+  
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
