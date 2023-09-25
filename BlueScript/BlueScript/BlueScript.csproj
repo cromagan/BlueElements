@@ -47,6 +47,7 @@
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Methods\Method_Ping.cs" />
     <Compile Include="ScriptDescription.cs" />
     <Compile Include="Enums\MethodType.cs" />
     <Compile Include="Enums\ScriptIssueType.cs" />
