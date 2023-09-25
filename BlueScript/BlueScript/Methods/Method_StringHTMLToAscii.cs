@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
@@ -32,6 +32,7 @@ internal class Method_StringHTMLToAscii : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, BoolVal };
+    public override string Comand => "stringhtmltoascii";
     public override string Description => "Ersetzt einen HTML-String zu normalen ASCII-String. Beispiel: Aus &auml; wird ä. Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -44,8 +45,6 @@ internal class Method_StringHTMLToAscii : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "stringhtmltoascii" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

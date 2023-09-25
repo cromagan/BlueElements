@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueBasics.Interfaces;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueDatabase.AdditionalScriptComands;
@@ -32,6 +32,7 @@ internal class Method_MatchColumnFormat : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new List<string> { Variable.Any_Variable } };
+    public override string Comand => "matchcolumnformat";
     public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -44,8 +45,6 @@ internal class Method_MatchColumnFormat : Method_Database {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "matchcolumnformat" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

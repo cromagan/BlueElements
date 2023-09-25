@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
@@ -33,8 +33,10 @@ public class Method_RowUnique : Method {
 
     public override List<List<string>> Args => new() { FilterVar };
 
+    public override string Comand => "rowunique";
+
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
-                                          "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
+                                              "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
                                           "Werden mehrere Zeilen gefunden, werden die Zeilen bis auf eine gelöscht.\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
 
@@ -51,8 +53,6 @@ public class Method_RowUnique : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "rowunique" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

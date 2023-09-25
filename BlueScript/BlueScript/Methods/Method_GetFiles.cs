@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.IO;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.IO;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
@@ -33,6 +33,7 @@ internal class Method_GetFiles : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
+    public override string Comand => "getfiles";
     public override string Description => "Gibt alle Dateien im angegebenen Verzeichnis zurück. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -45,8 +46,6 @@ internal class Method_GetFiles : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "getfiles" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

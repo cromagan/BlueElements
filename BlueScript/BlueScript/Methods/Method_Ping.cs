@@ -17,12 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Net.NetworkInformation;
 
 namespace BlueScript.Methods;
 
@@ -33,6 +32,7 @@ internal class Method_Ping : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
+    public override string Comand => "ping";
     public override string Description => "Pingt einen Server an und gibt dessen Reaktionszeit in Millsekunden zurück.\r\nTritt ein Fehler auf, für 9999 zurück gegeben.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -45,8 +45,6 @@ internal class Method_Ping : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "ping" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

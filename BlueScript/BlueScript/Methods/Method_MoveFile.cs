@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
@@ -32,6 +32,7 @@ internal class Method_MoveFile : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
+    public override string Comand => "movefile";
     public override string Description => "Verschiebt eine Datei.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
@@ -44,8 +45,6 @@ internal class Method_MoveFile : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "movefile" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

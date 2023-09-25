@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -34,6 +34,7 @@ internal class Method_FileExists : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
+    public override string Comand => "fileexists";
     public override string Description => "Prüft, ob eine Datei existiert";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -46,8 +47,6 @@ internal class Method_FileExists : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "fileexists" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

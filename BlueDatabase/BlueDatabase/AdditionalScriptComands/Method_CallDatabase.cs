@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -32,8 +32,10 @@ public class Method_CallDatabase : Method_Database {
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
 
+    public override string Comand => "calldatabase";
+
     public override string Description => "Führt das Skript in der angegebenen Datenabank aus.\r\n" +
-        "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszühenden Skript zur Verfügung.\r\n" +
+            "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszühenden Skript zur Verfügung.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
         "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
         "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
@@ -50,8 +52,6 @@ public class Method_CallDatabase : Method_Database {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "calldatabase" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
@@ -31,6 +31,7 @@ public class Method_ContentsFilter : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, FilterVar };
+    public override string Comand => "contentsfilter";
     public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
@@ -45,8 +46,6 @@ public class Method_ContentsFilter : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "contentsfilter" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

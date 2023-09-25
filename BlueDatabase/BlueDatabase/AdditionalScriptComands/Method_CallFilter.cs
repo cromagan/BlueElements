@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
@@ -32,8 +32,10 @@ public class Method_CallFilter : Method {
 
     public override List<List<string>> Args => new() { StringVal, FilterVar };
 
+    public override string Comand => "callfilter";
+
     public override string Description => "Sucht Zeilen und ruft in dessen Datenbank ein Skript für jede Zeile aus.\r\n" +
-                                            "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
+                                                "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
                                             "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
                                             "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
                                             "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
@@ -51,8 +53,6 @@ public class Method_CallFilter : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "callfilter" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

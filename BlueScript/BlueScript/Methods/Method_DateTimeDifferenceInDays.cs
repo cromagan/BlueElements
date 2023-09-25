@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -31,6 +31,7 @@ internal class Method_DateTimeDifferenceInDays : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { DateTimeVar, DateTimeVar };
+    public override string Comand => "datetimedifferenceindays";
     public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = Date1 - Date2";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -43,8 +44,6 @@ internal class Method_DateTimeDifferenceInDays : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "datetimedifferenceindays" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

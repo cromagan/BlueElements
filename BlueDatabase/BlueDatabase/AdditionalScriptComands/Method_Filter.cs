@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -32,6 +32,7 @@ public class Method_Filter : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal, StringVal };
+    public override string Comand => "filter";
     public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann. Aktuell werden nur die FilterTypen 'is' und 'isnot' unterstützt. Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
@@ -67,8 +68,6 @@ public class Method_Filter : Method_Database {
 
         return allFi.Count < 1 ? null : allFi;
     }
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "filter" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

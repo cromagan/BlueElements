@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -32,6 +32,7 @@ internal class Method_RandomInt : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { FloatVal };
+    public override string Comand => "randomint";
     public override string Description => "Gibt eine nicht negative Zufalls-Ganzzahl zurück,\rdie kleiner als das angegebene Maximum ist.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -44,8 +45,6 @@ internal class Method_RandomInt : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "randomint" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

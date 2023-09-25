@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.IO;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.IO;
 
 namespace BlueScript.Methods;
 
@@ -34,6 +34,7 @@ internal class Method_LoadTextFile : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
+    public override string Comand => "loadtextfile";
     public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -46,8 +47,6 @@ internal class Method_LoadTextFile : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "loadtextfile" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

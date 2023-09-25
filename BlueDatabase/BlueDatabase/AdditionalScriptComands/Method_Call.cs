@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -32,8 +32,10 @@ internal class Method_Call : Method_Database {
 
     public override List<List<string>> Args => new() { StringVal, BoolVal };
 
+    public override string Comand => "call";
+
     public override string Description => "Ruft eine Subroutine auf.\r\n" +
-        "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
+            "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
         "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
     public override bool EndlessArgs => false;
@@ -47,8 +49,6 @@ internal class Method_Call : Method_Database {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "call" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

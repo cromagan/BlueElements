@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -31,6 +31,7 @@ internal class Method_IsNullOrZero : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { Variable.Any_Variable } };
+    public override string Comand => "isnullorzero";
     public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist, keinen Inhalt hat, oder dem Zahlenwert 0 entspricht. Falls die Variable existiert, muss diese dem Typ Numeral entsprechen.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -44,8 +45,6 @@ internal class Method_IsNullOrZero : Method {
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "isnullorzero" };
-
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
 
@@ -57,10 +56,8 @@ internal class Method_IsNullOrZero : Method {
             return DoItFeedback.Wahr();
         }
 
-
         var v = attvar.Attributes[0];
         if (v == null) { return new DoItFeedback("Interner Fehler"); }
-
 
         if (v.IsNullOrEmpty) { return DoItFeedback.Wahr(); }
         if (v is VariableUnknown) { return DoItFeedback.Wahr(); }
@@ -71,7 +68,6 @@ internal class Method_IsNullOrZero : Method {
         }
 
         return new DoItFeedback(infos.Data, "Variable existiert, ist aber nicht vom Datentyp Numeral.");
-
     }
 
     #endregion

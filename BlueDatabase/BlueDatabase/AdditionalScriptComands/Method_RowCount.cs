@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
@@ -31,6 +31,7 @@ public class Method_RowCount : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { FilterVar };
+    public override string Comand => "rowcount";
     public override string Description => "Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
@@ -44,8 +45,6 @@ public class Method_RowCount : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "rowcount" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -32,6 +32,7 @@ internal class Method_DateTimeNowUTC : Method {
     #region Properties
 
     public override List<List<string>> Args => new();
+    public override string Comand => "datetimeutcnow";
     public override string Description => "Gibt die akutelle UTC-Uhrzeit zurück.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -44,8 +45,6 @@ internal class Method_DateTimeNowUTC : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "datetimeutcnow" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

@@ -43,7 +43,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "generatelayoutimage" };
+    public override string Comand => "generatelayoutimage";
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

@@ -132,11 +132,10 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
             if (Script.Comands != null) {
                 foreach (var thisc in Script.Comands) {
                     items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
+                    items.Add(new AutocompleteItem(thisc.Comand));
                     if (!string.IsNullOrEmpty(thisc.Returns)) {
                         items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
                     }
-
-                    items.AddRange(thisc.Comand(null).Select(thiscom => new AutocompleteItem(thiscom)));
                 }
             }
             //set as autocomplete source
@@ -199,7 +198,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
             _lastWord = string.Empty;
             _lastVariableContent = string.Empty;
             foreach (var thisc in Script.Comands) {
-                if (thisc.Comand(null).Contains(e.HoveredWord, false)) {
+                if (thisc.Comand.Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
                     e.ToolTipTitle = thisc.Syntax;
                     e.ToolTipText = thisc.HintText();
                     return;

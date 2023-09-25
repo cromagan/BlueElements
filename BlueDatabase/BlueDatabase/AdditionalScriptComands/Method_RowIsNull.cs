@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
@@ -32,6 +32,7 @@ public class Method_RowIsNull : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { RowVar };
+    public override string Comand => "rowisnull";
     public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -46,8 +47,6 @@ public class Method_RowIsNull : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "rowisnull" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

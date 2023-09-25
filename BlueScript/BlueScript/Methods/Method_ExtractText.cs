@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -34,8 +34,10 @@ internal class Method_ExtractText : Method {
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
 
+    public override string Comand => "extracttext";
+
     public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt eine Liste mit allen Funden zurück.\r\n" +
-                                          "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";
+                                              "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";
 
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -48,8 +50,6 @@ internal class Method_ExtractText : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "extracttext" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

@@ -17,15 +17,15 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.IO;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Drawing.Imaging;
+using System.IO;
 
 namespace BlueScript.Methods;
 
@@ -34,6 +34,7 @@ internal class Method_SaveImage : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, new List<string> { VariableBitmap.ShortName_Variable } };
+    public override string Comand => "saveimage";
     public override string Description => "Speichert das Bild auf die Festplatte";
     public override bool EndlessArgs => true;
     public override string EndSequence => ");";
@@ -47,8 +48,6 @@ internal class Method_SaveImage : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "saveimage" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

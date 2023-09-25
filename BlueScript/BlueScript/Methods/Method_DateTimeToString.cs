@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueBasics.Constants;
 
 namespace BlueScript.Methods;
@@ -32,6 +32,7 @@ internal class Method_DateTimeToString : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { DateTimeVar, StringVal };
+    public override string Comand => "datetimetostring";
     public override string Description => "Wandelt eine Zeitangabe in einen String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  " + Format_Date7 + "\rAchtung: Groß-Kleinschreibung ist wichtig!";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -44,8 +45,6 @@ internal class Method_DateTimeToString : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "datetimetostring" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -31,6 +31,7 @@ internal class Method_Exception : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
+    public override string Comand => "Exception";
     public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
@@ -43,8 +44,6 @@ internal class Method_Exception : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "Exception" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen."); }

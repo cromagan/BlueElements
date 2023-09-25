@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Drawing;
 
 namespace BlueScript.Methods;
 
@@ -40,6 +40,7 @@ internal class Method_DownloadImage : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
+    public override string Comand => "downloadimage";
     public override string Description => "Lädt das angegebene Bild aus dem Internet.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -52,8 +53,6 @@ internal class Method_DownloadImage : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "downloadimage" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

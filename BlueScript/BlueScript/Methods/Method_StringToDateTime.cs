@@ -1,10 +1,10 @@
 ﻿#nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueBasics.Converter;
 
 namespace BildzeichenListe.AdditionalScriptComands;
@@ -14,6 +14,7 @@ public class Method_StringToDateTime : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
+    public override string Comand => "stringtodatetime";
     public override string Description => "Wandelt einen Time-String ein Datum um.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -28,8 +29,6 @@ public class Method_StringToDateTime : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "stringtodatetime" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

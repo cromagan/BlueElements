@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace BlueScript.Methods;
 
@@ -33,6 +33,7 @@ internal class Method_ContainsWhitch : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, BoolVal, new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override string Comand => "containswhich";
     public override string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann als Liste alle gefundenen Strings zurück.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
@@ -47,8 +48,6 @@ internal class Method_ContainsWhitch : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "containswhich" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

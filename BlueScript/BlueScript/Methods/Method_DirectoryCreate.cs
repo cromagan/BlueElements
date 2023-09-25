@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.IO;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.IO;
 using static BlueBasics.Extensions;
 using static BlueBasics.IO;
 
@@ -34,6 +34,7 @@ internal class Method_DirectoryCreate : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
+    public override string Comand => "directorycreate";
     public override string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -46,8 +47,6 @@ internal class Method_DirectoryCreate : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "directorycreate" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

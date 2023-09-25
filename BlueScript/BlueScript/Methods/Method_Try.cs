@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -31,6 +31,7 @@ internal class Method_Try : Method {
     #region Properties
 
     public override List<List<string>> Args => new();
+    public override string Comand => "try";
     public override string Description => "Führt den Codeblock aus. Wenn ein Fehler ausgelöst wird, wird der Codeblock verlassen, das restlichs Sript wird aber ausgeführt. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
     public override bool EndlessArgs => false;
     public override string EndSequence => string.Empty;
@@ -43,8 +44,6 @@ internal class Method_Try : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "try" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

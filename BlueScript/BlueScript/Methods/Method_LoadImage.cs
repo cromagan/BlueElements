@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Drawing;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Drawing;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
@@ -34,6 +34,7 @@ internal class Method_LoadImage : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
+    public override string Comand => "loadimage";
     public override string Description => "Lädt das angegebene Bild aus dem Dateisystem.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -46,8 +47,6 @@ internal class Method_LoadImage : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "loadimage" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

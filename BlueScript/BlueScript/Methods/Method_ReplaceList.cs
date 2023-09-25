@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace BlueScript.Methods;
 
@@ -34,6 +34,7 @@ internal class Method_ReplaceList : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { ListStringVar, BoolVal, BoolVal, StringVal, StringVal };
+    public override string Comand => "replacelist";
     public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
@@ -46,8 +47,6 @@ internal class Method_ReplaceList : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "replacelist" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

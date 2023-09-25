@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Diagnostics;
 using BlueBasics.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -33,6 +33,7 @@ public class Method_AddRow : Method_Database {
 
     public override List<List<string>> Args => new() { StringVal, StringVal, BoolVal };
 
+    public override string Comand => "addrow";
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile.\r\nKeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
 
     public override bool EndlessArgs => false;
@@ -50,8 +51,6 @@ public class Method_AddRow : Method_Database {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "addrow" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

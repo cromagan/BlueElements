@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueDatabase.AdditionalScriptComands.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptComands;
@@ -32,8 +32,10 @@ public class Method_CallRow : Method {
 
     public override List<List<string>> Args => new() { StringVal, RowVar };
 
+    public override string Comand => "callrow";
+
     public override string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
-        "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
+            "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
         "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
         "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
@@ -50,8 +52,6 @@ public class Method_CallRow : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "callrow" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

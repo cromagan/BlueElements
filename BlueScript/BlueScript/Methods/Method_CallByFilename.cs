@@ -17,12 +17,12 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
@@ -33,8 +33,10 @@ public class Method_CallByFilename : Method {
 
     public override List<List<string>> Args => new() { StringVal, BoolVal };
 
+    public override string Comand => "callbyfilename";
+
     public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.\r\n" +
-                                            "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
+                                                "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
                                             "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
     public override bool EndlessArgs => false;
@@ -87,8 +89,6 @@ public class Method_CallByFilename : Method {
 
         return new DoItFeedback(scx.BreakFired, scx.EndScript);
     }
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "callbyfilename" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Linq;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueScript.Methods;
 
@@ -30,6 +30,7 @@ internal class Method_Min : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { FloatVal };
+    public override string Comand => "min";
     public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
@@ -42,8 +43,6 @@ internal class Method_Min : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "min" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

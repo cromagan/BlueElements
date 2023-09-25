@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Windows;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Windows;
 
 namespace BlueScript.Methods;
 
@@ -32,6 +32,7 @@ internal class Method_ClipboardText : Method {
     #region Properties
 
     public override List<List<string>> Args => new();
+    public override string Comand => "clipboardtext";
     public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.\r\nMit SetClipoard kann ein Wert in das Clipboard geschrieben werden.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -44,8 +45,6 @@ internal class Method_ClipboardText : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "clipboardtext" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

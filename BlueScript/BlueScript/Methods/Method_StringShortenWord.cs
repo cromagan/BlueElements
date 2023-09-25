@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using static BlueBasics.Extensions;
 
 namespace BlueScript.Methods;
@@ -33,6 +33,7 @@ internal class Method_StringShortenWord : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override string Comand => "stringshortenword";
     public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -45,8 +46,6 @@ internal class Method_StringShortenWord : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "stringshortenword" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -31,6 +31,7 @@ internal class Method_Add : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { ListStringVar, new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override string Comand => "add";
     public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ");";
@@ -43,8 +44,6 @@ internal class Method_Add : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "add" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

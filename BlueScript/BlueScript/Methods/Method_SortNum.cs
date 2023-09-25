@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueBasics.Converter;
 
 namespace BlueScript.Methods;
@@ -31,6 +31,7 @@ internal class Method_SortNum : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { ListStringVar, FloatVal };
+    public override string Comand => "sortnum";
     public override string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
@@ -44,8 +45,6 @@ internal class Method_SortNum : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "sortnum" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

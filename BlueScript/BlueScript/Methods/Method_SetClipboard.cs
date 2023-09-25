@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using static BlueBasics.Generic;
 
 namespace BlueScript.Methods;
@@ -32,6 +32,7 @@ internal class Method_SetClipboard : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
+    public override string Comand => "setclipboard";
     public override string Description => "Speichert den Text im Clipboard.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ");";
@@ -44,8 +45,6 @@ internal class Method_SetClipboard : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "setclipboard" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

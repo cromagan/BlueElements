@@ -19,8 +19,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Windows.Input;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -78,11 +80,13 @@ public class Script {
 
     #region Methods
 
-    public static DoItWithEndedPosFeedback ComandOnPosition(VariableCollection varCol, ScriptProperties scp, string txt, int pos, bool expectedvariablefeedback, LogData ld) {
+    public static DoItWithEndedPosFeedback ComandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
         if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
+        #region Befehle prüfen
+
         foreach (var thisC in Comands) {
-            var f = thisC.CanDo(varCol, scp, txt, pos, expectedvariablefeedback, ld);
+            var f = thisC.CanDo(varCol, scp, scriptText, pos, expectedvariablefeedback, ld);
             if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
@@ -91,23 +95,49 @@ public class Script {
             }
         }
 
+        #endregion
+
+        #region Variablen prüfen
+
+        if (!expectedvariablefeedback) {
+            var maxl = scriptText.Length;
+
+            foreach (var thisV in varCol) {
+                var comandtext = thisV.KeyName + "=";
+                var l = comandtext.Length;
+                if (pos + l < maxl) {
+                    if (string.Equals(scriptText.Substring(pos, l), comandtext, StringComparison.OrdinalIgnoreCase)) {
+                        var f = Method.GetEnd(scriptText, pos + l - 1, 1, ";", ld);
+                        if (!f.AllOk) {
+                            return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", ld);
+                        }
+                        var infos = new CanDoFeedback(scriptText, f.ContinuePosition, comandtext, f.AttributeText, string.Empty, ld);
+                        var fn = Method.VariablenBerechnung(infos, scp, comandtext + f.AttributeText + ";", varCol, false);
+                        return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript);
+                    }
+                }
+            }
+        }
+
+        #endregion
+
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var f in Comands.Select(thisC => thisC.CanDo(varCol, scp, txt, pos, !expectedvariablefeedback, ld))) {
+        foreach (var f in Comands.Select(thisC => thisC.CanDo(varCol, scp, scriptText, pos, !expectedvariablefeedback, ld))) {
             if (f.MustAbort) {
                 return new DoItWithEndedPosFeedback(f.ErrorMessage, ld);
             }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
                 return expectedvariablefeedback
-                    ? new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + txt.Substring(pos), ld)
-                    : new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + txt.Substring(pos), ld);
+                    ? new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), ld)
+                    : new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), ld);
             }
         }
 
         #endregion Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        var bef = (txt.Substring(pos) + "¶").SplitBy("¶");
+        var bef = (scriptText.Substring(pos) + "¶").SplitBy("¶");
 
         return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + bef[0], ld);
     }
@@ -132,7 +162,7 @@ public class Script {
                 pos++;
                 ld.LineAdd(1);
             } else {
-                var f = ComandOnPosition(varCol, scp, redScriptText, pos, false, ld);
+                var f = ComandOrVarOnPosition(varCol, scp, redScriptText, pos, false, ld);
                 if (!f.AllOk) {
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, false);
                 }

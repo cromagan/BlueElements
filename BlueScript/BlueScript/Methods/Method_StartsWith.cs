@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -31,6 +31,7 @@ internal class Method_StartsWith : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, BoolVal, StringVal };
+    public override string Comand => "startswith";
     public override string Description => "Prüft, ob der String mit einem der angegeben Strings startet.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ")";
@@ -43,8 +44,6 @@ internal class Method_StartsWith : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "startswith" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

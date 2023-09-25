@@ -17,14 +17,14 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.IO;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
+using System.IO;
 
 namespace BlueDatabase.AdditionalScriptComands;
 
@@ -33,6 +33,7 @@ internal class Method_Export : Method_Database {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal, FilterVar };
+    public override string Comand => "export";
     public override string Description => "Exportiert die Datenbank im angegeben Format. Achtung, bei BDB wird immer die gesamte Datenbank exportiert und die angegebenen Attribute ingnoriert.";
     public override bool EndlessArgs => true;
     public override string EndSequence => ");";
@@ -46,8 +47,6 @@ internal class Method_Export : Method_Database {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "export" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

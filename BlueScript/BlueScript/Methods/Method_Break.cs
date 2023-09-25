@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -31,6 +31,7 @@ internal class Method_Break : Method {
     #region Properties
 
     public override List<List<string>> Args => new();
+    public override string Comand => "break";
     public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ";";
@@ -44,8 +45,6 @@ internal class Method_Break : Method {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "break" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) =>
         //if (s.Sub < 1) { return new DoItFeedback(infos.Data, "Break nur innerhalb einer Schleife oder Subroutine erlaubt."); }

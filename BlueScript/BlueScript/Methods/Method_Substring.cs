@@ -17,10 +17,10 @@
 
 #nullable enable
 
-using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -31,6 +31,7 @@ internal class Method_Substring : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, FloatVal, FloatVal };
+    public override string Comand => "substring";
     public override string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
     public override bool EndlessArgs => false;
     public override string EndSequence => ")";
@@ -44,8 +45,6 @@ internal class Method_Substring : Method {
 
     #region Methods
 
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "substring" };
-
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
@@ -58,13 +57,9 @@ internal class Method_Substring : Method {
 
         var t = attvar.ValueStringGet(0);
 
-        if (st > t.Length) {
-            return DoItFeedback.Null();
-        }
+        if (st > t.Length) { return DoItFeedback.Null(); }
 
-        if (st + en > t.Length) {
-            en = t.Length - st;
-        }
+        if (st + en > t.Length) { en = t.Length - st; }
         return new DoItFeedback(t.Substring(st, en));
     }
 
