@@ -149,7 +149,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         #region Mögliche Variablen
 
         foreach (var thisv in varCol) {
-            toSearch.Add(thisv.KeyName);
+            toSearch.Add(thisv.KeyName + "=");
         }
 
         #endregion

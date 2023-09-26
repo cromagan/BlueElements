@@ -422,7 +422,11 @@ public class GenericControl : Control {
 
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
-    protected void SetDoubleBuffering() => SetStyle(ControlStyles.DoubleBuffer, true);
+    protected void SetDoubleBuffering() {
+        SetStyle(ControlStyles.DoubleBuffer, true);
+        SetStyle(ControlStyles.AllPaintingInWmPaint, true);
+        SetStyle(ControlStyles.UserPaint, true);
+    }
 
     //MyBase.GetScaledBounds(bounds, factor, specified)
 
