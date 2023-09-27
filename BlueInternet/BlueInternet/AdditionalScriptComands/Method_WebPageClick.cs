@@ -35,9 +35,9 @@ internal class Method_WebPageClick : Method_WebPage {
     #region Properties
 
     public override List<List<string>> Args => new() { WebPageVal, StringVal };
+    public override string Comand => "webpageclick";
     public override string Description => "Drückt einen Button, Klasse oder Link in der Webpage und wartet, bis die Seite geladen ist.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
@@ -47,8 +47,6 @@ internal class Method_WebPageClick : Method_WebPage {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpageclick" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

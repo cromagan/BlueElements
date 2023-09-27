@@ -40,9 +40,9 @@ internal class Method_WebPageScreenShot : Method_WebPage {
     #region Properties
 
     public override List<List<string>> Args => new() { WebPageVal };
+    public override string Comand => "webpagescreenshot";
     public override string Description => "Gibt die aktuelle Anzeige der WebPage zurück. NULL falls irgendwas fehlschlägt";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableBitmap.ShortName_Variable;
@@ -52,8 +52,6 @@ internal class Method_WebPageScreenShot : Method_WebPage {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpagescreenshot" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

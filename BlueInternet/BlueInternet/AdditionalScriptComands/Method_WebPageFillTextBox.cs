@@ -35,9 +35,9 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
     #region Properties
 
     public override List<List<string>> Args => new() { WebPageVal, StringVal, StringVal };
+    public override string Comand => "webpagefilltextbox";
     public override string Description => "Füllt ein Textfeld in der Webpage aus.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ");";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
@@ -47,8 +47,6 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpagefilltextbox" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
@@ -60,22 +58,22 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
         if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
 
         try {
-       //     var script = @"
-       //     var inputField = document.querySelector('.login_username input[type=""text""]');
-       //     if (inputField) {
-       //         inputField.value = 'Hallo';
-       //  var event = new Event('input', { bubbles: true });
-       //inputField.dispatchEvent(event);
-       //     }
-       // ";
+            //     var script = @"
+            //     var inputField = document.querySelector('.login_username input[type=""text""]');
+            //     if (inputField) {
+            //         inputField.value = 'Hallo';
+            //  var event = new Event('input', { bubbles: true });
+            //inputField.dispatchEvent(event);
+            //     }
+            // ";
 
-       //     var task = DoTask(wb, script);
+            //     var task = DoTask(wb, script);
 
-       //     if (!WaitLoaded(wb)) {
-       //         return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
-       //     }
+            //     if (!WaitLoaded(wb)) {
+            //         return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
+            //     }
 
-       //     return DoItFeedback.Null();
+            //     return DoItFeedback.Null();
 
             #region Versuch, Textbox per ID
 
