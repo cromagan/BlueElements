@@ -98,9 +98,9 @@ public partial class FontSelectDialog {
             if (FName.Item[value.FontName] == null) { _ = FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20)); }
             FName.Item.UncheckAll();
             FName.Item[value.FontName].Checked = true;
-            if (FSize.Item[value.FontSize.ToString(Constants.Format_Float1)] == null) { _ = FSize.Item.Add(value.FontSize.ToString(Constants.Format_Float1)); }
+            if (FSize.Item[value.Size.ToString(Constants.Format_Float1)] == null) { _ = FSize.Item.Add(value.Size.ToString(Constants.Format_Float1)); }
             FSize.Item.UncheckAll();
-            FSize.Item[value.FontSize.ToString(Constants.Format_Float1)].Checked = true;
+            FSize.Item[value.Size.ToString(Constants.Format_Float1)].Checked = true;
             fFett.Checked = value.Bold;
             fKursiv.Checked = value.Italic;
             fUnterstrichen.Checked = value.Underline;

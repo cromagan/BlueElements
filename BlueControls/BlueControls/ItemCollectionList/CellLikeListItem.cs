@@ -81,15 +81,15 @@ public class CellLikeListItem : AbstractListItem {
 
     public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Table.FormatedText_NeededSize(_styleLikeThis, Internal, Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _bildTextverhalten);
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => Table.FormatedText_NeededSize(_styleLikeThis, Internal, (Font)Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _bildTextverhalten);
 
-    protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States vState, bool drawBorderAndBack, bool translate) {
+    protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, itemdesign, vState, positionModified, null, false);
+            Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false);
         }
-        Table.Draw_FormatedText(gr, Internal, _styleLikeThis, positionModified, itemdesign, vState, _style, _bildTextverhalten);
+        Table.Draw_FormatedText(gr, Internal, _styleLikeThis, positionModified, itemdesign, state, _style, _bildTextverhalten);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, vState, positionModified);
+            Skin.Draw_Border(gr, itemdesign, state, positionModified);
         }
     }
 

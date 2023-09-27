@@ -223,7 +223,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
     }
 
     internal static Size StandardSize(string text, QuickImage? image) {
-        var s = Skin.FormatedText_NeededSize(text, image, Skin.GetBlueFont(Design.Button_CheckBox, States.Standard), 16);
+        var s = Skin.FormatedText_NeededSize(text, image, (Font)Skin.GetBlueFont(Design.Button_CheckBox, States.Standard), 16);
         s.Width += 10;
         s.Height += 4;
         return s;

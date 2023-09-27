@@ -549,43 +549,43 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         }
         switch (cod) {
             case "B":
-                font = BlueFont.Get(font.FontName, font.FontSize, true, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, true, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "/B":
-                font = BlueFont.Get(font.FontName, font.FontSize, false, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, false, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "I":
-                font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, true, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, true, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "/I":
-                font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, false, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, false, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "U":
-                font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, true, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, true, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "/U":
-                font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, false, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, false, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "STRIKE":
-                font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, true, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, true, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "/STRIKE":
-                font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, false, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, false, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "3":
-                font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, true, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, true, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "/3":
-                font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, false, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, false, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "FONTSIZE":
@@ -594,15 +594,15 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
                 break;
 
             case "FONTNAME":
-                font = BlueFont.Get(attribut, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(attribut, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "FONTCOLOR":
-                font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, attribut, font.ColorOutline.ToHtmlCode(), font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, attribut, font.ColorOutline.ToHtmlCode(), font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "FONTOUTLINE":
-                font = BlueFont.Get(font.FontName, font.FontSize, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain.ToHtmlCode(), attribut, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
+                font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, font.Outline, font.ColorMain.ToHtmlCode(), attribut, font.Kapitälchen, font.OnlyUpper, font.OnlyLower);
                 break;
 
             case "HR":

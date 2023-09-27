@@ -169,7 +169,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     public Size TextRequiredSize() {
         if (QuickModePossible()) {
             if (_design == Design.Undefiniert) { GetDesign(); }
-            var s = BlueFont.MeasureString(_text, Skin.GetBlueFont(_design, States.Standard).Font());
+            var s = BlueFont.MeasureString(_text, (Font)Skin.GetBlueFont(_design, States.Standard));
             return new Size((int)(s.Width + 1), (int)(s.Height + 1));
         }
         if (_eText == null) {

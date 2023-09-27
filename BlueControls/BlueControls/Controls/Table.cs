@@ -71,10 +71,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private readonly object _lockUserAction = new();
     private int _arrangementNr = 1;
     private AutoFilter? _autoFilter;
-    private BlueFont? _cellFont;
-    private BlueFont? _chapterFont;
-    private BlueFont? _columnFilterFont;
-    private BlueFont? _columnFont;
+    private BlueFont _cellFont = BlueFont.DefaultFont;
+    private BlueFont _chapterFont = BlueFont.DefaultFont;
+    private BlueFont _columnFilterFont = BlueFont.DefaultFont;
+    private BlueFont _columnFont = BlueFont.DefaultFont;
     private DateTime? _databaseDrawError;
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
     private bool _drawing = false;
@@ -102,7 +102,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private string _mouseOverText = string.Empty;
 
-    private BlueFont? _newRowFont;
+    private BlueFont _newRowFont = BlueFont.DefaultFont;
 
     private Progressbar? _pg;
 
@@ -369,11 +369,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     #region Methods
 
-    public static int CalculateColumnContentWidth(Table table, ColumnItem column, BlueFont? cellFont, int pix16) {
+    public static int CalculateColumnContentWidth(Table table, ColumnItem column, Font cellFont, int pix16) {
+        if (column.IsDisposed) { return 16; }
+        if (column.Database == null || column.Database.IsDisposed) { return 16; }
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
         if (column.ContentWidthIsValid) { return column.ContentWidth; }
-
-        if (column.Database == null) { return 16; }
 
         column.RefreshColumnsData();
 
@@ -405,7 +405,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return newContentWidth;
     }
 
-    public static Size Cell_ContentSize(Table? table, ColumnItem column, RowItem row, BlueFont? cellFont, int pix16) {
+    public static Size Cell_ContentSize(Table? table, ColumnItem column, RowItem row, Font cellFont, int pix16) {
         if (column?.Database == null || row == null || column.Database.IsDisposed) { return new Size(pix16, pix16); }
 
         if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
@@ -498,7 +498,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
-    public static Size FormatedText_NeededSize(ColumnItem? column, string originalText, BlueFont? font, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten) {
+    public static Size FormatedText_NeededSize(ColumnItem? column, string originalText, Font font, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten) {
         var (s, quickImage) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
         return Skin.FormatedText_NeededSize(s, quickImage, font, minSize);
     }
@@ -900,18 +900,18 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 if (_showNumber) {
                     for (var x = -1; x < 2; x++) {
                         for (var y = -1; y < 2; y++) {
-                            BlueFont.DrawString(gr, "#" + lfdNo, _columnFont.Font(), Brushes.Black, (int)viewItem.OrderTmpSpalteX1 + x, viewItem.TmpAutoFilterLocation.Top + y);
+                            BlueFont.DrawString(gr, "#" + lfdNo, (Font)_columnFont, Brushes.Black, (int)viewItem.OrderTmpSpalteX1 + x, viewItem.TmpAutoFilterLocation.Top + y);
                         }
                     }
 
-                    BlueFont.DrawString(gr, "#" + lfdNo, _columnFont.Font(), Brushes.White, (int)viewItem.OrderTmpSpalteX1, viewItem.TmpAutoFilterLocation.Top);
+                    BlueFont.DrawString(gr, "#" + lfdNo, (Font)_columnFont, Brushes.White, (int)viewItem.OrderTmpSpalteX1, viewItem.TmpAutoFilterLocation.Top);
                 }
 
                 #endregion LaufendeNummer
 
                 var tx = viewItem.Column.Caption;
                 tx = LanguageTool.DoTranslate(tx, Translate).Replace("\r", "\r\n");
-                var fs = gr.MeasureString(tx, _columnFont.Font());
+                var fs = gr.MeasureString(tx, (Font)_columnFont);
 
                 #region Spalten-Kopf-Bild erzeugen
 
@@ -932,7 +932,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     // Dann der Text
                     gr.TranslateTransform(pos.X, pos.Y);
                     //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                    BlueFont.DrawString(gr, tx, _columnFont.Font(), new SolidBrush(viewItem.Column.ForeColor), 0, 0);
+                    BlueFont.DrawString(gr, tx, (Font)_columnFont, new SolidBrush(viewItem.Column.ForeColor), 0, 0);
                     gr.TranslateTransform(-pos.X, -pos.Y);
 
                     #endregion
@@ -947,7 +947,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     gr.TranslateTransform(pos.X, pos.Y);
                     gr.RotateTransform(-90);
                     //GR.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-                    BlueFont.DrawString(gr, tx, _columnFont.Font(), new SolidBrush(viewItem.Column.ForeColor), 0, 0);
+                    BlueFont.DrawString(gr, tx, (Font)_columnFont, new SolidBrush(viewItem.Column.ForeColor), 0, 0);
                     gr.TranslateTransform(-pos.X, -pos.Y);
                     gr.ResetTransform();
 
@@ -1440,13 +1440,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _cellFont = Skin.GetBlueFont(Enums.Design.Table_Cell, States.Standard).Scale(FontScale);
         _columnFont = Skin.GetBlueFont(Enums.Design.Table_Column, States.Standard).Scale(FontScale);
         _chapterFont = Skin.GetBlueFont(Enums.Design.Table_Cell_Chapter, States.Standard).Scale(FontScale);
-        _columnFilterFont = BlueFont.Get(_columnFont.FontName, _columnFont.FontSize, false, false, false, false, true, Color.White, Color.Red, false, false, false);
+        _columnFilterFont = BlueFont.Get(_columnFont.FontName, _columnFont.Size, false, false, false, false, true, Color.White, Color.Red, false, false, false);
 
         _newRowFont = Skin.GetBlueFont(Enums.Design.Table_Cell_New, States.Standard).Scale(FontScale);
         if (Database != null && !Database.IsDisposed) {
-            _pix16 = GetPix(16, _cellFont, Database.GlobalScale);
-            _pix18 = GetPix(18, _cellFont, Database.GlobalScale);
-            _rowCaptionFontY = GetPix(26, _cellFont, Database.GlobalScale);
+            _pix16 = GetPix(16, (Font)_cellFont, Database.GlobalScale);
+            _pix18 = GetPix(18, (Font)_cellFont, Database.GlobalScale);
+            _rowCaptionFontY = GetPix(26, (Font)_cellFont, Database.GlobalScale);
         } else {
             _pix16 = 16;
             _pix18 = 18;
@@ -1837,10 +1837,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private static void Draw_CellTransparentDirect(Graphics gr, string? toDraw, Rectangle drawarea, BlueFont? font, ColumnItem? contentHolderCellColumn, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
+    private static void Draw_CellTransparentDirect(Graphics gr, string toDraw, Rectangle drawarea, BlueFont font, ColumnItem? contentHolderCellColumn, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
         if (contentHolderCellColumn == null) { return; }
-
-        toDraw ??= string.Empty;
 
         if (!ShowMultiLine(toDraw, contentHolderCellColumn.MultiLine)) {
             Draw_CellTransparentDirect_OneLine(gr, toDraw, contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state);
@@ -1852,13 +1850,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 var y = 0;
                 for (var z = 0; z <= mei.GetUpperBound(0); z++) {
                     Draw_CellTransparentDirect_OneLine(gr, mei[z], contentHolderCellColumn, drawarea, y, z != mei.GetUpperBound(0), font, pix16, style, bildTextverhalten, state);
-                    y += FormatedText_NeededSize(contentHolderCellColumn, mei[z], font, style, pix16 - 1, bildTextverhalten).Height;
+                    y += FormatedText_NeededSize(contentHolderCellColumn, mei[z], (Font)font, style, pix16 - 1, bildTextverhalten).Height;
                 }
             }
         }
     }
 
-    private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont? font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
+    private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
 
         if (r.Bottom + pix16 > drawarea.Bottom) {
@@ -1873,8 +1871,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_FormatedText(gr, text, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
     }
 
-    //    if (e.Type is enFehlerArt.DevelopInfo or enFehlerArt.Info) { return; }
-    private static int GetPix(int pix, BlueFont? f, double scale) => Skin.FormatedText_NeededSize("@|", null, f, (int)((pix * scale) + 0.5)).Height;
+    private static int GetPix(int pix, Font f, double scale) => Skin.FormatedText_NeededSize("@|", null, f, (int)((pix * scale) + 0.5)).Height;
 
     private static bool Mouse_IsInAutofilter(ColumnViewItem? viewItem, MouseEventArgs e) => viewItem?.Column != null && viewItem.TmpAutoFilterLocation.Width != 0 && viewItem.Column.AutoFilterSymbolPossible() && viewItem.TmpAutoFilterLocation.Contains(e.X, e.Y);
 
@@ -2461,8 +2458,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             viewItem.TmpDrawWidth = 16;
         } else {
             viewItem.TmpDrawWidth = viewItem.ViewType == ViewType.PermanentColumn
-                ? Math.Min(CalculateColumnContentWidth(this, viewItem.Column, _cellFont, _pix16), (int)(displayRectangleWoSlider.Width * 0.3))
-                : Math.Min(CalculateColumnContentWidth(this, viewItem.Column, _cellFont, _pix16), (int)(displayRectangleWoSlider.Width * 0.6));
+                ? Math.Min(CalculateColumnContentWidth(this, viewItem.Column, (Font)_cellFont, _pix16), (int)(displayRectangleWoSlider.Width * 0.3))
+                : Math.Min(CalculateColumnContentWidth(this, viewItem.Column, (Font)_cellFont, _pix16), (int)(displayRectangleWoSlider.Width * 0.6));
         }
 
         viewItem.TmpDrawWidth = Math.Max((int)viewItem.TmpDrawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;
@@ -2484,7 +2481,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (column.TmpCaptionTextSize.Width > 0) { return column.TmpCaptionTextSize; }
         if (_columnFont == null) { return new SizeF(_pix16, _pix16); }
-        column.TmpCaptionTextSize = BlueFont.MeasureString(column.Caption.Replace("\r", "\r\n"), _columnFont.Font());
+        column.TmpCaptionTextSize = BlueFont.MeasureString(column.Caption.Replace("\r", "\r\n"), (Font)_columnFont);
         return column.TmpCaptionTextSize;
     }
 
@@ -2661,7 +2658,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <param name="cellInThisDatabaseColumn"></param>
     /// <param name="cellInThisDatabaseRow"></param>
     /// <param name="font"></param>
-    private void Draw_CellTransparent(Graphics gr, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, Rectangle cellrectangle, BlueFont? font, States state) {
+    private void Draw_CellTransparent(Graphics gr, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, Rectangle cellrectangle, BlueFont font, States state) {
         if (cellInThisDatabaseRow?.Row == null) { return; }
         if (cellInThisDatabaseColumn?.Column == null) { return; }
 
@@ -2691,7 +2688,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <param name="contentHolderCellColumn"></param>
     /// <param name="contentHolderCellRow"></param>
     /// <param name="font"></param>
-    private void Draw_CellTransparentDirect(Graphics gr, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, Rectangle cellrectangle, ColumnItem? contentHolderCellColumn, RowItem? contentHolderCellRow, BlueFont? font, States state) {
+    private void Draw_CellTransparentDirect(Graphics gr, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, Rectangle cellrectangle, ColumnItem? contentHolderCellColumn, RowItem? contentHolderCellRow, BlueFont font, States state) {
         if (cellInThisDatabaseRow?.Row == null) { return; }
         if (cellInThisDatabaseColumn?.Column == null) { return; }
         if (contentHolderCellColumn == null) { return; }
@@ -2767,7 +2764,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 // Überschrift in der ersten Spalte zeichnen
                 currentRow.CaptionPos = Rectangle.Empty;
                 if (currentRow.ShowCap) {
-                    var si = gr.MeasureString(currentRow.Chapter, _chapterFont.Font());
+                    var si = gr.MeasureString(currentRow.Chapter, (Font)_chapterFont);
                     gr.FillRectangle(new SolidBrush(Skin.Color_Back(Enums.Design.Table_And_Pad, States.Standard).SetAlpha(50)), 1, DrawY(currentRow) - RowCaptionSizeY, displayRectangleWoSlider.Width - 2, RowCaptionSizeY);
                     currentRow.CaptionPos = new Rectangle(1, DrawY(currentRow) - _rowCaptionFontY, (int)si.Width + 28, (int)si.Height);
 
@@ -2878,7 +2875,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     gr.DrawImage(QuickImage.Get("Warnung|16||||||120||50"), new Point(r.Right - 19, (int)(r.Top + ((r.Height - 16) / 2.0))));
                 }
                 if (currentRow.ShowCap) {
-                    BlueFont.DrawString(gr, currentRow.Chapter, _chapterFont.Font(), _chapterFont.BrushColorMain, 0, DrawY(currentRow) - _rowCaptionFontY);
+                    BlueFont.DrawString(gr, currentRow.Chapter, (Font)_chapterFont, _chapterFont.BrushColorMain, 0, DrawY(currentRow) - _rowCaptionFontY);
                 }
             }
         }
@@ -3251,13 +3248,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private int Row_DrawHeight(RowItem? vrow, Rectangle displayRectangleWoSlider) {
         if (Database == null || Database.IsDisposed || vrow == null) { return _pix18; }
 
-        if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, Database?.Column.First(), vrow, _cellFont, _pix16).Height; }
+        if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, Database?.Column.First(), vrow, (Font)_cellFont, _pix16).Height; }
         var tmp = _pix18;
         if (CurrentArrangement == null) { return tmp; }
 
         foreach (var thisViewItem in CurrentArrangement) {
             if (thisViewItem?.Column != null && !vrow.CellIsNullOrEmpty(thisViewItem.Column)) {
-                tmp = Math.Max(tmp, Cell_ContentSize(this, thisViewItem.Column, vrow, _cellFont, _pix16).Height);
+                tmp = Math.Max(tmp, Cell_ContentSize(this, thisViewItem.Column, vrow, (Font)_cellFont, _pix16).Height);
             }
         }
         tmp = Math.Min(tmp, (int)(displayRectangleWoSlider.Height * 0.9) - HeadSize());

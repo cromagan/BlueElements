@@ -327,7 +327,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         get => _sheetStyleScale;
         set {
             if (IsDisposed) { return; }
-            if (value < 0.1d) { value = 0.1f; }
+            if (value < 0.1f) { value = 0.1f; }
             if (Math.Abs(_sheetStyleScale - value) < 0.0001) { return; }
             _sheetStyleScale = value;
             ApplyDesignToItems();

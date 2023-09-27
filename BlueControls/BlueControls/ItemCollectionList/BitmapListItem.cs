@@ -158,9 +158,9 @@ public class BitmapListItem : AbstractListItem {
         drawingCoordinates.Inflate(-Padding, -Padding);
         var scaledImagePosition = RectangleF.Empty;
         var areaOfWholeImage = RectangleF.Empty;
-        var bFont = Skin.GetBlueFont(itemdesign, state);
+        var bFont = (Font)Skin.GetBlueFont(itemdesign, state);
         GetImage();
-        if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = bFont.SplitByWidth(_caption, drawingCoordinates.Width, _captionlines); }
+        if (!string.IsNullOrEmpty(_caption) && _captiontmp.Count == 0) { _captiontmp = BlueFont.SplitByWidth(bFont, _caption, drawingCoordinates.Width, _captionlines); }
 
         //Point trp;
 

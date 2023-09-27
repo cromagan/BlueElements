@@ -1430,7 +1430,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         for (var rowNo = startZ; rowNo < zeil.Count; rowNo++) {
             if (zeileZuordnen) {
-                if (zeil[rowNo].GetUpperBound(0) > 0 && !string.IsNullOrEmpty(zeil[rowNo][0]) && !dictNeu.ContainsKey(zeil[rowNo][0].ToUpper())) {
+                if (zeil[rowNo].GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(zeil[rowNo][0]) && !dictNeu.ContainsKey(zeil[rowNo][0].ToUpper())) {
                     dictNeu.Add(zeil[rowNo][0].ToUpper(), zeil[rowNo]);
                 }
                 //else {

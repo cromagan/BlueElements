@@ -226,14 +226,14 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     private void ChangeToMultiOder() {
         var f = Skin.GetBlueFont(Design.Caption, States.Standard);
         _multiAuswahlOder = true;
-        capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>ODER-Filterung:</u></b><fontsize=" + f.FontSize + "><br><br>Wählen sie Einträge, von denen <b>einer</b> zutreffen muss:");
+        capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>ODER-Filterung:</u></b><fontsize=" + f.Size + "><br><br>Wählen sie Einträge, von denen <b>einer</b> zutreffen muss:");
         ChangeDesign();
     }
 
     private void ChangeToMultiUnd() {
         _multiAuswahlUnd = true;
         var f = Skin.GetBlueFont(Design.Caption, States.Standard);
-        capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>UND-Filterung:</u></b><fontsize=" + f.FontSize + "><br><br>Wählen sie welche Einträge <b>alle</b> zutreffen müssen:");
+        capInfo.Text = LanguageTool.DoTranslate("<fontsize=15><b><u>UND-Filterung:</u></b><fontsize=" + f.Size + "><br><br>Wählen sie welche Einträge <b>alle</b> zutreffen müssen:");
         ChangeDesign();
     }
 

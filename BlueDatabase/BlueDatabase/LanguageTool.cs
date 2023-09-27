@@ -57,18 +57,22 @@ public static class LanguageTool {
         if (style == ShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
         var ot = txt;
         foreach (var thisString in column.OpticalReplace) {
-            var x = thisString.SplitAndCutBy("|");
-            if (x.Length == 2 && !string.IsNullOrEmpty(x[0]) && !string.IsNullOrEmpty(x[1])) {
-                if (x[0] == txt) { txt = x[1]; break; }
+            var x = thisString.SplitBy("|");
 
-                //if (string.IsNullOrEmpty(x[0])) {
-                //    if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
-                //} else {
-                //    txt = txt.Replace(x[0], x[1]);
-                //}
+            if (x.Length == 2) { 
+
+
+            //if (!string.IsNullOrEmpty(x[0]) && !string.IsNullOrEmpty(x[1]) && x[0] == txt) { txt = x[1]; }
+
+                if (string.IsNullOrEmpty(x[0])) {
+                    if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
+                } else {
+                    txt = txt.Replace(x[0], x[1]);
+                }
             }
             //if (x.Length == 1 && !thisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
         }
+
 
         if (style is ShortenStyle.Replaced or ShortenStyle.HTML || ot == txt) {
             return txt;
