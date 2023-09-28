@@ -33,9 +33,9 @@ internal class Method_WebPageGetAllLinks : Method_WebPage {
     #region Properties
 
     public override List<List<string>> Args => new() { WebPageVal };
+    public override string Comand => "webpagegetalllinks";
     public override string Description => "Gibt eine Liste aller Links zurück.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableListString.ShortName_Plain;
@@ -45,8 +45,6 @@ internal class Method_WebPageGetAllLinks : Method_WebPage {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "webpagegetalllinks" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

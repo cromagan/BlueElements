@@ -43,9 +43,9 @@ internal class Method_LoadUrl : Method_WebPage {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
+    public override string Comand => "loadurl";
     public override string Description => "Lädt die angebenen Internet-Adresse.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Webpage des Wertes NULL.\r\n\r\nAlle Befehle, die auf die Url zugreifen können, beginnen mit WebPage.";
     public override bool EndlessArgs => false;
-    public override string EndSequence => ")";
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableWebpage.ShortName_Variable;
@@ -55,8 +55,6 @@ internal class Method_LoadUrl : Method_WebPage {
     #endregion
 
     #region Methods
-
-    public override List<string> Comand(VariableCollection? currentvariables) => new() { "loadurl" };
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         //https://keyholesoftware.com/2019/02/11/create-your-own-web-bots-in-net-with-cefsharp/
