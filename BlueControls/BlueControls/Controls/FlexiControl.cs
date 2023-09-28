@@ -834,8 +834,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Controls.Add(_captionObject);
         }
         _captionObject.Enabled = Enabled;
-        _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch; // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
 
+        // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
+        // Text_abschneiden, weil dann der Quickmode verfügbar ist
+        _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden; 
         if (_captionPosition == ÜberschriftAnordnung.Ohne_mit_Abstand) {
             _captionObject.Text = " ";
         } else {
