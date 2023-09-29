@@ -101,8 +101,16 @@ public static class Develop {
         }
     }
 
+    /// <summary>
+    /// Gibt die Meldung Unbekannte Item aus
+    /// </summary>
+    /// <param name="warnung"></param>
     public static void DebugPrint(IHasKeyName warnung) => DebugPrint(FehlerArt.Warnung, "Unbekanntes Item:" + warnung.KeyName);
 
+    /// <summary>
+    /// Gibt die Meldung Unbekannte Item aus
+    /// </summary>
+    /// <param name="warnung"></param>
     public static void DebugPrint(IReadableText warnung) => DebugPrint(FehlerArt.Warnung, "Unbekanntes Item:" + warnung.ReadableText());
 
     public static void DebugPrint(string warnung) => DebugPrint(FehlerArt.Warnung, warnung);

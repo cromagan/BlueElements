@@ -52,7 +52,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Constructors
 
-    public Caption() : base(false, false) {
+    public Caption() : base(true, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

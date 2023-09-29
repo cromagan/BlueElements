@@ -32,6 +32,7 @@ using static BlueBasics.Constants;
 using static BlueBasics.IO;
 using static BlueDatabase.DatabaseAbstract;
 using BlueDatabase.EventArgs;
+using System.Diagnostics;
 
 namespace BlueDatabase;
 
@@ -253,7 +254,12 @@ public abstract class SqlBackAbstract {
                     LastLoadUtc = DateTime.UtcNow;
                     return tbl;
                 }
-            } catch { }
+            } catch (Exception ex) {
+                StackTrace stackTrace = new();
+                if (stackTrace.FrameCount > 95) {
+                    Develop.DebugPrint(FehlerArt.Fehler, "Commandtext: " + commandtext, ex);
+                }
+            }
 
             Generic.Pause(0.1, false);
             _ = CloseConnection();

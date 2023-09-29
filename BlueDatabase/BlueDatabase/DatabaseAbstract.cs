@@ -160,7 +160,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public event EventHandler<ProgressbarEventArgs>? ProgressbarInfo;
 
-    public event EventHandler<RowCancelEventArgs>? ScriptError;
+    public event EventHandler<RowScriptCancelEventArgs>? ScriptError;
 
     public event EventHandler? SortParameterChanged;
 
@@ -1089,14 +1089,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public bool hasErrorCheckScript() {
-
-        if(!isRowScriptPossible(true)) {return false;} 
-
-        var e=  EventScript.Get(ScriptEventTypes.prepare_formula);
-        return e.Count == 1;
-    }
-
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row, List<string>? attributes) {
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
@@ -1333,6 +1325,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public abstract void GetUndoCache();
+
+    public bool hasErrorCheckScript() {
+
+        if (!isRowScriptPossible(true)) { return false; }
+
+        var e = EventScript.Get(ScriptEventTypes.prepare_formula);
+        return e.Count == 1;
+    }
 
     public string Import(string importText, bool spalteZuordnen, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
         if (!Row.IsNewRowPossible()) {
@@ -1599,7 +1599,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     //            }
     //        }
     //    }
-    public void OnScriptError(RowCancelEventArgs e) {
+    public void OnScriptError(RowScriptCancelEventArgs e) {
         if (IsDisposed) { return; }
         ScriptError?.Invoke(this, e);
     }
@@ -2257,4 +2257,5 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private void Variables_Changed() => Variables = new VariableCollection(_variables);
 
     #endregion
+
 }

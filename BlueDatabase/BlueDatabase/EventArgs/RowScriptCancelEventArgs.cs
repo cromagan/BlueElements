@@ -19,17 +19,21 @@
 
 namespace BlueDatabase.EventArgs;
 
-public class RowCancelEventArgs : RowEventArgs {
+public class RowScriptCancelEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public RowCancelEventArgs(RowItem row, string cancelReason) : base(row) => CancelReason = cancelReason;
+    public RowScriptCancelEventArgs(RowItem row, string cancelReason, bool syntaxError) : base(row) {
+        CancelReason = cancelReason;
+        SyntaxError = syntaxError;
+    }
 
     #endregion
 
-    #region Properties
+        #region Properties
 
     public string CancelReason { get; }
+    public bool SyntaxError { get; }
 
     #endregion
 }
