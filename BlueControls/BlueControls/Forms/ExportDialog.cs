@@ -131,7 +131,11 @@ public sealed partial class ExportDialog : IHasDatabase {
 
         if (rowsForExport == null || rowsForExport.Count < 1) { return -1; }
 
-        ItemCollectionPad.ItemCollectionPad tmp = new(layout, rowsForExport[0].Database, rowsForExport[0].KeyName);
+        ItemCollectionPad.ItemCollectionPad tmp = new(layout, rowsForExport[0].Database);
+        tmp.ResetVariables();
+        var scx = tmp.ParseVariable(rowsForExport[0]);
+        if (!scx.AllOk) { return -1; }
+
         var oneItem = tmp.MaxBounds(string.Empty);
         pad.Item.SheetStyle = tmp.SheetStyle;
         pad.Item.SheetStyleScale = tmp.SheetStyleScale;
@@ -143,8 +147,11 @@ public sealed partial class ExportDialog : IHasDatabase {
             var tempVar2 = Math.Max(1, (int)Math.Floor((druckB.Height / (double)(oneItem.Height + abstand)) + 0.01));
             for (var y = 0; y < tempVar2; y++) {
                 ChildPadItem it = new() {
-                    PadInternal = new CreativePad(new ItemCollectionPad.ItemCollectionPad(layout, rowsForExport[startNr].Database, rowsForExport[startNr].KeyName))
+                    PadInternal = new CreativePad(new ItemCollectionPad.ItemCollectionPad(layout, rowsForExport[startNr].Database))
                 };
+                it.PadInternal.Item.ResetVariables();
+                it.PadInternal.Item.ParseVariable(rowsForExport[startNr]);
+
                 pad.Item.Add(it);
                 it.SetCoordinates(oneItem with { X = druckB.Left + (x * (oneItem.Width + abstand)), Y = druckB.Top + (y * (oneItem.Height + abstand)) }, true);
                 startNr++;
@@ -242,7 +249,9 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
         if (Database != null && Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1) {
             padVorschau.ShowInPrintMode = true;
-            padVorschau.Item = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport[0].Database, _rowsForExport[0].KeyName);
+            padVorschau.Item = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport[0].Database);
+            padVorschau.Item.ResetVariables();
+            padVorschau.Item.ParseVariable(_rowsForExport[0]);
             padVorschau.ZoomFit();
         } else {
             padVorschau.Item.Clear();

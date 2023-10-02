@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -39,6 +40,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     #region Fields
 
     private DatabaseScriptDescription? _item;
+
+    private bool allowTemporay = false;
 
     #endregion
 
@@ -80,6 +83,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     public DatabaseScriptDescription? Item {
         get {
             if (Database == null || Database.IsDisposed) { return null; }
+
             return _item;
         }
         set {
@@ -135,7 +139,10 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         if (Database == null || Database.IsDisposed) {
             return;
         }
-        if (DirectoryExists(Database.AdditionalFilesPfadWhole())) { _ = ExecuteFile(Database.AdditionalFilesPfadWhole()); }
+
+        if (DirectoryExists(Database.AdditionalFilesPfadWhole())) {
+            _ = ExecuteFile(Database.AdditionalFilesPfadWhole());
+        }
     }
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
@@ -175,6 +182,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             WriteInfosBack();
             _ = Database.Save();
         }
+
         btnSave.Enabled = true;
     }
 
@@ -182,16 +190,19 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void btnVersionErhöhen_Click(object sender, System.EventArgs e) {
         if (Database == null || Database.IsDisposed) { return; }
+
         btnVersionErhöhen.Enabled = false;
 
         var tmp = Database.EventScriptVersion;
         tmp++;
         if (tmp == int.MaxValue) { tmp = 0; }
+
         Database.EventScriptVersion = tmp;
     }
 
     private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
+
         Item.ChangeValues = chkAendertWerte.Checked;
     }
 
@@ -210,6 +221,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private void chkExternVerfügbar_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
+
         Item.ManualExecutable = chkExternVerfügbar.Checked;
     }
 
@@ -220,6 +232,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         if (chkZeile.Checked && !Database.isRowScriptPossible(false)) {
             if (!EnableScript()) { chkZeile.Checked = false; }
+
             return;
         }
 
@@ -227,7 +240,10 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         txbTestZeile.Enabled = chkZeile.Checked;
     }
 
-    private void Database_CanDoScript(object sender, System.ComponentModel.CancelEventArgs e) => e.Cancel = true;
+    private void Database_CanDoScript(object sender, CancelReasonEventArgs e) {
+        if (allowTemporay) { return; }
+        e.CancelReason = "Skript-Editor geöffnet";
+    }
 
     private void Database_Disposing(object sender, System.EventArgs e) {
         RemoveDatabase();
@@ -290,7 +306,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
         }
 
+        allowTemporay = true;
         e.Feedback = Database?.ExecuteScript(_item, chkChangeValuesInTest.Checked, r, null);
+        allowTemporay = false;
     }
 
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();

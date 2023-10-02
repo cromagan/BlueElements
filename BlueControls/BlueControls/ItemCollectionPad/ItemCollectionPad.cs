@@ -38,6 +38,7 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollection;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueDatabase;
+using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
@@ -45,6 +46,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
+//TODO: IParseable implementieren
 public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName {
 
     #region Fields
@@ -95,19 +97,19 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(string layoutId, DatabaseAbstract? database, string? rowkey) : this(database?.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
+    public ItemCollectionPad(string layoutId, DatabaseAbstract? database) : this(database?.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
-        _ = ResetVariables();
+        //_ = ResetVariables();
 
-        ParseVariable(database?.Row.SearchByKey(rowkey));
+        //ParseVariable(database?.Row.SearchByKey(rowkey));
 
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(RowItem r, int index) : this(r.Database?.Layouts[index], string.Empty) {
+    public ItemCollectionPad(int index, DatabaseAbstract? database) : this(database?.Layouts[index], string.Empty) {
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
-        _ = ResetVariables();
-        ParseVariable(r);
+        //_ = ResetVariables();
+        //ParseVariable(r);
 
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
@@ -561,14 +563,18 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         return did;
     }
 
-    public void ParseVariable(RowItem? row) {
-        if (row == null || row.IsDisposed) { return; }
+    public ScriptEndedFeedback ParseVariable(DatabaseAbstract database, string? rowkey) => ParseVariable(database.Row.SearchByKey(rowkey));
+
+    public ScriptEndedFeedback ParseVariable(RowItem? row) {
+        if (row == null || row.IsDisposed) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
 
         var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0);
-        if (!script.AllOk || script.Variables == null) { return; }
+        if (!script.AllOk || script.Variables == null) { return script; }
         foreach (var thisV in script.Variables) {
             _ = ParseVariable(thisV);
         }
+
+        return script;
     }
 
     public void Remove(string internalname) => Remove(this[internalname]);

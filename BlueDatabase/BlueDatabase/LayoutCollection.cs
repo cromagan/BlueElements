@@ -49,6 +49,7 @@ public class LayoutCollection : List<string>, ICloneable {
     public int LayoutCaptionToIndex(string layoutcaption) {
         for (var z = 0; z < Count; z++) {
             if (this[z].Contains("Caption=" + layoutcaption + ",")) { return z; }
+            if (this[z].Contains("Caption=\"" + layoutcaption + "\",")) { return z; }
         }
         return -1;
     }
@@ -58,6 +59,7 @@ public class LayoutCollection : List<string>, ICloneable {
     public int LayoutIdToIndex(string exportFormularId) {
         for (var z = 0; z < Count; z++) {
             if (this[z].Contains("ID=" + exportFormularId + ",")) { return z; }
+            if (this[z].Contains("ID=\"" + exportFormularId + "\",")) { return z; }
         }
         return -1;
     }

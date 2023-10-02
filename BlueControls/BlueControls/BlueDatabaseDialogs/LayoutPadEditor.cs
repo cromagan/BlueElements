@@ -267,7 +267,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             lay[ind] = newl;
             Database.Layouts = lay;
 
-            if (!newl.StartsWith("{ID=#")) { Develop.DebugPrint("ID nicht gefunden: " + newl); }
+            if (!newl.StartsWith("{ID=#") && !newl.StartsWith("{ID=\"#")) { Develop.DebugPrint("ID nicht gefunden: " + newl); }
             //var ko = newl.IndexOf(", ", StringComparison.Ordinal);
             //var id = newl.Substring(4, ko - 4);
         } else if (Pad.Item.KeyName.FileSuffix().ToUpper() == "BCR") {

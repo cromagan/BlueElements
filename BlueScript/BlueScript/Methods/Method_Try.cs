@@ -32,7 +32,12 @@ internal class Method_Try : Method {
 
     public override List<List<string>> Args => new();
     public override string Comand => "try";
-    public override string Description => "Führt den Codeblock aus. Wenn ein Fehler ausgelöst wird, wird der Codeblock verlassen, das restlichs Sript wird aber ausgeführt. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
+
+    public override string Description => "Führt den Codeblock innerhalb der geschweiften Klammern aus.\r\n" +
+                                          "Tritt währenddessen ein Fehler auf, wird der Codeblock verlassen und die weiteren Befehle innerhalb des Codeblocks ignoriert.\r\n" +
+                                          "Das Skript wird in jedem Fall nach dem Codeblock-Ende weiter ausgeführt.\r\n" +
+                                          "Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
+
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => true;
     public override MethodType MethodType => MethodType.Standard;

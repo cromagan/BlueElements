@@ -145,7 +145,14 @@ public class RowFormulaListItem : AbstractListItem {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
-        ItemCollectionPad.ItemCollectionPad pad = new(_layoutId, Row.Database, Row.KeyName);
+        ItemCollectionPad.ItemCollectionPad pad = new(_layoutId, Row.Database);
+        pad.ResetVariables();
+        var l = pad.ParseVariable(Row);
+        if (!l.AllOk) {
+            _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
+            return;
+        }
+
         var mb = pad.MaxBounds(string.Empty).ToRect();
         if (_tmpBmp != null) {
             if (_tmpBmp.Width != mb.Width || _tmpBmp.Height != mb.Height) {

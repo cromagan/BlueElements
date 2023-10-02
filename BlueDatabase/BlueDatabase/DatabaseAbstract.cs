@@ -146,7 +146,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     #region Events
 
-    public event EventHandler<CancelEventArgs>? CanDoScript;
+    public event EventHandler<CancelReasonEventArgs>? CanDoScript;
 
     public event EventHandler? Disposing;
 
@@ -1093,9 +1093,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         try {
             if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, "Allgemein"); }
 
-            var e = new CancelEventArgs(false);
+            var e = new CancelReasonEventArgs();
             OnCanDoScript(e);
-            if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich", false, false, "Allgemein"); }
+            if (e.Cancel) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + e.CancelReason, false, false, "Allgemein"); }
 
             var m = EditableErrorReason(EditableErrorReasonType.EditCurrently);
 
@@ -1327,7 +1327,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public abstract void GetUndoCache();
 
     public bool hasErrorCheckScript() {
-
         if (!isRowScriptPossible(true)) { return false; }
 
         var e = EventScript.Get(ScriptEventTypes.prepare_formula);
@@ -1580,7 +1579,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return true;
     }
 
-    public void OnCanDoScript(CancelEventArgs e) {
+    public void OnCanDoScript(CancelReasonEventArgs e) {
         if (IsDisposed) { return; }
         CanDoScript?.Invoke(this, e);
     }
@@ -2141,8 +2140,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 6) { return; }
         if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return; }
-
-        var e = new CancelEventArgs(false);
+        var e = new CancelReasonEventArgs();
         OnCanDoScript(e);
         if (e.Cancel) { return; }
 
@@ -2257,5 +2255,4 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private void Variables_Changed() => Variables = new VariableCollection(_variables);
 
     #endregion
-
 }

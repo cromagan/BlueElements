@@ -72,7 +72,14 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         #endregion
 
-        var l = new ItemCollectionPad.ItemCollectionPad(r, ind);
+        var l = new ItemCollectionPad.ItemCollectionPad(ind, r.Database);
+        l.ResetVariables();
+        var scx = l.ParseVariable(r);
+
+        if (!scx.AllOk) {
+            infos.Data.Protocol.AddRange(scx.Protocol);
+            return new DoItFeedback(infos.Data, "Generierung fehlgeschlagen");
+        }
 
         var bmp = l.ToBitmap((float)sc, string.Empty);
 

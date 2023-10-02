@@ -183,7 +183,9 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
             return;
         }
 
-        CreativePad pad = new(new ItemCollectionPad(_layoutId, Database, _rowKey));
+        CreativePad pad = new(new ItemCollectionPad(_layoutId, Database));
+        pad.Item.ResetVariables();
+        pad.Item.ParseVariable(Database, _rowKey);
         var re = pad.Item.MaxBounds(string.Empty);
 
         var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);

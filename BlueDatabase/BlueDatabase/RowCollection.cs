@@ -26,6 +26,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.EventArgs;
@@ -522,7 +523,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             if (!Database.isRowScriptPossible(true)) { break; }
 
-            var e = new CancelEventArgs(false);
+            var e = new CancelReasonEventArgs();
             Database.OnCanDoScript(e);
             if (e.Cancel) { break; }
 
