@@ -42,7 +42,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     private string _ähnlicheAnsichtName = string.Empty;
     private bool _isFilling;
     private string _lastLooked = string.Empty;
-    private Table? _tableView;
+    private Table? _table;
 
     #endregion
 
@@ -84,25 +84,25 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
     [DefaultValue((Table?)null)]
     public Table? Table {
-        get => _tableView;
+        get => _table;
         set {
-            if (_tableView == value) { return; }
-            if (_tableView != null) {
-                _tableView.DatabaseChanged -= _TableView_DatabaseChanged;
-                _tableView.FilterChanged -= _TableView_PinnedOrFilterChanged;
-                _tableView.PinnedChanged -= _TableView_PinnedOrFilterChanged;
-                _tableView.EnabledChanged -= _TableView_EnabledChanged;
-                _tableView.ViewChanged -= _TableView_ViewChanged;
+            if (_table == value) { return; }
+            if (_table != null) {
+                _table.DatabaseChanged -= _table_DatabaseChanged;
+                _table.FilterChanged -= _table_PinnedOrFilterChanged;
+                _table.PinnedChanged -= _table_PinnedOrFilterChanged;
+                _table.EnabledChanged -= _table_EnabledChanged;
+                _table.ViewChanged -= _table_ViewChanged;
             }
-            _tableView = value;
+            _table = value;
             GetÄhnlich();
             FillFilters();
-            if (_tableView != null) {
-                _tableView.DatabaseChanged += _TableView_DatabaseChanged;
-                _tableView.FilterChanged += _TableView_PinnedOrFilterChanged;
-                _tableView.PinnedChanged += _TableView_PinnedOrFilterChanged;
-                _tableView.EnabledChanged += _TableView_EnabledChanged;
-                _tableView.ViewChanged += _TableView_ViewChanged;
+            if (_table != null) {
+                _table.DatabaseChanged += _table_DatabaseChanged;
+                _table.FilterChanged += _table_PinnedOrFilterChanged;
+                _table.PinnedChanged += _table_PinnedOrFilterChanged;
+                _table.EnabledChanged += _table_EnabledChanged;
+                _table.ViewChanged += _table_ViewChanged;
             }
         }
     }
@@ -123,15 +123,15 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         if (_isFilling) { return; }
         _isFilling = true;
 
-        btnPinZurück.Enabled = _tableView?.Database != null && _tableView.PinnedRows != null && _tableView.PinnedRows.Count > 0;
+        btnPinZurück.Enabled = _table?.Database != null && _table.PinnedRows != null && _table.PinnedRows.Count > 0;
 
         #region ZeilenFilter befüllen
 
-        txbZeilenFilter.Text = _tableView != null &&
-            _tableView.Database != null &&
-            _tableView.Filter != null &&
-            _tableView.Filter.IsRowFilterActiv()
-            ? _tableView.Filter.RowFilterText
+        txbZeilenFilter.Text = _table != null &&
+            _table.Database != null &&
+            _table.Filter != null &&
+            _table.Filter.IsRowFilterActiv()
+            ? _table.Filter.RowFilterText
             : string.Empty;
 
         #endregion
@@ -160,13 +160,13 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         #endregion
 
-        var cu = _tableView?.CurrentArrangement;
+        var cu = _table?.CurrentArrangement;
 
         #region Neue Flexis erstellen / updaten
 
-        if (_tableView?.Database != null && _tableView.Filter != null) {
+        if (_table?.Database != null && _table.Filter != null) {
             List<ColumnItem> columSort = new();
-            ColumnViewCollection? orderArrangement = _tableView.Database.ColumnArrangements.Get(AnsichtName);
+            ColumnViewCollection? orderArrangement = _table.Database.ColumnArrangements.Get(AnsichtName);
 
             #region Reihenfolge der Spalten bestimmen
 
@@ -182,7 +182,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                 }
             }
 
-            foreach (var thisColumn in _tableView.Database.Column) {
+            foreach (var thisColumn in _table.Database.Column) {
                 _ = columSort.AddIfNotExists(thisColumn);
             }
 
@@ -192,7 +192,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                 var showMe = false;
                 var viewItemOrder = orderArrangement?[thisColumn];
                 var viewItemCurrent = cu?[thisColumn];
-                var filterItem = _tableView.Filter[thisColumn];
+                var filterItem = _table.Filter[thisColumn];
 
                 #region Sichtbarkeit des Filterelemts bestimmen
 
@@ -215,7 +215,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                         _ = flexsToDelete.Remove(flx);
                     } else {
                         // Na gut, eben neuen Flex erstellen
-                        flx = new FlexiControlForFilter(_tableView, filterItem);
+                        flx = new FlexiControlForFilter(_table, filterItem);
                         flx.ValueChanged += Flx_ValueChanged;
                         flx.ButtonClicked += Flx_ButtonClicked;
                         Controls.Add(flx);
@@ -255,31 +255,31 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         _isFilling = false;
     }
 
-    private void _TableView_DatabaseChanged(object sender, System.EventArgs e) {
+    private void _table_DatabaseChanged(object sender, System.EventArgs e) {
         GetÄhnlich();
         FillFilters();
     }
 
-    private void _TableView_EnabledChanged(object sender, System.EventArgs e) {
-        var hasDb = _tableView?.Database != null;
-        var tabViewEbabled = _tableView?.Enabled ?? false;
+    private void _table_EnabledChanged(object sender, System.EventArgs e) {
+        var hasDb = _table?.Database != null;
+        var tabViewEbabled = _table?.Enabled ?? false;
 
         txbZeilenFilter.Enabled = hasDb && LanguageTool.Translation == null && Enabled && tabViewEbabled;
         btnAlleFilterAus.Enabled = hasDb && Enabled && tabViewEbabled;
     }
 
-    private void _TableView_PinnedOrFilterChanged(object sender, System.EventArgs e) => FillFilters();
+    private void _table_PinnedOrFilterChanged(object sender, System.EventArgs e) => FillFilters();
 
-    private void _TableView_ViewChanged(object sender, System.EventArgs e) => FillFilters();
+    private void _table_ViewChanged(object sender, System.EventArgs e) => FillFilters();
 
     private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
-        if (_tableView?.Filter == null) { return; }
+        if (_table?.Filter == null) { return; }
 
-        _tableView.Filter.Remove(e.Column);
+        _table.Filter.Remove(e.Column);
         if (e.Comand != "Filter") { return; }
 
         if (e.Filter == null) { return; }
-        _tableView.Filter.Add(e.Filter);
+        _table.Filter.Add(e.Filter);
     }
 
     //private void btnAdmin_Click(object sender, System.EventArgs e) {
@@ -291,13 +291,13 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     //}
 
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {
-        if (_tableView?.Database == null || _tableView.Database.IsDisposed) { return; }
+        if (_table?.Database == null || _table.Database.IsDisposed) { return; }
 
-        if (_tableView.Database.Column.First() is not ColumnItem co) { return; }
+        if (_table.Database.Column.First() is not ColumnItem co) { return; }
 
         List<FilterItem> fl = new() { new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
-        var r = _tableView.Database.Row.CalculateFilteredRows(fl);
+        var r = _table.Database.Row.CalculateFilteredRows(fl);
         if (r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
             MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
             return;
@@ -305,19 +305,19 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         btnAlleFilterAus_Click(null, null);
         foreach (var thiscolumnitem in _ähnliche) {
-            if (thiscolumnitem?.Column != null && _tableView?.Filter != null) {
+            if (thiscolumnitem?.Column != null && _table?.Filter != null) {
                 if (thiscolumnitem.Column.AutoFilterSymbolPossible()) {
                     if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
                         FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
-                        _tableView.Filter.Add(fi);
+                        _table.Filter.Add(fi);
                     } else if (thiscolumnitem.Column.MultiLine) {
                         var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
                         FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
-                        _tableView.Filter.Add(fi);
+                        _table.Filter.Add(fi);
                     } else {
                         var l = r[0].CellGetString(thiscolumnitem.Column);
                         FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
-                        _tableView.Filter.Add(fi);
+                        _table.Filter.Add(fi);
                     }
                 }
             }
@@ -326,32 +326,32 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         btnÄhnliche.Enabled = false;
     }
 
-    private void btnAlleFilterAus_Click(object? sender, System.EventArgs? e) {
+    private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {
         _lastLooked = string.Empty;
-        if (_tableView?.Database != null && _tableView.Filter != null) {
-            _tableView.Filter.Clear();
+        if (_table?.Database != null && _table.Filter != null) {
+            _table.Filter.Clear();
         }
     }
 
-    private void btnPin_Click(object sender, System.EventArgs e) => _tableView?.Pin(_tableView.VisibleUniqueRows());
+    private void btnPin_Click(object sender, System.EventArgs e) => _table?.Pin(_table.VisibleUniqueRows());
 
     private void btnPinZurück_Click(object sender, System.EventArgs e) {
         _lastLooked = string.Empty;
-        _tableView?.Pin(null);
+        _table?.Pin(null);
     }
 
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void DoÄhnlich() {
-        if (_tableView?.Database == null || _tableView.Database.Column.Count == 0) { return; }
+        if (_table?.Database == null || _table.Database.Column.Count == 0) { return; }
 
-        var col = _tableView.Database.Column.First();
+        var col = _table.Database.Column.First();
 
         if (col == null) { return; } // Neue Datenbank?
 
         List<FilterItem> fl = new() { new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
-        var r = _tableView.Database.Row.CalculateFilteredRows(fl);
+        var r = _table.Database.Row.CalculateFilteredRows(fl);
         if (_ähnliche != null) {
             btnÄhnliche.Visible = true;
             btnÄhnliche.Enabled = r != null && r.Count == 1;
@@ -361,9 +361,9 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         if (AutoPin && r != null && r.Count == 1) {
             if (_lastLooked != r[0].CellFirstString()) {
-                if (_tableView.SortedRows().Get(r[0]) == null) {
+                if (_table.SortedRows().Get(r[0]) == null) {
                     if (MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {
-                        _tableView.PinAdd(r[0]);
+                        _table.PinAdd(r[0]);
                     }
                     _lastLooked = r[0].CellFirstString();
                 }
@@ -372,27 +372,27 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     }
 
     private void Filter_ZeilenFilterSetzen() {
-        if (_tableView == null || _tableView.Database == null || _tableView.Filter == null) {
+        if (_table == null || _table.Database == null || _table.Filter == null) {
             DoÄhnlich();
             return;
         }
-        var isF = _tableView.Filter.RowFilterText;
+        var isF = _table.Filter.RowFilterText;
         var newF = txbZeilenFilter.Text;
         if (string.Equals(isF, newF, StringComparison.OrdinalIgnoreCase)) { return; }
         if (string.IsNullOrEmpty(newF)) {
-            _tableView.Filter.Remove_RowFilter();
+            _table.Filter.Remove_RowFilter();
             DoÄhnlich();
             return;
         }
 
         var l = new List<ColumnItem>();
-        foreach (var thisCo in _tableView.Database.Column) {
+        foreach (var thisCo in _table.Database.Column) {
             if (thisCo != null && thisCo.IsInCache == null && !thisCo.IgnoreAtRowFilter) { l.Add(thisCo); }
         }
 
-        _tableView.Database.RefreshColumnsData(l);
+        _table.Database.RefreshColumnsData(l);
 
-        _tableView.Filter.RowFilterText = newF;
+        _table.Filter.RowFilterText = newF;
         DoÄhnlich();
     }
 
@@ -408,19 +408,19 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     }
 
     private void Flx_ButtonClicked(object sender, System.EventArgs e) {
-        if (_tableView?.Filter == null) { return; }
+        if (_table?.Filter == null) { return; }
 
         var f = (FlexiControlForFilter)sender;
         if (f.CaptionPosition == ÜberschriftAnordnung.ohne) {
             // ein Großer Knopf ohne Überschrift, da wird der evl. Filter gelöscht
-            _ = _tableView.Filter.Remove(((FlexiControlForFilter)sender).Filter);
+            _ = _table.Filter.Remove(((FlexiControlForFilter)sender).Filter);
             return;
         }
 
         if (f.Filter.Column == null) { return; }
 
         //f.Enabled = false;
-        AutoFilter autofilter = new(f.Filter.Column, _tableView.Filter, _tableView.PinnedRows);
+        AutoFilter autofilter = new(f.Filter.Column, _table.Filter, _table.PinnedRows);
         var p = f.PointToScreen(Point.Empty);
         autofilter.Position_LocateToPosition(p with { Y = p.Y + f.Height });
         autofilter.Show();
@@ -432,14 +432,14 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         if (_isFilling) { return; }
         if (sender is FlexiControlForFilter flx) {
             if (flx.EditType == EditTypeFormula.Button) { return; }
-            if (_tableView?.Filter == null) { return; }
+            if (_table?.Filter == null) { return; }
             var isFilter = flx.WasThisValueClicked(); //  flx.Value.StartsWith("|");
             //flx.Filter.Herkunft = "Filterleiste";
             var v = flx.Value; //.Trim("|");
-            if (_tableView.Filter.Count == 0 || !_tableView.Filter.Contains(flx.Filter)) {
+            if (_table.Filter.Count == 0 || !_table.Filter.Contains(flx.Filter)) {
                 if (isFilter) { flx.Filter.FilterType = FilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werden
                 flx.Filter.Changeto(flx.Filter.FilterType, v);
-                _tableView.Filter.Add(flx.Filter);
+                _table.Filter.Add(flx.Filter);
                 return;
             }
             if (flx.Filter.SearchValue.Count != 1) {
@@ -450,7 +450,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                 flx.Filter.Changeto(FilterType.Istgleich_ODER_GroßKleinEgal, v);
             } else {
                 if (string.IsNullOrEmpty(v)) {
-                    _ = _tableView.Filter.Remove(flx.Filter);
+                    _ = _table.Filter.Remove(flx.Filter);
                 } else {
                     flx.Filter.Changeto(FilterType.Instr_GroßKleinEgal, v);
                     // flx.Filter.SearchValue[0] =v;
@@ -460,7 +460,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     }
 
     private void GetÄhnlich() {
-        _ähnliche = _tableView?.Database?.ColumnArrangements.Get(_ähnlicheAnsichtName);
+        _ähnliche = _table?.Database?.ColumnArrangements.Get(_ähnlicheAnsichtName);
         DoÄhnlich();
     }
 

@@ -380,22 +380,17 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         var newContentWidth = 16; // Wert muss gesetzt werden, dass er am ende auch gespeichert wird
 
         try {
-            if (column.Format == DataFormat.Button) {
-                // Beim Button reicht eine Abfrage mit Row null
-                newContentWidth = Cell_ContentSize(table, column, null, cellFont, pix16).Width;
-            } else {
-                _ = Parallel.ForEach(column.Database.Row, thisRowItem => {
-                    //var originalText = thisRowItem.CellGetString(column);
-
-                    if (thisRowItem != null && !thisRowItem.CellIsNullOrEmpty(column)) {
-                        //var (s, quickImage) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
-
-                        var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
-
-                        newContentWidth = Math.Max(newContentWidth, wx);
-                    }
-                });
-            }
+            //if (column.Format == DataFormat.Button) {
+            //    // Beim Button reicht eine Abfrage aus
+            //    newContentWidth = Cell_ContentSize(table, column, null, cellFont, pix16).Width;
+            //} else {
+            _ = Parallel.ForEach(column.Database.Row, thisRowItem => {
+                if (thisRowItem != null && !thisRowItem.CellIsNullOrEmpty(column)) {
+                    var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
+                    newContentWidth = Math.Max(newContentWidth, wx);
+                }
+            });
+            //}
         } catch {
             Develop.CheckStackForOverflow();
             return CalculateColumnContentWidth(table, column, cellFont, pix16);
@@ -406,7 +401,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public static Size Cell_ContentSize(Table? table, ColumnItem column, RowItem row, Font cellFont, int pix16) {
-        if (column?.Database == null || row == null || column.Database.IsDisposed) { return new Size(pix16, pix16); }
+        if (column?.Database == null || column.Database.IsDisposed) { return new Size(pix16, pix16); }
 
         if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);

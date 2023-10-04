@@ -908,14 +908,14 @@ namespace BlueControls.Forms {
             this.Table.ShowWaitScreen = true;
             this.Table.Size = new System.Drawing.Size(972, 531);
             this.Table.TabIndex = 0;
-            this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.TableView_ContextMenu_Init);
-            this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.TableView_ContextMenuItemClicked);
-            this.Table.DatabaseChanged += new System.EventHandler(this.TableView_DatabaseChanged);
+            this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Table_ContextMenuInit);
+            this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.Table_ContextMenuItemClicked);
+            this.Table.DatabaseChanged += new System.EventHandler(this.Table_DatabaseChanged);
             this.Table.SelectedCellChanged += new System.EventHandler<BlueDatabase.EventArgs.CellExtEventArgs>(this.Table_SelectedCellChanged);
             this.Table.SelectedRowChanged += new System.EventHandler<BlueDatabase.EventArgs.RowEventArgs>(this.Table_SelectedRowChanged);
             this.Table.ViewChanged += new System.EventHandler(this.Table_ViewChanged);
             this.Table.VisibleRowsChanged += new System.EventHandler(this.Table_VisibleRowsChanged);
-            this.Table.EnabledChanged += new System.EventHandler(this.TableView_EnabledChanged);
+            this.Table.EnabledChanged += new System.EventHandler(this.Table_EnabledChanged);
             // 
             // SplitContainer1
             // 

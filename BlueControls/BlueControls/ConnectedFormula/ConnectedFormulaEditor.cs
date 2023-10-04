@@ -132,7 +132,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         AddCentered(x);
     }
 
-    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs? e) {
+    private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.ForceLoadSaveAll();
 
         if (e?.Item == null) { return; }

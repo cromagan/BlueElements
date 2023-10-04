@@ -138,7 +138,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public void ShowMenu(object? sender, MouseEventArgs? ex) {
+    public void ShowMenu(object? sender, MouseEventArgs ex) {
         if (_btnDropDownIsIn || IsDisposed || !Enabled) { return; }
         _btnDropDownIsIn = true;
         OnDropDownShowing();

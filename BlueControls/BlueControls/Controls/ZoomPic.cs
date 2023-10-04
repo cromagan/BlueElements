@@ -73,16 +73,14 @@ public partial class ZoomPic : ZoomPad {
         get => _bmp;
         set {
             if (value == _bmp) { return; }
-            var dozoomfit = true;
-            if (_bmp != null && value != null) {
-                dozoomfit = value.Width != _bmp.Width || value.Height != _bmp.Height;
-            }
+            //var dozoomfit = true;
+            //if (_bmp != null && value != null) {
+            //    dozoomfit = value.Width != _bmp.Width || value.Height != _bmp.Height;
+            //}
             _bmp = value;
-            if (dozoomfit) {
-                ZoomFit();
-            } else {
-                Invalidate();
-            }
+            ZoomFit();
+            Invalidate();
+
         }
     }
 

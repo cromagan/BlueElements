@@ -129,7 +129,7 @@ public partial class PictureView : Form, IDisposableExtended {
     private void btnVor_Click(object sender, System.EventArgs e) {
         if (_fileList == null || _fileList.Count < 2) { return; }
         _nr++;
-        if (_nr >= _fileList.Count - 1) { _nr = _fileList.Count - 1; }
+        if (_nr >= _fileList.Count) { _nr = _fileList.Count - 1; }
         LoadPic(_nr);
     }
 

@@ -2200,12 +2200,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {
         try {
             if (e.Done) { return; }
-            // Es werden alle Datenbankn abgefragt, also kann nach der ersten nicht schluss sein...
+            // Es werden alle Datenbanken abgefragt, also kann nach der ersten nicht schluss sein...
 
-            if (string.IsNullOrWhiteSpace(AdditionalFilesPfadWhole())) {
-                //OnDropMessage(FehlerArt.Info, "Bild '" + e.Name + "' nicht gefunden, da das Verzeichniss mit den Zusatzdateien nicht existiert.");
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(AdditionalFilesPfadWhole())) { return; }
+
+            if (e.CheckedPath.Contains(AdditionalFilesPfadWhole())) { return; }
+            e.CheckedPath.Add(AdditionalFilesPfadWhole());
 
             var name = e.Name.RemoveChars(Char_DateiSonderZeichen);
             var hashname = name.GetHashString();

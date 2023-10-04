@@ -17,9 +17,17 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+
 namespace BlueBasics.EventArgs;
 
 public class NeedImageEventArgs : System.EventArgs {
+
+    #region Fields
+
+    public readonly List<string> CheckedPath = new();
+
+    #endregion
 
     #region Constructors
 

@@ -33,7 +33,7 @@ public sealed partial class Search : Form {
 
     #region Fields
 
-    private readonly Table _blueTable;
+    private readonly Table _table;
     private ColumnItem? _col;
     private RowData? _row;
 
@@ -45,9 +45,9 @@ public sealed partial class Search : Form {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        _blueTable = table;
-        _blueTable.SelectedCellChanged += SelectedCellChanged;
-        SelectedCellChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
+        _table = table;
+        _table.SelectedCellChanged += SelectedCellChanged;
+        SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
     }
 
     #endregion
@@ -56,30 +56,30 @@ public sealed partial class Search : Form {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
-        _blueTable.SelectedCellChanged -= SelectedCellChanged;
+        _table.SelectedCellChanged -= SelectedCellChanged;
     }
 
     private void btnSuchInCell_Click(object? sender, System.EventArgs e) {
         var suchtT = SuchText();
         if (string.IsNullOrEmpty(suchtT)) { return; }
-        Table.SearchNextText(suchtT, _blueTable, _col, _blueTable.CursorPosRow, out var found, out var gefRow, btnAehnliches.Checked);
+        Table.SearchNextText(suchtT, _table, _col, _table.CursorPosRow, out var found, out var gefRow, btnAehnliches.Checked);
         if (found == null) {
             MessageBox.Show("Text nicht gefunden", ImageCode.Information, "OK");
             return;
         }
-        _blueTable.CursorPos_Set(found, gefRow, true);
+        _table.CursorPos_Set(found, gefRow, true);
         _ = txbSuchText.Focus();
     }
 
     private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
-        if (_blueTable.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
+        if (_table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
             MessageBox.Show("In dieser Ansicht nicht möglich", ImageCode.Information, "OK");
             return;
         }
         var searchT = SuchText();
         if (string.IsNullOrEmpty(searchT)) { return; }
         var found = _col;
-        var ca = _blueTable?.CurrentArrangement;
+        var ca = _table?.CurrentArrangement;
         found ??= ca?.Last()?.Column;
         var columnStarted = _col;
 
@@ -117,7 +117,7 @@ public sealed partial class Search : Form {
             MessageBox.Show("Text in den Spalten nicht gefunden.", ImageCode.Information, "OK");
             return;
         }
-        _blueTable?.CursorPos_Set(found, _row, true);
+        _table?.CursorPos_Set(found, _row, true);
         _ = txbSuchText.Focus();
     }
 
