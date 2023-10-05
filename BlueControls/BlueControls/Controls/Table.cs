@@ -384,13 +384,18 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             //    // Beim Button reicht eine Abfrage aus
             //    newContentWidth = Cell_ContentSize(table, column, null, cellFont, pix16).Width;
             //} else {
-            _ = Parallel.ForEach(column.Database.Row, thisRowItem => {
-                if (thisRowItem != null && !thisRowItem.CellIsNullOrEmpty(column)) {
-                    var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
-                    newContentWidth = Math.Max(newContentWidth, wx);
-                }
-            });
+            //_ = Parallel.ForEach(column.Database.Row, thisRowItem => {
+            //        var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
+            //        newContentWidth = Math.Max(newContentWidth, wx);
+
+            //});
             //}
+
+            //  Parallel.ForEach füjhrt ab und zu zu DeadLocks
+            foreach (var thisRowItem in column.Database.Row) {
+                var wx = Cell_ContentSize(table, column, thisRowItem, cellFont, pix16).Width;
+                newContentWidth = Math.Max(newContentWidth, wx);
+            }
         } catch {
             Develop.CheckStackForOverflow();
             return CalculateColumnContentWidth(table, column, cellFont, pix16);

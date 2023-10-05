@@ -457,7 +457,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public Size? GetSizeOfCellContent(ColumnItem column, RowItem row) {
-        var key = TextSizeKey(column, row.CellGetString(column));
+        var txt = row.CellGetString(column);
+        if (string.IsNullOrEmpty(txt)) { return null; }
+
+        var key = TextSizeKey(column, txt);
 
         if (key == null) { return null; }
 
