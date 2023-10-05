@@ -93,14 +93,14 @@ public sealed class Database : DatabaseAbstract {
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
 
         if (!FileExists(ci.AdditionalData)) { return null; }
 
-        return new Database(ci, false, needPassword);
+        return new Database(ci, readOnly, needPassword);
     }
 
     public static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {

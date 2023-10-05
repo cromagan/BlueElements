@@ -485,7 +485,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public static DatabaseAbstract? GetById(ConnectionInfo? ci, NeedPassword? needPassword) {
+    public static DatabaseAbstract? GetById(ConnectionInfo? ci, bool readOnly, NeedPassword? needPassword) {
         if (ci is null) { return null; }
 
         #region Schauen, ob die Datenbank bereits geladen ist
@@ -521,9 +521,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         foreach (var thist in DatabaseTypes) {
             if (thist.Name.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) {
-                var l = new object?[2];
+                var l = new object?[3];
                 l[0] = ci;
-                l[1] = needPassword;
+                l[1] = readOnly;
+                l[2] = needPassword;
                 var v = thist.GetMethod("CanProvide")?.Invoke(null, l);
 
                 if (v is DatabaseAbstract db) { return db; }
@@ -536,7 +537,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         if (FileExists(ci.AdditionalData)) {
             if (ci.AdditionalData.FileSuffix().ToLower() is "mdb" or "bdb") {
-                return new Database(ci.AdditionalData, false, false, needPassword);
+                return new Database(ci.AdditionalData, readOnly, false, needPassword);
             }
         }
 
@@ -546,7 +547,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
                 var h = thisSql.HandleMe(ci);
                 if (h != null) {
-                    return new DatabaseSqlLite(h, false, ci.TableName);
+                    return new DatabaseSqlLite(h, readOnly, ci.TableName);
                 }
             }
         }
@@ -643,7 +644,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 if (FileExists(pf)) {
                     var ci = new ConnectionInfo(pf, Database.DatabaseId);
 
-                    var tmp = GetById(ci, null);
+                    var tmp = GetById(ci, false, null);
                     if (tmp != null) { return tmp; }
                     tmp = new Database(pf, false, false, null);
                     return tmp;
@@ -1321,7 +1322,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
 
-        return GetById(x, null);// new DatabaseSQL(_sql, readOnly, tablename);
+        return GetById(x, false, null);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
     public abstract void GetUndoCache();

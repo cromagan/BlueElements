@@ -2688,7 +2688,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (_linkedDatabase == null) {
             var ci = new ConnectionInfo(_linkedDatabaseFile, null);
 
-            _linkedDatabase = GetById(ci, null);
+            _linkedDatabase = GetById(ci, false, null);
             if (_linkedDatabase != null) {
                 _linkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                 _linkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;

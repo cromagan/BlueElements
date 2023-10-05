@@ -1298,7 +1298,7 @@ public partial class TableView : FormWithStatusBar {
 
         #endregion
 
-        var db = DatabaseAbstract.GetById(ci, Table.Database_NeedPassword);
+        var db = DatabaseAbstract.GetById(ci, false, Table.Database_NeedPassword);
 
         if (db is Database bdb) {
             if (!string.IsNullOrEmpty(bdb.Filename)) {

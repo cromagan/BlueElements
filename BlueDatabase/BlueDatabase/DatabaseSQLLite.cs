@@ -60,7 +60,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Constructors
 
-    public DatabaseSqlLite(ConnectionInfo ci) : this(((DatabaseSqlLite?)ci.Provider)?._sql, false, ci.TableName) { }
+    public DatabaseSqlLite(ConnectionInfo ci, bool readOnly) : this(((DatabaseSqlLite?)ci.Provider)?._sql, readOnly, ci.TableName) { }
 
     public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnly, string tablename) : base(readOnly) {
         if (sql == null) {
@@ -108,7 +108,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, NeedPassword? needPassword) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         var sql = ((DatabaseSqlLite?)ci.Provider)?._sql;
@@ -116,7 +116,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         var at = sql.Tables();
         if (at == null || !at.Contains(ci.TableName)) { return null; }
-        return new DatabaseSqlLite(ci);
+        return new DatabaseSqlLite(ci, readOnly);
     }
 
     public static void CheckSysUndoNow() {
