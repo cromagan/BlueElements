@@ -770,6 +770,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Database.ProgressbarInfo -= _Database_ProgressbarInfo;
             Database.Disposing -= _Database_Disposing;
             Database.InvalidateView -= Database_InvalidateView;
+            Database.IsTableVisibleForUser -= Database_IsTableVisibleForUser;
             DatabaseAbstract.ForceSaveAll();
             MultiUserFile.ForceLoadSaveAll();
             //_database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
@@ -797,6 +798,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Database.ProgressbarInfo += _Database_ProgressbarInfo;
             Database.Disposing += _Database_Disposing;
             Database.InvalidateView += Database_InvalidateView;
+            Database.IsTableVisibleForUser += Database_IsTableVisibleForUser;
         }
 
         ParseView(viewCode);
@@ -2357,7 +2359,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         if (contentHolderCellColumn.TextBearbeitungErlaubt) {
-            if (t.Count == 1 && cellInThisDatabaseRow.Row.CellIsNullOrEmpty(cellInThisDatabaseColumn)) {
+            if (t.Count == 0 && cellInThisDatabaseRow.Row.CellIsNullOrEmpty(cellInThisDatabaseColumn)) {
                 // Bei nur einem Wert, wenn Texteingabe erlaubt, Dropdown öffnen
                 Cell_Edit(cellInThisDatabaseColumn, cellInThisDatabaseRow, false);
                 return;
@@ -2572,6 +2574,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Database_InvalidateView(object sender, System.EventArgs e) => Invalidate();
+
+    private void Database_IsTableVisibleForUser(object sender, VisibleEventArgs e) => e.IsVisible = true;
 
     private Rectangle DisplayRectangleWithoutSlider() => _design == BlueTableAppearance.Standard
             ? new Rectangle(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height)

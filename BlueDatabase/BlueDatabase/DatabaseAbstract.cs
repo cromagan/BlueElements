@@ -154,6 +154,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public event EventHandler? InvalidateView;
 
+    public event EventHandler<VisibleEventArgs>? IsTableVisibleForUser;
+
     public event EventHandler? Loaded;
 
     public event EventHandler? Loading;
@@ -2128,6 +2130,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         if (AmITemporaryMaster()) { return; }
 
+        var e = new VisibleEventArgs();
+        OnIsTableVisibleForUser(e);
+
+        if (!e.IsVisible) { return; }
+
         var d = DateTimeParse(TemporaryDatabaseMasterTimeUTC);
 
         if (DateTime.UtcNow.Subtract(d).TotalMinutes < 60 && !string.IsNullOrEmpty(TemporaryDatabaseMasterUser)) { return; }
@@ -2173,6 +2180,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
 
     private void OnDisposing() => Disposing?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnIsTableVisibleForUser(VisibleEventArgs e) {
+        if (IsDisposed) { return; }
+        IsTableVisibleForUser?.Invoke(this, e);
+    }
 
     private void OnSortParameterChanged() {
         if (IsDisposed) { return; }
