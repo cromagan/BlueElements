@@ -41,8 +41,6 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
 
     #endregion
 
-    //private string _LoadedLayout = string.Empty;
-
     #region Constructors
 
     public LayoutPadEditor(DatabaseAbstract? database) : base() {
@@ -97,7 +95,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             return;
         }
 
-        var ind = Database.Layouts.LayoutIdToIndex(fileOrLayoutId);
+        var ind = Database.Layouts.LayoutCaptionToIndex(fileOrLayoutId);
         if (ind < 0) {
             if (fileOrLayoutId.FileSuffix().ToUpper() == "BCR") {
                 LoadFile(fileOrLayoutId, fileOrLayoutId);
@@ -164,7 +162,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         if (Pad.Item == null) { return; }
 
         SaveCurrentLayout();
-        var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.KeyName);
+        var ind = Database.Layouts.LayoutCaptionToIndex(Pad.Item.KeyName);
         if (ind < 0) {
             MessageBox.Show("Layout kann nur manuell gelöscht werden.");
             return;
@@ -187,7 +185,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         if (Pad.Item == null) { return; }
 
         SaveCurrentLayout();
-        var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.KeyName);
+        var ind = Database.Layouts.LayoutCaptionToIndex(Pad.Item.KeyName);
         if (ind < 0) {
             MessageBox.Show("Layout kann nur manuell umbenannt werden.");
             return;
@@ -227,7 +225,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             cbxLayout.Text = string.Empty;
             DisablePad();
         }
-        var ind = Database.Layouts.LayoutIdToIndex(cbxLayout.Text);
+        var ind = Database.Layouts.LayoutCaptionToIndex(cbxLayout.Text);
         if (ind < 0 && cbxLayout.Text.FileSuffix().ToUpper() != "BCR" && FileExists(cbxLayout.Text)) {
             btnTextEditor.Enabled = true;
             btnLayoutOeffnen.Enabled = true;
@@ -259,7 +257,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         if (Pad.Item == null) { return; }
 
         var newl = Pad.Item.ToString();
-        var ind = Database.Layouts.LayoutIdToIndex(Pad.Item.KeyName);
+        var ind = Database.Layouts.LayoutCaptionToIndex(Pad.Item.KeyName);
         if (ind > -1) {
             if (Database.Layouts[ind] == newl) { return; }
 
@@ -267,7 +265,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             lay[ind] = newl;
             Database.Layouts = lay;
 
-            if (!newl.StartsWith("{ID=#") && !newl.StartsWith("{ID=\"#")) { Develop.DebugPrint("ID nicht gefunden: " + newl); }
+            //if (!newl.StartsWith("{ID=#") && !newl.StartsWith("{ID=\"#")) { Develop.DebugPrint("ID nicht gefunden: " + newl); }
             //var ko = newl.IndexOf(", ", StringComparison.Ordinal);
             //var id = newl.Substring(4, ko - 4);
         } else if (Pad.Item.KeyName.FileSuffix().ToUpper() == "BCR") {

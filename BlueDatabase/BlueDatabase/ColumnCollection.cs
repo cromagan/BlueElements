@@ -478,7 +478,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         ok = Database.Cell.ChangeColumnName(oldName, newName);
         if (!ok) { return false; }
         Database?.RepairColumnArrangements();
-        Database?.RepairViews();
+        //Database?.RepairViews();
         return true;
     }
 
@@ -547,7 +547,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
             if (reason != Reason.LoadReload) {
                 Database.RepairColumnArrangements();
-                Database.RepairViews();
+                //Database.RepairViews();
             }
 
             return string.Empty;
@@ -563,7 +563,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
             if (reason != Reason.LoadReload) {
                 Database.RepairColumnArrangements();
-                Database.RepairViews();
+                //Database.RepairViews();
             }
 
             return string.Empty;

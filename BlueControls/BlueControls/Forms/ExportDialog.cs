@@ -247,7 +247,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
 
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
-        if (Database != null && Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1) {
+        if (Database != null && Database.Layouts.LayoutCaptionToIndex(cbxLayoutWahl.Text) > -1) {
             padVorschau.ShowInPrintMode = true;
             padVorschau.Item = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport[0].Database);
             padVorschau.Item.ResetVariables();
@@ -270,7 +270,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (Database == null || Database.IsDisposed) { return "Datenbank verworfen"; }
         if (_rowsForExport == null || _rowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
         if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
-        if (Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1) {
+        if (Database.Layouts.LayoutCaptionToIndex(cbxLayoutWahl.Text) > -1) {
             if (!optBildSchateln.Checked && !optDrucken.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gedruckt, geschachtelt oder gespeichtert werden."; }
         } else {
             if (!optSpezialFormat.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
@@ -364,7 +364,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             tabStart.Enabled = false; // Geht ja gleich los
             tabDateiExport.Enabled = true;
             Tabs.SelectedTab = tabDateiExport;
-            var (files, error) = Database.Layouts.LayoutIdToIndex(cbxLayoutWahl.Text) > -1
+            var (files, error) = Database.Layouts.LayoutCaptionToIndex(cbxLayoutWahl.Text) > -1
                 ? Export.SaveAsBitmap(_rowsForExport, cbxLayoutWahl.Text, _zielPfad)
                 : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
             lstExported.Item.AddRange(files);

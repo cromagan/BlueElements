@@ -30,15 +30,15 @@ public class LayoutCollection : List<string>, ICloneable {
     //     return this.JoinWithCr();
     //    )
 
-    #region Methods
+    //public void Check() {
+    //    for (var z = 0; z < Count; z++) {
+    //        if (!this[z].StartsWith("{ID=#")) {
+    //            this[z] = "{ID=#Converted" + z + ", " + this[z].Substring(1);
+    //        }
+    //    }
+    //}
 
-    public void Check() {
-        for (var z = 0; z < Count; z++) {
-            if (!this[z].StartsWith("{ID=#")) {
-                this[z] = "{ID=#Converted" + z + ", " + this[z].Substring(1);
-            }
-        }
-    }
+    #region Methods
 
     public object Clone() {
         var l = new LayoutCollection();
@@ -54,15 +54,15 @@ public class LayoutCollection : List<string>, ICloneable {
         return -1;
     }
 
+    #endregion
+
     // Info:
     // ExportDialog.AddLayoutsOff wandelt Layouts In Items um
-    public int LayoutIdToIndex(string exportFormularId) {
-        for (var z = 0; z < Count; z++) {
-            if (this[z].Contains("ID=" + exportFormularId + ",")) { return z; }
-            if (this[z].Contains("ID=\"" + exportFormularId + "\",")) { return z; }
-        }
-        return -1;
-    }
-
-    #endregion
+    //public int LayoutIdToIndex(string exportFormularId) {
+    //    for (var z = 0; z < Count; z++) {
+    //        if (this[z].Contains("ID=" + exportFormularId + ",")) { return z; }
+    //        if (this[z].Contains("ID=\"" + exportFormularId + "\",")) { return z; }
+    //    }
+    //    return -1;
+    //}
 }

@@ -47,7 +47,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 namespace BlueControls.ItemCollectionPad;
 
 //TODO: IParseable implementieren
-public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName {
+public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName, IStringable {
 
     #region Fields
 
@@ -86,9 +86,8 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         SheetSizeInMm = Size.Empty;
         RandinMm = Padding.Empty;
-        Caption = string.Empty;
         _idCount++;
-        KeyName = "#" + DateTime.UtcNow.ToString(Constants.Format_Date) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
+        Caption = "#" + DateTime.UtcNow.ToString(Constants.Format_Date) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         _sheetStyle = null;
         _sheetStyleScale = 1f;
@@ -97,7 +96,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(string layoutId, DatabaseAbstract? database) : this(database?.Layouts[database.Layouts.LayoutIdToIndex(layoutId)], string.Empty) {
+    public ItemCollectionPad(string layoutId, DatabaseAbstract? database) : this(database?.Layouts[database.Layouts.LayoutCaptionToIndex(layoutId)], string.Empty) {
         // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
         //_ = ResetVariables();
 
@@ -122,7 +121,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     public ItemCollectionPad(string? toParse, string useThisKeyName) : this() {
         if (toParse == null || string.IsNullOrEmpty(toParse) || toParse.Length < 3) { return; }
         if (toParse.Substring(0, 1) != "{") { return; }// Alte Daten gehen eben verloren.
-        KeyName = useThisKeyName;
+        Caption = useThisKeyName;
         foreach (var pair in toParse.GetAllTags()) {
             switch (pair.Key.ToLower()) {
                 case "sheetsize":
@@ -142,7 +141,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
                     break;
 
                 case "caption":
-                    Caption = pair.Value.FromNonCritical();
+                    if (string.IsNullOrEmpty(Caption)) { Caption = pair.Value.FromNonCritical(); }
                     break;
 
                 case "backcolor":
@@ -154,7 +153,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
                 //    break;
                 case "keyname":
                 case "id":
-                    if (string.IsNullOrEmpty(KeyName)) { KeyName = pair.Value.FromNonCritical(); }
+                    //if (string.IsNullOrEmpty(KeyName)) { KeyName = pair.Value.FromNonCritical(); }
                     break;
 
                 case "style":
@@ -281,7 +280,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     [DefaultValue(true)]
     public bool IsSaved { get; set; }
 
-    public string KeyName { get; set; }
+    public string KeyName => Caption;
 
     public Padding RandinMm {
         get => _randinMm;
@@ -686,7 +685,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     public new string ToString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = new();
-        result.ParseableAdd("ID", KeyName);
+        //result.ParseableAdd("ID", KeyName);
         result.ParseableAdd("Caption", Caption);
         result.ParseableAdd("Style", SheetStyle?.CellFirstString());
 

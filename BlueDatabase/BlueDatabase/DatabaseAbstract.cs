@@ -1710,8 +1710,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public virtual void RepairAfterParse() {
         Column.Repair();
         RepairColumnArrangements();
-        RepairViews();
-        _layouts.Check();
+        //RepairViews();
+        //_layouts.Check();
 
         IsInCache = DateTime.UtcNow;
     }
@@ -1784,11 +1784,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         ColumnArrangements = x.AsReadOnly();
     }
 
-    internal void RepairViews() {
-        var lay = (LayoutCollection)Layouts.Clone();
-        lay.Check();
-        Layouts = lay;
-    }
+    //internal void RepairViews() {
+    //    var lay = (LayoutCollection)Layouts.Clone();
+    //    lay.Check();
+    //    Layouts = lay;
+    //}
 
     /// <summary>
     /// Diese Routine setzt Werte auf den richtigen Speicherplatz und führt Comands aus.
