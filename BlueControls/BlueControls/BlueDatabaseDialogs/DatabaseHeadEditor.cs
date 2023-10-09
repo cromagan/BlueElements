@@ -182,12 +182,12 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 symb = ImageCode.Skript;
                 break;
 
-            case DatabaseDataType.Layouts:
-                //aenderung = "Layouts verändert";
-                alt = "[Layout alt]";
-                neu = "[Layout neu]";
-                symb = ImageCode.Layout;
-                break;
+            //case DatabaseDataType.Layouts:
+            //    //aenderung = "Layouts verändert";
+            //    alt = "[Layout alt]";
+            //    neu = "[Layout neu]";
+            //    symb = ImageCode.Layout;
+            //    break;
 
             case DatabaseDataType.Comand_AddRow:
                 //aenderung = "Neue Zeile";

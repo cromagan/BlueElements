@@ -536,7 +536,7 @@ public sealed class Database : DatabaseAbstract {
             }
             //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
             SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements.ToString(false));
-            SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
+            //SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
             //SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
 
             SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));

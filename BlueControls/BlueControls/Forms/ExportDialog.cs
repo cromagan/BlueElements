@@ -91,28 +91,12 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Methods
 
-    public static void AddLayoutsOff(ItemCollectionList.ItemCollectionList addHere, DatabaseAbstract? database, bool addDiskLayouts) {
-        if (database != null && !database.IsDisposed) {
-            foreach (var t in database.Layouts) {
-                ItemCollectionPad.ItemCollectionPad p = new(t, string.Empty);
-                _ = addHere.Add(p.Caption, p.KeyName, ImageCode.Stern);
-            }
-        }
-        if (!addDiskLayouts) { return; }
-        List<string> path = new();
-        if (database != null && !database.IsDisposed) {
-            path.Add(database.DefaultLayoutPath());
-            if (!string.IsNullOrEmpty(database.AdditionalFilesPfadWhole())) { path.Add(database.AdditionalFilesPfadWhole()); }
-        }
-        foreach (var thisP in path) {
-            if (DirectoryExists(thisP)) {
-                var e = Directory.GetFiles(thisP);
-                foreach (var thisFile in e) {
-                    if (thisFile.FileType() is FileFormat.HTML or FileFormat.Textdocument or FileFormat.Visitenkarte or FileFormat.BlueCreativeFile or FileFormat.XMLFile) {
-                        if (addHere[thisFile] == null) { _ = addHere.Add(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16)); }
-                    }
-                }
-            }
+    public static void AddLayoutsOff(ItemCollectionList.ItemCollectionList addHere, DatabaseAbstract? database) {
+        if (database == null) { return; }
+        var r = database.GetAllLayouts();
+
+        foreach (var thisFile in r) {
+            if (addHere[thisFile] == null) { _ = addHere.Add(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16)); }
         }
     }
 
@@ -121,17 +105,17 @@ public sealed partial class ExportDialog : IHasDatabase {
     /// </summary>
     /// <param name="pad"></param>
     /// <param name="startNr"></param>
-    /// <param name="layout"></param>
+    /// <param name="layoutFileName"></param>
     /// <param name="rowsForExport"></param>
     /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat. -1 falls keine (gültige) Liste übergeben wurde.</returns>
 
-    public static int GeneratePrintPad(CreativePad pad, int startNr, string layout, List<RowItem>? rowsForExport, float abstandMm) {
+    public static int GeneratePrintPad(CreativePad pad, int startNr, string layoutFileName, List<RowItem>? rowsForExport, float abstandMm) {
         pad.Item.Clear();
         Generic.CollectGarbage();
 
         if (rowsForExport == null || rowsForExport.Count < 1) { return -1; }
 
-        ItemCollectionPad.ItemCollectionPad tmp = new(layout, rowsForExport[0].Database);
+        ItemCollectionPad.ItemCollectionPad tmp = new(layoutFileName);
         tmp.ResetVariables();
         var scx = tmp.ParseVariable(rowsForExport[0]);
         if (!scx.AllOk) { return -1; }
@@ -147,7 +131,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             var tempVar2 = Math.Max(1, (int)Math.Floor((druckB.Height / (double)(oneItem.Height + abstand)) + 0.01));
             for (var y = 0; y < tempVar2; y++) {
                 ChildPadItem it = new() {
-                    PadInternal = new CreativePad(new ItemCollectionPad.ItemCollectionPad(layout, rowsForExport[startNr].Database))
+                    PadInternal = new CreativePad(new ItemCollectionPad.ItemCollectionPad(layoutFileName))
                 };
                 it.PadInternal.Item.ResetVariables();
                 it.PadInternal.Item.ParseVariable(rowsForExport[startNr]);
@@ -188,7 +172,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     private void BefülleLayoutDropdowns() {
         cbxLayoutWahl.Item.Clear();
-        AddLayoutsOff(cbxLayoutWahl.Item, Database, true);
+        AddLayoutsOff(cbxLayoutWahl.Item, Database);
     }
 
     private void btnDrucken_Click(object sender, System.EventArgs e) => padPrint.Print();
@@ -247,9 +231,9 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
 
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
-        if (Database != null && Database.Layouts.LayoutCaptionToIndex(cbxLayoutWahl.Text) > -1) {
+        if (Database != null && !string.IsNullOrEmpty(Database.GetLayout(cbxLayoutWahl.Text))) {
             padVorschau.ShowInPrintMode = true;
-            padVorschau.Item = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text, _rowsForExport[0].Database);
+            padVorschau.Item = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text);
             padVorschau.Item.ResetVariables();
             padVorschau.Item.ParseVariable(_rowsForExport[0]);
             padVorschau.ZoomFit();
@@ -270,11 +254,9 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (Database == null || Database.IsDisposed) { return "Datenbank verworfen"; }
         if (_rowsForExport == null || _rowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
         if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
-        if (Database.Layouts.LayoutCaptionToIndex(cbxLayoutWahl.Text) > -1) {
-            if (!optBildSchateln.Checked && !optDrucken.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gedruckt, geschachtelt oder gespeichtert werden."; }
-        } else {
-            if (!optSpezialFormat.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
-        }
+        //TODO: Schachteln implementieren
+        if (!optSpezialFormat.Checked && !optSpeichern.Checked) { return "Das gewählte Layout kann nur gespeichtert oder im Spezialformat bearbeitet werden."; }
+
         return string.Empty;
     }
 
@@ -364,7 +346,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             tabStart.Enabled = false; // Geht ja gleich los
             tabDateiExport.Enabled = true;
             Tabs.SelectedTab = tabDateiExport;
-            var (files, error) = Database.Layouts.LayoutCaptionToIndex(cbxLayoutWahl.Text) > -1
+            var (files, error) = !string.IsNullOrEmpty(Database.GetLayout(cbxLayoutWahl.Text))
                 ? Export.SaveAsBitmap(_rowsForExport, cbxLayoutWahl.Text, _zielPfad)
                 : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
             lstExported.Item.AddRange(files);

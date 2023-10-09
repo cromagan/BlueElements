@@ -95,20 +95,15 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             return;
         }
 
-        var ind = Database.Layouts.LayoutCaptionToIndex(fileOrLayoutId);
-        if (ind < 0) {
-            if (fileOrLayoutId.FileSuffix().ToUpper() == "BCR") {
-                LoadFile(fileOrLayoutId, fileOrLayoutId);
-            } else {
-                DisablePad();
-                TextPadItem x = new("x", "Nicht editierbares Layout aus dem Dateisystem");
-                Pad.Item.Add(x);
-                x.Stil = PadStyles.Style_Überschrift_Haupt;
-                x.SetCoordinates(new RectangleF(0, 0, 1000, 400), true);
-                ItemChanged();
-            }
+        if (fileOrLayoutId.FileSuffix().ToUpper() == "BCR") {
+            LoadFile(fileOrLayoutId, fileOrLayoutId);
         } else {
-            LoadFromString(Database.Layouts[ind], fileOrLayoutId);
+            DisablePad();
+            TextPadItem x = new("x", "Nicht editierbares Layout aus dem Dateisystem");
+            Pad.Item.Add(x);
+            x.Stil = PadStyles.Style_Überschrift_Haupt;
+            x.SetCoordinates(new RectangleF(0, 0, 1000, 400), true);
+            ItemChanged();
         }
     }
 
@@ -124,7 +119,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     private void BefülleLayoutDropdown() {
         if (Database != null && !Database.IsDisposed) {
             cbxLayout.Item.Clear();
-            ExportDialog.AddLayoutsOff(cbxLayout.Item, Database, true);
+            ExportDialog.AddLayoutsOff(cbxLayout.Item, Database);
         }
     }
 
@@ -136,67 +131,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         }
     }
 
-    private void btnLayoutHinzu_Click(object sender, System.EventArgs e) {
-        if (Database == null || Database.IsDisposed) { return; }
-
-        SaveCurrentLayout();
-        var ex = InputBox.Show("Geben sie den Namen<br>des neuen Layouts ein:", string.Empty, FormatHolder.Text);
-        if (string.IsNullOrEmpty(ex)) { return; }
-        LoadLayout(string.Empty);
-
-        ItemCollectionPad.ItemCollectionPad c = new() {
-            Caption = ex
-        };
-
-        var lay = (LayoutCollection)Database.Layouts.Clone();
-        lay.Add(c.ToString(false));
-        Database.Layouts = lay;
-
-        BefülleLayoutDropdown();
-        LoadLayout(c.KeyName);
-        CheckButtons();
-    }
-
-    private void btnLayoutLöschen_Click(object sender, System.EventArgs e) {
-        if (Database == null || Database.IsDisposed) { return; }
-        if (Pad.Item == null) { return; }
-
-        SaveCurrentLayout();
-        var ind = Database.Layouts.LayoutCaptionToIndex(Pad.Item.KeyName);
-        if (ind < 0) {
-            MessageBox.Show("Layout kann nur manuell gelöscht werden.");
-            return;
-        }
-        if (MessageBox.Show("Layout <b>'" + Pad.Item.Caption + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
-
-        var lay = (LayoutCollection)Database.Layouts.Clone();
-        lay.RemoveAt(ind);
-        Database.Layouts = lay;
-
-        LoadLayout(string.Empty);
-        BefülleLayoutDropdown();
-        CheckButtons();
-    }
-
     private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, string.Empty);
-
-    private void btnLayoutUmbenennen_Click(object sender, System.EventArgs e) {
-        if (Database == null || Database.IsDisposed) { return; }
-        if (Pad.Item == null) { return; }
-
-        SaveCurrentLayout();
-        var ind = Database.Layouts.LayoutCaptionToIndex(Pad.Item.KeyName);
-        if (ind < 0) {
-            MessageBox.Show("Layout kann nur manuell umbenannt werden.");
-            return;
-        }
-        var ex = InputBox.Show("Namen des Layouts ändern:", Pad.Item.Caption, FormatHolder.Text);
-        if (string.IsNullOrEmpty(ex)) { return; }
-        Pad.Item.Caption = ex;
-        SaveCurrentLayout();
-        BefülleLayoutDropdown();
-        CheckButtons();
-    }
 
     private void btnLayoutVerzeichnis_Click(object sender, System.EventArgs e) {
         if (Database == null || Database.IsDisposed) { return; }
@@ -214,10 +149,9 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         if (Database == null || Database.IsDisposed) {
             DisablePad();
             cbxLayout.Enabled = false;
-            btnLayoutHinzu.Enabled = false;
             return;
         }
-        btnLayoutHinzu.Enabled = true;
+
         if (cbxLayout.Item.Count > 0) {
             cbxLayout.Enabled = true;
         } else {
@@ -225,8 +159,8 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             cbxLayout.Text = string.Empty;
             DisablePad();
         }
-        var ind = Database.Layouts.LayoutCaptionToIndex(cbxLayout.Text);
-        if (ind < 0 && cbxLayout.Text.FileSuffix().ToUpper() != "BCR" && FileExists(cbxLayout.Text)) {
+
+        if (cbxLayout.Text.FileSuffix().ToUpper() != "BCR" && FileExists(cbxLayout.Text)) {
             btnTextEditor.Enabled = true;
             btnLayoutOeffnen.Enabled = true;
             tabStart.Enabled = false;
@@ -237,8 +171,6 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         //if (!string.IsNullOrEmpty(Pad.Item.ID)) {
         tabStart.Enabled = true;
         grpDateiSystem.Enabled = true;
-        btnLayoutLöschen.Enabled = true;
-        btnLayoutUmbenennen.Enabled = true;
         btnCopyID.Enabled = true;
         //} else {
         //    grpDrucken.Enabled = false;
@@ -257,19 +189,8 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         if (Pad.Item == null) { return; }
 
         var newl = Pad.Item.ToString();
-        var ind = Database.Layouts.LayoutCaptionToIndex(Pad.Item.KeyName);
-        if (ind > -1) {
-            if (Database.Layouts[ind] == newl) { return; }
-
-            var lay = (LayoutCollection)Database.Layouts.Clone();
-            lay[ind] = newl;
-            Database.Layouts = lay;
-
-            //if (!newl.StartsWith("{ID=#") && !newl.StartsWith("{ID=\"#")) { Develop.DebugPrint("ID nicht gefunden: " + newl); }
-            //var ko = newl.IndexOf(", ", StringComparison.Ordinal);
-            //var id = newl.Substring(4, ko - 4);
-        } else if (Pad.Item.KeyName.FileSuffix().ToUpper() == "BCR") {
-            WriteAllText(Pad.Item.KeyName, newl, Encoding.UTF8, false);
+        if (Pad.Item.KeyName.FileSuffix().ToUpper() == "BCR") {
+            WriteAllText(Pad.Item.KeyName, newl, Constants.Win1252, false);
         }
     }
 

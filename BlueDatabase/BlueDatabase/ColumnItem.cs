@@ -2104,11 +2104,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (UsedInScript()) { t += " - Regeln-Skript<br>"; }
         if (Database.ZeilenQuickInfo.ToUpper().Contains(_name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
         if (_tags.JoinWithCr().ToUpper().Contains(_name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
-        var layout = false;
-        foreach (var thisLayout in Database.Layouts) {
-            if (thisLayout.Contains(_name.ToUpper())) { layout = true; }
-        }
-        if (layout) { t += " - Layouts<br>"; }
 
         if (!string.IsNullOrEmpty(Am_A_Key_For_Other_Column)) { t += Am_A_Key_For_Other_Column; }
 

@@ -69,8 +69,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     private readonly List<DatabaseScriptDescription> _eventScript = new();
 
-    private readonly LayoutCollection _layouts = new();
-
     private readonly List<string> _permissionGroupsNewRow = new();
 
     private readonly List<string> _tags = new();
@@ -309,14 +307,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public DateTime LastChange { get; private set; } = new(1900, 1, 1);
-
-    public LayoutCollection Layouts {
-        get => _layouts;
-        set {
-            if (!_layouts.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.Layouts, null, null, _layouts.JoinWithCr(), value.JoinWithCr(), string.Empty, UserName, DateTime.UtcNow);
-        }
-    }
 
     public string LoadedVersion { get; private set; } = "0.00";
 
@@ -886,7 +876,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (tagsToo) {
             Tags = new(sourceDatabase.Tags.Clone());
         }
-        Layouts = sourceDatabase.Layouts;
 
         DatenbankAdmin = new(sourceDatabase.DatenbankAdmin.Clone());
         PermissionGroupsNewRow = new(sourceDatabase.PermissionGroupsNewRow.Clone());
@@ -1311,6 +1300,38 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (FileExists(AdditionalFilesPfadWhole() + _standardFormulaFile)) { return AdditionalFilesPfadWhole() + _standardFormulaFile; }
         if (FileExists(DefaultFormulaPath() + _standardFormulaFile)) { return DefaultFormulaPath() + _standardFormulaFile; }
         return null;
+    }
+
+    public List<string> GetAllLayouts() {
+        List<string> path = new();
+        var r = new List<string>();
+        if (!IsDisposed) {
+            path.Add(DefaultLayoutPath());
+            if (!string.IsNullOrEmpty(AdditionalFilesPfadWhole())) { path.Add(AdditionalFilesPfadWhole()); }
+        }
+
+        foreach (var thisP in path) {
+            if (DirectoryExists(thisP)) {
+                var e = Directory.GetFiles(thisP);
+                foreach (var thisFile in e) {
+                    if (thisFile.FileType() is FileFormat.HTML or FileFormat.Textdocument or FileFormat.Visitenkarte or FileFormat.BlueCreativeFile or FileFormat.XMLFile) {
+                        r.Add(thisFile);
+                    }
+                }
+            }
+        }
+        return r;
+    }
+
+    public string GetLayout(string ca) {
+        if (FileExists(ca)) { return ca; }
+
+        var f = GetAllLayouts();
+
+        foreach (var thisF in f) {
+            if (thisF.FileNameWithoutSuffix().Equals(ca, StringComparison.OrdinalIgnoreCase)) { return thisF; }
+        }
+        return string.Empty;
     }
 
     public DatabaseAbstract? GetOtherTable(string tablename) {
@@ -1951,9 +1972,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             //case enDatabaseDataType.BinaryDataInOne:
             //    break;
 
-            case DatabaseDataType.Layouts:
-                _layouts.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
-                break;
+            //case DatabaseDataType.Layouts:
+            //    var _layouts = value.SplitAndCutByCrToList();
+            //    foreach (var thisLayout in _layouts) {
+            //        WriteAllText(TempFile("C:\\01_data", TableName, "BCR"), thisLayout, Constants.Win1252, false);
+            //    }
+            //    break;
 
             //case DatabaseDataType.AutoExport:
             //    _export.Clear();
@@ -2083,15 +2107,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         Column.Dispose();
         //Cell?.Dispose();
         Row.Dispose();
-
-        _layouts.Clear();
     }
 
     protected void Initialize() {
         Cell.Initialize();
 
         _columnArrangements.Clear();
-        _layouts.Clear();
         _permissionGroupsNewRow.Clear();
         _tags.Clear();
         _datenbankAdmin.Clear();

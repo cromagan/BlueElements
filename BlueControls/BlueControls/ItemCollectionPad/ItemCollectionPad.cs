@@ -25,6 +25,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Windows.Data;
 using System.Windows.Forms;
@@ -96,20 +97,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(string layoutId, DatabaseAbstract? database) : this(database?.Layouts[database.Layouts.LayoutCaptionToIndex(layoutId)], string.Empty) {
-        // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
-        //_ = ResetVariables();
-
-        //ParseVariable(database?.Row.SearchByKey(rowkey));
-
-        Connections.CollectionChanged += ConnectsTo_CollectionChanged;
-    }
-
-    public ItemCollectionPad(int index, DatabaseAbstract? database) : this(database?.Layouts[index], string.Empty) {
-        // Wenn nur die Row ankommt und diese null ist, kann gar nix generiert werden
-        //_ = ResetVariables();
-        //ParseVariable(r);
-
+    public ItemCollectionPad(string layoutFileName) : this(File.ReadAllText(layoutFileName, Constants.Win1252), string.Empty) {
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 

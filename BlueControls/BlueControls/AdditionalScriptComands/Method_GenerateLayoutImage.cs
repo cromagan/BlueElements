@@ -59,9 +59,9 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         var ca = attvar.ValueStringGet(0);
 
-        var ind = r.Database.Layouts.LayoutCaptionToIndex(ca);
+        var ind = r.Database.GetLayout(ca);
 
-        if (ind < 0) { return new DoItFeedback(infos.Data, "Layout nicht gefunden."); }
+        if (string.IsNullOrEmpty(ind)) { return new DoItFeedback(infos.Data, "Layout nicht gefunden."); }
 
         #endregion
 
@@ -72,7 +72,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         #endregion
 
-        var l = new ItemCollectionPad.ItemCollectionPad(ind, r.Database);
+        var l = new ItemCollectionPad.ItemCollectionPad(ind);
         l.ResetVariables();
         var scx = l.ParseVariable(r);
 

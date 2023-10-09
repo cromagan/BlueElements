@@ -38,9 +38,6 @@ namespace BlueControls.BlueDatabaseDialogs
             {
             this.grpLayoutSelection = new GroupBox();
             this.btnCopyID = new Button();
-            this.btnLayoutUmbenennen = new Button();
-            this.btnLayoutLöschen = new Button();
-            this.btnLayoutHinzu = new Button();
             this.capLayout = new Caption();
             this.cbxLayout = new ComboBox();
             this.tabRight = new TabControl();
@@ -115,9 +112,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.grpLayoutSelection.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpLayoutSelection.CausesValidation = false;
             this.grpLayoutSelection.Controls.Add(this.btnCopyID);
-            this.grpLayoutSelection.Controls.Add(this.btnLayoutUmbenennen);
-            this.grpLayoutSelection.Controls.Add(this.btnLayoutLöschen);
-            this.grpLayoutSelection.Controls.Add(this.btnLayoutHinzu);
             this.grpLayoutSelection.Controls.Add(this.capLayout);
             this.grpLayoutSelection.Controls.Add(this.cbxLayout);
             this.grpLayoutSelection.Dock = DockStyle.Left;
@@ -139,36 +133,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnCopyID.TabIndex = 4;
             this.btnCopyID.Text = "ID";
             this.btnCopyID.Click += new EventHandler(this.btnCopyID_Click);
-            // 
-            // btnLayoutUmbenennen
-            // 
-            this.btnLayoutUmbenennen.ButtonStyle = ((ButtonStyle)((ButtonStyle.Button_Big | ButtonStyle.Borderless)));
-            this.btnLayoutUmbenennen.ImageCode = "Stift|16";
-            this.btnLayoutUmbenennen.Location = new Point(120, 46);
-            this.btnLayoutUmbenennen.Name = "btnLayoutUmbenennen";
-            this.btnLayoutUmbenennen.Size = new Size(24, 22);
-            this.btnLayoutUmbenennen.TabIndex = 3;
-            this.btnLayoutUmbenennen.Click += new EventHandler(this.btnLayoutUmbenennen_Click);
-            // 
-            // btnLayoutLöschen
-            // 
-            this.btnLayoutLöschen.ButtonStyle = ((ButtonStyle)((ButtonStyle.Button_Big | ButtonStyle.Borderless)));
-            this.btnLayoutLöschen.ImageCode = "MinusZeichen|16";
-            this.btnLayoutLöschen.Location = new Point(72, 46);
-            this.btnLayoutLöschen.Name = "btnLayoutLöschen";
-            this.btnLayoutLöschen.Size = new Size(24, 22);
-            this.btnLayoutLöschen.TabIndex = 2;
-            this.btnLayoutLöschen.Click += new EventHandler(this.btnLayoutLöschen_Click);
-            // 
-            // btnLayoutHinzu
-            // 
-            this.btnLayoutHinzu.ButtonStyle = ((ButtonStyle)((ButtonStyle.Button_Big | ButtonStyle.Borderless)));
-            this.btnLayoutHinzu.ImageCode = "PlusZeichen|16";
-            this.btnLayoutHinzu.Location = new Point(40, 46);
-            this.btnLayoutHinzu.Name = "btnLayoutHinzu";
-            this.btnLayoutHinzu.Size = new Size(24, 22);
-            this.btnLayoutHinzu.TabIndex = 1;
-            this.btnLayoutHinzu.Click += new EventHandler(this.btnLayoutHinzu_Click);
             // 
             // capLayout
             // 
@@ -271,9 +235,6 @@ namespace BlueControls.BlueDatabaseDialogs
 
         }
         internal GroupBox grpLayoutSelection;
-        internal Button btnLayoutUmbenennen;
-        internal Button btnLayoutLöschen;
-        internal Button btnLayoutHinzu;
         internal Caption capLayout;
         internal ComboBox cbxLayout;
         private TabControl tabRight;

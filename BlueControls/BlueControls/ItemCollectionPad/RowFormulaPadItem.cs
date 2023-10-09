@@ -36,7 +36,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     #region Fields
 
     private string _lastQuickInfo = string.Empty;
-    private string _layoutId = string.Empty;
+    private string _layoutFileName = string.Empty;
     private string _rowKey;
     private string _tmpQuickInfo = string.Empty;
 
@@ -52,15 +52,11 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public RowFormulaPadItem(DatabaseAbstract database, string? rowkey, string layoutId) : this(string.Empty, database, rowkey, layoutId) { }
 
-    public RowFormulaPadItem(string internalname, DatabaseAbstract? database, string? rowkey, string layoutId) : base(internalname) {
+    public RowFormulaPadItem(string internalname, DatabaseAbstract? database, string? rowkey, string layoutFileName) : base(internalname) {
         Database = database;
         if (Database != null) { Database.Disposing += _Database_Disposing; }
         _rowKey = rowkey ?? string.Empty;
-        if (Database != null && string.IsNullOrEmpty(layoutId)) {
-            ItemCollectionPad p = new(Database.Layouts[0], string.Empty);
-            layoutId = p.KeyName;
-        }
-        _layoutId = layoutId;
+        _layoutFileName = layoutFileName;
     }
 
     #endregion
@@ -74,11 +70,11 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     /// <summary>
     /// Namen so lassen, wegen Kontextmenu
     /// </summary>
-    public string Layout_Id {
-        get => _layoutId;
+    public string Layout_Dateiname {
+        get => _layoutFileName;
         set {
-            if (value == _layoutId) { return; }
-            _layoutId = value;
+            if (value == _layoutFileName) { return; }
+            _layoutFileName = value;
             RemovePic();
         }
     }
@@ -106,11 +102,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     #endregion
 
-    //public void Datensatz_bearbeiten() {
-    //    _tmpQuickInfo = string.Empty; // eigentlich unnötig, da RowChanged anschlagen müsste
-    //    EditBoxRow.Show("Datensatz bearbeiten:", Row, true);
-    //}
-
     #region Methods
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
@@ -118,11 +109,11 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
         if (Row?.Database is DatabaseAbstract dbl) {
             ItemCollectionList.ItemCollectionList layouts = new(true);
-            foreach (var thisLayouts in dbl.Layouts) {
+            foreach (var thisLayouts in dbl.GetAllLayouts()) {
                 ItemCollectionPad p = new(thisLayouts, string.Empty);
                 _ = layouts.Add(p.Caption, p.KeyName, ImageCode.Stern);
             }
-            l.Add(new FlexiControlForProperty<string>(() => Layout_Id, layouts));
+            l.Add(new FlexiControlForProperty<string>(() => Layout_Dateiname, layouts));
         }
         l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
@@ -131,8 +122,9 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
+            case "layoutfilename":
             case "layoutid":
-                _layoutId = value.FromNonCritical();
+                _layoutFileName = value.FromNonCritical();
                 return true;
 
             case "database":
@@ -170,7 +162,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = new();
-        result.ParseableAdd("LayoutID", _layoutId);
+        result.ParseableAdd("LayoutFileName", _layoutFileName);
         result.ParseableAdd("Database", Database);
         if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }
         if (Row is RowItem r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
@@ -178,12 +170,14 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     }
 
     protected override void GeneratePic() {
-        if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#")) {
+        if (string.IsNullOrEmpty(_layoutFileName) || Database == null || Database.IsDisposed) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
 
-        CreativePad pad = new(new ItemCollectionPad(_layoutId, Database));
+        var lf = Database.GetLayout(_layoutFileName);
+
+        CreativePad pad = new(new ItemCollectionPad(lf));
         pad.Item.ResetVariables();
         pad.Item.ParseVariable(Database, _rowKey);
         var re = pad.Item.MaxBounds(string.Empty);
