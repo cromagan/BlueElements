@@ -245,7 +245,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         var t = "<b>Tabelle:</b> <tab>" + Database.ConnectionData.TableName + "<br>";
         t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueID + "<br>";
-        t += "<b>Zeilen:</b> <tab>" + (Database.Row.Count() - 1);
+        t += "<b>Zeilen:</b> <tab>" + (Database.Row.Count() - 1) + "<br>";
+        t += "<b>Temporärer Master:</b>  <tab>" + Database.TemporaryDatabaseMasterTimeUTC + " " + Database.TemporaryDatabaseMasterUser;
         capInfo.Text = t.TrimEnd("<br>");
     }
 

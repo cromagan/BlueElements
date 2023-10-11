@@ -129,7 +129,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
             var it = ItemOfRow(ro);
             if (it == null) {
                 //lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);
-                lastit = AddOne(thisn, 0, 0, lastit.Layout_Id);
+                lastit = AddOne(thisn, 0, 0, lastit.Layout_Dateiname);
             }
         }
         //var Plus = 0;
