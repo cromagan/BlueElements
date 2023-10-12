@@ -213,12 +213,12 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             if (_variableTmp == tmp) { return; }
 
             _variableTmp = tmp;
-            Variables_RemoveAll(true);
+            _variables.Clear();
 
             foreach (var t in value) {
                 if (t is VariableString ts) {
                     ts.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
-                    Variables_Add(ts, true);
+                    _variables.Add(ts);
                 }
             }
 
@@ -657,22 +657,22 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     public void Save() => _muf?.Save(true);
 
-    public void Variables_Add(VariableString va, bool isLoading) {
-        _variables.Add(va);
-        //ev.Changed += EventScript_Changed;
-        if (!isLoading) { Variables_Changed(); }
-    }
+    //public void Variables_Add(VariableString va, bool isLoading) {
+    //    _variables.Add(va);
+    //    //ev.Changed += EventScript_Changed;
+    //    if (!isLoading) { Variables_Changed(); }
+    //}
 
-    public void Variables_RemoveAll(bool isLoading) {
-        while (_variables.Count > 0) {
-            //var va = _variables[_eventScript.Count - 1];
-            //ev.Changed -= EventScript_Changed;
+    //public void Variables_RemoveAll(bool isLoading) {
+    //    while (_variables.Count > 0) {
+    //        //var va = _variables[_eventScript.Count - 1];
+    //        //ev.Changed -= EventScript_Changed;
 
-            _variables.RemoveAt(_variables.Count - 1);
-        }
+    //        _variables.RemoveAt(_variables.Count - 1);
+    //    }
 
-        if (!isLoading) { Variables_Changed(); }
-    }
+    //    if (!isLoading) { Variables_Changed(); }
+    //}
 
     internal ScriptEndedFeedback ExecuteScript(FormulaScriptDescription s) {
         if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, false, s.KeyName); }
@@ -687,7 +687,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             VariableCollection vars = new();
 
             foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("Formula_" + thisvar.KeyName, thisvar.ValueString, false, false, "Formular-Kopf-Variable\r\n" + thisvar.Comment);
+                var v = new VariableString("FRM_" + thisvar.KeyName, thisvar.ValueString, false, false, "Formular-Kopf-Variable\r\n" + thisvar.Comment);
                 vars.Add(v);
             }
 
@@ -730,7 +730,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             #region Variablen zurückschreiben und Special Rules ausführen
 
             if (sc.ChangeValues && scf.AllOk) {
-                Variables = DatabaseAbstract.WriteBackDbVariables(vars, Variables, "Formula_");
+                Variables = VariableCollection.Combine(Variables, vars, "FRM_");
             }
 
             if (!scf.AllOk) {
@@ -872,13 +872,13 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
                 case "variables":
                     _variableTmp = pair.Value;
-                    Variables_RemoveAll(true);
+                    _variables.Clear();
                     List<string> va = new(pair.Value.FromNonCritical().SplitAndCutByCr());
                     foreach (var t in va) {
                         var l = new VariableString("dummy");
                         l.Parse(t.FromNonCritical());
                         l.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
-                        Variables_Add(l, true);
+                        _variables.Add(l);
                     }
                     break;
             }
@@ -982,7 +982,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         e.Data = t.Parseable().WIN1252_toByte();
     }
 
-    private void Variables_Changed() => Variables = new VariableCollection(_variables);
-
     #endregion
+
+    //private void Variables_Changed() => Variables = new VariableCollection(_variables);
 }

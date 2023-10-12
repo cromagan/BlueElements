@@ -714,22 +714,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         } while (true);
     }
 
-    public static VariableCollection WriteBackDbVariables(VariableCollection scriptVars, VariableCollection existingVars, string suffix) {
-        var vaa = new List<VariableString>();
-        vaa.AddRange(existingVars.ToListVariableString());
-
-        foreach (var thisvar in vaa) {
-            var v = scriptVars.Get(suffix + thisvar.KeyName);
-
-            if (v is VariableString vs) {
-                thisvar.ReadOnly = false; // weil kein OnChanged vorhanden ist
-                thisvar.ValueString = vs.ValueString;
-                thisvar.ReadOnly = true; // weil kein OnChanged vorhanden ist
-            }
-        }
-        return new VariableCollection(vaa);
-    }
-
     /// <summary>
     /// Der komplette Pfad mit abschlieﬂenden \
     /// </summary>
@@ -1065,7 +1049,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                     }
                 }
 
-                Variables = WriteBackDbVariables(vars, Variables, "DB_");
+                Variables = VariableCollection.Combine(Variables, vars, "DB_");
             }
 
             if (!scf.AllOk) {
@@ -1746,22 +1730,22 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return base.ToString() + " " + TableName;
     }
 
-    public void Variables_Add(VariableString va, bool isLoading) {
-        _variables.Add(va);
-        //ev.Changed += EventScript_Changed;
-        if (!isLoading) { Variables_Changed(); }
-    }
+    //public void Variables_Add(VariableString va, bool isLoading) {
+    //    _variables.Add(va);
+    //    if (!isLoading) { Variables = new VariableCollection(_variables); }
+    //}
 
-    public void Variables_RemoveAll(bool isLoading) {
-        while (_variables.Count > 0) {
-            //var va = _variables[_eventScript.Count - 1];
-            //ev.Changed -= EventScript_Changed;
+    //public void Variables_RemoveAll(bool isLoading) {
+    //    //while (_variables.Count > 0) {
+    //    //    //var va = _variables[_eventScript.Count - 1];
+    //    //    //ev.Changed -= EventScript_Changed;
 
-            _variables.RemoveAt(_variables.Count - 1);
-        }
+    //    //    _variables.RemoveAt(_variables.Count - 1);
+    //    //}
 
-        if (!isLoading) { Variables_Changed(); }
-    }
+    //    _variables.Clear();
+    //    if (!isLoading) { Variables = new VariableCollection(); }
+    //}
 
     internal void DevelopWarnung(string t) {
         try {
@@ -2000,13 +1984,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             case DatabaseDataType.DatabaseVariables:
                 _variableTmp = value;
-                Variables_RemoveAll(true);
+                _variables.Clear();
                 List<string> va = new(value.SplitAndCutByCr());
                 foreach (var t in va) {
                     var l = new VariableString("dummy");
                     l.Parse(t);
                     l.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
-                    Variables_Add(l, true);
+                    _variables.Add(l);
                 }
                 break;
 
@@ -2126,7 +2110,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         _zeilenQuickInfo = string.Empty;
         _sortDefinition = null;
         EventScript_RemoveAll(true);
-        Variables_RemoveAll(true);
+        _variables.Clear();
+        _variableTmp = string.Empty;
         Undo.Clear();
     }
 
@@ -2285,8 +2270,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             #endregion
         } catch { }
     }
-
-    private void Variables_Changed() => Variables = new VariableCollection(_variables);
 
     #endregion
 }

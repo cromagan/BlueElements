@@ -44,13 +44,17 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <param name="v"></param>
     public VariableCollection(List<Variable> v) : this(v, true) { }
 
-    public VariableCollection(List<Variable> v, bool creadonly) {
+    public VariableCollection(List<Variable> v, bool readOnly) {
         foreach (var thisV in v) {
             Add(thisV);
         }
-        ReadOnly = creadonly;
+        ReadOnly = readOnly;
     }
 
+    /// <summary>
+    /// Erstellt eine neue Liste aus Variablen, die ReadOnly ist
+    /// </summary>
+    /// <param name="v"></param>
     public VariableCollection(List<VariableString>? v) {
         if (v != null) {
             foreach (var thisV in v) {
@@ -82,6 +86,52 @@ public class VariableCollection : IEnumerable<Variable> {
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Erstellt eine neue VariableCollection, die alle Variablen aus ExistingVars enthält.
+    /// Überschreinbt die Werte in den existingVars mit den Werten aus newValues. Die Werte aus NewValues können dabei einen besonderen Prefix haben.
+    /// Beispiel: ExistingVars die Variable Test
+    /// NewValues behinhaltet XX_Test.
+    /// mit dem Prefix XX_ wird der Wert aus XX_Test nach Test geschrieben.
+    /// </summary>
+    /// <param name="existingVars"></param>
+    /// <param name="newValues"></param>
+    /// <param name="newValsPrefix"></param>
+    /// <returns></returns>
+    public static VariableCollection Combine(VariableCollection existingVars, VariableCollection newValues, string newValsPrefix) {
+        var vaa = new List<VariableString>();
+        vaa.AddRange(existingVars.ToListVariableString());
+
+        foreach (var thisvar in vaa) {
+            var v = newValues.Get(newValsPrefix + thisvar.KeyName);
+
+            if (v is VariableString vs) {
+                thisvar.ReadOnly = false; // weil kein OnChanged vorhanden ist
+                thisvar.ValueString = vs.ValueString;
+                thisvar.ReadOnly = true; // weil kein OnChanged vorhanden ist
+            }
+        }
+
+        return new VariableCollection(vaa);
+    }
+
+    //public static VariableCollection Combine(VariableCollection existingVars, Variable thisvar) {
+    //    var vaa = new List<VariableString>();
+    //    vaa.AddRange(existingVars.ToListVariableString());
+
+    //    foreach (var thisvar in vaa) {
+    //        var v = newVars.Get(newVarsPrefix + thisvar.KeyName);
+
+    //        if (v is VariableString vs) {
+    //            thisvar.ReadOnly = false; // weil kein OnChanged vorhanden ist
+    //            thisvar.ValueString = vs.ValueString;
+    //            thisvar.ReadOnly = true; // weil kein OnChanged vorhanden ist
+    //        } else {
+    //            vaa.Add((VariableString)thisvar.Clone());
+    //        }
+    //    }
+    //    return new VariableCollection(vaa);
+    //}
 
     public bool Add(Variable? variable) {
         if (ReadOnly) { return false; }

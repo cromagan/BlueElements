@@ -37,7 +37,7 @@ public class Method_WriteBackDBVariables : Method_Database {
                                     "So kann mit Routinen, die separate Skripte aufrufen, auf die Datenbank Variablen zugegriffen werden.";
 
     public override bool EndlessArgs => true;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
@@ -60,7 +60,7 @@ public class Method_WriteBackDBVariables : Method_Database {
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
         if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Variabeln zurückschreiben im Testmodus deaktiviert."); }
 
-        db.Variables = DatabaseAbstract.WriteBackDbVariables(varCol, db.Variables, "DB_");
+        db.Variables = VariableCollection.Combine(db.Variables, varCol, "DB_");
 
         return DoItFeedback.Null();
     }
