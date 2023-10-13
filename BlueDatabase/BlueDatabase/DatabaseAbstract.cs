@@ -992,6 +992,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
             vars.Add(new VariableDatabase("Database", this, true, true, "Die Datenbank, die zu dem Skript gehört"));
             vars.Add(new VariableString("Tablename", TableName, true, false, "Der aktuelle Tabellenname."));
+            vars.Add(new VariableBool("ReadOnly", ReadOnly, true, false, "Ob die aktuelle Datenbank schreibgeschützt ist."));
             vars.Add(new VariableFloat("Rows", Row.Count, true, false, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
             vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, false, "Der Name der ersten Spalte"));
             vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
