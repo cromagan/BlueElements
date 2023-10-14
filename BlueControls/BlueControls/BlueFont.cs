@@ -63,7 +63,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     private float _sizeTestedAndOk = float.MinValue;
     private QuickImage? _symbolForReadableTextSym;
     private QuickImage? _symbolOfLineSym;
-    private float _widthOf2Points = 0;
+    private float _widthOf2Points;
     private int _zeilenabstand = -1;
 
     #endregion
@@ -78,7 +78,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
 
     public string KeyName { get; private set; } = string.Empty;
 
-    internal bool Bold { get; private set; } = false;
+    internal bool Bold { get; private set; }
 
     internal Color ColorMain { get; private set; } = Color.Black;
 
@@ -86,15 +86,15 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
 
     internal string FontName { get; private set; } = "Arial";
 
-    internal bool Italic { get; private set; } = false;
-    internal bool Kapitälchen { get; private set; } = false;
-    internal bool OnlyLower { get; private set; } = false;
-    internal bool OnlyUpper { get; private set; } = false;
-    internal bool Outline { get; private set; } = false;
+    internal bool Italic { get; private set; }
+    internal bool Kapitälchen { get; private set; }
+    internal bool OnlyLower { get; private set; }
+    internal bool OnlyUpper { get; private set; }
+    internal bool Outline { get; private set; }
     internal float Size { get; private set; } = 9;
-    internal bool StrikeOut { get; private set; } = false;
+    internal bool StrikeOut { get; private set; }
 
-    internal bool Underline { get; private set; } = false;
+    internal bool Underline { get; private set; }
 
     #endregion
 
@@ -131,6 +131,9 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         toParse = toParse.Replace(",", ", "); // TODO: vor 01.10.2021 Entferen wenn inv bei den exports repariert wurde
 
         f.Parse(toParse);
+
+        // Kann beim Initialisieren von anderen Fonts tatsächlih noch null sein
+        // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract
         FontsAll?.Add(f);
 
         return f;
@@ -365,9 +368,9 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
             }
         }
 
-        bmp?.Dispose();
-        gr?.Dispose();
-        tmpfont?.Dispose();
+        bmp.Dispose();
+        gr.Dispose();
+        tmpfont.Dispose();
 
         _widthOf2Points = MeasureString("..", StringFormat.GenericTypographic).Width;
         //http://www.vb-helper.com/howto_net_rainbow_text.html

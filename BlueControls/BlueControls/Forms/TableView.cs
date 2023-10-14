@@ -1355,7 +1355,7 @@ public partial class TableView : FormWithStatusBar {
             return;
         }
 
-        if (!db.isRowScriptPossible(false)) {
+        if (!db.IsRowScriptPossible(false)) {
             var d = lstAufgaben.Item.Add("Zeilen-Skripte erlauben", "#enablerowscript", ImageCode.Spalte);
             d.Enabled = db.IsAdministrator();
             lstAufgaben.Enabled = true;
@@ -1367,7 +1367,7 @@ public partial class TableView : FormWithStatusBar {
                 var d = lstAufgaben.Item.Add(thiss);
                 d.Enabled = db.PermissionCheck(thiss.UserGroups, null) && thiss.IsOk();
 
-                if (d.Enabled && thiss.NeedRow && !db.isRowScriptPossible(true)) {
+                if (d.Enabled && thiss.NeedRow && !db.IsRowScriptPossible(true)) {
                     d.Enabled = false;
                 }
 

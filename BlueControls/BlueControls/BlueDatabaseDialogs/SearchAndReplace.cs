@@ -35,7 +35,7 @@ internal sealed partial class SearchAndReplace : Form {
 
     #region Fields
 
-    private readonly Table _blueTable;
+    private readonly Table _table;
     private bool _isWorking;
 
     #endregion
@@ -46,9 +46,9 @@ internal sealed partial class SearchAndReplace : Form {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        _blueTable = table;
-        _blueTable.SelectedCellChanged += SelectedCellChanged;
-        SelectedCellChanged(_blueTable, new CellExtEventArgs(_blueTable.CursorPosColumn, _blueTable.CursorPosRow));
+        _table = table;
+        _table.SelectedCellChanged += SelectedCellChanged;
+        SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
     }
 
     #endregion
@@ -57,15 +57,15 @@ internal sealed partial class SearchAndReplace : Form {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
-        _blueTable.SelectedCellChanged -= SelectedCellChanged;
+        _table.SelectedCellChanged -= SelectedCellChanged;
     }
 
     private void Alt_TextChange(object sender, System.EventArgs e) => Checkbuttons();
 
     private void Checkbuttons() {
         var canDo = true;
-        if (_blueTable?.Database == null) { return; }
-        if (!_blueTable.Database.IsAdministrator()) { canDo = false; }
+        if (_table.Database == null) { return; }
+        if (!_table.Database.IsAdministrator()) { canDo = false; }
         if (SucheNach.Checked) {
             if (string.IsNullOrEmpty(Alt.Text)) { canDo = false; }
             Alt.Enabled = true;
@@ -94,10 +94,10 @@ internal sealed partial class SearchAndReplace : Form {
             canDo = true;
         }
         if (NurinAktuellerSpalte.Checked) {
-            if (_blueTable.CursorPosColumn == null) {
+            if (_table.CursorPosColumn == null) {
                 canDo = false;
             } else {
-                if (!_blueTable.CursorPosColumn.Format.CanBeCheckedByRules()) { canDo = false; }
+                if (!_table.CursorPosColumn.Format.CanBeCheckedByRules()) { canDo = false; }
             }
         }
         if (Alt.Text == Neu.Text) {
@@ -113,17 +113,17 @@ internal sealed partial class SearchAndReplace : Form {
         var ersetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
         //db.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
-        if (_blueTable?.Database is not DatabaseAbstract db) { return; }
+        if (_table.Database is not DatabaseAbstract db) { return; }
 
         List<ColumnItem?> sp = new();
         List<RowItem> ro = new();
         if (NurinAktuellerSpalte.Checked) {
-            sp.Add(_blueTable.CursorPosColumn);
+            sp.Add(_table.CursorPosColumn);
         } else {
             sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Format.CanBeChangedByRules()));
         }
         foreach (var thisRow in db.Row) {
-            if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_blueTable.Filter)) {
+            if (!AktuelleFilterung.Checked || thisRow.MatchesTo(_table.Filter)) {
                 if (db.Column.SysLocked is ColumnItem sl) {
                     if (!AbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(sl)) { ro.Add(thisRow); }
                 }
@@ -164,7 +164,7 @@ internal sealed partial class SearchAndReplace : Form {
                 }
             }
         }
-        p?.Close();
+        p.Close();
 
         db.Row.ExecuteValueChanged(true);
 

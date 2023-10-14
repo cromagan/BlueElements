@@ -41,7 +41,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     private DatabaseScriptDescription? _item;
 
-    private bool allowTemporay = false;
+    private bool allowTemporay;
 
     #endregion
 
@@ -165,7 +165,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             if (thisSet != null) {
                 _ = lstEventScripts.Item.Add(thisSet);
 
-                if (!didMessage && thisSet.NeedRow && !Database.isRowScriptPossible(false)) {
+                if (!didMessage && thisSet.NeedRow && !Database.IsRowScriptPossible(false)) {
                     didMessage = true;
                     EnableScript();
                 }
@@ -230,7 +230,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         if (Database == null || Database.IsDisposed) { return; }
 
-        if (chkZeile.Checked && !Database.isRowScriptPossible(false)) {
+        if (chkZeile.Checked && !Database.IsRowScriptPossible(false)) {
             if (!EnableScript()) { chkZeile.Checked = false; }
 
             return;
@@ -259,7 +259,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         Database.EnableScript();
 
-        if (!Database.isRowScriptPossible(false)) {
+        if (!Database.IsRowScriptPossible(false)) {
             MessageBox.Show("Systemspalten konnten nicht erstellt werden.", ImageCode.Information, "Ok");
             return false;
         }
@@ -349,30 +349,30 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         Item.ScriptText = eventScriptEditor.ScriptText;
     }
 
-    private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        //Todo: Implementieren
-        if (e.HotItem is string txt) {
-            var c = Database?.Column.Exists(txt);
-            if (c is null) { return; }
-            _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
-        }
-    }
+    //private void scriptEditor_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+    //    //Todo: Implementieren
+    //    if (e.HotItem is string txt) {
+    //        var c = Database?.Column.Exists(txt);
+    //        if (c is null) { return; }
+    //        _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
+    //    }
+    //}
 
-    private void scriptEditor_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        //Todo: Implementieren
-        ColumnItem? c = null;
+    //private void scriptEditor_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
+    //    //Todo: Implementieren
+    //    ColumnItem? c = null;
 
-        if (e.HotItem is string txt) { c = Database?.Column.Exists(txt); }
+    //    if (e.HotItem is string txt) { c = Database?.Column.Exists(txt); }
 
-        switch (e.ClickedComand.ToLower()) {
-            case "spalteneigenschaftenbearbeiten":
-                if (c != null && !c.IsDisposed) {
-                    TableView.OpenColumnEditor(c, null, null);
-                }
+    //    switch (e.ClickedComand.ToLower()) {
+    //        case "spalteneigenschaftenbearbeiten":
+    //            if (c != null && !c.IsDisposed) {
+    //                TableView.OpenColumnEditor(c, null, null);
+    //            }
 
-                break;
-        }
-    }
+    //            break;
+    //    }
+    //}
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }

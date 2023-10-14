@@ -101,7 +101,7 @@ public class RowData : IComparable, IDisposableExtended {
     public bool IsDisposed { get; private set; }
     public bool MarkYellow { get; set; }
     public string PinStateSortAddition { get; set; }
-    public RowItem Row { get; private set; }
+    public RowItem Row { get; }
     public bool ShowCap { get; set; }
     public int Y { get; set; }
 

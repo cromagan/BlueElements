@@ -64,7 +64,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
             iar.GetRowFrom = isr;
         }
 
-        if (l is IItemSendFilter isf && x is IItemAcceptFilter iaf) {
+        if (l is IItemSendFilter && x is IItemAcceptFilter iaf) {
             iaf.GetFilterFrom = new List<string> { l.KeyName }.AsReadOnly();
         }
 
@@ -135,7 +135,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.ForceLoadSaveAll();
 
-        if (e?.Item == null) { return; }
+        if (e.Item == null) { return; }
         FormulaSet(e.Item.KeyName, null);
     }
 

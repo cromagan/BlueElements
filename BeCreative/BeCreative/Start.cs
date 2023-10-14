@@ -48,15 +48,15 @@ namespace BeCreative {
             DatabaseAbstract.ForceSaveAll();
             MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
 
-            p?.Update("Programm wird beendet<br><i>Speichern aller Datenbanken");
+            p.Update("Programm wird beendet<br><i>Speichern aller Datenbanken");
             DatabaseAbstract.ForceSaveAll();
             MultiUserFile.SaveAll(false); // Fonts und Dictionarys werden noch benötigt
 
             DebugPrint(FehlerArt.Info, "Schließe Programm, noch ein SaveAll.");
-            p?.Update("Programm wird beendet<br><i>Fast geschafft!");
+            p.Update("Programm wird beendet<br><i>Fast geschafft!");
             MultiUserFile.SaveAll(true); // Nun aber
 
-            p?.Close();
+            p.Close();
             TraceLogging_End();
         }
 

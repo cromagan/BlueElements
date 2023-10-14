@@ -42,7 +42,7 @@ public sealed class ColumnViewItem : IParseable {
         _viewType = type;
     }
 
-    public ColumnViewItem(DatabaseAbstract database, string toParse, ColumnViewCollection parent) : this(parent) {
+    public ColumnViewItem(ColumnViewCollection parent, string toParse) : this(parent) {
         this.Parse(toParse);
     }
 
@@ -89,7 +89,7 @@ public sealed class ColumnViewItem : IParseable {
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
-        if (Parent?.Database is not DatabaseAbstract db) {
+        if (Parent.Database is not DatabaseAbstract db) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank unbekannt");
             return false;
         }

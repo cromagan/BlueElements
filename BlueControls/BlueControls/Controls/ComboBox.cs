@@ -54,7 +54,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     /// </summary>
     private string _initialtext = string.Empty;
 
-    private string? _lastClickedText = null;
+    private string? _lastClickedText;
 
     #endregion
 
@@ -138,7 +138,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public void ShowMenu(object? sender, MouseEventArgs ex) {
+    public void ShowMenu(object? sender, MouseEventArgs? e) {
         if (_btnDropDownIsIn || IsDisposed || !Enabled) { return; }
         _btnDropDownIsIn = true;
         OnDropDownShowing();

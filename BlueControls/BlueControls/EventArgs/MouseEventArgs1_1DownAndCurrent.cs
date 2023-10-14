@@ -43,14 +43,7 @@ public class MouseEventArgs1_1DownAndCurrent : System.EventArgs {
 
     #region Methods
 
-    public Rectangle TrimmedRectangle() {
-        if (MouseDown == null || Current == null) {
-            Develop.DebugPrint("Trimmen nicht möglich. " + (MouseDown == null) + " " + (Current == null));
-            return Rectangle.Empty;
-        }
-
-        return new Rectangle(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
-    }
+    public Rectangle TrimmedRectangle() => new(Math.Min(MouseDown.TrimmedX, Current.TrimmedX), Math.Min(MouseDown.TrimmedY, Current.TrimmedY), Math.Abs(MouseDown.TrimmedX - Current.TrimmedX) + 1, Math.Abs(MouseDown.TrimmedY - Current.TrimmedY) + 1);
 
     #endregion
 }

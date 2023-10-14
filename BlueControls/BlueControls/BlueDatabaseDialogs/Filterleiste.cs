@@ -303,7 +303,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             return;
         }
 
-        btnAlleFilterAus_Click(null, null);
+        btnAlleFilterAus_Click(null, System.EventArgs.Empty);
         foreach (var thiscolumnitem in _ähnliche) {
             if (thiscolumnitem?.Column != null && _table?.Filter != null) {
                 if (thiscolumnitem.Column.AutoFilterSymbolPossible()) {

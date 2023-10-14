@@ -384,7 +384,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
             if (e.Column == column) { SetValueFromCell(); }
 
-            if (e.Column == column || e.Column == e.Column?.Database?.Column.SysLocked) { CheckEnabledState(); }
+            if (e.Column == column || e.Column == e.Column.Database?.Column.SysLocked) { CheckEnabledState(); }
         } catch {
             // Invoke: auf das verworfene Ojekt blah blah
             if (!IsDisposed) {

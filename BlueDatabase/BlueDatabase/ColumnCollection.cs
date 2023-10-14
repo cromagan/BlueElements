@@ -135,7 +135,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
-        GC.SuppressFinalize(this);
+        //GC.SuppressFinalize(this);
     }
 
     //    foreach (var thisKey in keys) {

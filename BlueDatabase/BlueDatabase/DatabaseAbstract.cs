@@ -1336,7 +1336,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public abstract void GetUndoCache();
 
     public bool hasErrorCheckScript() {
-        if (!isRowScriptPossible(true)) { return false; }
+        if (!IsRowScriptPossible(true)) { return false; }
 
         var e = EventScript.Get(ScriptEventTypes.prepare_formula);
         return e.Count == 1;
@@ -1489,7 +1489,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             #region Row zum schreiben ermitteln (row)
 
-            RowItem? row = null;
+            RowItem? row;
 
             if (dictVorhanden.ContainsKey(thisD.Key)) {
                 dictVorhanden.TryGetValue(thisD.Key, out row);
@@ -1581,7 +1581,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return true;
     }
 
-    public bool isRowScriptPossible(bool checkMessageTo) {
+    public bool IsRowScriptPossible(bool checkMessageTo) {
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
         if (checkMessageTo && !string.IsNullOrEmpty(_eventScriptErrorMessage)) { return false; }
@@ -1780,7 +1780,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     internal void RepairColumnArrangements() {
         //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
 
-        var x = _columnArrangements!.CloneWithClones();
+        var x = _columnArrangements.CloneWithClones();
 
         for (var z = 0; z < Math.Max(2, x.Count); z++) {
             if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
@@ -2133,7 +2133,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     protected void TryToSetMeTemporaryMaster() {
         if (ReadOnly) { return; }
         if (!IsAdministrator()) { return; }
-        if (!isRowScriptPossible(true)) { return; }
+        if (!IsRowScriptPossible(true)) { return; }
 
         if (AmITemporaryMaster()) { return; }
 

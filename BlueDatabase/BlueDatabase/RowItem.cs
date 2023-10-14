@@ -305,7 +305,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return;
         }
 
-        if (!Database.isRowScriptPossible(true)) {
+        if (!Database.IsRowScriptPossible(true)) {
             LastCheckedMessage = "Zeilenprüfung deaktiviert";
             return;
         }
@@ -638,7 +638,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             DoRowAutomaticEventArgs e = new(this, eventname);
             OnDoSpecialRules(e);
 
-            if (eventname is not null and ScriptEventTypes.value_changed) {
+            if (eventname is ScriptEventTypes.value_changed) {
                 CellSet(srs, Database.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
             } else {
                 var l = Database.EventScript.Get(ScriptEventTypes.value_changed);

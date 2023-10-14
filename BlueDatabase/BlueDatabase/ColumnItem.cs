@@ -469,7 +469,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public bool ContentWidthIsValid { get; private set; } = false;
+    public bool ContentWidthIsValid { get; private set; }
     public DatabaseAbstract? Database { get; private set; }
 
     public TranslationType DoOpticalTranslation {

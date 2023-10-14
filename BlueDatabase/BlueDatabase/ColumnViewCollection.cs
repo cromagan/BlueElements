@@ -243,18 +243,17 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
                 return true;
 
             case "columndata":
-                if (Database != null) {
-                    _internal.Add(new ColumnViewItem(Database, value, this)); // BAse, um Events zu vermeiden
-                }
+
+                _internal.Add(new ColumnViewItem(this, value)); // BAse, um Events zu vermeiden
 
                 return true;
 
             case "columns":
-                if (Database != null) {
-                    foreach (var pair2 in value.GetAllTags()) {
-                        _internal.Add(new ColumnViewItem(Database, pair2.Value.FromNonCritical(), this)); // BAse, um Events zu vermeiden
-                    }
+
+                foreach (var pair2 in value.GetAllTags()) {
+                    _internal.Add(new ColumnViewItem(this, pair2.Value.FromNonCritical())); // BAse, um Events zu vermeiden
                 }
+
                 return true;
 
             case "permissiongroup":
@@ -362,8 +361,6 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     }
 
     private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);//columnViewItem.Changed += ColumnViewItem_Changed;
-
-    private void ColumnViewItem_Changed(object sender, System.EventArgs e) => throw new NotImplementedException();
 
     //    Swap(index1, index2);
     //}

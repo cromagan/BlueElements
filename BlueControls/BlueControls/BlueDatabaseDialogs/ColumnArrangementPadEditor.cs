@@ -443,7 +443,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         return found;
     }
 
-    private void Pad_MouseUp(object? sender, MouseEventArgs e) {
+    private void Pad_MouseUp(object? sender, MouseEventArgs? e) {
         if (Generating || Sorting || Fixing > 0) { return; }
         SortColumns();
         FixColumnArrangement();

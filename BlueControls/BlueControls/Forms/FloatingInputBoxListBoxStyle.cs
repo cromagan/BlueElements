@@ -71,7 +71,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     #region Methods
 
-    public static void ContextMenuShow(IContextMenu control, MouseEventArgs e) {
+    public static void ContextMenuShow(IContextMenu control, MouseEventArgs? e) {
         Close(BlueListBoxAppearance.KontextMenu);
         Close(control);
 

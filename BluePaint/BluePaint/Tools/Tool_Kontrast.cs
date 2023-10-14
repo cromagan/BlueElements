@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using System.Drawing;
 using BlueBasics;
 using BlueControls.EventArgs;
@@ -42,12 +43,12 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
             e.DrawImage(picPreview);
             return;
         }
-        if (sldGamma.Value != 1) {
+        if (Math.Abs(sldGamma.Value - 1) > 0.001) {
             var picPreview = AdjustGamma(originalPic, sldGamma.Value);
             e.DrawImage(picPreview);
             return;
         }
-        if (sldHelligkeit.Value != 1) {
+        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) {
             var picPreview = AdjustBrightness(originalPic, sldHelligkeit.Value);
             e.DrawImage(picPreview);
         }

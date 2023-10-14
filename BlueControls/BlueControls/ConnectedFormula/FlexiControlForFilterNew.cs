@@ -79,15 +79,6 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
     //public FlexiControlForFilter() : this(null, null) { }
     public void FilterFromParentsChanged() { }
 
-    internal ComboBox? GetComboBox() {
-        foreach (var thisc in Controls) {
-            if (thisc is ComboBox cbx) {
-                return cbx;
-            }
-        }
-        return null;
-    }
-
     internal bool WasThisValueClicked() {
         var cb = GetComboBox();
         return cb != null && cb.WasThisValueClicked();

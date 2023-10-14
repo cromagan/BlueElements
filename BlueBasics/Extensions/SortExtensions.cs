@@ -37,7 +37,7 @@ public static partial class Extensions {
     }
 
     public static List<T> SortedDistinctList<T>(this IEnumerable<T> arr) where T : IComparable {
-        if (arr == null || !arr.Any()) { return new List<T>(); }
+        if (!arr.Any()) { return new List<T>(); }
 
         var arr2 = arr.Distinct().ToList();
         //if (arr2.Contains(null)) { _ = arr2.Remove(null); }

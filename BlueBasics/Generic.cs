@@ -266,7 +266,7 @@ public static class Generic {
             try {
                 Assembly assembly = Assembly.LoadFrom(assemblyFile);
                 //Console.WriteLine(assembly.FullName);
-            } catch (Exception ex) {
+            } catch {
                 //Console.WriteLine($"Fehler beim Laden der Assembly: {ex.Message}");
             }
         }

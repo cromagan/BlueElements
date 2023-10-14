@@ -156,7 +156,7 @@ public partial class PadEditor : PadEditorReadOnly {
         #region  SideMenu leeren
 
         foreach (var thisControl in tabElementEigenschaften.Controls) {
-            if (thisControl is IDisposable d) { d?.Dispose(); }
+            if (thisControl is IDisposable d) { d.Dispose(); }
         }
         tabElementEigenschaften.Controls.Clear();
 

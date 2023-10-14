@@ -866,17 +866,17 @@ public static partial class Extensions {
     }
 
     public static byte[] Unicode_ToByte(this string? tXt) {
-        if (tXt == null || string.IsNullOrEmpty(tXt)) { return new byte[0]; }
+        if (tXt == null || string.IsNullOrEmpty(tXt)) { return Array.Empty<byte>(); }
         return Encoding.Unicode.GetBytes(tXt);
     }
 
     public static byte[] UTF8_ToByte(this string? tXt) {
-        if (tXt == null || string.IsNullOrEmpty(tXt)) { return new byte[0]; }
+        if (tXt == null || string.IsNullOrEmpty(tXt)) { return Array.Empty<byte>(); }
         return Encoding.UTF8.GetBytes(tXt);
     }
 
     public static byte[] WIN1252_toByte(this string? tXt) {
-        if (tXt == null || string.IsNullOrEmpty(tXt)) { return new byte[0]; }
+        if (tXt == null || string.IsNullOrEmpty(tXt)) { return Array.Empty<byte>(); }
         return Encoding.GetEncoding(1252).GetBytes(tXt);
     }
 

@@ -23,7 +23,6 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
-using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueDatabase;
 
@@ -67,7 +66,7 @@ public class UndoItem : IParseable {
 
     public string RowKey { get; private set; } = string.Empty;
 
-    public string TableName { get; private set; } = string.Empty;
+    public string TableName { get; } = string.Empty;
 
     public string User { get; private set; } = string.Empty;
 

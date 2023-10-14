@@ -54,7 +54,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     private readonly string _tablename = string.Empty;
 
-    private bool _undoLoaded = false;
+    private bool _undoLoaded;
 
     #endregion
 
@@ -135,7 +135,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                             var db = LoadedDatabasesWithThisSql(thisDbSqlLite._sql);
                             done.AddRange(db);
 
-                            var erg = thisDbSqlLite._sql.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd, false);
+                            var erg = thisDbSqlLite._sql.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
                             if (erg == null) { _isInTimer = false; return; } // Später ein neuer Versuch
 
                             foreach (var thisdb in db) {
@@ -221,8 +221,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     public override void GetUndoCache() {
         if (UndoLoaded) { return; }
+        if (_sql == null) { return; }
 
-        var undos = _sql?.GetLastChanges(new List<DatabaseSqlLite> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1), true);
+        var undos = _sql.GetLastChanges(new List<DatabaseSqlLite> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1));
 
         Undo.Clear();
         Undo.AddRange(undos);

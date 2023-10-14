@@ -413,9 +413,11 @@ public sealed class QuickImage : IReadableText, IStringable {
                 if (Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled)) {
                     var c1 = Color.FromArgb(0, 0, 0, 0);
                     if (!c.IsMagentaOrTransparent()) {
-                        var randPixel = (x > 0 && bmpOri.GetPixel(x - 1, y).IsMagentaOrTransparent()) || (y > 0 && bmpOri.GetPixel(x, y - 1).IsMagentaOrTransparent());
-                        if (x < bmpOri.Width - 1 && bmpOri.GetPixel(x + 1, y).IsMagentaOrTransparent()) { randPixel = true; }
-                        if (y < bmpOri.Height - 1 && bmpOri.GetPixel(x, y + 1).IsMagentaOrTransparent()) { randPixel = true; }
+                        var randPixel = (x > 0 && bmpOri.GetPixel(x - 1, y).IsMagentaOrTransparent()) ||
+                                             (y > 0 && bmpOri.GetPixel(x, y - 1).IsMagentaOrTransparent()) ||
+                                             x < bmpOri.Width - 1 && bmpOri.GetPixel(x + 1, y).IsMagentaOrTransparent() ||
+                                             y < bmpOri.Height - 1 && bmpOri.GetPixel(x, y + 1).IsMagentaOrTransparent();
+
                         if (c.B < 128 || randPixel) {
                             c1 = SystemColors.ControlDark;
                             if (x < bmpOri.Width - 1 && y < bmpOri.Height - 1 && bmpOri.GetPixel(x + 1, y + 1).IsMagentaOrTransparent()) {
@@ -447,7 +449,7 @@ public sealed class QuickImage : IReadableText, IStringable {
 
         // Evtl. hat die "OnNeedImage" das Bild auch in den Stack hochgeladen
         // Falls nicht, hier noch erledigen
-        return Exists(tmpname) && Get(tmpname) != this ? Get(tmpname) : (Bitmap?)e.Bmp;
+        return Exists(tmpname) && Get(tmpname) != this ? Get(tmpname) : e.Bmp;
     }
 
     #endregion

@@ -17,17 +17,9 @@
 
 #nullable enable
 
-using BlueDatabase.Enums;
-
 namespace BlueDatabase.EventArgs;
 
 public class VisibleEventArgs : System.EventArgs {
-
-    #region Constructors
-
-    public VisibleEventArgs() : base() { }
-
-    #endregion
 
     #region Properties
 

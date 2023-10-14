@@ -34,7 +34,7 @@ public partial class EditBoxRow : DialogWithOkAndCancel {
 
         if (row != null && !row.IsDisposed) {
             if (cf == null) {
-                formToEdit.GetConnectedFormulaFromDatabase(row?.Database);
+                formToEdit.GetConnectedFormulaFromDatabase(row.Database);
             }
 
             formToEdit.SetData(row?.Database, row?.KeyName ?? string.Empty);

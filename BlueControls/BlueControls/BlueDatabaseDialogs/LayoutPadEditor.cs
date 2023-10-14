@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -29,7 +28,6 @@ using BlueControls.ItemCollectionPad;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
 using static BlueBasics.IO;
-using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

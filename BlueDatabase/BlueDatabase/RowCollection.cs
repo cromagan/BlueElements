@@ -230,7 +230,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (Database == null || Database.IsDisposed) { return; }
         if (row == null || row.IsDisposed) { return; }
 
-        if (!Database.isRowScriptPossible(true)) { return; }
+        if (!Database.IsRowScriptPossible(true)) { return; }
 
         if (!onlyIfMaster) {
             _ = _pendingChangedRows.AddIfNotExists(row.KeyName);
@@ -433,7 +433,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (_pendingChangedRows.Count > 0) { return; }
         if (_pendingChangedBackgroundRow.Count == 0) { return; }
         if (Database == null || Database.IsDisposed) { return; }
-        if (!Database.isRowScriptPossible(true)) { return; }
+        if (!Database.IsRowScriptPossible(true)) { return; }
 
         if (_executingbackgroundworks) { return; }
         _executingbackgroundworks = true;
@@ -454,7 +454,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (!Database.LogUndo) { break; }
                 if (_pendingChangedBackgroundRow.Count == 0) { break; }
                 if (_pendingChangedRows.Count > 0) { break; }
-                if (!Database.isRowScriptPossible(true)) { break; }
+                if (!Database.IsRowScriptPossible(true)) { break; }
 
                 var key = _pendingChangedBackgroundRow.First();
                 _ = _pendingChangedBackgroundRow.Remove(key);
@@ -521,7 +521,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (IsDisposed) { break; }
             if (Database == null || Database.IsDisposed) { break; }
 
-            if (!Database.isRowScriptPossible(true)) { break; }
+            if (!Database.IsRowScriptPossible(true)) { break; }
 
             var e = new CancelReasonEventArgs();
             Database.OnCanDoScript(e);
@@ -769,7 +769,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         // Zeilen erzeugen und Format übertragen
         foreach (var thisRow in sourceDatabase.Row) {
             var l = SearchByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, false, false, "Clone - Zeile fehlt");
-            l?.CloneFrom(thisRow, true);
+            l.CloneFrom(thisRow, true);
         }
 
         if (sourceDatabase.Row.Count != Count) {

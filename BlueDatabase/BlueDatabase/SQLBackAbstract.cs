@@ -320,7 +320,7 @@ public abstract class SqlBackAbstract {
     /// <param name="tablename"></param>
     /// <param name="columnName"></param>
     /// <returns></returns>
-    public Dictionary<string, string>? GetStyleDataAll(string tablename, string columnName) {
+    public Dictionary<string, string> GetStyleDataAll(string tablename, string columnName) {
         if (!IsValidTableName(tablename, true)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
             throw new Exception();
@@ -373,8 +373,6 @@ public abstract class SqlBackAbstract {
     /// <param name="tablename"></param>
     /// <param name="row"></param>
     /// <param name="refreshAlways">Bei TRUE wird die gesamte Zeile aktualistert, weil evtl. eine Änderung aufgetreten ist. Bei FLASE werden nur die fehlenden Daten der noch nicht geladenen Spalten nachgeladen.</param>
-    /// <param name="sortedRows"></param>
-    /// <param name="trycount"></param>
     public string LoadRow(string tablename, List<RowItem> row, bool refreshAlways) {
         if (!IsValidTableName(tablename, true)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
@@ -781,7 +779,7 @@ public abstract class SqlBackAbstract {
     /// <param name="fromDate"></param>
     /// <param name="toDate"></param>
     /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
-    internal List<UndoItem>? GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate, bool allData) {
+    internal List<UndoItem> GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate) {
         lock (_getChanges) {
             var commandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, CMT, TIMECODEUTC from " + SysUndo + " ";
 

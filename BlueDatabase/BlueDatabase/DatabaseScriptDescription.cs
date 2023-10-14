@@ -26,7 +26,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
-using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueDatabase;
 
@@ -167,7 +166,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (_needRow) { return "Routinen nach dem Laden einer Datenbank, dürfen sich nicht auf Zeilen beziehen."; }
         }
 
-        if (_needRow && !Database.isRowScriptPossible(false)) { return "Zeilenskripte in dieser Datenbank nicht möglich"; }
+        if (_needRow && !Database.IsRowScriptPossible(false)) { return "Zeilenskripte in dieser Datenbank nicht möglich"; }
 
         return string.Empty;
     }

@@ -161,17 +161,17 @@ public partial class VariableEditor : UserControl {
         }
 
         x.RepairAfterParse();
-        var car = x.ColumnArrangements?.CloneWithClones();
+        var car = x.ColumnArrangements.CloneWithClones();
 
-        if (car != null) {
-            if (Editabe) {
-                car[1].ShowColumns("Name", "Inhalt", "Kommentar");
-            } else {
-                car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
-            }
-            //car[1].HideSystemColumns();
-            x.ColumnArrangements = new(car);
+        //if (car != null) {
+        if (Editabe) {
+            car[1].ShowColumns("Name", "Inhalt", "Kommentar");
+        } else {
+            car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
         }
+        //car[1].HideSystemColumns();
+        x.ColumnArrangements = new(car);
+        //}
 
         x.SortDefinition = new RowSortDefinition(x, "Name", true);
         tableVariablen.DatabaseSet(x, string.Empty);

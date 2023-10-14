@@ -79,7 +79,7 @@ public sealed partial class Search : Form {
         var searchT = SuchText();
         if (string.IsNullOrEmpty(searchT)) { return; }
         var found = _col;
-        var ca = _table?.CurrentArrangement;
+        var ca = _table.CurrentArrangement;
         found ??= ca?.Last()?.Column;
         var columnStarted = _col;
 
@@ -117,7 +117,7 @@ public sealed partial class Search : Form {
             MessageBox.Show("Text in den Spalten nicht gefunden.", ImageCode.Information, "OK");
             return;
         }
-        _table?.CursorPos_Set(found, _row, true);
+        _table.CursorPos_Set(found, _row, true);
         _ = txbSuchText.Focus();
     }
 

@@ -63,7 +63,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private string _allowedChars = string.Empty;
 
-    private bool _alwaysInstantChange = false;
+    private bool _alwaysInstantChange;
 
     private string _caption = string.Empty;
 
@@ -654,7 +654,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         foreach (var thisc in l) {
             thisc.Visible = false;
             if (thisc != _captionObject && thisc != _infoCaption) {
-                thisc?.Dispose(); // Dispose entfernt dass Control aus der Collection
+                thisc.Dispose(); // Dispose entfernt dass Control aus der Collection
             }
         }
 
@@ -837,7 +837,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
         // Text_abschneiden, weil dann der Quickmode verfügbar ist
-        _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden; 
+        _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden;
         if (_captionPosition == ÜberschriftAnordnung.Ohne_mit_Abstand) {
             _captionObject.Text = " ";
         } else {

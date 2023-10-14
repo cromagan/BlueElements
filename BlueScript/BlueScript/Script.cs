@@ -19,10 +19,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using System.Text;
-using System.Windows.Input;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -43,7 +41,7 @@ public class Script {
 
     #region Constructors
 
-    public Script(VariableCollection variablen, string additionalFilesPath, ScriptProperties scp) {
+    public Script(VariableCollection? variablen, string additionalFilesPath, ScriptProperties scp) {
         Comands ??= GetInstaceOfType<Method>();
         if (VarTypes == null) {
             VarTypes = GetInstaceOfType<Variable>("NAME");
@@ -52,11 +50,11 @@ public class Script {
 
         ReducedScriptText = string.Empty;
         ChangeValues = scp.ChangeValues;
-        Variables = variablen;
+        Variables = variablen ?? new();
         AllowedMethods = scp.AllowedMethods;
 
         if (!string.IsNullOrEmpty(additionalFilesPath)) {
-            variablen.Add(new VariableString("AdditionalFilesPfad", (additionalFilesPath.Trim("\\") + "\\").CheckPath(), true, false, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+            Variables.Add(new VariableString("AdditionalFilesPfad", (additionalFilesPath.Trim("\\") + "\\").CheckPath(), true, false, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
         }
 
         Attributes = scp.ScriptAttributes;

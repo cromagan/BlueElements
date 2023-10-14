@@ -39,11 +39,11 @@ public partial class Tool_Eraser : GenericTool {
     #region Methods
 
     public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
-        if (Razi.Checked && e.Current != null) {
+        if (Razi.Checked) {
             e.FillCircle(ColorRedTransp, e.Current.TrimmedX, e.Current.TrimmedY, 3);
         }
         //e.FillRectangle(Brush_RedTransp, new Rectangle(e.Current.TrimmedX, e.Current.TrimmedY, 1, 1));
-        if (!DrawBox.Checked || e.Current == null) {
+        if (!DrawBox.Checked) {
             return;
         }
 

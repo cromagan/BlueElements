@@ -19,12 +19,6 @@ namespace BlueBasics.EventArgs;
 
 public class CancelReasonEventArgs : System.EventArgs {
 
-    #region Constructors
-
-    public CancelReasonEventArgs() { }
-
-    #endregion
-
     #region Properties
 
     public bool Cancel => !string.IsNullOrEmpty(CancelReason);

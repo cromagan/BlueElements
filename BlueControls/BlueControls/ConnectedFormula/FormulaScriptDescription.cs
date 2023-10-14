@@ -26,7 +26,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase;
 using static BlueBasics.Converter;
-using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -132,7 +131,7 @@ public sealed class FormulaScriptDescription : ScriptDescription, IParseable, IR
         return false;
     }
 
-    public override QuickImage? SymbolForReadableText() {
+    public override QuickImage SymbolForReadableText() {
         var i = base.SymbolForReadableText();
         if (i != null) { return i; }
 

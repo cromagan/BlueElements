@@ -72,7 +72,7 @@ public partial class FormulaView : FormWithStatusBar {
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.ForceLoadSaveAll();
 
-        if (e?.Item == null) { return; }
+        if (e.Item == null) { return; }
         FormulaSet(e.Item.KeyName);
     }
 

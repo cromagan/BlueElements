@@ -35,7 +35,7 @@ internal class Method_Remove : Method {
     public override string Comand => "remove";
     public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
     public override bool EndlessArgs => true;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
@@ -55,7 +55,7 @@ internal class Method_Remove : Method {
         var tmpList = attvar.ValueListStringGet(0);
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableString vs) {
-                tmpList!.RemoveString(vs.ValueString, attvar.ValueBoolGet(1));
+                tmpList.RemoveString(vs.ValueString, attvar.ValueBoolGet(1));
             }
             if (attvar.Attributes[z] is VariableListString vl) {
                 tmpList.RemoveString(vl.ValueList, attvar.ValueBoolGet(1));

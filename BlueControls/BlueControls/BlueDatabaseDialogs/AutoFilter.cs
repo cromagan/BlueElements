@@ -84,7 +84,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     public void GenerateAll(FilterCollection? filter, List<RowItem>? pinned) {
         var nochOk = true;
         var listFilterString = Autofilter_ItemList(_column, filter, pinned);
-        var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
+        //var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
 
         //ACHUNG:
         // Column ist für die Filter in dieser Datenbank zuständig

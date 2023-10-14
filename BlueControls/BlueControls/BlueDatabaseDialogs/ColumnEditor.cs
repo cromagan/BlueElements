@@ -539,7 +539,7 @@ internal sealed partial class ColumnEditor {
         if (linkdb == null || tblFilterliste.Database == null) { tblFilterliste.DatabaseSet(null, string.Empty); }
 
         if (tblFilterliste.Database != null &&
-            tblFilterliste.Database.Tags.TagGet("Filename") != linkdb?.ConnectionData?.UniqueID) {
+            tblFilterliste.Database.Tags.TagGet("Filename") != linkdb?.ConnectionData.UniqueID) {
             tblFilterliste.DatabaseSet(null, string.Empty);
         }
 

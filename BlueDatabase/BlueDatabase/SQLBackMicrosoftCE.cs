@@ -151,7 +151,7 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
         return ok;
     }
 
-    public override string? GenerateRow(string tablename) => throw new NotImplementedException();
+    public override string GenerateRow(string tablename) => throw new NotImplementedException();
 
     /// <summary>
     /// Gibt die Spaltenname in Grosschreibung zurück

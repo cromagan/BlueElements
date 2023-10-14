@@ -31,7 +31,6 @@ using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
-using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 

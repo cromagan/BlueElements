@@ -35,7 +35,17 @@ public static partial class Extensions {
         var llu = Geometry.GetLenght(p, lu);
         var lru = Geometry.GetLenght(p, ru);
         var erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
-        return erg == llo ? lo : erg == lro ? rO : erg == llu ? lu : erg == lru ? ru : Point.Empty;
+        if (Math.Abs(erg - llo) < 0.001) {
+            return lo;
+        } else if (Math.Abs(erg - lro) < 0.001) {
+            return rO;
+        } else if (Math.Abs(erg - llu) < 0.001) {
+            return lu;
+        } else if (Math.Abs(erg - lru) < 0.001) {
+            return ru;
+        } else {
+            return Point.Empty;
+        }
     }
 
     public static Point PointOf(this Rectangle r, Alignment p) {

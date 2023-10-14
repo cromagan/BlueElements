@@ -36,7 +36,7 @@ internal class Method_LoadUrl : Method_WebPage {
 
     #region Fields
 
-    private static bool didSettings = false;
+    private static bool _didSettings;
 
     #endregion
 
@@ -90,8 +90,8 @@ internal class Method_LoadUrl : Method_WebPage {
     }
 
     private void DoSettings() {
-        if (didSettings) { return; }
-        didSettings = true;
+        if (_didSettings) { return; }
+        _didSettings = true;
 
         CefSharpSettings.SubprocessExitIfParentProcessClosed = true;
 

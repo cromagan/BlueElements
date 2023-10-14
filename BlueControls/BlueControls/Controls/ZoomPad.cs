@@ -65,7 +65,7 @@ public partial class ZoomPad : GenericControl {
     public float ShiftX {
         get => _shiftX;
         set {
-            if (value == _shiftX) { return; }
+            if (Math.Abs(value - _shiftX) < 0.001) { return; }
             _shiftX = value;
             Invalidate();
         }
@@ -74,7 +74,7 @@ public partial class ZoomPad : GenericControl {
     public float ShiftY {
         get => _shiftY;
         set {
-            if (value == _shiftY) { return; }
+            if (Math.Abs(value - _shiftY) < 0.001) { return; }
             _shiftY = value;
             Invalidate();
         }
@@ -86,7 +86,7 @@ public partial class ZoomPad : GenericControl {
             value = Math.Max(_zoomFit / 10f, value);
             value = Math.Min(20, value);
 
-            if (value == _zoom) { return; }
+            if (Math.Abs(value - _zoom) < 0.001) { return; }
             _zoom = value;
             Invalidate();
         }
