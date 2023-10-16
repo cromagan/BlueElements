@@ -123,7 +123,7 @@ public partial class VariableEditor : UserControl {
     }
 
     private void GenerateVariableTable() {
-        Database x = new(false, DatabaseAbstract.UniqueKeyValue());
+        Database x = new(false, string.Empty, DatabaseAbstract.UniqueKeyValue());
         x.DropMessages = false;
         var na = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         _ = x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
@@ -169,11 +169,13 @@ public partial class VariableEditor : UserControl {
         } else {
             car[1].ShowColumns("Name", "Typ", "RO", "System", "Inhalt", "Kommentar");
         }
-        //car[1].HideSystemColumns();
+
         x.ColumnArrangements = new(car);
-        //}
 
         x.SortDefinition = new RowSortDefinition(x, "Name", true);
+
+        if (!Editabe) { x.Freeze("Nur Ansicht"); }
+
         tableVariablen.DatabaseSet(x, string.Empty);
         tableVariablen.Arrangement = 1;
         filterVariablen.Table = tableVariablen;

@@ -2322,7 +2322,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 var ok = Database?.Column.ChangeName(_name, nname) ?? false;
 
                 if (!ok) {
-                    Database?.SetReadOnly();
+                    Database?.Freeze("Schwerer Spalten Umbenennungsfehler!");
                     return "Schwerer Spalten Umbenennungsfehler!";
                 }
 
@@ -2677,13 +2677,18 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
 
         if (IsValidTableName(_linkedDatabaseFile, false)) {
-            _linkedDatabase = Database.GetOtherTable(_linkedDatabaseFile);
+            var sr = string.Empty;
+            if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
+            _linkedDatabase = Database.GetOtherTable(_linkedDatabaseFile, false, sr);
         }
 
         if (_linkedDatabase == null) {
             var ci = new ConnectionInfo(_linkedDatabaseFile, null);
 
-            _linkedDatabase = GetById(ci, false, null);
+            var sr = string.Empty;
+            if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
+
+            _linkedDatabase = GetById(ci, false, sr, null);
             if (_linkedDatabase != null) {
                 _linkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                 _linkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;

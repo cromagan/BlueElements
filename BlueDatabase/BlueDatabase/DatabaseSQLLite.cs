@@ -60,9 +60,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Constructors
 
-    public DatabaseSqlLite(ConnectionInfo ci, bool readOnly) : this(((DatabaseSqlLite?)ci.Provider)?._sql, readOnly, ci.TableName) { }
+    public DatabaseSqlLite(ConnectionInfo ci, bool readOnly, string freezedReason) : this(((DatabaseSqlLite?)ci.Provider)?._sql, readOnly, freezedReason, ci.TableName) { }
 
-    public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnly, string tablename) : base(readOnly) {
+    public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnly, string freezedReason, string tablename) : base(readOnly, freezedReason) {
         if (sql == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL-Verbindung übergeben: " + tablename);
             return;
@@ -108,7 +108,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, string freezedReason, NeedPassword? needPassword) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         var sql = ((DatabaseSqlLite?)ci.Provider)?._sql;
@@ -116,7 +116,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         var at = sql.Tables();
         if (at == null || !at.Contains(ci.TableName)) { return null; }
-        return new DatabaseSqlLite(ci, readOnly);
+        return new DatabaseSqlLite(ci, readOnly, freezedReason);
     }
 
     public static void CheckSysUndoNow() {
@@ -351,7 +351,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
-
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 
         if (reason != Reason.LoadReload) {
@@ -384,7 +383,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
         if (DateTime.UtcNow.Subtract(LastLoadUtc).TotalSeconds < 5) { return; }
 
-        if (CriticalState()) { return; }
+        //if (CriticalState()) { return; }
         CheckSysUndoNow();
     }
 
@@ -404,6 +403,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     private void DoLastChanges(List<UndoItem>? data) {
         if (data == null) { return; }
         if (IsDisposed) { return; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
 
         if (IsInCache == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank noch nicht korrekt geladen!");

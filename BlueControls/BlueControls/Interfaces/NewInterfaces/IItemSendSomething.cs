@@ -193,7 +193,7 @@ public class ItemSendSomething {
                     na = na.FilePath() + MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
-                _outputDatabase = GetById(new ConnectionInfo(na, null), false, null);
+                _outputDatabase = GetById(new ConnectionInfo(na, null), false, string.Empty, null);
                 return true;
 
             case "senttochildids":

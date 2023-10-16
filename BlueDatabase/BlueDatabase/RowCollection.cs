@@ -451,6 +451,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         try {
             while (_pendingworker.Count < 5) {
                 if (Database == null || Database.IsDisposed || IsDisposed) { break; }
+                if (!Database.IsRowScriptPossible(true)) { break; }
                 if (!Database.LogUndo) { break; }
                 if (_pendingChangedBackgroundRow.Count == 0) { break; }
                 if (_pendingChangedRows.Count > 0) { break; }

@@ -49,7 +49,7 @@ public abstract class Method_Database : Method {
         if (!IsValidTableName(tableName, false)) { return null; }
 
         var db = MyDatabase(variables)?.ConnectionDataOfOtherTable(tableName, false);
-        return GetById(db, false, null);
+        return GetById(db, false, string.Empty, null); // Freezed unnötog, da eh keine Scripte ausgeführt werden.
     }
 
     protected DatabaseAbstract? MyDatabase(VariableCollection variables) {

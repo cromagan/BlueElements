@@ -251,7 +251,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void GenerateUndoTabelle() {
-        Database x = new(false, DatabaseAbstract.UniqueKeyValue());
+        Database x = new(false, string.Empty, DatabaseAbstract.UniqueKeyValue());
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         //_ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
         _ = x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
@@ -282,6 +282,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         x.ColumnArrangements = new(car);
 
         x.SortDefinition = new RowSortDefinition(x, "Index", true);
+        x.Freeze("Nur Ansicht");
+
         tblUndo.DatabaseSet(x, string.Empty);
         tblUndo.Arrangement = 1;
 

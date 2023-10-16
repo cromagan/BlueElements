@@ -546,7 +546,7 @@ internal sealed partial class ColumnEditor {
         if (linkdb == null) { return; }
 
         if (tblFilterliste.Database == null) {
-            Database db = new(false, DatabaseAbstract.UniqueKeyValue());
+            Database db = new(false, string.Empty, DatabaseAbstract.UniqueKeyValue());
             //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
 

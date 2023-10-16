@@ -2888,7 +2888,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void Draw_Table_Std(Graphics gr, List<RowData> sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca) {
         try {
-            if (Database == null || Database.IsDisposed || ca == null) { return; }   // Kommt vor, dass spontan doch geparsed wird...
+            if (Database is not DatabaseAbstract db || db.IsDisposed || ca == null) { return; }   // Kommt vor, dass spontan doch geparsed wird...
             Skin.Draw_Back(gr, Enums.Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
 
             /// Maximale Rechten Pixel der Permanenten Columns ermitteln
@@ -2922,9 +2922,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             //return;
 
-            if (Database?.HasPendingChanges ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
-            if (Database?.ReadOnly ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8); }
-            if (Database?.AmITemporaryMaster() ?? false) { gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, 0); }
+            if (db.HasPendingChanges) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
+            if (db.ReadOnly) {
+                gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8);
+                if (!string.IsNullOrEmpty(db.FreezedReason)) {
+                    BlueFont.DrawString(gr, db.FreezedReason, (Font)_columnFont, Brushes.Blue, 52, 12);
+                }
+            }
+            if (db.AmITemporaryMaster()) { gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, 0); }
         } catch {
             Invalidate();
             //Develop.DebugPrint(ex);

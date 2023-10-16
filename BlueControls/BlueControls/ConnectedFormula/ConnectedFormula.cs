@@ -899,7 +899,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
         foreach (var thisfile in _databaseFiles) {
-            _ = DatabaseAbstract.GetById(new ConnectionInfo(thisfile, null), false, null);
+            _ = DatabaseAbstract.GetById(new ConnectionInfo(thisfile, null), false, string.Empty, null);
         }
 
         _saved = false;

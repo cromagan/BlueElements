@@ -49,15 +49,15 @@ public sealed class Database : DatabaseAbstract {
 
     #region Constructors
 
-    public Database(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.AdditionalData, readOnly, false, needPassword) { }
+    public Database(ConnectionInfo ci, bool readOnly, string freezedReason, NeedPassword? needPassword) : this(ci.AdditionalData, readOnly, freezedReason, false, needPassword) { }
 
-    public Database(Stream stream, string tablename) : this(stream, string.Empty, true, false, tablename, null) { }
+    public Database(Stream stream, string tablename) : this(stream, string.Empty, true, "Stream-Datenbank", false, tablename, null) { }
 
-    public Database(bool readOnly, string tablename) : this(null, string.Empty, readOnly, true, tablename, null) { }
+    public Database(bool readOnly, string freezedReason, string tablename) : this(null, string.Empty, readOnly, freezedReason, true, tablename, null) { }
 
-    public Database(string filename, bool readOnly, bool create, NeedPassword? needPassword) : this(null, filename, readOnly, create, filename.FileNameWithoutSuffix(), needPassword) { }
+    public Database(string filename, bool readOnly, string freezedReason, bool create, NeedPassword? needPassword) : this(null, filename, readOnly, freezedReason, create, filename.FileNameWithoutSuffix(), needPassword) { }
 
-    private Database(Stream? stream, string filename, bool readOnly, bool create, string tablename, NeedPassword? needPassword) : base(readOnly) {
+    private Database(Stream? stream, string filename, bool readOnly, string freezedReason, bool create, string tablename, NeedPassword? needPassword) : base(readOnly, freezedReason) {
         //Develop.StartService();
 
         _tablename = MakeValidTableName(tablename);
@@ -93,14 +93,14 @@ public sealed class Database : DatabaseAbstract {
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, string freezedReason, NeedPassword? needPassword) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
 
         if (!FileExists(ci.AdditionalData)) { return null; }
 
-        return new Database(ci, readOnly, needPassword);
+        return new Database(ci, readOnly, freezedReason, needPassword);
     }
 
     public static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {
@@ -302,7 +302,7 @@ public sealed class Database : DatabaseAbstract {
                     }
                     if (row == null || row.IsDisposed) {
                         Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
-                        db.SetReadOnly();
+                        db.Freeze("Zeile hinzufügen Fehler");
                         return;
                     }
                     row.IsInCache = DateTime.UtcNow;
@@ -337,7 +337,7 @@ public sealed class Database : DatabaseAbstract {
                     }
                     if (column == null || column.IsDisposed) {
                         Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
-                        db.SetReadOnly();
+                        db.Freeze("Spalte hinzufügen Fehler");
                         return;
                     }
                     column.IsInCache = DateTime.UtcNow;
@@ -353,7 +353,7 @@ public sealed class Database : DatabaseAbstract {
 
                     if (needPassword != null) { pwd = needPassword(); }
                     if (pwd != value) {
-                        db.SetReadOnly();
+                        db.Freeze("Passwort falsch");
                         break;
                     }
                 }
@@ -365,7 +365,7 @@ public sealed class Database : DatabaseAbstract {
                 if (type == DatabaseDataType.EOF) { break; }
 
                 if (!string.IsNullOrEmpty(fehler)) {
-                    db.SetReadOnly();
+                    db.Freeze("Datenbank-Ladefehler");
                     Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + db.TableName + "<br>Meldung: " + fehler);
                 }
             }
@@ -396,7 +396,7 @@ public sealed class Database : DatabaseAbstract {
         //    db.FirstColumn = Col
         //}
 
-        if (IntParse(db.LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))) { db.SetReadOnly(); }
+        if (IntParse(db.LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))) { db.Freeze("Datenbankversions-Konflikt"); }
     }
 
     public static void SaveToByteList(ColumnItem c, ref List<byte> l) {
@@ -698,6 +698,7 @@ public sealed class Database : DatabaseAbstract {
         //fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
         if (!createWhenNotExisting && !CanWriteInDirectory(fileNameToLoad.FilePath())) { SetReadOnly(); }
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
+
         if (!FileExists(fileNameToLoad)) {
             if (createWhenNotExisting) {
                 if (ReadOnly) {
@@ -707,7 +708,7 @@ public sealed class Database : DatabaseAbstract {
                 SaveAsAndChangeTo(fileNameToLoad);
             } else {
                 Develop.DebugPrint(FehlerArt.Warnung, "Datei existiert nicht: " + fileNameToLoad);  // Readonly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
-                SetReadOnly();
+                Freeze("Datei existiert nicht");
                 return;
             }
         }

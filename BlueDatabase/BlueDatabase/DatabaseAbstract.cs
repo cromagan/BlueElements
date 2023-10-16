@@ -42,6 +42,7 @@ using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using Timer = System.Threading.Timer;
 using static BlueBasics.Constants;
+using Microsoft.Win32;
 
 namespace BlueDatabase;
 
@@ -88,7 +89,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private string _createDate = string.Empty;
 
     private string _creator = string.Empty;
-    private string _eventScriptErrorMessage;
+    private string _eventScriptErrorMessage = string.Empty;
     private string _eventScriptTmp = string.Empty;
 
     //private string _timeCode = string.Empty;
@@ -96,6 +97,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     private double _globalScale;
     private string _globalShowPass = string.Empty;
+    private bool _readOnly = false;
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -113,10 +115,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     #region Constructors
 
-    protected DatabaseAbstract(bool readOnly) {
+    protected DatabaseAbstract(bool readOnly, string freezedReason) {
         Develop.StartService();
 
-        ReadOnly = readOnly;
+        _readOnly = readOnly;
+        FreezedReason = freezedReason;
 
         Cell = new CellCollection(this);
 
@@ -132,6 +135,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Datenbank finden können.
         // Zusätzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
         AllFiles.Add(this);
+        FreezedReason = freezedReason;
     }
 
     #endregion
@@ -273,6 +277,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
+    /// <summary>
+    /// Der FreezedReason kann niemals wieder rückgänig gemacht werden.
+    /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehten
+    /// </summary>
+    public string FreezedReason { get; private set; }
+
     public double GlobalScale {
         get => _globalScale;
         set {
@@ -321,7 +331,15 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public DateTime PowerEdit { get; set; }
-    public bool ReadOnly { get; private set; }
+
+    /// <summary>
+    /// Prüft auch den FreezedReason
+    /// </summary>
+    public bool ReadOnly {
+        get => _readOnly || !string.IsNullOrEmpty(FreezedReason);
+        private set => _readOnly = value;
+    }
+
     public RowCollection Row { get; }
 
     public RowSortDefinition? SortDefinition {
@@ -449,16 +467,16 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
-    public static bool CriticalState() {
-        foreach (var thisDb in AllFiles) {
-            if (!thisDb.IsDisposed) {
-                if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
-                if (thisDb.IsInCache == null) { return true; } // Irgend eine Datenbank wird aktuell geladen
-            }
-        }
+    //public static bool CriticalState() {
+    //    foreach (var thisDb in AllFiles) {
+    //        if (!thisDb.IsDisposed) {
+    //            if (!thisDb.LogUndox) { return true; } // Irgend ein heikler Prozess
+    //            if (thisDb.IsInCache == null) { return true; } // Irgend eine Datenbank wird aktuell geladen
+    //        }
+    //    }
 
-        return false;
-    }
+    //    return false;
+    //}
 
     public static string EditableErrorReason(DatabaseAbstract? database, EditableErrorReasonType mode) {
         if (database == null) { return "Keine Datenbank zum bearbeiten."; }
@@ -477,7 +495,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public static DatabaseAbstract? GetById(ConnectionInfo? ci, bool readOnly, NeedPassword? needPassword) {
+    public static DatabaseAbstract? GetById(ConnectionInfo? ci, bool readOnly, string freezedReason, NeedPassword? needPassword) {
         if (ci is null) { return null; }
 
         #region Schauen, ob die Datenbank bereits geladen ist
@@ -501,7 +519,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         #region Schauen, ob der Provider sie herstellen kann
 
         if (ci.Provider != null) {
-            var db = ci.Provider.GetOtherTable(ci.TableName);
+            var db = ci.Provider.GetOtherTable(ci.TableName, readOnly, freezedReason);
             if (db != null) { return db; }
         }
 
@@ -513,10 +531,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         foreach (var thist in DatabaseTypes) {
             if (thist.Name.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) {
-                var l = new object?[3];
+                var l = new object?[4];
                 l[0] = ci;
                 l[1] = readOnly;
-                l[2] = needPassword;
+                l[2] = freezedReason;
+                l[3] = needPassword;
                 var v = thist.GetMethod("CanProvide")?.Invoke(null, l);
 
                 if (v is DatabaseAbstract db) { return db; }
@@ -529,7 +548,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         if (FileExists(ci.AdditionalData)) {
             if (ci.AdditionalData.FileSuffix().ToLower() is "mdb" or "bdb") {
-                return new Database(ci.AdditionalData, readOnly, false, needPassword);
+                return new Database(ci.AdditionalData, readOnly, freezedReason, false, needPassword);
             }
         }
 
@@ -539,7 +558,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
                 var h = thisSql.HandleMe(ci);
                 if (h != null) {
-                    return new DatabaseSqlLite(h, readOnly, ci.TableName);
+                    return new DatabaseSqlLite(h, readOnly, freezedReason, ci.TableName);
                 }
             }
         }
@@ -636,9 +655,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 if (FileExists(pf)) {
                     var ci = new ConnectionInfo(pf, Database.DatabaseId);
 
-                    var tmp = GetById(ci, false, null);
+                    var tmp = GetById(ci, false, string.Empty, null);
                     if (tmp != null) { return tmp; }
-                    tmp = new Database(pf, false, false, null);
+                    tmp = new Database(pf, false, string.Empty, false, null);
                     return tmp;
                 }
             } while (pf != string.Empty);
@@ -736,6 +755,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
 
     public bool AmITemporaryMaster() {
+        if (ReadOnly) { return false; }
         if (TemporaryDatabaseMasterUser != UserName) { return false; }
 
         var d = DateTimeParse(TemporaryDatabaseMasterTimeUTC);
@@ -922,6 +942,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public virtual string EditableErrorReason(EditableErrorReasonType mode) {
         if (IsDisposed) { return "Datenbank verworfen."; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
 
         if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
 
@@ -958,6 +979,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public ScriptEndedFeedback ExecuteScript(DatabaseScriptDescription s, bool changevalues, RowItem? row, List<string>? attributes) {
         if (IsDisposed) { return new ScriptEndedFeedback("Datenbank verworfen", false, false, s.KeyName); }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return new ScriptEndedFeedback("Datenbank eingefroren: " + FreezedReason, false, false, s.KeyName); }
 
         var sce = CheckScriptError();
         if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, "Allgemein"); }
@@ -1287,6 +1309,17 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return null;
     }
 
+    /// <summary>
+    /// Friert die Datenbank komplett ein, nur noch Ansicht möglich.
+    /// Setzt auch ReadOnly
+    /// </summary>
+    /// <param name="reason"></param>
+    public void Freeze(string reason) {
+        SetReadOnly();
+        if (string.IsNullOrEmpty(reason)) { reason = "Eingefrohren"; }
+        FreezedReason = reason;
+    }
+
     public List<string> GetAllLayouts() {
         List<string> path = new();
         var r = new List<string>();
@@ -1319,7 +1352,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return string.Empty;
     }
 
-    public DatabaseAbstract? GetOtherTable(string tablename) {
+    public DatabaseAbstract? GetOtherTable(string tablename, bool readOnly, string freezedReason) {
         if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Ungültiger Tabellenname: " + tablename);
             return null;
@@ -1330,7 +1363,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
 
-        return GetById(x, false, null);// new DatabaseSQL(_sql, readOnly, tablename);
+        return GetById(x, readOnly, freezedReason, null);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
     public abstract void GetUndoCache();
@@ -1584,6 +1617,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public bool IsRowScriptPossible(bool checkMessageTo) {
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return false; }
         if (checkMessageTo && !string.IsNullOrEmpty(_eventScriptErrorMessage)) { return false; }
         return true;
     }
@@ -1864,7 +1898,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
                 default:
                     if (LoadedVersion == DatabaseVersion) {
-                        SetReadOnly();
+                        Freeze("Ladefehler der Datenbank");
                         if (!ReadOnly) {
                             Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData.ToString());
                         }
@@ -2034,7 +2068,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             default:
                 // Variable type
                 if (LoadedVersion == DatabaseVersion) {
-                    SetReadOnly();
+                    Freeze("Ladefehler der Datenbank");
                     if (!ReadOnly) {
                         Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData.ToString());
                     }
@@ -2152,6 +2186,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     private void Checker_Tick(object state) {
         if (IsDisposed) { return; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
 
         if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 6) { return; }
         if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return; }

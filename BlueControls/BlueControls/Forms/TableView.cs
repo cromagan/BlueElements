@@ -833,7 +833,7 @@ public partial class TableView : FormWithStatusBar {
             _ = DeleteFile(SaveTab.FileName, true);
         }
 
-        var db = new Database(false, SaveTab.FileName.FileNameWithoutSuffix());
+        var db = new Database(false, string.Empty, SaveTab.FileName.FileNameWithoutSuffix());
         db.SaveAsAndChangeTo(SaveTab.FileName);
         _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID));
     }
@@ -1298,7 +1298,7 @@ public partial class TableView : FormWithStatusBar {
 
         #endregion
 
-        var db = DatabaseAbstract.GetById(ci, false, Table.Database_NeedPassword);
+        var db = DatabaseAbstract.GetById(ci, false, string.Empty, Table.Database_NeedPassword);
 
         if (db is Database bdb) {
             if (!string.IsNullOrEmpty(bdb.Filename)) {
