@@ -1936,7 +1936,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public void Statisik(ICollection<FilterItem>? filter, List<RowItem>? pinnedRows) {
+    public void Statisik(ICollection<FilterItem>? filter, List<RowItem>? pinnedRows, bool ignoreMultiLine) {
         if (Database == null || Database.IsDisposed) { return; }
         var r = Database.Row.CalculateVisibleRows(filter, pinnedRows);
 
@@ -1944,12 +1944,23 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         var d = new Dictionary<string, int>();
 
+        var values = new List<string>();
+
         foreach (var thisRow in r) {
-            var keyValue = thisRow.CellGetString(this);
-            if (string.IsNullOrEmpty(keyValue)) { keyValue = "[empty]"; }
+            if (ignoreMultiLine) {
+                var keyValue = thisRow.CellGetString(this);
+                if (string.IsNullOrEmpty(keyValue)) { values.Add("[empty]"); } else {
+                    values.Add(keyValue.Replace("\r", ";"));
+                }
+            } else {
+                var keyValue = thisRow.CellGetList(this);
+                if (keyValue.Count == 0) { values.Add("[empty]"); } else {
+                    values.AddRange(keyValue);
+                }
+            }
+        }
 
-            keyValue = keyValue.Replace("\r", ";");
-
+        foreach (var keyValue in values) {
             var count = 0;
             if (d.ContainsKey(keyValue)) {
                 _ = d.TryGetValue(keyValue, out count);
@@ -1962,9 +1973,15 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         var l = new List<string> {
             "Statisik der vorkommenden Werte der Spalte: " + ReadableText(),
             " - nur aktuell angezeigte Zeilen",
-            " - Zelleninhalte werden als ganzes behandelt",
-            " "
         };
+
+        if (ignoreMultiLine) {
+            l.Add(" - Zelleninhalte werden als ganzes behandelt");
+        } else {
+            l.Add(" - Zelleninhalte werden gesplittet");
+        }
+
+        l.Add(" ");
 
         do {
             var maxCount = 0;

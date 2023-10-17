@@ -618,11 +618,14 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "Statistik":
-                if (!tbl.Database.IsAdministrator()) {
-                    return;
+                if (!tbl.Database.IsAdministrator() || column == null) { return; }
+
+                var split = false;
+                if (column.MultiLine) {
+                    split = MessageBox.Show("Zeilen als ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
                 }
 
-                column?.Statisik(Table.Filter, Table.PinnedRows);
+                column.Statisik(Table.Filter, Table.PinnedRows, !split);
                 break;
 
             case "VorherigenInhaltWiederherstellen":
