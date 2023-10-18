@@ -122,6 +122,7 @@
     <Compile Include="Interfaces\IErrorCheckable.cs" />
     <Compile Include="Interfaces\IDisposableExtended.cs" />
     <Compile Include="Interfaces\IInputFormat.cs" />
+    <Compile Include="Interfaces\IReadableTextWithKey.cs" />
     <Compile Include="Interfaces\IReadableTextWithChangingAndKey.cs" />
     <Compile Include="Interfaces\IStringable.cs" />
     <Compile Include="Interfaces\IReadableText.cs" />

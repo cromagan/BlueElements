@@ -787,7 +787,7 @@ public partial class TableView : FormWithStatusBar {
         MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
 
-        _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.KeyName, PreveredDatabaseID));
+        _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.KeyName, PreveredDatabaseID, string.Empty));
     }
 
     private void btnLoeschen_Click(object sender, System.EventArgs e) {
@@ -838,7 +838,7 @@ public partial class TableView : FormWithStatusBar {
 
         var db = new Database(false, string.Empty, SaveTab.FileName.FileNameWithoutSuffix());
         db.SaveAsAndChangeTo(SaveTab.FileName);
-        _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID));
+        _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID, string.Empty));
     }
 
     private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) =>
@@ -860,21 +860,18 @@ public partial class TableView : FormWithStatusBar {
         DatabaseAbstract.ForceSaveAll();
 
         if (Table.Database is Database db) {
+            if (db.ReadOnly) { return; }
             _ = SaveTab.ShowDialog();
-            if (!DirectoryExists(SaveTab.FileName.FilePath())) {
-                return;
-            }
+            if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
 
-            if (string.IsNullOrEmpty(SaveTab.FileName)) {
-                return;
-            }
+            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
             if (FileExists(SaveTab.FileName)) {
                 _ = DeleteFile(SaveTab.FileName, true);
             }
 
             db.SaveAsAndChangeTo(SaveTab.FileName);
-            _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID));
+            _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID, string.Empty));
         }
     }
 
@@ -1146,7 +1143,7 @@ public partial class TableView : FormWithStatusBar {
     private void LoadTab_FileOk(object sender, CancelEventArgs e) {
         if (!FileExists(LoadTab.FileName)) { return; }
 
-        _ = SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName, PreveredDatabaseID));
+        _ = SwitchTabToDatabase(new ConnectionInfo(LoadTab.FileName, PreveredDatabaseID, string.Empty));
     }
 
     private void lstAufgaben_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -1301,7 +1298,7 @@ public partial class TableView : FormWithStatusBar {
 
         #endregion
 
-        var db = DatabaseAbstract.GetById(ci, false, string.Empty, Table.Database_NeedPassword);
+        var db = DatabaseAbstract.GetById(ci, false, Table.Database_NeedPassword);
 
         if (db is Database bdb) {
             if (!string.IsNullOrEmpty(bdb.Filename)) {

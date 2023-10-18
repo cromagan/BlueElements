@@ -10,8 +10,8 @@ internal static class CommonDialogs {
 
     #region Methods
 
-    public static DatabaseAbstract? ChooseKnownDatabase(string caption) {
-        var l = DatabaseAbstract.AllAvailableTables();
+    public static DatabaseAbstract? ChooseKnownDatabase(string caption, string mustbefreezed) {
+        var l = DatabaseAbstract.AllAvailableTables(mustbefreezed);
 
         var l2 = new ItemCollectionList.ItemCollectionList(true);
 
@@ -23,7 +23,7 @@ internal static class CommonDialogs {
 
         if (x == null || x.Count != 1) { return null; }
 
-        return DatabaseAbstract.GetById(new ConnectionInfo(x[0], null), false, string.Empty, Table.Database_NeedPassword);
+        return DatabaseAbstract.GetById(new ConnectionInfo(x[0], null, mustbefreezed), false, Table.Database_NeedPassword);
     }
 
     #endregion

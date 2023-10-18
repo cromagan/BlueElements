@@ -25,16 +25,19 @@ public class ReadableListItem : TextListItem {
 
     #region Constructors
 
-    public ReadableListItem(IReadableTextWithChangingAndKey item, bool isCaption, bool enabled, string userDefCompareKey) : base(item.ReadableText(), item.KeyName, item.SymbolForReadableText(), isCaption, enabled, userDefCompareKey) {
+    public ReadableListItem(IReadableTextWithKey item, bool isCaption, bool enabled, string userDefCompareKey) : base(item.ReadableText(), item.KeyName, item.SymbolForReadableText(), isCaption, enabled, userDefCompareKey) {
         Item = item;
-        Item.Changed += Item_Changed;
+
+        if (item is IChangedFeedback it2) {
+            it2.Changed += Item_Changed;
+        }
     }
 
     #endregion
 
     #region Properties
 
-    public IReadableTextWithChangingAndKey Item { get; }
+    public IReadableTextWithKey Item { get; }
 
     #endregion
 

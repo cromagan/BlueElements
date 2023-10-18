@@ -42,7 +42,6 @@ using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using Timer = System.Threading.Timer;
 using static BlueBasics.Constants;
-using Microsoft.Win32;
 
 namespace BlueDatabase;
 
@@ -425,7 +424,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     #region Methods
 
-    public static List<ConnectionInfo> AllAvailableTables() {
+    public static List<ConnectionInfo> AllAvailableTables(string mustBeFreezed) {
         if (DateTime.UtcNow.Subtract(_lastTableCheck).TotalMinutes < 1) {
             return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
@@ -439,7 +438,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         alf.AddRange(AllFiles);
 
         foreach (var thisDb in alf) {
-            var possibletables = thisDb.AllAvailableTables(allreadychecked);
+            var possibletables = thisDb.AllAvailableTables(allreadychecked, mustBeFreezed);
 
             allreadychecked.Add(thisDb);
 
@@ -495,7 +494,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public static DatabaseAbstract? GetById(ConnectionInfo? ci, bool readOnly, string freezedReason, NeedPassword? needPassword) {
+    public static DatabaseAbstract? GetById(ConnectionInfo? ci, bool readOnly, NeedPassword? needPassword) {
         if (ci is null) { return null; }
 
         #region Schauen, ob die Datenbank bereits geladen ist
@@ -519,7 +518,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         #region Schauen, ob der Provider sie herstellen kann
 
         if (ci.Provider != null) {
-            var db = ci.Provider.GetOtherTable(ci.TableName, readOnly, freezedReason);
+            var db = ci.Provider.GetOtherTable(ci.TableName, readOnly, ci.MustBeFreezed);
             if (db != null) { return db; }
         }
 
@@ -531,11 +530,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         foreach (var thist in DatabaseTypes) {
             if (thist.Name.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) {
-                var l = new object?[4];
+                var l = new object?[3];
                 l[0] = ci;
                 l[1] = readOnly;
-                l[2] = freezedReason;
-                l[3] = needPassword;
+                l[2] = needPassword;
                 var v = thist.GetMethod("CanProvide")?.Invoke(null, l);
 
                 if (v is DatabaseAbstract db) { return db; }
@@ -548,7 +546,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         if (FileExists(ci.AdditionalData)) {
             if (ci.AdditionalData.FileSuffix().ToLower() is "mdb" or "bdb") {
-                return new Database(ci.AdditionalData, readOnly, freezedReason, false, needPassword);
+                return new Database(ci.AdditionalData, readOnly, ci.MustBeFreezed, false, needPassword);
             }
         }
 
@@ -558,7 +556,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
                 var h = thisSql.HandleMe(ci);
                 if (h != null) {
-                    return new DatabaseSqlLite(h, readOnly, freezedReason, ci.TableName);
+                    return new DatabaseSqlLite(h, readOnly, ci.MustBeFreezed, ci.TableName);
                 }
             }
         }
@@ -653,9 +651,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                         break;
                 }
                 if (FileExists(pf)) {
-                    var ci = new ConnectionInfo(pf, Database.DatabaseId);
+                    var ci = new ConnectionInfo(pf, Database.DatabaseId, string.Empty);
 
-                    var tmp = GetById(ci, false, string.Empty, null);
+                    var tmp = GetById(ci, false, null);
                     if (tmp != null) { return tmp; }
                     tmp = new Database(pf, false, string.Empty, false, null);
                     return tmp;
@@ -680,18 +678,18 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return tmp;
     }
 
-    public static ConnectionInfo? ProviderOf(string tablename) {
-        var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
-        alf.AddRange(AllFiles);
+    //public static ConnectionInfo? ProviderOf(string tablename) {
+    //    var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
+    //    alf.AddRange(AllFiles);
 
-        foreach (var thisDb in alf) {
-            if (thisDb.ConnectionDataOfOtherTable(tablename, true) is ConnectionInfo ci) {
-                return ci;
-            }
-        }
+    //    foreach (var thisDb in alf) {
+    //        if (thisDb.ConnectionDataOfOtherTable(tablename, true) is ConnectionInfo ci) {
+    //            return ci;
+    //        }
+    //    }
 
-        return null;
-    }
+    //    return null;
+    //}
 
     public static string UndoText(ColumnItem? column, RowItem? row) {
         if (column?.Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
@@ -752,7 +750,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return string.Empty;
     }
 
-    public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked);
+    public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, string mustBeFreezed);
 
     public bool AmITemporaryMaster() {
         if (ReadOnly) { return false; }
@@ -780,6 +778,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// <param name="datetimeutc"></param>
     public string ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string comment, string user, DateTime datetimeutc) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
 
         var f = SetValueInternal(comand, changedTo, column, row, Reason.SetComand, user, datetimeutc);
 
@@ -903,7 +902,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         //UndoCount = sourceDatabase.UndoCount;
     }
 
-    public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists);
+    public abstract ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists, string mustBeeFreezed);
 
     /// <summary>
     /// AdditionalFiles/Datenbankpfad mit Backup und abschließenden \
@@ -1358,12 +1357,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             return null;
         }
 
-        var x = ConnectionDataOfOtherTable(tablename, true);
+        var x = ConnectionDataOfOtherTable(tablename, true, freezedReason);
         if (x == null) { return null; }
 
         x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
 
-        return GetById(x, readOnly, freezedReason, null);// new DatabaseSQL(_sql, readOnly, tablename);
+        return GetById(x, readOnly, null);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
     public abstract void GetUndoCache();
@@ -1845,6 +1844,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return string.Empty; }
 
         LastChange = DateTime.UtcNow;

@@ -17,4 +17,4 @@
 
 namespace BlueBasics.Interfaces;
 
-public interface IReadableTextWithChangingAndKey : IReadableTextWithKey, IReadableTextWithChanging, IHasKeyName { }
+public interface IReadableTextWithKey : IReadableText, IHasKeyName { }

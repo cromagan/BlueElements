@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -29,7 +28,7 @@ namespace BlueDatabase;
 /// <summary>
 /// Informationen über eine Datenbank oder wie diese erzeugt werden kann.
 /// </summary>
-public class ConnectionInfo : IReadableTextWithChangingAndKey {
+public class ConnectionInfo : IReadableTextWithKey {
 
     #region Fields
 
@@ -46,7 +45,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
     /// </summary>
     /// <param name="uniqueId"></param>
     /// <param name="preveredFileFormatId"></param>
-    public ConnectionInfo(string uniqueId, string? preveredFileFormatId) {
+    public ConnectionInfo(string uniqueId, string? preveredFileFormatId, string mustbefreezed) {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(AllFiles);
 
@@ -70,6 +69,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
             Provider = null;
             DatabaseID = preveredFileFormatId ?? Database.DatabaseId;
             AdditionalData = uniqueId;
+            MustBeFreezed = mustbefreezed;
 
             return;
         }
@@ -95,7 +95,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
         foreach (var thisDb in alf) {
             //var d = thisDB.ConnectionData;
 
-            if (thisDb.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
+            if (thisDb.ConnectionDataOfOtherTable(x[0], true, mustbefreezed) is ConnectionInfo nci) {
                 TableName = nci.TableName;
                 Provider = nci.Provider;
                 DatabaseID = nci.DatabaseID;
@@ -107,20 +107,17 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
         #endregion
     }
 
-    public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string? additionalInfo) {
+    public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string additionalInfo, string mustbefreezed) {
         TableName = tablename.ToUpper();
         Provider = provider;
         DatabaseID = connectionString;
-        AdditionalData = additionalInfo ?? string.Empty;
+        AdditionalData = additionalInfo;
+        MustBeFreezed = mustbefreezed;
     }
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? Changed;
-
-    #endregion
+    //public event EventHandler? Changed;
 
     #region Properties
 
@@ -133,7 +130,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
         set {
             if (_additionalData == value) { return; }
             _additionalData = value;
-            OnChanged();
+            //OnChanged();
         }
     }
 
@@ -145,6 +142,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
     public string DatabaseID { get; } = string.Empty;
 
     public string KeyName => UniqueID;
+    public string MustBeFreezed { get; } = string.Empty;
 
     /// <summary>
     /// Welche bereits vorhandene Datenbank den in dieser Klasse aufgezeigten Tabellenamen erzeugen kann
@@ -154,7 +152,7 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
         set {
             if (_provider == value) { return; }
             _provider = value;
-            OnChanged();
+            //OnChanged();
         }
     }
 
@@ -179,9 +177,9 @@ public class ConnectionInfo : IReadableTextWithChangingAndKey {
 
     #endregion
 
-    #region Methods
+    //public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    #region Methods
 
     public string ReadableText() => TableName;
 

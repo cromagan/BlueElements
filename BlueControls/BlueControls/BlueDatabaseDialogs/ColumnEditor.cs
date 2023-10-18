@@ -674,7 +674,7 @@ internal sealed partial class ColumnEditor {
         if (_column?.Database == null || _column.Database.IsDisposed) { return; }
 
         if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedDatabase.Item.Count == 0) {
-            var l = DatabaseAbstract.AllAvailableTables();
+            var l = DatabaseAbstract.AllAvailableTables(_column.Database.FreezedReason);
 
             foreach (var thisString in l) {
                 if (!string.Equals(thisString.UniqueID, _column.Database.ConnectionData.UniqueID, StringComparison.OrdinalIgnoreCase)) { _ = cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueID); }

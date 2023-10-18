@@ -62,7 +62,7 @@ public static class ItemSendSomethingExtension {
     #region Methods
 
     public static void Datenbank_wählen(this IItemSendSomething item) {
-        var db = CommonDialogs.ChooseKnownDatabase("Ausgangs-Datenbank wählen:");
+        var db = CommonDialogs.ChooseKnownDatabase("Ausgangs-Datenbank wählen:", string.Empty);
         if (db == null) { return; }
         item.OutputDatabase = db;
 
@@ -193,7 +193,7 @@ public class ItemSendSomething {
                     na = na.FilePath() + MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
-                _outputDatabase = GetById(new ConnectionInfo(na, null), false, string.Empty, null);
+                _outputDatabase = GetById(new ConnectionInfo(na, null, string.Empty), false, null);
                 return true;
 
             case "senttochildids":

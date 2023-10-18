@@ -638,9 +638,15 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (row == null || row.IsDisposed) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + Database.ConnectionData.TableName);
+            Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + Database.ConnectionData.TableName);
             return;
         }
+
+        if (!string.IsNullOrEmpty(Database.FreezedReason)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank eingefroren!<br>" + Database.ConnectionData.TableName);
+            return;
+        }
+
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
             lrow?.CellSet(lcolumn, value);

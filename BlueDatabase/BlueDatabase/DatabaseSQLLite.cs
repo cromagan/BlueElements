@@ -60,7 +60,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Constructors
 
-    public DatabaseSqlLite(ConnectionInfo ci, bool readOnly, string freezedReason) : this(((DatabaseSqlLite?)ci.Provider)?._sql, readOnly, freezedReason, ci.TableName) { }
+    public DatabaseSqlLite(ConnectionInfo ci, bool readOnly) : this(((DatabaseSqlLite?)ci.Provider)?._sql, readOnly, ci.MustBeFreezed, ci.TableName) { }
 
     public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnly, string freezedReason, string tablename) : base(readOnly, freezedReason) {
         if (sql == null) {
@@ -91,9 +91,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     public override ConnectionInfo ConnectionData {
         get {
             if (_sql == null) {
-                return new(TableName, null, string.Empty, string.Empty);
+                return new(TableName, null, string.Empty, string.Empty, FreezedReason);
             }
-            var connectionData = _sql.ConnectionData(TableName);
+            var connectionData = _sql.ConnectionData(TableName, FreezedReason);
             connectionData.Provider = this;
             return connectionData;
         }
@@ -108,7 +108,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, string freezedReason, NeedPassword? needPassword) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         var sql = ((DatabaseSqlLite?)ci.Provider)?._sql;
@@ -116,7 +116,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         var at = sql.Tables();
         if (at == null || !at.Contains(ci.TableName)) { return null; }
-        return new DatabaseSqlLite(ci, readOnly, freezedReason);
+        return new DatabaseSqlLite(ci, readOnly);
     }
 
     public static void CheckSysUndoNow() {
@@ -155,7 +155,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         _isInTimer = false;
     }
 
-    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, string mustBeFreezed) {
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
                 if (thisa is DatabaseSqlLite db) {
@@ -173,7 +173,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
 
         foreach (var thistb in tb) {
-            var t = ConnectionDataOfOtherTable(thistb, false);
+            var t = ConnectionDataOfOtherTable(thistb, false, mustBeFreezed);
             if (t != null) { l.Add(t); }
         }
 
@@ -183,9 +183,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     //        return false;
     //    }
     //}
-    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists, string mustBeeFreezed) {
         if (checkExists) {
-            var t = AllAvailableTables(null);
+            var t = AllAvailableTables(null, mustBeeFreezed);
 
             if (t != null) {
                 foreach (var thisT in t) {
@@ -198,7 +198,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             return null;
         }
 
-        var connectionData = _sql?.ConnectionData(tableName);
+        var connectionData = _sql?.ConnectionData(tableName, mustBeeFreezed);
         if (connectionData != null) {
             connectionData.Provider = this;
             return connectionData;

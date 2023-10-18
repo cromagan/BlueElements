@@ -49,7 +49,7 @@ public sealed class Database : DatabaseAbstract {
 
     #region Constructors
 
-    public Database(ConnectionInfo ci, bool readOnly, string freezedReason, NeedPassword? needPassword) : this(ci.AdditionalData, readOnly, freezedReason, false, needPassword) { }
+    public Database(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.AdditionalData, readOnly, ci.MustBeFreezed, false, needPassword) { }
 
     public Database(Stream stream, string tablename) : this(stream, string.Empty, true, "Stream-Datenbank", false, tablename, null) { }
 
@@ -83,7 +83,7 @@ public sealed class Database : DatabaseAbstract {
     #region Properties
 
     public static string DatabaseId => nameof(Database);
-    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename);
+    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
     public string Filename { get; private set; } = string.Empty;
     public override string TableName => _tablename;
 
@@ -93,14 +93,14 @@ public sealed class Database : DatabaseAbstract {
 
     #region Methods
 
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, string freezedReason, NeedPassword? needPassword) {
+    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
         if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
 
         if (!FileExists(ci.AdditionalData)) { return null; }
 
-        return new Database(ci, readOnly, freezedReason, needPassword);
+        return new Database(ci, readOnly, needPassword);
     }
 
     public static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {
@@ -597,7 +597,7 @@ public sealed class Database : DatabaseAbstract {
         return string.Empty;
     }
 
-    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked) {
+    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, string mustBeFreezed) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
 
         if (allreadychecked != null) {
@@ -617,20 +617,20 @@ public sealed class Database : DatabaseAbstract {
         var nn = Directory.GetFiles(Filename.FilePath(), "*.bdb", SearchOption.AllDirectories);
         var gb = new List<ConnectionInfo>();
         foreach (var thisn in nn) {
-            var t = ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false);
+            var t = ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false, mustBeFreezed);
             if (t != null) { gb.Add(t); }
         }
         return gb;
     }
 
-    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists, string mustBeeFreezed) {
         if (string.IsNullOrEmpty(Filename)) { return null; }
 
         var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".bdb";
 
         if (checkExists && !File.Exists(f)) { return null; }
 
-        return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f);
+        return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
     }
 
     public override string EditableErrorReason(EditableErrorReasonType mode) {

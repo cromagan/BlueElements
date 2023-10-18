@@ -236,7 +236,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
     /// Fügt das übergebende Object den Tags hinzu.
     /// </summary>
     /// <param name="readableObject"></param>
-    public TextListItem Add(IReadableTextWithChangingAndKey readableObject) {
+    public TextListItem Add(IReadableTextWithKey readableObject) {
         var i = new ReadableListItem(readableObject, false, true, string.Empty);
         Add(i);
         return i;

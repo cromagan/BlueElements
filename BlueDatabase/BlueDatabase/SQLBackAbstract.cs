@@ -220,7 +220,7 @@ public abstract class SqlBackAbstract {
     /// </summary>
     /// <param name="tablename"></param>
     /// <returns></returns>
-    public ConnectionInfo ConnectionData(string tablename) => new(tablename, null, ConnectionString, string.Empty);
+    public ConnectionInfo ConnectionData(string tablename, string mustBeFreezed) => new(tablename, null, ConnectionString, string.Empty, mustBeFreezed);
 
     public string ExecuteCommand(string commandtext, bool abort) {
         if (Connection == null || !OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
