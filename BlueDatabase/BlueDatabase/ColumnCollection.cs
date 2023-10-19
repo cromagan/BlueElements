@@ -416,6 +416,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public void Repair() {
         GetSystems();
 
+        if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut)) || Database == null) { return; }
+
+
         //for (var s1 = 0; s1 < Count; s1++) {
         //    if (this[s1] != null) {
         //        for (var s2 = s1 + 1; s2 < Count; s2++) {
@@ -459,6 +462,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //        }
         //    }
         //} while (true);
+
 
         foreach (var thisColumn in this) {
             thisColumn.Repair();

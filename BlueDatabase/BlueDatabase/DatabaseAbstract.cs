@@ -941,9 +941,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public virtual string EditableErrorReason(EditableErrorReasonType mode) {
         if (IsDisposed) { return "Datenbank verworfen."; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
 
         if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
+
+        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
 
         if (ReadOnly && mode.HasFlag(EditableErrorReasonType.Save)) { return "Datenbank schreibgeschützt!"; }
 
@@ -1315,7 +1316,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// <param name="reason"></param>
     public void Freeze(string reason) {
         SetReadOnly();
-        if (string.IsNullOrEmpty(reason)) { reason = "Eingefrohren"; }
+        if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
         FreezedReason = reason;
     }
 
@@ -1747,6 +1748,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public (bool didreload, string errormessage) RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem> { row }, refreshAlways);
 
     public virtual void RepairAfterParse() {
+        if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditAcut))) { return; }
+
         Column.Repair();
         RepairColumnArrangements();
         //RepairViews();
@@ -1806,6 +1809,17 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         ProgressbarInfo?.Invoke(this, e);
     }
 
+    internal void RefreshCellData(ColumnItem column, RowItem row, Reason reason) {
+        if (reason == Reason.LoadReload) { return; }
+
+        if (column.IsInCache != null) { return; }
+
+        var (_, errormessage) = RefreshRowData(row, false);
+        if (!string.IsNullOrEmpty(errormessage)) {
+            OnDropMessage(FehlerArt.Fehler, errormessage);
+        }
+    }
+
     //internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventArgs e) {
     //    if (IsDisposed) { return; }
     //    GenerateLayoutInternal?.Invoke(this, e);
@@ -1831,7 +1845,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     /// <summary>
     /// Diese Routine setzt Werte auf den richtigen Speicherplatz und führt Comands aus.
-    /// Echtzeitbasierte Syteme sollten diese Routine verwenden, um den Wert ebenfalls fest zu verankern (sofern !IsLoading && !Readonly)
+    /// Echtzeitbasierte Systeme sollten diese Routine verwenden, um den Wert ebenfalls fest zu verankern (sofern !IsLoading && !Readonly)
     /// Nur von Laderoutinen aufzurufen, oder von ChangeData, wenn der Wert bereits fest in der Datenbank verankert ist.
     /// Vorsicht beim Überschreiben:
     /// Da in Columns und Cells abgesprungen wird, und diese nicht überschrieben werden können,
@@ -1844,7 +1858,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
+        if (reason != Reason.LoadReload && !string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return string.Empty; }
 
         LastChange = DateTime.UtcNow;

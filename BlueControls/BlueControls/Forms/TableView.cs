@@ -582,7 +582,8 @@ public partial class TableView : FormWithStatusBar {
             case "ContentDelete":
                 if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditCurrently)) { return; }
 
-                tbl.Database.Cell.Delete(column, row?.KeyName);
+                row?.CellSet(column, string.Empty);
+                //tbl.Database.Cell.Delete(column, row?.KeyName);
                 break;
 
             case "SpaltenEigenschaftenBearbeiten":
@@ -1330,8 +1331,8 @@ public partial class TableView : FormWithStatusBar {
     private void UpdateScripts(DatabaseAbstract? db) {
         lstAufgaben.Item.Clear();
 
-        if (db == null || db.IsDisposed) {
-            lstAufgaben.Enabled = false;
+        if (db == null || db.IsDisposed || !string.IsNullOrEmpty(db.FreezedReason)) {
+            lstAufgaben.Enabled = false;    
             return;
         }
 

@@ -2238,6 +2238,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (Database == null || Database.IsDisposed) { return "Die Datenbank wurde verworfen."; }
         if (IsDisposed) { return "Die Spalte wurde verworfen."; }
 
+        var f = Database.EditableErrorReason(mode);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+
         if (mode == EditableErrorReasonType.OnlyRead) { return string.Empty; }
 
         //if (!SaveContent) { return "Der Spalteninhalt wird nicht gespeichert."; }
@@ -2625,7 +2629,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (e.Column.KeyName != LinkedCell_ColumnNameOfLinkedDatabase) { return; }
 
         foreach (var thisRow in Database.Row) {
-            if (Database.Cell.GetStringBehindLinkedValue(this, thisRow) == e.Row.KeyName) {
+            if (Database.Cell.GetStringCore(this, thisRow) == e.Row.KeyName) {
                 //CellCollection.Invalidate_CellContentSize(this, thisRow);
                 Invalidate_ContentWidth();
                 Database.Cell.OnCellValueChanged(new CellChangedEventArgs(this, thisRow, e.Reason));
@@ -2702,8 +2706,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (_linkedDatabase == null) {
             var ci = new ConnectionInfo(_linkedDatabaseFile, null, Database.FreezedReason);
 
-            var sr = string.Empty;
-            if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
+            //var sr = string.Empty;
+            //if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
 
             _linkedDatabase = GetById(ci, false, null);
             if (_linkedDatabase != null) {

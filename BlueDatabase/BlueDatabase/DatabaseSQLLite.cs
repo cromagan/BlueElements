@@ -296,7 +296,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
 
         //Row.DoLinkedDatabase(rows);
-
+        //Develop.CheckStackForOverflow();
         OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) der Datenbank '" + TableName + "' nach.");
 
         if (_sql == null) { return (false, "SQL Verbindung fehlerhaft"); }
@@ -351,9 +351,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
-        if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 
         if (reason != Reason.LoadReload) {
+            if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
             _ = _sql?.SetValueInternal(this, type, value, column, row, user, datetimeutc);
         }
 

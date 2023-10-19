@@ -823,7 +823,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             OnRowRemoving(new RowReasonEventArgs(row, reason));
             foreach (var thisColumnItem in db.Column) {
                 if (thisColumnItem != null) {
-                    db.Cell.Delete(thisColumnItem, row.KeyName);
+                    row.CellSet(thisColumnItem, string.Empty);
+                    //db.Cell.Delete(thisColumnItem, row.KeyName);
                 }
             }
 

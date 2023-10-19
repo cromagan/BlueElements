@@ -817,10 +817,10 @@ public sealed class Database : DatabaseAbstract {
     }
 
     internal static void SaveToByteList(List<byte> list, ColumnItem column, RowItem row) {
-        //if (!column.SaveContent) { return; }
+        if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        var cellContent = column.Database?.Cell.GetStringBehindLinkedValue(column, row);
-        if (cellContent == null || string.IsNullOrEmpty(cellContent)) { return; }
+        var cellContent = db.Cell.GetStringCore(column, row);
+        if (string.IsNullOrEmpty(cellContent)) { return; }
 
         list.Add((byte)Routinen.CellFormatUTF8_V402);
 

@@ -312,6 +312,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (LastCheckedEventArgs != null) { return; }
 
+        //_ = Database.RefreshRowData(this, false);
+
+        //if (IsInCache == null) { Develop.DebugPrint(FehlerArt.Fehler, "Refresh-Fehler"); }
+
         var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, false, false, true, 0);
 
         LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
@@ -354,7 +358,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (nameAndKeyToo) { KeyName = source.KeyName; }
 
         foreach (var thisColumn in Database.Column) {
-            var value = sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source);
+            var value = sdb.Cell.GetStringCore(sdb.Column[thisColumn.KeyName], source);
 
             _ = Database.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, string.Empty, Generic.UserName, DateTime.UtcNow);
 
