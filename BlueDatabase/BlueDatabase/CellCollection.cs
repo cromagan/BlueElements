@@ -618,6 +618,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank ungültig"; }
 
         db.RefreshCellData(column, row, reason);
+
         var cellKey = KeyOfCell(column, row);
 
         if (ContainsKey(cellKey)) {
@@ -894,6 +895,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         ColumnItem? targetColumn = null;
         var cr = false;
 
+        var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false);
+
+        if (!string.IsNullOrEmpty(editableError)) { return Ergebnis(editableError); }
+
         if (column?.Database == null || column.Database.IsDisposed) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
 
         if (row == null || row.IsDisposed) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
@@ -934,7 +939,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 return (targetColumn, targetRow, fehler, cr);
             }
 
-            if (column != null && row != null) { column.Database?.Cell.SetValueCore(column, row, string.Empty, UserName, DateTime.UtcNow, false); }
+            if (string.IsNullOrEmpty(editableError) && column != null && row != null) { column.Database?.Cell.SetValueCore(column, row, string.Empty, UserName, DateTime.UtcNow, false); }
             return (targetColumn, targetRow, fehler, cr);
         }
 

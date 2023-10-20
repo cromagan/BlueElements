@@ -48,7 +48,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
 
     /// <summary>
-    /// Nicht static, weil verschiedene Datenbankverbindngen möglich sind.
+    /// Nicht static, weil verschiedene Datenbankverbindungen möglich sind.
     /// </summary>
     private readonly SqlBackAbstract? _sql;
 
@@ -77,7 +77,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
 
         Initialize();
-        LoadFromSqlBack();
+        LoadFromSqlBack(_preselection);
 
         TryToSetMeTemporaryMaster();
     }
@@ -231,7 +231,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         _undoLoaded = true;
     }
 
-    public override void RefreshColumnsData(List<ColumnItem> columns) {
+    public override void RefreshColumnsData(List<ColumnItem?> columns) {
         if (columns.Count == 0) { return; }
 
         if (_sql == null) {
@@ -263,7 +263,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         OnDropMessage(FehlerArt.Info, "Lade " + columns.Count + " Spalte(n) der Datenbank '" + TableName + "' nach.");
 
         try {
-            _sql.LoadColumns(TableName, columns);
+            _sql.LoadColumns(TableName, Row, columns, false, _preselection);
         } catch {
             Develop.CheckStackForOverflow();
             RefreshColumnsData(columns);
@@ -314,29 +314,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     public override bool Save() => _sql != null;
 
     public List<string> SQLLog() => Log;
-
-    internal void GetColumnAttributesColumn(ColumnItem column, SqlBackAbstract sql) {
-        var l = sql.GetStyleDataAll(TableName.FileNameWithoutSuffix(), column.KeyName);
-
-        if (l == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
-            return;
-        }
-
-        if (l.Count > 0) {
-            foreach (var thisstyle in l) {
-                _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
-                if (!t.IsObsolete()) {
-                    _ = column.SetValueInternal(t, thisstyle.Value, Reason.LoadReload);
-                }
-            }
-        }
-
-        var mcl = sql.ColumnLenght(TableName.FileNameWithoutSuffix(), column.KeyName);
-        column.MaxCellLenght = mcl;
-
-        //_ = column.SetValueInternal(DatabaseDataType.MaxCellLenght, mcl.ToString(), false);
-    }
 
     internal override bool IsNewRowPossible() => Column.SysCorrect != null;
 
@@ -548,7 +525,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         _ = _timer.Change(10000, 10000);
     }
 
-    private void LoadFromSqlBack() {
+    private void LoadFromSqlBack(List<FilterItem>? preselection) {
         OnLoading();
         //Develop.DebugPrint(FehlerArt.DevelopInfo, "Loading++");
 
@@ -589,9 +566,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                         }
                     }
 
-                    if (_sql != null) {
-                        GetColumnAttributesColumn(column, _sql);
-                    }
+                    //if (_sql != null) {
+                    //    GetColumnAttributesColumn(column, _sql);
+                    //}
                 }
             }
 
@@ -601,33 +578,23 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             #endregion
 
-            #region Datenbank Eigenschaften laden
+            //#region Datenbank Eigenschaften laden
+            _sql?.GetStyleDataAll(this);
 
-            var l = _sql?.GetStyleDataAll(TableName, DatabaseProperty);
+            //#endregion
 
-            if (l == null) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler");
-                return;
-            }
+            #region Alle ZEILENKEYS laden
 
-            if (l.Count > 0) {
-                foreach (var thisstyle in l) {
-                    _ = Enum.TryParse(thisstyle.Key, out DatabaseDataType t);
-                    if (!t.IsObsolete()) {
-                        _ = SetValueInternal(t, thisstyle.Value, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow);
-                    }
-                }
-            }
-
-            #endregion
-
-            #region  Alle ZEILENKEYS laden
-
-            _sql?.LoadAllRowKeys(TableName, Row);
+            var cl = new List<ColumnItem?>()
+                        {Column.First(),
+                         Column.SysChapter,
+                         Column.SysLocked,
+                         Column.SysCorrect};
 
             foreach (var thisColumn in Column) {
                 thisColumn.IsInCache = null;
             }
+            _sql?.LoadColumns(TableName, Row, cl, true, preselection);
 
             #endregion
 
@@ -635,7 +602,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             Cell.RemoveOrphans();
         } catch {
-            LoadFromSqlBack();
+            LoadFromSqlBack(preselection);
             return;
         }
 

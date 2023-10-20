@@ -61,6 +61,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// </summary>
     public readonly List<UndoItem> Undo;
 
+    protected List<FilterItem>? _preselection = null;
     private static DateTime _lastTableCheck = new(1900, 1, 1);
 
     private readonly List<ColumnViewCollection> _columnArrangements = new();
@@ -1704,10 +1705,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public void RefreshColumnsData(ColumnItem column) {
         if (column.IsInCache != null) { return; }
-        RefreshColumnsData(new List<ColumnItem> { column });
+        RefreshColumnsData(new List<ColumnItem?> { column });
     }
 
-    public abstract void RefreshColumnsData(List<ColumnItem> columns);
+    public abstract void RefreshColumnsData(List<ColumnItem?> columns);
 
     public void RefreshColumnsData(IEnumerable<FilterItem>? filter) {
         if (filter != null) {

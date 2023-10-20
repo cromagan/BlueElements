@@ -320,16 +320,10 @@ public abstract class SqlBackAbstract {
     /// <param name="tablename"></param>
     /// <param name="columnName"></param>
     /// <returns></returns>
-    public Dictionary<string, string> GetStyleDataAll(string tablename, string columnName) {
-        if (!IsValidTableName(tablename, true)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
-            throw new Exception();
-        }
-
+    public void GetStyleDataAll(DatabaseAbstract db) {
         var l = new Dictionary<string, string>();
-        var commandText = @"select TYPE, PART, VALUE from " + SysStyle + " " +
-                         "where TABLENAME = " + Dbval(tablename.ToUpper()) + " " +
-                         "and COLUMNNAME = " + Dbval(columnName.ToUpper()) + " " +
+        var commandText = @"select TYPE, PART, COLUMNNAME, VALUE from " + SysStyle + " " +
+                         "where TABLENAME = " + Dbval(db.TableName.ToUpper()) + " " +
                          "ORDER BY PART ASC";
 
         var dt = Fill_Table(commandText);
@@ -337,33 +331,38 @@ public abstract class SqlBackAbstract {
         foreach (var thisRow in dt.Rows) {
             var reader = (DataRow)thisRow;
             var key = reader[0].ToString();
-            var value = reader[2].ToString();
+            var part = reader[1].ToString();
+            var column = reader[2].ToString();
+            var value = reader[3].ToString();
 
-            if (reader[1].ToString() != "001") {
-                l[key] += value;
+            var cc = key + "|" + column;
+
+            if (part != "001") {
+                l[cc] += value;
             } else {
-                l.Add(key, value);
+                l.Add(cc, value);
             }
         }
 
-        return l;
-    }
+        if (l.Count > 0) {
+            foreach (var thisstyle in l) {
+                var k = thisstyle.Key.Split('|');
+                _ = Enum.TryParse(k[0], out DatabaseDataType t);
 
-    public void LoadAllRowKeys(string tablename, RowCollection row) {
-        if (!IsValidTableName(tablename, true)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
-            throw new Exception();
-        }
+                if (!t.IsObsolete()) {
+                    string? ok;
+                    if (k[1].Equals(DatabaseProperty, StringComparison.OrdinalIgnoreCase)) {
+                        ok = db.SetValueInternal(t, thisstyle.Value, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow);
+                    } else {
+                        var column = db.Column[k[1]];
+                        ok = column?.SetValueInternal(t, thisstyle.Value, Reason.LoadReload);
+                    }
 
-        var com = "SELECT ROWID ";
-        com = com + " FROM " + tablename.ToUpper();
-
-        var dt = Fill_Table(com);
-        _ = row.Clear("Row Keys werden neu geladen");
-
-        foreach (var thisRow in dt.Rows) {
-            var rk = ((DataRow)thisRow)[0].ToString();
-            _ = row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, Reason.LoadReload);
+                    if (!string.IsNullOrEmpty(ok)) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Ladefehler: " + ok);
+                    }
+                }
+            }
         }
     }
 
@@ -845,15 +844,20 @@ public abstract class SqlBackAbstract {
     //        return GetLastColumnName(tablename, key);
     //    }
     //}
-    internal void LoadColumns(string tablename, List<ColumnItem>? columns) {
+    internal void LoadColumns(string tablename, RowCollection rows, List<ColumnItem?> columns, bool addmissingRows, List<FilterItem>? preselection) {
         if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
             throw new Exception();
         }
 
-        if (columns == null || columns.Count == 0) { return; }
+        if (rows.Database is not DatabaseAbstract db || db.IsDisposed) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!");
+            throw new Exception();
+        }
 
-        #region tatsächlich benötite Spalten ermitteln (columnsToLoad)
+        if (columns.Count == 0 && !addmissingRows) { return; }
+
+        #region tatsächlich benötigte Spalten ermitteln (columnsToLoad)
 
         var columnsToLoad = new List<ColumnItem>();
 
@@ -863,15 +867,13 @@ public abstract class SqlBackAbstract {
             }
         }
 
-        if (columnsToLoad.Count == 0) { return; }
+        if (columnsToLoad.Count == 0 && !addmissingRows) { return; }
 
         #endregion
 
-        var db = columnsToLoad[0].Database;
-        if (db == null || db.IsDisposed) { return; }
+        #region Command erstellen
 
         var wh = string.Empty;
-
         var com = "SELECT ROWID, ";
 
         foreach (var thiscolumn in columnsToLoad) {
@@ -880,7 +882,12 @@ public abstract class SqlBackAbstract {
         }
         com = com.TrimEnd(", ");
         com = com + " FROM " + tablename.ToUpper();
-        com = com + " WHERE (" + wh.TrimEnd(" OR ") + ")";
+
+        if (!addmissingRows) {
+            com = com + " WHERE (" + wh.TrimEnd(" OR ") + ")";
+        }
+
+        #endregion
 
         var dt = Fill_Table(com);
 
@@ -890,11 +897,11 @@ public abstract class SqlBackAbstract {
             #region Zeile ermitteln, in die der Wert geschrieben werden soll
 
             var rk = reader[0].ToString();
-            var row = db.Row.SearchByKey(rk);
+            var row = rows.SearchByKey(rk);
 
-            if (row == null || row.IsDisposed) {
-                _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, Reason.LoadReload);
-                row = db.Row.SearchByKey(rk);
+            if ((row == null || row.IsDisposed) && addmissingRows) {
+                _ = rows.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, Reason.LoadReload);
+                row = rows.SearchByKey(rk);
             }
 
             #endregion
