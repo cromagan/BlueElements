@@ -482,7 +482,7 @@ public partial class TableView : FormWithStatusBar {
         if (e.HotItem is ColumnItem c) { column = c; }
         if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out row); }
 
-        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false));
+        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true));
 
         if (_ansicht != Ansicht.Überschriften_und_Formular) {
             _ = e.UserMenu.Add("Info", true);
@@ -1299,7 +1299,7 @@ public partial class TableView : FormWithStatusBar {
 
         #endregion
 
-        var db = DatabaseAbstract.GetById(ci, false, Table.Database_NeedPassword);
+        var db = DatabaseAbstract.GetById(ci, false, Table.Database_NeedPassword, true);
 
         if (db is Database bdb) {
             if (!string.IsNullOrEmpty(bdb.Filename)) {
@@ -1332,7 +1332,7 @@ public partial class TableView : FormWithStatusBar {
         lstAufgaben.Item.Clear();
 
         if (db == null || db.IsDisposed || !string.IsNullOrEmpty(db.FreezedReason)) {
-            lstAufgaben.Enabled = false;    
+            lstAufgaben.Enabled = false;
             return;
         }
 

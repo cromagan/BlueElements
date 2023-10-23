@@ -174,7 +174,7 @@ public partial class VariableEditor : UserControl {
 
         x.SortDefinition = new RowSortDefinition(x, "Name", true);
 
-        if (!Editabe) { x.Freeze("Nur Ansicht"); }
+        //if (!Editabe) { x.Freeze("Nur Ansicht"); }
 
         tableVariablen.DatabaseSet(x, string.Empty);
         tableVariablen.Arrangement = 1;

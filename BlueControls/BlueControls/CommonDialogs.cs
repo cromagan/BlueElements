@@ -23,7 +23,7 @@ internal static class CommonDialogs {
 
         if (x == null || x.Count != 1) { return null; }
 
-        return DatabaseAbstract.GetById(new ConnectionInfo(x[0], null, mustbefreezed), false, Table.Database_NeedPassword);
+        return DatabaseAbstract.GetById(new ConnectionInfo(x[0], null, mustbefreezed), false, Table.Database_NeedPassword, true);
     }
 
     #endregion

@@ -282,7 +282,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         x.ColumnArrangements = new(car);
 
         x.SortDefinition = new RowSortDefinition(x, "Index", true);
-        x.Freeze("Nur Ansicht");
+
 
         tblUndo.DatabaseSet(x, string.Empty);
         tblUndo.Arrangement = 1;
@@ -301,6 +301,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         }
 
         tblUndo.SortDefinitionTemporary = new RowSortDefinition(x, "Aenderzeit", true);
+
+        x.Freeze("Nur Ansicht");
     }
 
     private void GlobalTab_Selecting(object sender, TabControlCancelEventArgs e) {

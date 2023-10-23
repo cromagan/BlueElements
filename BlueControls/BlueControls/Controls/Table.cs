@@ -975,7 +975,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public string EditableErrorReason(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool maychangeview) {
-        var f = CellCollection.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode);
+        var f = CellCollection.EditableErrorReason(cellInThisDatabaseColumn, cellInThisDatabaseRow?.Row, mode, checkUserRights, checkEditmode, true);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         if (checkEditmode) {
@@ -1958,7 +1958,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (contentHolderCellRow != null) {
             if (newValue == contentHolderCellRow.CellGetString(contentHolderCellColumn)) { return; }
 
-            var f = CellCollection.EditableErrorReason(contentHolderCellColumn, contentHolderCellRow, EditableErrorReasonType.EditCurrently, true, false);
+            var f = CellCollection.EditableErrorReason(contentHolderCellColumn, contentHolderCellRow, EditableErrorReasonType.EditCurrently, true, false, true);
             if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
             contentHolderCellRow.CellSet(contentHolderCellColumn, newValue);
 
@@ -3255,14 +3255,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private int Row_DrawHeight(RowItem? vrow, Rectangle displayRectangleWoSlider) {
-        if (Database == null || Database.IsDisposed || vrow == null) { return _pix18; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed || vrow == null) { return _pix18; }
 
-        if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, Database?.Column.First(), vrow, (Font)_cellFont, _pix16).Height; }
+        if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, db.Column.First(), vrow, (Font)_cellFont, _pix16).Height; }
         var tmp = _pix18;
         if (CurrentArrangement == null) { return tmp; }
 
         foreach (var thisViewItem in CurrentArrangement) {
-            if (thisViewItem?.Column != null && !vrow.CellIsNullOrEmpty(thisViewItem.Column)) {
+            if (db.Cell.IsInCache(thisViewItem?.Column, vrow) && !vrow.CellIsNullOrEmpty(thisViewItem.Column)) {
                 tmp = Math.Max(tmp, Cell_ContentSize(this, thisViewItem.Column, vrow, (Font)_cellFont, _pix16).Height);
             }
         }

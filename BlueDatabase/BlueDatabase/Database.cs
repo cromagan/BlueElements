@@ -450,7 +450,7 @@ public sealed class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.ColumnTags, c.Tags.JoinWithCr(), name);
         SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.Suffix, c.Suffix, name);
-        SaveToByteList(l, DatabaseDataType.LinkedDatabase, c.LinkedDatabaseFile, name);
+        SaveToByteList(l, DatabaseDataType.LinkedDatabase, c.LinkedDatabaseTableName, name);
         SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, c.ConstantHeightOfImageCode, name);
         SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)c.BehaviorOfImageAndText).ToString(), name);
         SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString(), name);

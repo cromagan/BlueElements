@@ -103,7 +103,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// </summary>
     private DatabaseAbstract? _linkedDatabase;
 
-    private string _linkedDatabaseFile;
+    private string _linkedDatabaseTableName;
     private int _maxCellLenght;
     private int _maxTextLenght;
     private bool _multiLine;
@@ -202,7 +202,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         _showMultiLineInOneLine = false;
         _editAllowedDespiteLock = false;
         _suffix = string.Empty;
-        _linkedDatabaseFile = string.Empty;
+        _linkedDatabaseTableName = string.Empty;
         _behaviorOfImageAndText = BildTextVerhalten.Nur_Text;
         _constantHeightOfImageCode = string.Empty;
         _prefix = string.Empty;
@@ -734,7 +734,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         get {
             if (Database == null || Database.IsDisposed) { return null; }
 
-            if (string.IsNullOrEmpty(_linkedDatabaseFile)) { return null; }
+            if (string.IsNullOrEmpty(_linkedDatabaseTableName)) { return null; }
 
             if (_linkedDatabase != null && !_linkedDatabase.IsDisposed) {
                 return _linkedDatabase;
@@ -745,13 +745,13 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public string LinkedDatabaseFile {
-        get => _linkedDatabaseFile;
+    public string LinkedDatabaseTableName {
+        get => _linkedDatabaseTableName;
         set {
             if (IsDisposed) { return; }
-            if (_linkedDatabaseFile == value) { return; }
+            if (_linkedDatabaseTableName == value) { return; }
 
-            _ = Database?.ChangeData(DatabaseDataType.LinkedDatabase, this, null, _linkedDatabaseFile, value, string.Empty, Generic.UserName, DateTime.UtcNow);
+            _ = Database?.ChangeData(DatabaseDataType.LinkedDatabase, this, null, _linkedDatabaseTableName, value, string.Empty, Generic.UserName, DateTime.UtcNow);
             Invalidate_LinkedDatabase();
             OnChanged();
         }
@@ -1108,7 +1108,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (m <= 0) { return 8; }
         if (m == 1) { return 1; }
         var erg = Math.Max((int)(m * prozentZuschlag) + 1, _maxTextLenght);
-        return Math.Min(erg, 4000);
+        return Math.Min(erg, 3999);
     }
 
     public int CalculatePreveredMaxTextLenght(double prozentZuschlag) {
@@ -1222,7 +1222,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         CaptionGroup2 = source.CaptionGroup2;
         CaptionGroup3 = source.CaptionGroup3;
         //LinkedKeyKennung = source.LinkedKeyKennung;
-        LinkedDatabaseFile = source.LinkedDatabaseFile;
+        LinkedDatabaseTableName = source.LinkedDatabaseTableName;
         BehaviorOfImageAndText = source.BehaviorOfImageAndText;
         ConstantHeightOfImageCode = source.ConstantHeightOfImageCode;
         //BestFile_StandardSuffix = source.BestFile_StandardSuffix;
@@ -2241,7 +2241,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         var f = Database.EditableErrorReason(mode);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-
         if (mode == EditableErrorReasonType.OnlyRead) { return string.Empty; }
 
         //if (!SaveContent) { return "Der Spalteninhalt wird nicht gespeichert."; }
@@ -2526,7 +2525,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 break;
 
             case DatabaseDataType.LinkedDatabase:
-                _linkedDatabaseFile = newvalue;
+                _linkedDatabaseTableName = newvalue;
                 Invalidate_LinkedDatabase();
                 break;
 
@@ -2692,24 +2691,24 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (Database == null || Database.IsDisposed) { return; }
 
-        if (!_linkedDatabaseFile.Contains("|") && !_linkedDatabaseFile.IsFormat(FormatHolder.FilepathAndName)) {
-            _linkedDatabaseFile = _linkedDatabaseFile.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB");
-            _linkedDatabaseFile = MakeValidTableName(_linkedDatabaseFile);
+        if (!_linkedDatabaseTableName.Contains("|") && !_linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
+            _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB");
+            _linkedDatabaseTableName = MakeValidTableName(_linkedDatabaseTableName);
         }
 
-        if (IsValidTableName(_linkedDatabaseFile, false)) {
+        if (IsValidTableName(_linkedDatabaseTableName, false)) {
             var sr = string.Empty;
             if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
-            _linkedDatabase = Database.GetOtherTable(_linkedDatabaseFile, false, sr);
+            _linkedDatabase = Database.GetOtherTable(_linkedDatabaseTableName, false, sr);
         }
 
         if (_linkedDatabase == null) {
-            var ci = new ConnectionInfo(_linkedDatabaseFile, null, Database.FreezedReason);
+            var ci = new ConnectionInfo(_linkedDatabaseTableName, null, Database.FreezedReason);
 
             //var sr = string.Empty;
             //if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
 
-            _linkedDatabase = GetById(ci, false, null);
+            _linkedDatabase = GetById(ci, false, null, true);
             if (_linkedDatabase != null) {
                 _linkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
                 _linkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;

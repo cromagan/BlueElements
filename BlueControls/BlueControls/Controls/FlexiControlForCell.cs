@@ -215,7 +215,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
             DisabledReason = "Kein Bezug zu einer Zelle.";
             return;
         }
-        DisabledReason = CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false); // Rechteverwaltung einfliesen lassen.
+        DisabledReason = CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true); // Rechteverwaltung einfliesen lassen.
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {

@@ -467,16 +467,16 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
-    //public static bool CriticalState() {
-    //    foreach (var thisDb in AllFiles) {
-    //        if (!thisDb.IsDisposed) {
-    //            if (!thisDb.LogUndox) { return true; } // Irgend ein heikler Prozess
-    //            if (thisDb.IsInCache == null) { return true; } // Irgend eine Datenbank wird aktuell geladen
-    //        }
-    //    }
+    public static bool CriticalState() {
+        foreach (var thisDb in AllFiles) {
+            if (!thisDb.IsDisposed) {
+                if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
+                if (thisDb.IsInCache == null) { return true; } // Irgend eine Datenbank wird aktuell geladen
+            }
+        }
 
-    //    return false;
-    //}
+        return false;
+    }
 
     public static string EditableErrorReason(DatabaseAbstract? database, EditableErrorReasonType mode) {
         if (database == null) { return "Keine Datenbank zum bearbeiten."; }
@@ -495,7 +495,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public static DatabaseAbstract? GetById(ConnectionInfo? ci, bool readOnly, NeedPassword? needPassword) {
+    public static DatabaseAbstract? GetById(ConnectionInfo? ci, bool readOnly, NeedPassword? needPassword, bool checktablename) {
         if (ci is null) { return null; }
 
         #region Schauen, ob die Datenbank bereits geladen ist
@@ -505,6 +505,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             if (string.Equals(d.UniqueID, ci.UniqueID, StringComparison.OrdinalIgnoreCase)) {
                 return thisFile;
+            }
+
+            if (checktablename) {
+                if (string.Equals(d.TableName, ci.TableName, StringComparison.OrdinalIgnoreCase)) {
+                    return thisFile;
+                }
             }
 
             if (d.AdditionalData.ToLower().EndsWith(".mdb") || d.AdditionalData.ToLower().EndsWith(".bdb")) {
@@ -654,7 +660,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 if (FileExists(pf)) {
                     var ci = new ConnectionInfo(pf, Database.DatabaseId, string.Empty);
 
-                    var tmp = GetById(ci, false, null);
+                    var tmp = GetById(ci, false, null, true);
                     if (tmp != null) { return tmp; }
                     tmp = new Database(pf, false, string.Empty, false, null);
                     return tmp;
@@ -1364,7 +1370,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         x.Provider = null;  // KEINE Vorage mitgeben, weil sonst eine Endlosschleife aufgerufen wird!
 
-        return GetById(x, readOnly, null);// new DatabaseSQL(_sql, readOnly, tablename);
+        return GetById(x, readOnly, null, true);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
     public abstract void GetUndoCache();
@@ -1657,6 +1663,22 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public void Optimize() {
         foreach (var thisColumn in Column) {
             thisColumn.Optimize();
+
+            var x = thisColumn.Contents();
+            if (x.Count == 0) {
+                Column.Remove(thisColumn, "Automatische Optimierung");
+                Optimize();
+                return;
+            }
+        }
+
+        Column.GetSystems();
+
+        if (Column.SysChapter is ColumnItem c) {
+            var x = c.Contents();
+            if (x.Count < 2) {
+                Column.Remove(c, "Automatische Optimierung");
+            }
         }
     }
 

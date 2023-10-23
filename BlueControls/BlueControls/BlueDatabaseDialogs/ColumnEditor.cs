@@ -252,7 +252,7 @@ internal sealed partial class ColumnEditor {
     private void cbxLinkedDatabase_TextChanged(object? sender, System.EventArgs e) {
         if (_column == null || _column.IsDisposed) { return; }
 
-        _column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
+        _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text;
 
         cbxTargetColumn.Item.Clear();
 
@@ -395,7 +395,7 @@ internal sealed partial class ColumnEditor {
         cbxBildTextVerhalten.Text = ((int)_column.BehaviorOfImageAndText).ToString();
         //txbBestFileStandardFolder.Text = _column.BestFile_StandardFolder;
         //txbBestFileStandardSuffix.Text = _column.BestFile_StandardSuffix;
-        cbxLinkedDatabase.Text = _column.LinkedDatabaseFile;
+        cbxLinkedDatabase.Text = _column.LinkedDatabaseTableName;
         //txbLinkedKeyKennung.Text = _column.LinkedKeyKennung;
 
         txbAutoRemove.Text = _column.AutoRemove;
@@ -513,7 +513,7 @@ internal sealed partial class ColumnEditor {
         _column.BehaviorOfImageAndText = (BildTextVerhalten)imNf;
         //_column.BestFile_StandardFolder = txbBestFileStandardFolder.Text;
         //_column.BestFile_StandardSuffix = txbBestFileStandardSuffix.Text;
-        _column.LinkedDatabaseFile = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
+        _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
         //_column.KeyColumnKey = ColumKeyFrom(_column.Database, cbxSchlüsselspalte.Text);
         _column.LinkedCell_ColumnNameOfLinkedDatabase = cbxTargetColumn.Text; // LINKED DATABASE
         //_column.VorschlagsColumn = ColumKeyFrom(_column.Database, cbxVorschlagSpalte.Text);
@@ -532,7 +532,7 @@ internal sealed partial class ColumnEditor {
     private void GeneratFilterListe() {
         if (_column?.Database == null || _column.Database.IsDisposed) { return; }
 
-        _column.LinkedDatabaseFile = cbxLinkedDatabase.Text;
+        _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text;
 
         var linkdb = _column.LinkedDatabase;
 

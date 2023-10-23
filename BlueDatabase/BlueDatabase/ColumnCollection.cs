@@ -569,6 +569,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 Database.RepairColumnArrangements();
                 //Database.RepairViews();
             }
+            c.Dispose();
+            GetSystems();
 
             return string.Empty;
         }
