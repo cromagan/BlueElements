@@ -68,7 +68,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             return;
         }
 
-        _sql = sql.OtherTable(tablename);
+        _sql = sql;
+        sql.RepairAll(tablename);
 
         _tablename = MakeValidTableName(tablename);
 
@@ -395,24 +396,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
                     Undo.Add(thisWork);
 
-                    //_ = Enum.TryParse(thisWork.Comand, out DatabaseDataType t);
-
                     if (thisWork.Comand.IsObsolete()) {
                         // Nix tun
-                    }
-                     //else if (t == DatabaseDataType.ColumnName) {
-                     //    #region Sonderbehandlung: ColumnName
-
-                     //    // Sonderbehandlung!
-                     //    var c = Column.SearchByKey(LongParse(columnkey));
-
-                     //    if (c != null && !c.IsDisposed) {
-                     //        var newn = _sql.GetLastColumnName(tablename, c.KeyName);
-                     //        c.Name = newn;
-                     //    }
-
-                     //    #endregion
-                     else if (thisWork.Comand.IsCommand()) {
+                    } else if (thisWork.Comand.IsCommand()) {
 
                         #region Befehle
 
@@ -460,11 +446,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                         var c = Column.Exists(thisWork.ColName);
                         var r = Row.SearchByKey(thisWork.RowKey);
-                        //if (r== null || r.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Zeile nicht gefunden"); }
-                        //if (c == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte nicht gefunden"); }
                         if (r != null && c != null) {
-                            // Kann sein, dass der Bentzer hier ja schon eine Zeile oder so geklscht hat
-                            // hier geklscht, aber anderer PC mat bei der noch vorhanden Zeile eine Änderung
+                            // Kann sein, dass der Benutzer hier ja schon eine Zeile oder so gelöscht hat,
+                            // aber anderer PC hat bei der noch vorhandenen Zeile eine Änderung
                             if (thisWork.DateTimeUtc > r.IsInCache || thisWork.DateTimeUtc > c.IsInCache) {
                                 _ = rk.AddIfNotExists(r.KeyName);
                                 _ = cek.AddIfNotExists(CellCollection.KeyOfCell(c, r));
@@ -582,6 +566,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             _sql?.GetStyleDataAll(this);
 
             //#endregion
+
+            RepairColumnArrangements(Reason.LoadReload);
+
 
             #region Alle ZEILENKEYS laden
 

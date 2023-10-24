@@ -42,6 +42,7 @@ using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using Timer = System.Threading.Timer;
 using static BlueBasics.Constants;
+using System.Windows.Input;
 
 namespace BlueDatabase;
 
@@ -951,6 +952,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
 
+        if (IsInCache == null) { return "Datenbank wird noch geladen"; }
+
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
 
         if (ReadOnly && mode.HasFlag(EditableErrorReasonType.Save)) { return "Datenbank schreibgeschützt!"; }
@@ -1661,14 +1664,20 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public void Optimize() {
+        if (Row.Count < 5) { return; }
+
         foreach (var thisColumn in Column) {
             thisColumn.Optimize();
 
-            var x = thisColumn.Contents();
-            if (x.Count == 0) {
-                Column.Remove(thisColumn, "Automatische Optimierung");
-                Optimize();
-                return;
+            if (thisColumn.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank and
+                                     not DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems and
+                                     not DataFormat.Button) {
+                var x = thisColumn.Contents();
+                if (x.Count == 0) {
+                    Column.Remove(thisColumn, "Automatische Optimierung");
+                    Optimize();
+                    return;
+                }
             }
         }
 
@@ -1771,14 +1780,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public (bool didreload, string errormessage) RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem> { row }, refreshAlways);
 
     public virtual void RepairAfterParse() {
+        IsInCache ??= DateTime.UtcNow;
+
         if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditAcut))) { return; }
 
         Column.Repair();
-        RepairColumnArrangements();
+        RepairColumnArrangements(Reason.SetComand);
         //RepairViews();
         //_layouts.Check();
-
-        IsInCache = DateTime.UtcNow;
     }
 
     public abstract bool Save();
@@ -1847,7 +1856,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     //    if (IsDisposed) { return; }
     //    GenerateLayoutInternal?.Invoke(this, e);
     //}
-    internal void RepairColumnArrangements() {
+    internal void RepairColumnArrangements(Reason reason) {
         //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
 
         var x = _columnArrangements.CloneWithClones();
@@ -1857,7 +1866,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             ColumnViewCollection.Repair(x[z], z);
         }
 
-        ColumnArrangements = x.AsReadOnly();
+        if (reason == Reason.LoadReload) {
+            SetValueInternal(DatabaseDataType.ColumnArrangement, x.ToString(false), null, null, Reason.LoadReload, UserName, DateTime.UtcNow);
+        } else {
+            ColumnArrangements = x.AsReadOnly();
+        }
     }
 
     //internal void RepairViews() {

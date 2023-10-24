@@ -107,7 +107,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei Internen Prozessen angeben.</param>
     /// <param name="checkEditmode">Ob gewünscht wird, das die intern Programmierte Routine geprüft werden soll. Nur in Datenbankansicht empfohlen.</param>
     /// <returns></returns>
-    public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed) {
+    public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked) {
         if (mode == EditableErrorReasonType.OnlyRead) {
             if (column == null || row == null) {
                 return string.Empty;
@@ -122,6 +122,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            if (ignoreLinked) { return string.Empty; }
             //repairallowed = repairallowed && mode is EditableErrorReasonType.EditAcut or EditableErrorReasonType.EditCurrently;
 
             var (lcolumn, lrow, info, canrepair) = LinkedCellData(column, row, repairallowed, mode is EditableErrorReasonType.EditAcut or EditableErrorReasonType.EditCurrently);
@@ -133,7 +134,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             lcolumn.Database.PowerEdit = column.Database.PowerEdit;
 
             if (lrow != null) {
-                var tmp = EditableErrorReason(lcolumn, lrow, mode, checkUserRights, checkEditmode, false);
+                var tmp = EditableErrorReason(lcolumn, lrow, mode, checkUserRights, checkEditmode, false, false);
                 return string.IsNullOrEmpty(tmp)
                     ? string.Empty
                     : "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp;
@@ -793,9 +794,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         string message;
 
         if (isSystem) {
-            message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, string.Empty, user, datetimeutc);
-        } else {
             message = db.ChangeData(DatabaseDataType.SystemValue, column, row, oldValue, value, "SystemSet", user, datetimeutc);
+        } else {
+            message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, string.Empty, user, datetimeutc);
         }
 
         if (!string.IsNullOrEmpty(message)) {
@@ -905,7 +906,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var cr = false;
 
         // Repair nicht mehr erlauben, ergibt rekursieve Schleife, wir sind hier ja schon im repair
-        var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false);
+        var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true);
 
         if (!string.IsNullOrEmpty(editableError)) { return Ergebnis(editableError); }
 

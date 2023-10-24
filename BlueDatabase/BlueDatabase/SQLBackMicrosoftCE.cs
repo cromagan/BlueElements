@@ -184,7 +184,7 @@ public class SQLBackMicrosoftCE : SqlBackAbstract {
         return columns;
     }
 
-    public override SqlBackAbstract OtherTable(string tablename) => new SQLBackMicrosoftCE(this, tablename);
+    //public override SqlBackAbstract OtherTable(string tablename) => new SQLBackMicrosoftCE(this, tablename);
 
     public override string VarChar(int lenght) => "VARCHAR(" + lenght + ")";
 

@@ -482,7 +482,7 @@ public partial class TableView : FormWithStatusBar {
         if (e.HotItem is ColumnItem c) { column = c; }
         if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out row); }
 
-        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true));
+        var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false));
 
         if (_ansicht != Ansicht.Überschriften_und_Formular) {
             _ = e.UserMenu.Add("Info", true);

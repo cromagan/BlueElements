@@ -98,7 +98,7 @@ public sealed class ColumnViewItem : IParseable {
             case "column":
             case "columnname":// ColumnName wichtg, wegen CopyLayout
                 Column = db.Column.Exists(value);
-                Column?.Repair(); // Alte Formate reparieren
+                //Column?.Repair(); // Alte Formate reparieren
                 return true;
 
             case "columnkey":

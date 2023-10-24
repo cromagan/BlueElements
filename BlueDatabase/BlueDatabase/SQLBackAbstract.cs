@@ -53,6 +53,7 @@ public abstract class SqlBackAbstract {
     private readonly object _fill = new();
     private readonly object _getChanges = new();
     private readonly object _openclose = new();
+    private bool _didCritical = false;
 
     #endregion
 
@@ -464,7 +465,7 @@ public abstract class SqlBackAbstract {
         }
     }
 
-    public abstract SqlBackAbstract OtherTable(string tablename);
+    //public abstract SqlBackAbstract OtherTable(string tablename);
 
     public void RenameColumn(string tablename, string oldname, string newname, bool allowSystemTableNames) {
         if (oldname.Equals(newname, StringComparison.OrdinalIgnoreCase)) { return; }
@@ -523,45 +524,49 @@ public abstract class SqlBackAbstract {
 
         #endregion
 
-        #region Style
+        if (!_didCritical) {
+            _didCritical = true;
 
-        if (!x.Contains(SysStyle)) {
-            _ = CreateTable(SysStyle, new List<string> { "TABLENAME", "COLUMNNAME", "TYPE", "PART" }, true);
-            ChangeDataType(SysStyle, "COLUMNNAME", 128, true);
-            ChangeDataType(SysStyle, "TABLENAME", 128, true);
-            ChangeDataType(SysStyle, "PART", 3, true);
+            #region Style
+
+            if (!x.Contains(SysStyle)) {
+                _ = CreateTable(SysStyle, new List<string> { "TABLENAME", "COLUMNNAME", "TYPE", "PART" }, true);
+                ChangeDataType(SysStyle, "COLUMNNAME", 128, true);
+                ChangeDataType(SysStyle, "TABLENAME", 128, true);
+                ChangeDataType(SysStyle, "PART", 3, true);
+            }
+
+            var colStyle = GetColumnNames(SysStyle);
+            if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
+
+            if (!colStyle.Contains("VALUE")) {
+                AddColumn(SysStyle, "VALUE", ColumnTypeVarChar4000, true, true);
+                ChangeDataType(SysStyle, "VALUE", 511, true);
+            }
+
+            #endregion
+
+            #region  Undo
+
+            if (!x.Contains(SysUndo)) { _ = CreateTable(SysUndo, true); }
+
+            var colUndo = GetColumnNames(SysUndo);
+            if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
+            if (!colUndo.Contains("TABLENAME")) { AddColumn(SysUndo, "TABLENAME", ColumnTypeVarChar255, false, true); }
+            if (!colUndo.Contains("COMAND")) { AddColumn(SysUndo, "COMAND", false, true); }
+            //if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", ColumnTypeVarChar15, true, true); }
+            if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", ColumnTypeVarChar18, true, true); }
+            if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SysUndo, "PREVIOUSVALUE", ColumnTypeVarChar4000, true, true); }
+            if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SysUndo, "CHANGEDTO", ColumnTypeVarChar4000, true, true); }
+            if (!colUndo.Contains("USERNAME")) { AddColumn(SysUndo, "USERNAME", false, true); }
+            if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SysUndo, "TIMECODEUTC", ColumnTypeDate, false, true); }
+            if (!colUndo.Contains("CMT")) { AddColumn(SysUndo, "CMT", ColumnTypeVarChar255, true, true); }
+            if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SysUndo, "COLUMNNAME", ColumnTypeVarChar255, true, true); }
+
+            #endregion
+
+            SysUndoAufräumen();
         }
-
-        var colStyle = GetColumnNames(SysStyle);
-        if (colStyle == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-
-        if (!colStyle.Contains("VALUE")) {
-            AddColumn(SysStyle, "VALUE", ColumnTypeVarChar4000, true, true);
-            ChangeDataType(SysStyle, "VALUE", 511, true);
-        }
-
-        #endregion
-
-        #region  Undo
-
-        if (!x.Contains(SysUndo)) { _ = CreateTable(SysUndo, true); }
-
-        var colUndo = GetColumnNames(SysUndo);
-        if (colUndo == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spaltenfehler"); return; }
-        if (!colUndo.Contains("TABLENAME")) { AddColumn(SysUndo, "TABLENAME", ColumnTypeVarChar255, false, true); }
-        if (!colUndo.Contains("COMAND")) { AddColumn(SysUndo, "COMAND", false, true); }
-        //if (!colUndo.Contains("COLUMNKEY")) { AddColumn(SysUndo, "COLUMNKEY", ColumnTypeVarChar15, true, true); }
-        if (!colUndo.Contains("ROWKEY")) { AddColumn(SysUndo, "ROWKEY", ColumnTypeVarChar18, true, true); }
-        if (!colUndo.Contains("PREVIOUSVALUE")) { AddColumn(SysUndo, "PREVIOUSVALUE", ColumnTypeVarChar4000, true, true); }
-        if (!colUndo.Contains("CHANGEDTO")) { AddColumn(SysUndo, "CHANGEDTO", ColumnTypeVarChar4000, true, true); }
-        if (!colUndo.Contains("USERNAME")) { AddColumn(SysUndo, "USERNAME", false, true); }
-        if (!colUndo.Contains("TIMECODEUTC")) { AddColumn(SysUndo, "TIMECODEUTC", ColumnTypeDate, false, true); }
-        if (!colUndo.Contains("CMT")) { AddColumn(SysUndo, "CMT", ColumnTypeVarChar255, true, true); }
-        if (!colUndo.Contains("COLUMNNAME")) { AddColumn(SysUndo, "COLUMNNAME", ColumnTypeVarChar255, true, true); }
-
-        #endregion
-
-        SysUndoAufräumen();
 
         _ = CloseConnection();
     }
@@ -824,12 +829,11 @@ public abstract class SqlBackAbstract {
     internal SqlBackAbstract? HandleMe(ConnectionInfo ci) {
         if (ci is null) { return null; }
 
-        //var s = connectionID.SplitBy("|");
-        //if (s.Count() != 2) { return null; }
-
         foreach (var thisK in ConnectedSqlBack) {
             if (thisK.Connection != null && thisK.ConnectionString == ci.DatabaseID) {
-                return thisK.OtherTable(ci.TableName);
+                return thisK;
+
+                //return thisK.OtherTable(ci.TableName);
             }
         }
 

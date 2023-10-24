@@ -22,6 +22,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -164,7 +165,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (Database == null || Database.IsDisposed) { return null; }
 
         if (Database.ColumnArrangements.Count < 1 || Database.ColumnArrangements[0].Count != Database.Column.Count()) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
+            //Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
             return null;
         }
 
@@ -418,7 +419,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut)) || Database == null) { return; }
 
-
         //for (var s1 = 0; s1 < Count; s1++) {
         //    if (this[s1] != null) {
         //        for (var s2 = s1 + 1; s2 < Count; s2++) {
@@ -463,7 +463,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    }
         //} while (true);
 
-
         foreach (var thisColumn in this) {
             thisColumn.Repair();
         }
@@ -481,7 +480,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         ok = Database.Cell.ChangeColumnName(oldName, newName);
         if (!ok) { return false; }
-        Database?.RepairColumnArrangements();
+        Database?.RepairColumnArrangements(Reason.SetComand);
         //Database?.RepairViews();
         return true;
     }
@@ -550,8 +549,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             _ = Add(c, reason);
 
             if (reason != Reason.LoadReload) {
-                Database.RepairColumnArrangements();
-                //Database.RepairViews();
+                // Wichtig! NICHT bei LoadReload - da werden ja noch weitere Spalten erstellt
+                Database.RepairColumnArrangements(reason);
             }
 
             return string.Empty;
@@ -566,7 +565,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             OnColumnRemoved();
 
             if (reason != Reason.LoadReload) {
-                Database.RepairColumnArrangements();
+                // Wichtig! Nicht bei LoadReload, da werden evtl. noch weitere Spalten modifiziert
+
+                Database.RepairColumnArrangements(reason);
                 //Database.RepairViews();
             }
             c.Dispose();
