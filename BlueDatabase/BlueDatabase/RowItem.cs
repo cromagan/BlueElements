@@ -238,7 +238,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <summary>
     ///
     /// </summary>
-    /// <param name="columnName"></param>
+    /// <param name="column"></param>
     /// <returns>DateTime.MinValue bei Fehlern</returns>
     public DateTime CellGetDateTime(ColumnItem? column) => Database?.Cell.GetDateTime(column, this) ?? DateTime.MinValue;
 
@@ -269,7 +269,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database?.Column.Exists(columnName), this) ?? default;
 
-    public bool CellIsNullOrEmpty(ColumnItem column) => Database?.Cell.IsNullOrEmpty(column, this) ?? default;
+    public bool CellIsNullOrEmpty(ColumnItem? column) => Database?.Cell.IsNullOrEmpty(column, this) ?? default;
 
     public void CellSet(string columnName, bool value) => Database?.Cell.Set(Database?.Column[columnName], this, value);
 

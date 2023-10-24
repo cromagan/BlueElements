@@ -244,9 +244,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         }
 
         var t = "<b>Tabelle:</b> <tab>" + Database.ConnectionData.TableName + "<br>";
-        t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueID + "<br>";
+        t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueId + "<br>";
         t += "<b>Zeilen:</b> <tab>" + (Database.Row.Count() - 1) + "<br>";
-        t += "<b>Temporärer Master:</b>  <tab>" + Database.TemporaryDatabaseMasterTimeUTC + " " + Database.TemporaryDatabaseMasterUser;
+        t += "<b>Temporärer Master:</b>  <tab>" + Database.TemporaryDatabaseMasterTimeUtc + " " + Database.TemporaryDatabaseMasterUser;
         capInfo.Text = t.TrimEnd("<br>");
     }
 
@@ -282,7 +282,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         x.ColumnArrangements = new(car);
 
         x.SortDefinition = new RowSortDefinition(x, "Index", true);
-
 
         tblUndo.DatabaseSet(x, string.Empty);
         tblUndo.Arrangement = 1;

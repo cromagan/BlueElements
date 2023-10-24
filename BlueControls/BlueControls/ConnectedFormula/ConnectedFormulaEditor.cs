@@ -247,18 +247,18 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void CheckButtons() { }
 
-    private void ChooseDatabaseAndId(IItemSendRow? it) {
-        if (CFormula == null || it == null) { return; }
+    //private void ChooseDatabaseAndId(IItemSendRow? it) {
+    //    if (CFormula == null || it == null) { return; }
 
-        it.Datenbank_wählen();
+    //    it.Datenbank_wählen();
 
-        //var db = CommonDialogs.ChooseKnownDatabase();
+    //    //var db = CommonDialogs.ChooseKnownDatabase();
 
-        //if (db == null) { return; }
+    //    //if (db == null) { return; }
 
-        //it.OutputDatabase = db;
-        //it.Id = CFormula.NextId();
-    }
+    //    //it.OutputDatabase = db;
+    //    //it.Id = CFormula.NextId();
+    //}
 
     private void FormulaSet(string? filename, ReadOnlyCollection<string>? notAllowedchilds) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);

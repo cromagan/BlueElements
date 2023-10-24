@@ -131,7 +131,7 @@ public partial class TextGenerator : UserControl {
 
         #region und nun die Datenbank durchforsten und fehlene einträge erzeugen
 
-        var allr = _textDatabase.Row.CalculateSortedRows((List<FilterItem>)null, _textDatabase.SortDefinition, null, null);
+        var allr = _textDatabase.Row.CalculateSortedRows(null as List<FilterItem>, _textDatabase.SortDefinition, null, null);
         var txt = string.Empty;
 
         foreach (var thisRow in allr) {

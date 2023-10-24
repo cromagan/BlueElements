@@ -264,7 +264,7 @@ public static class Generic {
         // Alle Assemblys laden und instanziieren
         foreach (string assemblyFile in assemblyFiles) {
             try {
-                Assembly assembly = Assembly.LoadFrom(assemblyFile);
+                _ = Assembly.LoadFrom(assemblyFile);
                 //Console.WriteLine(assembly.FullName);
             } catch {
                 //Console.WriteLine($"Fehler beim Laden der Assembly: {ex.Message}");

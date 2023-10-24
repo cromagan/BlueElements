@@ -539,7 +539,7 @@ internal sealed partial class ColumnEditor {
         if (linkdb == null || tblFilterliste.Database == null) { tblFilterliste.DatabaseSet(null, string.Empty); }
 
         if (tblFilterliste.Database != null &&
-            tblFilterliste.Database.Tags.TagGet("Filename") != linkdb?.ConnectionData.UniqueID) {
+            tblFilterliste.Database.Tags.TagGet("Filename") != linkdb?.ConnectionData.UniqueId) {
             tblFilterliste.DatabaseSet(null, string.Empty);
         }
 
@@ -594,7 +594,7 @@ internal sealed partial class ColumnEditor {
             tblFilterliste.Arrangement = 1;
 
             var t = db.Tags.Clone();
-            t.TagSet("Filename", linkdb.ConnectionData.UniqueID);
+            t.TagSet("Filename", linkdb.ConnectionData.UniqueId);
             db.Tags = t.AsReadOnly();
 
             tblFilterliste?.Filter?.Add(vis, FilterType.Istgleich, "+");
@@ -677,7 +677,7 @@ internal sealed partial class ColumnEditor {
             var l = DatabaseAbstract.AllAvailableTables(_column.Database.FreezedReason);
 
             foreach (var thisString in l) {
-                if (!string.Equals(thisString.UniqueID, _column.Database.ConnectionData.UniqueID, StringComparison.OrdinalIgnoreCase)) { _ = cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueID); }
+                if (!string.Equals(thisString.UniqueId, _column.Database.ConnectionData.UniqueId, StringComparison.OrdinalIgnoreCase)) { _ = cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueId); }
             }
         }
     }

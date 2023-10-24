@@ -22,7 +22,6 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -316,7 +315,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 da.CellAdd(thisColumnItem.Column.KeyName);
                 da.CellAdd(thisColumnItem.Column.Caption.Replace("\r", "<br>"));
                 da.CellAdd((thisColumnItem.Column.CaptionGroup1 + "/" + thisColumnItem.Column.CaptionGroup2 + "/" + thisColumnItem.Column.CaptionGroup3 + "/").TrimEnd("/"));
-                var name = "{" + thisColumnItem.Column.Format.ToString() + "}";
+                var name = "{" + thisColumnItem.Column.Format + "}";
                 foreach (var thisFormat in FormatHolder.AllFormats) {
                     if (thisFormat.IsFormatIdenticalSoft(thisColumnItem.Column)) { name = thisFormat.Name; }
                 }

@@ -258,9 +258,11 @@ public enum DatabaseDataType : byte {
     TextFormatingAllowed = 199,
 
     Value_withoutSizeData = 200,
-    Value_withSizeData = 201,
+
+    //Value_withSizeData = 201,
     UTF8Value_withoutSizeData = 202,
-    UTF8Value_withSizeData = 203,
+
+    // UTF8Value_withSizeData = 203,
     //Dummy_ce_ValueWithoutSizeUncrypted = 204,
 
     SystemValue = 205,

@@ -32,8 +32,6 @@ public class ConnectionInfo : IReadableTextWithKey {
 
     #region Fields
 
-    private string _additionalData = string.Empty;
-    private DatabaseAbstract? _provider;
     private string _tablename = string.Empty;
 
     #endregion
@@ -45,6 +43,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// </summary>
     /// <param name="uniqueId"></param>
     /// <param name="preveredFileFormatId"></param>
+    /// <param name="mustbefreezed"></param>
     public ConnectionInfo(string uniqueId, string? preveredFileFormatId, string mustbefreezed) {
         var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(AllFiles);
@@ -56,10 +55,10 @@ public class ConnectionInfo : IReadableTextWithKey {
             foreach (var thisDb in alf) {
                 var d = thisDb.ConnectionData;
 
-                if (d.UniqueID.ToUpper().EndsWith(uniqueId.ToUpper())) {
+                if (d.UniqueId.ToUpper().EndsWith(uniqueId.ToUpper())) {
                     TableName = d.TableName;
                     Provider = d.Provider;
-                    DatabaseID = d.DatabaseID;
+                    DatabaseId = d.DatabaseId;
                     AdditionalData = d.AdditionalData;
                     return;
                 }
@@ -67,7 +66,7 @@ public class ConnectionInfo : IReadableTextWithKey {
 
             TableName = MakeValidTableName(uniqueId.FileNameWithoutSuffix());
             Provider = null;
-            DatabaseID = preveredFileFormatId ?? Database.DatabaseId;
+            DatabaseId = preveredFileFormatId ?? Database.DatabaseId;
             AdditionalData = uniqueId;
             MustBeFreezed = mustbefreezed;
 
@@ -83,7 +82,7 @@ public class ConnectionInfo : IReadableTextWithKey {
         if (IsValidTableName(x[0], false) && !string.IsNullOrEmpty(x[1])) {
             TableName = x[0];
             Provider = null;
-            DatabaseID = x[1];
+            DatabaseId = x[1];
             AdditionalData = x[2];
             return;
         }
@@ -98,7 +97,7 @@ public class ConnectionInfo : IReadableTextWithKey {
             if (thisDb.ConnectionDataOfOtherTable(x[0], true, mustbefreezed) is ConnectionInfo nci) {
                 TableName = nci.TableName;
                 Provider = nci.Provider;
-                DatabaseID = nci.DatabaseID;
+                DatabaseId = nci.DatabaseId;
                 AdditionalData = nci.AdditionalData;
                 return;
             }
@@ -110,7 +109,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string additionalInfo, string mustbefreezed) {
         TableName = tablename.ToUpper();
         Provider = provider;
-        DatabaseID = connectionString;
+        DatabaseId = connectionString;
         AdditionalData = additionalInfo;
         MustBeFreezed = mustbefreezed;
     }
@@ -125,36 +124,22 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// z.B. wenn ein Dateiname oder sowas mitgegeben werden soll.
     /// Ist nur wichtig für von DatabaseAbstract abgeleiten Klassen und nur diese können damit umgehen.
     /// </summary>
-    public string AdditionalData {
-        get => _additionalData;
-        set {
-            if (_additionalData == value) { return; }
-            _additionalData = value;
-            //OnChanged();
-        }
-    }
+    public string AdditionalData { get; set; } = string.Empty;
 
     /// <summary>
     /// Eine Kennung, die von von DatabaseAbstract abgeleiten Klassen erkannt werden kann.
     /// Enthält nur einen Wert wie z.B. DatabaseSQL.
     /// Um eine Datenbank wieder zu finden, muss uniqueID verwendet werden.
     /// </summary>
-    public string DatabaseID { get; } = string.Empty;
+    public string DatabaseId { get; } = string.Empty;
 
-    public string KeyName => UniqueID;
+    public string KeyName => UniqueId;
     public string MustBeFreezed { get; } = string.Empty;
 
     /// <summary>
     /// Welche bereits vorhandene Datenbank den in dieser Klasse aufgezeigten Tabellenamen erzeugen kann
     /// </summary>
-    public DatabaseAbstract? Provider {
-        get => _provider;
-        set {
-            if (_provider == value) { return; }
-            _provider = value;
-            //OnChanged();
-        }
-    }
+    public DatabaseAbstract? Provider { get; set; }
 
     /// <summary>
     /// Die Tabelle, um die es geht.
@@ -173,7 +158,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// <summary>
     /// Eindeutiger Schlüssel, mit dem eine Datenbank von vorhandenen Datenbanken wieder gefunden werden kann.
     /// </summary>
-    public string UniqueID => TableName + "|" + DatabaseID + "|" + AdditionalData;
+    public string UniqueId => TableName + "|" + DatabaseId + "|" + AdditionalData;
 
     #endregion
 

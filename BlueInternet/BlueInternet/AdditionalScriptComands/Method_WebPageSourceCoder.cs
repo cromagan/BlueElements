@@ -95,7 +95,7 @@ internal class Method_WebPageSourceCode : Method_WebPage {
 
             return new DoItFeedback(infos.Data, "Quellcode konnte nicht gelesen werden.");
         } catch (Exception ex) {
-            return new DoItFeedback(infos.Data, "Quellcode konnte nicht gelesen werden: " + ex.ToString());
+            return new DoItFeedback(infos.Data, "Quellcode konnte nicht gelesen werden: " + ex);
         }
     }
 

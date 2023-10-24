@@ -53,7 +53,7 @@ public abstract class SqlBackAbstract {
     private readonly object _fill = new();
     private readonly object _getChanges = new();
     private readonly object _openclose = new();
-    private bool _didCritical = false;
+    private bool _didCritical;
 
     #endregion
 
@@ -220,14 +220,17 @@ public abstract class SqlBackAbstract {
     /// Provider ist immer NULL!
     /// </summary>
     /// <param name="tablename"></param>
+    /// <param name="mustBeFreezed"></param>
     /// <returns></returns>
     public ConnectionInfo ConnectionData(string tablename, string mustBeFreezed) => new(tablename, null, ConnectionString, string.Empty, mustBeFreezed);
 
     public string ExecuteCommand(string commandtext, bool abort) {
-        if (Connection == null || !OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
-        using var command = Connection.CreateCommand();
-        command.CommandText = commandtext;
-        return ExecuteCommand(command, abort);
+        lock (_openclose) {
+            if (Connection is not DbConnection dbcon || !OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
+            using var command = dbcon.CreateCommand();
+            command.CommandText = commandtext;
+            return ExecuteCommand(command, abort);
+        }
     }
 
     /// <summary>
@@ -284,7 +287,7 @@ public abstract class SqlBackAbstract {
     /// <returns></returns>
     public abstract List<string> GetColumnNames(string tablename);
 
-    public string GetStyleData(string tablename, DatabaseDataType type, string columnName, string styleDB) {
+    public string GetStyleData(string tablename, DatabaseDataType type, string columnName, string styleDb) {
         if (!IsValidTableName(tablename, true)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellename ungültig: " + tablename);
             throw new Exception();
@@ -297,7 +300,7 @@ public abstract class SqlBackAbstract {
             throw new Exception();
         }
 
-        var cmd = @"select VALUE, PART from " + styleDB + " " +
+        var cmd = @"select VALUE, PART from " + styleDb + " " +
                         "where TABLENAME = " + Dbval(tablename.ToUpper()) + " " +
                         "and TYPE = " + Dbval(type.ToString()) + " " +
                         "and COLUMNNAME = " + Dbval(columnName.ToUpper()) + " " +
@@ -318,8 +321,7 @@ public abstract class SqlBackAbstract {
     /// Wird kein Spaltenname angegeben, werden die Eigenschaften der Datenbank zurück gegeben.
     /// Achtung, die Connection wird nicht geschlossen!
     /// </summary>
-    /// <param name="tablename"></param>
-    /// <param name="columnName"></param>
+    /// <param name="db"></param>
     /// <returns></returns>
     public void GetStyleDataAll(DatabaseAbstract db) {
         var l = new Dictionary<string, string>();
@@ -645,11 +647,13 @@ public abstract class SqlBackAbstract {
     /// <summary>
     /// Führt eine eine Änderung im BackEnd aus
     /// </summary>
-    /// <param name="tablename"></param>
+    /// <param name="db"></param>
     /// <param name="type"></param>
     /// <param name="value"></param>
-    /// <param name="columname"></param>
-    /// <param name="rowkey"></param>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <param name="user"></param>
+    /// <param name="datetimeutc"></param>
     /// <returns></returns>
     public string SetValueInternal(DatabaseSqlLite db, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc) {
         if (!IsValidTableName(db.TableName, false)) {
@@ -695,18 +699,16 @@ public abstract class SqlBackAbstract {
         #region Zellen-Wert
 
         if (type.IsCellValue() && column != null && row != null) {
-            if (type != DatabaseDataType.SystemValue) {
-                var l = new List<CellValueEventArgs>();
-                l.Add(new CellValueEventArgs(column, value));
+            //  type != DatabaseDataType.SystemValue wird oben schon abgefragt
+            var l = new List<CellValueEventArgs> { new(column, value) };
 
-                if (db.Column.SysRowChangeDate is ColumnItem srd && column != srd) { l.Add(new CellValueEventArgs(srd, datetimeutc.ToString(Format_Date7))); }
-                if (db.Column.SysRowChanger is ColumnItem src && column != src) { l.Add(new CellValueEventArgs(src, user)); }
+            if (db.Column.SysRowChangeDate is ColumnItem srd && column != srd) { l.Add(new CellValueEventArgs(srd, datetimeutc.ToString(Format_Date7))); }
+            if (db.Column.SysRowChanger is ColumnItem src && column != src) { l.Add(new CellValueEventArgs(src, user)); }
 
-                if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                    if (db.Column.SysRowState is ColumnItem srs && column != srs) { l.Add(new CellValueEventArgs(srs, string.Empty)); }
-                }
-                return SetCellValue(db.TableName, row.KeyName, l);
+            if (column.ScriptType != ScriptType.Nicht_vorhanden) {
+                if (db.Column.SysRowState is ColumnItem srs && column != srs) { l.Add(new CellValueEventArgs(srs, string.Empty)); }
             }
+            return SetCellValue(db.TableName, row.KeyName, l);
         }
 
         #endregion
@@ -830,7 +832,7 @@ public abstract class SqlBackAbstract {
         if (ci is null) { return null; }
 
         foreach (var thisK in ConnectedSqlBack) {
-            if (thisK.Connection != null && thisK.ConnectionString == ci.DatabaseID) {
+            if (thisK.Connection != null && thisK.ConnectionString == ci.DatabaseId) {
                 return thisK;
 
                 //return thisK.OtherTable(ci.TableName);
@@ -848,7 +850,7 @@ public abstract class SqlBackAbstract {
     //        return GetLastColumnName(tablename, key);
     //    }
     //}
-    internal void LoadColumns(string tablename, RowCollection rows, List<ColumnItem?> columns, bool addmissingRows, List<FilterItem>? preselection) {
+    internal void LoadColumns(string tablename, RowCollection rows, List<ColumnItem> columns, bool addmissingRows, List<FilterItem>? preselection) {
         if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
             throw new Exception();
@@ -1174,7 +1176,7 @@ public abstract class SqlBackAbstract {
     /// </summary>
     /// <param name="tablename"></param>
     /// <param name="rowkey"></param>
-    /// <param name="newValue"></param>
+    /// <param name="values"></param>
     /// <returns></returns>
     private string SetCellValue(string tablename, string rowkey, List<CellValueEventArgs> values) {
         if (!IsValidTableName(tablename, false)) {

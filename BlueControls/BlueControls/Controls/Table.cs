@@ -707,7 +707,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (Database?.Column.SysChapter is not ColumnItem sc) { return; }
 
         _collapsed.Clear();
-        if (Database != null && !Database.IsDisposed && sc != null) {
+        if (Database != null && !Database.IsDisposed) {
             _collapsed.AddRange(sc.Contents());
         }
         Invalidate_SortedRowData();
@@ -1269,26 +1269,32 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public RowData? View_NextRow(RowData? row) {
         if (Database == null || Database.IsDisposed) { return null; }
-        var rowNr = SortedRows()?.IndexOf(row) ?? -1;
-        return rowNr < 0 || rowNr >= SortedRows().Count - 1 ? null : SortedRows()[rowNr + 1];
+        if (row == null || row.IsDisposed) { return null; }
+
+        if (SortedRows() is not List<RowData> sr) { return null; }
+
+        var rowNr = sr.IndexOf(row);
+        return rowNr < 0 || rowNr >= sr.Count - 1 ? null : sr[rowNr + 1];
     }
 
     public RowData? View_PreviousRow(RowData? row) {
         if (Database == null || Database.IsDisposed) { return null; }
-        var rowNr = SortedRows()?.IndexOf(row) ?? -1;
-        return rowNr < 1 ? null : SortedRows()[rowNr - 1];
+        if (row == null || row.IsDisposed) { return null; }
+        if (SortedRows() is not List<RowData> sr) { return null; }
+        var rowNr = sr.IndexOf(row);
+        return rowNr < 1 ? null : sr[rowNr - 1];
     }
 
     public RowData? View_RowFirst() {
         if (Database == null || Database.IsDisposed) { return null; }
-        var s = SortedRows();
-        return s == null || s.Count == 0 ? null : s[0];
+        if (SortedRows() is not List<RowData> sr) { return null; }
+        return sr.Count == 0 ? null : sr[0];
     }
 
     public RowData? View_RowLast() {
         if (Database == null || Database.IsDisposed) { return null; }
-        var s = SortedRows();
-        return s == null || s.Count == 0 ? null : s[s.Count - 1];
+        if (SortedRows() is not List<RowData> sr) { return null; }
+        return sr.Count == 0 ? null : sr[sr.Count - 1];
     }
 
     public string ViewToString() {
@@ -2756,7 +2762,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 //}
 
                 if (_unterschiede != null && _unterschiede != currentRow.Row) {
-                    if (currentRow?.Row.CellGetString(viewItem.Column) != _unterschiede.CellGetString(viewItem.Column)) {
+                    if (currentRow.Row.CellGetString(viewItem.Column) != _unterschiede.CellGetString(viewItem.Column)) {
                         Rectangle tmpr = new((int)viewItem.OrderTmpSpalteX1 + 1, DrawY(currentRow) + 1,
                             Column_DrawWidth(viewItem, displayRectangleWoSlider) - 2, currentRow.DrawHeight - 2);
                         gr.DrawRectangle(PenRed1, tmpr);

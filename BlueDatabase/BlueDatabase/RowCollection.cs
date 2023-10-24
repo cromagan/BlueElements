@@ -237,17 +237,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return;
         }
 
-        var IsMyRow = row.AmIChanger();
-        var Age = row.RowChangedXMinutesAgo();
+        var isMyRow = row.AmIChanger();
+        var age = row.RowChangedXMinutesAgo();
 
-        if (IsMyRow && Age > 0 && Age < 60) {
+        if (isMyRow && age > 0 && age < 60) {
             _ = _pendingChangedRows.AddIfNotExists(row.KeyName);
             return;
         }
 
-        if (Database.AmITemporaryMaster() && Age is < 0 or > 120) {
+        if (Database.AmITemporaryMaster() && age is < 0 or > 120) {
             _ = _pendingChangedRows.AddIfNotExists(row.KeyName);
-            return;
         }
     }
 
@@ -308,9 +307,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         #region Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
 
         var capName = pinnedRows != null && pinnedRows.Count > 0;
-        if (!capName) {
+        if (!capName && db.Column.SysChapter is ColumnItem cap) {
             foreach (var thisRow in filteredRows) {
-                if (thisRow.Database != null && !thisRow.CellIsNullOrEmpty(thisRow.Database.Column.SysChapter)) {
+                if (thisRow.Database != null && !thisRow.CellIsNullOrEmpty(cap)) {
                     capName = true;
                     break;
                 }
@@ -596,7 +595,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var u = Generic.UserName;
         var d = DateTime.UtcNow;
 
-        var s = db.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key.ToString(), comment, u, d);
+        var s = db.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key, comment, u, d);
         if (!string.IsNullOrEmpty(s)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen: " + s);
             throw new Exception();
@@ -674,7 +673,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var r = SearchByKey(key);
 
         if (r == null || r.IsDisposed) { return false; }
-        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, r, string.Empty, key.ToString(), comment, Generic.UserName, DateTime.UtcNow));
+        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, r, string.Empty, key, comment, Generic.UserName, DateTime.UtcNow));
     }
 
     public bool Remove(FilterItem filter, List<RowItem>? pinned, string comment) {

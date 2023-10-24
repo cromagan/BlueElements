@@ -42,7 +42,6 @@ using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using Timer = System.Threading.Timer;
 using static BlueBasics.Constants;
-using System.Windows.Input;
 
 namespace BlueDatabase;
 
@@ -62,7 +61,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// </summary>
     public readonly List<UndoItem> Undo;
 
-    protected List<FilterItem>? _preselection = null;
+    protected List<FilterItem>? Preselection = null;
     private static DateTime _lastTableCheck = new(1900, 1, 1);
 
     private readonly List<ColumnViewCollection> _columnArrangements = new();
@@ -98,7 +97,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     private double _globalScale;
     private string _globalShowPass = string.Empty;
-    private bool _readOnly = false;
+    private bool _readOnly;
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -106,7 +105,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
-    private string _temporaryDatabaseMasterTimeUTC = string.Empty;
+    private string _temporaryDatabaseMasterTimeUtc = string.Empty;
     private string _temporaryDatabaseMasterUser = string.Empty;
     private string _variableTmp = string.Empty;
 
@@ -313,7 +312,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     public string KeyName {
         get {
             if (IsDisposed) { return string.Empty; }
-            return ConnectionData.UniqueID;
+            return ConnectionData.UniqueId;
         }
     }
 
@@ -379,11 +378,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public string TemporaryDatabaseMasterTimeUTC {
-        get => _temporaryDatabaseMasterTimeUTC;
+    public string TemporaryDatabaseMasterTimeUtc {
+        get => _temporaryDatabaseMasterTimeUtc;
         private set {
-            if (_temporaryDatabaseMasterTimeUTC == value) { return; }
-            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, null, null, _temporaryDatabaseMasterTimeUTC, value, string.Empty, UserName, DateTime.UtcNow);
+            if (_temporaryDatabaseMasterTimeUtc == value) { return; }
+            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, null, null, _temporaryDatabaseMasterTimeUtc, value, string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -504,7 +503,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         foreach (var thisFile in AllFiles) {
             var d = thisFile.ConnectionData;
 
-            if (string.Equals(d.UniqueID, ci.UniqueID, StringComparison.OrdinalIgnoreCase)) {
+            if (string.Equals(d.UniqueId, ci.UniqueId, StringComparison.OrdinalIgnoreCase)) {
                 return thisFile;
             }
 
@@ -537,7 +536,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         #region Schauen, ob sie über den Typ definiert werden kann
 
         foreach (var thist in DatabaseTypes) {
-            if (thist.Name.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) {
+            if (thist.Name.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) {
                 var l = new object?[3];
                 l[0] = ci;
                 l[1] = readOnly;
@@ -764,7 +763,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (ReadOnly) { return false; }
         if (TemporaryDatabaseMasterUser != UserName) { return false; }
 
-        var d = DateTimeParse(TemporaryDatabaseMasterTimeUTC);
+        var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
 
         // Info:
         // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
@@ -1378,7 +1377,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public abstract void GetUndoCache();
 
-    public bool hasErrorCheckScript() {
+    public bool HasErrorCheckScript() {
         if (!IsRowScriptPossible(true)) { return false; }
 
         var e = EventScript.Get(ScriptEventTypes.prepare_formula);
@@ -1736,10 +1735,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public void RefreshColumnsData(ColumnItem column) {
         if (column.IsInCache != null) { return; }
-        RefreshColumnsData(new List<ColumnItem?> { column });
+        RefreshColumnsData(new List<ColumnItem> { column });
     }
 
-    public abstract void RefreshColumnsData(List<ColumnItem?> columns);
+    public abstract void RefreshColumnsData(List<ColumnItem> columns);
 
     public void RefreshColumnsData(IEnumerable<FilterItem>? filter) {
         if (filter != null) {
@@ -1821,7 +1820,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             t += "\r\nColumn-Count: " + Column.Count;
             t += "\r\nRow-Count: " + Row.Count;
             t += "\r\nTable: " + ConnectionData.TableName;
-            t += "\r\nID: " + ConnectionData.DatabaseID;
+            t += "\r\nID: " + ConnectionData.DatabaseId;
         } catch { }
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
@@ -1890,7 +1889,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     /// <param name="value"></param>
     /// <param name="column"></param>
     /// <param name="row"></param>
-    /// <param name="isLoading"></param>
+    /// <param name="reason"></param>
+    /// <param name="user"></param>
+    /// <param name="datetimeutc"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
@@ -1950,7 +1951,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                     if (LoadedVersion == DatabaseVersion) {
                         Freeze("Ladefehler der Datenbank");
                         if (!ReadOnly) {
-                            Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData.ToString());
+                            Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData);
                         }
                     }
                     return "Befehl unbekannt.";
@@ -1995,7 +1996,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 break;
 
             case DatabaseDataType.TemporaryDatabaseMasterTimeUTC:
-                _temporaryDatabaseMasterTimeUTC = value;
+                _temporaryDatabaseMasterTimeUtc = value;
                 break;
 
             case DatabaseDataType.DatabaseAdminGroups:
@@ -2120,7 +2121,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 if (LoadedVersion == DatabaseVersion) {
                     Freeze("Ladefehler der Datenbank");
                     if (!ReadOnly) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData.ToString());
+                        Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData);
                     }
                 }
 
@@ -2226,12 +2227,12 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         if (!e.IsVisible) { return; }
 
-        var d = DateTimeParse(TemporaryDatabaseMasterTimeUTC);
+        var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
 
         if (DateTime.UtcNow.Subtract(d).TotalMinutes < 60 && !string.IsNullOrEmpty(TemporaryDatabaseMasterUser)) { return; }
 
         TemporaryDatabaseMasterUser = UserName;
-        TemporaryDatabaseMasterTimeUTC = DateTime.UtcNow.ToString(Format_Date5);
+        TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString(Format_Date5);
     }
 
     private void Checker_Tick(object state) {

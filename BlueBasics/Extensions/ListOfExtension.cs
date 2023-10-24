@@ -233,7 +233,7 @@ public static partial class Extensions {
 
         if (l.Length > 0) { l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
 
-        col.Add(tagname + "=" + l.ToString());
+        col.Add(tagname + "=" + l);
     }
 
     public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T? value) where T : Enum {

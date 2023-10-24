@@ -101,7 +101,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
         }
     }
 
-    public string CompareKey => KeyName.ToString();
+    public string CompareKey => KeyName;
 
     public string Image {
         get => _image;

@@ -94,7 +94,7 @@ public sealed class Database : DatabaseAbstract {
     #region Methods
 
     public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
-        if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
+        if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
 
@@ -508,7 +508,7 @@ public sealed class Database : DatabaseAbstract {
             SaveToByteList(l, DatabaseDataType.Caption, db.Caption);
 
             SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
-            SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUTC);
+            SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterTimeUTC, db.TemporaryDatabaseMasterTimeUtc);
 
             //SaveToByteList(l, enDatabaseDataType.JoinTyp, ((int)_JoinTyp).ToString(false));
             //SaveToByteList(l, DatabaseDataType.VerwaisteDaten, ((int)_verwaisteDaten).ToString(false));
@@ -752,7 +752,7 @@ public sealed class Database : DatabaseAbstract {
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
     }
 
-    public override void RefreshColumnsData(List<ColumnItem?> columns) {
+    public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns.Count == 0) { return; }
 
         foreach (var thiscol in columns) {

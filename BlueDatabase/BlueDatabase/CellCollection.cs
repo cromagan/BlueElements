@@ -109,9 +109,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <returns></returns>
     public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked) {
         if (mode == EditableErrorReasonType.OnlyRead) {
-            if (column == null || row == null) {
-                return string.Empty;
-            }
+            if (column == null || row == null) { return string.Empty; }
         }
 
         if (column?.Database == null) { return "Es ist keine Spalte ausgewählt."; }
@@ -660,7 +658,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public List<string> ValuesReadable(ColumnItem column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style);
+    public List<string> ValuesReadable(ColumnItem column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style) ?? new List<string>();
 
     internal static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
         List<RowItem?> allRows = new();
@@ -761,7 +759,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    internal void SetValueCore(ColumnItem column, RowItem row, string value, string user, DateTime datetimeutc, bool isSystem) {
+    internal void SetValueCore(ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, bool isSystem) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!");
             return;
@@ -780,7 +778,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (isSystem) {
             if (!column.IsSystemColumn()) {
-                Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + column.ToString());
+                Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + column);
                 return;
             }
         } else {
@@ -881,6 +879,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     private static void MakeNewRelations(ColumnItem? column, RowItem? row, ICollection<string> oldBz, List<string> newBz) {
         if (row == null || row.IsDisposed) { return; }
+        if (column == null || column.IsDisposed) { return; }
+
         //// Dann die neuen Erstellen
         foreach (var t in newBz) {
             if (!oldBz.Contains(t)) {

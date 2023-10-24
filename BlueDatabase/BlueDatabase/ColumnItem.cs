@@ -2052,7 +2052,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public QuickImage? SymbolForReadableText() {
         if (IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
         if (Database == null || Database.IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
-        if (this == null || IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
 
         if (this == Database.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
 

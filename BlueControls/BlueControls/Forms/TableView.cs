@@ -442,7 +442,7 @@ public partial class TableView : FormWithStatusBar {
 
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
             if (thisT is TabPage tp && tp.Tag is List<object> s && s[0] is ConnectionInfo ci) {
-                if (ci.UniqueID.Equals(connectionInfo.UniqueID, StringComparison.OrdinalIgnoreCase)) {
+                if (ci.UniqueId.Equals(connectionInfo.UniqueId, StringComparison.OrdinalIgnoreCase)) {
                     tbcDatabaseSelector.SelectedTab = tp;
 
                     if (_firstOne) {
@@ -512,7 +512,7 @@ public partial class TableView : FormWithStatusBar {
 
         _ = e.UserMenu.Add("Zeile", true);
         _ = e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && tbl.Database.IsAdministrator());
-        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null && tbl.Database.hasErrorCheckScript());
+        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null && tbl.Database.HasErrorCheckScript());
 
         foreach (var thiss in tbl.Database.EventScript) {
             if (thiss != null && thiss.ManualExecutable && thiss.NeedRow) {
@@ -1306,7 +1306,7 @@ public partial class TableView : FormWithStatusBar {
                 btnLetzteDateien.AddFileName(bdb.Filename, db.TableName);
                 LoadTab.FileName = bdb.Filename;
             } else {
-                btnLetzteDateien.AddFileName(db.ConnectionData.UniqueID, db.TableName);
+                btnLetzteDateien.AddFileName(db.ConnectionData.UniqueId, db.TableName);
             }
         }
 
@@ -1376,7 +1376,7 @@ public partial class TableView : FormWithStatusBar {
             }
         }
 
-        if (db.hasErrorCheckScript()) {
+        if (db.HasErrorCheckScript()) {
             _ = lstAufgaben.Item.Add("Zeilen auf Fehler prüfen", "#datenüberprüfung", ImageCode.HäkchenDoppelt);
         }
 

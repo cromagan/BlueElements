@@ -78,7 +78,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
 
         Initialize();
-        LoadFromSqlBack(_preselection);
+        LoadFromSqlBack(Preselection);
 
         TryToSetMeTemporaryMaster();
     }
@@ -87,7 +87,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Properties
 
-    public static string DatabaseId => typeof(DatabaseSqlLite).Name;
+    public static string DatabaseId => nameof(DatabaseSqlLite);
 
     public override ConnectionInfo ConnectionData {
         get {
@@ -100,7 +100,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
-    public SqlBackAbstract? SQL => _sql;
+    //public SqlBackAbstract? SQL => _sql;
     public override string TableName => _tablename;
 
     public override bool UndoLoaded => _undoLoaded;
@@ -110,7 +110,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     #region Methods
 
     public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
-        if (!DatabaseId.Equals(ci.DatabaseID, StringComparison.OrdinalIgnoreCase)) { return null; }
+        if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         var sql = ((DatabaseSqlLite?)ci.Provider)?._sql;
         if (sql == null) { return null; }
@@ -232,7 +232,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         _undoLoaded = true;
     }
 
-    public override void RefreshColumnsData(List<ColumnItem?> columns) {
+    public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns.Count == 0) { return; }
 
         if (_sql == null) {
@@ -264,7 +264,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         OnDropMessage(FehlerArt.Info, "Lade " + columns.Count + " Spalte(n) der Datenbank '" + TableName + "' nach.");
 
         try {
-            _sql.LoadColumns(TableName, Row, columns, false, _preselection);
+            _sql.LoadColumns(TableName, Row, columns, false, Preselection);
         } catch {
             Develop.CheckStackForOverflow();
             RefreshColumnsData(columns);
@@ -568,7 +568,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             //#endregion
 
             RepairColumnArrangements(Reason.LoadReload);
-
 
             #region Alle ZEILENKEYS laden
 

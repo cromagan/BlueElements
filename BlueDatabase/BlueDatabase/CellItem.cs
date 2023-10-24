@@ -30,19 +30,11 @@ namespace BlueDatabase;
 /// </summary>
 public class CellItem {
 
-    #region Fields
-
-    private string _value;
-
-    #endregion
-
     #region Constructors
 
-    public CellItem(string value) => _value = value;
+    public CellItem(string value) => Value = value;
 
     #endregion
-
-    //public Size Size { get; set; }
 
     #region Properties
 
@@ -50,14 +42,7 @@ public class CellItem {
     //public Color FontColor { get; set; }
     //public bool Editable { get; set; }
     //public byte Symbol { get; set; }
-    public string Value {
-        get => _value;
-        set {
-            if (_value == value) { return; }
-            _value = value;
-            //InvalidateSize();
-        }
-    }
+    public string Value { get; set; }
 
     #endregion
 
@@ -74,31 +59,6 @@ public class CellItem {
         }
         return (tmpText, tmpImageCode);
     }
-
-    //public static enAlignment StandardAlignment(ColumnItem column, BildTextVerhalten bildTextverhalten) {
-    //    switch (column.Align) {
-    //        case enAlignmentHorizontal.Links:
-    //            return enAlignment.Top_Left;
-
-    //        case enAlignmentHorizontal.Rechts:
-    //            return enAlignment.Top_Right;
-
-    //        case enAlignmentHorizontal.Zentriert:
-    //            return enAlignment.HorizontalCenter;
-    //    }
-    //    switch (column.Format) {
-    //        case DataFormat.Ganzzahl:
-    //        case DataFormat.Gleitkommazahl:
-    //            return enAlignment.Top_Right;
-
-    //        case DataFormat.Bit:
-    //            if (bildTextverhalten is BildTextVerhalten.Nur_Bild or BildTextVerhalten.Bild_oder_Text) { return enAlignment.Top_HorizontalCenter; }
-    //            return enAlignment.Top_Left;
-
-    //        default:
-    //            return enAlignment.Top_Left;
-    //    }
-    //}
 
     public static QuickImage? StandardErrorImage(string gr, BildTextVerhalten bildTextverhalten, string originalText, ColumnItem? column) {
         switch (bildTextverhalten) {
@@ -161,9 +121,9 @@ public class CellItem {
     /// <param name="column"></param>
     /// <param name="txt"></param>
     /// <param name="style"></param>
+    /// <param name="bildTextverhalten"></param>
     /// <param name="removeLineBreaks">bei TRUE werden Zeilenumbrüche mit Leerzeichen ersetzt</param>
     /// <returns></returns>
-
     public static string ValueReadable(ColumnItem? column, string txt, ShortenStyle style, BildTextVerhalten bildTextverhalten, bool removeLineBreaks) {
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild && style != ShortenStyle.HTML) { return string.Empty; }
 
@@ -174,18 +134,6 @@ public class CellItem {
             case DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems:
             case DataFormat.RelationText:
             case DataFormat.Verknüpfung_zu_anderer_Datenbank: // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
-
-                //if (column.BildTextVerhalten == BildTextVerhalten.Interpretiere_Bool) {
-                //    if (txt == "+") {
-                //        if (column == column.Database.Column.SysCorrectx) { return "Ok"; }
-                //        if (column == column.Database.Column.SysLockedx) { return "gesperrt"; }
-                //        return "ja";
-                //    } else if (txt == "-") {
-                //        if (column == column.Database.Column.SysCorrectx) { return "fehlerhaft"; }
-                //        if (column == column.Database.Column.SysLockedx) { return "bearbeitbar"; }
-                //        return "nein";
-                //    }
-                //}
 
                 txt = LanguageTool.ColumnReplace(txt, column, style);
                 if (removeLineBreaks) {
@@ -276,7 +224,7 @@ public class CellItem {
         // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird
         if (bildTextverhalten == BildTextVerhalten.Nur_Text) { return null; }
         if (style == ShortenStyle.HTML) { return null; }
-        if (column == null || column.IsDisposed) { return null; }
+        if (column.IsDisposed) { return null; }
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, BildTextVerhalten.Nur_Text, true); }
         if (string.IsNullOrEmpty(replacedText)) { return null; }
 
@@ -290,7 +238,7 @@ public class CellItem {
         var ntxt = x.JoinWith("|").TrimEnd("|");
 
         var defaultImage = QuickImage.Get(ntxt);
-        return defaultImage != null && !defaultImage.IsError ? defaultImage : StandardErrorImage(gr, bildTextverhalten, replacedText, column);
+        return !defaultImage.IsError ? defaultImage : StandardErrorImage(gr, bildTextverhalten, replacedText, column);
     }
 
     #endregion

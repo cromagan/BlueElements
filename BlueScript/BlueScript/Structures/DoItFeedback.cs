@@ -37,7 +37,7 @@ public struct DoItFeedback {
     public DoItFeedback(LogData ld, string errormessage) {
         AllOk = false;
         Variable = null;
-        ld?.AddMessage(errormessage);
+        ld.AddMessage(errormessage);
     }
 
     public DoItFeedback(string valueString) {

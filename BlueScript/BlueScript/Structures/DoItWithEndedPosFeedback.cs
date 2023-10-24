@@ -48,7 +48,7 @@ public readonly struct DoItWithEndedPosFeedback {
         Position = -1;
         AllOk = false;
         Variable = null;
-        ld?.AddMessage(errormessage);
+        ld.AddMessage(errormessage);
     }
 
     #endregion

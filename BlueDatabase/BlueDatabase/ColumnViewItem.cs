@@ -29,17 +29,11 @@ namespace BlueDatabase;
 
 public sealed class ColumnViewItem : IParseable {
 
-    #region Fields
-
-    private ViewType _viewType;
-
-    #endregion
-
     #region Constructors
 
     public ColumnViewItem(ColumnItem column, ViewType type, ColumnViewCollection parent) : this(parent) {
         Column = column;
-        _viewType = type;
+        ViewType = type;
     }
 
     public ColumnViewItem(ColumnViewCollection parent, string toParse) : this(parent) {
@@ -48,7 +42,7 @@ public sealed class ColumnViewItem : IParseable {
 
     private ColumnViewItem(ColumnViewCollection parent) : base() {
         Parent = parent;
-        _viewType = ViewType.None;
+        ViewType = ViewType.None;
         Column = null;
         OrderTmpSpalteX1 = null;
         TmpAutoFilterLocation = Rectangle.Empty;
@@ -64,19 +58,12 @@ public sealed class ColumnViewItem : IParseable {
     public ColumnItem? Column { get; private set; }
     public int? OrderTmpSpalteX1 { get; set; }
     public ColumnViewCollection Parent { get; }
-
     public Rectangle TmpAutoFilterLocation { get; set; }
     public int? TmpDrawWidth { get; set; }
     public bool TmpReduced { get; set; }
     public Rectangle TmpReduceLocation { get; set; }
 
-    public ViewType ViewType {
-        get => _viewType;
-        set {
-            if (value == _viewType) { return; }
-            _viewType = value;
-        }
-    }
+    public ViewType ViewType { get; set; }
 
     #endregion
 
@@ -107,12 +94,12 @@ public sealed class ColumnViewItem : IParseable {
                 return true;
 
             case "permanent": // Todo: Alten Code Entfernen, Permanent wird nicht mehr verstringt 06.09.2019
-                _viewType = ViewType.PermanentColumn;
+                ViewType = ViewType.PermanentColumn;
                 return true;
 
             case "type":
-                _viewType = (ViewType)IntParse(value);
-                if (Column != null && _viewType == ViewType.None) { _viewType = ViewType.Column; }
+                ViewType = (ViewType)IntParse(value);
+                if (Column != null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
                 return true;
 
             case "edittype":
@@ -127,7 +114,7 @@ public sealed class ColumnViewItem : IParseable {
 
     public override string ToString() {
         var result = new List<string>();
-        result.ParseableAdd("Type", _viewType);
+        result.ParseableAdd("Type", ViewType);
         result.ParseableAdd("ColumnName", Column);
         return result.Parseable();
     }

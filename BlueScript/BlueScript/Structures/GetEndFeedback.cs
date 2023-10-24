@@ -47,7 +47,7 @@ public readonly struct GetEndFeedback {
         AllOk = false;
         AttributeText = string.Empty;
         Variable = null;
-        ld?.AddMessage(erromessage);
+        ld.AddMessage(erromessage);
     }
 
     public GetEndFeedback(int continuePosition, string attributetext) {
