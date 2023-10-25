@@ -1567,7 +1567,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                 d1 = DateTime.Now;
             }
 
-            if (DateTime.Now.Subtract(d2).TotalSeconds > 5) {
+            if (DateTime.Now.Subtract(d2).TotalSeconds > 4.5) {
                 OnDropMessage(FehlerArt.Info, "Import: Zeile " + no + " von " + zeil.Count);
                 d2 = DateTime.Now;
             }

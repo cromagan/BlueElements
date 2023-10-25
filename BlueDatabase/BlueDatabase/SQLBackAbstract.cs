@@ -1092,6 +1092,7 @@ public abstract class SqlBackAbstract {
         LastLoadUtc = DateTime.UtcNow;
 
         if (Connection == null || !OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
+        command.CommandTimeout = 10;
 
         try {
             if (Log.Count > 2000) { Log.RemoveAt(0); }
