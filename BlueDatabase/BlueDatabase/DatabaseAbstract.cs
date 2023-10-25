@@ -1514,6 +1514,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         #region Der eigentliche Import
 
+        var d1 = DateTime.Now;
+        var d2 = DateTime.Now;
+
         var no = 0;
         foreach (var thisD in dictNeu) {
             no++;
@@ -1558,13 +1561,15 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             #region Speichern und Ausgabe
 
-            if (no % 5000 == 0 & no > 1000) {
+            if (DateTime.Now.Subtract(d1).TotalMinutes > 5) {
                 OnDropMessage(FehlerArt.Info, "Import: Zwischenspeichern der Datenbank");
                 Save();
+                d1 = DateTime.Now;
             }
 
-            if (no % GlobalRND.Next(40, 60) == 0) {
+            if (DateTime.Now.Subtract(d2).TotalSeconds > 5) {
                 OnDropMessage(FehlerArt.Info, "Import: Zeile " + no + " von " + zeil.Count);
+                d2 = DateTime.Now;
             }
 
             #endregion

@@ -35,6 +35,11 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Fields
 
+    /// <summary>
+    /// Nicht static, weil verschiedene Datenbankverbindungen möglich sind.
+    /// </summary>
+    public readonly SqlBackAbstract? SQL;
+
     private static bool _isInTimer;
 
     /// <summary>
@@ -47,20 +52,14 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     /// </summary>
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
 
-    /// <summary>
-    /// Nicht static, weil verschiedene Datenbankverbindungen möglich sind.
-    /// </summary>
-    private readonly SqlBackAbstract? _sql;
-
     private readonly string _tablename = string.Empty;
-
     private bool _undoLoaded;
 
     #endregion
 
     #region Constructors
 
-    public DatabaseSqlLite(ConnectionInfo ci, bool readOnly) : this(((DatabaseSqlLite?)ci.Provider)?._sql, readOnly, ci.MustBeFreezed, ci.TableName) { }
+    public DatabaseSqlLite(ConnectionInfo ci, bool readOnly) : this(((DatabaseSqlLite?)ci.Provider)?.SQL, readOnly, ci.MustBeFreezed, ci.TableName) { }
 
     public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnly, string freezedReason, string tablename) : base(readOnly, freezedReason) {
         if (sql == null) {
@@ -68,7 +67,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             return;
         }
 
-        _sql = sql;
+        SQL = sql;
         sql.RepairAll(tablename);
 
         _tablename = MakeValidTableName(tablename);
@@ -91,16 +90,15 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     public override ConnectionInfo ConnectionData {
         get {
-            if (_sql == null) {
+            if (SQL == null) {
                 return new(TableName, null, string.Empty, string.Empty, FreezedReason);
             }
-            var connectionData = _sql.ConnectionData(TableName, FreezedReason);
+            var connectionData = SQL.ConnectionData(TableName, FreezedReason);
             connectionData.Provider = this;
             return connectionData;
         }
     }
 
-    //public SqlBackAbstract? SQL => _sql;
     public override string TableName => _tablename;
 
     public override bool UndoLoaded => _undoLoaded;
@@ -112,7 +110,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
         if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
 
-        var sql = ((DatabaseSqlLite?)ci.Provider)?._sql;
+        var sql = ((DatabaseSqlLite?)ci.Provider)?.SQL;
         if (sql == null) { return null; }
 
         var at = sql.Tables();
@@ -132,11 +130,11 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             foreach (var thisDb in AllFiles) {
                 if (!done.Contains(thisDb)) {
                     if (thisDb is DatabaseSqlLite thisDbSqlLite) {
-                        if (thisDbSqlLite._sql != null) {
-                            var db = LoadedDatabasesWithThisSql(thisDbSqlLite._sql);
+                        if (thisDbSqlLite.SQL != null) {
+                            var db = LoadedDatabasesWithThisSql(thisDbSqlLite.SQL);
                             done.AddRange(db);
 
-                            var erg = thisDbSqlLite._sql.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
+                            var erg = thisDbSqlLite.SQL.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
                             if (erg == null) { _isInTimer = false; return; } // Später ein neuer Versuch
 
                             foreach (var thisdb in db) {
@@ -160,12 +158,12 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
                 if (thisa is DatabaseSqlLite db) {
-                    if (db._sql?.ConnectionString == _sql?.ConnectionString) { return null; }
+                    if (db.SQL?.ConnectionString == SQL?.ConnectionString) { return null; }
                 }
             }
         }
 
-        var tb = _sql?.Tables();
+        var tb = SQL?.Tables();
         var l = new List<ConnectionInfo>();
 
         if (tb == null) {
@@ -199,7 +197,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             return null;
         }
 
-        var connectionData = _sql?.ConnectionData(tableName, mustBeeFreezed);
+        var connectionData = SQL?.ConnectionData(tableName, mustBeeFreezed);
         if (connectionData != null) {
             connectionData.Provider = this;
             return connectionData;
@@ -211,7 +209,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         var m = base.EditableErrorReason(mode);
         if (!string.IsNullOrEmpty(m)) { return m; }
 
-        if (_sql == null) { return "Keine SQL-Verbindung vorhanden"; }
+        if (SQL == null) { return "Keine SQL-Verbindung vorhanden"; }
 
         if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
 
@@ -222,9 +220,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     public override void GetUndoCache() {
         if (UndoLoaded) { return; }
-        if (_sql == null) { return; }
+        if (SQL == null) { return; }
 
-        var undos = _sql.GetLastChanges(new List<DatabaseSqlLite> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1));
+        var undos = SQL.GetLastChanges(new List<DatabaseSqlLite> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1));
 
         Undo.Clear();
         Undo.AddRange(undos);
@@ -235,7 +233,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns.Count == 0) { return; }
 
-        if (_sql == null) {
+        if (SQL == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "SQL Verbindung verworfen");
             return;
         }
@@ -264,7 +262,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         OnDropMessage(FehlerArt.Info, "Lade " + columns.Count + " Spalte(n) der Datenbank '" + TableName + "' nach.");
 
         try {
-            _sql.LoadColumns(TableName, Row, columns, false, Preselection);
+            SQL.LoadColumns(TableName, Row, columns, false, Preselection);
         } catch {
             Develop.CheckStackForOverflow();
             RefreshColumnsData(columns);
@@ -300,10 +298,10 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         //Develop.CheckStackForOverflow();
         OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) der Datenbank '" + TableName + "' nach.");
 
-        if (_sql == null) { return (false, "SQL Verbindung fehlerhaft"); }
+        if (SQL == null) { return (false, "SQL Verbindung fehlerhaft"); }
 
         try {
-            return (true, _sql.LoadRow(TableName, l, refreshAlways));
+            return (true, SQL.LoadRow(TableName, l, refreshAlways));
         } catch {
             Develop.CheckStackForOverflow();
             return RefreshRowData(rows, refreshAlways);
@@ -312,7 +310,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     //    LoadFromSQLBack();
     //}
-    public override bool Save() => _sql != null;
+    public override bool Save() => SQL != null;
 
     public List<string> SQLLog() => Log;
 
@@ -322,7 +320,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         if (!Row.IsNewRowPossible()) {
             Develop.DebugPrint(FehlerArt.Fehler, "Systemspalte Correct fehlt!");
         }
-        return _sql?.GenerateRow(TableName);
+        return SQL?.GenerateRow(TableName);
     }
 
     internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {
@@ -332,7 +330,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         if (reason != Reason.LoadReload) {
             if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
-            _ = _sql?.SetValueInternal(this, type, value, column, row, user, datetimeutc);
+            _ = SQL?.SetValueInternal(this, type, value, column, row, user, datetimeutc);
         }
 
         return base.SetValueInternal(type, value, column, row, reason, user, datetimeutc);
@@ -350,7 +348,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         var columnName = column?.KeyName ?? string.Empty;
         var rowkey = row?.KeyName ?? string.Empty;
 
-        var err = _sql?.AddUndo(TableName, type, columnName, rowkey, previousValue, changedTo, userName, datetimeutc, comment);
+        var err = SQL?.AddUndo(TableName, type, columnName, rowkey, previousValue, changedTo, userName, datetimeutc, comment);
         if (!string.IsNullOrEmpty(err)) {
             Develop.CheckStackForOverflow();
             AddUndo(type, column, row, previousValue, changedTo, userName, datetimeutc, comment);
@@ -369,7 +367,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         var oo = new List<DatabaseSqlLite>();
         foreach (var thisDb in AllFiles) {
             if (thisDb is DatabaseSqlLite thidDbsqllIte) {
-                if (sql.ConnectionString == thidDbsqllIte._sql?.ConnectionString) {
+                if (sql.ConnectionString == thidDbsqllIte.SQL?.ConnectionString) {
                     oo.Add(thidDbsqllIte);
                 }
             }
@@ -461,7 +459,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                         #region Datenbank-Styles
 
-                        var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, DatabaseProperty, SysStyle);
+                        var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Comand, DatabaseProperty, SysStyle);
                         if (v != null) { _ = SetValueInternal(thisWork.Comand, v, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow); }
 
                         #endregion
@@ -471,7 +469,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
                         var c = Column.Exists(thisWork.ColName);
                         if (c != null && !c.IsDisposed) {
-                            var v = _sql?.GetStyleData(thisWork.TableName, thisWork.Comand, c.KeyName, SysStyle);
+                            var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Comand, c.KeyName, SysStyle);
                             if (v != null) { _ = SetValueInternal(thisWork.Comand, v, c, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow); }
                         }
 
@@ -517,7 +515,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             #region Spalten richtig stellen
 
-            var columnsToLoad = _sql?.GetColumnNames(TableName.ToUpper());
+            var columnsToLoad = SQL?.GetColumnNames(TableName.ToUpper());
             if (columnsToLoad != null) {
                 //_ = columnsToLoad.Remove("RK");
 
@@ -563,7 +561,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             #endregion
 
             //#region Datenbank Eigenschaften laden
-            _sql?.GetStyleDataAll(this);
+            SQL?.GetStyleDataAll(this);
 
             //#endregion
 
@@ -580,11 +578,11 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             foreach (var thisColumn in Column) {
                 thisColumn.IsInCache = null;
             }
-            _sql?.LoadColumns(TableName, Row, cl, true, preselection);
+            SQL?.LoadColumns(TableName, Row, cl, true, preselection);
 
             #endregion
 
-            _ = _sql?.CloseConnection();
+            _ = SQL?.CloseConnection();
 
             Cell.RemoveOrphans();
         } catch {

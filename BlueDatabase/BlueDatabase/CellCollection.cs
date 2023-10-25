@@ -716,7 +716,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         var cellKey = KeyOfCell(column, row);
 
-        return ContainsKey(cellKey) ? this[cellKey].Value : string.Empty;
+        return ContainsKey(cellKey) ? (this[cellKey].Value ?? string.Empty): string.Empty;
     }
 
     internal void InvalidateAllSizes() {

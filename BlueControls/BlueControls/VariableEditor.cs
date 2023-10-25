@@ -89,6 +89,8 @@ public partial class VariableEditor : UserControl {
             GenerateVariableTable();
         }
 
+        //tableVariablen.Database?.Row.Clear("Neue Variablen");
+
         if (tableVariablen?.Database == null) { return; }
         if (variables == null) { return; }
 
@@ -179,6 +181,19 @@ public partial class VariableEditor : UserControl {
         tableVariablen.DatabaseSet(x, string.Empty);
         tableVariablen.Arrangement = 1;
         filterVariablen.Table = tableVariablen;
+
+        tableVariablen.CellValueChanged += TableVariablen_CellValueChanged;
+
+    }
+
+    private void TableVariablen_CellValueChanged(object sender, BlueDatabase.EventArgs.CellChangedEventArgs e) {
+
+        var c = tableVariablen.Database?.Column.First();
+        if (e.Column == c) {
+            if (e.Row.CellIsNullOrEmpty(c))
+                tableVariablen.Database?.Row.Remove(e.Row,"Variable gelöscht");
+        }
+
     }
 
     #endregion

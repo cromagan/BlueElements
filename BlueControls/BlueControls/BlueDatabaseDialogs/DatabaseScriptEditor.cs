@@ -307,6 +307,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         allowTemporay = true;
         e.Feedback = Database?.ExecuteScript(_item, chkChangeValuesInTest.Checked, r, null);
         allowTemporay = false;
+        variableEditor.WriteVariablesToTable(Database?.Variables);
     }
 
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
