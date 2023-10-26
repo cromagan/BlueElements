@@ -1600,150 +1600,63 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public void Repair() {
-        if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut)) || Database == null) { return; }
+        if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut))) { return; }
 
         if (Database == null || Database.IsDisposed) { return; }
+        if (IsDisposed) { return; }
 
-        // Unbekannt = -1,
-        // Nothing = 0,
-        //    Text = 1,
+        if (_format == DataFormat.Button) { ScriptType = ScriptType.Nicht_vorhanden; }
 
-        //Bit = 2,
-
-        // Binärdaten_Bild = 19,
-        // Passwort = 20, // String
-        //  Text_Ohne_Kritische_Zeichen = 21,
-        // Binärdaten = 39,
-        // Link_To_BlueDataSystem = 42
-        // Telefonnummer = 43, // Spezielle Formate
-        //FarbeInteger = 45, // Color
-
-        // Email = 46, // Spezielle Formate
-        // InternetAdresse = 47, // Spezielle Formate
-        // Relation = 65,
-        // Event = 66,
-        // Tendenz = 67
-        // Einschätzung = 68,
-        //Schrift = 69,
-
-        //Text_mit_Formatierung = 70,
-
-        // TextmitFormatierungUndLinkToAnotherDatabase = 71
-        // Relation_And_Event_Mixed = 72,
-        //Link_To_Filesystem = 73,
-
-        //LinkedCell = 74,
-        //Columns_für_LinkedCellDropdown = 75,
-
-        //Values_für_LinkedCellDropdown = 76,
-
-        //RelationText = 77,
-
-        // KeyForSame = 78
-        //Button = 79
-
-        // bis 999 wird geprüft
-
-        //CheckIfIAmAKeyColumn();
-
-        try {
-            switch ((int)_format) {
-                case (int)DataFormat.Button:
-                    ScriptType = ScriptType.Nicht_vorhanden;
-                    break;
-
-                case 21: //Text_Ohne_Kritische_Zeichen
-                    this.GetStyleFrom(ColumnFormatHolder.Text);
-                    break;
-
-                case 15:// Date_GermanFormat = 15
-                case 16://Datum_und_Uhrzeit = 16,
-                    this.GetStyleFrom(ColumnFormatHolder.DateTime);
-                    break;
-
-                case 2:   //Bit = 3,
-                    this.GetStyleFrom(ColumnFormatHolder.Bit);
-                    break;
-
-                case 3:   //Ganzzahl = 3,
-                    this.GetStyleFrom(ColumnFormatHolder.Integer);
-                    break;
-
-                case 6:  //Gleitkommazahl = 6,
-                    this.GetStyleFrom(ColumnFormatHolder.Float);
-                    break;
-
-                case 13:         //BildCode = 13,
-                    this.GetStyleFrom(ColumnFormatHolder.BildCode);
-                    break;
-
-                case 70:
-                    this.GetStyleFrom(ColumnFormatHolder.TextMitFormatierung);
-                    break;
-
-                case 73: // Link To Filesystem
-                    this.GetStyleFrom(ColumnFormatHolder.Text);
-                    break;
-
-                case 74: //(int)DataFormat.Verknüpfung_zu_anderer_Datenbank_Skriptgesteuert:
-
-                    //if (LinkedCell_RowKeyIsInColumn != -9999) {
-                    _format = DataFormat.Verknüpfung_zu_anderer_Datenbank;
-                    _linkedCellFilter.Clear();
-                    //LinkedCellFilter.GenerateAndAdd(LinkedCell_RowKeyIsInColumn.ToString(false));
-                    //LinkedCell_RowKeyIsInColumn = -1;
-                    //}
-                    break;
-
-                case 75:
-                    _format = DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems;
-
-                    break;
-            }
-
-            if (ScriptType == ScriptType.undefiniert) {
-                if (MultiLine) {
-                    ScriptType = ScriptType.List;
-                } else if (Format is DataFormat.Text) {
-                    if (SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
-                        ScriptType = ScriptType.Numeral;
-                    }
-                    ScriptType = ScriptType.String;
-                } else if (Format == DataFormat.Schrift) {
-                    ScriptType = ScriptType.Nicht_vorhanden;
-                }
-            }
-
-            if (_format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                var c = LinkedDatabase?.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
-                if (c != null && !c.IsDisposed) {
-                    this.GetStyleFrom((IInputFormat)c);
-                    BehaviorOfImageAndText = c.BehaviorOfImageAndText;
-                    ScriptType = c.ScriptType; // 29.06.2022 Wieder aktivert. Grund: Plananalyse waren zwei vershieden Typen bei den Zeitn. So erschien immer automatisch eine 0 bei den Stnden, und es war nicht ersichtlich warum.
-                    DoOpticalTranslation = c.DoOpticalTranslation;
-                }
-            }
-
-            if (ScriptType == ScriptType.undefiniert) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Umsetzung fehlgeschlagen: " + Caption + " " + Database.ConnectionData.TableName);
-            }
-
-            if (_scriptType is ScriptType.Bool or ScriptType.Numeral or ScriptType.DateTime) {
-                _ignoreAtRowFilter = true;
-            }
-
-            // Nicht möglich, weil die ganze Spalte geladen sein muss
-            //if (!Name.StartsWith("SYS_") &&  CalculatePreveredMaxCellLenght(1f) > MaxTextLenght) {
-            //    MaxTextLenght = CalculatePreveredMaxCellLenght(1f);
-            //}
-
-            if (MaxCellLenght < MaxTextLenght) { MaxCellLenght = MaxTextLenght; }
-
-            ResetSystemToDefault(false);
-            CheckIfIAmAKeyColumn();
-        } catch (Exception ex) {
-            Develop.DebugPrint("Reparatur der Spalte fehlgeschlagen: " + _name, ex);
+        if (_format.ToString() == ((int)_format).ToString()) {
+            this.GetStyleFrom(ColumnFormatHolder.Text);
         }
+
+        if (ScriptType == ScriptType.undefiniert) {
+            if (MultiLine) {
+                ScriptType = ScriptType.List;
+            } else if (Format is DataFormat.Text) {
+                if (SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
+                    ScriptType = ScriptType.Numeral;
+                }
+                ScriptType = ScriptType.String;
+            } else {
+                ScriptType = ScriptType.Nicht_vorhanden;
+            }
+        }
+
+        if (_format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+
+            #region Aus Dateinamen den Tablename extrahieren
+
+            if (!_linkedDatabaseTableName.Contains("|") && !_linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
+                _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB");
+                LinkedDatabaseTableName = MakeValidTableName(_linkedDatabaseTableName);
+            }
+
+            #endregion
+
+            #region Aus Connection-info den Tablename extrahieren
+
+            if (_linkedDatabaseTableName.Contains("|")) {
+                var l = _linkedDatabaseTableName.Split('|');
+                if (IsValidTableName(l[0], false)) { LinkedDatabaseTableName = l[0]; }
+            }
+
+            #endregion
+
+            var c = LinkedDatabase?.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
+            if (c != null && !c.IsDisposed) {
+                this.GetStyleFrom((IInputFormat)c);
+                BehaviorOfImageAndText = c.BehaviorOfImageAndText;
+                ScriptType = c.ScriptType; // 29.06.2022 Wieder aktivert. Grund: Plananalyse waren zwei vershieden Typen bei den Zeitn. So erschien immer automatisch eine 0 bei den Stnden, und es war nicht ersichtlich warum.
+                DoOpticalTranslation = c.DoOpticalTranslation;
+            }
+        }
+
+        if (MaxCellLenght < MaxTextLenght) { MaxCellLenght = MaxTextLenght; }
+
+        ResetSystemToDefault(false);
+        CheckIfIAmAKeyColumn();
     }
 
     public void ResetSystemToDefault(bool setOpticalToo) {
@@ -2690,11 +2603,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (Database == null || Database.IsDisposed) { return; }
 
-        if (!_linkedDatabaseTableName.Contains("|") && !_linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
-            _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB");
-            _linkedDatabaseTableName = MakeValidTableName(_linkedDatabaseTableName);
-        }
-
         if (IsValidTableName(_linkedDatabaseTableName, false)) {
             var sr = string.Empty;
             if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
@@ -2703,25 +2611,15 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (_linkedDatabase == null) {
             var ci = new ConnectionInfo(_linkedDatabaseTableName, null, Database.FreezedReason);
-
-            //var sr = string.Empty;
-            //if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
-
             _linkedDatabase = GetById(ci, false, null, true);
-            if (_linkedDatabase != null) {
-                _linkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
-                _linkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
-            }
         }
 
-        //if (_linkedDatabase != null) {
-        //    _linkedDatabase.UserGroup = Database.UserGroup;
-        //}
+        if (_linkedDatabase != null) {
+            _linkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
+            _linkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
+        }
     }
 
-    //        case FormatHolder.Integer:
-    //            SetFormatForInteger();
-    //            break;
     private string KleineFehlerCorrect(string txt) {
         if (string.IsNullOrEmpty(txt)) { return string.Empty; }
         const char h4 = (char)1004; // H4 = Normaler Text, nach links rutschen

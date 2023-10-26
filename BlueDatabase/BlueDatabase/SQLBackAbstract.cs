@@ -247,6 +247,7 @@ public abstract class SqlBackAbstract {
             try {
                 using var command = Connection.CreateCommand();
                 command.CommandText = commandtext;
+
                 command.CommandTimeout = 10;
 
                 var tbl = new DataTable();
@@ -343,7 +344,7 @@ public abstract class SqlBackAbstract {
             if (part != "001") {
                 l[cc] += value;
             } else {
-                l.Add(cc, value);
+                if (!l.ContainsKey(cc)) { l.Add(cc, value); }
             }
         }
 
@@ -357,7 +358,7 @@ public abstract class SqlBackAbstract {
                     if (k[1].Equals(DatabaseProperty, StringComparison.OrdinalIgnoreCase)) {
                         ok = db.SetValueInternal(t, thisstyle.Value, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow);
                     } else {
-                        var column = db.Column[k[1]];
+                        var column = db.Column.Exists(k[1]); // Exists, kann sein dass noch ein Eintrag in der SysSytle ist, aber die Spalte schon gelöscjht wurde
                         ok = column?.SetValueInternal(t, thisstyle.Value, Reason.LoadReload);
                     }
 
@@ -1094,12 +1095,17 @@ public abstract class SqlBackAbstract {
         if (Connection == null || !OpenConnection()) { return "Verbindung konnte nicht geöffnet werden"; }
         command.CommandTimeout = 10;
 
+        using var transaction = Connection.BeginTransaction();
+        command.Transaction = transaction;
+
         try {
             if (Log.Count > 2000) { Log.RemoveAt(0); }
             Log.Add("[" + DateTime.UtcNow.ToString(Format_Date) + "]\r\n" + command.CommandText);
             _ = command.ExecuteNonQuery();
+            transaction.Commit();
             return string.Empty;
         } catch (Exception ex) {
+            transaction.Rollback();
             if (abort) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Befehl konnte nicht ausgeführt werden: " + command.CommandText, ex);
             }
