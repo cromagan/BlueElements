@@ -121,6 +121,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         var n = InputBox.Show("Umbenennen:", ca.KeyName, FormatHolder.Text);
         if (string.IsNullOrEmpty(n)) { return; }
+        ca.KeyName = n;
 
         Change(_arrangement, ca);
         UpdateCombobox();

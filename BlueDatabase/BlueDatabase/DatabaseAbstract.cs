@@ -1830,7 +1830,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         Develop.DebugPrint(FehlerArt.Warnung, t);
     }
 
-    internal abstract bool IsNewRowPossible();
+    internal virtual bool IsNewRowPossible() => string.IsNullOrWhiteSpace(EditableErrorReason(EditableErrorReasonType.EditNormaly));
 
     internal abstract string? NextRowKey();
 

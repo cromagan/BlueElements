@@ -314,7 +314,10 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     public List<string> SQLLog() => Log;
 
-    internal override bool IsNewRowPossible() => Column.SysCorrect != null;
+    internal override bool IsNewRowPossible() {
+        if (Column.SysCorrect == null) { return false; }
+        return base.IsNewRowPossible();
+    }
 
     internal override string? NextRowKey() {
         if (!Row.IsNewRowPossible()) {
