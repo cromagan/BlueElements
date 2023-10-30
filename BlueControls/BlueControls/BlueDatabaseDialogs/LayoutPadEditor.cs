@@ -82,7 +82,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     }
 
     internal void LoadLayout(string fileOrLayoutId) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (Pad.Item == null) { return; }
 
         SaveCurrentLayout();
@@ -132,7 +132,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, string.Empty);
 
     private void btnLayoutVerzeichnis_Click(object sender, System.EventArgs e) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (!string.IsNullOrEmpty(Database.AdditionalFilesPfadWhole())) {
             _ = ExecuteFile(Database.AdditionalFilesPfadWhole());
         }
@@ -144,7 +144,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     private void cbxLayout_ItemClicked(object sender, AbstractListItemEventArgs e) => LoadLayout(e.Item.KeyName);
 
     private void CheckButtons() {
-        if (Database == null || Database.IsDisposed) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) {
             DisablePad();
             cbxLayout.Enabled = false;
             return;
@@ -182,7 +182,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     private void Database_Disposing(object sender, System.EventArgs e) => Close();
 
     private void SaveCurrentLayout() {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         if (Pad.Item == null) { return; }
 

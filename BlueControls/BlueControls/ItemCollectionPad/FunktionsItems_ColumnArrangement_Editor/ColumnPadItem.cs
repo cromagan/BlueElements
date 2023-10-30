@@ -58,8 +58,8 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public string Datenbank {
         get {
-            if (Column?.Database == null) { return "?"; }
-            return Column.Database.TableName;
+            if (Column?.Database is not DatabaseAbstract db || db.IsDisposed) { return "?"; }
+            return db.TableName;
         }
     }
 
@@ -182,7 +182,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
         gr.DrawLine(Pens.Black, 0, 210, bmp.Width, 210);
 
-        var r = Column.Database.Row.First();
+        var r = Column.Database?.Row.First();
         if (r != null && !r.IsDisposed) {
             Table.Draw_FormatedText(gr, r.CellGetString(Column), Column, new Rectangle(0, 210, bmp.Width, 90), Design.Table_Cell, States.Standard, ShortenStyle.Replaced, Column.BehaviorOfImageAndText);
         }

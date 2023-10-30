@@ -74,7 +74,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         if (_frmHeadEditorFormClosingIsin) { return; }
         _frmHeadEditorFormClosingIsin = true;
         base.OnFormClosing(e);
-        if (Database == null || Database.IsDisposed) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) {
             return;
         }
 
@@ -85,43 +85,43 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
 
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         PermissionGroups_NewRow.Item.Clear();
-        PermissionGroups_NewRow.Item.AddRange(Database.PermissionGroupsNewRow);
+        PermissionGroups_NewRow.Item.AddRange(db.PermissionGroupsNewRow);
 
         DatenbankAdmin.Item.Clear();
-        DatenbankAdmin.Item.AddRange(Database.DatenbankAdmin);
+        DatenbankAdmin.Item.AddRange(db.DatenbankAdmin);
 
-        txbKennwort.Text = Database.GlobalShowPass;
+        txbKennwort.Text = db.GlobalShowPass;
         lbxSortierSpalten.Item.Clear();
 
-        if (Database.SortDefinition != null) {
-            btnSortRichtung.Checked = Database.SortDefinition.Reverse;
-            if (Database.SortDefinition?.Columns != null) {
-                foreach (var thisColumn in Database.SortDefinition.Columns) {
+        if (db.SortDefinition != null) {
+            btnSortRichtung.Checked = db.SortDefinition.Reverse;
+            if (db.SortDefinition?.Columns != null) {
+                foreach (var thisColumn in db.SortDefinition.Columns) {
                     if (thisColumn != null && !thisColumn.IsDisposed) {
                         _ = lbxSortierSpalten.Item.Add(thisColumn);
                     }
                 }
             }
         }
-        txbTags.Text = Database.Tags.JoinWithCr();
+        txbTags.Text = db.Tags.JoinWithCr();
 
-        txbCaption.Text = Database.Caption;
-        txbGlobalScale.Text = Database.GlobalScale.ToString(Constants.Format_Float1);
-        txbAdditionalFiles.Text = Database.AdditionalFilesPfad;
-        txbStandardFormulaFile.Text = Database.StandardFormulaFile;
-        txbZeilenQuickInfo.Text = Database.ZeilenQuickInfo.Replace("<br>", "\r");
+        txbCaption.Text = db.Caption;
+        txbGlobalScale.Text = db.GlobalScale.ToString(Constants.Format_Float1);
+        txbAdditionalFiles.Text = db.AdditionalFilesPfad;
+        txbStandardFormulaFile.Text = db.StandardFormulaFile;
+        txbZeilenQuickInfo.Text = db.ZeilenQuickInfo.Replace("<br>", "\r");
 
         PermissionGroups_NewRow.Suggestions.Clear();
-        PermissionGroups_NewRow.Suggestions.AddRange(Database.Permission_AllUsed(false));
+        PermissionGroups_NewRow.Suggestions.AddRange(db.Permission_AllUsed(false));
 
         DatenbankAdmin.Suggestions.Clear();
-        DatenbankAdmin.Suggestions.AddRange(Database.Permission_AllUsed(false));
+        DatenbankAdmin.Suggestions.AddRange(db.Permission_AllUsed(false));
 
         lbxSortierSpalten.Suggestions.Clear();
-        lbxSortierSpalten.Suggestions.AddRange(Database.Column, false);
+        lbxSortierSpalten.Suggestions.AddRange(db.Column, false);
 
         GenerateInfoText();
     }
@@ -227,7 +227,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         Database.Column.GenerateAndAddSystem();
     }
@@ -238,7 +238,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void GenerateInfoText() {
-        if (Database == null || Database.IsDisposed) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) {
             capInfo.Text = "Datenbank-Fehler";
             return;
         }
@@ -306,14 +306,14 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     private void GlobalTab_Selecting(object sender, TabControlCancelEventArgs e) {
         if (e.TabPage == tabUndo) {
-            if (tblUndo.Database == null) { GenerateUndoTabelle(); }
+            if (tblUndo.Database is null) { GenerateUndoTabelle(); }
         }
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
     private void RemoveDatabase() {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         Database.Disposing -= Database_Disposing;
         Database = null;
     }
@@ -351,7 +351,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void WriteInfosBack() {
-        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditAcut) || Database == null) { return; }
+        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditAcut) || Database == null || Database.IsDisposed) { return; }
 
         //eventScriptEditor.WriteScriptBack();
         Database.GlobalShowPass = txbKennwort.Text;

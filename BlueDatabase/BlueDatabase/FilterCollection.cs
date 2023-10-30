@@ -68,7 +68,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
             return f?.SearchValue[0] ?? string.Empty;
         }
         set {
-            if (Database == null || Database.IsDisposed) { return; }
+            if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
             var f = this[null];
             if (f != null) {
@@ -102,34 +102,34 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     }
 
     public void Add(FilterType filterType, string filterBy) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         AddIfNotExists(new FilterItem(Database, filterType, filterBy));
     }
 
     public void Add(FilterType filterType, List<string> filterBy) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         AddIfNotExists(new FilterItem(Database, filterType, filterBy));
     }
 
     public void Add(string columnName, FilterType filterType, string filterBy) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         Add(Database?.Column.Exists(columnName), filterType, filterBy);
     }
 
     public void Add(string columnName, FilterType filterType, List<string> filterBy) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         Add(Database?.Column.Exists(columnName), filterType, filterBy);
     }
 
     public void Add(ColumnItem? column, FilterType filterType, List<string> filterBy) {
-        if (column?.Database == null || column.Database.IsDisposed) { return; }
+        if (column?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         AddIfNotExists(new FilterItem(column, filterType, filterBy));
     }
 
     public void Add(ColumnItem? column, FilterType filterType, string filterBy) {
-        if (column?.Database == null || column.Database.IsDisposed) { return; }
+        if (column?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         AddIfNotExists(new FilterItem(column, filterType, filterBy));
     }
 

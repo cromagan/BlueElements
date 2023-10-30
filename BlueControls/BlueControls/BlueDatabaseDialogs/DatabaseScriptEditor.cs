@@ -30,6 +30,8 @@ using BlueDatabase.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
+using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -80,7 +82,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     public DatabaseScriptDescription? Item {
         get {
-            if (Database == null || Database.IsDisposed) { return null; }
+            if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
 
             return _item;
         }
@@ -134,7 +136,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     public void OpenAdditionalFileFolder() {
         //Todo: Implementieren
-        if (Database == null || Database.IsDisposed) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) {
             return;
         }
 
@@ -145,7 +147,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         base.OnFormClosing(e);
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         WriteInfosBack();
         RemoveDatabase();
@@ -157,7 +159,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         var didMessage = false;
 
         lstEventScripts.Item.Clear();
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         foreach (var thisSet in Database.EventScript) {
             if (thisSet != null) {
@@ -187,15 +189,15 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
     private void btnVersionErhöhen_Click(object sender, System.EventArgs e) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         btnVersionErhöhen.Enabled = false;
 
-        var tmp = Database.EventScriptVersion;
+        _ = IntTryParse(Database.EventScriptVersion, out var tmp);
         tmp++;
         if (tmp == int.MaxValue) { tmp = 0; }
 
-        Database.EventScriptVersion = tmp;
+        Database.EventScriptVersion = tmp.ToString();
     }
 
     private void chkAendertWerte_CheckedChanged(object sender, System.EventArgs e) {
@@ -226,7 +228,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void chkZeile_CheckedChanged(object sender, System.EventArgs e) {
         if (Item == null) { return; }
 
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         if (chkZeile.Checked && !Database.IsRowScriptPossible(false)) {
             if (!EnableScript()) { chkZeile.Checked = false; }
@@ -249,7 +251,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private bool EnableScript() {
-        if (Database == null || Database.IsDisposed) { return false; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
 
         var s = MessageBox.Show("Für Zeilenskripte werden bestimmte Systemspalten benötigt.<br>Sollen diese erstellt werden?", ImageCode.Spalte, "Ja", "Nein");
 
@@ -265,7 +267,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void eventScriptEditor_ExecuteScript(object sender, BlueScript.EventArgs.ScriptEventArgs e) {
-        if (Database == null || Database.IsDisposed) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) {
             e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
             return;
         }
@@ -313,7 +315,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
 
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         var newScriptItem = lstEventScripts.Item.Add(new DatabaseScriptDescription(Database));
 
@@ -336,7 +338,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void RemoveDatabase() {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         Item = null;
         Database.Disposing -= Database_Disposing;
         Database.CanDoScript -= Database_CanDoScript;
@@ -379,7 +381,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void WriteInfosBack() {
-        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null) { return; }
+        if (TableView.ErrorMessage(Database, EditableErrorReasonType.EditNormaly) || Database == null || Database.IsDisposed) { return; }
 
         if (_item != null) {
             _item.ScriptText = eventScriptEditor.ScriptText;

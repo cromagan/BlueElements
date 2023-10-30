@@ -36,9 +36,7 @@ public sealed class ColumnViewItem : IParseable {
         ViewType = type;
     }
 
-    public ColumnViewItem(ColumnViewCollection parent, string toParse) : this(parent) {
-        this.Parse(toParse);
-    }
+    public ColumnViewItem(ColumnViewCollection parent, string toParse) : this(parent) => this.Parse(toParse);
 
     private ColumnViewItem(ColumnViewCollection parent) : base() {
         Parent = parent;

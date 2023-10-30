@@ -247,8 +247,7 @@ public partial class TableView : FormWithStatusBar {
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(false);
         DatabaseAbstract.ForceSaveAll();
-
-        if (Table.Database == null || Table.Database.IsDisposed) { return; }
+        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         switch (e.Item.KeyName) {
             case "erweitert":
@@ -260,7 +259,7 @@ public partial class TableView : FormWithStatusBar {
                     selectedRows = Table.VisibleUniqueRows();
                 }
 
-                using (ExportDialog l = new(Table.Database, selectedRows)) {
+                using (ExportDialog l = new(db, selectedRows)) {
                     _ = l.ShowDialog();
                 }
 
@@ -467,7 +466,7 @@ public partial class TableView : FormWithStatusBar {
     /// </summary>
     /// <returns></returns>
     protected bool SwitchTabToDatabase(DatabaseAbstract? database) {
-        if (database == null || database.IsDisposed) {
+        if (database is null || database.IsDisposed) {
             return false;
         }
 
@@ -501,20 +500,20 @@ public partial class TableView : FormWithStatusBar {
             _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column != null && column.Format.CanBeChangedByRules());
             _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column != null && column.Format.CanBeChangedByRules());
             _ = e.UserMenu.Add(ContextMenuComands.VorherigenInhaltWiederherstellen, editable && column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
-            _ = e.UserMenu.Add(ContextMenuComands.SuchenUndErsetzen, column != null && tbl.Database.IsAdministrator());
+            _ = e.UserMenu.Add(ContextMenuComands.SuchenUndErsetzen, column != null && db.IsAdministrator());
             _ = e.UserMenu.AddSeparator();
             _ = e.UserMenu.Add("Spalte", true);
-            _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null && tbl.Database.IsAdministrator());
-            _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && tbl.Database.IsAdministrator());
-            _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && tbl.Database.IsAdministrator());
+            _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null && db.IsAdministrator());
+            _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && db.IsAdministrator());
+            _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && db.IsAdministrator());
             _ = e.UserMenu.AddSeparator();
         }
 
         _ = e.UserMenu.Add("Zeile", true);
-        _ = e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && tbl.Database.IsAdministrator());
-        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null && tbl.Database.HasErrorCheckScript());
+        _ = e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && db.IsAdministrator());
+        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null && db.HasErrorCheckScript());
 
-        foreach (var thiss in tbl.Database.EventScript) {
+        foreach (var thiss in db.EventScript) {
             if (thiss != null && thiss.ManualExecutable && thiss.NeedRow) {
                 _ = e.UserMenu.Add("Skript: " + thiss.ReadableText(), "Skript|" + thiss.KeyName, ImageCode.Skript, row != null && thiss.IsOk());
             }
@@ -568,19 +567,18 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "ZeileLöschen":
-                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditCurrently)) { return; }
-                if (!tbl.Database.IsAdministrator()) { return; }
+                if (ErrorMessage(db, EditableErrorReasonType.EditCurrently)) { return; }
+                if (!db.IsAdministrator()) { return; }
                 if (row == null || row.IsDisposed) { return; }
 
-                if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja",
-                        "Nein") == 0) {
-                    _ = tbl.Database.Row.Remove(row, "Benutzer: löschen Befehl");
+                if (MessageBox.Show("Zeile wirklich löschen? (<b>" + valueCol0 + "</b>)", ImageCode.Frage, "Ja", "Nein") == 0) {
+                    _ = db.Row.Remove(row, "Benutzer: löschen Befehl");
                 }
 
                 break;
 
             case "ContentDelete":
-                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditCurrently)) { return; }
+                if (ErrorMessage(db, EditableErrorReasonType.EditCurrently)) { return; }
 
                 row?.CellSet(column, string.Empty);
                 //tbl.Database.Cell.Delete(column, row?.KeyName);
@@ -596,30 +594,25 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "SuchenUndErsetzen":
-                if (!tbl.Database.IsAdministrator()) {
-                    return;
-                }
+                if (!db.IsAdministrator()) { return; }
 
                 Table.OpenSearchAndReplace();
                 break;
 
             case "Summe":
-                if (!tbl.Database.IsAdministrator()) {
-                    return;
-                }
+                if (!db.IsAdministrator()) { return; }
 
                 var summe = column?.Summe(Table.Filter);
                 if (!summe.HasValue) {
                     MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
                 } else {
-                    MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, ImageCode.Summe,
-                        "OK");
+                    MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, ImageCode.Summe, "OK");
                 }
 
                 break;
 
             case "Statistik":
-                if (!tbl.Database.IsAdministrator() || column == null) { return; }
+                if (!db.IsAdministrator() || column == null) { return; }
 
                 var split = false;
                 if (column.MultiLine) {
@@ -630,7 +623,7 @@ public partial class TableView : FormWithStatusBar {
                 break;
 
             case "VorherigenInhaltWiederherstellen":
-                if (ErrorMessage(tbl.Database, EditableErrorReasonType.EditCurrently)) { return; }
+                if (ErrorMessage(db, EditableErrorReasonType.EditCurrently)) { return; }
 
                 Table.DoUndo(column, row);
                 break;
@@ -746,7 +739,7 @@ public partial class TableView : FormWithStatusBar {
     private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
 
     private void btnClipboardImport_Click(object sender, System.EventArgs e) {
-        if (Table.Database == null || !Table.Database.IsAdministrator()) {
+        if (Table.Database is not DatabaseAbstract db || !db.IsAdministrator()) {
             return;
         }
 
@@ -766,22 +759,20 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (Table.Database == null) {
+        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) {
             return;
         }
 
-        var x = new ConnectedFormulaEditor(Table.Database.FormulaFileName(), null);
+        var x = new ConnectedFormulaEditor(db.FormulaFileName(), null);
         x.Show();
         //x?.Dispose();
     }
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (Table.Database == null) {
-            return;
-        }
+        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        OpenLayoutEditor(Table.Database, string.Empty);
+        OpenLayoutEditor(db, string.Empty);
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -888,17 +879,17 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
-        if (Table.Database == null) { return; }
+        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        var x = new ColumnArrangementPadEditor(Table.Database);
+        var x = new ColumnArrangementPadEditor(db);
         _ = x.ShowDialog();
 
-        if (Table.Database.ColumnArrangements.Count == 0) { return; }
+        if (db.ColumnArrangements.Count == 0) { return; }
 
-        var car = Table.Database.ColumnArrangements.CloneWithClones();
+        var car = db.ColumnArrangements.CloneWithClones();
         if (car[0] is ColumnViewCollection cvc) {
             cvc.ShowAllColumns();
-            Table.Database.ColumnArrangements = new(car);
+            db.ColumnArrangements = new(car);
         }
 
         Table.Invalidate_HeadSize();
@@ -995,15 +986,15 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
-        if (Table.Database == null || Table.Database.IsDisposed) { return; }
-        if (!Table.Database.IsAdministrator()) { return; }
+        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (!db.IsAdministrator()) { return; }
 
         var m = MessageBox.Show("Angezeigte Zeilen löschen?", ImageCode.Warnung, "Ja", "Nein");
         if (m != 0) {
             return;
         }
 
-        _ = Table.Database.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeile löschen");
+        _ = db.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeile löschen");
     }
 
     private void btnZurück_Click(object sender, System.EventArgs e) {
@@ -1037,12 +1028,12 @@ public partial class TableView : FormWithStatusBar {
 
         const bool enTabAllgemein = true;
         var enTabellenAnsicht = true;
-        if (Table.Database == null || Table.Database.IsDisposed || !Table.Database.IsAdministrator()) {
+        if (Table.Database is not DatabaseAbstract db || db.IsDisposed || !db.IsAdministrator()) {
             tabAdmin.Enabled = false;
             return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
         }
 
-        var m = DatabaseAbstract.EditableErrorReason(Table.Database, EditableErrorReasonType.EditCurrently);
+        var m = DatabaseAbstract.EditableErrorReason(db, EditableErrorReasonType.EditCurrently);
 
         if (Table.Design != BlueTableAppearance.Standard || !Table.Enabled || !string.IsNullOrEmpty(m)) {
             enTabellenAnsicht = false;
@@ -1053,7 +1044,8 @@ public partial class TableView : FormWithStatusBar {
         tabAdmin.Enabled = true;
     }
 
-    private void Check_SuchButton() => btnTextSuche.Enabled = Table.Database != null && Table.Database.Row.Count >= 1 &&
+    private void Check_SuchButton() => btnTextSuche.Enabled = Table.Database is DatabaseAbstract db &&
+                                                                db.Row.Count >= 1 &&
                                                               !string.IsNullOrEmpty(txbTextSuche.Text) &&
                                                               !string.IsNullOrEmpty(txbTextSuche.Text.RemoveChars(" "));
 
@@ -1148,7 +1140,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void lstAufgaben_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Table.Database == null) { return; }
+        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         lstAufgaben.Enabled = false;
 
@@ -1157,13 +1149,13 @@ public partial class TableView : FormWithStatusBar {
 
             if (sc.NeedRow) {
                 if (MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
-                    m = Table.Database.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
+                    m = db.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
                 } else {
                     m = "Durch Benutzer abgebrochen";
                 }
             } else {
                 //public Script? ExecuteScript(Events? eventname, string? scriptname, bool onlyTesting, RowItem? row) {
-                var s = Table.Database.ExecuteScript(sc, sc.ChangeValues, null, null);
+                var s = db.ExecuteScript(sc, sc.ChangeValues, null, null);
                 m = s.Protocol.JoinWithCr();
             }
 
@@ -1183,23 +1175,23 @@ public partial class TableView : FormWithStatusBar {
             switch (com[0].ToLower()) {
                 case "#repairscript":
                 case "#editscript":
-                    OpenScriptEditor(Table.Database);
-                    UpdateScripts(Table.Database);
+                    OpenScriptEditor(db);
+                    UpdateScripts(db);
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
 
                 case "#enablerowscript":
-                    Table.Database.EnableScript();
-                    UpdateScripts(Table.Database);
+                    db.EnableScript();
+                    UpdateScripts(db);
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
 
                 case "#repaircolumn":
-                    var c = Table.Database.Column.Exists(com[1]);
+                    var c = db.Column.Exists(com[1]);
                     OpenColumnEditor(c, null);
-                    UpdateScripts(Table.Database);
+                    UpdateScripts(db);
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
 
                 case "#datenüberprüfung":
-                    var rows = Table.Database.Row.CalculateVisibleRows(Table.Filter, Table.PinnedRows);
+                    var rows = db.Row.CalculateVisibleRows(Table.Filter, Table.PinnedRows);
 
                     foreach (var thisR in rows) {
                         thisR.InvalidateCheckData();
@@ -1246,7 +1238,7 @@ public partial class TableView : FormWithStatusBar {
         column = Table.View_ColumnFirst();
         row = null;
 
-        if (Table.Database == null || Table.Database.Row.Count < 1) { return; }
+        if (Table.Database is not DatabaseAbstract db || db.Row.Count < 1) { return; }
 
         // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
         if (richtung.HasFlag(Direction.Unten)) {

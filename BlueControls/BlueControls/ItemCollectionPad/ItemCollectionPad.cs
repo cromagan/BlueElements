@@ -97,9 +97,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(string layoutFileName) : this(File.ReadAllText(layoutFileName, Constants.Win1252), string.Empty) {
-        Connections.CollectionChanged += ConnectsTo_CollectionChanged;
-    }
+    public ItemCollectionPad(string layoutFileName) : this(File.ReadAllText(layoutFileName, Constants.Win1252), string.Empty) => Connections.CollectionChanged += ConnectsTo_CollectionChanged;
 
     /// <summary>
     ///

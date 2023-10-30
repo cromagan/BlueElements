@@ -97,7 +97,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptRow, IContro
     }
 
     public void SetData(DatabaseAbstract? database, string? rowkey) {
-        if (database == null || _inputcolumn == null || _outputcolumn == null) {
+        if (database is null || _inputcolumn == null || _outputcolumn == null) {
             Filter = new FilterItem();
             return;
         }

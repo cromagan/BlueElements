@@ -64,8 +64,8 @@ internal sealed partial class SearchAndReplace : Form {
 
     private void Checkbuttons() {
         var canDo = true;
-        if (_table.Database == null) { return; }
-        if (!_table.Database.IsAdministrator()) { canDo = false; }
+        if (_table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (!db.IsAdministrator()) { canDo = false; }
         if (SucheNach.Checked) {
             if (string.IsNullOrEmpty(Alt.Text)) { canDo = false; }
             Alt.Enabled = true;
@@ -115,10 +115,10 @@ internal sealed partial class SearchAndReplace : Form {
 
         if (_table.Database is not DatabaseAbstract db) { return; }
 
-        List<ColumnItem?> sp = new();
+        List<ColumnItem> sp = new();
         List<RowItem> ro = new();
         if (NurinAktuellerSpalte.Checked) {
-            sp.Add(_table.CursorPosColumn);
+            if (_table.CursorPosColumn is ColumnItem c) { sp.Add(c); }
         } else {
             sp.AddRange(db.Column.Where(thisColumn => thisColumn != null && thisColumn.Format.CanBeChangedByRules()));
         }
@@ -166,7 +166,7 @@ internal sealed partial class SearchAndReplace : Form {
         }
         p.Close();
 
-        db.Row.ExecuteValueChanged(true);
+        db.Row.ExecuteValueChangedEvent(true);
 
         MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
         _isWorking = false;

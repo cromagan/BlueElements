@@ -170,16 +170,16 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     }
 
     protected override void GeneratePic() {
-        if (string.IsNullOrEmpty(_layoutFileName) || Database == null || Database.IsDisposed) {
+        if (string.IsNullOrEmpty(_layoutFileName) || Database is not DatabaseAbstract db || db.IsDisposed) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
 
-        var lf = Database.GetLayout(_layoutFileName);
+        var lf = db.GetLayout(_layoutFileName);
 
         CreativePad pad = new(new ItemCollectionPad(lf));
         pad.Item.ResetVariables();
-        pad.Item.ParseVariable(Database, _rowKey);
+        pad.Item.ParseVariable(db, _rowKey);
         var re = pad.Item.MaxBounds(string.Empty);
 
         var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);

@@ -230,7 +230,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
-        if (InputDatabase == null) { return l; }
+        if (InputDatabase is not DatabaseAbstract db) { return l; }
 
         l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
 
@@ -251,6 +251,12 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
+    }
+
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string tag, string value) {
@@ -306,20 +312,20 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             return;
         }
 
-        if (GetRowFrom.OutputDatabase == null) {
+        if (GetRowFrom.OutputDatabase is not DatabaseAbstract db || db.IsDisposed) {
             MessageBox.Show("Quelle fehlerhaft!");
             return;
         }
 
         var lst = new ItemCollectionList.ItemCollectionList(true);
-        lst.AddRange(GetRowFrom.OutputDatabase.Column, false);
+        lst.AddRange(db.Column, false);
         //lst.Sort();
 
         var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
 
         if (sho == null || sho.Count != 1) { return; }
 
-        var col = GetRowFrom.OutputDatabase.Column.Exists(sho[0]);
+        var col = db.Column.Exists(sho[0]);
 
         if (col == Column) { return; }
         Column = col;
@@ -375,12 +381,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        //_itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

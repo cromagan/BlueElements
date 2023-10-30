@@ -79,8 +79,8 @@ public static class ItemSendSomethingExtension {
     }
 
     public static void Datenbankkopf(this IItemSendSomething item) {
-        if (item.OutputDatabase == null || item.OutputDatabase.IsDisposed) { return; }
-        TableView.OpenDatabaseHeadEditor(item.OutputDatabase);
+        if (item.OutputDatabase is not DatabaseAbstract db || db.IsDisposed) { return; }
+        TableView.OpenDatabaseHeadEditor(db);
     }
 
     public static void DoChilds(this IItemSendSomething item) {
@@ -224,9 +224,9 @@ public class ItemSendSomething {
 
         l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
 
-        if (item.OutputDatabase == null || item.OutputDatabase.IsDisposed) { return l; }
+        if (item.OutputDatabase is not DatabaseAbstract db || db.IsDisposed) { return l; }
 
-        l.Add(new FlexiControlForDelegate(item.Datenbankkopf, "Datenbank: '" + item.OutputDatabase.Caption + "'", ImageCode.Stift));
+        l.Add(new FlexiControlForDelegate(item.Datenbankkopf, "Datenbank: '" + db.Caption + "'", ImageCode.Stift));
 
         return l;
     }

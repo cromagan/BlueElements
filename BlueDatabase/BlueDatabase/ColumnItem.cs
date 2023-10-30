@@ -732,7 +732,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public DatabaseAbstract? LinkedDatabase {
         get {
-            if (Database == null || Database.IsDisposed) { return null; }
+            if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
 
             if (string.IsNullOrEmpty(_linkedDatabaseTableName)) { return null; }
 
@@ -1092,7 +1092,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && Format.Autofilter_möglich();
 
     public int CalculatePreveredMaxCellLenght(double prozentZuschlag) {
-        if (Database == null || Database.IsDisposed) { return 0; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return 0; }
 
         //if (Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) { return 35; }
         //if (Format == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return 15; }
@@ -1112,7 +1112,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public int CalculatePreveredMaxTextLenght(double prozentZuschlag) {
-        if (Database == null || Database.IsDisposed) { return 0; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return 0; }
 
         ////if (Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) { return 35; }
         ////if (Format == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return 15; }
@@ -1280,7 +1280,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public List<string> Contents(ICollection<FilterItem>? filter, List<RowItem>? pinned) {
         List<string> list = new();
-        if (Database == null || Database.IsDisposed) { return list; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return list; }
 
         RefreshColumnsData();
 
@@ -1303,7 +1303,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public void DeleteContents(FilterCollection filter, List<RowItem?>? pinned) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         foreach (var thisRowItem in Database.Row) {
             if (thisRowItem != null) {
@@ -1322,7 +1322,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public string ErrorReason() {
-        if (Database == null || Database.IsDisposed) { return "Datenbank verworfen"; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank verworfen"; }
         //if (_name < 0) { return "Interner Fehler: ID nicht definiert"; }
         if (string.IsNullOrEmpty(_name)) { return "Der Spaltenname ist nicht definiert."; }
 
@@ -1349,9 +1349,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         //if (!_saveContent && _showUndo) { return "Wenn der Inhalt der Spalte nicht gespeichert wird, darf auch kein Undo geloggt werden."; }
         if (((int)_format).ToString() == _format.ToString()) { return "Format fehlerhaft."; }
         if (_format.NeedTargetDatabase()) {
-            if (LinkedDatabase == null) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
-            if (LinkedDatabase == Database) { return "Zirkelbezug mit verknüpfter Datenbank."; }
-            var c = LinkedDatabase.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
+            if (LinkedDatabase is not DatabaseAbstract db2 || db2.IsDisposed) { return "Verknüpfte Datenbank fehlt oder existiert nicht."; }
+            if (db == db2) { return "Zirkelbezug mit verknüpfter Datenbank."; }
+            var c = db2.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
             //var (filter, info) = CellCollection.GetFilterFromLinkedCellData(LinkedDatabase, column, row);
             if (_linkedCellFilter == null || _linkedCellFilter.Count == 0) {
@@ -1487,7 +1487,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public void Invalidate_ColumAndContent() {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         Invalidate_Head();
         Invalidate_ContentWidth();
         Invalidate_LinkedDatabase();
@@ -1543,7 +1543,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public void OnChanged() => Changed?.Invoke(this, new ColumnEventArgs(this));
 
     public string QuickInfoText(string additionalText) {
-        if (Database == null || Database.IsDisposed) { return string.Empty; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
         var T = string.Empty;
         if (!string.IsNullOrEmpty(_quickInfo)) { T += _quickInfo; }
         if (Database.IsAdministrator() && !string.IsNullOrEmpty(_adminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + _adminInfo; }
@@ -1558,7 +1558,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public string ReadableText() {
-        if (Database == null || Database.IsDisposed) { return string.Empty; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
 
         var ret = _caption;
         if (Database.Column.Any(thisColumnItem => thisColumnItem != null && thisColumnItem != this && string.Equals(thisColumnItem.Caption, _caption, StringComparison.OrdinalIgnoreCase))) {
@@ -1592,7 +1592,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public void RefreshColumnsData() {
         if (IsInCache != null) { return; }
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (_name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
 
         var x = new List<ColumnItem> { this };
@@ -1602,7 +1602,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public void Repair() {
         if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut))) { return; }
 
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (IsDisposed) { return; }
 
         if (_format == DataFormat.Button) { ScriptType = ScriptType.Nicht_vorhanden; }
@@ -1628,7 +1628,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
             #region Aus Dateinamen den Tablename extrahieren
 
-            if (!_linkedDatabaseTableName.Contains("|") && !_linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
+            if (!_linkedDatabaseTableName.Contains("|") && _linkedDatabaseTableName.IsFormat(FormatHolder.FilepathAndName)) {
                 _linkedDatabaseTableName = _linkedDatabaseTableName.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB");
                 LinkedDatabaseTableName = MakeValidTableName(_linkedDatabaseTableName);
             }
@@ -1850,7 +1850,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public void Statisik(ICollection<FilterItem>? filter, List<RowItem>? pinnedRows, bool ignoreMultiLine) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         var r = Database.Row.CalculateVisibleRows(filter, pinnedRows);
 
         if (r.Count < 1) { return; }
@@ -1915,7 +1915,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public double? Summe(FilterCollection? filter) {
-        if (Database == null || Database.IsDisposed) { return null; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
 
         double summ = 0;
         foreach (var thisrow in Database.Row) {
@@ -1964,18 +1964,18 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //            break;
     public QuickImage? SymbolForReadableText() {
         if (IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
-        if (Database == null || Database.IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
 
-        if (this == Database.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
+        if (this == db.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
 
-        if (this == Database.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
-        if (this == Database.Column.SysRowCreator) { return QuickImage.Get(ImageCode.Person); }
-        if (this == Database.Column.SysRowCreateDate) { return QuickImage.Get(ImageCode.Uhr); }
-        if (this == Database.Column.SysRowChangeDate) { return QuickImage.Get(ImageCode.Uhr); }
+        if (this == db.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
+        if (this == db.Column.SysRowCreator) { return QuickImage.Get(ImageCode.Person); }
+        if (this == db.Column.SysRowCreateDate) { return QuickImage.Get(ImageCode.Uhr); }
+        if (this == db.Column.SysRowChangeDate) { return QuickImage.Get(ImageCode.Uhr); }
 
-        if (this == Database.Column.SysLocked) { return QuickImage.Get(ImageCode.Schloss); }
+        if (this == db.Column.SysLocked) { return QuickImage.Get(ImageCode.Schloss); }
 
-        if (this == Database.Column.SysCorrect) { return QuickImage.Get(ImageCode.Warnung); }
+        if (this == db.Column.SysCorrect) { return QuickImage.Get(ImageCode.Warnung); }
 
         if (_format == DataFormat.RelationText) { return QuickImage.Get(ImageCode.Herz, 16); }
 
@@ -2010,14 +2010,14 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public string Useage() {
-        if (Database is null || Database.IsDisposed) { return string.Empty; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
 
         var t = "<b><u>Verwendung von " + ReadableText() + "</b></u><br>";
         if (IsSystemColumn()) {
             t += " - Systemspalte<br>";
         }
 
-        if (Database.SortDefinition?.Columns.Contains(this) ?? false) { t += " - Sortierung<br>"; }
+        if (db.SortDefinition?.Columns.Contains(this) ?? false) { t += " - Sortierung<br>"; }
         //var view = false;
         //foreach (var thisView in OldFormulaViews) {
         //    if (thisView[column] != null) { view = true; }
@@ -2025,13 +2025,13 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         //if (view) { t += " - Formular-Ansichten<br>"; }
         var cola = false;
         var first = true;
-        foreach (var thisView in Database.ColumnArrangements) {
+        foreach (var thisView in db.ColumnArrangements) {
             if (!first && thisView[this] != null) { cola = true; }
             first = false;
         }
         if (cola) { t += " - Benutzerdefinierte Spalten-Anordnungen<br>"; }
         if (UsedInScript()) { t += " - Regeln-Skript<br>"; }
-        if (Database.ZeilenQuickInfo.ToUpper().Contains(_name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
+        if (db.ZeilenQuickInfo.ToUpper().Contains(_name.ToUpper())) { t += " - Zeilen-Quick-Info<br>"; }
         if (_tags.JoinWithCr().ToUpper().Contains(_name.ToUpper())) { t += " - Datenbank-Tags<br>"; }
 
         if (!string.IsNullOrEmpty(Am_A_Key_For_Other_Column)) { t += Am_A_Key_For_Other_Column; }
@@ -2072,7 +2072,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 //    return editTypeToCheck is enEditTypeFormula.Textfeld or enEditTypeFormula.nur_als_Text_anzeigen;
                 //}
 
-                //if (LinkedDatabase == null) { return false; }
+                //if (LinkedDatabase is not DatabaseAbstract db) { return false; }
                 //if (string.IsNullOrEmpty_linkedCell_ColumnKeyOfLinkedDatabase < 0) { return false; }
                 var col = LinkedDatabase?.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
                 if (col == null) { return false; }
@@ -2127,7 +2127,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     internal void CheckIfIAmAKeyColumn() {
         Am_A_Key_For_Other_Column = string.Empty;
 
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         foreach (var c in Database.Column) {
             //if (thisColumn.KeyColumnKey == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
@@ -2147,7 +2147,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     internal string EditableErrorReason(EditableErrorReasonType mode, bool checkEditmode) {
-        if (Database == null || Database.IsDisposed) { return "Die Datenbank wurde verworfen."; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Die Datenbank wurde verworfen."; }
         if (IsDisposed) { return "Die Spalte wurde verworfen."; }
 
         var f = Database.EditableErrorReason(mode);
@@ -2535,7 +2535,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //        }
     //    }
     private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellChangedEventArgs e) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         if (e.Column.KeyName != LinkedCell_ColumnNameOfLinkedDatabase) { return; }
 
@@ -2545,7 +2545,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 Invalidate_ContentWidth();
                 Database.Cell.OnCellValueChanged(new CellChangedEventArgs(this, thisRow, e.Reason));
                 //_ = thisRow.ExecuteScript(EventTypes.value_changedx, string.Empty, true, false, true, 5);
-                thisRow.Database?.Row.AddRowWithChangedValue(thisRow, false);
+                thisRow.Database?.Row.AddRowWithChangedValue(thisRow);
             }
         }
     }
@@ -2601,7 +2601,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     private void GetLinkedDatabase() {
         Invalidate_LinkedDatabase(); // Um evtl. Events zu löschen
 
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         if (IsValidTableName(_linkedDatabaseTableName, false)) {
             var sr = string.Empty;
@@ -2609,7 +2609,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             _linkedDatabase = Database.GetOtherTable(_linkedDatabaseTableName, false, sr);
         }
 
-        if (_linkedDatabase == null) {
+        if (_linkedDatabase != null) {
             var ci = new ConnectionInfo(_linkedDatabaseTableName, null, Database.FreezedReason);
             _linkedDatabase = GetById(ci, false, null, true);
         }
@@ -2700,7 +2700,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// </summary>
     /// <returns></returns>
     private bool UsedInScript() {
-        if (Database == null || Database.IsDisposed) { return false; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
 
         foreach (var thiss in Database.EventScript) {
             if (thiss.ScriptText.ContainsWord(_name, RegexOptions.IgnoreCase)) { return true; }

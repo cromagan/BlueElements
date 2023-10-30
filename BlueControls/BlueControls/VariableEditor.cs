@@ -65,13 +65,13 @@ public partial class VariableEditor : UserControl {
     }
 
     public RowItem? RowOfVariable(string variable) {
-        if (tableVariablen?.Database == null) { return null; }
-        return tableVariablen.Database.Row[variable];
+        if (tableVariablen?.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        return db.Row[variable];
     }
 
     public RowItem? RowOfVariable(Variable variable) {
-        if (tableVariablen?.Database == null) { return null; }
-        return tableVariablen.Database.Row[variable.KeyName];
+        if (tableVariablen?.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        return db.Row[variable.KeyName];
     }
 
     public void WriteVariablesToTable(IReadOnlyCollection<Variable> variables) {
@@ -91,11 +91,11 @@ public partial class VariableEditor : UserControl {
 
         //tableVariablen.Database?.Row.Clear("Neue Variablen");
 
-        if (tableVariablen?.Database == null) { return; }
+        if (tableVariablen?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (variables == null) { return; }
 
         foreach (var thisv in variables) {
-            var ro = RowOfVariable(thisv) ?? tableVariablen.Database.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");
+            var ro = RowOfVariable(thisv) ?? db.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");
 
             if (ro != null) {
                 ro.CellSet("typ", thisv.MyClassId);
@@ -183,17 +183,14 @@ public partial class VariableEditor : UserControl {
         filterVariablen.Table = tableVariablen;
 
         tableVariablen.CellValueChanged += TableVariablen_CellValueChanged;
-
     }
 
     private void TableVariablen_CellValueChanged(object sender, BlueDatabase.EventArgs.CellChangedEventArgs e) {
-
         var c = tableVariablen.Database?.Column.First();
         if (e.Column == c) {
             if (e.Row.CellIsNullOrEmpty(c))
-                tableVariablen.Database?.Row.Remove(e.Row,"Variable gelöscht");
+                tableVariablen.Database?.Row.Remove(e.Row, "Variable gelöscht");
         }
-
     }
 
     #endregion

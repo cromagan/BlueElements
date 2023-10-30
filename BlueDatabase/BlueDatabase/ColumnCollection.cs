@@ -138,12 +138,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //GC.SuppressFinalize(this);
     }
 
-    //    foreach (var thisKey in keys) {
-    //        Remove(thisKey, comment);
-    //    }
-    //}
     public ColumnItem? Exists(string? columnName) {
-        if (Database == null || Database.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
 
         try {
             columnName = columnName.ToUpper();
@@ -161,7 +157,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? First() {
         // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
-        if (Database == null || Database.IsDisposed) { return null; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
 
         if (Database.ColumnArrangements.Count < 1 || Database.ColumnArrangements[0].Count != Database.Column.Count()) {
             //Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
@@ -176,7 +172,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     //public ColumnItem? this[int index] {
     //    get {
-    //        if (Database == null || Database.IsDisposed) { return null; }
+    //        if (Database is not DatabaseAbstract db || Database.IsDisposed) { return null; }
 
     //        //var L = new List<string>();
 
@@ -244,7 +240,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             return null;
         }
 
-        if (Database == null || Database.IsDisposed) { return null; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
 
         //var item = SearchByKey(key);
         //if (item != null) {
@@ -290,7 +286,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public void GenerateOverView() {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         Html da = new(Database.TableName);
         da.AddCaption("Spaltenliste von: " + Database.Caption);
         da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.TableName + "</h1><br>");
@@ -415,8 +411,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void Repair() {
         GetSystems();
-
-        if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut)) || Database == null) { return; }
+        if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut)) || Database is null) { return; }
 
         //for (var s1 = 0; s1 < Count; s1++) {
         //    if (this[s1] != null) {
@@ -469,7 +464,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     internal bool ChangeName(string oldName, string newName) {
         if (oldName == newName) { return true; }
-        if (Database == null || Database.IsDisposed) { return false; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
 
         var ok = _internal.TryRemove(oldName.ToUpper(), out var vcol);
         if (!ok) { return false; }
@@ -522,7 +517,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     internal string SetValueInternal(DatabaseDataType type, Reason reason, string name) {
-        if (Database == null || Database.IsDisposed) { return "Datenbank verworfen!"; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank verworfen!"; }
         //if (key is null or < 0) { return "Schlüsselfehler"; }
 
         //if (type == DatabaseDataType.Comand_AddColumnByKey) {

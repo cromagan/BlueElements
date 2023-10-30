@@ -261,7 +261,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public string CellGetString(string columnName) => Database?.Cell.GetString(Database?.Column[columnName], this) ?? string.Empty;
 
     public string CellGetString(ColumnItem column) {
-        if (Database == null || Database.IsDisposed || column.IsDisposed) { return string.Empty; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed || column.IsDisposed) { return string.Empty; }
         return Database.Cell.GetString(column, this);
     }
 
@@ -300,12 +300,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public void CellSet(ColumnItem column, DateTime value) => Database?.Cell.Set(column, this, value);
 
     public void CheckRowDataIfNeeded() {
-        if (Database is null || Database.IsDisposed) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) {
             LastCheckedMessage = "Datenbank verworfen";
             return;
         }
 
-        if (!Database.IsRowScriptPossible(true)) {
+        if (!db.IsRowScriptPossible(true)) {
             LastCheckedMessage = "Zeilenprüfung deaktiviert";
             return;
         }
@@ -327,7 +327,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             foreach (var thiss in tmp) {
                 _ = cols.AddIfNotExists(thiss);
                 var t = thiss.SplitBy("|");
-                var thisc = Database?.Column.Exists(t[0]);
+                var thisc = db?.Column.Exists(t[0]);
                 if (thisc != null) {
                     LastCheckedMessage = LastCheckedMessage + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
                 }
@@ -338,9 +338,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             LastCheckedMessage += "Diese Zeile ist fehlerfrei.";
         }
 
-        if (Database?.Column.SysCorrect != null) {
-            if (IsNullOrEmpty(Database.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(Database.Column.SysCorrect)) {
-                CellSet(Database.Column.SysCorrect, cols.Count == 0);
+        if (db?.Column.SysCorrect != null) {
+            if (IsNullOrEmpty(db.Column.SysCorrect) || cols.Count == 0 != CellGetBoolean(db.Column.SysCorrect)) {
+                CellSet(db.Column.SysCorrect, cols.Count == 0);
             }
         }
 
@@ -350,17 +350,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void CloneFrom(RowItem source, bool nameAndKeyToo) {
-        if (Database is null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         var sdb = source.Database;
         if (sdb is null || sdb.IsDisposed) { return; }
 
         if (nameAndKeyToo) { KeyName = source.KeyName; }
 
-        foreach (var thisColumn in Database.Column) {
+        foreach (var thisColumn in db.Column) {
             var value = sdb.Cell.GetStringCore(sdb.Column[thisColumn.KeyName], source);
 
-            _ = Database.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, string.Empty, Generic.UserName, DateTime.UtcNow);
+            _ = db.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, string.Empty, Generic.UserName, DateTime.UtcNow);
 
             //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source), false);
         }
@@ -370,7 +370,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         StringBuilder r = new();
         if (columns != null) {
             foreach (var t in columns) {
-                if (t.LinkedDatabase == null) {
+                if (t.LinkedDatabase is not DatabaseAbstract db || db.IsDisposed) {
                     // LinkedDatabase = null - Ansonsten wird beim Sortieren alles immer wieder geladen,
                     _ = r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
                 }
@@ -410,7 +410,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues, float tryforsceonds) {
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m) || Database == null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
+        if (!string.IsNullOrEmpty(m) || Database is null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
         do {
@@ -427,17 +427,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public bool IsNullOrEmpty() {
-        if (Database == null || Database.IsDisposed) { return true; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return true; }
         return Database.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
     }
 
     public bool IsNullOrEmpty(ColumnItem? column) {
-        if (Database == null || Database.IsDisposed) { return true; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return true; }
         return Database.Cell.IsNullOrEmpty(column, this);
     }
 
     public bool MatchesTo(FilterItem filter) {
-        if (Database == null || Database.IsDisposed) { return false; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
 
         if (filter.IsDisposed) { return true; }
 
@@ -460,7 +460,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public bool MatchesTo(ICollection<FilterItem>? filter) {
-        if (Database == null || Database.IsDisposed) { return false; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
         if (filter == null || filter.Count == 0) { return true; }
 
         Database.RefreshColumnsData(filter);
@@ -473,6 +473,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return true;
     }
 
+    public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
+                                     CellGetString(srs) != Database.EventScriptVersion &&
+                                     Database.IsRowScriptPossible(true);
+
     /// <summary>
     ///
     /// </summary>
@@ -481,7 +485,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="removeLineBreaks"></param>
     /// <returns></returns>
     public string ReplaceVariables(string txt, bool replacedvalue, bool removeLineBreaks) {
-        if (Database == null || Database.IsDisposed) { return txt; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return txt; }
 
         var erg = txt;
         // Variablen ersetzen
@@ -519,7 +523,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars) {
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m) || Database == null || column == null) { return; }
+        if (!string.IsNullOrEmpty(m) || Database is not DatabaseAbstract db || db.IsDisposed || column == null) { return; }
 
         var columnVar = vars.Get(column.KeyName);
         if (columnVar == null || columnVar.ReadOnly) { return; }
@@ -565,14 +569,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     internal bool AmIChanger() {
         if (IsDisposed) { return false; }
-        if (Database == null || Database.IsDisposed) { return false; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
 
-        return Database.Column.SysRowChanger is ColumnItem src && CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase);
+        return db.Column.SysRowChanger is ColumnItem src && CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase);
     }
 
     internal bool NeedDataCheck() {
-        if (Database == null || Database.IsDisposed) { return false; }
-        return Database.Row.NeedDataCheck(KeyName);
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
+        return db.Row.NeedDataCheck(KeyName);
     }
 
     internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
@@ -581,9 +585,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     internal double RowChangedXMinutesAgo() {
         if (IsDisposed) { return -1; }
-        if (Database == null || Database.IsDisposed) { return -1; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return -1; }
 
-        if (Database.Column.SysRowChangeDate is not ColumnItem src) { return -1; }
+        if (db.Column.SysRowChangeDate is not ColumnItem src) { return -1; }
 
         var v = CellGetDateTime(src);
         if (v == DateTime.MinValue) { return -1; }
@@ -618,7 +622,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues) {
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m) || Database == null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
+        if (!string.IsNullOrEmpty(m) || Database is null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
         var feh = Database.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true, false, "Allgemein"); }
@@ -684,7 +688,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     private void GenerateQuickInfo() {
-        if (Database == null || Database.IsDisposed ||
+        if (Database is not DatabaseAbstract db || db.IsDisposed ||
             string.IsNullOrEmpty(Database.ZeilenQuickInfo)) {
             _tmpQuickInfo = string.Empty;
             return;
@@ -695,7 +699,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private bool RowFilterMatch(string searchText) {
         if (string.IsNullOrEmpty(searchText)) { return true; }
-        if (Database == null || Database.IsDisposed) { return false; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
 
         searchText = searchText.ToUpper();
         foreach (var thisColumnItem in Database.Column) {

@@ -93,7 +93,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     private string _eventScriptTmp = string.Empty;
 
     //private string _timeCode = string.Empty;
-    private int _eventScriptVersion;
+    private string _eventScriptVersion = string.Empty;
 
     private double _globalScale;
     private string _globalShowPass = string.Empty;
@@ -156,7 +156,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public event EventHandler? InvalidateView;
 
-    public event EventHandler<VisibleEventArgs>? IsTableVisibleForUser;
+    //public event EventHandler<VisibleEventArgs>? IsTableVisibleForUser;
 
     public event EventHandler? Loaded;
 
@@ -269,11 +269,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public int EventScriptVersion {
+    public string EventScriptVersion {
         get => _eventScriptVersion;
         set {
             if (_eventScriptVersion == value) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion.ToString(), value.ToString(), string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion, value, string.Empty, UserName, DateTime.UtcNow);
         }
     }
 
@@ -479,7 +479,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     public static string EditableErrorReason(DatabaseAbstract? database, EditableErrorReasonType mode) {
-        if (database == null) { return "Keine Datenbank zum bearbeiten."; }
+        if (database is null || database.IsDisposed) { return "Keine Datenbank zum bearbeiten."; }
         return database.EditableErrorReason(mode);
     }
 
@@ -2107,7 +2107,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             //    break;
 
             case DatabaseDataType.EventScriptVersion:
-                _eventScriptVersion = IntParse(value);
+                _eventScriptVersion = value;
                 break;
 
             case DatabaseDataType.EventScriptErrorMessage:
@@ -2227,10 +2227,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
         if (AmITemporaryMaster()) { return; }
 
-        var e = new VisibleEventArgs();
-        OnIsTableVisibleForUser(e);
+        //var e = new VisibleEventArgs();
+        //OnIsTableVisibleForUser(e);
 
-        if (!e.IsVisible) { return; }
+        //if (!e.IsVisible) { return; }
 
         var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
 
@@ -2250,7 +2250,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         OnCanDoScript(e);
         if (e.Cancel) { return; }
 
-        Row.ExecuteValueChanged(false);
+        Row.AddRowsForValueChangedEvent();
+
+        Row.ExecuteValueChangedEvent(false);
 
         if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Save))) { return; }
         if (!LogUndo) { return; }
@@ -2279,10 +2281,10 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     private void OnDisposing() => Disposing?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnIsTableVisibleForUser(VisibleEventArgs e) {
-        if (IsDisposed) { return; }
-        IsTableVisibleForUser?.Invoke(this, e);
-    }
+    //private void OnIsTableVisibleForUser(VisibleEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    IsTableVisibleForUser?.Invoke(this, e);
+    //}
 
     private void OnSortParameterChanged() {
         if (IsDisposed) { return; }

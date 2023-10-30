@@ -51,9 +51,7 @@ public partial class TextGenerator : UserControl {
 
         if (DesignMode) { return; }
 
-        //_textDatabase = EnsureLoaded("Textkonserven");
-
-        if (_textDatabase == null) { return; }
+        if (_textDatabase is null || _textDatabase.IsDisposed) { return; }
 
         var c1 = _textDatabase.Column.Exists("Filter00");
         var c2 = _textDatabase.Column.Exists("Filter01");

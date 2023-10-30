@@ -46,7 +46,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Database = database;
 
-        if (Database == null) { return; }
+        if (Database is not DatabaseAbstract db) { return; }
         Database.Disposing += Database_Disposing;
         foreach (var thisColumnItem in Database.Column) {
             if (thisColumnItem != null && thisColumnItem.Format == DataFormat.RelationText) {

@@ -92,7 +92,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     #region Methods
 
     public static void AddLayoutsOff(ItemCollectionList.ItemCollectionList addHere, DatabaseAbstract? database) {
-        if (database == null) { return; }
+        if (database is null || database.IsDisposed) { return; }
         var r = database.GetAllLayouts();
 
         foreach (var thisFile in r) {
@@ -251,7 +251,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Exported_ItemClicked(object sender, AbstractListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
 
     private string Fehler() {
-        if (Database == null || Database.IsDisposed) { return "Datenbank verworfen"; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank verworfen"; }
         if (_rowsForExport == null || _rowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
         if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
         //TODO: Schachteln implementieren
@@ -327,7 +327,8 @@ public sealed partial class ExportDialog : IHasDatabase {
             MessageBox.Show(f);
             return;
         }
-        if (Database == null || _rowsForExport == null) { return; } // wird mit Fehler schon abgedeckt
+
+        if (Database is null || _rowsForExport == null) { return; } // wird mit Fehler schon abgedeckt
 
         if (optBildSchateln.Checked) {
             tabBildSchachteln.Enabled = true;

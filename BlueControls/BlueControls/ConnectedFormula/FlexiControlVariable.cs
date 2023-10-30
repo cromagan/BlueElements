@@ -154,7 +154,7 @@ public partial class FlexiControlVariable : FlexiControl, IDisabledReason, IHasD
     }
 
     private void Database_RowChecked(object sender, RowCheckedEventArgs e) {
-        var row = GetTmpVariables();
+        _ = GetTmpVariables();
 
         Develop.DebugPrint_NichtImplementiert();
 
@@ -203,7 +203,7 @@ public partial class FlexiControlVariable : FlexiControl, IDisabledReason, IHasD
     private void SetValueFromCell() {
         if (IsDisposed) { return; }
 
-        var row = GetTmpVariables();
+        _ = GetTmpVariables();
         Develop.DebugPrint_NichtImplementiert();
 
         //if (column == null || row == null) {

@@ -72,9 +72,9 @@ public class RowFormulaListItem : AbstractListItem {
 
     public override string QuickInfo {
         get {
-            if (_row?.Database == null) { return string.Empty; }
+            if (_row?.Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
 
-            return !string.IsNullOrEmpty(_row.Database.ZeilenQuickInfo)
+            return !string.IsNullOrEmpty(db.ZeilenQuickInfo)
                 ? _row.QuickInfo.CreateHtmlCodes(true)
                 : _row.CellFirstString().CreateHtmlCodes(true);
         }
@@ -141,7 +141,7 @@ public class RowFormulaListItem : AbstractListItem {
     protected override string GetCompareKey() => _row?.CompareKey() ?? string.Empty;
 
     private void GeneratePic() {
-        if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#") || Row?.Database == null) {
+        if (string.IsNullOrEmpty(_layoutId) || !_layoutId.StartsWith("#") || Row?.Database is not DatabaseAbstract db || db.IsDisposed) {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }

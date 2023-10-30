@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using BlueDatabase;
 using BlueDatabase.AdditionalScriptComands;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -50,8 +51,7 @@ public class Method_GenerateLayoutImage : Method_Database {
         #region  Meine Zeile ermitteln (r)
 
         var r = MyRow(varCol);
-
-        if (r?.Database == null) { return new DoItFeedback(infos.Data, "Zeilenfehler!"); }
+        if (r?.Database is not DatabaseAbstract db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Zeilenfehler!"); }
 
         #endregion
 

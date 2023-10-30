@@ -175,14 +175,14 @@ internal sealed partial class ColumnEditor {
     }
 
     private void btnSchnellText_Click(object sender, System.EventArgs e) {
-        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
+        if (_column?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (!AllOk()) { return; }
         _column.GetStyleFrom(ColumnFormatHolder.Text);
         Column_DatenAuslesen();
     }
 
     private void btnStandard_Click(object sender, System.EventArgs e) {
-        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
+        if (_column?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (!AllOk()) { return; }
         _column.ResetSystemToDefault(true);
         Column_DatenAuslesen();
@@ -197,7 +197,7 @@ internal sealed partial class ColumnEditor {
     private void btnVerwendung_Click(object sender, System.EventArgs e) => MessageBox.Show(_column?.Useage() ?? "Fehler");
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
-        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
+        if (_column?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (!AllOk()) { return; }
 
         _column = _table?.CurrentArrangement?[_column]?.NextVisible()?.Column;
@@ -205,7 +205,7 @@ internal sealed partial class ColumnEditor {
     }
 
     private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
-        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
+        if (_column?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (!AllOk()) { return; }
         _column = _table?.CurrentArrangement?[_column]?.PreviewsVisible()?.Column;
         Column_DatenAuslesen();
@@ -434,7 +434,7 @@ internal sealed partial class ColumnEditor {
     /// </summary>
 
     private void Column_DatenZurückschreiben() {
-        if (TableView.ErrorMessage(_column?.Database, EditableErrorReasonType.EditAcut) || _column?.Database == null) { return; }
+        if (TableView.ErrorMessage(_column?.Database, EditableErrorReasonType.EditAcut) || _column?.Database is null) { return; }
 
         if (_column.IsDisposed) { return; }
 
@@ -530,13 +530,13 @@ internal sealed partial class ColumnEditor {
     }
 
     private void GeneratFilterListe() {
-        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
+        if (_column?.Database is not DatabaseAbstract db2 || db2.IsDisposed) { return; }
 
         _column.LinkedDatabaseTableName = cbxLinkedDatabase.Text;
 
         var linkdb = _column.LinkedDatabase;
 
-        if (linkdb == null || tblFilterliste.Database == null) { tblFilterliste.DatabaseSet(null, string.Empty); }
+        if (linkdb == null || tblFilterliste.Database != null) { tblFilterliste.DatabaseSet(null, string.Empty); }
 
         if (tblFilterliste.Database != null &&
             tblFilterliste.Database.Tags.TagGet("Filename") != linkdb?.ConnectionData.UniqueId) {
@@ -545,7 +545,7 @@ internal sealed partial class ColumnEditor {
 
         if (linkdb == null) { return; }
 
-        if (tblFilterliste.Database == null) {
+        if (tblFilterliste.Database != null) {
             Database db = new(false, string.Empty, DatabaseAbstract.UniqueKeyValue());
             //db.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             _ = db.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
@@ -567,7 +567,7 @@ internal sealed partial class ColumnEditor {
             var dd = b.DropDownItems.Clone();
             var or = b.OpticalReplace.Clone();
 
-            foreach (var thisColumn in _column.Database.Column) {
+            foreach (var thisColumn in db2.Column) {
                 if (thisColumn.Format.CanBeCheckedByRules() && !thisColumn.MultiLine) {
                     dd.Add("~" + thisColumn.KeyName.ToLower() + "~");
                     or.Add("~" + thisColumn.KeyName.ToLower() + "~|[Spalte: " + thisColumn.ReadableText() + "]");
@@ -628,11 +628,11 @@ internal sealed partial class ColumnEditor {
     /// </summary>
 
     private void GetLinkedCellFilter() {
-        if (tblFilterliste.Database == null) { return; }
-        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
+        if (tblFilterliste.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (_column?.Database is not DatabaseAbstract db2 || db2.IsDisposed) { return; }
 
         var nf = new List<string>();
-        foreach (var thisr in tblFilterliste.Database.Row) {
+        foreach (var thisr in db.Row) {
             if (thisr.CellGetBoolean("visible") && !string.IsNullOrEmpty(thisr.CellGetString("such"))) {
                 nf.Add(thisr.CellGetString("spaltename") + "|=|" + thisr.CellGetString("Such").ToNonCritical());
             }
@@ -671,13 +671,13 @@ internal sealed partial class ColumnEditor {
     }
 
     private void tabControl_SelectedIndexChanged(object sender, System.EventArgs e) {
-        if (_column?.Database == null || _column.Database.IsDisposed) { return; }
+        if (_column?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedDatabase.Item.Count == 0) {
-            var l = DatabaseAbstract.AllAvailableTables(_column.Database.FreezedReason);
+            var l = DatabaseAbstract.AllAvailableTables(db.FreezedReason);
 
             foreach (var thisString in l) {
-                if (!string.Equals(thisString.UniqueId, _column.Database.ConnectionData.UniqueId, StringComparison.OrdinalIgnoreCase)) { _ = cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueId); }
+                if (!string.Equals(thisString.UniqueId, db.ConnectionData.UniqueId, StringComparison.OrdinalIgnoreCase)) { _ = cbxLinkedDatabase.Item.Add(thisString.TableName, thisString.UniqueId); }
             }
         }
     }

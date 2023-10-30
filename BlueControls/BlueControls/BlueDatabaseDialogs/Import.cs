@@ -44,7 +44,7 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
         var ein = _originalImportText.SplitAndCutByCrToList();
         Eintr.Text = ein.Count + " zum Importieren bereit.";
         Database = database;
-        if (Database == null || Database.IsDisposed) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) {
             return;
         }
 

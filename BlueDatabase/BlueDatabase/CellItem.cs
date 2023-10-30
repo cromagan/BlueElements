@@ -166,7 +166,7 @@ public class CellItem {
             //    if (string.IsNullOrEmpty(txt)) { return string.Empty; }
             //    if (!IntTryParse(txt, out var ColKey)) { return "Columkey kann nicht geparsed werden"; }
             //    var LinkedDatabase = column.LinkedDatabase();
-            //    if (LinkedDatabase == null) { return "Datenbankverknüpfung fehlt"; }
+            //    if (LinkedDatabase is not DatabaseAbstract db) { return "Datenbankverknüpfung fehlt"; }
             //    var C = LinkedDatabase.Column.SearchByKey(ColKey);
             //    if (C == null) { return "Columnkey nicht gefunden"; }
             //    txt = LanguageTool.ColumnReplace(C.ReadableText(), column, style);
@@ -228,7 +228,7 @@ public class CellItem {
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, BildTextVerhalten.Nur_Text, true); }
         if (string.IsNullOrEmpty(replacedText)) { return null; }
 
-        var gr = column.Database == null ? "16" : Math.Truncate(column.Database.GlobalScale * 16).ToString(Constants.Format_Integer1);
+        var gr = column.Database is not DatabaseAbstract ? "16" : Math.Truncate(column.Database.GlobalScale * 16).ToString(Constants.Format_Integer1);
         if (!string.IsNullOrEmpty(column.ConstantHeightOfImageCode)) { gr = column.ConstantHeightOfImageCode; }
 
         var x = (replacedText + "||").SplitBy("|");

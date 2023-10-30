@@ -117,12 +117,12 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     /// <param name="ca"></param>
     /// <param name="number"></param>
     public static void Repair(ColumnViewCollection ca, int number) {
-        if (ca.Database == null || ca.Database.IsDisposed) { return; }
+        if (ca.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         #region Ungültige Spalten entfernen
 
         for (var z = 0; z < ca.Count; z++) {
-            if (ca[z]?.Column == null || !ca.Database.Column.Contains(ca[z]?.Column)) {
+            if (ca[z]?.Column == null || !db.Column.Contains(ca[z]?.Column)) {
                 ca.RemoveAt(z);
                 z--;
             }
@@ -312,12 +312,10 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         return x;
     }
 
-    public void RemoveAt(int z) =>
-        //var it = _internal[z];
-        _internal.RemoveAt(z);//it.Changed -= ColumnViewItem_Changed;
+    public void RemoveAt(int z) => _internal.RemoveAt(z);
 
     public void ShowAllColumns() {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         foreach (var thisColumn in Database.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed) {
@@ -327,7 +325,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     }
 
     public void ShowColumns(params string[] columnnames) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         foreach (var thisColumn in columnnames) {
             var c = Database?.Column.Exists(thisColumn);
@@ -360,10 +358,8 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         return result.Parseable();
     }
 
-    private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);//columnViewItem.Changed += ColumnViewItem_Changed;
+    private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);
 
-    //    Swap(index1, index2);
-    //}
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void Remove(ColumnViewItem columnViewItem) {

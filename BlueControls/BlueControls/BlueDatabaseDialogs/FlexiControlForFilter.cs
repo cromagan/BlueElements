@@ -90,7 +90,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         hotItem = null;
-        if (Filter.Column?.Database == null || !Filter.Column.Database.IsAdministrator()) { return; }
+        if (Filter.Column?.Database is not DatabaseAbstract db || db.IsDisposed || !db.IsAdministrator()) { return; }
 
         hotItem = Filter.Column;
         _ = items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));
@@ -201,8 +201,6 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
                 var texteingabe = Filter.Column.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
 
-
-
                 if (Filter.FilterType == FilterType.Instr_GroßKleinEgal && Filter.SearchValue.Count == 1) {
                     CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
                     Caption = Filter.Column.ReadableText() + ":";
@@ -215,7 +213,6 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
                 if (showWählen && Filter.FilterType != FilterType.Instr_GroßKleinEgal) {
                     showDelFilterButton = false;
                 }
-
 
                 if ((showWählen || !texteingabe) && !showDelFilterButton) {
                     showDelFilterButton = false;

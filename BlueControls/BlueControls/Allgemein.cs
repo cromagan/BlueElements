@@ -121,7 +121,7 @@ public static class Allgemein {
     //private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
     //    if (e.Handled) { return; }
     //    e.Handled = true;
-    //    if (e?.Row?.Database == null) { return; }
+    //    if (e?.Row?.Database is not DatabaseAbstract db) { return; }
 
     //    var pad = new ItemCollectionPad(e.LayoutId, e.Row.Database, e.Row.Key);
     //    pad.SaveAsBitmap(e.Filename);

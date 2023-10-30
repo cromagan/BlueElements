@@ -103,7 +103,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (InputDatabase == null || InputDatabase.IsDisposed) {
+        if (InputDatabase is null || InputDatabase.IsDisposed) {
             return "Quelle fehlt";
         }
 
@@ -122,6 +122,12 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         l.AddRange(base.GetStyleOptions(widthOfControl));
 
         return l;
+    }
+
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        _itemSends.ParseFinished(this);
+        //_itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string tag, string value) {
@@ -182,12 +188,6 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        _itemSends.ParseFinished(this);
-        //_itemAccepts.ParseFinished(this);
     }
 
     #endregion

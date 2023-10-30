@@ -291,13 +291,13 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     //}
 
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {
-        if (_table?.Database == null || _table.Database.IsDisposed) { return; }
+        if (_table?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        if (_table.Database.Column.First() is not ColumnItem co) { return; }
+        if (db.Column.First() is not ColumnItem co) { return; }
 
         List<FilterItem> fl = new() { new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
-        var r = _table.Database.Row.CalculateFilteredRows(fl);
+        var r = db.Row.CalculateFilteredRows(fl);
         if (r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
             MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
             return;
@@ -343,15 +343,15 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void DoÄhnlich() {
-        if (_table?.Database == null || _table.Database.Column.Count == 0) { return; }
+        if (_table?.Database is not DatabaseAbstract db || db.Column.Count == 0) { return; }
 
-        var col = _table.Database.Column.First();
+        var col = db.Column.First();
 
         if (col == null) { return; } // Neue Datenbank?
 
         List<FilterItem> fl = new() { new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
 
-        var r = _table.Database.Row.CalculateFilteredRows(fl);
+        var r = db.Row.CalculateFilteredRows(fl);
         if (_ähnliche != null) {
             btnÄhnliche.Visible = true;
             btnÄhnliche.Enabled = r != null && r.Count == 1;
@@ -372,7 +372,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     }
 
     private void Filter_ZeilenFilterSetzen() {
-        if (_table == null || _table.Database == null || _table.Filter == null) {
+        if (_table == null || _table.Database is not DatabaseAbstract db || db.IsDisposed) {
             DoÄhnlich();
             return;
         }
@@ -386,11 +386,11 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         }
 
         var l = new List<ColumnItem>();
-        foreach (var thisCo in _table.Database.Column) {
+        foreach (var thisCo in db.Column) {
             if (thisCo != null && thisCo.IsInCache == null && !thisCo.IgnoreAtRowFilter) { l.Add(thisCo); }
         }
 
-        _table.Database.RefreshColumnsData(l);
+        db.RefreshColumnsData(l);
 
         _table.Filter.RowFilterText = newF;
         DoÄhnlich();

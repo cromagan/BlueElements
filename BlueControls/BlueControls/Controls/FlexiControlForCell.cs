@@ -489,7 +489,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
     }
 
     private void Marker_DoWork(object sender, DoWorkEventArgs e) {
-        if (Database == null || Database.IsDisposed) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         #region  in Frage kommende Textbox ermitteln txb
 
@@ -508,7 +508,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         if (row == null || row.IsDisposed) { return; }
         if (Marker.CancellationPending) { return; }
 
-        var col = Database.Column.First();
+        var col = db.Column.First();
         if (col == null) { return; }
 
         List<string> names = new();
