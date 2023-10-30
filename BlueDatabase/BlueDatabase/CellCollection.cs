@@ -106,6 +106,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="mode"></param>
     /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei Internen Prozessen angeben.</param>
     /// <param name="checkEditmode">Ob gewünscht wird, das die intern Programmierte Routine geprüft werden soll. Nur in Datenbankansicht empfohlen.</param>
+    /// <param name="repairallowed"></param>
+    /// <param name="ignoreLinked"></param>
     /// <returns></returns>
     public static string EditableErrorReason(ColumnItem? column, RowItem? row, EditableErrorReasonType mode, bool checkUserRights, bool checkEditmode, bool repairallowed, bool ignoreLinked) {
         if (mode == EditableErrorReasonType.OnlyRead) {
@@ -239,7 +241,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (repairLinkedValue) { return RepairLinkedCellValue(linkedDatabase, column, row, addRowIfNotExists); }
 
-        var key = db.Cell.GetStringCore(column, row) ?? string.Empty;
+        var key = db.Cell.GetStringCore(column, row);
         if (string.IsNullOrEmpty(key)) {
             return (linkedDatabase.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase), null, "Keine Verlinkung vorhanden.", false);
         }
@@ -440,7 +442,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public void Initialize() => Clear();
 
-    public bool IsInCache(ColumnItem? column, RowItem row) {
+    public bool IsInCache(ColumnItem? column, RowItem? row) {
         if (column == null || column.IsDisposed) { return false; }
         if (row == null || row.IsDisposed) { return false; }
         if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
@@ -610,10 +612,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// </summary>
     /// <param name="column"></param>
     /// <param name="row"></param>
-    /// <param name="contentSize">Wird im Scale der Datenbank gespeichert, da es ja Benutzerübergreifend ist</param>
+    /// <param name="value"></param>
+    /// <param name="reason"></param>
     public string SetValueInternal(ColumnItem column, RowItem row, string value, Reason reason) {
-        if (row is null) { return "Row konnte nicht generiert werden."; }
-        if (column is null) { return "Column konnte nicht generiert werden."; }
         if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank ungültig"; }
 
         db.RefreshCellData(column, row, reason);
@@ -704,7 +705,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         var cellKey = KeyOfCell(column, row);
 
-        return ContainsKey(cellKey) ? (this[cellKey].Value ?? string.Empty) : string.Empty;
+        return ContainsKey(cellKey) ? this[cellKey].Value : string.Empty;
     }
 
     internal void InvalidateAllSizes() {
@@ -715,7 +716,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     internal void OnCellValueChanged(CellChangedEventArgs e) {
-        if (e.Column == null) { return; }
         e.Column.UcaseNamesSortedByLenght = null;
         CellValueChanged?.Invoke(this, e);
     }
@@ -888,7 +888,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    private static (ColumnItem? column, RowItem? row, string info, bool canrepair) RepairLinkedCellValue(DatabaseAbstract linkedDatabase, ColumnItem? column, RowItem? row, bool addRowIfNotExists) {
+    private static (ColumnItem? column, RowItem? row, string info, bool canrepair) RepairLinkedCellValue(DatabaseAbstract linkedDatabase, ColumnItem column, RowItem? row, bool addRowIfNotExists) {
         RowItem? targetRow = null;
         ColumnItem? targetColumn = null;
         var cr = false;
@@ -896,14 +896,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         // Repair nicht mehr erlauben, ergibt rekursieve Schleife, wir sind hier ja schon im repair
         var editableError = EditableErrorReason(column, row, EditableErrorReasonType.EditAcut, false, false, false, true);
 
-        var db = column?.Database;
+        var db = column.Database;
         if (db == null || db.IsDisposed) { return Ergebnis("Verknüpfte Datenbank verworfen."); }
 
         if (!string.IsNullOrEmpty(editableError)) { return Ergebnis(editableError); }
 
         if (row == null || row.IsDisposed) { return Ergebnis("Keine Zeile zum finden des Zeilenschlüssels angegeben."); }
 
-        targetColumn = linkedDatabase.Column.Exists(column?.LinkedCell_ColumnNameOfLinkedDatabase);
+        targetColumn = linkedDatabase.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase);
         if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 
         var (filter, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row);
@@ -934,12 +934,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         #region Subroutine Ergebnis
 
         (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
-            if (targetColumn != null && targetRow != null && string.IsNullOrEmpty(fehler) && column != null && row != null) {
+            if (targetColumn != null && targetRow != null && string.IsNullOrEmpty(fehler) && row != null && db != null) {
                 db.Cell.SetValueCore(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
                 return (targetColumn, targetRow, fehler, cr);
             }
 
-            if (string.IsNullOrEmpty(editableError) && column != null && row != null) { db.Cell.SetValueCore(column, row, string.Empty, UserName, DateTime.UtcNow, false); }
+            if (string.IsNullOrEmpty(editableError) && row != null && db != null) { db.Cell.SetValueCore(column, row, string.Empty, UserName, DateTime.UtcNow, false); }
             return (targetColumn, targetRow, fehler, cr);
         }
 
@@ -1026,7 +1026,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     //    }
     //}
 
-    private void RelationTextNameChanged(ColumnItem? columnToRepair, string? rowKey, string oldValue, string newValue) {
+    private void RelationTextNameChanged(ColumnItem columnToRepair, string rowKey, string oldValue, string newValue) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         if (string.IsNullOrEmpty(newValue)) { return; }

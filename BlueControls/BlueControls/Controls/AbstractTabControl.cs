@@ -78,11 +78,6 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
 
     #region Methods
 
-    public void PerformAutoScale() { }
-
-    //public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-    public void Scale() { }
-
     //public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
     protected void DrawControl(PaintEventArgs e, Design design) {
         Skin.Draw_Back(e.Graphics, design, States.Standard, new Rectangle(0, 0, Width, Height), this, true);
@@ -136,11 +131,6 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         // Um flimmern zu vermeiden!
     }
 
-    //protected override void OnParentChanged(System.EventArgs e) {
-    //    base.OnParentChanged(e);
-
-    //}
-
     protected override void OnSelectedIndexChanged(System.EventArgs e) {
         if (_indexChanged) { return; }
         _indexChanged = true;
@@ -148,6 +138,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         _indexChanged = false;
     }
 
+    //}
     protected override void OnVisibleChanged(System.EventArgs e) {
         try {
             base.OnVisibleChanged(e);
@@ -181,7 +172,11 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         } catch { }
     }
 
+    //protected override void OnParentChanged(System.EventArgs e) {
+    //    base.OnParentChanged(e);
     protected override void ScaleControl(SizeF factor, BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
+
+    protected override void ScaleCore(float dx, float dy) { }
 
     protected override void WndProc(ref Message m) {
         try {
