@@ -130,7 +130,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public event EventHandler? ButtonClicked;
 
-    public event EventHandler? NeedRefresh;
+    //public event EventHandler? NeedRefresh;
 
     [Obsolete("Value Changed benutzen", true)]
     public new event EventHandler? TextChanged;
@@ -626,7 +626,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (e.Control == _captionObject) { _captionObject = null; }
     }
 
-    protected virtual void OnNeedRefresh() => NeedRefresh?.Invoke(this, System.EventArgs.Empty);
+    //protected virtual void OnNeedRefresh() => NeedRefresh?.Invoke(this, System.EventArgs.Empty);
 
     protected override void OnParentChanged(System.EventArgs e) {
         base.OnParentChanged(e);
@@ -844,7 +844,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _captionObject.Text = _caption;
         }
 
-        _captionObject.Size = Extended_Text.ExtText.MeasureString(_captionObject.Text, Design.Caption, States.Standard, Width);//  _captionObject.TextRequiredSize();
+        _captionObject.Size = Extended_Text.ExtText.MeasureString(_captionObject.Text, Design.Caption, States.Standard, 500);//  _captionObject.TextRequiredSize();
         _captionObject.Left = 0;
         _captionObject.Top = 0;
         _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;

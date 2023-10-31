@@ -992,6 +992,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (name.ToUpper() == "OWNER") { return false; } // SQL System-Name
         if (name.ToUpper() == "DATA_TYPE") { return false; } // SQL System-Name
         if (name.ToUpper() == "DATA_LENGTH") { return false; } // SQL System-Name
+        if (name.ToUpper() == "OFFLINE") { return false; } // SQL System-Name
+        if (name.ToUpper() == "ONLINE") { return false; } // SQL System-Name
 
         if (name.ToUpper() == TmpNewDummy) { return false; } // BlueDatabase name bei neuen Spalten
 

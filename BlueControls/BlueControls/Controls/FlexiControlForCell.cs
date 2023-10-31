@@ -83,7 +83,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
     #region Properties
 
-    [Description("Dieses Feld kann für den Forms-Editor verwendet werden. Falls ein Key und ein Name befüllt sind, ist der Name führend.")]
+    [Description("Dieses Feld kann für den Forms-Editor verwendet werden.")]
     [DefaultValue("")]
     public string ColumnName {
         get => _columnName;
@@ -367,7 +367,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         if (e.Column == column) {
             UpdateColumnData();
             CheckEnabledState();
-            OnNeedRefresh();
+            //OnNeedRefresh();
         }
     }
 
