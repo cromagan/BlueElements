@@ -521,6 +521,20 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return erg;
     }
 
+    public string RowStamp() {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
+
+        var erg = string.Empty;
+        foreach (var thisColumn in db.Column) {
+            if (thisColumn != null && !thisColumn.IsDisposed) {
+                if (thisColumn.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { continue; }
+
+                erg += CellGetString(thisColumn) + "|";
+            }
+        }
+        return erg;
+    }
+
     public void VariableToCell(ColumnItem? column, VariableCollection vars) {
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m) || Database is not DatabaseAbstract db || db.IsDisposed || column == null) { return; }

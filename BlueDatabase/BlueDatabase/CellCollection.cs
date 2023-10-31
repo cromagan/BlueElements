@@ -802,7 +802,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!isSystem) {
             DoSpecialFormats(column, row, oldValue, false);
             if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueCore(src, row, user, user, datetimeutc, true); }
-            if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueCore(scd, row, datetimeutc.ToString(Constants.Format_Date7), user, datetimeutc, true); }
+            if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueCore(scd, row, datetimeutc.ToString(Constants.Format_Date5), user, datetimeutc, true); }
 
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {
                 if (db.Column.SysRowState is ColumnItem srs && srs != column) { SetValueCore(srs, row, string.Empty, user, datetimeutc, true); }

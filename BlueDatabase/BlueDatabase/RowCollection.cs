@@ -489,6 +489,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, 0, rows.Count, true, false));
 
         var all = rows.Count;
+        var start = DateTime.UtcNow;
         while (rows.Count > 0) {
             Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, all - rows.Count, all, false, false));
 
@@ -502,7 +503,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 return "Skript fehlerhaft bei " + w + "\r\n" + scx.Protocol[0];
             }
             if (scx.AllOk) { rows.RemoveAt(0); }
+
+            if (DateTime.UtcNow.Subtract(start).TotalMinutes > 1) {
+                db.Save();
+                start = DateTime.UtcNow;
+            }
         }
+        db.Save();
         Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, rows.Count, rows.Count, false, true));
         return string.Empty;
     }

@@ -966,7 +966,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             : string.Empty;
     }
 
-    public void EnableScript() => Column.GenerateAndAddSystem("SYS_ROWSTATE", "SYS_DATECHANGED");
+    public void EnableScript() => Column.GenerateAndAddSystem("SYS_ROWSTATE");
 
     public void EventScript_Add(DatabaseScriptDescription ev, bool isLoading) {
         _eventScript.Add(ev);
@@ -994,18 +994,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, "Allgemein"); }
 
         try {
-            var timestamp = string.Empty;
+            var rowstamp = string.Empty;
 
             #region Variablen für Skript erstellen
 
             VariableCollection vars = new();
 
             if (row != null && !row.IsDisposed) {
-                if (Column.SysRowChangeDate is not ColumnItem column) {
-                    return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);
-                }
-
-                timestamp = row.CellGetString(column);
+                rowstamp = row.RowStamp();
                 foreach (var thisCol in Column) {
                     var v = RowItem.CellToVariable(thisCol, row);
                     if (v != null) { vars.AddRange(v); }
@@ -1072,7 +1068,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                         return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);
                     }
 
-                    if (row.CellGetString(column) != timestamp) {
+                    if (row.RowStamp() != rowstamp) {
                         return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, s.KeyName);
                     }
 
