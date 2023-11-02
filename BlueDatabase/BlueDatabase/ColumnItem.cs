@@ -1948,14 +1948,14 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //        ? tmpfile
     //        : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase) ? tmpfile : fullFileName;
     //}
-    public double? Summe(List<RowData>? sort) {
+    public double? Summe(List<RowItem>? sort) {
         if (sort == null) { return null; }
 
         double summ = 0;
         foreach (var thisrow in sort) {
-            if (thisrow?.Row != null && !thisrow.Row.CellIsNullOrEmpty(this)) {
-                if (!thisrow.Row.CellGetString(this).IsDouble()) { return null; }
-                summ += thisrow.Row.CellGetDouble(this);
+            if (thisrow != null && !thisrow.CellIsNullOrEmpty(this)) {
+                if (!thisrow.CellGetString(this).IsDouble()) { return null; }
+                summ += thisrow.CellGetDouble(this);
             }
         }
         return summ;

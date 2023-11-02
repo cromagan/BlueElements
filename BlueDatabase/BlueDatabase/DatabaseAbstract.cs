@@ -1144,13 +1144,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowData>? sortedRows) =>
+    public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowItem>? sortedRows) =>
                     //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
                     Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
-    public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, List<RowData>? sortedRows) {
+    public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, List<RowItem> sortedRows) {
         columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
-        sortedRows ??= Row.AllRows();
+        //sortedRows ??= Row.AllRows();
 
         StringBuilder sb = new();
         switch (firstRow) {
@@ -1195,7 +1195,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
             if (thisRow != null && !thisRow.IsDisposed) {
                 for (var colNr = 0; colNr < columnList.Count; colNr++) {
                     if (columnList[colNr] != null) {
-                        var tmp = Cell.GetString(columnList[colNr], thisRow?.Row);
+                        var tmp = Cell.GetString(columnList[colNr], thisRow);
                         tmp = tmp.Replace("\r\n", "|");
                         tmp = tmp.Replace("\r", "|");
                         tmp = tmp.Replace("\n", "|");
@@ -1210,19 +1210,19 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return sb.ToString().TrimEnd("\r\n");
     }
 
-    public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, List<RowData>? sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
+    public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, List<RowItem>? sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
 
-    public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null));
+    public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateFilteredRows(filter));
 
-    public bool Export_HTML(string filename, int arrangementNo, FilterCollection? filter, List<RowItem>? pinned) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateSortedRows(filter, SortDefinition, pinned, null), false);
+    public bool Export_HTML(string filename, int arrangementNo, FilterCollection? filter) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateFilteredRows(filter), false);
 
-    public bool Export_HTML(string filename, List<ColumnItem>? columnList, List<RowData>? sortedRows, bool execute) {
+    public bool Export_HTML(string filename, List<ColumnItem>? columnList, List<RowItem> sortedRows, bool execute) {
         try {
             if (columnList == null || columnList.Count == 0) {
                 columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
             }
 
-            sortedRows ??= Row.AllRows();
+            //sortedRows ??= Row.AllRows();
 
             if (string.IsNullOrEmpty(filename)) {
                 filename = TempFile(string.Empty, "Export", "html");
@@ -1259,9 +1259,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
                     foreach (var thisColumn in columnList) {
                         if (thisColumn != null) {
                             var lcColumn = thisColumn;
-                            var lCrow = thisRow?.Row;
+                            var lCrow = thisRow;
                             if (thisColumn.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-                                (lcColumn, lCrow, _, _) = CellCollection.LinkedCellData(thisColumn, thisRow?.Row, false, false);
+                                (lcColumn, lCrow, _, _) = CellCollection.LinkedCellData(thisColumn, thisRow, false, false);
                             }
 
                             if (lCrow != null && lcColumn != null) {
@@ -1305,7 +1305,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public bool Export_HTML(string filename, ColumnViewCollection? arrangement, List<RowData>? sortedRows, bool execute) => Export_HTML(filename, arrangement?.ListOfUsedColumn(), sortedRows, execute);
+    public bool Export_HTML(string filename, ColumnViewCollection? arrangement, List<RowItem>? sortedRows, bool execute) => Export_HTML(filename, arrangement?.ListOfUsedColumn(), sortedRows, execute);
 
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
@@ -1777,7 +1777,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return RefreshRowData(r, refreshAlways);
     }
 
-    public (bool didreload, string errormessage) RefreshRowData(RowItem row, bool refreshAlways) => RefreshRowData(new List<RowItem> { row }, refreshAlways);
+    public (bool didreload, string errormessage) RefreshRowData(RowItem row, bool refreshAlways) {
+        if (!refreshAlways && row.IsInCache != null) { return (false, string.Empty); }
+
+        return RefreshRowData(new List<RowItem> { row }, refreshAlways);
+    }
 
     public virtual void RepairAfterParse() {
         IsInCache ??= DateTime.UtcNow;
@@ -2313,51 +2317,14 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
             if (string.IsNullOrWhiteSpace(AdditionalFilesPfadWhole())) { return; }
 
-            if (e.CheckedPath.Contains(AdditionalFilesPfadWhole())) { return; }
-            e.CheckedPath.Add(AdditionalFilesPfadWhole());
-
             var name = e.Name.RemoveChars(Char_DateiSonderZeichen);
-            var hashname = name.GetHashString();
 
-            var fullname = AdditionalFilesPfadWhole() + name + ".png";
-            var fullhashname = CachePfad.TrimEnd("\\") + "\\" + hashname;
-
-            if (!string.IsNullOrWhiteSpace(CachePfad)) {
-                if (FileExists(fullhashname)) {
-                    FileInfo f = new(fullhashname);
-                    if (DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalDays < VorhalteZeit && GlobalRND.Next(0, VorhalteZeit * 20) != 1) {
-                        if (f.Length < 5) { return; }
-                        e.Bmp = new BitmapExt(fullhashname);
-                        return;
-                    }
-                    _ = DeleteFile(fullhashname, false);
-                }
-            }
+            var fullname = CachePfad.TrimEnd("\\") + "\\" + name + ".PNG";
 
             if (FileExists(fullname)) {
                 e.Done = true;
                 e.Bmp = new BitmapExt(fullname);
-                if (!string.IsNullOrWhiteSpace(CachePfad)) {
-                    _ = CopyFile(fullname, fullhashname, false);
-                    try {
-                        //File.SetLastWriteTime(fullhashname, DateTime.UtcNow);
-                        File.SetCreationTime(fullhashname, DateTime.UtcNow);
-                        //var x = new FileInfo(fullname);
-                        //x.CreationTime = DateTime.UtcNow;
-                    } catch { }
-                }
-                return;
             }
-            //OnDropMessage(FehlerArt.Info, "Bild '" + e.Name + "' im Verzeihniss der Zusatzdateien nicht gefunden.");
-
-            #region   Datei nicht vorhanden, dann einen Dummy speichern
-
-            if (!string.IsNullOrWhiteSpace(CachePfad)) {
-                var l = new List<string>();
-                l.WriteAllText(fullhashname, Encoding.UTF8, false);
-            }
-
-            #endregion
         } catch { }
     }
 

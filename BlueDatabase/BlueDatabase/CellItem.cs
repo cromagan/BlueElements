@@ -228,7 +228,7 @@ public class CellItem {
         if (bildTextverhalten == BildTextVerhalten.Nur_Bild) { replacedText = ValueReadable(column, originalText, style, BildTextVerhalten.Nur_Text, true); }
         if (string.IsNullOrEmpty(replacedText)) { return null; }
 
-        var gr = column.Database is not DatabaseAbstract ? "16" : Math.Truncate(column.Database.GlobalScale * 16).ToString(Constants.Format_Integer1);
+        var gr = column.Database is not DatabaseAbstract db ? "16" : Math.Truncate(db.GlobalScale * 16).ToString(Constants.Format_Integer1);
         if (!string.IsNullOrEmpty(column.ConstantHeightOfImageCode)) { gr = column.ConstantHeightOfImageCode; }
 
         var x = (replacedText + "||").SplitBy("|");
@@ -237,7 +237,10 @@ public class CellItem {
         x[2] = gr2[1];
         var ntxt = x.JoinWith("|").TrimEnd("|");
 
-        var defaultImage = QuickImage.Get(ntxt);
+        var defaultImage = QuickImage.Get(column.KeyName.ToLower() + "_" + ntxt);
+        if (!defaultImage.IsError) { return defaultImage; }
+
+        defaultImage = QuickImage.Get(ntxt);
         return !defaultImage.IsError ? defaultImage : StandardErrorImage(gr, bildTextverhalten, replacedText, column);
     }
 

@@ -1033,18 +1033,18 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Invalidate_SortedRowData();
     }
 
-    public string Export_CSV(FirstRow firstRow) => Database == null ? string.Empty : Database.Export_CSV(firstRow, CurrentArrangement, SortedRows());
+    public string Export_CSV(FirstRow firstRow) => Database == null ? string.Empty : Database.Export_CSV(firstRow, CurrentArrangement, FilteredRows);
 
     public string Export_CSV(FirstRow firstRow, ColumnItem onlyColumn) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
         List<ColumnItem> l = new() { onlyColumn };
-        return Database.Export_CSV(firstRow, l, SortedRows());
+        return Database.Export_CSV(firstRow, l, FilteredRows);
     }
 
     public void Export_HTML(string filename = "", bool execute = true) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (string.IsNullOrEmpty(filename)) { filename = TempFile(string.Empty, string.Empty, "html"); }
-        Database.Export_HTML(filename, CurrentArrangement, SortedRows(), execute);
+        Database.Export_HTML(filename, CurrentArrangement, FilteredRows, execute);
     }
 
     public void FilterFromParentsChanged() {
@@ -3297,12 +3297,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         CheckView();
     }
 
-    private int Row_DrawHeight(ColumnViewCollection ca, RowItem? row, Rectangle displayRectangleWoSlider) {
+    private int Row_DrawHeight(ColumnViewCollection ca, RowItem row, Rectangle displayRectangleWoSlider) {
         if (Database is not DatabaseAbstract db || db.IsDisposed || row == null) { return _pix18; }
 
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return Cell_ContentSize(this, db.Column.First(), row, (Font)_cellFont, _pix16).Height; }
         var tmp = _pix18;
         if (CurrentArrangement == null) { return tmp; }
+
+        db.RefreshRowData(row, false);
 
         foreach (var thisViewItem in CurrentArrangement) {
             if (db.Cell.IsInCache(thisViewItem?.Column, row) && !row.CellIsNullOrEmpty(thisViewItem.Column)) {

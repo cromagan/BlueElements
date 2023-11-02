@@ -247,19 +247,19 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    /// <summary>
-    /// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Datenbanken einzigartig ist.
-    /// </summary>
-    /// <returns></returns>
-    public List<RowData> AllRows() {
-        var sortedRows = new List<RowData>();
-        foreach (var thisRowItem in this) {
-            if (thisRowItem != null) {
-                sortedRows.Add(new RowData(thisRowItem));
-            }
-        }
-        return sortedRows;
-    }
+    ///// <summary>
+    ///// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Datenbanken einzigartig ist.
+    ///// </summary>
+    ///// <returns></returns>
+    //public List<RowData> AllRows() {
+    //    var sortedRows = new List<RowData>();
+    //    foreach (var thisRowItem in this) {
+    //        if (thisRowItem != null) {
+    //            sortedRows.Add(new RowData(thisRowItem));
+    //        }
+    //    }
+    //    return sortedRows;
+    //}
 
     public List<RowItem> CalculateFilteredRows(ICollection<FilterItem>? filter) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>(); }
@@ -768,7 +768,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         try {
             foreach (var thisRow in this) {
                 if (thisRow.IsInCache != null) {
-
                     AddRowWithChangedValue(thisRow);
                 }
                 if (DateTime.UtcNow.Subtract(x).TotalSeconds > 5) { break; }
