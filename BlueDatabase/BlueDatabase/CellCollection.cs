@@ -91,7 +91,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     //        new FilterItem(cc, FilterType.Istgleich_GroﬂKleinEgal, row.CellGetString(cc)),
     //        new FilterItem(column, FilterType.Ungleich_MultiRowIgnorieren, string.Empty)
     //    };
-    //    var rows = column.Database.Row.CalculateFilteredRows(f);
+    //    var rows = column.Database.Row.RowsFiltered(f);
     //    rows.Remove(row);
     //    return rows.Count == 0 ? string.Empty : rows[0].CellGetString(column);
     //}
@@ -910,7 +910,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!string.IsNullOrEmpty(info)) { return Ergebnis(info); }
         if (filter == null || filter.Count == 0) { return Ergebnis("Filter konnten nicht generiert werden."); }
 
-        var r = linkedDatabase.Row.CalculateFilteredRows(filter);
+        var r = linkedDatabase.Row.RowsFiltered(filter, null);
         switch (r.Count) {
             case > 1:
                 return Ergebnis("Suchergebnis liefert mehrere Ergebnisse.");

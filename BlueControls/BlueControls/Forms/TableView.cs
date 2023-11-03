@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -256,7 +257,7 @@ public partial class TableView : FormWithStatusBar {
                 if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead && CFO.ShowingRow != null) {
                     selectedRows.Add(CFO.ShowingRow);
                 } else {
-                    selectedRows = Table.VisibleUniqueRows();
+                    selectedRows = Table.RowsVisibleUnique();
                 }
 
                 using (ExportDialog l = new(db, selectedRows)) {
@@ -619,7 +620,7 @@ public partial class TableView : FormWithStatusBar {
                     split = MessageBox.Show("Zeilen als ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
                 }
 
-                column.Statisik(Table.Filter, Table.PinnedRows, !split);
+                column.Statisik(Table.RowsVisibleUnique(), !split);
                 break;
 
             case "VorherigenInhaltWiederherstellen":
@@ -682,7 +683,7 @@ public partial class TableView : FormWithStatusBar {
 
         if (Table.Database != null) {
             capZeilen1.Text = "<IMAGECODE=Information|16> " + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " +
-                              Table.Database.Row.VisibleRowCount + " " + LanguageTool.DoTranslate("St.");
+                              Table.VisibleRowCount + " " + LanguageTool.DoTranslate("St.");
         } else {
             {
                 capZeilen1.Text = string.Empty;
@@ -808,7 +809,7 @@ public partial class TableView : FormWithStatusBar {
         var r = Table.Database?.Column.First()?.SortType == SortierTyp.Datum_Uhrzeit
             ? Table.Database?.Row.GenerateAndAdd(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null), "Benutzer: +")
             : Table.Database?.Row.GenerateAndAdd(NameRepair("Neuer Eintrag", null), "Benutzer: +");
-        Table.CursorPos_Set(Table.Database?.Column.First(), Table.SortedRows().Get(r), true);
+        Table.CursorPos_Set(Table.Database?.Column.First(), Table.RowsFilteredAndPinned().Get(r), true);
     }
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
@@ -1149,7 +1150,7 @@ public partial class TableView : FormWithStatusBar {
 
             if (sc.NeedRow) {
                 if (MessageBox.Show("Skript bei <b>allen</b> aktuell<br>angezeigten Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") == 0) {
-                    m = db.Row.ExecuteScript(null, e.Item.KeyName, Table.Filter, Table.PinnedRows, true, true);
+                    m = db.Row.ExecuteScript(null, e.Item.KeyName, Table.RowsVisibleUnique());
                 } else {
                     m = "Durch Benutzer abgebrochen";
                 }
@@ -1191,12 +1192,17 @@ public partial class TableView : FormWithStatusBar {
                     return; // lstAufgaben.Enabled = true; wird von UpdateScript gemacht
 
                 case "#datenüberprüfung":
-                    var rows = db.Row.CalculateVisibleRows(Table.Filter, Table.PinnedRows);
+                    var rows = Table.RowsVisibleUnique();
+                    if (rows.Count == 0) {
+                        MessageBox.Show("Keine Zeilen angezeigt.", ImageCode.Kreuz, "OK");
+                        return;
+                    }
 
                     foreach (var thisR in rows) {
                         thisR.InvalidateCheckData();
                         thisR.CheckRowDataIfNeeded();
                     }
+
                     MessageBox.Show("Alle angezeigten Zeilen überprüft.", ImageCode.HäkchenDoppelt, "OK");
                     lstAufgaben.Enabled = true;
                     return;

@@ -1212,9 +1212,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, List<RowItem>? sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
 
-    public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateFilteredRows(filter));
+    //public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.RowsFiltered(filter));
 
-    public bool Export_HTML(string filename, int arrangementNo, FilterCollection? filter) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.CalculateFilteredRows(filter), false);
+    //public bool Export_HTML(string filename, int arrangementNo, FilterCollection? filter) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.RowsFiltered(filter), false);
 
     public bool Export_HTML(string filename, List<ColumnItem>? columnList, List<RowItem> sortedRows, bool execute) {
         try {
@@ -1632,6 +1632,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return true;
     }
 
+    public abstract string? NextRowKey();
+
     public void OnCanDoScript(CancelReasonEventArgs e) {
         if (IsDisposed) { return; }
         CanDoScript?.Invoke(this, e);
@@ -1754,16 +1756,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public (bool didreload, string errormessage) RefreshRowData(List<RowData> rowdata, bool refreshAlways) {
-        if (rowdata.Count == 0) { return (false, string.Empty); }
-
-        var r = new List<RowItem>();
-        foreach (var thisRow in rowdata) {
-            if (thisRow.Row != null) { r.Add(thisRow.Row); }
-        }
-        return RefreshRowData(r, refreshAlways);
-    }
-
     public abstract (bool didreload, string errormessage) RefreshRowData(List<RowItem> row, bool refreshAlways);
 
     public (bool didreload, string errormessage) RefreshRowData(List<string> keys, bool refreshAlways) {
@@ -1831,8 +1823,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
     }
 
     internal virtual bool IsNewRowPossible() => string.IsNullOrWhiteSpace(EditableErrorReason(EditableErrorReasonType.EditNormaly));
-
-    internal abstract string? NextRowKey();
 
     internal void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }

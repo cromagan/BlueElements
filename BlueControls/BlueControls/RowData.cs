@@ -24,8 +24,9 @@ using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueDatabase;
 
-namespace BlueDatabase;
+namespace BlueControls;
 
 public static class RowDrawDataExtensions {
 

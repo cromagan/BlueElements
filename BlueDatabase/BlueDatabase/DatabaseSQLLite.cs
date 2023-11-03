@@ -230,6 +230,13 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         _undoLoaded = true;
     }
 
+    public override string? NextRowKey() {
+        if (!Row.IsNewRowPossible()) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Systemspalte Correct fehlt!");
+        }
+        return SQL?.GenerateRow(TableName);
+    }
+
     public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns.Count == 0) { return; }
 
@@ -317,13 +324,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     internal override bool IsNewRowPossible() {
         if (Column.SysCorrect == null) { return false; }
         return base.IsNewRowPossible();
-    }
-
-    internal override string? NextRowKey() {
-        if (!Row.IsNewRowPossible()) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Systemspalte Correct fehlt!");
-        }
-        return SQL?.GenerateRow(TableName);
     }
 
     internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {

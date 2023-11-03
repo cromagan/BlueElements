@@ -59,7 +59,7 @@ public partial class TextGenerator : UserControl {
 
         var fi = new FilterItem(c1, BlueDatabase.Enums.FilterType.Istgleich_ODER_GroßKleinEgal, Vorfilter);
 
-        var l = c2.Contents(fi, null);
+        var l = c2.Contents(_textDatabase.Row.RowsFiltered(fi));
 
         if (l.Count == 0) {
             cbxModus.Text = string.Empty;
@@ -127,13 +127,14 @@ public partial class TextGenerator : UserControl {
 
         #endregion
 
-        #region und nun die Datenbank durchforsten und fehlene einträge erzeugen
+        #region und nun die Datenbank durchforsten und fehlende Einträge erzeugen
 
-        var allr = _textDatabase.Row.CalculateSortedRows(null as List<FilterItem>, _textDatabase.SortDefinition, null, null);
+        var allr = _textDatabase.Row.RowsFiltered();
+        allr.Sort(); // , _textDatabase.SortDefinition
         var txt = string.Empty;
 
         foreach (var thisRow in allr) {
-            var r = RowString(thisRow.Row);
+            var r = RowString(thisRow);
 
             if (lstAuswahl.Item[r] == null) {
                 var add = false;
@@ -148,7 +149,7 @@ public partial class TextGenerator : UserControl {
             }
 
             if (chk.Contains(r)) {
-                txt = txt + "\r\n" + thisRow.Row.CellGetString("Deutsch");
+                txt = txt + "\r\n" + thisRow.CellGetString("Deutsch");
             }
         }
 

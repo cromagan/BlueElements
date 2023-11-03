@@ -752,6 +752,17 @@ public sealed class Database : DatabaseAbstract {
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
     }
 
+    public override string NextRowKey() {
+        var tmp = 0;
+        string key;
+
+        do {
+            key = GetUniqueKey(tmp, "row");
+            tmp++;
+        } while (Row.SearchByKey(key) != null);
+        return key;
+    }
+
     public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns.Count == 0) { return; }
 
@@ -862,17 +873,6 @@ public sealed class Database : DatabaseAbstract {
         list.Add((byte)databaseDataType);
         SaveToByteList(list, b.Length, 3);
         list.AddRange(b);
-    }
-
-    internal override string NextRowKey() {
-        var tmp = 0;
-        string key;
-
-        do {
-            key = GetUniqueKey(tmp, "row");
-            tmp++;
-        } while (Row.SearchByKey(key) != null);
-        return key;
     }
 
     internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {

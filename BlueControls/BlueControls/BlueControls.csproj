@@ -181,6 +181,7 @@
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </Compile>
     <Compile Include="Enums\FilterTypeRowInputItem.cs" />
+    <Compile Include="EventArgs\CellExtEventArgs.cs" />
     <Compile Include="FormManager.cs" />
     <Compile Include="Forms\FormulaView.cs">
       <SubType>Form</SubType>
@@ -424,6 +425,7 @@
     <Compile Include="Controls\RibbonBar.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="RowData.cs" />
     <Compile Include="SkinDesign.cs" />
     <Compile Include="ScriptEditor.cs">
       <SubType>Component</SubType>

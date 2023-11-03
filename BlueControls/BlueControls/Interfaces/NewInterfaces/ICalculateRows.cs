@@ -26,7 +26,7 @@ public interface ICalculateRows {
 
     #region Properties
 
-    public List<RowItem> FilteredRows { get; }
+    public List<RowItem> RowsFiltered { get; }
 
     #endregion
 
@@ -41,11 +41,11 @@ public static class ICalculateRowsExtension {
 
     #region Methods
 
-    public static List<RowItem> CalculateFilteredRows(this ICalculateRows item, ref List<RowItem>? precalculaeItems, FilterCollection? filter, DatabaseAbstract? database) {
-        if (precalculaeItems != null) { return precalculaeItems; }
+    public static List<RowItem> RowsFiltered(this ICalculateRows item, ref List<RowItem>? precalculateItems, FilterCollection? filter, DatabaseAbstract? database) {
+        if (precalculateItems != null) { return precalculateItems; }
         if (database == null || database.IsDisposed) { return new List<RowItem>(); }
-        precalculaeItems = database.Row.CalculateFilteredRows(filter);
-        return precalculaeItems;
+        precalculateItems = database.Row.RowsFiltered(filter, null);
+        return precalculateItems;
     }
 
     #endregion

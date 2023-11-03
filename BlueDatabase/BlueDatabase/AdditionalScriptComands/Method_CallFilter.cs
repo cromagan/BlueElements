@@ -41,7 +41,7 @@ public class Method_CallFilter : Method {
                                             "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
     public override bool EndlessArgs => true;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override string Returns => string.Empty;
@@ -69,7 +69,7 @@ public class Method_CallFilter : Method {
         //var db = MyDatabase(s);
         if (allFi[0].Database is not DatabaseAbstract db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
-        var r = db.Row.CalculateFilteredRows(allFi);
+        var r = db.Row.RowsFiltered(allFi, null);
         if (r.Count == 0) { return DoItFeedback.Null(); }
 
         var vs = attvar.ValueStringGet(0);

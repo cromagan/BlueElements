@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -25,6 +26,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -1248,49 +1250,25 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         return tmp;
     }
 
-    public List<string> Contents() => Contents(null as FilterCollection, null);
+    public List<string> Contents() => Contents(Database?.Row?.ToList());
 
-    public List<string> Contents(FilterItem filter, List<RowItem>? pinned) {
-        var x = new FilterCollection(filter.Database) { filter };
-        return Contents(x, pinned);
-    }
-
-    //public List<string> Contents(List<FilterItem>? filter, List<RowItem?>? pinned) {
-    //    if (filter == null || filter.Count == 0) { return Contents(); }
-    //    //var ficol = new FilterCollection(filter[0].Database);
-    //    //ficol.AddRange(filter);
-    //    return Contents(filter, pinned);
-    //}
-    public List<string> Contents(List<RowItem?>? pinned) {
-        List<string> list = new();
-
-        if (pinned == null || pinned.Count == 0) { return list; }
-
-        foreach (var thisRowItem in pinned) {
-            if (thisRowItem != null) {
-                if (_multiLine) {
-                    list.AddRange(thisRowItem.CellGetList(this));
-                } else {
-                    if (thisRowItem.CellGetString(this).Length > 0) {
-                        list.Add(thisRowItem.CellGetString(this));
-                    }
-                }
-            }
-        }
-        return list.SortedDistinctList();
-    }
+    public List<string> Contents(FilterItem filter, List<RowItem> additional) => Contents(new List<FilterItem>() { filter }, additional);
 
     public List<string> Contents(ICollection<FilterItem>? filter, List<RowItem>? pinned) {
-        List<string> list = new();
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return list; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<string>(); }
+        return Contents(db.Row.RowsFiltered(filter, pinned));
+    }
+
+    public List<string> Contents(List<RowItem>? rows) {
+        if (rows == null || rows.Count == 0) { return new List<string>(); }
 
         RefreshColumnsData();
 
-        foreach (var thisRowItem in Database.Row) {
-            if (thisRowItem != null) {
-                var add = thisRowItem.MatchesTo(filter);
-                if (!add && pinned != null) { add = pinned.Contains(thisRowItem); }
-                if (add) {
+        ConcurrentBag<string> list = new();
+
+        try {
+            _ = Parallel.ForEach(rows, thisRowItem => {
+                if (thisRowItem != null) {
                     if (_multiLine) {
                         list.AddRange(thisRowItem.CellGetList(this));
                     } else {
@@ -1299,23 +1277,39 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                         }
                     }
                 }
-            }
+            });
+        } catch {
+            Develop.CheckStackForOverflow();
+            return Contents(rows);
         }
+
+        //foreach (var thisRowItem in rows) {
+        //    if (thisRowItem != null) {
+        //        if (_multiLine) {
+        //            list.AddRange(thisRowItem.CellGetList(this));
+        //        } else {
+        //            if (thisRowItem.CellGetString(this).Length > 0) {
+        //                list.Add(thisRowItem.CellGetString(this));
+        //            }
+        //        }
+        //    }
+        //}
+
         return list.SortedDistinctList();
     }
 
-    public void DeleteContents(FilterCollection filter, List<RowItem?>? pinned) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+    //public void DeleteContents(FilterCollection filter, List<RowItem?>? pinned) {
+    //    if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        foreach (var thisRowItem in Database.Row) {
-            if (thisRowItem != null) {
-                if (thisRowItem.MatchesTo(filter) ||
-                    (pinned != null && pinned.Contains(thisRowItem))) {
-                    thisRowItem.CellSet(this, string.Empty);
-                }
-            }
-        }
-    }
+    //    foreach (var thisRowItem in Database.Row) {
+    //        if (thisRowItem != null) {
+    //            if (thisRowItem.MatchesTo(filter) ||
+    //                (pinned != null && pinned.Contains(thisRowItem))) {
+    //                thisRowItem.CellSet(this, string.Empty);
+    //            }
+    //        }
+    //    }
+    //}
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -1457,8 +1451,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public bool ExportableTextformatForLayout() => _format.ExportableForLayout();
 
     public List<string> GetUcaseNamesSortedByLenght() {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<string>(); }
+
         if (UcaseNamesSortedByLenght != null) { return UcaseNamesSortedByLenght; }
-        var tmp = Contents(null as FilterCollection, null);
+        var tmp = Contents(db.Row.ToList());
         for (var z = 0; z < tmp.Count; z++) {
             tmp[z] = tmp[z].Length.ToString(Constants.Format_Integer10) + tmp[z].ToUpper();
         }
@@ -1851,17 +1847,16 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public void Statisik(ICollection<FilterItem>? filter, List<RowItem>? pinnedRows, bool ignoreMultiLine) {
+    public void Statisik(List<RowItem> rows, bool ignoreMultiLine) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
-        var r = Database.Row.CalculateVisibleRows(filter, pinnedRows);
 
-        if (r.Count < 1) { return; }
+        if (rows.Count < 1) { return; }
 
         var d = new Dictionary<string, int>();
 
         var values = new List<string>();
 
-        foreach (var thisRow in r) {
+        foreach (var thisRow in rows) {
             if (ignoreMultiLine) {
                 var keyValue = thisRow.CellGetString(this);
                 if (string.IsNullOrEmpty(keyValue)) { values.Add("[empty]"); } else {

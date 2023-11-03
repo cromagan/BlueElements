@@ -71,12 +71,14 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         if (column == null || column.IsDisposed) { return new(); }
 
         if (filter == null || filter.Count < 0) { return column.Contents(); }
-        FilterCollection tfilter = new(column.Database);
-        foreach (var thisFilter in filter) {
-            if (thisFilter != null && column != thisFilter.Column) {
-                tfilter.Add(thisFilter);
-            }
-        }
+        FilterCollection tfilter = (FilterCollection)filter.Clone();
+        tfilter.Remove(column);
+
+        //foreach (var thisFilter in filter) {
+        //    if (thisFilter != null && column != thisFilter.Column) {
+        //        tfilter.Add(thisFilter);
+        //    }
+        //}
 
         return column.Contents(tfilter, pinned);
     }

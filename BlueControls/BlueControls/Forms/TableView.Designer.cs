@@ -9,6 +9,7 @@ using GroupBox = BlueControls.Controls.GroupBox;
 using TabControl = BlueControls.Controls.TabControl;
 using TextBox = BlueControls.Controls.TextBox;
 
+
 namespace BlueControls.Forms {
     partial class TableView {
         /// <summary>
@@ -911,7 +912,7 @@ namespace BlueControls.Forms {
             this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Table_ContextMenuInit);
             this.Table.ContextMenuItemClicked += new System.EventHandler<BlueControls.EventArgs.ContextMenuItemClickedEventArgs>(this.Table_ContextMenuItemClicked);
             this.Table.DatabaseChanged += new System.EventHandler(this.Table_DatabaseChanged);
-            this.Table.SelectedCellChanged += new System.EventHandler<BlueDatabase.EventArgs.CellExtEventArgs>(this.Table_SelectedCellChanged);
+            this.Table.SelectedCellChanged += new System.EventHandler<BlueControls.EventArgs.CellExtEventArgs>(this.Table_SelectedCellChanged);
             this.Table.SelectedRowChanged += new System.EventHandler<BlueDatabase.EventArgs.RowEventArgs>(this.Table_SelectedRowChanged);
             this.Table.ViewChanged += new System.EventHandler(this.Table_ViewChanged);
             this.Table.VisibleRowsChanged += new System.EventHandler(this.Table_VisibleRowsChanged);

@@ -61,7 +61,6 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
     #region Properties
 
-    public List<RowItem> FilteredRows => this.CalculateFilteredRows(ref _filteredRows, this.FilterOfSender(), InputDatabase);
     public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
     public DatabaseAbstract? InputDatabase { get; set; }
     public DatabaseAbstract? OutputDatabase { get; set; }
@@ -75,6 +74,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
             this.DoChilds(_childs, _row);
         }
     }
+
+    public List<RowItem> RowsFiltered => this.RowsFiltered(ref _filteredRows, this.FilterOfSender(), InputDatabase);
 
     #endregion
 
@@ -148,7 +149,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
         #region Zeilen erzeugen
 
-        var f = FilteredRows;
+        var f = RowsFiltered;
         if (f != null) {
             foreach (var thisR in f) {
                 if (cb?.Item?[thisR.KeyName] == null) {

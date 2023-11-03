@@ -89,8 +89,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public bool IsDisposed { get; private set; }
 
-    public long VisibleRowCount { get; private set; }
-
     #endregion
 
     #region Indexers
@@ -128,33 +126,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #endregion
 
     #region Methods
-
-    /// <summary>
-    /// Füllt die Liste rowsToExpand auf, bis sie 100 Einträge enthält.
-    /// </summary>
-    /// <param name="rowsToExpand"></param>
-    /// <param name="sortedRows"></param>
-    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
-    public static bool FillUp100(List<RowItem> rowsToExpand, List<RowData> sortedRows) {
-        if (rowsToExpand.Count is > 99 or 0) { return false; }
-
-        if (rowsToExpand[0].IsDisposed) { return false; }
-        if (rowsToExpand[0].Database is not DatabaseAbstract db) { return false; }
-        if (db.IsDisposed) { return false; }
-
-        if (sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
-
-        var tmpRowsToExpand = new List<RowItem>();
-        tmpRowsToExpand.AddRange(rowsToExpand);
-
-        foreach (var thisRow in tmpRowsToExpand) {
-            var all = FillUp(rowsToExpand, thisRow, sortedRows, (100 / tmpRowsToExpand.Count) + 1);
-            if (all) { return true; }
-            if (rowsToExpand.Count > 200) { return false; }
-        }
-
-        return false;
-    }
 
     /// <summary>
     /// Erstellt eine neue Spalte mit den aus den Filterkriterien. Nur Filter IstGleich wird unterstützt.
@@ -261,162 +232,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    return sortedRows;
     //}
 
-    public List<RowItem> CalculateFilteredRows(ICollection<FilterItem>? filter) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>(); }
-        Database.RefreshColumnsData(filter);
-
-        ConcurrentBag<RowItem> tmpVisibleRows = new();
-
-        try {
-            _ = Parallel.ForEach(Database.Row, thisRowItem => {
-                if (thisRowItem != null) {
-                    if (thisRowItem.MatchesTo(filter)) {
-                        tmpVisibleRows.Add(thisRowItem);
-                    }
-                }
-            });
-        } catch {
-            Develop.CheckStackForOverflow();
-            return CalculateFilteredRows(filter);
-        }
-
-        var l = new List<RowItem>();
-        l.AddRange(tmpVisibleRows);
-        return l;
-    }
-
-    /// <summary>
-    /// Gibt die mit dieser Kombination sichtbaren Zeilen zurück. Ohne Sortierung. Jede Zeile kann maximal einmal vorkommen.
-    /// </summary>
-    /// <param name="filter"></param>
-    /// <param name="rowSortDefinition"></param>
-    /// <param name="pinnedRows"></param>
-    /// <param name="reUseMe"></param>
-    /// <returns></returns>
-    public List<RowData> CalculateSortedRows(ICollection<FilterItem>? filter, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) => CalculateSortedRows(CalculateFilteredRows(filter), rowSortDefinition, pinnedRows, reUseMe);
-
-    public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
-        var db = Database;
-        if (db == null || db.IsDisposed) { return new List<RowData>(); }
-
-        VisibleRowCount = 0;
-
-        #region Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
-
-        var capName = pinnedRows != null && pinnedRows.Count > 0;
-        if (!capName && db.Column.SysChapter is ColumnItem cap) {
-            foreach (var thisRow in filteredRows) {
-                if (thisRow.Database != null && !thisRow.CellIsNullOrEmpty(cap)) {
-                    capName = true;
-                    break;
-                }
-            }
-        }
-
-        #endregion
-
-        var l = new List<ColumnItem>();
-        if (rowSortDefinition != null) { l.AddRange(rowSortDefinition.Columns); }
-        if (db.Column.SysChapter != null) { _ = l.AddIfNotExists(db.Column.SysChapter); }
-
-        db.RefreshColumnsData(l);
-
-        #region _Angepinnten Zeilen erstellen (_pinnedData)
-
-        List<RowData> pinnedData = new();
-        var lockMe = new object();
-        if (pinnedRows != null) {
-            _ = Parallel.ForEach(pinnedRows, thisRow => {
-                var rd = reUseMe.Get(thisRow, "Angepinnt") ?? new RowData(thisRow, "Angepinnt");
-                rd.PinStateSortAddition = "1";
-                rd.MarkYellow = true;
-                rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
-
-                lock (lockMe) {
-                    VisibleRowCount++;
-                    pinnedData.Add(rd);
-                }
-            });
-        }
-
-        #endregion
-
-        #region Gefiltere Zeilen erstellen (_rowData)
-
-        List<RowData> rowData = new();
-        _ = Parallel.ForEach(filteredRows, thisRow => {
-            var adk = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
-
-            var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
-            var added = markYellow;
-
-            List<string> caps;
-            if (db.Column.SysChapter is ColumnItem sc) {
-                caps = thisRow.CellGetList(sc);
-            } else {
-                caps = new();
-            }
-
-            if (caps.Count > 0) {
-                if (caps.Contains(string.Empty)) {
-                    _ = caps.Remove(string.Empty);
-                    caps.Add("-?-");
-                }
-            }
-
-            if (caps.Count == 0 && capName) { caps.Add("Weitere Zeilen"); }
-            if (caps.Count == 0) { caps.Add(string.Empty); }
-
-            foreach (var thisCap in caps) {
-                var rd = reUseMe.Get(thisRow, thisCap) ?? new RowData(thisRow, thisCap);
-
-                rd.PinStateSortAddition = "2";
-                rd.MarkYellow = markYellow;
-                rd.AdditionalSort = adk;
-                lock (lockMe) {
-                    rowData.Add(rd);
-                    if (!added) { VisibleRowCount++; added = true; }
-                }
-            }
-        });
-
-        #endregion
-
-        pinnedData.Sort();
-        rowData.Sort();
-
-        if (rowSortDefinition != null && rowSortDefinition.Reverse) { rowData.Reverse(); }
-
-        rowData.InsertRange(0, pinnedData);
-        return rowData;
-    }
-
-    public List<RowItem> CalculateVisibleRows(ICollection<FilterItem>? filter, ICollection<RowItem>? pinnedRows) {
-        List<RowItem> tmpVisibleRows = new();
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return tmpVisibleRows; }
-
-        pinnedRows ??= new List<RowItem>();
-
-        var lockMe = new object();
-        _ = Parallel.ForEach(Database.Row, thisRowItem => {
-            if (thisRowItem != null) {
-                if (thisRowItem.MatchesTo(filter) || pinnedRows.Contains(thisRowItem)) {
-                    lock (lockMe) { tmpVisibleRows.Add(thisRowItem); }
-                }
-            }
-        });
-
-        //foreach (var thisRowItem in database.Row) {
-        //    if (thisRowItem != null) {
-        //        if (thisRowItem.MatchesTo(filter) || pinnedRows.Contains(thisRowItem)) {
-        //            _tmpVisibleRows.GenerateAndAdd(thisRowItem);
-        //        }
-        //    }
-        //}
-
-        return tmpVisibleRows;
-    }
-
     public bool Clear(string comment) => Remove(new FilterCollection(Database), null, comment);
 
     public void Dispose() {
@@ -475,11 +290,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         _executingbackgroundworks = false;
     }
 
-    public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, FilterCollection? filter, List<RowItem>? pinned, bool fullCheck, bool changevalues) {
+    public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, List<RowItem> rows) {
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditCurrently);
         if (!string.IsNullOrEmpty(m) || Database is not DatabaseAbstract db || db.IsDisposed) { return m; }
 
-        var rows = CalculateVisibleRows(filter, pinned);
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
         Database.RefreshRowData(rows, false);
@@ -493,7 +307,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         while (rows.Count > 0) {
             Database.OnProgressbarInfo(new ProgressbarEventArgs(txt, all - rows.Count, all, false, false));
 
-            var scx = rows[0].ExecuteScript(eventname, scriptname, true, fullCheck, changevalues, 0);
+            var scx = rows[0].ExecuteScript(eventname, scriptname, true, true, true, 0);
 
             if (!scx.AllOk) {
                 var w = rows[0].CellFirstString();
@@ -723,6 +537,33 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return true;
     }
 
+    public List<RowItem> RowsFiltered() => RowsFiltered(null, null);
+
+    public List<RowItem> RowsFiltered(FilterItem filter) => RowsFiltered(new List<FilterItem>() { filter }, null);
+
+    public List<RowItem> RowsFiltered(ICollection<FilterItem>? filter, List<RowItem>? additional) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>(); }
+        Database.RefreshColumnsData(filter);
+
+        ConcurrentBag<RowItem> tmpVisibleRows = new();
+        additional ??= new List<RowItem>();
+
+        try {
+            _ = Parallel.ForEach(Database.Row, thisRowItem => {
+                if (thisRowItem != null) {
+                    if (thisRowItem.MatchesTo(filter) || additional.Contains(thisRowItem)) {
+                        tmpVisibleRows.Add(thisRowItem);
+                    }
+                }
+            });
+        } catch {
+            Develop.CheckStackForOverflow();
+            return RowsFiltered(filter, additional);
+        }
+
+        return tmpVisibleRows.ToList();
+    }
+
     public RowItem? SearchByKey(string? key) {
         if (Database is not DatabaseAbstract db || db.IsDisposed || key == null || string.IsNullOrWhiteSpace(key)) { return null; }
         try {
@@ -853,61 +694,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         return "Befehl unbekannt";
-    }
-
-    /// <summary>
-    /// Füllt die Liste rowsToExpand um expandCount Einträge auf. Ausgehend von rowToCheck
-    /// </summary>
-    /// <param name="rowsToExpand"></param>
-    /// <param name="rowToCheck"></param>
-    /// <param name="sortedRows"></param>
-    /// <param name="expandCount"></param>
-    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
-    private static bool FillUp(List<RowItem> rowsToExpand, RowItem rowToCheck, List<RowData> sortedRows, int expandCount) {
-        var indexPosition = -1;
-
-        for (var z = 0; z < sortedRows.Count; z++) {
-            var tmpr = sortedRows[z];
-            if (!tmpr.MarkYellow && tmpr.Row == rowToCheck) { indexPosition = z; break; }
-        }
-
-        if (indexPosition == -1) { return false; } // Wie bitte?
-
-        var modi = 0;
-
-        while (expandCount > 0) {
-            modi++;
-            var n1 = indexPosition - modi;
-            var n2 = indexPosition + modi;
-
-            if (n1 < 0 && n2 >= sortedRows.Count) { return true; }
-
-            #region Zeile "vorher" prüfen und aufnehmen
-
-            if (n1 >= 0) {
-                var tmpr = sortedRows[n1].Row;
-                if (!tmpr.IsDisposed && tmpr.IsInCache == null && !rowsToExpand.Contains(tmpr)) {
-                    rowsToExpand.Add(tmpr);
-                    expandCount--;
-                }
-            }
-
-            #endregion
-
-            #region Zeile "nachher" prüfen und aufnehmen
-
-            if (n2 < sortedRows.Count) {
-                var tmpr = sortedRows[n2].Row;
-                if (tmpr.IsInCache == null && !rowsToExpand.Contains(tmpr)) {
-                    rowsToExpand.Add(tmpr);
-                    expandCount--;
-                }
-            }
-
-            #endregion
-        }
-
-        return false;
     }
 
     /// <summary>

@@ -29,7 +29,7 @@ using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
-public sealed class FilterCollection : ObservableCollection<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IChangedFeedback {
+public sealed class FilterCollection : ObservableCollection<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IChangedFeedback, ICloneable {
 
     #region Constructors
 
@@ -142,6 +142,15 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         foreach (var thisFilter in filterItem) {
             AddIfNotExists(thisFilter);
         }
+    }
+
+    public object Clone() {
+        var x = new FilterCollection(Database);
+        foreach (var thisf in this) {
+            x.Add(thisf);
+        }
+
+        return x;
     }
 
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.

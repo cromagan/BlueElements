@@ -30,6 +30,7 @@ using BlueBasics.Interfaces;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
 using System.Collections;
+using System.Collections.Concurrent;
 
 namespace BlueBasics;
 
@@ -51,6 +52,8 @@ public static partial class Extensions {
         l.Add(value);
         return true;
     }
+
+    public static void AddRange<T>(this ConcurrentBag<T> @this, IEnumerable<T> toAdd) => toAdd.AsParallel().ForAll(@this.Add);
 
     public static List<T> Clone<T>(this ICollection<T> l) {
         var l2 = new List<T>();

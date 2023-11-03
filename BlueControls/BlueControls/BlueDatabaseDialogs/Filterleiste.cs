@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -295,9 +296,9 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         if (db.Column.First() is not ColumnItem co) { return; }
 
-        List<FilterItem> fl = new() { new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
+        var fl = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
 
-        var r = db.Row.CalculateFilteredRows(fl);
+        var r = db.Row.RowsFiltered(fl);
         if (r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
             MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
             return;
@@ -333,7 +334,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         }
     }
 
-    private void btnPin_Click(object sender, System.EventArgs e) => _table?.Pin(_table.VisibleUniqueRows());
+    private void btnPin_Click(object sender, System.EventArgs e) => _table?.Pin(_table.RowsVisibleUnique());
 
     private void btnPinZurück_Click(object sender, System.EventArgs e) {
         _lastLooked = string.Empty;
@@ -349,9 +350,9 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         if (col == null) { return; } // Neue Datenbank?
 
-        List<FilterItem> fl = new() { new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text) };
+        var fl = new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
 
-        var r = db.Row.CalculateFilteredRows(fl);
+        var r = db.Row.RowsFiltered(fl);
         if (_ähnliche != null) {
             btnÄhnliche.Visible = true;
             btnÄhnliche.Enabled = r != null && r.Count == 1;
@@ -361,7 +362,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         if (AutoPin && r != null && r.Count == 1) {
             if (_lastLooked != r[0].CellFirstString()) {
-                if (_table.SortedRows().Get(r[0]) == null) {
+                if (_table.RowsFilteredAndPinned().Get(r[0]) == null) {
                     if (MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {
                         _table.PinAdd(r[0]);
                     }

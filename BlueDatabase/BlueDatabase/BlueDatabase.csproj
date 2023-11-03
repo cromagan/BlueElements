@@ -133,7 +133,6 @@
     <Compile Include="Enums\ÜberschriftAnordnung.cs" />
     <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
     <Compile Include="Interfaces\ITranslateAble.cs" />
-    <Compile Include="RowData.cs" />
     <Compile Include="ColumnCollection.cs" />
     <Compile Include="ColumnItem.cs" />
     <Compile Include="ColumnViewCollection.cs" />
@@ -149,7 +148,6 @@
     <Compile Include="Enums\Routinen.cs" />
     <Compile Include="Enums\DatabaseDataType.cs" />
     <Compile Include="Enums\ViewType.cs" />
-    <Compile Include="EventArgs\CellExtEventArgs.cs" />
     <Compile Include="EventArgs\CellEventArgs.cs" />
     <Compile Include="EventArgs\DoRowAutomaticEventArgs.cs" />
     <Compile Include="EventArgs\FilterEventArgs.cs" />

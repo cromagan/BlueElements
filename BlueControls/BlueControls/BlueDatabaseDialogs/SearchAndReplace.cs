@@ -23,6 +23,7 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
+using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueDatabase;
 using BlueDatabase.EventArgs;

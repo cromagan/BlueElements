@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -272,23 +273,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public List<RowItem> FilteredRows {
-        get {
-            if (_filterFromParents == null) {
-                return this.CalculateFilteredRows(ref _filteredRows, Filter, Database);
-            }
-
-            if (Filter == null) {
-                return this.CalculateFilteredRows(ref _filteredRows, _filterFromParents, Database);
-            }
-
-            var f = new FilterCollection(Database);
-            f.AddIfNotExists(Filter);
-            f.AddIfNotExists(_filterFromParents);
-            return this.CalculateFilteredRows(ref _filteredRows, f, Database);
-        }
-    }
-
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
@@ -323,6 +307,24 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
 
             return t1 + t2; // Eins davon ist leer
+        }
+    }
+
+    public List<RowItem> RowsFiltered {
+        get {
+            if (_filterFromParents == null) {
+                return this.RowsFiltered(ref _filteredRows, Filter, Database);
+            }
+
+            if (Filter == null) {
+                return this.RowsFiltered(ref _filteredRows, _filterFromParents, Database);
+            }
+
+            // Filter kombinieren
+            var f = new FilterCollection(Database);
+            f.AddIfNotExists(Filter);
+            f.AddIfNotExists(_filterFromParents);
+            return this.RowsFiltered(ref _filteredRows, f, Database);
         }
     }
 
@@ -367,6 +369,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Invalidate();
         }
     }
+
+    public long VisibleRowCount { get; private set; }
 
     #endregion
 
@@ -498,12 +502,91 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     /// <summary>
+    /// Füllt die Liste rowsToExpand auf, bis sie 100 Einträge enthält.
+    /// </summary>
+    /// <param name="rowsToExpand"></param>
+    /// <param name="sortedRows"></param>
+    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
+    public static bool FillUp100(List<RowItem> rowsToExpand, List<RowData> sortedRows) {
+        if (rowsToExpand.Count is > 99 or 0) { return false; }
+
+        if (rowsToExpand[0].IsDisposed) { return false; }
+        if (rowsToExpand[0].Database is not DatabaseAbstract db) { return false; }
+        if (db.IsDisposed) { return false; }
+
+        if (sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
+
+        var tmpRowsToExpand = new List<RowItem>();
+        tmpRowsToExpand.AddRange(rowsToExpand);
+
+        foreach (var thisRow in tmpRowsToExpand) {
+            var all = FillUp(rowsToExpand, thisRow, sortedRows, (100 / tmpRowsToExpand.Count) + 1);
+            if (all) { return true; }
+            if (rowsToExpand.Count > 200) { return false; }
+        }
+
+        return false;
+    }
+
+    /// <summary>
     /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
     public static Size FormatedText_NeededSize(ColumnItem? column, string originalText, Font font, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten) {
         var (s, quickImage) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
         return Skin.FormatedText_NeededSize(s, quickImage, font, minSize);
+    }
+
+    /// <summary>
+    /// Erstellt eine neue Spalte mit den aus den Filterkriterien. Nur Filter IstGleich wird unterstützt.
+    /// Schägt irgendetwas fehl, wird NULL zurückgegeben.
+    /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
+    /// Am Schluß wird noch das Skript ausgeführt.
+    /// </summary>
+    /// <param name="fi"></param>
+    /// <param name="comment"></param>
+    /// <returns></returns>
+    public static RowItem? GenerateAndAdd(List<FilterItem> fi, string comment) {
+        IReadOnlyCollection<string>? first = null;
+
+        DatabaseAbstract? database = null;
+
+        foreach (var thisfi in fi) {
+            if (thisfi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal) { return null; }
+            if (thisfi.Column == null) { return null; }
+            if (thisfi.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+            database ??= db;
+
+            if (db.Column.First() == thisfi.Column) {
+                if (first != null) { return null; }
+                first = thisfi.SearchValue;
+            }
+
+            if (thisfi.Column.Database != database) { return null; }
+        }
+
+        if (database == null || database.IsDisposed) { return null; }
+
+        if (!database.Row.IsNewRowPossible()) { return null; }
+
+        if (first == null) { return null; }
+
+        var s = database.NextRowKey();
+        if (s == null || string.IsNullOrEmpty(s)) { return null; }
+
+        var row = database.Row.GenerateAndAdd(s, first.JoinWithCr(), false, true, comment);
+
+        if (row == null || row.IsDisposed) { return null; }
+
+        foreach (var thisfi in fi) {
+            if (thisfi.Column is ColumnItem c) {
+                row.CellSet(c, thisfi.SearchValue.ToList());
+            }
+        }
+
+        _ = row.ExecuteScript(ScriptEventTypes.new_row, string.Empty, false, false, true, 1);
+
+        return row;
     }
 
     //    FileDialogs.DeleteFile(delList, true);
@@ -687,6 +770,101 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         item.ChildAdd(this);
     }
 
+    public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowData>(); }
+
+        VisibleRowCount = 0;
+
+        #region Ermitteln, ob mindestens eine Überschrift vorhanden ist (capName)
+
+        var capName = pinnedRows != null && pinnedRows.Count > 0;
+        if (!capName && db.Column.SysChapter is ColumnItem cap) {
+            foreach (var thisRow in filteredRows) {
+                if (thisRow.Database != null && !thisRow.CellIsNullOrEmpty(cap)) {
+                    capName = true;
+                    break;
+                }
+            }
+        }
+
+        #endregion
+
+        var l = new List<ColumnItem>();
+        if (rowSortDefinition != null) { l.AddRange(rowSortDefinition.Columns); }
+        if (db.Column.SysChapter != null) { _ = l.AddIfNotExists(db.Column.SysChapter); }
+
+        db.RefreshColumnsData(l);
+
+        #region _Angepinnten Zeilen erstellen (_pinnedData)
+
+        List<RowData> pinnedData = new();
+        var lockMe = new object();
+        if (pinnedRows != null) {
+            _ = Parallel.ForEach(pinnedRows, thisRow => {
+                var rd = reUseMe.Get(thisRow, "Angepinnt") ?? new RowData(thisRow, "Angepinnt");
+                rd.PinStateSortAddition = "1";
+                rd.MarkYellow = true;
+                rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
+
+                lock (lockMe) {
+                    VisibleRowCount++;
+                    pinnedData.Add(rd);
+                }
+            });
+        }
+
+        #endregion
+
+        #region Gefiltere Zeilen erstellen (_rowData)
+
+        List<RowData> rowData = new();
+        _ = Parallel.ForEach(filteredRows, thisRow => {
+            var adk = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
+
+            var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
+            var added = markYellow;
+
+            List<string> caps;
+            if (db.Column.SysChapter is ColumnItem sc) {
+                caps = thisRow.CellGetList(sc);
+            } else {
+                caps = new();
+            }
+
+            if (caps.Count > 0) {
+                if (caps.Contains(string.Empty)) {
+                    _ = caps.Remove(string.Empty);
+                    caps.Add("-?-");
+                }
+            }
+
+            if (caps.Count == 0 && capName) { caps.Add("Weitere Zeilen"); }
+            if (caps.Count == 0) { caps.Add(string.Empty); }
+
+            foreach (var thisCap in caps) {
+                var rd = reUseMe.Get(thisRow, thisCap) ?? new RowData(thisRow, thisCap);
+
+                rd.PinStateSortAddition = "2";
+                rd.MarkYellow = markYellow;
+                rd.AdditionalSort = adk;
+                lock (lockMe) {
+                    rowData.Add(rd);
+                    if (!added) { VisibleRowCount++; added = true; }
+                }
+            }
+        });
+
+        #endregion
+
+        pinnedData.Sort();
+        rowData.Sort();
+
+        if (rowSortDefinition != null && rowSortDefinition.Reverse) { rowData.Reverse(); }
+
+        rowData.InsertRange(0, pinnedData);
+        return rowData;
+    }
+
     public void CheckView() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
@@ -725,7 +903,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void CursorPos_Set(ColumnItem? column, RowData? row, bool ensureVisible) {
         if (Database is not DatabaseAbstract db || row == null || column == null ||
             db.ColumnArrangements.Count == 0 || CurrentArrangement?[column] == null ||
-            SortedRows() is not List<RowData> s || !s.Contains(row)) {
+            RowsFilteredAndPinned() is not List<RowData> s || !s.Contains(row)) {
             column = null;
             row = null;
         }
@@ -1033,18 +1211,18 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Invalidate_SortedRowData();
     }
 
-    public string Export_CSV(FirstRow firstRow) => Database == null ? string.Empty : Database.Export_CSV(firstRow, CurrentArrangement, FilteredRows);
+    public string Export_CSV(FirstRow firstRow) => Database == null ? string.Empty : Database.Export_CSV(firstRow, CurrentArrangement, RowsVisibleUnique());
 
     public string Export_CSV(FirstRow firstRow, ColumnItem onlyColumn) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
         List<ColumnItem> l = new() { onlyColumn };
-        return Database.Export_CSV(firstRow, l, FilteredRows);
+        return Database.Export_CSV(firstRow, l, RowsVisibleUnique());
     }
 
     public void Export_HTML(string filename = "", bool execute = true) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (string.IsNullOrEmpty(filename)) { filename = TempFile(string.Empty, string.Empty, "html"); }
-        Database.Export_HTML(filename, CurrentArrangement, FilteredRows, execute);
+        Database.Export_HTML(filename, CurrentArrangement, RowsVisibleUnique(), execute);
     }
 
     public void FilterFromParentsChanged() {
@@ -1179,7 +1357,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Invalidate();
     }
 
-    public List<RowData>? SortedRows() {
+    public List<RowData>? RowsFilteredAndPinned() {
         var ca = CurrentArrangement;
         if (ca == null) { return null; }
 
@@ -1196,7 +1374,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (Database is not DatabaseAbstract db || db.IsDisposed) {
                 sortedRowDataNew = new List<RowData>();
             } else {
-                sortedRowDataNew = Database.Row.CalculateSortedRows(FilteredRows, SortUsed(), PinnedRows, _sortedRowData);
+                sortedRowDataNew = CalculateSortedRows(RowsFiltered, SortUsed(), PinnedRows, _sortedRowData);
             }
 
             if (_sortedRowData != null && !_sortedRowData.IsDifferentTo(sortedRowDataNew)) { return _sortedRowData; }
@@ -1267,13 +1445,37 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             OnVisibleRowsChanged();
 
-            return SortedRows(); // Rekursiver aufruf. Manchmal funktiniert OnRowsSorted nicht...
+            return RowsFilteredAndPinned(); // Rekursiver aufruf. Manchmal funktiniert OnRowsSorted nicht...
         } catch {
             // Komisch, manchmal wird die Variable _sortedRowDatax verworfen.
             Develop.CheckStackForOverflow();
             Invalidate_SortedRowData();
-            return SortedRows();
+            return RowsFilteredAndPinned();
         }
+    }
+
+    public List<RowItem> RowsVisibleUnique() {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>(); }
+
+        var f = RowsFiltered;
+
+        ConcurrentBag<RowItem> l = new();
+
+        try {
+            var lockMe = new object();
+            _ = Parallel.ForEach(Database.Row, thisRowItem => {
+                if (thisRowItem != null) {
+                    if (f.Contains(thisRowItem) || PinnedRows.Contains(thisRowItem)) {
+                        lock (lockMe) { l.Add(thisRowItem); }
+                    }
+                }
+            });
+        } catch {
+            Develop.CheckStackForOverflow();
+            return RowsVisibleUnique();
+        }
+
+        return l.ToList();
     }
 
     public ColumnItem? View_ColumnFirst() {
@@ -1287,7 +1489,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
         if (row == null || row.IsDisposed) { return null; }
 
-        if (SortedRows() is not List<RowData> sr) { return null; }
+        if (RowsFilteredAndPinned() is not List<RowData> sr) { return null; }
 
         var rowNr = sr.IndexOf(row);
         return rowNr < 0 || rowNr >= sr.Count - 1 ? null : sr[rowNr + 1];
@@ -1296,20 +1498,20 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public RowData? View_PreviousRow(RowData? row) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
         if (row == null || row.IsDisposed) { return null; }
-        if (SortedRows() is not List<RowData> sr) { return null; }
+        if (RowsFilteredAndPinned() is not List<RowData> sr) { return null; }
         var rowNr = sr.IndexOf(row);
         return rowNr < 1 ? null : sr[rowNr - 1];
     }
 
     public RowData? View_RowFirst() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
-        if (SortedRows() is not List<RowData> sr) { return null; }
+        if (RowsFilteredAndPinned() is not List<RowData> sr) { return null; }
         return sr.Count == 0 ? null : sr[0];
     }
 
     public RowData? View_RowLast() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
-        if (SortedRows() is not List<RowData> sr) { return null; }
+        if (RowsFilteredAndPinned() is not List<RowData> sr) { return null; }
         return sr.Count == 0 ? null : sr[sr.Count - 1];
     }
 
@@ -1325,25 +1527,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         result.ParseableAdd("TempSort", _sortDefinitionTemporary);
         result.ParseableAdd("CursorPos", CellCollection.KeyOfCell(CursorPosColumn, CursorPosRow?.Row));
         return result.Parseable();
-    }
-
-    public List<RowItem> VisibleUniqueRows() {
-        var l = new List<RowItem>();
-
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return l; }
-
-        var f = FilteredRows;
-        var lockMe = new object();
-        _ = Parallel.ForEach(Database.Row, thisRowItem => {
-            if (thisRowItem != null) {
-                if (f.Contains(thisRowItem) || PinnedRows.Contains(thisRowItem)) {
-                    lock (lockMe) { l.Add(thisRowItem); }
-                }
-            }
-        });
-
-        return l;
-        //return Database.Row.CalculateVisibleRows(Filter, PinnedRows);
     }
 
     protected override void DrawControl(Graphics gr, States state) {
@@ -1405,7 +1588,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 //    return;
                 //}
 
-                sortedRowData = SortedRows();
+                sortedRowData = RowsFilteredAndPinned();
 
                 if (sortedRowData == null) {
                     // Multitasking...
@@ -1437,7 +1620,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     }
                 }
 
-                _ = RowCollection.FillUp100(rowsToRefreh, sortedRowData);
+                _ = FillUp100(rowsToRefreh, RowsFilteredAndPinned());
 
                 (bool didreload, string errormessage) = Database.RefreshRowData(rowsToRefreh, false);
 
@@ -1485,12 +1668,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     protected override bool IsInputKey(Keys keyData) =>
-            // Ganz wichtig diese Routine!
-            // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
-            keyData switch {
-                Keys.Up or Keys.Down or Keys.Left or Keys.Right => true,
-                _ => false
-            };
+                    // Ganz wichtig diese Routine!
+                    // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
+                    keyData switch {
+                        Keys.Up or Keys.Down or Keys.Left or Keys.Right => true,
+                        _ => false
+                    };
 
     protected override void OnClick(System.EventArgs e) {
         base.OnClick(e);
@@ -1921,6 +2104,61 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Skin.Draw_FormatedText(gr, text, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
     }
 
+    /// <summary>
+    /// Füllt die Liste rowsToExpand um expandCount Einträge auf. Ausgehend von rowToCheck
+    /// </summary>
+    /// <param name="rowsToExpand"></param>
+    /// <param name="rowToCheck"></param>
+    /// <param name="sortedRows"></param>
+    /// <param name="expandCount"></param>
+    /// <returns>Gibt false zurück, wenn ALLE Zeilen dadurch geladen sind.</returns>
+    private static bool FillUp(List<RowItem> rowsToExpand, RowItem rowToCheck, List<RowData> sortedRows, int expandCount) {
+        var indexPosition = -1;
+
+        for (var z = 0; z < sortedRows.Count; z++) {
+            var tmpr = sortedRows[z];
+            if (!tmpr.MarkYellow && tmpr.Row == rowToCheck) { indexPosition = z; break; }
+        }
+
+        if (indexPosition == -1) { return false; } // Wie bitte?
+
+        var modi = 0;
+
+        while (expandCount > 0) {
+            modi++;
+            var n1 = indexPosition - modi;
+            var n2 = indexPosition + modi;
+
+            if (n1 < 0 && n2 >= sortedRows.Count) { return true; }
+
+            #region Zeile "vorher" prüfen und aufnehmen
+
+            if (n1 >= 0) {
+                var tmpr = sortedRows[n1].Row;
+                if (!tmpr.IsDisposed && tmpr.IsInCache == null && !rowsToExpand.Contains(tmpr)) {
+                    rowsToExpand.Add(tmpr);
+                    expandCount--;
+                }
+            }
+
+            #endregion
+
+            #region Zeile "nachher" prüfen und aufnehmen
+
+            if (n2 < sortedRows.Count) {
+                var tmpr = sortedRows[n2].Row;
+                if (tmpr.IsInCache == null && !rowsToExpand.Contains(tmpr)) {
+                    rowsToExpand.Add(tmpr);
+                    expandCount--;
+                }
+            }
+
+            #endregion
+        }
+
+        return false;
+    }
+
     private static int GetPix(int pix, Font f, double scale) => Skin.FormatedText_NeededSize("@|", null, f, (int)((pix * scale) + 0.5)).Height;
 
     private static bool Mouse_IsInAutofilter(ColumnViewItem? viewItem, MouseEventArgs e) => viewItem?.Column != null && viewItem.TmpAutoFilterLocation.Width != 0 && viewItem.Column.AutoFilterSymbolPossible() && viewItem.TmpAutoFilterLocation.Contains(e.X, e.Y);
@@ -1987,14 +2225,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             var newr = cellInThisDatabaseColumn.Database?.Row.GenerateAndAdd(newValue, "Neue Zeile über Tabellen-Ansicht");
 
-            var l = table.FilteredRows;
+            var l = table.RowsFiltered;
             if (newr != null && !l.Contains(newr)) {
                 if (MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
                     table.PinAdd(newr);
                 }
             }
 
-            var sr = table.SortedRows();
+            var sr = table.RowsFilteredAndPinned();
             var rd = sr.Get(newr);
             table.CursorPos_Set(table.View_ColumnFirst(), rd, true);
             return;
@@ -2134,7 +2372,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             case "doeinzigartig":
                 Filter.Remove(e.Column);
-                e.Column.GetUniques(VisibleUniqueRows(), out var einzigartig, out _);
+                e.Column.GetUniques(RowsVisibleUnique(), out var einzigartig, out _);
                 if (einzigartig.Count > 0) {
                     Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, einzigartig));
                     Notification.Show("Die aktuell einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", ImageCode.Trichter);
@@ -2145,7 +2383,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             case "donichteinzigartig":
                 Filter.Remove(e.Column);
-                e.Column.GetUniques(VisibleUniqueRows(), out _, out var xNichtEinzigartig);
+                e.Column.GetUniques(RowsVisibleUnique(), out _, out var xNichtEinzigartig);
                 if (xNichtEinzigartig.Count > 0) {
                     Filter.Add(new FilterItem(e.Column, FilterType.Istgleich_ODER_GroßKleinEgal, xNichtEinzigartig));
                     Notification.Show("Die aktuell <b>nicht</b> einzigartigen Einträge wurden berechnet<br>und als <b>ODER-Filter</b> gespeichert.", ImageCode.Trichter);
@@ -2231,14 +2469,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private int Autofilter_Text(ColumnItem column) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed || Filter == null) { return 0; }
         if (column.TmpIfFilterRemoved != null) { return (int)column.TmpIfFilterRemoved; }
-        var tfilter = new FilterCollection(column.Database);
-        foreach (var thisFilter in Filter) {
-            if (thisFilter != null && thisFilter.Column != column) { tfilter.Add(thisFilter); }
-        }
-        var temp = Database.Row.CalculateFilteredRows(tfilter);
-        column.TmpIfFilterRemoved = FilteredRows.Count - temp.Count;
-        return (int)column.TmpIfFilterRemoved;
+        var tfilter = (FilterCollection)Filter.Clone();
+        tfilter.Remove(column);
+
+        var temp = db.Row.RowsFiltered(tfilter, null);
+        var c = RowsFiltered.Count - temp.Count;
+        column.TmpIfFilterRemoved = c;
+        return c;
     }
 
     /// <summary>
@@ -3267,7 +3506,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                     case "cursorpos":
                         db.Cell.DataOfCellKey(pair.Value.FromNonCritical(), out var column, out var row);
-                        CursorPos_Set(column, SortedRows().Get(row), false);
+                        CursorPos_Set(column, RowsFilteredAndPinned().Get(row), false);
                         break;
 
                     case "tempsort":
@@ -3324,7 +3563,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private string RowCaptionOnCoordinate(int pixelX, int pixelY) {
         try {
-            var s = SortedRows();
+            var s = RowsFilteredAndPinned();
             if (s == null) { return string.Empty; }
             foreach (var thisRow in s) {
                 if (thisRow.ShowCap && thisRow.CaptionPos is var r) {
@@ -3337,7 +3576,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private RowData? RowOnCoordinate(ColumnViewCollection ca, int pixelY) {
         if (Database is not DatabaseAbstract db || pixelY <= HeadSize(ca)) { return null; }
-        var s = SortedRows();
+        var s = RowsFilteredAndPinned();
         if (s == null) { return null; }
 
         return s.FirstOrDefault(thisRowItem => thisRowItem != null && pixelY >= DrawY(ca, thisRowItem) && pixelY <= DrawY(ca, thisRowItem) + thisRowItem.DrawHeight && thisRowItem.Expanded);

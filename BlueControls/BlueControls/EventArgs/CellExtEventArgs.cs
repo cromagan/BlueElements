@@ -17,7 +17,9 @@
 
 #nullable enable
 
-namespace BlueDatabase.EventArgs;
+using BlueDatabase;
+
+namespace BlueControls.EventArgs;
 
 public class CellExtEventArgs : System.EventArgs {
 

@@ -58,7 +58,7 @@ public class Method_ContentsFilter : Method {
 
         var returncolumn = db.Column.Exists(attvar.ReadableText(0));
         if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ReadableText(0)); }
-        var x = returncolumn.Contents(allFi, null);
+        var x = returncolumn.Contents(db.Row.RowsFiltered(allFi, null));
         return new DoItFeedback(x);
     }
 
