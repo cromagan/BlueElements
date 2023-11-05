@@ -31,15 +31,13 @@ internal class FilterChangeControl : GenericControl, IControlAcceptFilter, ICont
 
     private readonly List<IControlAcceptFilter> _childs = new();
 
-    private readonly List<IControlSendFilter> _getFilterFrom = new();
-
     #endregion
 
     #region Properties
 
     public FilterItem? Filter { get; }
 
-    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
+    public List<IControlSendFilter> GetFilterFrom { get; } = new();
 
     public DatabaseAbstract? InputDatabase { get; set; }
     public DatabaseAbstract? OutputDatabase { get; set; }
@@ -47,12 +45,6 @@ internal class FilterChangeControl : GenericControl, IControlAcceptFilter, ICont
     #endregion
 
     #region Methods
-
-    public void AddGetFilterFrom(IControlSendFilter item) {
-        _getFilterFrom.AddIfNotExists(item);
-        FilterFromParentsChanged();
-        item.ChildAdd(this);
-    }
 
     public void ChildAdd(IControlAcceptFilter c) {
         if (IsDisposed) { return; }

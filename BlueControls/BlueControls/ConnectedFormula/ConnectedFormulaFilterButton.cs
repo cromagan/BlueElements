@@ -25,34 +25,30 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class ButtonAddRow : Button, IControlAcceptFilter, ICalculateRows {
-
-    #region Fields
-
-    private readonly List<IControlSendFilter> _getFilterFrom = new();
-    private List<RowItem>? _filteredRows;
-
-    #endregion
+internal class ConnectedFormulaFilterButton : Button, IControlAcceptFilter, ICalculateRows {
 
     #region Properties
 
-    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
+    public List<IControlSendFilter> GetFilterFrom { get; } = new();
+
     public DatabaseAbstract? InputDatabase { get; set; }
+
+    /// <summary>
+    /// Wird benötigt, um zu wissen, ob auf welche Zeilen das Script angewendet werden soll.
+    /// </summary>
     public List<RowItem> RowsFiltered => this.RowsFiltered(ref _filteredRows, this.FilterOfSender(), InputDatabase);
 
     #endregion
 
     #region Methods
-
-    public void AddGetFilterFrom(IControlSendFilter item) {
-        _getFilterFrom.AddIfNotExists(item);
-        FilterFromParentsChanged();
-        item.ChildAdd(this);
-    }
-
+    private List<RowItem>? _filteredRows;
     public void FilterFromParentsChanged() => Invalidate_FilteredRows();
 
-    public void Invalidate_FilteredRows() => _filteredRows = null;
+    public void Invalidate_FilteredRows() {
+        if (IsDisposed) { return; }
+        _filteredRows = null;
+        Invalidate();
+    }
 
     #endregion
 }

@@ -117,6 +117,11 @@ public partial class ConnectedFormulaEditor : PadEditor {
         AddCentered(x);
     }
 
+    private void btnButton_Click(object sender, System.EventArgs e) {
+        var x = new FilterButtonPadItem(string.Empty);
+        AddCentered(x);
+    }
+
     private void btnDropdownmenu_Click(object sender, System.EventArgs e) {
         var x = new DropDownSelectRowPadItem(string.Empty);
         AddCentered(x);
@@ -233,11 +238,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
         }
 
         EditBoxRow.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", CFormula, r, true);
-    }
-
-    private void btnZeileAnlegen_Click(object sender, System.EventArgs e) {
-        var x = new AddRowPaditem(string.Empty);
-        AddCentered(x);
     }
 
     private void btnZeileZuFilter_Click(object sender, System.EventArgs e) {

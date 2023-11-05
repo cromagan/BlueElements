@@ -68,7 +68,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly int RowCaptionSizeY = 50;
     private readonly List<IControlAcceptRow> _childs = new();
     private readonly List<string> _collapsed = new();
-    private readonly List<IControlSendFilter> _getFilterFrom = new();
     private readonly object _lockUserAction = new();
     private int _arrangementNr = 1;
     private AutoFilter? _autoFilter;
@@ -276,7 +275,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
-    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
+    public List<IControlSendFilter> GetFilterFrom { get; } = new();
 
     public DatabaseAbstract? InputDatabase { get => Database; set => DatabaseSet(value, string.Empty); }
 
@@ -762,12 +761,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             columnArrangementSelector.Enabled = columnArrangementSelector.Item.Count > 1;
             columnArrangementSelector.Text = columnArrangementSelector.Item.Count > 0 ? showingNo.ToString() : string.Empty;
         }
-    }
-
-    public void AddGetFilterFrom(IControlSendFilter item) {
-        _getFilterFrom.AddIfNotExists(item);
-        FilterFromParentsChanged();
-        item.ChildAdd(this);
     }
 
     public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {

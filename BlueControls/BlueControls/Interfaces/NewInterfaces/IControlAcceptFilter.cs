@@ -17,9 +17,11 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueControls.Controls;
 using BlueDatabase;
 using System.Collections.ObjectModel;
+using BlueBasics;
 
 namespace BlueControls.Interfaces;
 
@@ -27,15 +29,13 @@ public interface IControlAcceptFilter : IControlAcceptSomething {
 
     #region Properties
 
-    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom { get; }
+    public List<IControlSendFilter> GetFilterFrom { get; }
 
     public DatabaseAbstract? InputDatabase { get; set; }
 
     #endregion
 
     #region Methods
-
-    public void AddGetFilterFrom(IControlSendFilter item);
 
     public void FilterFromParentsChanged();
 
@@ -45,6 +45,12 @@ public interface IControlAcceptFilter : IControlAcceptSomething {
 public static class IControlAcceptFilterExtension {
 
     #region Methods
+
+    public static void AddGetFilterFrom(this IControlAcceptFilter mz, IControlSendFilter item) {
+        mz.GetFilterFrom.AddIfNotExists(item);
+        mz.FilterFromParentsChanged();
+        item.ChildAdd(mz);
+    }
 
     public static void DoInputSettings(this IControlAcceptFilter dest, ConnectedFormulaView parent, IItemAcceptFilter source) {
         dest.Name = source.DefaultItemToControlName();

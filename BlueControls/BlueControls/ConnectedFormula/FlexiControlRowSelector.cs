@@ -36,7 +36,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     #region Fields
 
     private readonly List<IControlAcceptRow> _childs = new();
-    private readonly List<IControlSendFilter> _getFilterFrom = new();
+
     private readonly string _showformat;
     private List<RowItem>? _filteredRows;
     private RowItem? _row;
@@ -61,7 +61,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
     #region Properties
 
-    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
+    public List<IControlSendFilter> GetFilterFrom { get; } = new();
     public DatabaseAbstract? InputDatabase { get; set; }
     public DatabaseAbstract? OutputDatabase { get; set; }
 
@@ -80,12 +80,6 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     #endregion
 
     #region Methods
-
-    public void AddGetFilterFrom(IControlSendFilter item) {
-        _getFilterFrom.AddIfNotExists(item);
-        FilterFromParentsChanged();
-        item.ChildAdd(this);
-    }
 
     public void ChildAdd(IControlAcceptRow c) {
         if (IsDisposed) { return; }

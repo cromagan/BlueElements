@@ -230,7 +230,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
-        if (InputDatabase is not DatabaseAbstract db) { return l; }
+        if (InputDatabase is not DatabaseAbstract db || db.IsDisposed) { return l; }
 
         l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
 

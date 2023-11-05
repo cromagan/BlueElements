@@ -35,7 +35,6 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
     #region Fields
 
     private readonly List<IControlAcceptFilter> _childs = new();
-    private readonly List<IControlSendFilter> _getFilterFrom = new();
 
     #endregion
 
@@ -56,19 +55,13 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
     #region Properties
 
     public FilterItem? Filter { get; }
-    public ReadOnlyCollection<IControlSendFilter> GetFilterFrom => new(_getFilterFrom);
+    public List<IControlSendFilter> GetFilterFrom { get; } = new();
     public DatabaseAbstract? InputDatabase { get; set; }
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 
     #region Methods
-
-    public void AddGetFilterFrom(IControlSendFilter item) {
-        _getFilterFrom.AddIfNotExists(item);
-        FilterFromParentsChanged();
-        item.ChildAdd(this);
-    }
 
     public void ChildAdd(IControlAcceptFilter c) {
         if (IsDisposed) { return; }
