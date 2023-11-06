@@ -446,7 +446,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (column == null || column.IsDisposed) { return false; }
         if (row == null || row.IsDisposed) { return false; }
         if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
-        return column.IsInCache != null && row.IsInCache != null;
+        return column.IsInCache != null || row.IsInCache != null;
     }
 
     public bool IsNullOrEmpty(ColumnItem? column, RowItem? row) {

@@ -39,10 +39,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Fields
 
-    public DateTime? IsInCache = null;
     public RowCheckedEventArgs? LastCheckedEventArgs;
     public string? LastCheckedMessage;
     public List<string>? LastCheckedRowFeedback;
+    private DateTime? _isInCache = null;
     private string? _tmpQuickInfo;
 
     #endregion
@@ -79,6 +79,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
+    public event EventHandler<RowEventArgs>? RowGotData;
+
     #endregion
 
     #region Properties
@@ -91,6 +93,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public DatabaseAbstract? Database { get; private set; }
 
     public bool IsDisposed { get; private set; }
+
+    public DateTime? IsInCache {
+        get => _isInCache;
+        set {
+            _isInCache = value;
+            OnRowGotData(new RowEventArgs(this));
+        }
+    }
 
     public string KeyName { get; private set; }
 
@@ -596,6 +606,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
     internal void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
+
+    internal void OnRowGotData(RowEventArgs e) => RowGotData?.Invoke(this, e);
 
     internal double RowChangedXMinutesAgo() {
         if (IsDisposed) { return -1; }

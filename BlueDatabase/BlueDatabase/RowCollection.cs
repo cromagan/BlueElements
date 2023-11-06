@@ -75,6 +75,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
+    public event EventHandler<RowEventArgs>? RowGotData;
+
     public event EventHandler? RowRemoved;
 
     public event EventHandler<RowReasonEventArgs>? RowRemoving;
@@ -659,6 +661,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     internal void OnRowRemoving(RowReasonEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
         e.Row.DoSpecialRules -= OnDoSpecialRules;
+        e.Row.RowGotData -= OnRowGotData;
         RowRemoving?.Invoke(this, e);
     }
 
@@ -738,11 +741,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private void OnRowAdded(RowReasonEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
         e.Row.DoSpecialRules += OnDoSpecialRules;
+        e.Row.RowGotData += OnRowGotData;
 
         RowAdded?.Invoke(this, e);
     }
 
     private void OnRowChecked(object sender, RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
+
+    private void OnRowGotData(object sender, RowEventArgs e) => RowGotData?.Invoke(this, e);
 
     private void OnRowRemoved() => RowRemoved?.Invoke(this, System.EventArgs.Empty);
 
