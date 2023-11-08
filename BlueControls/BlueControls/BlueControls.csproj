@@ -201,7 +201,6 @@
     <Compile Include="Interfaces\NewInterfaces\IControlAcceptFilter.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlSendFilter.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlAcceptRow.cs" />
-    <Compile Include="Interfaces\NewInterfaces\ICalculateRows.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlSendRow.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlAcceptSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IHasVersion.cs" />

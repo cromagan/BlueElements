@@ -548,7 +548,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         return did;
     }
 
-    public ScriptEndedFeedback ParseVariable(DatabaseAbstract database, string? rowkey) => ParseVariable(database.Row.SearchByKey(rowkey));
+    public ScriptEndedFeedback ParseVariable(DatabaseAbstract database, string rowkey) => ParseVariable(database.Row.SearchByKey(rowkey));
 
     public ScriptEndedFeedback ParseVariable(RowItem? row) {
         if (row == null || row.IsDisposed) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }

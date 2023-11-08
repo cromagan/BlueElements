@@ -48,11 +48,11 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public RowFormulaPadItem(string internalname) : this(internalname, null, string.Empty, string.Empty) { }
 
-    public RowFormulaPadItem(DatabaseAbstract database, string? rowkey) : this(database, rowkey, string.Empty) { }
+    public RowFormulaPadItem(DatabaseAbstract database, string rowkey) : this(database, rowkey, string.Empty) { }
 
-    public RowFormulaPadItem(DatabaseAbstract database, string? rowkey, string layoutId) : this(string.Empty, database, rowkey, layoutId) { }
+    public RowFormulaPadItem(DatabaseAbstract database, string rowkey, string layoutId) : this(string.Empty, database, rowkey, layoutId) { }
 
-    public RowFormulaPadItem(string internalname, DatabaseAbstract? database, string? rowkey, string layoutFileName) : base(internalname) {
+    public RowFormulaPadItem(string internalname, DatabaseAbstract? database, string rowkey, string layoutFileName) : base(internalname) {
         Database = database;
         if (Database != null) { Database.Disposing += _Database_Disposing; }
         _rowKey = rowkey ?? string.Empty;

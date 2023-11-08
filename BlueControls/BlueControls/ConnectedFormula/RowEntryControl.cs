@@ -68,7 +68,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
         this.DoChilds(_childs, LastInputRow);
     }
 
-    public void SetData(DatabaseAbstract? database, string? rowkey) {
+    public void SetData(DatabaseAbstract? database, string rowkey) {
         //if(OutputDatabase== null) { return; }
 
         if (OutputDatabase != database) {

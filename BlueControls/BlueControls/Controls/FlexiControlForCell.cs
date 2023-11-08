@@ -167,19 +167,19 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void SetData(DatabaseAbstract? database, string? rowkey) {
+    public void SetData(DatabaseAbstract? database, string rowkey) {
         if (rowkey == _rowKey && database == Database) { return; }
         FillCellNow();
 
         var change = Database != database;
 
-        if (Database != null && change) {
-            Database.Cell.CellValueChanged -= Database_CellValueChanged;
-            Database.Row.RowRemoving -= Row_RowRemoving;
-            Database.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
-            Database.Row.RowChecked -= Database_RowChecked;
-            Database.Loaded -= _Database_Loaded;
-            Database.Disposing -= _Database_Disposing;
+        if (Database is DatabaseAbstract db1 && change) {
+            db1.Cell.CellValueChanged -= Database_CellValueChanged;
+            db1.Row.RowRemoving -= Row_RowRemoving;
+            db1.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
+            db1.Row.RowChecked -= Database_RowChecked;
+            db1.Loaded -= _Database_Loaded;
+            db1.Disposing -= _Database_Disposing;
         }
 
         Database = database;
@@ -189,13 +189,13 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
         UpdateColumnData();
 
-        if (Database != null && change) {
-            Database.Cell.CellValueChanged += Database_CellValueChanged;
-            Database.Row.RowRemoving += Row_RowRemoving;
-            Database.Column.ColumnInternalChanged += Column_ItemInternalChanged;
-            Database.Row.RowChecked += Database_RowChecked;
-            Database.Loaded += _Database_Loaded;
-            Database.Disposing += _Database_Disposing;
+        if (Database is DatabaseAbstract db2 && change) {
+            db2.Cell.CellValueChanged += Database_CellValueChanged;
+            db2.Row.RowRemoving += Row_RowRemoving;
+            db2.Column.ColumnInternalChanged += Column_ItemInternalChanged;
+            db2.Row.RowChecked += Database_RowChecked;
+            db2.Loaded += _Database_Loaded;
+            db2.Disposing += _Database_Disposing;
         }
         SetValueFromCell();
         CheckEnabledState();
@@ -451,9 +451,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         try {
             if (_tmpColumn != null && _tmpRow != null) { return (_tmpColumn, _tmpRow); }
 
-            if (Database != null && !Database.IsDisposed) {
-                _tmpColumn = Database.Column.Exists(_columnName);
-                _tmpRow = Database.Row.SearchByKey(_rowKey);
+            if (Database is DatabaseAbstract db && !db.IsDisposed) {
+                _tmpColumn = db.Column.Exists(_columnName);
+                _tmpRow = db.Row.SearchByKey(_rowKey);
             } else {
                 _tmpColumn = null;
                 _tmpRow = null;

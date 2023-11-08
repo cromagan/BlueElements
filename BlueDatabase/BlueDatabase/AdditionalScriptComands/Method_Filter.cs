@@ -45,7 +45,7 @@ public class Method_Filter : Method_Database {
 
     #region Methods
 
-    public static List<FilterItem>? ObjectToFilter(VariableCollection attributes, int ab) {
+    public static FilterCollection? ObjectToFilter(VariableCollection attributes, int ab) {
         if (attributes == null) { return null; }
 
         var allFi = new List<FilterItem>();
@@ -63,7 +63,11 @@ public class Method_Filter : Method_Database {
             allFi.Add(fi.FilterItem);
         }
 
-        return allFi.Count < 1 ? null : allFi;
+        if (allFi.Count < 1) { return null; }
+
+        var f = new FilterCollection(allFi[0].Database);
+        f.AddIfNotExists(allFi);
+        return f;
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {

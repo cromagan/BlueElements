@@ -103,7 +103,7 @@ public abstract class SqlBackAbstract {
         return SetStyleData(tablename, DatabaseDataType.ColumnName, columnName.ToUpper(), columnName.ToUpper());
     }
 
-    public string AddUndo(string tablename, DatabaseDataType comand, string? columname, string? rowKey, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment) {
+    public string AddUndo(string tablename, DatabaseDataType comand, string? columname, string rowKey, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment) {
         if (!OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
         if (comand == DatabaseDataType.SystemValue) { return "System-Values werden nicht geloggt."; }
@@ -450,9 +450,17 @@ public abstract class SqlBackAbstract {
                     }
                 }
 
-                r.IsInCache = DateTime.UtcNow;
+  
             }
         }
+
+        //Ja, alle Rows den Stempel geben.
+        // Wenn die Zeile nicht mehr existent ist, würde der Befehl unendlich oft versuchen
+        // Die Zeile aus der Datenbank zu erhalten
+        foreach(var thisr in row) {
+            thisr.IsInCache = DateTime.UtcNow;
+        }
+
 
         return string.Empty; // db.Row.DoLinkedDatabase(row);
     }
@@ -1117,7 +1125,7 @@ public abstract class SqlBackAbstract {
         }
     }
 
-    //private (string? value, string error) GetCellValue(string tablename, string columnname, string? rowKey) {
+    //private (string? value, string error) GetCellValue(string tablename, string columnname, string rowKey) {
     //    if (!IsValidTableName(tablename, false)) {
     //            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
     //            return (null, "Tabellenname ungültig: " + tablename);

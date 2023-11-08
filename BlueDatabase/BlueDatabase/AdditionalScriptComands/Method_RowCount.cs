@@ -51,7 +51,7 @@ public class Method_RowCount : Method {
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
         if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
-        var r = RowCollection.MatchesTo(allFi);
+        var r = allFi.Rows;
 
         return new DoItFeedback(r.Count);
     }

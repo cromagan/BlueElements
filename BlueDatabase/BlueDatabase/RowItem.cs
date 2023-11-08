@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -438,12 +439,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public bool IsNullOrEmpty() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return true; }
-        return Database.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
+        return db.Column.All(thisColumnItem => thisColumnItem != null && CellIsNullOrEmpty(thisColumnItem));
     }
 
     public bool IsNullOrEmpty(ColumnItem? column) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return true; }
-        return Database.Cell.IsNullOrEmpty(column, this);
+        return db.Cell.IsNullOrEmpty(column, this);
     }
 
     public bool MatchesTo(FilterItem filter) {
@@ -475,12 +476,21 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         Database.RefreshColumnsData(filter);
 
-        foreach (var thisFilter in filter) {
-            //if (thisFilter.Database != filter[0].Database) { Develop.DebugPrint_NichtImplementiert(); }
+        var ok = true;
 
-            if (!MatchesTo(thisFilter)) { return false; }
-        }
-        return true;
+        _ = Parallel.ForEach(filter, (thisFilter, state) => {
+            if (!MatchesTo(thisFilter)) {
+                ok = false;
+                state.Break();
+            }
+        });
+
+        return ok;
+
+        //foreach (var thisFilter in filter) {
+        //    if (!MatchesTo(thisFilter)) { return false; }
+        //}
+        //return true;
     }
 
     public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
@@ -499,7 +509,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var erg = txt;
         // Variablen ersetzen
-        foreach (var thisColumnItem in Database.Column) {
+        foreach (var thisColumnItem in db.Column) {
             if (!erg.Contains("~")) { return erg; }
 
             if (thisColumnItem != null) {
@@ -648,36 +658,36 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     private ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool doFemdZelleInvalidate, bool fullCheck, bool changevalues) {
         var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut);
-        if (!string.IsNullOrEmpty(m) || Database is null) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
+        if (!string.IsNullOrEmpty(m) || Database is not DatabaseAbstract db) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, false, "Allgemein"); }
 
-        var feh = Database.EditableErrorReason(EditableErrorReasonType.EditAcut);
+        var feh = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true, false, "Allgemein"); }
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
         DoingScript = true;
-        var script = Database.ExecuteScript(eventname, scriptname, changevalues, this, null);
+        var script = db.ExecuteScript(eventname, scriptname, changevalues, this, null);
 
         if (!script.AllOk) {
-            Database.OnScriptError(new RowScriptCancelEventArgs(this, script.ProtocolText, script.ScriptHasSystaxError));
+            db.OnScriptError(new RowScriptCancelEventArgs(this, script.ProtocolText, script.ScriptHasSystaxError));
             if (script.ScriptHasSystaxError) {
-                Database.EventScriptErrorMessage = "Zeile: " + CellFirstString() + "\r\n\r\n" + script.ProtocolText;
+                db.EventScriptErrorMessage = "Zeile: " + CellFirstString() + "\r\n\r\n" + script.ProtocolText;
             }
 
             DoingScript = false;
             return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
         }
 
-        if (changevalues && Database.Column.SysRowState is ColumnItem srs) {
+        if (changevalues && db.Column.SysRowState is ColumnItem srs) {
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
             DoRowAutomaticEventArgs e = new(this, eventname);
             OnDoSpecialRules(e);
 
             if (eventname is ScriptEventTypes.value_changed) {
-                CellSet(srs, Database.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
+                CellSet(srs, db.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
             } else {
-                var l = Database.EventScript.Get(ScriptEventTypes.value_changed);
+                var l = db.EventScript.Get(ScriptEventTypes.value_changed);
                 if (l.Count == 1 && l[0].KeyName == scriptname) {
-                    CellSet(srs, Database.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
+                    CellSet(srs, db.EventScriptVersion); // Nicht System set, diese Änderung muss geloggt werden
                 }
             }
         }
@@ -689,16 +699,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         // checkPerformed geht von Dateisystemfehlern aus
 
         // Dann die abschließenden Korrekturen vornehmen
-        foreach (var thisColum in Database.Column) {
+        foreach (var thisColum in db.Column) {
             if (thisColum != null) {
                 if (fullCheck) {
                     var x = CellGetString(thisColum);
                     var x2 = thisColum.AutoCorrect(x, true);
                     if (thisColum.Format is not DataFormat.Verknüpfung_zu_anderer_Datenbank && x != x2) {
-                        Database.Cell.Set(thisColum, this, x2);
+                        db.Cell.Set(thisColum, this, x2);
                     } else {
                         if (!thisColum.IsFirst()) {
-                            Database.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
+                            db.Cell.DoSpecialFormats(thisColum, this, CellGetString(thisColum), true);
                         }
                     }
                     doFemdZelleInvalidate = false; // Hier ja schon bei jedem gemacht
@@ -728,7 +738,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
 
         searchText = searchText.ToUpper();
-        foreach (var thisColumnItem in Database.Column) {
+        foreach (var thisColumnItem in db.Column) {
             {
                 if (!thisColumnItem.IgnoreAtRowFilter) {
                     var @string = CellGetString(thisColumnItem);

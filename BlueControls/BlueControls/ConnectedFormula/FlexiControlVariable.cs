@@ -100,7 +100,7 @@ public partial class FlexiControlVariable : FlexiControl, IDisabledReason, IHasD
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void SetData(DatabaseAbstract? database, string? rowkey) {
+    public void SetData(DatabaseAbstract? database, string rowkey) {
         if (rowkey == _rowKey && database == Database) { return; }
 
         if (Database != null) {

@@ -25,7 +25,7 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class ConnectedFormulaFilterButton : Button, IControlAcceptFilter, ICalculateRows {
+internal class ConnectedFormulaFilterButton : Button, IControlAcceptFilter {
 
     #region Properties
 
@@ -33,22 +33,11 @@ internal class ConnectedFormulaFilterButton : Button, IControlAcceptFilter, ICal
 
     public DatabaseAbstract? InputDatabase { get; set; }
 
-    /// <summary>
-    /// Wird benötigt, um zu wissen, ob auf welche Zeilen das Script angewendet werden soll.
-    /// </summary>
-    public List<RowItem> RowsFiltered => this.RowsFiltered(ref _filteredRows, this.FilterOfSender(), InputDatabase);
-
     #endregion
 
     #region Methods
-    private List<RowItem>? _filteredRows;
-    public void FilterFromParentsChanged() => Invalidate_FilteredRows();
 
-    public void Invalidate_FilteredRows() {
-        if (IsDisposed) { return; }
-        _filteredRows = null;
-        Invalidate();
-    }
+    public void FilterFromParentsChanged() { }
 
     #endregion
 }

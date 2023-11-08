@@ -229,7 +229,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        Database.Column.GenerateAndAddSystem();
+        db.Column.GenerateAndAddSystem();
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) {

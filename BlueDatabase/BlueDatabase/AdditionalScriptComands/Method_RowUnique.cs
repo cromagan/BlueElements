@@ -58,7 +58,7 @@ public class Method_RowUnique : Method {
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
         if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
-        var r = RowCollection.MatchesTo(allFi);
+        var r = allFi.Rows;
 
         if (r.Count > 1) { return new DoItFeedback(infos.Data, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 

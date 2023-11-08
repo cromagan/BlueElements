@@ -176,7 +176,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public static (List<FilterItem>? filter, string info) GetFilterFromLinkedCellData(DatabaseAbstract? linkedDatabase, ColumnItem column, RowItem? row) {
+    public static (FilterCollection? filter, string info) GetFilterFromLinkedCellData(DatabaseAbstract? linkedDatabase, ColumnItem column, RowItem? row) {
         if (linkedDatabase == null || linkedDatabase.IsDisposed) { return (null, "Verlinkte Datenbank verworfen."); }
         if (column.Database is not DatabaseAbstract db || db.IsDisposed || column.IsDisposed) { return (null, "Datenbank verworfen."); }
 
@@ -187,12 +187,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             var x = thisFi.SplitBy("|");
             var c = linkedDatabase?.Column.Exists(x[0]);
-            if (c == null) { return (fi, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
+            if (c == null) { return (null, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
 
-            if (x[1] != "=") { return (fi, "Nur 'Gleich'-Fiter wird unterstützt."); }
+            if (x[1] != "=") { return (null, "Nur 'Gleich'-Fiter wird unterstützt."); }
 
             var value = x[2].FromNonCritical();
-            if (string.IsNullOrEmpty(value)) { return (fi, "Leere Suchwerte werden nicht unterstützt."); }
+            if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
 
             if (row != null && !row.IsDisposed) {
                 // Es kann auch sein, dass nur mit Texten anstelle von Variablen gearbeitet wird,
@@ -205,7 +205,10 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (fi.Count == 0 && column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
-        return (fi, string.Empty);
+        var fc = new FilterCollection(db);
+        fi.AddIfNotExists(fi);
+
+        return (fc, string.Empty);
     }
 
     public static string KeyOfCell(string colname, string rowKey) => colname.ToUpper() + "|" + rowKey;
@@ -270,18 +273,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         column = Database?.Column.Exists(cd[0]);
         row = Database?.Row.SearchByKey(cd[1]);
     }
-
-    //public void Delete(ColumnItem? column, string? rowKey) {
-    //    if (column == null || rowKey == null) { return; }
-
-    //    var cellKey = KeyOfCell(column.KeyName, rowKey);
-    //    if (!ContainsKey(cellKey)) { return; }
-
-    //    if (!TryRemove(cellKey, out _)) {
-    //        Develop.CheckStackForOverflow();
-    //        Delete(column, rowKey);
-    //    }
-    //}
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -910,7 +901,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!string.IsNullOrEmpty(info)) { return Ergebnis(info); }
         if (filter == null || filter.Count == 0) { return Ergebnis("Filter konnten nicht generiert werden."); }
 
-        var r = linkedDatabase.Row.RowsFiltered(filter, null);
+        var r = filter.Rows;
         switch (r.Count) {
             case > 1:
                 return Ergebnis("Suchergebnis liefert mehrere Ergebnisse.");

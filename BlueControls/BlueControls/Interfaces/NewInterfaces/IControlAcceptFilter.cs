@@ -73,17 +73,17 @@ public static class IControlAcceptFilterExtension {
     }
 
     public static FilterCollection? FilterOfSender(this IControlAcceptFilter item) {
-        if (item.InputDatabase is not DatabaseAbstract db) { return null; }
+        if (item.InputDatabase is not DatabaseAbstract db || db.IsDisposed) { return null; }
 
-        var x = new FilterCollection(db);
+        var fc = new FilterCollection(db);
 
         foreach (var thiss in item.GetFilterFrom) {
-            if (thiss.Filter is FilterItem f) {
-                x.Add(f);
+            if (thiss.Filter is FilterItem fi) {
+                fc.Add(fi);
             }
         }
 
-        return x;
+        return fc;
     }
 
     #endregion

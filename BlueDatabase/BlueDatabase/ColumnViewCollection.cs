@@ -317,7 +317,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     public void ShowAllColumns() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        foreach (var thisColumn in Database.Column) {
+        foreach (var thisColumn in db.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed) {
                 Add(new ColumnViewItem(thisColumn, ViewType.Column, this));
             }

@@ -1144,11 +1144,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public string Export_CSV(FirstRow firstRow, ColumnItem column, List<RowItem> sortedRows) =>
+    public string Export_CSV(FirstRow firstRow, ColumnItem column, IEnumerable<RowItem> sortedRows) =>
                     //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
                     Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
-    public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, List<RowItem> sortedRows) {
+    public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
         columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
         //sortedRows ??= Row.AllRows();
 
@@ -1210,13 +1210,13 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         return sb.ToString().TrimEnd("\r\n");
     }
 
-    public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, List<RowItem> sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
+    public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, IEnumerable<RowItem> sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
 
     //public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.RowsFiltered(filter));
 
     //public bool Export_HTML(string filename, int arrangementNo, FilterCollection? filter) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.RowsFiltered(filter), false);
 
-    public bool Export_HTML(string filename, List<ColumnItem>? columnList, List<RowItem> sortedRows, bool execute) {
+    public bool Export_HTML(string filename, List<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows, bool execute) {
         try {
             if (columnList == null || columnList.Count == 0) {
                 columnList = Column.Where(thisColumnItem => thisColumnItem != null).ToList();
@@ -1305,7 +1305,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public bool Export_HTML(string filename, ColumnViewCollection? arrangement, List<RowItem> sortedRows, bool execute) => Export_HTML(filename, arrangement?.ListOfUsedColumn(), sortedRows, execute);
+    public bool Export_HTML(string filename, ColumnViewCollection? arrangement, IEnumerable<RowItem> sortedRows, bool execute) => Export_HTML(filename, arrangement?.ListOfUsedColumn(), sortedRows, execute);
 
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
@@ -1756,7 +1756,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         }
     }
 
-    public abstract (bool didreload, string errormessage) RefreshRowData(List<RowItem> row, bool refreshAlways);
+    public abstract (bool didreload, string errormessage) RefreshRowData(IEnumerable<RowItem> row, bool refreshAlways);
 
     public (bool didreload, string errormessage) RefreshRowData(List<string> keys, bool refreshAlways) {
         if (keys.Count == 0) { return (false, string.Empty); }

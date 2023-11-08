@@ -90,7 +90,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
-        if (Database is not DatabaseAbstract db || _arrangement < 2 || _arrangement >= db.ColumnArrangements.Count) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed || _arrangement < 2 || _arrangement >= db.ColumnArrangements.Count) { return; }
 
         var ca = CloneOfCurrentArrangement;
         if (ca == null) { return; }
@@ -98,7 +98,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         if (MessageBox.Show("Anordung <b>'" + ca.KeyName + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         var car = db.ColumnArrangements.CloneWithClones();
         car.RemoveAt(_arrangement);
-        Database.ColumnArrangements = car.AsReadOnly();
+        db.ColumnArrangements = car.AsReadOnly();
         _arrangement = 1;
         UpdateCombobox();
         ShowOrder();
@@ -158,21 +158,21 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         //car.RemoveAt(Arrangement);
 
         if (car.Count < 1) {
-            car.Add(new ColumnViewCollection(Database, string.Empty, string.Empty));
+            car.Add(new ColumnViewCollection(db, string.Empty, string.Empty));
         }
 
         string newname;
         if (mitVorlage && ca != null) {
             newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            car.Add(new ColumnViewCollection(Database, ca.ToString(), newname));
+            car.Add(new ColumnViewCollection(db, ca.ToString(), newname));
         } else {
             newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            car.Add(new ColumnViewCollection(Database, string.Empty, newname));
+            car.Add(new ColumnViewCollection(db, string.Empty, newname));
         }
 
-        Database.ColumnArrangements = car.AsReadOnly();
+        db.ColumnArrangements = car.AsReadOnly();
         _arrangement = car.Count - 1;
         UpdateCombobox();
 
@@ -383,7 +383,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
                 var col = thisColumnViewCollection[thisColumnViewCollection.Count - 1]?.Column;
                 if (col != null && MessageBox.Show("Spalte <b>" + col.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
                         "Ja", "Nein") == 0) {
-                    Database.Column.Remove(col, "Benutzer löscht im ColArrangement Editor");
+                    db.Column.Remove(col, "Benutzer löscht im ColArrangement Editor");
                     did = true;
                 }
 

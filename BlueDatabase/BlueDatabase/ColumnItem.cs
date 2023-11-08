@@ -701,33 +701,17 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         get => _linkedCellFilter;
         set {
             if (IsDisposed) { return; }
-            //#region Altes Format konvertieren
+            if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-            //var newVal = new List<string>();
-
-            //foreach (var item in value) {
-            //    if (!string.IsNullOrEmpty(item)) {
-            //        if (item.Contains("|")) {
-            //            newVal.Add(item);
-            //        } else {
-            //            Develop.DebugPrint("Altes Format!");
-            //            newVal.Add(item);
-            //        }
-            //    }
-            //}
-
-            //#endregion
             value = value.SortedDistinctList();
 
             if (!_linkedCellFilter.IsDifferentTo(value)) { return; }
 
-            _ = Database?.ChangeData(DatabaseDataType.LinkedCellFilter, this, null, _linkedCellFilter.JoinWithCr(), value.JoinWithCr(), string.Empty, Generic.UserName, DateTime.UtcNow);
+            _ = db.ChangeData(DatabaseDataType.LinkedCellFilter, this, null, _linkedCellFilter.JoinWithCr(), value.JoinWithCr(), string.Empty, Generic.UserName, DateTime.UtcNow);
             OnChanged();
 
-            if (Database != null) {
-                foreach (var thisColumn in Database.Column) {
-                    thisColumn.CheckIfIAmAKeyColumn();
-                }
+            foreach (var thisColumn in db.Column) {
+                thisColumn.CheckIfIAmAKeyColumn();
             }
         }
     }
@@ -1252,15 +1236,22 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public List<string> Contents() => Contents(Database?.Row?.ToList());
 
-    public List<string> Contents(FilterItem filter, List<RowItem> additional) => Contents(new List<FilterItem>() { filter }, additional);
+    public List<string> Contents(FilterItem filter, List<RowItem>? additional) => Contents(new FilterCollection(filter.Database) { filter }, additional);
 
-    public List<string> Contents(ICollection<FilterItem>? filter, List<RowItem>? pinned) {
+    public List<string> Contents(FilterCollection filter, List<RowItem>? pinned) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<string>(); }
-        return Contents(db.Row.RowsFiltered(filter, pinned));
+        var r = filter.Rows;
+
+        var r2 = new List<RowItem>();
+        r2.AddRange(r);
+
+        if (pinned != null) { r.AddIfNotExists(pinned); }
+
+        return Contents(r2);
     }
 
-    public List<string> Contents(List<RowItem>? rows) {
-        if (rows == null || rows.Count == 0) { return new List<string>(); }
+    public List<string> Contents(IEnumerable<RowItem>? rows) {
+        if (rows == null || !rows.Any()) { return new List<string>(); }
 
         RefreshColumnsData();
 
@@ -1943,7 +1934,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //        ? tmpfile
     //        : string.Equals(BestFile(tmpfile, false), fullFileName, StringComparison.OrdinalIgnoreCase) ? tmpfile : fullFileName;
     //}
-    public double? Summe(List<RowItem>? sort) {
+    public double? Summe(IEnumerable<RowItem>? sort) {
         if (sort == null) { return null; }
 
         double summ = 0;
@@ -2126,7 +2117,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        foreach (var c in Database.Column) {
+        foreach (var c in db.Column) {
             //if (thisColumn.KeyColumnKey == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
             //if (thisColumn.LinkedCell_RowKeyIsInColumn == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen
             //if (ThisColumn.LinkedCell_ColumnValueFoundIn == _name) { I_Am_A_Key_For_Other_Column = "Spalte " + ThisColumn.ReadableText() + " verweist auf diese Spalte"; } // LinkdeCells pflegen

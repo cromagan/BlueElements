@@ -135,15 +135,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Ist ein Filter mehrfach vorhanden, erhält die Zelle den LETZTEN Wert.
     /// Am Schluß wird noch das Skript ausgeführt.
     /// </summary>
-    /// <param name="fi"></param>
+    /// <param name="fc"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public static RowItem? GenerateAndAdd(List<FilterItem> fi, string comment) {
+    public static RowItem? GenerateAndAdd(FilterCollection fc, string comment) {
         IReadOnlyCollection<string>? first = null;
 
         DatabaseAbstract? database = null;
 
-        foreach (var thisfi in fi) {
+        foreach (var thisfi in fc) {
             if (thisfi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroßKleinEgal) { return null; }
             if (thisfi.Column == null) { return null; }
             if (thisfi.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
@@ -170,7 +170,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (row == null || row.IsDisposed) { return null; }
 
-        foreach (var thisfi in fi) {
+        foreach (var thisfi in fc) {
             if (thisfi.Column is ColumnItem c) {
                 row.CellSet(c, thisfi.SearchValue.ToList());
             }
@@ -539,33 +539,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return true;
     }
 
-    public List<RowItem> RowsFiltered() => RowsFiltered(null, null);
-
-    public List<RowItem> RowsFiltered(FilterItem filter) => RowsFiltered(new List<FilterItem>() { filter }, null);
-
-    public List<RowItem> RowsFiltered(ICollection<FilterItem>? filter, List<RowItem>? additional) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>(); }
-        Database.RefreshColumnsData(filter);
-
-        ConcurrentBag<RowItem> tmpVisibleRows = new();
-        additional ??= new List<RowItem>();
-
-        try {
-            _ = Parallel.ForEach(Database.Row, thisRowItem => {
-                if (thisRowItem != null) {
-                    if (thisRowItem.MatchesTo(filter) || additional.Contains(thisRowItem)) {
-                        tmpVisibleRows.Add(thisRowItem);
-                    }
-                }
-            });
-        } catch {
-            Develop.CheckStackForOverflow();
-            return RowsFiltered(filter, additional);
-        }
-
-        return tmpVisibleRows.ToList();
-    }
-
     public RowItem? SearchByKey(string? key) {
         if (Database is not DatabaseAbstract db || db.IsDisposed || key == null || string.IsNullOrWhiteSpace(key)) { return null; }
         try {
@@ -667,7 +640,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
-    internal string SetValueInternal(DatabaseDataType type, string? rowkey, RowItem? row, Reason reason) {
+    internal string SetValueInternal(DatabaseDataType type, string rowkey, RowItem? row, Reason reason) {
         if (rowkey is null || string.IsNullOrWhiteSpace(rowkey)) { return "Schlüsselfehler"; }
 
         var db = Database;

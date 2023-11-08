@@ -56,7 +56,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptFilter, IControlSendRow, ICalculateRows {
+public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptFilter, IControlSendRow {
 
     #region Fields
 
@@ -79,8 +79,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
     private bool _drawing;
     private FilterCollection? _filter;
-    private List<RowItem>? _filteredRows;
-    private FilterCollection? _filterFromParents;
+
     private int? _headSize;
     private bool _isinClick;
     private bool _isinDoubleClick;
@@ -233,7 +232,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
             Invalidate_HeadSize();
             CurrentArrangement?.Invalidate_DrawWithOfAllItems();
-            Invalidate_FilteredRows();
+            Invalidate_SortedRowData();
             OnViewChanged();
         }
     }
@@ -265,6 +264,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     _filter.CollectionChanged += Filter_CollectionChanged;
                 }
 
+                FilterFromParentsChanged();
                 OnFilterChanged();
             }
         }
@@ -307,21 +307,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public List<RowItem> RowsFiltered {
+    public ReadOnlyCollection<RowItem> RowsFiltered {
         get {
-            if (_filterFromParents == null) {
-                return this.RowsFiltered(ref _filteredRows, Filter, Database);
-            }
+            if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
+            if (Filter != null) { return Filter.Rows; }
 
-            if (Filter == null) {
-                return this.RowsFiltered(ref _filteredRows, _filterFromParents, Database);
-            }
-
-            // Filter kombinieren
-            var f = new FilterCollection(Database);
-            f.AddIfNotExists(Filter);
-            f.AddIfNotExists(_filterFromParents);
-            return this.RowsFiltered(ref _filteredRows, f, Database);
+            return db.Row.ToList().AsReadOnly();
         }
     }
 
@@ -761,7 +752,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public List<RowData> CalculateSortedRows(List<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
+    public List<RowData> CalculateSortedRows(IEnumerable<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowData>(); }
 
         VisibleRowCount = 0;
@@ -930,56 +921,56 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         CloseAllComponents();
 
-        if (Database != null && !Database.IsDisposed) {
+        if (Database is DatabaseAbstract db1 && !db1.IsDisposed) {
             // auch Disposed Datenbanken die Bezüge entfernen!
-            Database.Cell.CellValueChanged -= _Database_CellValueChanged;
-            Database.Loaded -= _Database_DatabaseLoaded;
-            Database.Loading -= _Database_StoreView;
-            Database.ViewChanged -= _Database_ViewChanged;
-            //_Database.RowKeyChanged -= _Database_RowKeyChanged;
-            //_Database.ColumnKeyChanged -= _Database_ColumnKeyChanged;
-            Database.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
-            Database.SortParameterChanged -= _Database_SortParameterChanged;
-            Database.Row.RowRemoving -= Row_RowRemoving;
-            Database.Row.RowRemoved -= _Database_RowRemoved;
-            Database.Row.RowAdded -= _Database_Row_RowAdded;
-            Database.Row.RowGotData -= _Database_Row_RowGotData;
-            Database.Column.ColumnRemoving -= Column_ItemRemoving;
-            Database.Column.ColumnRemoved -= _Database_ViewChanged;
-            Database.Column.ColumnAdded -= _Database_ViewChanged;
-            Database.ProgressbarInfo -= _Database_ProgressbarInfo;
-            Database.Disposing -= _Database_Disposing;
-            Database.InvalidateView -= Database_InvalidateView;
-            //Database.IsTableVisibleForUser -= Database_IsTableVisibleForUser;
+            db1.Cell.CellValueChanged -= _Database_CellValueChanged;
+            db1.Loaded -= _Database_DatabaseLoaded;
+            db1.Loading -= _Database_StoreView;
+            db1.ViewChanged -= _Database_ViewChanged;
+            //db.RowKeyChanged -= _Database_RowKeyChanged;
+            //db.ColumnKeyChanged -= _Database_ColumnKeyChanged;
+            db1.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
+            db1.SortParameterChanged -= _Database_SortParameterChanged;
+            db1.Row.RowRemoving -= Row_RowRemoving;
+            db1.Row.RowRemoved -= _Database_RowRemoved;
+            db1.Row.RowAdded -= _Database_Row_RowAdded;
+            db1.Row.RowGotData -= _Database_Row_RowGotData;
+            db1.Column.ColumnRemoving -= Column_ItemRemoving;
+            db1.Column.ColumnRemoved -= _Database_ViewChanged;
+            db1.Column.ColumnAdded -= _Database_ViewChanged;
+            db1.ProgressbarInfo -= _Database_ProgressbarInfo;
+            db1.Disposing -= _Database_Disposing;
+            db1.InvalidateView -= Database_InvalidateView;
+            //db.IsTableVisibleForUser -= Database_IsTableVisibleForUser;
             DatabaseAbstract.ForceSaveAll();
             MultiUserFile.ForceLoadSaveAll();
-            //_database.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
+            //db.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
         }
         ShowWaitScreen = true;
         Refresh(); // um die Uhr anzuzeigen
         Database = value;
         _databaseDrawError = null;
         InitializeSkin(); // Neue Schriftgrößen
-        if (Database != null && !Database.IsDisposed) {
-            Database.Cell.CellValueChanged += _Database_CellValueChanged;
-            Database.Loaded += _Database_DatabaseLoaded;
-            Database.Loading += _Database_StoreView;
-            Database.ViewChanged += _Database_ViewChanged;
-            //_Database.RowKeyChanged += _Database_RowKeyChanged;
-            //_Database.ColumnKeyChanged += _Database_ColumnKeyChanged;
-            Database.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
-            Database.SortParameterChanged += _Database_SortParameterChanged;
-            Database.Row.RowRemoving += Row_RowRemoving;
-            Database.Row.RowRemoved += _Database_RowRemoved;
-            Database.Row.RowAdded += _Database_Row_RowAdded;
-            Database.Row.RowGotData += _Database_Row_RowGotData;
-            Database.Column.ColumnAdded += _Database_ViewChanged;
-            Database.Column.ColumnRemoving += Column_ItemRemoving;
-            Database.Column.ColumnRemoved += _Database_ViewChanged;
-            Database.ProgressbarInfo += _Database_ProgressbarInfo;
-            Database.Disposing += _Database_Disposing;
-            Database.InvalidateView += Database_InvalidateView;
-            //Database.IsTableVisibleForUser += Database_IsTableVisibleForUser;
+        if (Database is DatabaseAbstract db2 && !db2.IsDisposed) {
+            db2.Cell.CellValueChanged += _Database_CellValueChanged;
+            db2.Loaded += _Database_DatabaseLoaded;
+            db2.Loading += _Database_StoreView;
+            db2.ViewChanged += _Database_ViewChanged;
+            //db2.RowKeyChanged += _Database_RowKeyChanged;
+            //db2.ColumnKeyChanged += _Database_ColumnKeyChanged;
+            db2.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
+            db2.SortParameterChanged += _Database_SortParameterChanged;
+            db2.Row.RowRemoving += Row_RowRemoving;
+            db2.Row.RowRemoved += _Database_RowRemoved;
+            db2.Row.RowAdded += _Database_Row_RowAdded;
+            db2.Row.RowGotData += _Database_Row_RowGotData;
+            db2.Column.ColumnAdded += _Database_ViewChanged;
+            db2.Column.ColumnRemoving += Column_ItemRemoving;
+            db2.Column.ColumnRemoved += _Database_ViewChanged;
+            db2.ProgressbarInfo += _Database_ProgressbarInfo;
+            db2.Disposing += _Database_Disposing;
+            db2.InvalidateView += Database_InvalidateView;
+            //db2.IsTableVisibleForUser += Database_IsTableVisibleForUser;
         }
 
         ParseView(viewCode);
@@ -1219,9 +1210,33 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void FilterFromParentsChanged() {
-        Invalidate_FilteredRows();
-        _filterFromParents = this.FilterOfSender();
-        OnFilterChanged();
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Filter == null) { return; }
+
+        var _filterFromParents = this.FilterOfSender();
+
+        var t = "Übergeordnetes Element";
+
+        foreach (var thisFi in _filterFromParents) {
+            thisFi.Herkunft = t;
+        }
+
+        Filter.RemoveRange(t);
+
+        Filter.RemoveOtherAndAddIfNotExists(_filterFromParents);
+
+        //_filterall = new FilterCollection(Database);
+        //_filterall.AddIfNotExists(Filter);
+
+        //if (_filterFromParents != null) { _filterall.AddIfNotExists(_filterFromParents); }
+
+        //_filterall = new FilterCollection(Database);
+        //_filterall.AddIfNotExists(Filter);
+
+        //if (_filterFromParents != null) { _filterall.AddIfNotExists(_filterFromParents); }
+
+        //Invalidate_SortedRowData();
+        //OnFilterChanged();
     }
 
     /// <summary>
@@ -1265,17 +1280,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void Invalidate_AllColumnArrangements() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        foreach (var thisArrangement in Database.ColumnArrangements) {
+        foreach (var thisArrangement in db.ColumnArrangements) {
             thisArrangement?.Invalidate_DrawWithOfAllItems();
         }
-    }
-
-    public void Invalidate_FilteredRows() {
-        _filteredRows = null;
-        ////CursorPos_Reset(); // Gibt Probleme bei Formularen, wenn die Key-Spalte geändert wird. Mal abgesehen davon macht es einen Sinn, den Cursor proforma zu löschen, dass soll der RowSorter übernehmen.
-        Invalidate_Filterinfo();
-        Invalidate_SortedRowData();
-        Invalidate();
     }
 
     public void Invalidate_HeadSize() {
@@ -1345,7 +1352,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         Invalidate_AllColumnArrangements();
         Invalidate_HeadSize();
-        Invalidate_FilteredRows();
+        Invalidate_SortedRowData();
         OnViewChanged();
         Invalidate();
     }
@@ -2246,17 +2253,16 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void _Database_CellValueChanged(object sender, CellChangedEventArgs e) {
-        if (_filteredRows != null) {
-            var f = Filter;
-            var rsd = SortUsed();
+        var f = Filter;
+        var rsd = SortUsed();
 
-            if ((f != null && f[e.Column] != null) ||
-                rsd == null ||
-               rsd.UsedForRowSort(e.Column) ||
-              (f != null && f.MayHasRowFilter(e.Column)) ||
-                e.Column == Database?.Column.SysChapter) {
-                Invalidate_FilteredRows();
-            }
+        if ((f != null && f[e.Column] != null) ||
+            rsd == null ||
+           rsd.UsedForRowSort(e.Column) ||
+          (f != null && f.MayHasRowFilter(e.Column)) ||
+            e.Column == Database?.Column.SysChapter) {
+            f.Invalidate_FilteredRows();
+            Invalidate_SortedRowData();
         }
 
         if (CurrentArrangement is ColumnViewCollection cvc) {
@@ -2319,12 +2325,16 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void _Database_Row_RowAdded(object sender, RowReasonEventArgs e) {
         OnRowAdded(sender, e);
-        Invalidate_FilteredRows();
+        Filter?.Invalidate_FilteredRows();
+        Invalidate_SortedRowData();
     }
 
     private void _Database_Row_RowGotData(object sender, RowEventArgs e) => Invalidate_SortedRowData();
 
-    private void _Database_RowRemoved(object sender, System.EventArgs e) => Invalidate_FilteredRows();
+    private void _Database_RowRemoved(object sender, System.EventArgs e) {
+        Filter?.Invalidate_FilteredRows();
+        Invalidate_SortedRowData();
+    }
 
     private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
 
@@ -2466,11 +2476,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private int Autofilter_Text(ColumnItem column) {
         if (Database is not DatabaseAbstract db || db.IsDisposed || Filter == null) { return 0; }
         if (column.TmpIfFilterRemoved != null) { return (int)column.TmpIfFilterRemoved; }
-        var tfilter = (FilterCollection)Filter.Clone();
-        tfilter.Remove(column);
+        var fc = (FilterCollection)Filter.Clone();
+        fc.Remove(column);
 
-        var temp = db.Row.RowsFiltered(tfilter, null);
-        var c = RowsFiltered.Count - temp.Count;
+        var ro = fc.Rows;
+        var c = RowsFiltered.Count - ro.Count;
         column.TmpIfFilterRemoved = c;
         return c;
     }
@@ -2802,7 +2812,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private bool ComputeAllColumnPositions() {
         try {
             // Kommt vor, dass spontan doch geparsed wird...
-            if (Database?.ColumnArrangements == null || _arrangementNr >= Database.ColumnArrangements.Count) { return false; }
+            //if (Database?.ColumnArrangements == null || _arrangementNr >= Database.ColumnArrangements.Count) { return false; }
 
             var ca = CurrentArrangement;
             if (ca == null) { return false; }
@@ -3119,7 +3129,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         var ca = db.ColumnArrangements[0];
-        var col = Database.Column.First();
+        var col = db.Column.First();
         var viewItem = ca[col];
 
         var itStat = state;
@@ -3332,15 +3342,21 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Filter_Changed(object sender, System.EventArgs e) {
-        Invalidate_FilteredRows();
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
+        foreach (var thisColumn in db.Column) {
+            if (thisColumn != null) {
+                thisColumn.TmpIfFilterRemoved = null;
+                thisColumn.TmpAutoFilterSinnvoll = null;
+            }
+        }
+
+        Invalidate_SortedRowData();
         OnFilterChanged();
     }
 
     private void Filter_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
-        Invalidate_FilteredRows();
-
-        OnFilterChanged();
+        Filter_Changed(sender, System.EventArgs.Empty);
     }
 
     private int HeadSize(ColumnViewCollection? ca) {
@@ -3370,17 +3386,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         foreach (var thisArr in db.ColumnArrangements) {
             thisArr[column]?.Invalidate_DrawWidth();
-        }
-    }
-
-    private void Invalidate_Filterinfo() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
-
-        foreach (var thisColumn in Database.Column) {
-            if (thisColumn != null) {
-                thisColumn.TmpIfFilterRemoved = null;
-                thisColumn.TmpAutoFilterSinnvoll = null;
-            }
         }
     }
 

@@ -18,9 +18,12 @@
 #nullable enable
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -30,6 +33,12 @@ using BlueDatabase.Interfaces;
 namespace BlueDatabase;
 
 public sealed class FilterCollection : ObservableCollection<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IChangedFeedback, ICloneable {
+
+    #region Fields
+
+    private List<RowItem>? _rows;
+
+    #endregion
 
     #region Constructors
 
@@ -41,6 +50,8 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     }
 
     public FilterCollection(DatabaseAbstract? database, string toParse) : this(database) => this.Parse(toParse);
+
+    public FilterCollection(FilterItem fi) : this(fi.Database) => Add(fi);
 
     #endregion
 
@@ -82,6 +93,14 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         }
     }
 
+    public ReadOnlyCollection<RowItem> Rows {
+        get {
+            if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
+            if (_rows == null) { _rows = CalculateFilteredRows(); }
+            return _rows.AsReadOnly();
+        }
+    }
+
     #endregion
 
     #region Indexers
@@ -96,8 +115,12 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
 
     public new void Add(FilterItem filter) {
         if (IsDisposed) { return; }
+
+        if (filter.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
+
         filter.Changed += Filter_Changed;
         base.Add(filter);
+        Invalidate_FilteredRows();
         OnChanged();
     }
 
@@ -138,6 +161,12 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         Add(fi);
     }
 
+    public void AddIfNotExists(List<FilterItem> filterItem) {
+        foreach (var thisFilter in filterItem) {
+            AddIfNotExists(thisFilter);
+        }
+    }
+
     public void AddIfNotExists(FilterCollection filterItem) {
         foreach (var thisFilter in filterItem) {
             AddIfNotExists(thisFilter);
@@ -166,8 +195,11 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         foreach (var thisFilter in this) {
             if (filterItem.Equals(thisFilter)) { return true; }
         }
+
         return false;
     }
+
+    public void Invalidate_FilteredRows() => _rows = null;
 
     //GC.SuppressFinalize(this);
     public bool IsRowFilterActiv() => this[null] != null;
@@ -215,6 +247,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     public void Remove(FilterItem filterItem, bool throwChangedEvent) {
         if (IsDisposed) { return; }
         if (Remove(filterItem)) {
+            Invalidate_FilteredRows();
             if (throwChangedEvent) {
                 OnChanged();
             }
@@ -223,12 +256,18 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
 
     public void Remove_RowFilter() => Remove(null as ColumnItem);
 
-    public void RemoveOtherAndAddIfNotExists(ColumnItem column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new(column, filterType, filterBy, herkunft));
+    public void RemoveOtherAndAddIfNotExists(ColumnItem column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 
     public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, string filterBy, string herkunft) {
         var column = Database?.Column.Exists(columnName);
         if (column == null || column.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
         RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
+    }
+
+    public void RemoveOtherAndAddIfNotExists(FilterCollection fc) {
+        foreach (var thisFi in fc) {
+            RemoveOtherAndAddIfNotExists(thisFi);
+        }
     }
 
     public void RemoveOtherAndAddIfNotExists(FilterItem filterItem) {
@@ -241,7 +280,18 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, List<string>? filterBy, string herkunft) {
         var column = Database?.Column.Exists(columnName);
         if (column == null || column.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
-        RemoveOtherAndAddIfNotExists(new(column, filterType, filterBy, herkunft));
+        RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
+    }
+
+    public void RemoveRange(string herkunft) {
+        var l = new List<FilterItem>();
+
+        foreach (var thisItem in this) {
+            if (thisItem.Herkunft.Equals(herkunft, StringComparison.OrdinalIgnoreCase)) {
+                l.Add(thisItem);
+            }
+        }
+        RemoveRange(l);
     }
 
     public void RemoveRange(List<FilterItem> filter) {
@@ -255,7 +305,9 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
             }
         }
 
-        if (did) { OnChanged(); }
+        if (did) {
+            OnChanged();
+        }
     }
 
     public override string ToString() {
@@ -270,6 +322,28 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         return result.Parseable();
     }
 
+    private List<RowItem> CalculateFilteredRows() {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>(); }
+        db.RefreshColumnsData(this);
+
+        ConcurrentBag<RowItem> tmpVisibleRows = new();
+
+        try {
+            _ = Parallel.ForEach(Database.Row, thisRowItem => {
+                if (thisRowItem != null) {
+                    if (thisRowItem.MatchesTo(this)) {
+                        tmpVisibleRows.Add(thisRowItem);
+                    }
+                }
+            });
+        } catch {
+            Develop.CheckStackForOverflow();
+            return CalculateFilteredRows();
+        }
+
+        return tmpVisibleRows.ToList();
+    }
+
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void Dispose(bool disposing) {
@@ -280,6 +354,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
                     Database.Disposing -= Database_Disposing;
                     Database = null;
                 }
+                _rows = null;
             }
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
@@ -290,6 +365,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
 
     private void Filter_Changed(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
+        Invalidate_FilteredRows();
         OnChanged();
     }
 

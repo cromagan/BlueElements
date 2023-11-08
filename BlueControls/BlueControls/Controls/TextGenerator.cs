@@ -58,8 +58,7 @@ public partial class TextGenerator : UserControl {
         if (c1 == null || c2 == null) { return; }
 
         var fi = new FilterItem(c1, BlueDatabase.Enums.FilterType.Istgleich_ODER_GroßKleinEgal, Vorfilter);
-
-        var l = c2.Contents(_textDatabase.Row.RowsFiltered(fi));
+        var l = c2.Contents(fi, null);
 
         if (l.Count == 0) {
             cbxModus.Text = string.Empty;
@@ -129,8 +128,8 @@ public partial class TextGenerator : UserControl {
 
         #region und nun die Datenbank durchforsten und fehlende Einträge erzeugen
 
-        var allr = _textDatabase.Row.RowsFiltered();
-        allr.Sort(); // , _textDatabase.SortDefinition
+        var allr = _textDatabase.Row;
+        //allr.Sort(); // , _textDatabase.SortDefinition
         var txt = string.Empty;
 
         foreach (var thisRow in allr) {

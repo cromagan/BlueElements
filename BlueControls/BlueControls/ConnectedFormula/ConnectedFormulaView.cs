@@ -197,9 +197,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         return c;
     }
 
-    public void SetData(DatabaseAbstract? database, string? rowKey) => SetData(ConnectedFormula, database, rowKey ?? string.Empty);
+    public void SetData(DatabaseAbstract? database, string rowKey) => SetData(ConnectedFormula, database, rowKey ?? string.Empty);
 
-    public void SetData(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database, string? rowKey) {
+    public void SetData(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database, string rowKey) {
         if (IsDisposed) { return; }
 
         var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
@@ -227,17 +227,17 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         }
 
         if (Database != database) {
-            if (Database != null) {
+            if (Database is DatabaseAbstract db1) {
                 RemoveRow();
-                Database.Disposing -= _Database_Disposing;
-                Database.Row.RowRemoving -= Row_RowRemoving;
+                db1.Disposing -= _Database_Disposing;
+                db1.Row.RowRemoving -= Row_RowRemoving;
             }
             InvalidateView();
             Database = database;
 
-            if (Database != null) {
-                Database.Disposing += _Database_Disposing;
-                Database.Row.RowRemoving += Row_RowRemoving;
+            if (Database is DatabaseAbstract db2) {
+                db2.Disposing += _Database_Disposing;
+                db2.Row.RowRemoving += Row_RowRemoving;
             }
         }
 

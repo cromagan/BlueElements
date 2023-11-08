@@ -190,7 +190,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         return ct == OriginalText;
     }
 
-    public void SetData(DatabaseAbstract? database, string? rowkey) {
+    public void SetData(DatabaseAbstract? database, string rowkey) {
         if (this.InputDatabase() != database) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
         }

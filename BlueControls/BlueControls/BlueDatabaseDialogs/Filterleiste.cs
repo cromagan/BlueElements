@@ -298,7 +298,9 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         var fl = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
 
-        var r = db.Row.RowsFiltered(fl);
+        var fc = new FilterCollection(fl);
+
+        var r = fc.Rows;
         if (r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
             MessageBox.Show("Aktion fehlgeschlagen", ImageCode.Information, "OK");
             return;
@@ -350,9 +352,10 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         if (col == null) { return; } // Neue Datenbank?
 
-        var fl = new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
+        var fi = new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
+        var fc = new FilterCollection(fi);
 
-        var r = db.Row.RowsFiltered(fl);
+        var r = fc.Rows;
         if (_ähnliche != null) {
             btnÄhnliche.Visible = true;
             btnÄhnliche.Enabled = r != null && r.Count == 1;

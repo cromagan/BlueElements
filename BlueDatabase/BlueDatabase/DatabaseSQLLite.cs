@@ -278,8 +278,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         OnDropMessage(FehlerArt.Info, string.Empty);
     }
 
-    public override (bool didreload, string errormessage) RefreshRowData(List<RowItem> rows, bool refreshAlways) {
-        if (rows == null || rows.Count == 0) { return (false, string.Empty); }
+    public override (bool didreload, string errormessage) RefreshRowData(IEnumerable<RowItem> rows, bool refreshAlways) {
+        if (rows == null || !rows.Any()) { return (false, string.Empty); }
 
         var l = new List<RowItem>();
 

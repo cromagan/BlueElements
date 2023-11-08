@@ -31,14 +31,14 @@ using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControlAcceptFilter, ICalculateRows {
+internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControlAcceptFilter {
 
     #region Fields
 
     private readonly List<IControlAcceptRow> _childs = new();
 
     private readonly string _showformat;
-    private List<RowItem>? _filteredRows;
+    private FilterCollection? _fc;
     private RowItem? _row;
 
     #endregion
@@ -75,8 +75,6 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
         }
     }
 
-    public List<RowItem> RowsFiltered => this.RowsFiltered(ref _filteredRows, this.FilterOfSender(), InputDatabase);
-
     #endregion
 
     #region Methods
@@ -87,11 +85,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
         this.DoChilds(_childs, _row);
     }
 
-    public void FilterFromParentsChanged() => Invalidate_FilteredRows();
-
-    public void Invalidate_FilteredRows() {
-        if (IsDisposed) { return; }
-        _filteredRows = null;
+    public void FilterFromParentsChanged() {
+        _fc = null;
         Invalidate();
     }
 
@@ -106,13 +101,11 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
             //_disposing = true;
             _childs.Clear();
-
-            _filteredRows = null;
         }
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        if (_filteredRows == null) {
+        if (_fc == null) {
             UpdateMyCollection();
         }
         base.DrawControl(gr, state);
@@ -143,7 +136,10 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
         #region Zeilen erzeugen
 
-        var f = RowsFiltered;
+        _fc = this.FilterOfSender();
+        if (_fc == null) { return; }
+
+        var f = _fc.Rows;
         if (f != null) {
             foreach (var thisR in f) {
                 if (cb?.Item?[thisR.KeyName] == null) {

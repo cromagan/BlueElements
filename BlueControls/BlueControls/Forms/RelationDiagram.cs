@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -46,9 +47,9 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Database = database;
 
-        if (Database is not DatabaseAbstract db) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         Database.Disposing += Database_Disposing;
-        foreach (var thisColumnItem in Database.Column) {
+        foreach (var thisColumnItem in db.Column) {
             if (thisColumnItem != null && thisColumnItem.Format == DataFormat.RelationText) {
                 _column = thisColumnItem;
                 break;
@@ -109,12 +110,14 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     private void BezPlus(RowFormulaPadItem? initialItem) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+
         // Den Beziehungstext holen
         var t = initialItem?.Row.CellGetString(_column).ToUpper();
         if (string.IsNullOrEmpty(t)) { return; }
         // Alle möglichen Namen holen
         List<string> names = new();
-        names.AddRange(Database.Column.First().GetUcaseNamesSortedByLenght());
+        names.AddRange(db.Column.First().GetUcaseNamesSortedByLenght());
         // Namen ermitteln, die relevant sind
         List<string> bez = new();
         foreach (var thisN in names.Where(t.Contains)) {
@@ -125,7 +128,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         // Namen in der Übersicht hinzufügen
         var lastit = initialItem;
         foreach (var thisn in bez) {
-            var ro = Database.Row[thisn];
+            var ro = db.Row[thisn];
             var it = ItemOfRow(ro);
             if (it == null) {
                 //lastit = AddOne(thisn, (int)lastit.p_RO.X, (int)lastit.p_RO.Y, lastit.Layout_ID);

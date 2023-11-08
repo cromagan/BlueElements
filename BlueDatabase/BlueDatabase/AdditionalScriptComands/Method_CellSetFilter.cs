@@ -56,7 +56,7 @@ public class Method_CellSetFilter : Method_Database {
         var columnToSet = db.Column.Exists(attvar.ValueStringGet(1));
         if (columnToSet == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(4)); }
 
-        var r = RowCollection.MatchesTo(allFi);
+        var r = allFi.Rows;
         if (r.Count is 0 or > 1) {
             return DoItFeedback.Falsch();
         }

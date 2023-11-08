@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
@@ -778,8 +779,8 @@ public sealed class Database : DatabaseAbstract {
         }
     }
 
-    public override (bool didreload, string errormessage) RefreshRowData(List<RowItem> row, bool refreshAlways) {
-        if (row == null || row.Count == 0) { return (false, string.Empty); }
+    public override (bool didreload, string errormessage) RefreshRowData(IEnumerable<RowItem> row, bool refreshAlways) {
+        if (row == null || !row.Any()) { return (false, string.Empty); }
 
         foreach (var thisrow in row) {
             thisrow.IsInCache = DateTime.UtcNow;

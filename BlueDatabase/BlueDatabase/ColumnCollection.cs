@@ -159,15 +159,15 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
 
-        if (Database.ColumnArrangements.Count < 1 || Database.ColumnArrangements[0].Count != Database.Column.Count()) {
+        if (db.ColumnArrangements.Count < 1 || db.ColumnArrangements[0].Count != db.Column.Count()) {
             //Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
             return null;
         }
 
-        var l = Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed && !thisViewItem.Column.KeyName.StartsWith("SYS_"))?.Column;
+        var l = db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed && !thisViewItem.Column.KeyName.StartsWith("SYS_"))?.Column;
         if (l != null) { return l; }
 
-        return Database?.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed)?.Column;
+        return db.ColumnArrangements[0]?.FirstOrDefault(thisViewItem => thisViewItem?.Column != null && !thisViewItem.Column.IsDisposed)?.Column;
     }
 
     //public ColumnItem? this[int index] {
@@ -303,7 +303,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         da.CellAdd("Änderungs-Rechte");
         da.RowEnd();
         var lfdn = 0;
-        foreach (var thisColumnItem in Database.ColumnArrangements[0]) {
+        foreach (var thisColumnItem in db.ColumnArrangements[0]) {
             if (thisColumnItem?.Column != null) {
                 lfdn++;
                 da.RowBeginn();

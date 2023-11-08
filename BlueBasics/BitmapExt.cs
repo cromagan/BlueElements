@@ -608,8 +608,8 @@ public class BitmapExt : IDisposableExtended {
                 var byteOffset = (offsetY * sourceData.Stride) + (offsetX * 4);
                 neighbourPixels.Clear();
                 for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
-                    for (var filterX = -filterOffset; filterX <= filterOffset; filterX++) {
-                        var calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
+                    for (var Filter = -filterOffset; Filter <= filterOffset; Filter++) {
+                        var calcOffset = byteOffset + (Filter * 4) + (filterY * sourceData.Stride);
                         neighbourPixels.Add(BitConverter.ToInt32(pixelBuffer, calcOffset));
                     }
                 }
@@ -921,11 +921,11 @@ public class BitmapExt : IDisposableExtended {
                 double red = 0;
                 var byteOffset = (offsetY * sourceData.Stride) + (offsetX * 4);
                 for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
-                    for (var filterX = -filterOffset; filterX <= filterOffset; filterX++) {
-                        var calcOffset = byteOffset + (filterX * 4) + (filterY * sourceData.Stride);
-                        blue += pixelBuffer[calcOffset] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
-                        green += pixelBuffer[calcOffset + 1] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
-                        red += pixelBuffer[calcOffset + 2] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
+                    for (var Filter = -filterOffset; Filter <= filterOffset; Filter++) {
+                        var calcOffset = byteOffset + (Filter * 4) + (filterY * sourceData.Stride);
+                        blue += pixelBuffer[calcOffset] * filterMatrix[filterY + filterOffset, Filter + filterOffset];
+                        green += pixelBuffer[calcOffset + 1] * filterMatrix[filterY + filterOffset, Filter + filterOffset];
+                        red += pixelBuffer[calcOffset + 2] * filterMatrix[filterY + filterOffset, Filter + filterOffset];
                     }
                 }
                 blue = (factor * blue) + bias;

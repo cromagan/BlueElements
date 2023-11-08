@@ -59,7 +59,7 @@ public class Method_LookupFilter : Method {
 
         var l = new List<string>();
 
-        var r = RowCollection.MatchesTo(allFi);
+        var r = allFi.Rows;
         if (r.Count == 0) {
             l.Add(attvar.ValueStringGet(1));
             return new DoItFeedback(l);

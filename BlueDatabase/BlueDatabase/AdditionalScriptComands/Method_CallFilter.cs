@@ -69,7 +69,7 @@ public class Method_CallFilter : Method {
         //var db = MyDatabase(s);
         if (allFi[0].Database is not DatabaseAbstract db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
-        var r = db.Row.RowsFiltered(allFi, null);
+        var r = allFi.Rows;
         if (r.Count == 0) { return DoItFeedback.Null(); }
 
         var vs = attvar.ValueStringGet(0);

@@ -834,8 +834,7 @@ public partial class TableView : FormWithStatusBar {
         _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID, string.Empty));
     }
 
-    private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) =>
-        Table.ShowNumber = btnNummerierung.Checked;
+    private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => Table.ShowNumber = btnNummerierung.Checked;
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);

@@ -70,7 +70,7 @@ internal class Method_Export : Method_Database {
 
         #region  Zeilen Ermitteln (r)
 
-        var r = db.Row.RowsFiltered(allFi, null);
+        var r = allFi.Rows;
 
         #endregion
 
