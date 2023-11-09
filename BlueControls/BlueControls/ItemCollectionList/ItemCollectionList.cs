@@ -194,12 +194,12 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
                 var targetColumn = db2.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase);
                 if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieldatenbank nicht vorhanden."); return; }
 
-                var (filter, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow);
+                var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow);
                 if (!string.IsNullOrEmpty(info)) {
                     Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", ImageCode.Information);
                 }
 
-                l.AddRange(targetColumn.Contents(filter, null));
+                l.AddRange(targetColumn.Contents(fc, null));
                 if (l.Count == 0) {
                     Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", ImageCode.Information);
                 }

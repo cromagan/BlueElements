@@ -447,38 +447,38 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return db.Cell.IsNullOrEmpty(column, this);
     }
 
-    public bool MatchesTo(FilterItem filter) {
+    public bool MatchesTo(FilterItem fi) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
 
-        if (filter.IsDisposed) { return true; }
+        if (fi.IsDisposed) { return true; }
 
-        if (filter.Database != Database) { return false; }
+        if (fi.Database != Database) { return false; }
 
-        filter.Column?.RefreshColumnsData();
+        fi.Column?.RefreshColumnsData();
 
-        if (filter.FilterType is FilterType.KeinFilter or FilterType.GroﬂKleinEgal) { return true; } // Filter ohne Funktion
-        if (filter.Column == null) {
-            if (!filter.FilterType.HasFlag(FilterType.GroﬂKleinEgal)) { filter.FilterType |= FilterType.GroﬂKleinEgal; }
-            if (filter.FilterType is not FilterType.Instr_GroﬂKleinEgal and not FilterType.Instr_UND_GroﬂKleinEgal) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit Instr mˆglich!"); }
-            if (filter.SearchValue.Count < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert mˆglich"); }
+        if (fi.FilterType is FilterType.KeinFilter or FilterType.GroﬂKleinEgal) { return true; } // Filter ohne Funktion
+        if (fi.Column == null) {
+            if (!fi.FilterType.HasFlag(FilterType.GroﬂKleinEgal)) { fi.FilterType |= FilterType.GroﬂKleinEgal; }
+            if (fi.FilterType is not FilterType.Instr_GroﬂKleinEgal and not FilterType.Instr_UND_GroﬂKleinEgal) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit Instr mˆglich!"); }
+            if (fi.SearchValue.Count < 1) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit mindestens einem Wert mˆglich"); }
 
-            return filter.SearchValue.All(RowFilterMatch);
+            return fi.SearchValue.All(RowFilterMatch);
         }
 
-        if (!Database.Cell.MatchesTo(filter.Column, this, filter)) { return false; }
+        if (!Database.Cell.MatchesTo(fi.Column, this, fi)) { return false; }
 
         return true;
     }
 
-    public bool MatchesTo(ICollection<FilterItem>? filter) {
+    public bool MatchesTo(ICollection<FilterItem>? fi) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
-        if (filter == null || filter.Count == 0) { return true; }
+        if (fi == null || fi.Count == 0) { return true; }
 
-        Database.RefreshColumnsData(filter);
+        Database.RefreshColumnsData(fi);
 
         var ok = true;
 
-        _ = Parallel.ForEach(filter, (thisFilter, state) => {
+        _ = Parallel.ForEach(fi, (thisFilter, state) => {
             if (!MatchesTo(thisFilter)) {
                 ok = false;
                 state.Break();

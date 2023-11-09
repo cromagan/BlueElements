@@ -78,7 +78,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private DateTime? _databaseDrawError;
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
     private bool _drawing;
-    private FilterCollection? _filter;
+    private FilterCollection? _fc;
 
     private int? _headSize;
     private bool _isinClick;
@@ -242,26 +242,26 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public FilterCollection? Filter {
         get {
             if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
-            if (_filter == null) { Filter = new FilterCollection(Database); }
+            if (_fc == null) { Filter = new FilterCollection(Database); }
 
-            return _filter;
+            return _fc;
         }
         private set {
-            if (value == null && _filter == null) { return; }
+            if (value == null && _fc == null) { return; }
 
-            if ((value == null && _filter != null) ||
-                (_filter == null && value != null) ||
-                (value!.ToString(true) != _filter!.ToString(true))) {
-                if (_filter != null) {
-                    _filter.Changed -= Filter_Changed;
-                    _filter.CollectionChanged -= Filter_CollectionChanged;
+            if ((value == null && _fc != null) ||
+                (_fc == null && value != null) ||
+                (value!.ToString(true) != _fc!.ToString(true))) {
+                if (_fc != null) {
+                    _fc.Changed -= Filter_Changed;
+                    _fc.CollectionChanged -= Filter_CollectionChanged;
                 }
 
-                _filter = value;
+                _fc = value;
 
-                if (_filter != null) {
-                    _filter.Changed += Filter_Changed;
-                    _filter.CollectionChanged += Filter_CollectionChanged;
+                if (_fc != null) {
+                    _fc.Changed += Filter_Changed;
+                    _fc.CollectionChanged += Filter_CollectionChanged;
                 }
 
                 FilterFromParentsChanged();
@@ -521,8 +521,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
     /// </summary>
     public static Size FormatedText_NeededSize(ColumnItem? column, string originalText, Font font, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten) {
-        var (s, quickImage) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
-        return Skin.FormatedText_NeededSize(s, quickImage, font, minSize);
+        var (s, qi) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
+        return Skin.FormatedText_NeededSize(s, qi, font, minSize);
     }
 
     /// <summary>
@@ -872,9 +872,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (Database?.Column.SysChapter is not ColumnItem sc) { return; }
 
         _collapsed.Clear();
-        if (Database != null && !Database.IsDisposed) {
-            _collapsed.AddRange(sc.Contents());
-        }
+        _collapsed.AddRange(sc.Contents());
+
         Invalidate_SortedRowData();
     }
 
@@ -916,8 +915,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public void DatabaseSet(DatabaseAbstract? value, string viewCode) {
-        if (Database == value && string.IsNullOrEmpty(viewCode)) { return; }
+    public void DatabaseSet(DatabaseAbstract? db, string viewCode) {
+        if (Database == db && string.IsNullOrEmpty(viewCode)) { return; }
 
         CloseAllComponents();
 
@@ -948,7 +947,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
         ShowWaitScreen = true;
         Refresh(); // um die Uhr anzuzeigen
-        Database = value;
+        Database = db;
         _databaseDrawError = null;
         InitializeSkin(); // Neue Schriftgrößen
         if (Database is DatabaseAbstract db2 && !db2.IsDisposed) {
@@ -1020,13 +1019,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 QuickImage? trichterIcon = null;
                 var trichterState = States.Undefiniert;
                 viewItem.TmpAutoFilterLocation = new Rectangle((int)viewItem.OrderTmpSpalteX1 + Column_DrawWidth(viewItem, displayRectangleWoSlider) - AutoFilterSize, HeadSize(ca) - AutoFilterSize, AutoFilterSize, AutoFilterSize);
-                FilterItem? filtIt = null;
+                FilterItem? fi = null;
                 if (Filter != null) {
-                    filtIt = Filter[viewItem.Column];
+                    fi = Filter[viewItem.Column];
                 }
 
                 if (viewItem.Column.AutoFilterSymbolPossible()) {
-                    if (filtIt != null) {
+                    if (fi != null) {
                         trichterState = States.Checked;
                         var anz = Autofilter_Text(viewItem.Column);
                         trichterText = anz > -100 ? (anz * -1).ToString() : "∞";
@@ -1036,7 +1035,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 }
 
                 var trichterSize = (AutoFilterSize - 4).ToString();
-                if (filtIt != null) {
+                if (fi != null) {
                     trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000");
                 } else if (Filter != null && Filter.MayHasRowFilter(viewItem.Column)) {
                     trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||227722");
@@ -1718,6 +1717,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         base.OnKeyDown(e);
 
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (CursorPosColumn is null) { return; }
 
         var ca = CurrentArrangement;
         if (ca == null) { return; }
@@ -1982,12 +1982,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
 
-        if (Database is not DatabaseAbstract dbx || dbx.IsDisposed) { return; }
-        var ca = CurrentArrangement;
-        if (ca == null) { return; }
-
         lock (_lockUserAction) {
-            if (Database is not DatabaseAbstract db || db.IsDisposed) {
+            var ca = CurrentArrangement;
+            if (Database is not DatabaseAbstract db || db.IsDisposed || ca == null) {
                 Forms.QuickInfo.Close();
                 return;
             }
@@ -2097,8 +2094,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (changeToDot) { drawString = "..."; }// Die letzte Zeile noch ganz hinschreiben
         }
 
-        var (text, image) = CellItem.GetDrawingData(contentHolderColumnStyle, drawString, style, bildTextverhalten);
-        var tmpImageCode = image;
+        var (text, qi) = CellItem.GetDrawingData(contentHolderColumnStyle, drawString, style, bildTextverhalten);
+        var tmpImageCode = qi;
         if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
         Skin.Draw_FormatedText(gr, text, tmpImageCode, (Alignment)contentHolderColumnStyle.Align, r, null, false, font, false);
@@ -3576,7 +3573,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private RowData? RowOnCoordinate(ColumnViewCollection ca, int pixelY) {
-        if (Database is not DatabaseAbstract db || pixelY <= HeadSize(ca)) { return null; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed || pixelY <= HeadSize(ca)) { return null; }
         var s = RowsFilteredAndPinned();
         if (s == null) { return null; }
 
@@ -3627,7 +3624,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private bool UserEdit_NewRowAllowed() {
-        if (Database is not DatabaseAbstract db || db.Column.Count == 0 || db.Column.First() is not ColumnItem fc) { return false; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed || db.Column.Count == 0 || db.Column.First() is not ColumnItem fc) { return false; }
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) { return false; }
         if (db.ColumnArrangements.Count == 0) { return false; }
         if (CurrentArrangement?[fc] == null) { return false; }

@@ -1093,14 +1093,14 @@ public static class Skin {
     /// <param name="txt"></param>
     /// <param name="design"></param>
     /// <param name="state"></param>
-    /// <param name="imageCode"></param>
+    /// <param name="qi"></param>
     /// <param name="align"></param>
     /// <param name="fitInRect"></param>
     /// <param name="child"></param>
     /// <param name="deleteBack"></param>
-    public static void Draw_FormatedText(Graphics gr, string txt, Design design, States state, QuickImage? imageCode, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, imageCode, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
+    public static void Draw_FormatedText(Graphics gr, string txt, Design design, States state, QuickImage? qi, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, qi, DesignOf(design, state), align, fitInRect, child, deleteBack, translate);
 
-    public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? imageCode, Alignment align, Rectangle fitInRect, BlueFont? bFont, bool translate) => Draw_FormatedText(gr, txt, imageCode, align, fitInRect, null, false, bFont, translate);
+    public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align, Rectangle fitInRect, BlueFont? bFont, bool translate) => Draw_FormatedText(gr, txt, qi, align, fitInRect, null, false, bFont, translate);
 
     //private static void Draw_Border_DuoColor(Graphics GR, RowItem Row, Rectangle r, bool NurOben) {
     //    var c1 = Color.FromArgb(Value(Row, col_Color_Border_2, 0));
@@ -1154,7 +1154,11 @@ public static class Skin {
         float xp = 0;
         float yp1 = 0;
         float yp2 = 0;
-        if (qi != null) { pSize = ((Bitmap)qi).Size; }
+        if (qi != null) {
+            lock (qi) {
+                pSize = ((Bitmap)qi).Size;
+            }
+        }
         if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, translate); }
         if (bFont != null) {
             if (fitInRect.Width > 0) { txt = BlueFont.TrimByWidth((Font)bFont, txt, fitInRect.Width - pSize.Width); }
@@ -1184,21 +1188,21 @@ public static class Skin {
             if (qi != null) { gr.DrawImage(qi, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
             if (!string.IsNullOrEmpty(txt)) { bFont.DrawString(gr, txt, fitInRect.X + pSize.Width + xp, fitInRect.Y + yp2); }
         } catch {
-            // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird. Was immer das auch heiﬂen mag...
+            // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird.
             //Develop.DebugPrint(ex);
         }
     }
 
-    public static Size FormatedText_NeededSize(string text, QuickImage? image, Font font, int minSie) {
+    public static Size FormatedText_NeededSize(string text, QuickImage? qi, Font font, int minSie) {
         try {
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
             if (font == null) { return new Size(3, 3); }
-            if (image != null) { pSize = ((Bitmap)image).Size; }
+            if (qi != null) { pSize = ((Bitmap)qi).Size; }
             if (!string.IsNullOrEmpty(text)) { tSize = BlueFont.MeasureString(text, font); }
 
             if (!string.IsNullOrEmpty(text)) {
-                if (image == null) {
+                if (qi == null) {
                     return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSie));
                 }
 
@@ -1206,7 +1210,7 @@ public static class Skin {
                     Math.Max((int)tSize.Height, (int)pSize.Height));
             }
 
-            if (image != null) {
+            if (qi != null) {
                 return new Size((int)pSize.Width, (int)pSize.Height);
             }
 
@@ -1214,7 +1218,7 @@ public static class Skin {
         } catch {
             // tmpImageCode wird an anderer Stelle verwendet
             Develop.CheckStackForOverflow();
-            return FormatedText_NeededSize(text, image, font, minSie);
+            return FormatedText_NeededSize(text, qi, font, minSie);
         }
     }
 

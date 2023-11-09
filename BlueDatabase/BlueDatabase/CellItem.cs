@@ -48,7 +48,7 @@ public class CellItem {
 
     #region Methods
 
-    public static (string text, QuickImage? image) GetDrawingData(ColumnItem? column, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
+    public static (string text, QuickImage? qi) GetDrawingData(ColumnItem? column, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         if (column == null || column.IsDisposed) { return (originalText, null); }
 
         var tmpText = ValueReadable(column, originalText, style, bildTextverhalten, true);

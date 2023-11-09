@@ -311,15 +311,15 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             if (thiscolumnitem?.Column != null && _table?.Filter != null) {
                 if (thiscolumnitem.Column.AutoFilterSymbolPossible()) {
                     if (r[0].CellIsNullOrEmpty(thiscolumnitem.Column)) {
-                        FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
+                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, string.Empty);
                         _table.Filter.Add(fi);
                     } else if (thiscolumnitem.Column.MultiLine) {
                         var l = r[0].CellGetList(thiscolumnitem.Column).SortedDistinctList();
-                        FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
+                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
                         _table.Filter.Add(fi);
                     } else {
                         var l = r[0].CellGetString(thiscolumnitem.Column);
-                        FilterItem fi = new(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
+                        var fi = new FilterItem(thiscolumnitem.Column, FilterType.Istgleich_UND_GroßKleinEgal, l);
                         _table.Filter.Add(fi);
                     }
                 }
@@ -402,10 +402,10 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
     private void Filterleiste_SizeChanged(object sender, System.EventArgs e) => FillFilters();
 
-    private FlexiControlForFilter? FlexiItemOf(FilterItem filter) {
+    private FlexiControlForFilter? FlexiItemOf(FilterItem fi) {
         foreach (var thisControl in Controls) {
             if (thisControl is FlexiControlForFilter flx) {
-                if (flx.Filter.ToString() == filter.ToString()) { return flx; }
+                if (flx.Filter.ToString() == fi.ToString()) { return flx; }
             }
         }
         return null;

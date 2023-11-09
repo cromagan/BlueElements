@@ -44,14 +44,13 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     #region Constructors
 
-    public FilterItem(DatabaseAbstract database, FilterType filterType, string searchValue) : this(database, filterType, new List<string> { searchValue }) { }
+    public FilterItem(DatabaseAbstract db, FilterType filterType, string searchValue) : this(db, filterType, new List<string> { searchValue }) { }
 
-    public FilterItem(DatabaseAbstract database, FilterType filterType, IList<string>? searchValue) {
-        Database = database;
+    public FilterItem(DatabaseAbstract db, FilterType filterType, IList<string>? searchValue) {
+        Database = db;
         KeyName = Generic.UniqueInternal();
-        if (Database != null && !Database.IsDisposed) {
-            Database.Disposing += Database_Disposing;
-        }
+
+        db.Disposing += Database_Disposing;
 
         _filterType = filterType;
         if (searchValue != null && searchValue.Count > 0) {
@@ -74,11 +73,11 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         SearchValue = new List<string>().AsReadOnly();
     }
 
-    public FilterItem(DatabaseAbstract database, string filterCode) {
-        Database = database;
-        if (Database != null && !Database.IsDisposed) {
-            Database.Disposing += Database_Disposing;
-        }
+    public FilterItem(DatabaseAbstract db, string filterCode) {
+        Database = db;
+
+        db.Disposing += Database_Disposing;
+
         KeyName = Generic.UniqueInternal();
 
         SearchValue = new List<string>().AsReadOnly();

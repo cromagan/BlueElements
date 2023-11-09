@@ -70,7 +70,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //private bool RelationsValid;
     //   Dim ItS As New Size(60, 80)
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
-        if (Database is not DatabaseAbstract db) { return null; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad?.Item?[what] != null) { return null; }
         var r = db.Row[what];
@@ -102,8 +102,8 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
-        if (Database != null) {
-            Database.Disposing -= Database_Disposing;
+        if (Database is DatabaseAbstract db) {
+            db.Disposing -= Database_Disposing;
         }
 
         Database = null;

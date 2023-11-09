@@ -96,13 +96,13 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptRow, IContro
         this.DoChilds(_childs);
     }
 
-    public void SetData(DatabaseAbstract? database, string rowkey) {
-        if (database is null || _inputcolumn == null || _outputcolumn == null) {
+    public void SetData(DatabaseAbstract? db, string rowkey) {
+        if (db is null || _inputcolumn == null || _outputcolumn == null) {
             Filter = new FilterItem();
             return;
         }
 
-        var nr = database.Row.SearchByKey(rowkey);
+        var nr = db.Row.SearchByKey(rowkey);
         if (nr == LastInputRow) { return; }
 
         LastInputRow = nr;

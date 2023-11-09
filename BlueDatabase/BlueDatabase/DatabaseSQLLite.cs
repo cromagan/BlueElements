@@ -572,11 +572,12 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             #region Alle ZEILENKEYS laden
 
-            var cl = new List<ColumnItem?>()
-                        {Column.First(),
-                         Column.SysChapter,
-                         Column.SysLocked,
-                         Column.SysCorrect};
+            var cl = new List<ColumnItem?>();
+
+            if (Column.First() is ColumnItem c1) { cl.Add(c1); }
+            if (Column.SysChapter is ColumnItem c2) { cl.Add(c2); }
+            if (Column.SysLocked is ColumnItem c3) { cl.Add(c3); }
+            if (Column.SysCorrect is ColumnItem c4) { cl.Add(c4); }
 
             foreach (var thisColumn in Column) {
                 thisColumn.IsInCache = null;

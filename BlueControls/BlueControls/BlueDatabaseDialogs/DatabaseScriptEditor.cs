@@ -176,12 +176,12 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     protected override void OnShown(System.EventArgs e) => variableEditor.WriteVariablesToTable(Database?.Variables);
 
     private void btnSave_Click(object sender, System.EventArgs e) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+
         btnSave.Enabled = false;
 
-        if (Database != null) {
-            WriteInfosBack();
-            _ = Database.Save();
-        }
+        WriteInfosBack();
+        _ = db.Save();
 
         btnSave.Enabled = true;
     }

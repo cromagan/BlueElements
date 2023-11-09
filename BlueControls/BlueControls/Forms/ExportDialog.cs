@@ -91,9 +91,9 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Methods
 
-    public static void AddLayoutsOff(ItemCollectionList.ItemCollectionList addHere, DatabaseAbstract? database) {
-        if (database is null || database.IsDisposed) { return; }
-        var r = database.GetAllLayouts();
+    public static void AddLayoutsOff(ItemCollectionList.ItemCollectionList addHere, DatabaseAbstract? db) {
+        if (db is null || db.IsDisposed) { return; }
+        var r = db.GetAllLayouts();
 
         foreach (var thisFile in r) {
             if (addHere[thisFile] == null) { _ = addHere.Add(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16)); }

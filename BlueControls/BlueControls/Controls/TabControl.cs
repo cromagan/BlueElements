@@ -76,9 +76,9 @@ public class TabControl : AbstractTabControl, IControlAcceptRow {
 
     #region Methods
 
-    public void SetData(DatabaseAbstract? database, string rowkey) {
-        if (database != Database && rowkey == RowKey) { return; }
-        Database = database;
+    public void SetData(DatabaseAbstract? db, string rowkey) {
+        if (db != Database && rowkey == RowKey) { return; }
+        Database = db;
         RowKey = rowkey ?? string.Empty;
         DoTabChilds();
     }

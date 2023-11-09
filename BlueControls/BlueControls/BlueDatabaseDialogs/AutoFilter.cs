@@ -49,12 +49,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Constructors
 
-    public AutoFilter(ColumnItem column, FilterCollection? filter, List<RowItem>? pinned) : base(Design.Form_AutoFilter) {
+    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned) : base(Design.Form_AutoFilter) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
 
         _column = column;
-        GenerateAll(filter, pinned);
+        GenerateAll(fc, pinned);
     }
 
     #endregion
@@ -67,12 +67,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Methods
 
-    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? filter, List<RowItem>? pinned) {
+    public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned) {
         if (column == null || column.IsDisposed) { return new(); }
 
-        if (filter == null || filter.Count < 0) { return column.Contents(); }
-        FilterCollection tfilter = (FilterCollection)filter.Clone();
-        tfilter.Remove(column);
+        if (fc == null || fc.Count < 0) { return column.Contents(); }
+        FilterCollection fc2 = (FilterCollection)fc.Clone();
+        fc2.Remove(column);
 
         //foreach (var thisFilter in filter) {
         //    if (thisFilter != null && column != thisFilter.Column) {
@@ -80,12 +80,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         //    }
         //}
 
-        return column.Contents(tfilter, pinned);
+        return column.Contents(fc2, pinned);
     }
 
-    public void GenerateAll(FilterCollection? filter, List<RowItem>? pinned) {
+    public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned) {
         var nochOk = true;
-        var listFilterString = Autofilter_ItemList(_column, filter, pinned);
+        var listFilterString = Autofilter_ItemList(_column, fc, pinned);
         //var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
 
         //ACHUNG:
@@ -130,8 +130,8 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                 capWas.Text = "...oder von-bis:";
             }
             lsbStandardFilter.Item.Clear();
-            if (filter != null) {
-                _ = lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), filter[_column] != null, Constants.FirstSortChar + "01");
+            if (fc != null) {
+                _ = lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), fc[_column] != null, Constants.FirstSortChar + "01");
             } else {
                 _ = lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01");
             }
@@ -161,8 +161,8 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         #region Wenn ein Filter übergeben wurde, die Einträge markieren
 
-        if (filter != null) {
-            foreach (var thisfilter in filter) {
+        if (fc != null) {
+            foreach (var thisfilter in fc) {
                 if (thisfilter != null && thisfilter.FilterType != FilterType.KeinFilter) {
                     if (thisfilter.Column == _column) {
                         if (thisfilter.FilterType.HasFlag(FilterType.Istgleich)) {

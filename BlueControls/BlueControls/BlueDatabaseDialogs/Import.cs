@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.ComponentModel;
+using System.Windows.Media.Animation;
 using BlueBasics.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
@@ -44,11 +45,9 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
         var ein = _originalImportText.SplitAndCutByCrToList();
         Eintr.Text = ein.Count + " zum Importieren bereit.";
         Database = database;
-        if (Database is not DatabaseAbstract db || db.IsDisposed) {
-            return;
-        }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        Database.Disposing += Database_Disposing;
+        db.Disposing += Database_Disposing;
     }
 
     #endregion
@@ -62,7 +61,7 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
     #region Methods
 
     protected override void OnClosing(CancelEventArgs e) {
-        if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+        if (Database is DatabaseAbstract db && !db.IsDisposed) { db.Disposing -= Database_Disposing; }
         base.OnClosing(e);
     }
 
@@ -89,8 +88,8 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
         }
         var m = "Datenbank-Fehler";
 
-        if (Database != null && !Database.IsDisposed) {
-            m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked);
+        if (Database is DatabaseAbstract db && !db.IsDisposed) {
+            m = db.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked);
         }
 
         if (!string.IsNullOrEmpty(m)) {

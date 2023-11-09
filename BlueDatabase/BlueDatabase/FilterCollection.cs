@@ -21,6 +21,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -88,7 +89,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
                 return;
             }
 
-            FilterItem fi = new(Database, FilterType.Instr_UND_GroßKleinEgal, value);
+            var fi = new FilterItem(Database, FilterType.Instr_UND_GroßKleinEgal, value);
             Add(fi);
         }
     }
@@ -113,13 +114,13 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
 
     #region Methods
 
-    public new void Add(FilterItem filter) {
+    public new void Add(FilterItem fi) {
         if (IsDisposed) { return; }
 
-        if (filter.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
+        if (fi.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
 
-        filter.Changed += Filter_Changed;
-        base.Add(filter);
+        fi.Changed += Filter_Changed;
+        base.Add(fi);
         Invalidate_FilteredRows();
         OnChanged();
     }
@@ -161,14 +162,14 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         Add(fi);
     }
 
-    public void AddIfNotExists(List<FilterItem> filterItem) {
-        foreach (var thisFilter in filterItem) {
+    public void AddIfNotExists(List<FilterItem> fi) {
+        foreach (var thisFilter in fi) {
             AddIfNotExists(thisFilter);
         }
     }
 
-    public void AddIfNotExists(FilterCollection filterItem) {
-        foreach (var thisFilter in filterItem) {
+    public void AddIfNotExists(FilterCollection fc) {
+        foreach (var thisFilter in fc) {
             AddIfNotExists(thisFilter);
         }
     }
@@ -191,9 +192,9 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
 
-    public bool Exists(FilterItem filterItem) {
+    public bool Exists(FilterItem fi) {
         foreach (var thisFilter in this) {
-            if (filterItem.Equals(thisFilter)) { return true; }
+            if (fi.Equals(thisFilter)) { return true; }
         }
 
         return false;
@@ -238,15 +239,15 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
     /// <summary>
     /// Wirft niemals das Event Changed ab - CollectionChanged aber schon
     /// </summary>
-    /// <param name="filterItem"></param>
-    public new bool Remove(FilterItem filterItem) {
-        filterItem.Changed -= Filter_Changed;
-        return base.Remove(filterItem);
+    /// <param name="fi"></param>
+    public new bool Remove(FilterItem fi) {
+        fi.Changed -= Filter_Changed;
+        return base.Remove(fi);
     }
 
-    public void Remove(FilterItem filterItem, bool throwChangedEvent) {
+    public void Remove(FilterItem fi, bool throwChangedEvent) {
         if (IsDisposed) { return; }
-        if (Remove(filterItem)) {
+        if (Remove(fi)) {
             Invalidate_FilteredRows();
             if (throwChangedEvent) {
                 OnChanged();
@@ -270,11 +271,11 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         }
     }
 
-    public void RemoveOtherAndAddIfNotExists(FilterItem filterItem) {
-        if (Exists(filterItem)) { return; }
-        Remove(filterItem.Column);
-        if (Exists(filterItem)) { return; } // Falls ein Event ausgelöst wurde, und es nun doch schon das ist
-        Add(filterItem);
+    public void RemoveOtherAndAddIfNotExists(FilterItem fi) {
+        if (Exists(fi)) { return; }
+        Remove(fi.Column);
+        if (Exists(fi)) { return; } // Falls ein Event ausgelöst wurde, und es nun doch schon das ist
+        Add(fi);
     }
 
     public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, List<string>? filterBy, string herkunft) {
@@ -294,10 +295,10 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         RemoveRange(l);
     }
 
-    public void RemoveRange(List<FilterItem> filter) {
+    public void RemoveRange(List<FilterItem> fi) {
         if (IsDisposed) { return; }
         var did = false;
-        foreach (var thisItem in filter) {
+        foreach (var thisItem in fi) {
             if (Contains(thisItem)) {
                 did = true;
 
@@ -322,17 +323,26 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         return result.Parseable();
     }
 
+    protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e) {
+        // Wegen Remove
+        Invalidate_FilteredRows();
+        base.OnCollectionChanged(e);
+        OnChanged();
+    }
+
     private List<RowItem> CalculateFilteredRows() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>(); }
         db.RefreshColumnsData(this);
 
-        ConcurrentBag<RowItem> tmpVisibleRows = new();
-
+        List<RowItem> tmpVisibleRows = new();
+        var lockMe = new object();
         try {
             _ = Parallel.ForEach(Database.Row, thisRowItem => {
                 if (thisRowItem != null) {
                     if (thisRowItem.MatchesTo(this)) {
-                        tmpVisibleRows.Add(thisRowItem);
+                        lock (lockMe) {
+                            tmpVisibleRows.Add(thisRowItem);
+                        }
                     }
                 }
             });
@@ -341,7 +351,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
             return CalculateFilteredRows();
         }
 
-        return tmpVisibleRows.ToList();
+        return tmpVisibleRows;
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();

@@ -1212,10 +1212,6 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, IEnumerable<RowItem> sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
 
-    //public string Export_CSV(FirstRow firstRow, int arrangementNo, FilterCollection? filter) => Export_CSV(firstRow, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.RowsFiltered(filter));
-
-    //public bool Export_HTML(string filename, int arrangementNo, FilterCollection? filter) => Export_HTML(filename, _columnArrangements[arrangementNo].ListOfUsedColumn(), Row.RowsFiltered(filter), false);
-
     public bool Export_HTML(string filename, List<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows, bool execute) {
         try {
             if (columnList == null || columnList.Count == 0) {
@@ -1743,11 +1739,11 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public abstract void RefreshColumnsData(List<ColumnItem> columns);
 
-    public void RefreshColumnsData(IEnumerable<FilterItem>? filter) {
-        if (filter != null) {
+    public void RefreshColumnsData(IEnumerable<FilterItem>? fi) {
+        if (fi != null) {
             var c = new List<ColumnItem>();
 
-            foreach (var thisF in filter) {
+            foreach (var thisF in fi) {
                 if (thisF.Column != null && thisF.Column.IsInCache == null) {
                     _ = c.AddIfNotExists(thisF.Column);
                 }

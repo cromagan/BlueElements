@@ -176,7 +176,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
-    public static (FilterCollection? filter, string info) GetFilterFromLinkedCellData(DatabaseAbstract? linkedDatabase, ColumnItem column, RowItem? row) {
+    public static (FilterCollection? fc, string info) GetFilterFromLinkedCellData(DatabaseAbstract? linkedDatabase, ColumnItem column, RowItem? row) {
         if (linkedDatabase == null || linkedDatabase.IsDisposed) { return (null, "Verlinkte Datenbank verworfen."); }
         if (column.Database is not DatabaseAbstract db || db.IsDisposed || column.IsDisposed) { return (null, "Datenbank verworfen."); }
 
@@ -189,7 +189,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var c = linkedDatabase?.Column.Exists(x[0]);
             if (c == null) { return (null, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
 
-            if (x[1] != "=") { return (null, "Nur 'Gleich'-Fiter wird unterstützt."); }
+            if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
 
             var value = x[2].FromNonCritical();
             if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
@@ -205,8 +205,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (fi.Count == 0 && column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
-        var fc = new FilterCollection(db);
-        fi.AddIfNotExists(fi);
+        var fc = new FilterCollection(fi[0].Database);
+        fc.AddIfNotExists(fi);
 
         return (fc, string.Empty);
     }
@@ -452,7 +452,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.IsNullOrEmpty(GetStringCore(column, row));
     }
 
-    public bool MatchesTo(ColumnItem? column, RowItem? row, FilterItem filter) {
+    public bool MatchesTo(ColumnItem? column, RowItem? row, FilterItem fi) {
         //Grundlegendes zu UND und ODER:
         //Ein Filter kann mehrere Werte haben, diese müssen ein Attribut UND oder ODER haben.
         //Bei UND müssen alle Werte des Filters im Multiline vorkommen.
@@ -464,14 +464,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         //Deswegen muss beim einem UND-Filter nur EINER der Zellenwerte zutreffen.
         //if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugPrint(enFehlerArt.Fehler, "Kein Filter angegeben: " + ToString()); }
         try {
-            var typ = filter.FilterType;
+            var typ = fi.FilterType;
             // Oder-Flag ermitteln --------------------------------------------
             var oder = typ.HasFlag(FilterType.ODER);
             if (oder) { typ ^= FilterType.ODER; }
             // Und-Flag Ermitteln --------------------------------------------
             var und = typ.HasFlag(FilterType.UND);
             if (und) { typ ^= FilterType.UND; }
-            if (filter.SearchValue.Count < 2) {
+            if (fi.SearchValue.Count < 2) {
                 oder = true;
                 und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
             }
@@ -504,7 +504,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                                                                                //}
             if (!tmpMultiLine) {
                 var bedingungErfüllt = false;
-                foreach (var t in filter.SearchValue) {
+                foreach (var t in fi.SearchValue) {
                     bedingungErfüllt = CompareValues(txt, t, typ);
                     if (oder && bedingungErfüllt) { return true; }
                     if (und && bedingungErfüllt == false) { return false; } // Bei diesem UND hier müssen allezutreffen, deshalb kann getrost bei einem False dieses zurückgegeben werden.
@@ -519,7 +519,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             // Diese Reihenfolge der For Next ist unglaublich wichtig:
             // Sind wenigere VORHANDEN vorhanden als FilterWerte, dann durchsucht diese Routine zu wenig Einträge,
             // bevor sie bei einem UND ein False zurückgibt
-            foreach (var t1 in filter.SearchValue) {
+            foreach (var t1 in fi.SearchValue) {
                 var bedingungErfüllt = false;
                 foreach (var t in vorhandenWerte) {
                     bedingungErfüllt = CompareValues(t, t1, typ);
@@ -537,7 +537,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             Develop.DebugPrint("Unerwarteter Filter-Fehler", ex);
             Pause(1, true);
             Develop.CheckStackForOverflow();
-            return MatchesTo(column, row, filter);
+            return MatchesTo(column, row, fi);
         }
     }
 
@@ -897,11 +897,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         targetColumn = linkedDatabase.Column.Exists(column.LinkedCell_ColumnNameOfLinkedDatabase);
         if (targetColumn == null) { return Ergebnis("Die Spalte ist in der Zieldatenbank nicht vorhanden."); }
 
-        var (filter, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row);
+        var (fc, info) = GetFilterFromLinkedCellData(linkedDatabase, column, row);
         if (!string.IsNullOrEmpty(info)) { return Ergebnis(info); }
-        if (filter == null || filter.Count == 0) { return Ergebnis("Filter konnten nicht generiert werden."); }
+        if (fc == null || fc.Count == 0) { return Ergebnis("Filter konnten nicht generiert werden: " + info); }
 
-        var r = filter.Rows;
+        var r = fc.Rows;
         switch (r.Count) {
             case > 1:
                 return Ergebnis("Suchergebnis liefert mehrere Ergebnisse.");
@@ -912,7 +912,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             default: {
                     if (addRowIfNotExists) {
-                        targetRow = RowCollection.GenerateAndAdd(filter, "LinkedCell aus " + db.TableName);
+                        targetRow = RowCollection.GenerateAndAdd(fc, "LinkedCell aus " + db.TableName);
                     } else {
                         cr = true;
                     }

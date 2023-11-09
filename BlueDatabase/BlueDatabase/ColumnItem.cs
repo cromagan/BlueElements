@@ -36,6 +36,8 @@ using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueDatabase.DatabaseAbstract;
+using static BlueBasics.Extensions;
+using BlueScript;
 
 namespace BlueDatabase;
 
@@ -1236,11 +1238,11 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public List<string> Contents() => Contents(Database?.Row?.ToList());
 
-    public List<string> Contents(FilterItem filter, List<RowItem>? additional) => Contents(new FilterCollection(filter.Database) { filter }, additional);
+    public List<string> Contents(FilterItem fi, List<RowItem>? additional) => Contents(new FilterCollection(fi.Database) { fi }, additional);
 
-    public List<string> Contents(FilterCollection filter, List<RowItem>? pinned) {
+    public List<string> Contents(FilterCollection fc, List<RowItem>? pinned) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<string>(); }
-        var r = filter.Rows;
+        var r = fc.Rows;
 
         var r2 = new List<RowItem>();
         r2.AddRange(r);
@@ -1255,41 +1257,42 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         RefreshColumnsData();
 
-        ConcurrentBag<string> list = new();
-
-        try {
-            _ = Parallel.ForEach(rows, thisRowItem => {
-                if (thisRowItem != null) {
-                    if (_multiLine) {
-                        list.AddRange(thisRowItem.CellGetList(this));
-                    } else {
-                        if (thisRowItem.CellGetString(this).Length > 0) {
-                            list.Add(thisRowItem.CellGetString(this));
-                        }
-                    }
-                }
-            });
-        } catch {
-            Develop.CheckStackForOverflow();
-            return Contents(rows);
-        }
-
-        //foreach (var thisRowItem in rows) {
-        //    if (thisRowItem != null) {
-        //        if (_multiLine) {
-        //            list.AddRange(thisRowItem.CellGetList(this));
-        //        } else {
-        //            if (thisRowItem.CellGetString(this).Length > 0) {
-        //                list.Add(thisRowItem.CellGetString(this));
+        //ConcurrentBag<string> list = new();
+        //q
+        //try {
+        //    _ = Parallel.ForEach(rows, thisRowItem => {
+        //        if (thisRowItem != null) {
+        //            if (_multiLine) {
+        //                list.AddIfNotExists(thisRowItem.CellGetList(this));
+        //            } else {
+        //                if (thisRowItem.CellGetString(this).Length > 0) {
+        //                    list.AddIfNotExists(thisRowItem.CellGetString(this));
+        //                }
         //            }
         //        }
-        //    }
+        //    });
+        //} catch {
+        //    Develop.CheckStackForOverflow();
+        //    return Contents(rows);
         //}
+
+        var list = new List<string>();
+        foreach (var thisRowItem in rows) {
+            if (thisRowItem != null) {
+                if (_multiLine) {
+                    list.AddRange(thisRowItem.CellGetList(this));
+                } else {
+                    if (thisRowItem.CellGetString(this).Length > 0) {
+                        list.Add(thisRowItem.CellGetString(this));
+                    }
+                }
+            }
+        }
 
         return list.SortedDistinctList();
     }
 
-    //public void DeleteContents(FilterCollection filter, List<RowItem?>? pinned) {
+    //public void DeleteContents(FilterCollection fc, List<RowItem?>? pinned) {
     //    if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
     //    foreach (var thisRowItem in Database.Row) {
@@ -1902,12 +1905,12 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Encoding.UTF8, true);
     }
 
-    public double? Summe(FilterCollection? filter) {
+    public double? Summe(FilterCollection? fc) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
 
         double summ = 0;
-        foreach (var thisrow in Database.Row) {
-            if (thisrow != null && thisrow.MatchesTo(filter)) {
+        foreach (var thisrow in db.Row) {
+            if (thisrow != null && thisrow.MatchesTo(fc)) {
                 if (!thisrow.CellIsNullOrEmpty(this)) {
                     if (!thisrow.CellGetString(this).IsDouble()) { return null; }
                     summ += thisrow.CellGetDouble(this);

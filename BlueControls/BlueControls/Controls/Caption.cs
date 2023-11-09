@@ -57,6 +57,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
+        SetDoubleBuffering();
         MouseHighlight = false;
     }
 
@@ -162,7 +163,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     public void ResetETextAndInvalidate() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
         _eText = null;
-        if (!QuickModePossible()) { SetDoubleBuffering(); }
+        //if (!QuickModePossible()) { SetDoubleBuffering(); }
         Invalidate();
     }
 

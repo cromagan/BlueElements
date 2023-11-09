@@ -117,14 +117,14 @@ internal sealed class QuickPic : Panel {
         return QuickImage.GenerateCode(PicName.Text, IntParse(GrX.Text), IntParse(GrY.Text), e, Färb.Text, grün.Text, SAT.Value, Hell.Value, 0, Transp.Value, txbZweitsymbol.Text);
     }
 
-    public void StartAll(string qicode) {
+    public void StartAll(string code) {
         LB.Items.Clear();
         const ImageCode tempVar = (ImageCode)9999;
         for (ImageCode z = 0; z <= tempVar; z++) {
             var w = Enum.GetName(z.GetType(), z);
             if (!string.IsNullOrEmpty(w)) { _ = LB.Items.Add(w); }
         }
-        QuickImage l = new(qicode);
+        QuickImage l = new(code);
         PicName.Text = l.Name;
         Färb.Text = l.Färbung;
         grün.Text = l.ChangeGreenTo;

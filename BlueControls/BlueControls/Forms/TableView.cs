@@ -342,12 +342,12 @@ public partial class TableView : FormWithStatusBar {
         FilterLeiste.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
     }
 
-    protected virtual void DatabaseSet(DatabaseAbstract? database, string toParse) {
-        if (database != null && !database.IsDisposed) {
-            DropMessages = database.IsAdministrator();
+    protected virtual void DatabaseSet(DatabaseAbstract db, string toParse) {
+        if (db != null && !db.IsDisposed) {
+            DropMessages = db.IsAdministrator();
         }
 
-        if (Table.Database != database) {
+        if (Table.Database != db) {
             CFO.SetData(null, null, string.Empty);
         }
 
@@ -358,7 +358,7 @@ public partial class TableView : FormWithStatusBar {
             foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key) {
                     case "tableview":
-                        Table.DatabaseSet(database, pair.Value.FromNonCritical());
+                        Table.DatabaseSet(db, pair.Value.FromNonCritical());
                         did = true;
                         break;
 
@@ -379,8 +379,8 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (!did) {
-            Table.DatabaseSet(database, string.Empty);
-            if (Table.View_RowFirst() != null && database != null) {
+            Table.DatabaseSet(db, string.Empty);
+            if (Table.View_RowFirst() != null && db != null) {
                 Table.CursorPos_Set(Table.View_ColumnFirst(), Table.View_RowFirst(), false);
             }
         }

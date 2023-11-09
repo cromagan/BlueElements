@@ -245,20 +245,20 @@ public sealed class QuickImage : IReadableText, IStringable {
         return bmp;
     }
 
-    public static QuickImage Get(QuickImage imageCode, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? imageCode
-            : Get(GenerateCode(imageCode.Name, imageCode.Width, imageCode.Height, imageCode.Effekt | additionalState, imageCode.Färbung, imageCode.ChangeGreenTo, imageCode.Sättigung, imageCode.Helligkeit, imageCode.DrehWinkel, imageCode.Transparenz, imageCode.Zweitsymbol));
+    public static QuickImage Get(QuickImage qi, ImageCodeEffect additionalState) => additionalState == ImageCodeEffect.Ohne ? qi
+            : Get(GenerateCode(qi.Name, qi.Width, qi.Height, qi.Effekt | additionalState, qi.Färbung, qi.ChangeGreenTo, qi.Sättigung, qi.Helligkeit, qi.DrehWinkel, qi.Transparenz, qi.Zweitsymbol));
 
-    public static QuickImage Get(string imageCode) {
+    public static QuickImage Get(string code) {
         //if (imageCode == null || string.IsNullOrWhiteSpace(imageCode)) { return null; }
 
-        if (Pics.TryGetValue(imageCode, out var p)) { return p; }
-        var x = new QuickImage(imageCode);
+        if (Pics.TryGetValue(code, out var p)) { return p; }
+        var x = new QuickImage(code);
 
         if (Pics.Count == 0) {
             System.Windows.Data.BindingOperations.EnableCollectionSynchronization(Pics, new object());
         }
 
-        _ = Pics.TryAdd(imageCode, x);
+        _ = Pics.TryAdd(code, x);
 
         x.Generate();
         return x;
@@ -283,7 +283,7 @@ public sealed class QuickImage : IReadableText, IStringable {
 
     public static QuickImage Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
 
-    public static implicit operator Bitmap(QuickImage p) => p._bitmap;
+    public static implicit operator Bitmap(QuickImage qi) => qi._bitmap;
 
     public string CompareKey() => ToString();
 
@@ -415,8 +415,8 @@ public sealed class QuickImage : IReadableText, IStringable {
                     if (!c.IsMagentaOrTransparent()) {
                         var randPixel = (x > 0 && bmpOri.GetPixel(x - 1, y).IsMagentaOrTransparent()) ||
                                              (y > 0 && bmpOri.GetPixel(x, y - 1).IsMagentaOrTransparent()) ||
-                                             x < bmpOri.Width - 1 && bmpOri.GetPixel(x + 1, y).IsMagentaOrTransparent() ||
-                                             y < bmpOri.Height - 1 && bmpOri.GetPixel(x, y + 1).IsMagentaOrTransparent();
+                                             (x < bmpOri.Width - 1 && bmpOri.GetPixel(x + 1, y).IsMagentaOrTransparent()) ||
+                                             (y < bmpOri.Height - 1 && bmpOri.GetPixel(x, y + 1).IsMagentaOrTransparent());
 
                         if (c.B < 128 || randPixel) {
                             c1 = SystemColors.ControlDark;

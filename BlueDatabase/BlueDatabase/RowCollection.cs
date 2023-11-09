@@ -141,32 +141,32 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static RowItem? GenerateAndAdd(FilterCollection fc, string comment) {
         IReadOnlyCollection<string>? first = null;
 
-        DatabaseAbstract? database = null;
+        DatabaseAbstract? db2 = null;
 
         foreach (var thisfi in fc) {
             if (thisfi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroﬂKleinEgal) { return null; }
             if (thisfi.Column == null) { return null; }
-            if (thisfi.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
-            database ??= db;
+            if (thisfi.Database is not DatabaseAbstract db1 || db1.IsDisposed) { return null; }
+            db2 ??= db1;
 
-            if (db.Column.First() == thisfi.Column) {
+            if (db1.Column.First() == thisfi.Column) {
                 if (first != null) { return null; }
                 first = thisfi.SearchValue;
             }
 
-            if (thisfi.Column.Database != database) { return null; }
+            if (thisfi.Column.Database != db2) { return null; }
         }
 
-        if (database == null || database.IsDisposed) { return null; }
+        if (db2 == null || db2.IsDisposed) { return null; }
 
-        if (!database.Row.IsNewRowPossible()) { return null; }
+        if (!db2.Row.IsNewRowPossible()) { return null; }
 
         if (first == null) { return null; }
 
-        var s = database.NextRowKey();
+        var s = db2.NextRowKey();
         if (s == null || string.IsNullOrEmpty(s)) { return null; }
 
-        var row = database.Row.GenerateAndAdd(s, first.JoinWithCr(), false, true, comment);
+        var row = db2.Row.GenerateAndAdd(s, first.JoinWithCr(), false, true, comment);
 
         if (row == null || row.IsDisposed) { return null; }
 
@@ -496,13 +496,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, r, string.Empty, key, comment, Generic.UserName, DateTime.UtcNow));
     }
 
-    public bool Remove(FilterItem filter, List<RowItem>? pinned, string comment) {
-        FilterCollection nf = new(Database) { filter };
-        return Remove(nf, pinned, comment);
+    public bool Remove(FilterItem fi, List<RowItem>? pinned, string comment) {
+        FilterCollection fc = new(Database) { fi };
+        return Remove(fc, pinned, comment);
     }
 
-    public bool Remove(FilterCollection? filter, List<RowItem>? pinned, string comment) {
-        var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(filter) select thisrowitem.KeyName).Select(dummy => dummy).ToList();
+    public bool Remove(FilterCollection? fc, List<RowItem>? pinned, string comment) {
+        var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(fc) select thisrowitem.KeyName).Select(dummy => dummy).ToList();
         var did = false;
 
         foreach (var thisKey in keys) {
@@ -555,23 +555,23 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    internal static List<RowItem> MatchesTo(FilterItem filterItem) {
+    internal static List<RowItem> MatchesTo(FilterItem fi) {
         List<RowItem> l = new();
 
-        if (filterItem.Database is not DatabaseAbstract db) { return l; }
+        if (fi.Database is not DatabaseAbstract db) { return l; }
 
-        l.AddRange(filterItem.Database.Row.Where(thisRow => thisRow.MatchesTo(filterItem)));
+        l.AddRange(fi.Database.Row.Where(thisRow => thisRow.MatchesTo(fi)));
         return l;
     }
 
-    internal static List<RowItem> MatchesTo(List<FilterItem>? filterItem) {
+    internal static List<RowItem> MatchesTo(List<FilterItem>? fi) {
         List<RowItem> l = new();
 
-        if (filterItem == null || filterItem.Count < 1) { return l; }
-        var db = filterItem[0].Database;
+        if (fi == null || fi.Count < 1) { return l; }
+        var db = fi[0].Database;
         if (db == null || db.IsDisposed) { return l; }
 
-        l.AddRange(db.Row.Where(thisRow => thisRow.MatchesTo(filterItem)));
+        l.AddRange(db.Row.Where(thisRow => thisRow.MatchesTo(fi)));
         return l;
     }
 

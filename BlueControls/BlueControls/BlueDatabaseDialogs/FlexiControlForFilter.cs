@@ -40,14 +40,14 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
     #region Constructors
 
-    public FlexiControlForFilter(Table? tableView, FilterItem filter) {
+    public FlexiControlForFilter(Table? tableView, FilterItem fi) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Size = new Size(204, 24);
         TableView = tableView;
-        Filter = filter;
+        Filter = fi;
         AlwaysInstantChange = true;
         UpdateFilterData();
         Filter.Changed += Filter_Changed;

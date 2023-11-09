@@ -23,7 +23,7 @@ public class FilterEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public FilterEventArgs(FilterItem? filter) => Filter = filter;
+    public FilterEventArgs(FilterItem? fi) => Filter = fi;
 
     #endregion
 
