@@ -28,7 +28,7 @@ public partial class TextGenerator : UserControl {
 
     #region Fields
 
-    private DatabaseAbstract? _textDatabase = null;
+    private readonly DatabaseAbstract? _textDatabase = null;
 
     #endregion
 

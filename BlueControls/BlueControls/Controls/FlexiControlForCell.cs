@@ -216,6 +216,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         if (disposing) { FilterInput_Changing(this, System.EventArgs.Empty); }
 
         if (disposing && (components != null)) {
+            FilterInput?.Dispose();
+            //FilterOutput.Dispose();
+            FilterInput = null;
             components?.Dispose();
         }
 

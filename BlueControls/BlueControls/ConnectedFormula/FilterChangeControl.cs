@@ -29,15 +29,14 @@ internal class FilterChangeControl : GenericControl, IControlAcceptSomething, IC
     #region Properties
 
     public List<IControlAcceptSomething> Childs { get; } = new();
-    public DatabaseAbstract? DatabaseOutput { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; } = null;
+    public FilterCollection? FilterInput { get; set; }
 
-    public FilterCollection? FilterOutput { get; set; } = null;
+    public FilterCollection FilterOutput { get; } = new();
 
     public List<IControlSendSomething> Parents { get; } = new();
 
@@ -51,6 +50,15 @@ internal class FilterChangeControl : GenericControl, IControlAcceptSomething, IC
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            FilterInput?.Dispose();
+            FilterOutput.Dispose();
+            FilterInput = null;
+        }
+        base.Dispose(disposing);
+    }
 
     #endregion
 }

@@ -34,7 +34,6 @@ using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueDatabase.DatabaseAbstract;
-using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 

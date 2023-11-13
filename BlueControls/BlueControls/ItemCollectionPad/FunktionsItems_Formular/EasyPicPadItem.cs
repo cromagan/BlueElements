@@ -82,7 +82,10 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<string> Parents { get; set; }
+    public ReadOnlyCollection<string> Parents {
+        get => _itemAccepts.GetFilterFromKeysGet();
+        set => _itemAccepts.GetFilterFromKeysSet(value, this);
+    }
 
     public bool WaitForDatabase => false;
     protected override int SaveOrder => 4;

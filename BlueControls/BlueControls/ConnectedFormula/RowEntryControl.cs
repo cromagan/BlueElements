@@ -28,22 +28,22 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
 
     #region Constructors
 
-    public RowEntryControl(DatabaseAbstract? database) : base() => DatabaseOutput = database;
+    public RowEntryControl(DatabaseAbstract? database) : base() => FilterOutput.Database = database;
 
     #endregion
 
     #region Properties
 
     public List<IControlAcceptSomething> Childs { get; } = new();
-    public DatabaseAbstract? DatabaseOutput { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; } = null;
+    public FilterCollection? FilterInput { get; set; }
 
-    public FilterCollection? FilterOutput { get; set; } = null;
+    public FilterCollection FilterOutput { get; } = new();
+
     public List<IControlSendSomething> Parents { get; } = new();
 
     #endregion
@@ -55,12 +55,21 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
         Invalidate();
 
         FilterOutput.Clear();
-        if (FilterInput == null || DatabaseOutput != FilterInput.Database) { return; }
+        if (FilterInput == null || FilterOutput.Database != FilterInput.Database) { return; }
 
         FilterOutput.AddIfNotExists(FilterInput);
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            FilterInput?.Dispose();
+            FilterOutput.Dispose();
+            FilterInput = null;
+        }
+        base.Dispose(disposing);
+    }
 
     #endregion
 }

@@ -55,15 +55,9 @@ public class TabControl : AbstractTabControl, IControlAcceptSomething, IControlS
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DatabaseAbstract? DatabaseOutput { get; set; }
+    public FilterCollection? FilterInput { get; set; }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; } = null;
-
-    public FilterCollection? FilterOutput { get; set; } = null;
+    public FilterCollection FilterOutput { get; } = new();
 
     public List<IControlSendSomething> Parents { get; } = new();
 
@@ -102,19 +96,10 @@ public class TabControl : AbstractTabControl, IControlAcceptSomething, IControlS
 
         base.Dispose(disposing);
         if (disposing) {
-            _bitmapOfControl?.Dispose();
-            _bitmapOfControl = null;
+            FilterInput?.Dispose();
+            FilterOutput.Dispose();
+            FilterInput = null;
         }
-    }
-
-    protected override void Dispose(bool disposing) {
-        OnDisposingEvent();
-
-        base.Dispose(disposing);
-        //if (disposing) {
-        //    _bitmapOfControl?.Dispose();
-        //    _bitmapOfControl = null;
-        //}
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {

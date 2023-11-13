@@ -140,7 +140,10 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<string> Parents { get; set; }
+    public ReadOnlyCollection<string> Parents {
+        get => _itemAccepts.GetFilterFromKeysGet();
+        set => _itemAccepts.GetFilterFromKeysSet(value, this);
+    }
 
     public string Spalten_AdminInfo {
         get {

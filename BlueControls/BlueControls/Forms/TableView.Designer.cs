@@ -903,7 +903,6 @@ namespace BlueControls.Forms {
             this.Table.DropMessages = false;
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
-            this.Table.DatabaseOutput = null;
             this.Table.ShowWaitScreen = true;
             this.Table.Size = new System.Drawing.Size(972, 531);
             this.Table.TabIndex = 0;

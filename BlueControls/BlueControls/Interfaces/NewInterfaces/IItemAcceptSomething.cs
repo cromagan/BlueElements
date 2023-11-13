@@ -222,13 +222,11 @@ public class ItemAcceptSomething {
         item.OnChanged();
     }
 
-    public string ErrorReason(IItemAcceptSomething item) {
+    public string ErrorReason(IItemAcceptSomething item) =>
         //if (item.DatabaseInput is not DatabaseAbstract db || db.IsDisposed) {
         //    return "Eingehende Datenbank unbekannt";
         //}
-
-        return string.Empty;
-    }
+        string.Empty;
 
     public ReadOnlyCollection<IItemSendSomething> GetFilterFromGet(IItemAcceptSomething item) {
         if (item.Parent == null) {

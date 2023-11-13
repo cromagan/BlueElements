@@ -36,21 +36,18 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Fields
 
-    private List<FilterItem> _internal = new();
+    private readonly List<FilterItem> _internal = new();
 
+    private DatabaseAbstract? _database;
     private List<RowItem>? _rows;
 
     #endregion
 
     #region Constructors
 
-    public FilterCollection(DatabaseAbstract? database) {
-        Database = database;
-        if (Database != null && !Database.IsDisposed) {
-            Database.DisposingEvent += Database_Disposing;
-            Database.Row.RowRemoving += Row_RowRemoving;
-        }
-    }
+    public FilterCollection() : this(null as DatabaseAbstract) { }
+
+    public FilterCollection(DatabaseAbstract? database) => Database = database;
 
     public FilterCollection(DatabaseAbstract? database, string toParse) : this(database) => this.Parse(toParse);
 
@@ -83,7 +80,25 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
-    public DatabaseAbstract? Database { get; private set; }
+    public DatabaseAbstract? Database {
+        get => _database;
+        set {
+            if (IsDisposed) { return; }
+            if (_database == value) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= Database_Disposing;
+                _database.Row.RowRemoving -= Row_RowRemoving;
+            }
+            OnChanging();
+            _database = value;
+            OnChanged();
+            if (_database != null) {
+                _database.DisposingEvent += Database_Disposing;
+                _database.Row.RowRemoving += Row_RowRemoving;
+            }
+        }
+    }
 
     public bool IsDisposed { get; private set; }
 
@@ -136,7 +151,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Methods
 
-    public new void Add(FilterItem fi) {
+    public void Add(FilterItem fi) {
         if (IsDisposed) { return; }
 
         if (fi.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
@@ -177,7 +192,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <summary>
     /// Erstellt einen Filter, der die erste Spalte als Filter hat, mit dem Wert der Zeile.
     /// </summary>
-    /// <param name="setedrow"></param>
+    /// <param name="row"></param>
     public void Add(RowItem row) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (db.Column.First() is not ColumnItem column) { return; }

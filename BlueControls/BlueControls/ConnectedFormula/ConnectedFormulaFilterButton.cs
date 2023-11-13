@@ -38,6 +38,16 @@ internal class ConnectedFormulaFilterButton : Button, IControlAcceptSomething {
 
     #endregion
 
+
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        if (disposing) {
+            FilterInput?.Dispose();
+            //FilterOutput.Dispose();
+            FilterInput = null;
+        }
+    }
+
     #region Methods
 
     public void FilterInput_Changed(object sender, System.EventArgs e) {

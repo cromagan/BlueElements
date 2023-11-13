@@ -40,7 +40,7 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     private readonly ItemAcceptSomething _itemAccepts;
     private string _anzeige = string.Empty;
-    private int _enabledwhenrows = 0;
+    private int _enabledwhenrows;
     private ExtText? _eTxt;
     private string _scriptname = string.Empty;
 

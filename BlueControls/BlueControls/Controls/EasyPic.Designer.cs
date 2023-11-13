@@ -9,23 +9,7 @@ namespace BlueControls.Controls
 {
     public partial class EasyPic 
     {
-        //Inherits Windows.Forms.UserControl
-        //UserControl überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
-        [DebuggerNonUserCode()]
-        protected override void Dispose(bool disposing)
-        {
-            try
-            {
-                if (disposing && components != null)
-                {
-                    components?.Dispose();
-                }
-            }
-            finally
-            {
-                base.Dispose(disposing);
-            }
-        }
+
         //Wird vom Windows Form-Designer benötigt.
         private IContainer components;
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.

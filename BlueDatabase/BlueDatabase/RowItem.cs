@@ -43,7 +43,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public RowCheckedEventArgs? LastCheckedEventArgs;
     public string? LastCheckedMessage;
     public List<string>? LastCheckedRowFeedback;
-    private DateTime? _isInCache = null;
+    private DateTime? _isInCache;
     private string? _tmpQuickInfo;
 
     #endregion

@@ -476,7 +476,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tblUndo.DropMessages = false;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
-            this.tblUndo.DatabaseOutput = null;
             this.tblUndo.ShowWaitScreen = true;
             this.tblUndo.Size = new System.Drawing.Size(1233, 624);
             this.tblUndo.TabIndex = 0;

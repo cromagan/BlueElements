@@ -22,6 +22,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Linq;
@@ -61,33 +62,61 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     #region Fields
 
     public static readonly int AutoFilterSize = 22;
+
     public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(40, 255, 128, 128));
+
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
+
     public static readonly int ColumnCaptionSizeY = 22;
+
     public static readonly Pen PenRed1 = new(Color.Red, 1);
+
     public static readonly int RowCaptionSizeY = 50;
+
     public FilterCollection? Filter;
+
     private readonly List<string> _collapsed = new();
+
     private readonly object _lockUserAction = new();
+
     private int _arrangementNr = 1;
+
     private AutoFilter? _autoFilter;
+
     private BlueFont _cellFont = BlueFont.DefaultFont;
+
     private BlueFont _chapterFont = BlueFont.DefaultFont;
+
     private BlueFont _columnFilterFont = BlueFont.DefaultFont;
+
     private BlueFont _columnFont = BlueFont.DefaultFont;
+
     private DateTime? _databaseDrawError;
+
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
+
     private bool _drawing;
+
     private int? _headSize;
+
     private bool _isinClick;
+
     private bool _isinDoubleClick;
+
     private bool _isinKeyDown;
+
     private bool _isinMouseDown;
+
     private bool _isinMouseEnter;
+
     private bool _isinMouseLeave;
+
     private bool _isinMouseMove;
+
     private bool _isinMouseWheel;
+
     private bool _isinSizeChanged;
+
     private bool _isinVisibleChanged;
 
     /// <summary>
@@ -96,19 +125,33 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private ColumnItem? _mouseOverColumn;
 
     private RowData? _mouseOverRow;
+
     private string _mouseOverText = string.Empty;
+
     private BlueFont _newRowFont = BlueFont.DefaultFont;
+
     private Progressbar? _pg;
+
     private int _pix16 = 16;
+
     private int _pix18 = 18;
+
     private int _rowCaptionFontY = 26;
+
     private List<RowData>? _rowsFilteredAndPinned;
+
     private SearchAndReplace? _searchAndReplace;
+
     private bool _showNumber;
+
     private RowSortDefinition? _sortDefinitionTemporary;
+
     private string _storedView = string.Empty;
+
     private Rectangle _tmpCursorRect = Rectangle.Empty;
+
     private RowItem? _unterschiede;
+
     private int _wiederHolungsSpaltenWidth;
 
     #endregion
@@ -193,6 +236,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public ColumnItem? CursorPosColumn { get; private set; }
+
     public RowData? CursorPosRow { get; private set; }
 
     /// <summary>
@@ -202,8 +246,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DatabaseAbstract? Database { get; private set; }
-
-    public DatabaseAbstract? DatabaseOutput { get => Database; set => DatabaseSet(value, string.Empty); }
 
     [DefaultValue(BlueTableAppearance.Standard)]
     public BlueTableAppearance Design {
@@ -232,14 +274,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; } = null;
+    public FilterCollection? FilterInput { get; set; }
 
-    public FilterCollection? FilterOutput { get; set; } = null;
+    public FilterCollection FilterOutput { get; } = new();
 
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
     public List<IControlSendSomething> Parents { get; } = new();
+
     public List<RowItem> PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
@@ -318,43 +361,17 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    //public FilterCollection? UserFilter {
-    //    get {
-    //        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
-    //        if (_filterUser == null) { UserFilter = new FilterCollection(Database); }
-
-    //        return _filterUser;
-    //    }
-    //    //private set {
-    //    //    if (value == null && _fc == null) { return; }
-
-    //    //    if ((value == null && _fc != null) ||
-    //    //        (_fc == null && value != null) ||
-    //    //        (value!.ToString(true) != _fc!.ToString(true))) {
-    //    //        Output
-
-    //    //        if (_fc != null) {
-    //    //            _fc.Changed -= Filter_Changed;
-    //    //        }
-
-    //    //        _fc = value;
-
-    //    //        if (_fc != null) {
-    //    //            _fc.Changed += Filter_Changed;
-    //    //        }
-
-    //    //        FilterOutput_Changed();
-    //    //        OnFilterChanged();
-    //    //    }
-    //    //}
-    //}
-
     public long VisibleRowCount { get; private set; }
 
     #endregion
 
     #region Methods
 
+    //    //        FilterOutput_Changed();
+    //    //        OnFilterChanged();
+    //    //    }
+    //    //}
+    //}
     public static int CalculateColumnContentWidth(Table table, ColumnItem column, Font cellFont, int pix16) {
         if (column.IsDisposed) { return 16; }
         if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return 16; }
@@ -391,6 +408,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return newContentWidth;
     }
 
+    //    //        if (_fc != null) {
+    //    //            _fc.Changed += Filter_Changed;
+    //    //        }
     public static Size Cell_ContentSize(Table? table, ColumnItem column, RowItem row, Font cellFont, int pix16) {
         if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return new Size(pix16, pix16); }
 
@@ -430,6 +450,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return contentSize;
     }
 
+    //    //        _fc = value;
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
             if (row != null && column != null && column.Format.CanBeCheckedByRules()) {
@@ -446,8 +467,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    //    //        if (_fc != null) {
+    //    //            _fc.Changed -= Filter_Changed;
+    //    //        }
     public static string Database_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Datenbank<br>zu erhalten:", string.Empty, FormatHolder.Text);
 
+    //    //    if ((value == null && _fc != null) ||
+    //    //        (_fc == null && value != null) ||
+    //    //        (value!.ToString(true) != _fc!.ToString(true))) {
+    //    //        Output
     public static void DoUndo(ColumnItem? column, RowItem? row) {
         if (column == null || column.IsDisposed) { return; }
         if (row == null || row.IsDisposed) { return; }
@@ -473,6 +501,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         row.Database?.Row.ExecuteValueChangedEvent(true);
     }
 
+    //        return _filterUser;
+    //    }
+    //    //private set {
+    //    //    if (value == null && _fc == null) { return; }
     public static void Draw_FormatedText(Graphics gr, string text, ColumnItem? column, Rectangle fitInRect, Design design, States state, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         if (string.IsNullOrEmpty(text)) { return; }
         var d = Skin.DesignOf(design, state);
@@ -480,6 +512,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Draw_CellTransparentDirect(gr, text, fitInRect, d.BFont, column, 16, style, bildTextverhalten, state);
     }
 
+    //public FilterCollection? UserFilter {
+    //    get {
+    //        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+    //        if (_filterUser == null) { UserFilter = new FilterCollection(Database); }
     /// <summary>
     /// Füllt die Liste rowsToExpand auf, bis sie 100 Einträge enthält.
     /// </summary>
@@ -1518,6 +1554,21 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         result.ParseableAdd("TempSort", _sortDefinitionTemporary);
         result.ParseableAdd("CursorPos", CellCollection.KeyOfCell(CursorPosColumn, CursorPosRow?.Row));
         return result.Parseable();
+    }
+
+    //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
+    [DebuggerNonUserCode()]
+    protected override void Dispose(bool disposing) {
+        try {
+            if (disposing) {
+                DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
+                FilterInput?.Dispose();
+                FilterOutput.Dispose();
+                FilterInput = null;
+            }
+        } finally {
+            base.Dispose(disposing);
+        }
     }
 
     protected override void DrawControl(Graphics gr, States state) {

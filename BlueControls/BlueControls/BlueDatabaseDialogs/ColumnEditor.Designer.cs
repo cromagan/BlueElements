@@ -1496,7 +1496,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblFilterliste.DropMessages = false;
             this.tblFilterliste.Location = new System.Drawing.Point(8, 80);
             this.tblFilterliste.Name = "tblFilterliste";
-            this.tblFilterliste.DatabaseOutput = null;
             this.tblFilterliste.ShowWaitScreen = true;
             this.tblFilterliste.Size = new System.Drawing.Size(968, 396);
             this.tblFilterliste.TabIndex = 39;

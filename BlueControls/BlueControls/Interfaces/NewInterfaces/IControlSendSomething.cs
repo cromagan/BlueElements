@@ -20,7 +20,6 @@
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueDatabase;
-using System;
 using System.Collections.Generic;
 
 namespace BlueControls.Interfaces;
@@ -30,14 +29,12 @@ public interface IControlSendSomething : IDisposableExtendedWithEvent {
     #region Properties
 
     public List<IControlAcceptSomething> Childs { get; }
-    public DatabaseAbstract? DatabaseOutput { get; set; }
 
     /// <summary>
-    /// Darf nur von DoOupuitSettings generiert werden.
+    /// Sollte von DoOuputSettings befüllt werden.
     /// </summary>
-    public FilterCollection? FilterOutput { get; set; }
+    public FilterCollection FilterOutput { get; }
 
-    //public ReadOnlyCollection<IControlSendSomething> Childs { get; }
     public string Name { get; set; }
 
     #endregion
@@ -54,11 +51,11 @@ public static class IControlSendSomethingExtension {
         parent.FilterOutput.Changing += child.FilterInput_Changing;
         parent.FilterOutput.Changed += child.FilterInput_Changed;
         parent.FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
-        child.DisposingEvent += Child_DisposingEvent;
-        parent.DisposingEvent += Parent_DisposingEvent;
+        //child.DisposingEvent += Child_DisposingEvent;
+        //parent.DisposingEvent += Parent_DisposingEvent;
     }
 
-    public static void DisconnectChildParents(IControlSendSomething parent, IControlAcceptSomething child) {
+    public static void DisconnectChildParents(this IControlSendSomething parent, IControlAcceptSomething child) {
         parent.Childs.Remove(child);
         child.Parents.Remove(parent);
 
@@ -69,30 +66,22 @@ public static class IControlSendSomethingExtension {
 
     public static void DoOutputSettings(this IControlSendSomething dest, ConnectedFormulaView parent, IItemSendSomething source) {
         dest.Name = source.DefaultItemToControlName();
-        dest.DatabaseOutput = source.DatabaseOutput;
-        dest.FilterOutput = new FilterCollection(source.DatabaseOutput);
+        dest.FilterOutput.Database = source.DatabaseOutput;
     }
-
-    private static void Child_DisposingEvent(object sender, System.EventArgs e) => throw new NotImplementedException();
 
     private static void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {
         if (sender is IControlSendSomething parent) {
             foreach (var child in parent.Childs) {
                 child.FilterInput_Changing(parent, System.EventArgs.Empty);
-                q
-                parent.FilterOutput.Changing -= child.FilterInput_Changing;
-                parent.FilterOutput.Changed -= child.FilterInput_Changed;
-                parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
-                child.DisposingEvent += Child_DisposingEvent;
-                item.DisposingEvent += Parent_DisposingEvent;
+                parent.DisconnectChildParents(child);
+                //parent.FilterOutput.Changing -= child.FilterInput_Changing;
+                //parent.FilterOutput.Changed -= child.FilterInput_Changed;
+                //parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
+                //child.DisposingEvent += Child_DisposingEvent;
+                //item.DisposingEvent += Parent_DisposingEvent;
             }
         }
     }
 
-    private static void Parent_DisposingEvent(object sender, System.EventArgs e) => 1
-
-
-#endregion
-
-throw
+    #endregion
 }

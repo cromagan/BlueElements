@@ -62,15 +62,9 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DatabaseAbstract? DatabaseOutput { get; set; }
+    public FilterCollection? FilterInput { get; set; }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; } = null;
-
-    public FilterCollection? FilterOutput { get; set; } = null;
+    public FilterCollection FilterOutput { get; } = new();
 
     public List<IControlSendSomething> Parents { get; } = new();
 
@@ -89,6 +83,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
         base.Dispose(disposing);
 
         if (disposing) {
+            FilterInput?.Dispose();
+            FilterOutput.Dispose();
             FilterInput = null;
             Tag = null;
             Childs.Clear();
@@ -105,7 +101,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     protected override void OnValueChanged() {
         base.OnValueChanged();
 
-        var fi = new FilterItem(DatabaseOutput.Column.First(), FilterType.Istgleich, Value);
+        var fi = new FilterItem(FilterOutput.Database?.Column.First(), FilterType.Istgleich, Value);
 
         FilterOutput.RemoveOtherAndAddIfNotExists(fi);
     }

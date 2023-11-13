@@ -48,7 +48,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         Database = database;
-        Database.DisposingEvent += Database_Disposing;
+        Database.DisposingEvent += Database_DisposingEvent;
     }
 
     #endregion

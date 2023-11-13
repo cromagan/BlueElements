@@ -37,7 +37,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSome
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Size = new Size(300, 300);
-        DatabaseOutput = database;
+        FilterOutput.Database = database;
 
         UpdateFilterData();
     }
@@ -47,15 +47,14 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSome
     #region Properties
 
     public List<IControlAcceptSomething> Childs { get; } = new();
-    public DatabaseAbstract? DatabaseOutput { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; } = null;
+    public FilterCollection? FilterInput { get; set; }
 
-    public FilterCollection? FilterOutput { get; set; } = null;
+    public FilterCollection FilterOutput { get; } = new();
 
     public List<IControlSendSomething> Parents { get; } = new();
 
@@ -73,6 +72,19 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSome
     internal bool WasThisValueClicked() {
         var cb = GetComboBox();
         return cb != null && cb.WasThisValueClicked();
+    }
+
+    /// <summary>
+    /// Verwendete Ressourcen bereinigen.
+    /// </summary>
+    /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
+    protected override void Dispose(bool disposing) {
+        if (disposing && (components != null)) {
+            components?.Dispose();
+            FilterInput?.Dispose();
+            FilterOutput.Dispose();
+        }
+        base.Dispose(disposing);
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {

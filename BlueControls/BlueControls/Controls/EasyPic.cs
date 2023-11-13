@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
@@ -44,8 +45,11 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     #region Fields
 
     private Bitmap? _bitmap;
+
     private string _filename = string.Empty;
+
     private string _originalText = string.Empty;
+
     private int _panelMoveDirection;
 
     #endregion
@@ -192,6 +196,22 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
         FileName = ct;
         return ct == OriginalText;
+    }
+
+    //Inherits Windows.Forms.UserControl
+    //UserControl überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+    [DebuggerNonUserCode()]
+    protected override void Dispose(bool disposing) {
+        try {
+            if (disposing && components != null) {
+                FilterInput?.Dispose();
+                //FilterOutput.Dispose();
+                FilterInput = null;
+                components?.Dispose();
+            }
+        } finally {
+            base.Dispose(disposing);
+        }
     }
 
     protected override void DrawControl(Graphics gr, States vState) {

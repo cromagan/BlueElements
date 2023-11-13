@@ -76,15 +76,13 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
     }
 
-    public DatabaseAbstract? DatabaseOutput { get; set; }
-
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
-    public FilterCollection? FilterOutput { get; set; } = null;
+    public FilterCollection FilterOutput { get; } = new();
 
     public string Page { get; } = "Head";
 
@@ -110,7 +108,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         Invalidate();
 
         FilterOutput.Clear();
-        if (FilterInput == null || DatabaseOutput != FilterInput.Database) { return; }
+        if (FilterInput == null || FilterOutput.Database != FilterInput.Database) { return; }
 
         FilterOutput.AddIfNotExists(FilterInput);
     }
@@ -197,10 +195,10 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     public void InitFormula(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database) {
         if (IsDisposed) { return; }
-        q
-                var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
 
-        if (oldf == cf && DatabaseOutput == database) { return; }
+        var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
+
+        if (oldf == cf && FilterOutput.Database == database) { return; }
 
         SuspendLayout();
 
@@ -220,15 +218,15 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
             }
         }
 
-        if (DatabaseOutput != database) {
-            if (DatabaseOutput is DatabaseAbstract db1) {
+        if (FilterOutput.Database != database) {
+            if (FilterOutput.Database is DatabaseAbstract db1) {
                 FilterOutput.Clear();
                 db1.DisposingEvent -= _Database_DisposingEvent;
             }
             InvalidateView();
-            DatabaseOutput = database;
+            FilterOutput.Database = database;
 
-            if (DatabaseOutput is DatabaseAbstract db2) {
+            if (FilterOutput.Database is DatabaseAbstract db2) {
                 db2.DisposingEvent += _Database_DisposingEvent;
             }
         }
@@ -276,7 +274,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     protected override void Dispose(bool disposing) {
         if (disposing) {
             OnDisposingEvent();
-            //SetData(null,null);
+            FilterInput?.Dispose();
+            FilterOutput.Dispose();
+            FilterInput = null;
             InitFormula(null, null);
         }
 
