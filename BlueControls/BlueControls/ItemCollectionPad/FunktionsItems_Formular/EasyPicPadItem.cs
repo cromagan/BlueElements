@@ -71,23 +71,19 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
         }
     }
 
+    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public DatabaseAbstract? DatabaseInputMustBe => null;
     public override string Description => "Dieses Element erzeugt eine Bild-Steuerelement,\r\nwelches dann auch bearbeitet werden kann.";
+
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
+    public override bool MustBeInDrawingArea => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<string> GetFilterFrom { get; set; }
+    public ReadOnlyCollection<string> Parents { get; set; }
 
-    public IItemSendSomething? GetRowFrom {
-        get => _itemAccepts.GetRowFromGet(this);
-        set => _itemAccepts.GetRowFromSet(value, this);
-    }
-
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
-    public DatabaseAbstract? InputDatabaseMustBe => null;
-    public override bool MustBeInDrawingArea => true;
     public bool WaitForDatabase => false;
     protected override int SaveOrder => 4;
 
@@ -151,8 +147,8 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
     public override string ReadableText() {
         var txt = "Bild: ";
 
-        if (this.IsOk() && InputDatabase != null) {
-            return txt + InputDatabase.Caption;
+        if (this.IsOk() && DatabaseInput != null) {
+            return txt + DatabaseInput.Caption;
         }
 
         return txt + ErrorReason();

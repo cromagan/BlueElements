@@ -34,6 +34,7 @@ using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueDatabase.DatabaseAbstract;
+using static BlueBasics.Extensions;
 
 namespace BlueDatabase;
 
@@ -133,7 +134,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
 
         Database = database;
-        Database.Disposing += Database_Disposing;
+        Database.DisposingEvent += Database_Disposing;
 
         var ex = database.Column.Exists(name);
         if (ex != null) {
@@ -832,7 +833,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     //    Database = database;
-    //    Database.Disposing += Database_Disposing;
+    //    Database.DisposingEvent += Database_Disposing;
     //    if (columnkey < 0) {
     //        Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey < 0");
     //    }
@@ -1906,7 +1907,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         double summ = 0;
         foreach (var thisrow in db.Row) {
-            if (thisrow != null && thisrow.MatchesTo(fc)) {
+            if (thisrow != null && thisrow.MatchesTo(fc.ToList())) {
                 if (!thisrow.CellIsNullOrEmpty(this)) {
                     if (!thisrow.CellGetString(this).IsDouble()) { return null; }
                     summ += thisrow.CellGetDouble(this);
@@ -2170,7 +2171,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     internal void Invalidate_LinkedDatabase() {
         if (_linkedDatabase != null) {
             _linkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
-            _linkedDatabase.Disposing -= _TMP_LinkedDatabase_Disposing;
+            _linkedDatabase.DisposingEvent -= _TMP_LinkedDatabase_Disposing;
             _linkedDatabase = null;
         }
     }
@@ -2558,7 +2559,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+            if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
             Invalidate_LinkedDatabase();
             Database = null;
 
@@ -2603,7 +2604,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (_linkedDatabase != null) {
             _linkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
-            _linkedDatabase.Disposing += _TMP_LinkedDatabase_Disposing;
+            _linkedDatabase.DisposingEvent += _TMP_LinkedDatabase_Disposing;
         }
     }
 

@@ -58,7 +58,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         _itemAccepts = new();
         _itemSends = new();
 
-        OutputDatabase = db;
+        DatabaseOutput = db;
     }
 
     public DropDownSelectRowPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
@@ -99,14 +99,10 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen eine per Dropdownmenu zu wählen.\r\n\r\nFalls die Filterung nur eine Zeile ergibt, wird diese automatisch gewählt.";
 
-    public ReadOnlyCollection<string> GetFilterFrom {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
-    }
-
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
-    public DatabaseAbstract? InputDatabaseMustBe => OutputDatabase;
+    public DatabaseAbstract? DatabaseInputMustBe => DatabaseOutput;
+
     public override bool MustBeInDrawingArea => true;
 
     public int OutputColorId {
@@ -114,9 +110,14 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         set => _itemSends.OutputColorIdSet(value, this);
     }
 
-    public DatabaseAbstract? OutputDatabase {
-        get => _itemSends.OutputDatabaseGet();
-        set => _itemSends.OutputDatabaseSet(value, this);
+    public DatabaseAbstract? DatabaseOutput {
+        get => _itemSends.DatabaseOutputGet();
+        set => _itemSends.DatabaseOutputSet(value, this);
+    }
+
+    public ReadOnlyCollection<string> Parents {
+        get => _itemAccepts.GetFilterFromKeysGet();
+        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public string Überschrift {
@@ -141,7 +142,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControlRowSelector(OutputDatabase, _überschrift, _anzeige) {
+        var con = new FlexiControlRowSelector(DatabaseOutput, _überschrift, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition
         };
@@ -222,8 +223,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     public override string ReadableText() {
         var txt = "Zeilenauswahl: ";
 
-        if (this.IsOk() && OutputDatabase != null) {
-            return txt + OutputDatabase.Caption;
+        if (this.IsOk() && DatabaseOutput != null) {
+            return txt + DatabaseOutput.Caption;
         }
 
         return txt + ErrorReason();

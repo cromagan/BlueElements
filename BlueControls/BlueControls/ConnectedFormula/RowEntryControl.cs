@@ -19,72 +19,48 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using BlueBasics;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class RowEntryControl : GenericControl, IControlAcceptSomething, IControlSendSomething, IControlRowInput {
-
-    #region Fields
-
-    private readonly List<IControlAcceptSomething> _childs = new();
-
-    #endregion
+internal class RowEntryControl : GenericControl, IControlAcceptSomething, IControlSendSomething {
 
     #region Constructors
 
-    public RowEntryControl(DatabaseAbstract? database) : base() => OutputDatabase = database;
+    public RowEntryControl(DatabaseAbstract? database) : base() => DatabaseOutput = database;
 
     #endregion
 
     #region Properties
 
-    public FilterCollection? Filter { get; }
+    public List<IControlAcceptSomething> Childs { get; } = new();
+    public DatabaseAbstract? DatabaseOutput { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> GetFilterFrom { get; } = new();
+    public FilterCollection? FilterInput { get; set; } = null;
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? InputFilter { get; set; } = null;
-
-    public DatabaseAbstract? OutputDatabase { get; set; }
+    public FilterCollection? FilterOutput { get; set; } = null;
+    public List<IControlSendSomething> Parents { get; } = new();
 
     #endregion
 
     #region Methods
 
-    public void ChildAdd(IControlAcceptSomething c) {
-        if (IsDisposed) { return; }
-        _childs.AddIfNotExists(c);
-        this.DoChilds(_childs);
-    }
-
-    public void ParentDataChanged() {
-        InputFilter = this.FilterOfSender();
+    public void FilterInput_Changed(object sender, System.EventArgs e) {
+        FilterInput = this.FilterOfSender();
         Invalidate();
 
-        var row = InputFilter?.RowSingleOrNull;
+        FilterOutput.Clear();
+        if (FilterInput == null || DatabaseOutput != FilterInput.Database) { return; }
 
-        if (OutputDatabase != InputFilter?.Database) {
-            return;
-        }
-
-        var r = OutputDatabase?.Row.SearchByKey(rowkey);
-        if (r == LastInputRow) { return; }
-
-        LastInputRow = r;
-        this.DoChilds(_childs, LastInputRow);
+        FilterOutput.AddIfNotExists(FilterInput);
     }
 
-    public void ParentDataChanging() { }
+    public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
     #endregion
 }

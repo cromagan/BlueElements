@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -28,19 +29,16 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
-using BlueDatabase.EventArgs;
-using BlueDatabase.Interfaces;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHasDatabase {
+public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IControlAcceptSomething, IControlSendSomething {
 
     #region Fields
 
     private bool _generated;
-    private RowItem? _tmpShowingRow;
 
     #endregion
 
@@ -51,12 +49,20 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
     public ConnectedFormulaView(string page) {
         InitializeComponent();
         Page = page;
-        SetData(null, null, string.Empty);
+        InitFormula(null, null);
     }
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? DisposingEvent;
+
+    #endregion
+
     #region Properties
+
+    public List<IControlAcceptSomething> Childs { get; } = new();
 
     public ConnectedFormula.ConnectedFormula? ConnectedFormula {
         get; private set;
@@ -70,16 +76,19 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         }
     }
 
+    public DatabaseAbstract? DatabaseOutput { get; set; }
+
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DatabaseAbstract? Database { get; private set; }
+    public FilterCollection? FilterInput { get; set; }
+
+    public FilterCollection? FilterOutput { get; set; } = null;
 
     public string Page { get; } = "Head";
 
-    [DefaultValue("")]
-    public string RowKey { get; private set; } = string.Empty;
+    public List<IControlSendSomething> Parents { get; } = new();
 
     //set => SetData(ConnectedFormula, Database, value, Page);
     [Browsable(false)]
@@ -88,13 +97,25 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
     public RowItem? ShowingRow {
         get {
             if (IsDisposed) { return null; }
-            return _tmpShowingRow;
+            return FilterOutput.RowSingleOrNull;
         }
     }
 
     #endregion
 
     #region Methods
+
+    public void FilterInput_Changed(object sender, System.EventArgs e) {
+        FilterInput = this.FilterOfSender();
+        Invalidate();
+
+        FilterOutput.Clear();
+        if (FilterInput == null || DatabaseOutput != FilterInput.Database) { return; }
+
+        FilterOutput.AddIfNotExists(FilterInput);
+    }
+
+    public void FilterInput_Changing(object sender, System.EventArgs e) => throw new NotImplementedException();
 
     public void GenerateView() {
         if (_generated) { return; }
@@ -160,13 +181,10 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         if (database != null && !database.IsDisposed) {
             var f = database.FormulaFileName();
 
-            var rk = RowKey;
-            if (Database != database) { rk = string.Empty; }
-
             if (f != null) {
                 var tmpFormula = GetByFilename(f);
                 if (tmpFormula != ConnectedFormula) {
-                    SetData(tmpFormula, database, rk);
+                    InitFormula(tmpFormula, database);
                 }
                 return;
             }
@@ -175,10 +193,58 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         ConnectedFormula = null;
     }
 
+    public void InitFormula(DatabaseAbstract? database) => InitFormula(ConnectedFormula, database);
+
+    public void InitFormula(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database) {
+        if (IsDisposed) { return; }
+        q
+                var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
+
+        if (oldf == cf && DatabaseOutput == database) { return; }
+
+        SuspendLayout();
+
+        if (oldf != cf) {
+            if (oldf != null) {
+                FilterOutput.Clear();
+                oldf.Loaded -= _cf_Loaded;
+                oldf.Changed -= _cf_Changed;
+            }
+
+            InvalidateView();
+            ConnectedFormula = cf;
+
+            if (cf != null) {
+                cf.Loaded += _cf_Loaded;
+                cf.Changed += _cf_Changed;
+            }
+        }
+
+        if (DatabaseOutput != database) {
+            if (DatabaseOutput is DatabaseAbstract db1) {
+                FilterOutput.Clear();
+                db1.DisposingEvent -= _Database_DisposingEvent;
+            }
+            InvalidateView();
+            DatabaseOutput = database;
+
+            if (DatabaseOutput is DatabaseAbstract db2) {
+                db2.DisposingEvent += _Database_DisposingEvent;
+            }
+        }
+
+        FilterOutput.Clear();
+
+        ResumeLayout();
+        Invalidate();
+    }
+
     public void InvalidateView() {
         _generated = false;
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
+
+    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     public Control? SearchOrGenerate(IItemToControl? thisit) {
         if (thisit == null) { return null; }
@@ -197,66 +263,33 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         return c;
     }
 
-    public void SetData(DatabaseAbstract? database, string rowKey) => SetData(ConnectedFormula, database, rowKey ?? string.Empty);
+    public void SetToRow(RowItem? row) {
+        FilterOutput.Clear();
+        if (row == null) { return; }
+        FilterOutput.Add(row);
+    }
 
-    public void SetData(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database, string rowKey) {
-        if (IsDisposed) { return; }
-
-        var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
-
-        if (oldf == cf &&
-            Database == database &&
-            RowKey == rowKey) { return; }
-
-        SuspendLayout();
-
-        if (oldf != cf) {
-            if (oldf != null) {
-                RemoveRow();
-                oldf.Loaded -= _cf_Loaded;
-                oldf.Changed -= _cf_Changed;
-            }
-
-            InvalidateView();
-            ConnectedFormula = cf;
-
-            if (cf != null) {
-                cf.Loaded += _cf_Loaded;
-                cf.Changed += _cf_Changed;
-            }
+    /// <summary>
+    /// Verwendete Ressourcen bereinigen.
+    /// </summary>
+    /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            OnDisposingEvent();
+            //SetData(null,null);
+            InitFormula(null, null);
         }
 
-        if (Database != database) {
-            if (Database is DatabaseAbstract db1) {
-                RemoveRow();
-                db1.Disposing -= _Database_Disposing;
-                db1.Row.RowRemoving -= Row_RowRemoving;
-            }
-            InvalidateView();
-            Database = database;
-
-            if (Database is DatabaseAbstract db2) {
-                db2.Disposing += _Database_Disposing;
-                db2.Row.RowRemoving += Row_RowRemoving;
-            }
+        if (disposing && (components != null)) {
+            InitFormula(null, null);
+            components?.Dispose();
         }
-
-        if (!string.IsNullOrEmpty(rowKey) && Database != null && cf != null) {
-            RowKey = rowKey;
-            _tmpShowingRow = Database?.Row.SearchByKey(RowKey);
-            SetInputRow();
-        } else {
-            RemoveRow();
-        }
-
-        ResumeLayout();
-        Invalidate();
+        base.Dispose(disposing);
     }
 
     protected override void DrawControl(Graphics gr, States state) {
         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
         GenerateView();
-        SetInputRow();
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
@@ -267,50 +300,11 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IHa
         InvalidateView();
     }
 
-    protected override void OnVisibleChanged(System.EventArgs e) {
-        base.OnVisibleChanged(e);
-        SetInputRow();
-    }
-
     private void _cf_Changed(object sender, System.EventArgs e) => InvalidateView();
 
     private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
 
-    private void _Database_Disposing(object sender, System.EventArgs e) => SetData(null, string.Empty);
-
-    private void RemoveRow() {
-        RowKey = string.Empty;
-        _tmpShowingRow = null;
-        if (_generated) { SetInputRow(); }
-    }
-
-    private void Row_RowRemoving(object sender, RowReasonEventArgs e) {
-        if (e.Row != null && RowKey == e.Row.KeyName) {
-            SetData(ConnectedFormula, Database, string.Empty);
-        }
-    }
-
-    private void SetInputRow() {
-        if (IsDisposed) { return; }
-
-        GenerateView();
-        if (!_generated) { return; }
-
-        if (ConnectedFormula == null || ConnectedFormula.PadData == null) { return; }
-
-        foreach (var thisIt in ConnectedFormula.PadData) {
-            if (thisIt is IItemRowInput ripi && ripi.IsVisibleOnPage(Page)) {
-                var c = SearchOrGenerate(ripi);
-                if (c is IControlRowInput fcfc) {
-                    fcfc.SetData(Database, RowKey);
-                }
-            }
-        }
-
-        if (Database?.Row.SearchByKey(RowKey) is RowItem r) {
-            r.CheckRowDataIfNeeded();
-        }
-    }
+    private void _Database_DisposingEvent(object sender, System.EventArgs e) => InitFormula(null, null);
 
     #endregion
 }

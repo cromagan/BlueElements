@@ -17,31 +17,28 @@
 
 #nullable enable
 
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueDatabase;
+using System;
 using System.Collections.Generic;
 
 namespace BlueControls.Interfaces;
 
-public interface IControlSendSomething {
+public interface IControlSendSomething : IDisposableExtendedWithEvent {
 
     #region Properties
 
+    public List<IControlAcceptSomething> Childs { get; }
+    public DatabaseAbstract? DatabaseOutput { get; set; }
+
     /// <summary>
-    /// Diese Routine muss bei einer Änderng DoChilds auslösen
+    /// Darf nur von DoOupuitSettings generiert werden.
     /// </summary>
-    public FilterCollection? Filter { get; }
+    public FilterCollection? FilterOutput { get; set; }
 
     //public ReadOnlyCollection<IControlSendSomething> Childs { get; }
     public string Name { get; set; }
-
-    public DatabaseAbstract? OutputDatabase { get; set; }
-
-    #endregion
-
-    #region Methods
-
-    public void ChildAdd(IControlAcceptSomething c);
 
     #endregion
 }
@@ -50,36 +47,52 @@ public static class IControlSendSomethingExtension {
 
     #region Methods
 
-    public static void DoChilds(this IControlSendSomething item, List<IControlAcceptSomething> childs) {
-        //var r = db?.Row.SearchByKey(rowkey);
-        //r?.CheckRowDataIfNeeded();
+    public static void ConnectChildParents(this IControlSendSomething parent, IControlAcceptSomething child) {
+        parent.Childs.Add(child);
+        child.Parents.Add(parent);
 
-        foreach (var thischild in childs) {
-            thischild.ParentDataChanging();
-            thischild.ParentDataChanged();
-            //var did = false;
+        parent.FilterOutput.Changing += child.FilterInput_Changing;
+        parent.FilterOutput.Changed += child.FilterInput_Changed;
+        parent.FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
+        child.DisposingEvent += Child_DisposingEvent;
+        parent.DisposingEvent += Parent_DisposingEvent;
+    }
 
-            //if (!did && thischild is ICalculateRows fcfc) {
-            //    fcfc.Invalidate_FilteredRows();
-            //    did = true;
-            //}
+    public static void DisconnectChildParents(IControlSendSomething parent, IControlAcceptSomething child) {
+        parent.Childs.Remove(child);
+        child.Parents.Remove(parent);
 
-            //if (thischild is IDisabledReason id) {
-            //    if (!did) {
-            //        id.DeleteValue();
-            //        id.DisabledReason = "Keine Befüllmethode bekannt.";
-            //        did = true;
-            //    }
-            //}
-
-            //if (!did) { Develop.DebugPrint(FehlerArt.Warnung, "Typ unbekannt"); }
-        }
+        parent.FilterOutput.Changing -= child.FilterInput_Changing;
+        parent.FilterOutput.Changed -= child.FilterInput_Changed;
+        parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
     }
 
     public static void DoOutputSettings(this IControlSendSomething dest, ConnectedFormulaView parent, IItemSendSomething source) {
         dest.Name = source.DefaultItemToControlName();
-        dest.OutputDatabase = source.OutputDatabase;
+        dest.DatabaseOutput = source.DatabaseOutput;
+        dest.FilterOutput = new FilterCollection(source.DatabaseOutput);
     }
 
-    #endregion
+    private static void Child_DisposingEvent(object sender, System.EventArgs e) => throw new NotImplementedException();
+
+    private static void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {
+        if (sender is IControlSendSomething parent) {
+            foreach (var child in parent.Childs) {
+                child.FilterInput_Changing(parent, System.EventArgs.Empty);
+                q
+                parent.FilterOutput.Changing -= child.FilterInput_Changing;
+                parent.FilterOutput.Changed -= child.FilterInput_Changed;
+                parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
+                child.DisposingEvent += Child_DisposingEvent;
+                item.DisposingEvent += Parent_DisposingEvent;
+            }
+        }
+    }
+
+    private static void Parent_DisposingEvent(object sender, System.EventArgs e) => 1
+
+
+#endregion
+
+throw
 }

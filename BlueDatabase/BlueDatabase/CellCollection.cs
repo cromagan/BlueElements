@@ -45,7 +45,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public CellCollection(DatabaseAbstract database) : base() {
         Database = database;
-        Database.Disposing += _database_Disposing;
+        Database.DisposingEvent += _database_Disposing;
         //       Cell = New Dictionary(Of String, CellItem)
         Initialize();
     }
@@ -999,7 +999,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            if (Database != null) { Database.Disposing -= _database_Disposing; }
+            if (Database != null) { Database.DisposingEvent -= _database_Disposing; }
             Database = null;
             Clear();
             IsDisposed = true;

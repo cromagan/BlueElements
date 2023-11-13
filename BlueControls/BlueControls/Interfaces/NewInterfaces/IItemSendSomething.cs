@@ -34,10 +34,8 @@ public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangin
     #region Properties
 
     public ReadOnlyCollection<string> ChildIds { get; set; }
+    public DatabaseAbstract? DatabaseOutput { get; set; }
     int OutputColorId { get; set; }
-
-    public DatabaseAbstract? OutputDatabase { get; set; }
-
     public string Page { get; }
 
     public ItemCollectionPad.ItemCollectionPad? Parent { get; }
@@ -62,7 +60,7 @@ public static class ItemSendSomethingExtension {
     #region Methods
 
     public static void Datenbankkopf(this IItemSendSomething item) {
-        if (item.OutputDatabase is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (item.DatabaseOutput is not DatabaseAbstract db || db.IsDisposed) { return; }
         TableView.OpenDatabaseHeadEditor(db);
     }
 
@@ -91,9 +89,8 @@ public class ItemSendSomething {
 
     private readonly List<string> _childIds = new();
 
+    private DatabaseAbstract? _databaseOutput;
     private int _outputColorId = -1;
-
-    private DatabaseAbstract? _outputDatabase;
 
     #endregion
 
@@ -121,6 +118,19 @@ public class ItemSendSomething {
         item.OnChanged();
     }
 
+    public DatabaseAbstract? DatabaseOutputGet() => _databaseOutput;
+
+    public void DatabaseOutputSet(DatabaseAbstract? value, IItemSendSomething item) {
+        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
+        if (value == _databaseOutput) { return; }
+
+        _databaseOutput = value;
+        item.RaiseVersion();
+        item.DoChilds();
+        item.OnChanged();
+        item.UpdateSideOptionMenu();
+    }
+
     public void DoCreativePadAddedToCollection(IItemSendSomething item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (item.Parent != null) {
@@ -129,6 +139,19 @@ public class ItemSendSomething {
         }
         item.DoChilds();
         item.OnChanged();
+    }
+
+    public List<GenericControl> GetStyleOptions(IItemSendSomething item, int widthOfControl) {
+        var l = new List<GenericControl>();
+        l.Add(new FlexiControl("Ausgang:", widthOfControl));
+
+        //l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
+
+        if (item.DatabaseOutput is not DatabaseAbstract db || db.IsDisposed) { return l; }
+
+        l.Add(new FlexiControlForDelegate(item.Datenbankkopf, "Datenbank: '" + db.Caption + "'", ImageCode.Stift));
+
+        return l;
     }
 
     public int OutputColorIdGet() => _outputColorId;
@@ -141,23 +164,10 @@ public class ItemSendSomething {
         item.OnChanged();
     }
 
-    public DatabaseAbstract? OutputDatabaseGet() => _outputDatabase;
-
-    public void OutputDatabaseSet(DatabaseAbstract? value, IItemSendSomething item) {
-        if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
-        if (value == _outputDatabase) { return; }
-
-        _outputDatabase = value;
-        item.RaiseVersion();
-        item.DoChilds();
-        item.OnChanged();
-        item.UpdateSideOptionMenu();
-    }
-
     public virtual List<string> ParsableTags() {
         List<string> result = new();
 
-        result.ParseableAdd("OutputDatabase", _outputDatabase);
+        result.ParseableAdd("OutputDatabase", _databaseOutput);
 
         result.ParseableAdd("SentToChildIds", _childIds);
 
@@ -176,7 +186,7 @@ public class ItemSendSomething {
                     na = na.FilePath() + MakeValidTableName(na.FileNameWithoutSuffix()) + "." + na.FileSuffix();
                 }
 
-                _outputDatabase = GetById(new ConnectionInfo(na, null, string.Empty), false, null, true);
+                _databaseOutput = GetById(new ConnectionInfo(na, null, string.Empty), false, null, true);
                 return true;
 
             case "senttochildids":
@@ -202,25 +212,12 @@ public class ItemSendSomething {
     }
 
     internal string ErrorReason(IItemSendSomething item) {
-        var d = item.OutputDatabase;
+        var d = item.DatabaseOutput;
         if (d == null || d.IsDisposed) {
             return "Ausgehende Datenbank nicht angegeben.";
         }
 
         return string.Empty;
-    }
-
-    protected List<GenericControl> GetStyleOptions(IItemSendSomething item, int widthOfControl) {
-        var l = new List<GenericControl>();
-        l.Add(new FlexiControl("Ausgang:", widthOfControl));
-
-        //l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
-
-        if (item.OutputDatabase is not DatabaseAbstract db || db.IsDisposed) { return l; }
-
-        l.Add(new FlexiControlForDelegate(item.Datenbankkopf, "Datenbank: '" + db.Caption + "'", ImageCode.Stift));
-
-        return l;
     }
 
     #endregion

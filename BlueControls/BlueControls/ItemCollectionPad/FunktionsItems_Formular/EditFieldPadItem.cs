@@ -96,7 +96,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public ColumnItem? Column {
         get {
-            _column ??= GetRowFrom?.OutputDatabase?.Column.Exists(_columnName);
+            _column ??= DatabaseInput?.Column.Exists(_columnName);
 
             return _column;
         }
@@ -110,6 +110,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
     }
 
+    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public DatabaseAbstract? DatabaseInputMustBe => null;
     public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
 
     public EditTypeFormula EditType {
@@ -123,21 +125,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
     }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<string> GetFilterFrom { get; set; }
-
-    public IItemSendSomething? GetRowFrom {
-        get => _itemAccepts.GetRowFromGet(this);
-        set => _itemAccepts.GetRowFromSet(value, this);
-    }
-
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
-
-    public DatabaseAbstract? InputDatabaseMustBe => null;
 
     public string Interner_Name {
         get {
@@ -147,6 +135,12 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public override bool MustBeInDrawingArea => true;
+
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ReadOnlyCollection<string> Parents { get; set; }
 
     public string Spalten_AdminInfo {
         get {
@@ -195,7 +189,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         //var ff = parent.SearchOrGenerate(rfw2);
 
         var con = new FlexiControlForCell();
-        con.SetData(Column?.Database, string.Empty);
         con.ColumnName = Column?.KeyName ?? string.Empty;
         con.EditType = EditType;
         con.CaptionPosition = CaptionPosition;
@@ -203,20 +196,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         con.DoInputSettings(parent, this);
         //con.DoOutputSettings(this);
         return con;
-
-        //var cy = new FlexiControl();
-        //if (Column  ==null || Column .IsDisposed) {
-        //    cy.Caption = "?Kein Bezug?:";
-        //} else {
-        //    cy.Caption = Column.ReadableText() + ":";
-        //}
-
-        //cy.EditType = EditType;
-        //cy.CaptionPosition = CaptionPosition;
-        //cy.DisabledReason = "Keine Verknüpfung vorhanden.";
-        //cy.Tag = KeyName;
-        ////cy.Name = DefaultItemToControlName();
-        //return cy;
     }
 
     public override string ErrorReason() {
@@ -241,7 +220,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
-        if (InputDatabase is not DatabaseAbstract db || db.IsDisposed) { return l; }
+        if (DatabaseInput is not DatabaseAbstract db || db.IsDisposed) { return l; }
 
         l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
 
@@ -318,12 +297,12 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public void Spalte_wählen() {
         if (IsDisposed) { return; }
 
-        if (GetRowFrom == null) {
-            MessageBox.Show("Zuerst Datenquelle wählen.");
-            return;
-        }
+        //if (DatabaseInput ? == null) {
+        //    MessageBox.Show("Zuerst Datenquelle wählen.");
+        //    return;
+        //}
 
-        if (GetRowFrom.OutputDatabase is not DatabaseAbstract db || db.IsDisposed) {
+        if (DatabaseInput is not DatabaseAbstract db || db.IsDisposed) {
             MessageBox.Show("Quelle fehlerhaft!");
             return;
         }

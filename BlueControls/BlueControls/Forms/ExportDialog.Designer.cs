@@ -184,7 +184,6 @@ namespace BlueControls.Forms
             this.Tabs.Controls.Add(this.tabBildSchachteln);
             this.Tabs.Controls.Add(this.tabDateiExport);
             this.Tabs.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Tabs.GetRowFrom = null;
             this.Tabs.HotTrack = true;
             this.Tabs.Location = new System.Drawing.Point(0, 0);
             this.Tabs.Name = "Tabs";

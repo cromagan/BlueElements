@@ -88,13 +88,11 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    public List<IControlSendSomething> GetFilterFrom { get; } = new();
-
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? InputFilter { get; set; }
+    public FilterCollection? FilterInput { get; set; }
 
     public string OriginalText {
         get => _originalText;
@@ -103,6 +101,8 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
             ZoomFitInvalidateAndCheckButtons();
         }
     }
+
+    public List<IControlSendSomething> Parents { get; } = new();
 
     [DefaultValue(0)]
     public new int TabIndex {
@@ -159,6 +159,17 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         return false;
     }
 
+    public void FilterInput_Changed(object sender, System.EventArgs e) {
+        FilterInput = this.FilterOfSender();
+        Invalidate();
+
+        var row = FilterInput?.RowSingleOrNull;
+        row?.CheckRowDataIfNeeded();
+        ParseVariables(row?.LastCheckedEventArgs?.Variables);
+    }
+
+    public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         hotItem = null;
         if (_bitmap != null) {
@@ -169,17 +180,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
-    public void ParentDataChanged() {
-        InputFilter = this.FilterOfSender();
-        Invalidate();
-
-        var row = InputFilter?.RowSingleOrNull;
-        row?.CheckRowDataIfNeeded();
-        ParseVariables(row?.LastCheckedEventArgs?.Variables);
-    }
-
-    public void ParentDataChanging() { }
 
     public bool ParseVariables(VariableCollection? list) {
         if (IsDisposed) { return false; }

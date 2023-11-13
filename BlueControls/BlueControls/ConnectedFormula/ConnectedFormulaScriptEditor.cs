@@ -43,7 +43,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
         grpEigenschaften.Enabled = false;
         eventScriptEditor.Enabled = false;
         Formula = formula;
-        //Formula.Disposing += Database_Disposing;
+        //Formula.DisposingEvent += Database_DisposingEvent;
 
         FormManager.Current.RegisterForm(this);
     }

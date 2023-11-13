@@ -17,29 +17,26 @@
 
 #nullable enable
 
-using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueDatabase;
 using System.Collections.Generic;
 
 namespace BlueControls.Interfaces;
 
-public interface IControlAcceptSomething {
+public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
 
     #region Properties
 
     /// <summary>
-    /// Führender Wert. Wird von den Parents e
-    /// </summary>
-    public List<IControlSendSomething> GetFilterFrom { get; }
-
-    /// <summary>
     /// Ein Wert, der bei ParentDataChanged berechnet werden sollte.
-    /// Enthält die InputDatabase und auch den berechnete Zeile.
+    /// Enthält die DatabaseInput und auch den berechnete Zeile.
     /// </summary>
-    public FilterCollection? InputFilter { get; set; }
+    public FilterCollection? FilterInput { get; set; }
 
     public string Name { get; set; }
+
+    public List<IControlSendSomething> Parents { get; }
 
     #endregion
 
@@ -50,13 +47,13 @@ public interface IControlAcceptSomething {
     /// Hier können die neuen temporären Daten berechnet werden und sollten auch angezeigt werden und ein Invalidate gesetzt werden
     /// Events können gekoppelt werden
     /// </summary>
-    public void ParentDataChanged();
+    public void FilterInput_Changed(object sender, System.EventArgs e);
 
     /// <summary>
     /// Wird ausgelöst, bevor eine relevante Änderung an den Daten erfolgt.
     /// Hier können Daten, die angezeigt werden, zurückgeschrieben werden. Events entkoppelt werden
     /// </summary>
-    public void ParentDataChanging();
+    public void FilterInput_Changing(object sender, System.EventArgs e);
 
     #endregion
 }
@@ -74,31 +71,26 @@ public static class IControlAcceptSomethingExtension {
     public static void DoInputSettings(this IControlAcceptSomething dest, ConnectedFormulaView parent, IItemAcceptSomething source) {
         dest.Name = source.DefaultItemToControlName();
 
-        dest.ParentDataChanging();
-
-        foreach (var thisKey in source.GetFilterFrom) {
+        foreach (var thisKey in source.Parents) {
             var it = source.Parent?[thisKey];
 
             if (it is IItemToControl itc) {
                 var ff = parent.SearchOrGenerate(itc);
 
                 if (ff is IControlSendSomething ffx) {
-                    dest.GetFilterFrom.AddIfNotExists(ffx);
-                    ffx.ChildAdd(dest);
+                    ffx.ConnectChildParents(dest);
                 }
             }
         }
-
-        dest.ParentDataChanged();
     }
 
     public static FilterCollection? FilterOfSender(this IControlAcceptSomething item) {
-        if (item.InputFilter?.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        if (item.FilterInput?.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
 
         FilterCollection? fc = null;
 
-        foreach (var thiss in item.GetFilterFrom) {
-            if (thiss.Filter is FilterCollection fi) {
+        foreach (var thiss in item.Parents) {
+            if (thiss.FilterOutput is FilterCollection fi) {
                 if (fc == null) { fc = new FilterCollection(fi.Database); }
                 fc.AddIfNotExists(fi);
             }

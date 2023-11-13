@@ -861,7 +861,6 @@ namespace BlueControls.Forms {
             // tbcDatabaseSelector
             // 
             this.tbcDatabaseSelector.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbcDatabaseSelector.GetRowFrom = null;
             this.tbcDatabaseSelector.HotTrack = true;
             this.tbcDatabaseSelector.Location = new System.Drawing.Point(0, 0);
             this.tbcDatabaseSelector.Name = "tbcDatabaseSelector";
@@ -904,7 +903,7 @@ namespace BlueControls.Forms {
             this.Table.DropMessages = false;
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
-            this.Table.OutputDatabase = null;
+            this.Table.DatabaseOutput = null;
             this.Table.ShowWaitScreen = true;
             this.Table.Size = new System.Drawing.Size(972, 531);
             this.Table.TabIndex = 0;
@@ -943,7 +942,6 @@ namespace BlueControls.Forms {
             // 
             this.tbcSidebar.Controls.Add(this.tabFormula);
             this.tbcSidebar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tbcSidebar.GetRowFrom = null;
             this.tbcSidebar.HotTrack = true;
             this.tbcSidebar.Location = new System.Drawing.Point(0, 0);
             this.tbcSidebar.Name = "tbcSidebar";

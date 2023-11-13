@@ -55,7 +55,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         _itemAccepts = new();
         _itemSends = new();
 
-        OutputDatabase = db;
+        DatabaseOutput = db;
     }
 
     public TableSelectRowPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
@@ -72,17 +72,18 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public override string Description => "Darstellung einer Datenbank.\r\nKann Vorfilter empfangen und eine Zeile weitergeben.";
+    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public DatabaseAbstract? DatabaseInputMustBe => DatabaseOutput;
 
-    public ReadOnlyCollection<string> GetFilterFrom {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
+    public DatabaseAbstract? DatabaseOutput {
+        get => _itemSends.DatabaseOutputGet();
+        set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public override string Description => "Darstellung einer Datenbank.\r\nKann Vorfilter empfangen und eine Zeile weitergeben.";
 
-    public DatabaseAbstract? InputDatabaseMustBe => OutputDatabase;
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
+
     public override bool MustBeInDrawingArea => true;
 
     public int OutputColorId {
@@ -90,9 +91,9 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         set => _itemSends.OutputColorIdSet(value, this);
     }
 
-    public DatabaseAbstract? OutputDatabase {
-        get => _itemSends.OutputDatabaseGet();
-        set => _itemSends.OutputDatabaseSet(value, this);
+    public ReadOnlyCollection<string> Parents {
+        get => _itemAccepts.GetFilterFromKeysGet();
+        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public bool WaitForDatabase => true;
@@ -136,6 +137,12 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         return l;
     }
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        _itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
+    }
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         if (_itemSends.ParseThis(tag, value)) { return true; }
@@ -151,8 +158,8 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     public override string ReadableText() {
         var txt = "Tabellenansicht: ";
 
-        if (this.IsOk() && OutputDatabase != null) {
-            return txt + OutputDatabase.Caption;
+        if (this.IsOk() && DatabaseOutput != null) {
+            return txt + DatabaseOutput.Caption;
         }
 
         return txt + ErrorReason();
@@ -191,12 +198,6 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        _itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

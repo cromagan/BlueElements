@@ -50,7 +50,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         _itemAccepts = new();
         _itemSends = new();
 
-        OutputDatabase = db;
+        DatabaseOutput = db;
     }
 
     public ScriptChangeFilterPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
@@ -66,17 +66,18 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public override string Description => "Dieses Element kann Filter empfangen, und per Skript einen komplett anderen Filter ausgeben.\r\nWird verwendet, wenn z.b. Zwei Werte gefiltert werden, aber in Wirklichkeit ein komplett anderer Filter verwendet werden soll.\r\nUnsichtbares element, wird nicht angezeigt.";
+    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public DatabaseAbstract? DatabaseInputMustBe => null;
 
-    public ReadOnlyCollection<string> GetFilterFrom {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
+    public DatabaseAbstract? DatabaseOutput {
+        get => _itemSends.DatabaseOutputGet();
+        set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public override string Description => "Dieses Element kann Filter empfangen, und per Skript einen komplett anderen Filter ausgeben.\r\nWird verwendet, wenn z.b. Zwei Werte gefiltert werden, aber in Wirklichkeit ein komplett anderer Filter verwendet werden soll.\r\nUnsichtbares element, wird nicht angezeigt.";
 
-    public DatabaseAbstract? InputDatabaseMustBe => null;
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
+
     public override bool MustBeInDrawingArea => false;
 
     public int OutputColorId {
@@ -84,9 +85,9 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         set => _itemSends.OutputColorIdSet(value, this);
     }
 
-    public DatabaseAbstract? OutputDatabase {
-        get => _itemSends.OutputDatabaseGet();
-        set => _itemSends.OutputDatabaseSet(value, this);
+    public ReadOnlyCollection<string> Parents {
+        get => _itemAccepts.GetFilterFromKeysGet();
+        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public bool WaitForDatabase => false;
@@ -131,6 +132,12 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         return l;
     }
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        _itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
+    }
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         if (_itemSends.ParseThis(tag, value)) { return true; }
@@ -146,8 +153,8 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
     public override string ReadableText() {
         var txt = "Filter aus Skript: ";
 
-        if (this.IsOk() && OutputDatabase != null) {
-            return txt + OutputDatabase.Caption;
+        if (this.IsOk() && DatabaseOutput != null) {
+            return txt + DatabaseOutput.Caption;
         }
 
         return txt + ErrorReason();
@@ -185,12 +192,6 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", null);
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        _itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

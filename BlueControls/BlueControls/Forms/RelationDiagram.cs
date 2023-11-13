@@ -47,7 +47,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         Database = database;
 
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
-        Database.Disposing += Database_Disposing;
+        Database.DisposingEvent += Database_Disposing;
         foreach (var thisColumnItem in db.Column) {
             if (thisColumnItem != null && thisColumnItem.Format == DataFormat.RelationText) {
                 _column = thisColumnItem;
@@ -102,7 +102,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
         if (Database is DatabaseAbstract db) {
-            db.Disposing -= Database_Disposing;
+            db.DisposingEvent -= Database_Disposing;
         }
 
         Database = null;

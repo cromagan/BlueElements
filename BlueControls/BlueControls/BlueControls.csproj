@@ -188,7 +188,6 @@
     </Compile>
     <Compile Include="Interfaces\NewInterfaces\IAutosizable.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemRowInput.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IControlRowInput.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlAcceptSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IHasVersion.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemAcceptSomething.cs" />

@@ -50,7 +50,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     #region Fields
 
     private readonly List<string> _childs = new();
-
     private readonly ItemAcceptSomething _itemAccepts;
 
     #endregion
@@ -84,23 +83,19 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     /// </summary>
     public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
 
+    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public DatabaseAbstract? DatabaseInputMustBe => null;
     public override string Description => "Dieses Element erzeugt ein Tab-Control, dass weitere Unterformulare enthalten kann.\r\nEs kann eine Zeile empfangen, welche an die Unterformulare weitergegeben wird.";
+
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
+    public override bool MustBeInDrawingArea => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ReadOnlyCollection<string> GetFilterFrom { get; set; }
+    public ReadOnlyCollection<string> Parents { get; set; }
 
-    public IItemSendSomething? GetRowFrom {
-        get => _itemAccepts.GetRowFromGet(this);
-        set => _itemAccepts.GetRowFromSet(value, this);
-    }
-
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
-    public DatabaseAbstract? InputDatabaseMustBe => null;
-    public override bool MustBeInDrawingArea => true;
     public bool WaitForDatabase => false;
     protected override int SaveOrder => 1000;
 
@@ -176,7 +171,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
                         cc = new ConnectedFormulaView(pg);
                         t.Controls.Add(cc);
-                        cc.SetData(cf, null, string.Empty);
+                        cc.InitFormula(cf, null);
                         cc.Dock = DockStyle.Fill;
                         cc.GenerateView();
 
@@ -287,8 +282,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     public override string ReadableText() {
         var txt = "Formulare: ";
 
-        if (this.IsOk() && InputDatabase != null) {
-            return txt + InputDatabase.Caption;
+        if (this.IsOk() && DatabaseInput != null) {
+            return txt + DatabaseInput.Caption;
         }
 
         return txt + ErrorReason();

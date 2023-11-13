@@ -61,7 +61,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         Database = database;
 
         if (Database != null && !Database.IsDisposed) {
-            Database.Disposing += Database_Disposing;
+            Database.DisposingEvent += Database_Disposing;
         }
 
         _needRow = false;
@@ -231,7 +231,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+            if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
             Database = null;
         }
 

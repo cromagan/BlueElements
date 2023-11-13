@@ -947,8 +947,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         //foreach (var thisit in PadData) {
         //    if (thisit is IItemSendSomething rwf) {
-        //        if (rwf.OutputDatabase != null) {
-        //            _ = _databaseFiles.AddIfNotExists(rwf.OutputDatabase.ConnectionData.UniqueID);
+        //        if (rwf.DatabaseOutput != null) {
+        //            _ = _databaseFiles.AddIfNotExists(rwf.DatabaseOutput.ConnectionData.UniqueID);
         //            _id = Math.Max(_id, rwf.InputColorId);
         //        }
         //    }

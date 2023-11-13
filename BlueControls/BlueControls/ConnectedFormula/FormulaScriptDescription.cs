@@ -169,7 +169,7 @@ public sealed class FormulaScriptDescription : ScriptDescription, IParseable, IR
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            //if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+            //if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_DisposingEvent; }
             Formula = null;
         }
 

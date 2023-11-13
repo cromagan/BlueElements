@@ -95,13 +95,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> GetFilterFrom { get; } = new();
+    public FilterCollection? FilterInput { get; set; }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? InputFilter { get; set; }
+    public List<IControlSendSomething> Parents { get; } = new();
 
     #endregion
 
@@ -126,6 +122,46 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
                 //    break;
         }
         return false;
+    }
+
+    public void FilterInput_Changed(object sender, System.EventArgs e) {
+        FilterInput = this.FilterOfSender();
+
+        UpdateColumnData();
+
+        if (FilterInput?.Database is DatabaseAbstract db) {
+            db.Cell.CellValueChanged += Database_CellValueChanged;
+            db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
+            db.Row.RowChecked += Database_RowChecked;
+            db.Loaded += _Database_Loaded;
+            db.DisposingEvent += _Database_Disposing;
+            db.Disposed += _Database_Disposed;
+        }
+        SetValueFromCell();
+        CheckEnabledState();
+
+        var (_, row) = GetTmpVariables();
+        row?.CheckRowDataIfNeeded();
+
+        if (row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
+            Database_RowChecked(this, rce);
+        }
+
+        Invalidate();
+        SetValueFromCell();
+    }
+
+    public void FilterInput_Changing(object sender, System.EventArgs e) {
+        FillCellNow();
+
+        if (FilterInput?.Database is DatabaseAbstract db) {
+            db.Cell.CellValueChanged -= Database_CellValueChanged;
+            db.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
+            db.Row.RowChecked -= Database_RowChecked;
+            db.Loaded -= _Database_Loaded;
+            db.DisposingEvent -= _Database_Disposing;
+            db.Disposed -= _Database_Disposed;
+        }
     }
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
@@ -153,42 +189,13 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void ParentDataChanged() {
-        InputFilter = this.FilterOfSender();
-
-        UpdateColumnData();
-
-        if (InputFilter?.Database is DatabaseAbstract db) {
-            db.Cell.CellValueChanged += Database_CellValueChanged;
-            db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
-            db.Row.RowChecked += Database_RowChecked;
-            db.Loaded += _Database_Loaded;
-            db.Disposing += _Database_Disposing;
+    public void SetToRow(RowItem? row) {
+        if (row == null) {
+            FilterInput = null;
+            return;
         }
-        SetValueFromCell();
-        CheckEnabledState();
-
-        var (_, row) = GetTmpVariables();
-        row?.CheckRowDataIfNeeded();
-
-        if (row?.LastCheckedEventArgs is RowCheckedEventArgs e) {
-            Database_RowChecked(this, e);
-        }
-
-        Invalidate();
-        SetValueFromCell();
-    }
-
-    public void ParentDataChanging() {
-        FillCellNow();
-
-        if (InputFilter?.Database is DatabaseAbstract db) {
-            db.Cell.CellValueChanged -= Database_CellValueChanged;
-            db.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
-            db.Row.RowChecked -= Database_RowChecked;
-            db.Loaded -= _Database_Loaded;
-            db.Disposing -= _Database_Disposing;
-        }
+        FilterInput = new FilterCollection(row.Database);
+        FilterInput.Add(row);
     }
 
     internal void CheckEnabledState() {
@@ -199,6 +206,20 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
             return;
         }
         DisabledReason = CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false); // Rechteverwaltung einfliesen lassen.
+    }
+
+    /// <summary>
+    /// Verwendete Ressourcen bereinigen.
+    /// </summary>
+    /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
+    protected override void Dispose(bool disposing) {
+        if (disposing) { FilterInput_Changing(this, System.EventArgs.Empty); }
+
+        if (disposing && (components != null)) {
+            components?.Dispose();
+        }
+
+        base.Dispose(disposing);
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
@@ -323,7 +344,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         }
     }
 
-    private void _Database_Disposing(object sender, System.EventArgs e) => ParentDataChanging();
+    private void _Database_Disposed(object sender, System.EventArgs e) => FilterInput_Changed(sender, e);
+
+    private void _Database_Disposing(object sender, System.EventArgs e) => FilterInput_Changing(sender, e);
 
     private void _Database_Loaded(object sender, System.EventArgs e) {
         if (Disposing || IsDisposed) { return; }
@@ -435,9 +458,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
             ColumnItem? tmpColumn;
             RowItem? tmpRow;
 
-            if (InputFilter?.Database is DatabaseAbstract db && !db.IsDisposed) {
+            if (FilterInput?.Database is DatabaseAbstract db && !db.IsDisposed) {
                 tmpColumn = db.Column.Exists(_columnName);
-                tmpRow = InputFilter?.RowSingleOrNull;
+                tmpRow = FilterInput?.RowSingleOrNull;
             } else {
                 tmpColumn = null;
                 tmpRow = null;
@@ -473,7 +496,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
     }
 
     private void Marker_DoWork(object sender, DoWorkEventArgs e) {
-        if (InputFilter?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (FilterInput?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         #region  in Frage kommende Textbox ermitteln txb
 
@@ -589,7 +612,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
         }
     }
 
-    private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = InputFilter?.Database;
+    private void textBox_NeedDatabaseOfAdditinalSpecialChars(object sender, MultiUserFileGiveBackEventArgs e) => e.File = FilterInput?.Database;
 
     private void TextBox_TextChanged(object sender, System.EventArgs e) {
         while (Marker.IsBusy) {

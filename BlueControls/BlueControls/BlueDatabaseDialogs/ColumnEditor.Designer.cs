@@ -1282,7 +1282,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabControl.Controls.Add(this.tabQuickInfo);
             this.tabControl.Controls.Add(this.tabSonstiges);
             this.tabControl.Controls.Add(this.tabSpaltenVerlinkung);
-            this.tabControl.GetRowFrom = null;
             this.tabControl.HotTrack = true;
             this.tabControl.Location = new System.Drawing.Point(0, 136);
             this.tabControl.Name = "tabControl";
@@ -1497,7 +1496,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tblFilterliste.DropMessages = false;
             this.tblFilterliste.Location = new System.Drawing.Point(8, 80);
             this.tblFilterliste.Name = "tblFilterliste";
-            this.tblFilterliste.OutputDatabase = null;
+            this.tblFilterliste.DatabaseOutput = null;
             this.tblFilterliste.ShowWaitScreen = true;
             this.tblFilterliste.Size = new System.Drawing.Size(968, 396);
             this.tblFilterliste.TabIndex = 39;

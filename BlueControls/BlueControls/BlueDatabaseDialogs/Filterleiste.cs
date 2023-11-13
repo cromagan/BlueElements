@@ -416,7 +416,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         var f = (FlexiControlForFilter)sender;
         if (f.CaptionPosition == ÜberschriftAnordnung.ohne) {
             // ein Großer Knopf ohne Überschrift, da wird der evl. Filter gelöscht
-            _ = _table.Filter.Remove(((FlexiControlForFilter)sender).Filter);
+            _table.Filter.Remove(((FlexiControlForFilter)sender).Filter);
             return;
         }
 
@@ -453,7 +453,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                 flx.Filter.Changeto(FilterType.Istgleich_ODER_GroßKleinEgal, v);
             } else {
                 if (string.IsNullOrEmpty(v)) {
-                    _ = _table.Filter.Remove(flx.Filter);
+                    _table.Filter.Remove(flx.Filter);
                 } else {
                     flx.Filter.Changeto(FilterType.Instr_GroßKleinEgal, v);
                     // flx.Filter.SearchValue[0] =v;

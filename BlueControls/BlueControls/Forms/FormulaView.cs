@@ -114,7 +114,7 @@ public partial class FormulaView : FormWithStatusBar {
             DropMessages = cf.IsAdministrator();
         }
 
-        CFormula.SetData(cf, null, string.Empty);
+        CFormula.InitFormula(cf, null);
 
         UpdateScripts(CFormula.ConnectedFormula?.EventScript, grpSkripte);
         CheckButtons();
@@ -146,14 +146,14 @@ public partial class FormulaView : FormWithStatusBar {
         //if (Database != database) {
         //    if (Database != null) {
         //        RemoveRow();
-        //        Database.Disposing -= _Database_Disposing;
+        //        Database.DisposingEvent -= _Database_Disposing;
         //        Database.Row.RowRemoving -= Row_RowRemoving;
         //    }
         //    InvalidateView();
         //    Database = database;
 
         //    if (Database != null) {
-        //        Database.Disposing += _Database_Disposing;
+        //        Database.DisposingEvent += _Database_Disposing;
         //        Database.Row.RowRemoving += Row_RowRemoving;
         //    }
         //}

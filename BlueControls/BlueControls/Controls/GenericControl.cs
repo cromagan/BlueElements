@@ -81,6 +81,12 @@ public class GenericControl : Control {
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? DisposingEvent;
+
+    #endregion
+
     #region Properties
 
     [DefaultValue(false)]
@@ -250,6 +256,8 @@ public class GenericControl : Control {
         return PointToClient(Cursor.Position);
     }
 
+    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+
     // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
     public void PerformAutoScale() {
         // NIX TUN!!!!
@@ -279,6 +287,8 @@ public class GenericControl : Control {
     }
 
     protected override void Dispose(bool disposing) {
+        OnDisposingEvent();
+
         base.Dispose(disposing);
         if (disposing) {
             _bitmapOfControl?.Dispose();

@@ -82,7 +82,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.GlobalTab.Controls.Add(this.tabScripts);
             this.GlobalTab.Controls.Add(this.tabVariablen);
             this.GlobalTab.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.GlobalTab.GetRowFrom = null;
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";

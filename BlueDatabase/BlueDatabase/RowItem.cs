@@ -56,7 +56,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         _tmpQuickInfo = null;
         if (Database != null && !Database.IsDisposed) {
             Database.Cell.CellValueChanged += Cell_CellValueChanged;
-            Database.Disposing += Database_Disposing;
+            Database.DisposingEvent += Database_Disposing;
         }
     }
 
@@ -470,7 +470,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return true;
     }
 
-    public bool MatchesTo(ICollection<FilterItem>? fi) {
+    public bool MatchesTo(List<FilterItem>? fi) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
         if (fi == null || fi.Count == 0) { return true; }
 
@@ -648,7 +648,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             if (Database != null && !Database.IsDisposed) {
                 Database.Cell.CellValueChanged -= Cell_CellValueChanged;
-                Database.Disposing -= Database_Disposing;
+                Database.DisposingEvent -= Database_Disposing;
             }
             Database = null;
             _tmpQuickInfo = null;

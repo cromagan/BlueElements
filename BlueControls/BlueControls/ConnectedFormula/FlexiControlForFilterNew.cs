@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Interfaces;
 using BlueDatabase;
@@ -31,12 +30,6 @@ namespace BlueControls.Controls;
 [Designer(typeof(BasicDesigner))]
 public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSomething, IControlSendSomething {
 
-    #region Fields
-
-    private readonly List<IControlAcceptSomething> _childs = new();
-
-    #endregion
-
     #region Constructors
 
     public FlexiControlForFilterNew(DatabaseAbstract? database) {
@@ -44,7 +37,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSome
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Size = new Size(300, 300);
-        OutputDatabase = database;
+        DatabaseOutput = database;
 
         UpdateFilterData();
     }
@@ -53,33 +46,29 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSome
 
     #region Properties
 
-    public FilterCollection? Filter { get; }
-    public List<IControlSendSomething> GetFilterFrom { get; } = new();
+    public List<IControlAcceptSomething> Childs { get; } = new();
+    public DatabaseAbstract? DatabaseOutput { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? InputFilter { get; set; } = null;
+    public FilterCollection? FilterInput { get; set; } = null;
 
-    public DatabaseAbstract? OutputDatabase { get; set; }
+    public FilterCollection? FilterOutput { get; set; } = null;
+
+    public List<IControlSendSomething> Parents { get; } = new();
 
     #endregion
 
     #region Methods
 
-    public void ChildAdd(IControlAcceptSomething c) {
-        if (IsDisposed) { return; }
-        _childs.AddIfNotExists(c);
-        this.DoChilds(_childs);
-    }
-
-    public void ParentDataChanged() {
-        InputFilter = this.FilterOfSender();
+    public void FilterInput_Changed(object sender, System.EventArgs e) {
+        FilterInput = this.FilterOfSender();
         Invalidate();
     }
 
-    public void ParentDataChanging() { }
+    public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
     internal bool WasThisValueClicked() {
         var cb = GetComboBox();

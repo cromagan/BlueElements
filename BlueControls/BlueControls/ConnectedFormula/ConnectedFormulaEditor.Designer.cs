@@ -88,6 +88,10 @@ namespace BlueControls.Forms {
             // 
             this.grpDesign.Visible = false;
             // 
+            // tabHintergrund
+            // 
+            this.tabHintergrund.Size = new System.Drawing.Size(1267, 81);
+            // 
             // tabRightSide
             // 
             this.tabRightSide.Location = new System.Drawing.Point(903, 136);
@@ -119,6 +123,10 @@ namespace BlueControls.Forms {
             // 
             this.tabStart.Size = new System.Drawing.Size(1267, 81);
             // 
+            // tabExport
+            // 
+            this.tabExport.Size = new System.Drawing.Size(1267, 81);
+            // 
             // grpAssistent
             // 
             this.grpAssistent.Visible = false;
@@ -135,7 +143,6 @@ namespace BlueControls.Forms {
             // capStatusBar
             // 
             this.capStatusBar.Size = new System.Drawing.Size(1275, 24);
-            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -164,7 +171,7 @@ namespace BlueControls.Forms {
             this.groupBox2.Controls.Add(this.btnSkripteBearbeiten);
             this.groupBox2.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox2.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.groupBox2.Location = new System.Drawing.Point(1040, 0);
+            this.groupBox2.Location = new System.Drawing.Point(920, 0);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(104, 81);
             this.groupBox2.TabIndex = 5;
@@ -189,7 +196,7 @@ namespace BlueControls.Forms {
             this.grpVorschau.Controls.Add(this.btnPfeileAusblenden);
             this.grpVorschau.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpVorschau.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpVorschau.Location = new System.Drawing.Point(880, 0);
+            this.grpVorschau.Location = new System.Drawing.Point(760, 0);
             this.grpVorschau.Name = "grpVorschau";
             this.grpVorschau.Size = new System.Drawing.Size(160, 81);
             this.grpVorschau.TabIndex = 1;
@@ -222,12 +229,13 @@ namespace BlueControls.Forms {
             // grpFelder
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpFelder.Controls.Add(this.btnButton);
             this.grpFelder.Controls.Add(this.btnBild);
             this.grpFelder.Controls.Add(this.btnFileExplorer);
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
             this.grpFelder.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpFelder.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpFelder.Location = new System.Drawing.Point(624, 0);
+            this.grpFelder.Location = new System.Drawing.Point(504, 0);
             this.grpFelder.Name = "grpFelder";
             this.grpFelder.Size = new System.Drawing.Size(256, 81);
             this.grpFelder.TabIndex = 0;
@@ -281,7 +289,7 @@ namespace BlueControls.Forms {
             this.grpOptik.Controls.Add(this.btnTabControlAdd);
             this.grpOptik.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpOptik.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpOptik.Location = new System.Drawing.Point(464, 0);
+            this.grpOptik.Location = new System.Drawing.Point(344, 0);
             this.grpOptik.Name = "grpOptik";
             this.grpOptik.Size = new System.Drawing.Size(160, 81);
             this.grpOptik.TabIndex = 2;
@@ -315,7 +323,6 @@ namespace BlueControls.Forms {
             // groupBox1
             // 
             this.groupBox1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.groupBox1.Controls.Add(this.btnButton);
             this.groupBox1.Controls.Add(this.btnTable);
             this.groupBox1.Controls.Add(this.btnDropdownmenu);
             this.groupBox1.Controls.Add(this.btnFilterConverter);
@@ -324,7 +331,7 @@ namespace BlueControls.Forms {
             this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.groupBox1.Location = new System.Drawing.Point(72, 0);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(392, 81);
+            this.groupBox1.Size = new System.Drawing.Size(272, 81);
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Zeilen-Berechnung";
@@ -333,11 +340,11 @@ namespace BlueControls.Forms {
             // 
             this.btnButton.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnButton.ImageCode = "Stop";
-            this.btnButton.Location = new System.Drawing.Point(320, 2);
+            this.btnButton.Location = new System.Drawing.Point(8, 24);
             this.btnButton.Name = "btnButton";
             this.btnButton.QuickInfo = "Fügt einen Knopf hinzu, der ein Skript starten kann.\r\nDer Knopf kann Filter empfa" +
     "ngen, die dann im Skipt\r\nverfügbar sind.";
-            this.btnButton.Size = new System.Drawing.Size(64, 66);
+            this.btnButton.Size = new System.Drawing.Size(136, 22);
             this.btnButton.TabIndex = 6;
             this.btnButton.Text = "Knopf";
             this.btnButton.Click += new System.EventHandler(this.btnButton_Click);
@@ -346,7 +353,7 @@ namespace BlueControls.Forms {
             // 
             this.btnTable.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnTable.ImageCode = "Tabelle|16";
-            this.btnTable.Location = new System.Drawing.Point(256, 2);
+            this.btnTable.Location = new System.Drawing.Point(200, 2);
             this.btnTable.Name = "btnTable";
             this.btnTable.QuickInfo = "Fügt eine Tabellenansicht hinzu.\r\nDiese kann Vorfilterungen empfangen,\r\ndie vom B" +
     "enutzer dann nicht mehr\r\nverändert werden können.";
@@ -359,7 +366,7 @@ namespace BlueControls.Forms {
             // 
             this.btnDropdownmenu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnDropdownmenu.ImageCode = "Textfeld2";
-            this.btnDropdownmenu.Location = new System.Drawing.Point(192, 2);
+            this.btnDropdownmenu.Location = new System.Drawing.Point(136, 2);
             this.btnDropdownmenu.Name = "btnDropdownmenu";
             this.btnDropdownmenu.QuickInfo = resources.GetString("btnDropdownmenu.QuickInfo");
             this.btnDropdownmenu.Size = new System.Drawing.Size(64, 66);
@@ -371,7 +378,7 @@ namespace BlueControls.Forms {
             // 
             this.btnFilterConverter.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnFilterConverter.ImageCode = "Trichter|16";
-            this.btnFilterConverter.Location = new System.Drawing.Point(128, 2);
+            this.btnFilterConverter.Location = new System.Drawing.Point(72, 2);
             this.btnFilterConverter.Name = "btnFilterConverter";
             this.btnFilterConverter.Size = new System.Drawing.Size(64, 66);
             this.btnFilterConverter.TabIndex = 3;
@@ -382,7 +389,7 @@ namespace BlueControls.Forms {
             // 
             this.btnBenutzerFilterWahl.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
             this.btnBenutzerFilterWahl.ImageCode = "Trichter|16";
-            this.btnBenutzerFilterWahl.Location = new System.Drawing.Point(64, 2);
+            this.btnBenutzerFilterWahl.Location = new System.Drawing.Point(8, 2);
             this.btnBenutzerFilterWahl.Name = "btnBenutzerFilterWahl";
             this.btnBenutzerFilterWahl.Size = new System.Drawing.Size(64, 66);
             this.btnBenutzerFilterWahl.TabIndex = 2;

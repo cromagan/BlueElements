@@ -50,7 +50,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         Database = db;
         KeyName = Generic.UniqueInternal();
 
-        db.Disposing += Database_Disposing;
+        db.DisposingEvent += Database_Disposing;
 
         _filterType = filterType;
         if (searchValue != null && searchValue.Count > 0) {
@@ -76,7 +76,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public FilterItem(DatabaseAbstract db, string filterCode) {
         Database = db;
 
-        db.Disposing += Database_Disposing;
+        db.DisposingEvent += Database_Disposing;
 
         KeyName = Generic.UniqueInternal();
 
@@ -129,6 +129,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public event EventHandler? Changed;
 
+    public event EventHandler? Changing;
+
     #endregion
 
     #region Properties
@@ -138,6 +140,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         set {
             if (IsDisposed) { return; }
             if (value == _column) { return; }
+            OnChanging();
             _column = value;
             OnChanged();
         }
@@ -153,6 +156,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         set {
             if (IsDisposed) { return; }
             if (value == _filterType) { return; }
+            OnChanging();
             _filterType = value;
             OnChanged();
         }
@@ -172,7 +176,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         l.AddRange(searchvalue);
 
         SearchValue = l.SortedDistinctList().AsReadOnly();
-
+        OnChanging();
         _filterType = type;
         OnChanged();
     }
@@ -180,7 +184,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public void Changeto(FilterType type, string searchvalue) {
         if (IsDisposed) { return; }
         SearchValue = new List<string> { searchvalue }.AsReadOnly();
-
+        OnChanging();
         _filterType = type;
         OnChanged();
     }
@@ -190,7 +194,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
         Column = null;
         if (Database != null && !Database.IsDisposed) {
-            if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+            if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
             Database = null;
         }
     }
@@ -235,6 +239,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
+    public void OnChanging() => Changing?.Invoke(this, System.EventArgs.Empty);
+
     public void ParseFinished(string parsed) {
         if (parsed.Contains(", Value=}") || parsed.Contains(", Value=,")) { _ = SearchValue.AddIfNotExists(""); }
     }
@@ -248,10 +254,10 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                 return true;
 
             case "database":
-                if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+                if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
                 Database = DatabaseAbstract.GetById(new ConnectionInfo(value.FromNonCritical(), null, string.Empty), false, null, true);
 
-                if (Database != null && !Database.IsDisposed) { Database.Disposing += Database_Disposing; }
+                if (Database != null && !Database.IsDisposed) { Database.DisposingEvent += Database_Disposing; }
 
                 return true;
 

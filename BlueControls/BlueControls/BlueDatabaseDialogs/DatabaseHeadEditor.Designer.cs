@@ -286,7 +286,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GlobalTab.Controls.Add(this.tabRechte);
             this.GlobalTab.Controls.Add(this.tabSortierung);
             this.GlobalTab.Controls.Add(this.tabUndo);
-            this.GlobalTab.GetRowFrom = null;
             this.GlobalTab.HotTrack = true;
             this.GlobalTab.Location = new System.Drawing.Point(0, 0);
             this.GlobalTab.Name = "GlobalTab";
@@ -477,7 +476,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tblUndo.DropMessages = false;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
-            this.tblUndo.OutputDatabase = null;
+            this.tblUndo.DatabaseOutput = null;
             this.tblUndo.ShowWaitScreen = true;
             this.tblUndo.Size = new System.Drawing.Size(1233, 624);
             this.tblUndo.TabIndex = 0;

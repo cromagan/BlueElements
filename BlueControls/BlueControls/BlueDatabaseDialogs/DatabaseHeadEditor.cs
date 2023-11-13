@@ -48,7 +48,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         Database = database;
-        Database.Disposing += Database_Disposing;
+        Database.DisposingEvent += Database_Disposing;
     }
 
     #endregion
@@ -232,7 +232,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         db.Column.GenerateAndAddSystem();
     }
 
-    private void Database_Disposing(object sender, System.EventArgs e) {
+    private void Database_DisposingEvent(object sender, System.EventArgs e) {
         RemoveDatabase();
         Close();
     }
@@ -314,7 +314,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     private void RemoveDatabase() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
-        Database.Disposing -= Database_Disposing;
+        Database.DisposingEvent -= Database_DisposingEvent;
         Database = null;
     }
 

@@ -62,12 +62,12 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
             if (value == _database) { return; }
 
             if (_database != null) {
-                _database.Disposing -= Database_Disposing;
+                _database.DisposingEvent -= Database_DisposingEvent;
             }
             _database = value;
 
             if (_database != null) {
-                _database.Disposing += Database_Disposing;
+                _database.DisposingEvent += Database_DisposingEvent;
             }
         }
     }
@@ -107,7 +107,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         if (Database != null && !Database.IsDisposed) {
-            Database.Disposing -= Database_Disposing;
+            Database.DisposingEvent -= Database_DisposingEvent;
         }
         SaveCurrentLayout();
         Database = null;
@@ -179,7 +179,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
         //}
     }
 
-    private void Database_Disposing(object sender, System.EventArgs e) => Close();
+    private void Database_DisposingEvent(object sender, System.EventArgs e) => Close();
 
     private void SaveCurrentLayout() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }

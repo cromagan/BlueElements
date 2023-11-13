@@ -28,24 +28,24 @@ internal class ConnectedFormulaFilterButton : Button, IControlAcceptSomething {
 
     #region Properties
 
-    public List<IControlSendSomething> GetFilterFrom { get; } = new();
-
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? InputFilter { get; set; }
+    public FilterCollection? FilterInput { get; set; }
+
+    public List<IControlSendSomething> Parents { get; } = new();
 
     #endregion
 
     #region Methods
 
-    public void ParentDataChanged() {
-        InputFilter = this.FilterOfSender();
+    public void FilterInput_Changed(object sender, System.EventArgs e) {
+        FilterInput = this.FilterOfSender();
         Invalidate();
     }
 
-    public void ParentDataChanging() {
+    public void FilterInput_Changing(object sender, System.EventArgs e) {
         throw new System.NotImplementedException();
     }
 

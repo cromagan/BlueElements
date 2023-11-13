@@ -60,23 +60,23 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         Pad.AddCentered(x);
 
-        if (l is IItemSendSomething isr && x is IItemAcceptSomething iar) {
-            iar.GetRowFrom = isr;
-        }
+        //if (l is IItemSendSomething isr && x is IItemAcceptSomething iar) {
+        //    iar.GetRowFrom = isr;
+        //}
 
         if (l is IItemSendSomething && x is IItemAcceptSomething iaf) {
-            iaf.GetFilterFrom = new List<string> { l.KeyName }.AsReadOnly();
+            iaf.Parents = new List<string> { l.KeyName }.AsReadOnly();
         }
 
-        if (x is IItemSendSomething isr2) {
-            isr2.Datenbank_wählen();
-        }
+        //if (x is IItemSendSomething isr2) {
+        //    isr2.Datenbank_wählen();
+        //}
 
-        if (x is IItemSendSomething isf2) {
-            isf2.Datenbank_wählen();
-        }
+        //if (x is IItemSendSomething isf2) {
+        //    isf2.Datenbank_wählen();
+        //}
 
-        if (x is IItemAcceptSomething iaf2 && iaf2.GetFilterFrom.Count == 0) {
+        if (x is IItemAcceptSomething iaf2 && iaf2.Parents.Count == 0) {
             iaf2.Datenquellen_bearbeiten();
         }
     }
@@ -181,7 +181,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         Pad.Item?.Add(it);
         CFormula?.Repair();
 
-        it.Datenbank_wählen();
+        //it.Datenbank_wählen();
 
         //it.Bei_Export_sichtbar = false;
 
@@ -218,7 +218,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         if (CFormula?.PadData != null) {
             foreach (var thisItem in CFormula.PadData) {
                 if (thisItem is IItemRowInput iri) {
-                    db = iri.OutputDatabase;
+                    db = iri.DatabaseOutput;
                 }
             }
         }

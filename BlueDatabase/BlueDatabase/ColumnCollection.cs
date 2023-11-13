@@ -44,7 +44,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnCollection(DatabaseAbstract database) : base() {
         Database = database;
-        Database.Disposing += Database_Disposing;
+        Database.DisposingEvent += Database_Disposing;
     }
 
     #endregion
@@ -580,7 +580,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+            if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
             Database = null;
             _internal.Clear();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben

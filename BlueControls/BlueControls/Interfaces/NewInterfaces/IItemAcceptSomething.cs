@@ -38,24 +38,23 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
     #region Properties
 
     /// <summary>
-    /// Enthält die Schlüssel der Items
-    /// </summary>
-    public ReadOnlyCollection<string> GetFilterFrom { get; set; }
-
-    List<int> InputColorId { get; }
-
-    /// <summary>
     /// Welcher Datenbank die eingehenden Filter entsprechen müssen.
     /// Wenn NULL zurück gegeben wird, ist freie Datenbankwahl
     /// </summary>
-    public DatabaseAbstract? InputDatabaseMustBe { get; }
+    public DatabaseAbstract? DatabaseInputMustBe { get; }
 
+    List<int> InputColorId { get; }
     public string Page { get; }
 
     public ItemCollectionPad.ItemCollectionPad? Parent { get; }
 
     /// <summary>
-    /// Wenn InputDatabaseMustBe null zurück gibt, ob schon Filter gewählt werden dürfen.
+    /// Enthält die Schlüssel der Items
+    /// </summary>
+    public ReadOnlyCollection<string> Parents { get; set; }
+
+    /// <summary>
+    /// Wenn DatabaseInputMustBe null zurück gibt, ob schon Filter gewählt werden dürfen.
     /// Typischerweise false, wenn auf die Output-Database gewartet werden soll.
     /// </summary>
     public bool WaitForDatabase { get; }
@@ -78,7 +77,7 @@ public static class ItemAcceptSomethingExtensions {
     public static List<int> CalculateColorIds(this IItemAcceptSomething item) {
         var l = new List<int>();
 
-        foreach (var thisId in item.GetFilterFrom) {
+        foreach (var thisId in item.Parents) {
             if (item?.Parent?[thisId] is IItemSendSomething i) {
                 l.Add(i.OutputColorId);
             }
@@ -93,7 +92,7 @@ public static class ItemAcceptSomethingExtensions {
     public static void Datenquellen_bearbeiten(this IItemAcceptSomething item) {
         if (item.Parent is null) { return; }
 
-        var matchDB = item.InputDatabaseMustBe;
+        var matchDB = item.DatabaseInputMustBe;
 
         if (item.WaitForDatabase && matchDB == null) {
             return;
@@ -101,7 +100,7 @@ public static class ItemAcceptSomethingExtensions {
 
         //if (sameDatabase && item.GetFilterFrom.Count > 0) {
         //    if (item.Parent[item.GetFilterFrom[0]] is IItemSendSomething ir) {
-        //        matchDB = ir.OutputDatabase;
+        //        matchDB = ir.DatabaseOutput;
         //    }
         //}
 
@@ -110,8 +109,8 @@ public static class ItemAcceptSomethingExtensions {
         // Die Items, die man noch wählen könnte
         foreach (var thisR in item.Parent) {
             if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendSomething rfp) {
-                if (!item.GetFilterFrom.Contains(rfp.KeyName)) {
-                    if (matchDB == null || matchDB == rfp.OutputDatabase) {
+                if (!item.Parents.Contains(rfp.KeyName)) {
+                    if (matchDB == null || matchDB == rfp.DatabaseOutput) {
                         _ = x.Add("Hinzu: " + rfp.ReadableText(), "+|" + rfp.KeyName, rfp.SymbolForReadableText(), true, "1");
                     }
                 }
@@ -119,10 +118,10 @@ public static class ItemAcceptSomethingExtensions {
         }
 
         // Die Items, die entfernt werden können
-        if (item.GetFilterFrom.Count > 0) {
+        if (item.Parents.Count > 0) {
             x.AddSeparator();
 
-            foreach (var thisIt in item.GetFilterFrom) {
+            foreach (var thisIt in item.Parents) {
                 var name = thisIt;
                 var im = QuickImage.Get(ImageCode.Warnung, 16);
 
@@ -152,26 +151,26 @@ public static class ItemAcceptSomethingExtensions {
 
             if (t is IItemSendSomething rfp2) {
                 var l = new List<string>();
-                l.AddRange(item.GetFilterFrom);
+                l.AddRange(item.Parents);
                 l.Add(rfp2.KeyName);
                 l = l.SortedDistinctList();
-                item.GetFilterFrom = l.AsReadOnly();
+                item.Parents = l.AsReadOnly();
             }
         }
 
         if (ak[0] == "-") {
             var l = new List<string>();
-            l.AddRange(item.GetFilterFrom);
+            l.AddRange(item.Parents);
             l.Remove(ak[1]);
             l = l.SortedDistinctList();
-            item.GetFilterFrom = l.AsReadOnly();
+            item.Parents = l.AsReadOnly();
         }
     }
 
     #endregion
 }
 
-public abstract class ItemAcceptSomething {
+public class ItemAcceptSomething {
     //public void InputColorIdSet(IItemAcceptSomething item, List<int> value) {
     //    if (!_inputColorId.IsDifferentTo(value)) { return; }
 
@@ -203,6 +202,17 @@ public abstract class ItemAcceptSomething {
         }
     }
 
+    public DatabaseAbstract? DatabaseInput(IItemAcceptSomething item) {
+        if (item.DatabaseInputMustBe is DatabaseAbstract db) {
+            return db;
+        }
+
+        var g = GetFilterFromGet(item);
+
+        if (g.Count == 0) { return null; }
+        return g[0].DatabaseOutput;
+    }
+
     public void DoCreativePadAddedToCollection(IItemAcceptSomething item) {
         var l = GetFilterFromGet(item);
 
@@ -213,7 +223,7 @@ public abstract class ItemAcceptSomething {
     }
 
     public string ErrorReason(IItemAcceptSomething item) {
-        //if (item.InputDatabase is not DatabaseAbstract db || db.IsDisposed) {
+        //if (item.DatabaseInput is not DatabaseAbstract db || db.IsDisposed) {
         //    return "Eingehende Datenbank unbekannt";
         //}
 
@@ -281,17 +291,6 @@ public abstract class ItemAcceptSomething {
         return _inputColorId;
     }
 
-    public DatabaseAbstract? InputDatabase(IItemAcceptSomething item) {
-        if (item.InputDatabaseMustBe is DatabaseAbstract db) {
-            return db;
-        }
-
-        var g = GetFilterFromGet(item);
-
-        if (g.Count == 0) { return null; }
-        return g[0].OutputDatabase;
-    }
-
     public virtual List<string> ParsableTags() {
         List<string> result = new();
         result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys);
@@ -329,7 +328,7 @@ public abstract class ItemAcceptSomething {
 
         l.Add(new FlexiControl("Eingang:", widthOfControl));
 
-        if (item.WaitForDatabase && item.InputDatabaseMustBe == null) {
+        if (item.WaitForDatabase && item.DatabaseInputMustBe == null) {
             l.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl));
         } else {
             l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten, "Eingehende Filter wählen", ImageCode.Trichter));

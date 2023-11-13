@@ -347,7 +347,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         if (Table.Database != db) {
-            CFO.SetData(null, null, string.Empty);
+            CFO.InitFormula(null, null);
         }
 
         FilterLeiste.Table = Table;
@@ -409,7 +409,8 @@ public partial class TableView : FormWithStatusBar {
             if (CFO.Width < 30 || CFO.Height < 10) { return; }
 
             CFO.GetConnectedFormulaFromDatabase(r?.Database);
-            CFO.SetData(r?.Database, r?.KeyName ?? string.Empty);
+            CFO.InitFormula(r?.Database);
+            CFO.SetToRow(r);
         }
     }
 
@@ -1011,7 +1012,7 @@ public partial class TableView : FormWithStatusBar {
 
     //private void ChangeDatabase(DatabaseAbstract? database) {
     //    if (_originalDb != null) {
-    //        _originalDb.Disposing -= _originalDB_Disposing;
+    //        _originalDb.DisposingEvent -= _originalDB_Disposing;
     //    }
 
     //    _originalDb = null;

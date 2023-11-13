@@ -60,7 +60,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         _itemAccepts = new();
         _itemSends = new();
 
-        OutputDatabase = db;
+        DatabaseOutput = db;
     }
 
     public InputFilterOutputFilterPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
@@ -99,17 +99,17 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public override string Description => "Dieses Element kann Filter empfangen - um eine Vorauswahl der verfügbaren Filterelement darzustallen.\r\nAnschließend kann mit den übrig gebliebenen Werten ein neuer Filter erzeugt werden, den der Benutzer auswählen kann.";
+    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public DatabaseAbstract? DatabaseInputMustBe => DatabaseOutput;
 
-    public ReadOnlyCollection<string> GetFilterFrom {
-        get => _itemAccepts.GetFilterFromKeysGet();
-        set => _itemAccepts.GetFilterFromKeysSet(value, this);
+    public DatabaseAbstract? DatabaseOutput {
+        get => _itemSends.DatabaseOutputGet();
+        set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
+    public override string Description => "Dieses Element kann Filter empfangen - um eine Vorauswahl der verfügbaren Filterelement darzustallen.\r\nAnschließend kann mit den übrig gebliebenen Werten ein neuer Filter erzeugt werden, den der Benutzer auswählen kann.";
 
-    public DatabaseAbstract? InputDatabaseMustBe => OutputDatabase;
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => true;
 
     public int OutputColorId {
@@ -117,9 +117,9 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         set => _itemSends.OutputColorIdSet(value, this);
     }
 
-    public DatabaseAbstract? OutputDatabase {
-        get => _itemSends.OutputDatabaseGet();
-        set => _itemSends.OutputDatabaseSet(value, this);
+    public ReadOnlyCollection<string> Parents {
+        get => _itemAccepts.GetFilterFromKeysGet();
+        set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
     public string Überschrift {
@@ -144,7 +144,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControlForFilterNew(OutputDatabase) {
+        var con = new FlexiControlForFilterNew(DatabaseOutput) {
             //EditType = _bearbeitung,
             //CaptionPosition = CaptionPosition,
             //Name = DefaultItemToControlName()
@@ -189,6 +189,12 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         return l;
     }
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        _itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
+    }
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         if (_itemSends.ParseThis(tag, value)) { return true; }
@@ -217,8 +223,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     public override string ReadableText() {
         var txt = "Filter: ";
 
-        if (this.IsOk() && OutputDatabase != null) {
-            return txt + OutputDatabase.Caption;
+        if (this.IsOk() && DatabaseOutput != null) {
+            return txt + DatabaseOutput.Caption;
         }
 
         return txt + ErrorReason();
@@ -262,12 +268,6 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Trichter", InputColorId);
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        _itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

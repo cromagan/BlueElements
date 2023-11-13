@@ -71,6 +71,8 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public bool AutoSizeableHeight => false;
 
+    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public DatabaseAbstract? DatabaseInputMustBe => DatabaseInput;
     public override string Description => "Dieses Element wird als Knopf zum drücken dargstellt.<br>Das Element kann Filter empfangen.<br>Diese Filter werden an ein Skript weitergegeben.";
 
     [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert  größer 1 als 'mehr als eine' gilt.")]
@@ -84,18 +86,14 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
         }
     }
 
-    public ReadOnlyCollection<string> GetFilterFrom {
+    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
+
+    public override bool MustBeInDrawingArea => true;
+
+    public ReadOnlyCollection<string> Parents {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
-
-    public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
-    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
-
-    public DatabaseAbstract? InputDatabaseMustBe => InputDatabase;
-
-    public override bool MustBeInDrawingArea => true;
 
     [Description("Welches Skript ausgeführt werden soll")]
     public string SkriptName {
@@ -143,7 +141,7 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
         List<GenericControl> l = new();
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
-        if (InputDatabase is not DatabaseAbstract db || db.IsDisposed) { return l; }
+        if (DatabaseInput is not DatabaseAbstract db || db.IsDisposed) { return l; }
 
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
@@ -189,8 +187,8 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
     public override string ReadableText() {
         var txt = "Knopf ";
 
-        if (this.IsOk() && InputDatabase != null) {
-            return txt + InputDatabase.Caption;
+        if (this.IsOk() && DatabaseInput != null) {
+            return txt + DatabaseInput.Caption;
         }
 
         return txt + ErrorReason();

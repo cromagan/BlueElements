@@ -50,7 +50,7 @@ public class Method_CellSetFilter : Method_Database {
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
-        var db = allFi[0].Database;
+        var db = allFi.Database;
         if (db == null || db.IsDisposed) { return new DoItFeedback(infos.Data, "Datenbank verworfen."); }
 
         var columnToSet = db.Column.Exists(attvar.ValueStringGet(1));

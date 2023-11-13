@@ -64,7 +64,7 @@ internal class Method_Export : Method_Database {
 
         var db = MyDatabase(varCol);
 
-        if (db == null || allFi[0].Database != db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
+        if (db == null || allFi.Database != db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         #endregion
 

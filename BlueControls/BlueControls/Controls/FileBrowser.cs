@@ -83,13 +83,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> GetFilterFrom { get; } = new();
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? InputFilter { get; set; } = null;
+    public FilterCollection? FilterInput { get; set; } = null;
 
     public string OriginalText {
         get => _originalText;
@@ -98,6 +92,8 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
             CheckButtons(DirectoryExists(txbPfad.Text));
         }
     }
+
+    public List<IControlSendSomething> Parents { get; } = new();
 
     public string Pfad {
         get => IsDisposed ? string.Empty : txbPfad.Text;
@@ -124,6 +120,18 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
 
     #region Methods
 
+    public void FilterInput_Changed(object sender, System.EventArgs e) {
+        FilterInput = this.FilterOfSender();
+        Invalidate();
+
+        var row = FilterInput?.RowSingleOrNull;
+        row?.CheckRowDataIfNeeded();
+        ParseVariables(row?.LastCheckedEventArgs?.Variables);
+        CreateWatcher();
+    }
+
+    public void FilterInput_Changing(object sender, System.EventArgs e) { RemoveWatcher(); }
+
     public string GestStandardCommand(string extension) {
         if (!SubKeyExist(extension)) { return string.Empty; }
         var mainkey = Registry.ClassesRoot.OpenSubKey(extension);
@@ -145,18 +153,6 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
         if (exekey == null) { return string.Empty; }
         return exekey.GetValue("").ToString();
     }
-
-    public void ParentDataChanged() {
-        InputFilter = this.FilterOfSender();
-        Invalidate();
-
-        var row = InputFilter?.RowSingleOrNull;
-        row?.CheckRowDataIfNeeded();
-        ParseVariables(row?.LastCheckedEventArgs?.Variables);
-        CreateWatcher();
-    }
-
-    public void ParentDataChanging() { RemoveWatcher(); }
 
     public void ParentPath() => btnZurück_Click(null, System.EventArgs.Empty);
 

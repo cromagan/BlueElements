@@ -46,7 +46,7 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
         Database = database;
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        db.Disposing += Database_Disposing;
+        db.DisposingEvent += Database_DisposingEvent;
     }
 
     #endregion
@@ -60,13 +60,13 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
     #region Methods
 
     protected override void OnClosing(CancelEventArgs e) {
-        if (Database is DatabaseAbstract db && !db.IsDisposed) { db.Disposing -= Database_Disposing; }
+        if (Database is DatabaseAbstract db && !db.IsDisposed) { db.DisposingEvent -= Database_DisposingEvent; }
         base.OnClosing(e);
     }
 
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
-    private void Database_Disposing(object sender, System.EventArgs e) => Close();
+    private void Database_DisposingEvent(object sender, System.EventArgs e) => Close();
 
     private void Fertig_Click(object sender, System.EventArgs e) {
         var TR = string.Empty;

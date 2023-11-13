@@ -60,7 +60,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Database = db;
-        Database.Disposing += _Database_Disposing;
+        Database.DisposingEvent += _Database_Disposing;
         _rowsForExport = rows;
         if (!string.IsNullOrEmpty(autosaveFile)) {
             _zielPfad = autosaveFile.FilePath();
@@ -149,7 +149,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         if (Database != null && !Database.IsDisposed) {
-            Database.Disposing -= _Database_Disposing;
+            Database.DisposingEvent -= _Database_Disposing;
             Database = null;
         }
         base.OnFormClosing(e);

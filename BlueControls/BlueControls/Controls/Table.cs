@@ -66,7 +66,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
     public static readonly int RowCaptionSizeY = 50;
-    private readonly List<IControlAcceptSomething> _childs = new();
+    public FilterCollection? Filter;
     private readonly List<string> _collapsed = new();
     private readonly object _lockUserAction = new();
     private int _arrangementNr = 1;
@@ -78,8 +78,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private DateTime? _databaseDrawError;
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
     private bool _drawing;
-    private FilterCollection? _fc;
-
     private int? _headSize;
     private bool _isinClick;
     private bool _isinDoubleClick;
@@ -98,31 +96,19 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private ColumnItem? _mouseOverColumn;
 
     private RowData? _mouseOverRow;
-
     private string _mouseOverText = string.Empty;
-
     private BlueFont _newRowFont = BlueFont.DefaultFont;
-
     private Progressbar? _pg;
-
     private int _pix16 = 16;
-
     private int _pix18 = 18;
-
     private int _rowCaptionFontY = 26;
-
     private List<RowData>? _rowsFilteredAndPinned;
     private SearchAndReplace? _searchAndReplace;
-
     private bool _showNumber;
-
     private RowSortDefinition? _sortDefinitionTemporary;
     private string _storedView = string.Empty;
-
     private Rectangle _tmpCursorRect = Rectangle.Empty;
-
     private RowItem? _unterschiede;
-
     private int _wiederHolungsSpaltenWidth;
 
     #endregion
@@ -194,6 +180,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    public List<IControlAcceptSomething> Childs { get; } = new();
+
     public ColumnViewCollection? CurrentArrangement {
         get {
             if (Database is not DatabaseAbstract db || db.IsDisposed || db.ColumnArrangements.Count <= _arrangementNr) {
@@ -205,7 +193,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public ColumnItem? CursorPosColumn { get; private set; }
-
     public RowData? CursorPosRow { get; private set; }
 
     /// <summary>
@@ -215,6 +202,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public DatabaseAbstract? Database { get; private set; }
+
+    public DatabaseAbstract? DatabaseOutput { get => Database; set => DatabaseSet(value, string.Empty); }
 
     [DefaultValue(BlueTableAppearance.Standard)]
     public BlueTableAppearance Design {
@@ -239,49 +228,18 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public bool DropMessages { get; set; }
 
-    public FilterCollection? Filter {
-        get {
-            if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
-            if (_fc == null) { Filter = new FilterCollection(Database); }
-
-            return _fc;
-        }
-        private set {
-            if (value == null && _fc == null) { return; }
-
-            if ((value == null && _fc != null) ||
-                (_fc == null && value != null) ||
-                (value!.ToString(true) != _fc!.ToString(true))) {
-                if (_fc != null) {
-                    _fc.Changed -= Filter_Changed;
-                    _fc.CollectionChanged -= Filter_CollectionChanged;
-                }
-
-                _fc = value;
-
-                if (_fc != null) {
-                    _fc.Changed += Filter_Changed;
-                    _fc.CollectionChanged += Filter_CollectionChanged;
-                }
-
-                FilterFromParentsChanged();
-                OnFilterChanged();
-            }
-        }
-    }
-
-    [DefaultValue(1.0f)]
-    public double FontScale => Database?.GlobalScale ?? 1f;
-
-    public List<IControlSendSomething> GetFilterFrom { get; } = new();
-
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? InputFilter { get; set; } = null;
+    public FilterCollection? FilterInput { get; set; } = null;
 
-    public DatabaseAbstract? OutputDatabase { get => Database; set => DatabaseSet(value, string.Empty); }
+    public FilterCollection? FilterOutput { get; set; } = null;
+
+    [DefaultValue(1.0f)]
+    public double FontScale => Database?.GlobalScale ?? 1f;
+
+    public List<IControlSendSomething> Parents { get; } = new();
     public List<RowItem> PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
@@ -314,7 +272,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         get {
             if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
             if (Filter != null) { return Filter.Rows; }
-
             return db.Row.ToList().AsReadOnly();
         }
     }
@@ -360,6 +317,37 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Invalidate();
         }
     }
+
+    //public FilterCollection? UserFilter {
+    //    get {
+    //        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+    //        if (_filterUser == null) { UserFilter = new FilterCollection(Database); }
+
+    //        return _filterUser;
+    //    }
+    //    //private set {
+    //    //    if (value == null && _fc == null) { return; }
+
+    //    //    if ((value == null && _fc != null) ||
+    //    //        (_fc == null && value != null) ||
+    //    //        (value!.ToString(true) != _fc!.ToString(true))) {
+    //    //        Output
+
+    //    //        if (_fc != null) {
+    //    //            _fc.Changed -= Filter_Changed;
+    //    //        }
+
+    //    //        _fc = value;
+
+    //    //        if (_fc != null) {
+    //    //            _fc.Changed += Filter_Changed;
+    //    //        }
+
+    //    //        FilterOutput_Changed();
+    //    //        OnFilterChanged();
+    //    //    }
+    //    //}
+    //}
 
     public long VisibleRowCount { get; private set; }
 
@@ -865,12 +853,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (CursorPosRow?.Row != null && CursorPosRow?.Row.Database != db) { CursorPosRow = null; }
     }
 
-    public void ChildAdd(IControlAcceptSomething c) {
-        if (IsDisposed) { return; }
-        _childs.AddIfNotExists(c);
-        this.DoChilds(_childs, CursorPosRow?.Row);
-    }
-
     public void CollapesAll() {
         if (Database?.Column.SysChapter is not ColumnItem sc) { return; }
 
@@ -914,7 +896,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (!sameRow) {
             OnSelectedRowChanged(new RowEventArgs(setedrow));
-            this.DoChilds(_childs, setedrow);
+            FilterOutput.Add(setedrow);
         }
     }
 
@@ -941,8 +923,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db1.Column.ColumnRemoved -= _Database_ViewChanged;
             db1.Column.ColumnAdded -= _Database_ViewChanged;
             db1.ProgressbarInfo -= _Database_ProgressbarInfo;
-            db1.Disposing -= _Database_Disposing;
+            db1.DisposingEvent -= _Database_Disposing;
             db1.InvalidateView -= Database_InvalidateView;
+            if (Filter != null) { Filter.Changed -= Filter_Changed; }
             //db.IsTableVisibleForUser -= Database_IsTableVisibleForUser;
             DatabaseAbstract.ForceSaveAll();
             MultiUserFile.ForceLoadSaveAll();
@@ -970,9 +953,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db2.Column.ColumnRemoving += Column_ItemRemoving;
             db2.Column.ColumnRemoved += _Database_ViewChanged;
             db2.ProgressbarInfo += _Database_ProgressbarInfo;
-            db2.Disposing += _Database_Disposing;
+            db2.DisposingEvent += _Database_Disposing;
             db2.InvalidateView += Database_InvalidateView;
             //db2.IsTableVisibleForUser += Database_IsTableVisibleForUser;
+            Filter = new FilterCollection(db2);
+            Filter.Changed += Filter_Changed;
         }
 
         ParseView(viewCode);
@@ -1211,6 +1196,40 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Database.Export_HTML(filename, CurrentArrangement, RowsVisibleUnique(), execute);
     }
 
+    public void FilterInput_Changed(object sender, System.EventArgs e) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Filter == null) { return; }
+
+        FilterInput = this.FilterOfSender();
+
+        var t = "Übergeordnetes Element";
+
+        if (FilterInput != null) {
+            foreach (var thisFi in FilterInput) {
+                thisFi.Herkunft = t;
+            }
+        }
+
+        Filter.RemoveRange(t);
+
+        Filter.RemoveOtherAndAddIfNotExists(FilterInput);
+
+        //_filterall = new FilterCollection(Database);
+        //_filterall.AddIfNotExists(Filter);
+
+        //if (_filterFromParents != null) { _filterall.AddIfNotExists(_filterFromParents); }
+
+        //_filterall = new FilterCollection(Database);
+        //_filterall.AddIfNotExists(Filter);
+
+        //if (_filterFromParents != null) { _filterall.AddIfNotExists(_filterFromParents); }
+
+        //Invalidate_SortedRowData();
+        //OnFilterChanged();
+    }
+
+    public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
     /// <summary>
     /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
     /// </summary>
@@ -1278,40 +1297,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _searchAndReplace.Show();
         }
     }
-
-    public void ParentDataChanged() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
-        if (Filter == null) { return; }
-
-        InputFilter = this.FilterOfSender();
-
-        var t = "Übergeordnetes Element";
-
-        if (InputFilter != null) {
-            foreach (var thisFi in InputFilter) {
-                thisFi.Herkunft = t;
-            }
-        }
-
-        Filter.RemoveRange(t);
-
-        Filter.RemoveOtherAndAddIfNotExists(InputFilter);
-
-        //_filterall = new FilterCollection(Database);
-        //_filterall.AddIfNotExists(Filter);
-
-        //if (_filterFromParents != null) { _filterall.AddIfNotExists(_filterFromParents); }
-
-        //_filterall = new FilterCollection(Database);
-        //_filterall.AddIfNotExists(Filter);
-
-        //if (_filterFromParents != null) { _filterall.AddIfNotExists(_filterFromParents); }
-
-        //Invalidate_SortedRowData();
-        //OnFilterChanged();
-    }
-
-    public void ParentDataChanging() { }
 
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
@@ -3357,10 +3342,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         Invalidate_SortedRowData();
         OnFilterChanged();
-    }
-
-    private void Filter_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
-        Filter_Changed(sender, System.EventArgs.Empty);
     }
 
     private int HeadSize(ColumnViewCollection? ca) {

@@ -44,7 +44,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
     public ColumnViewCollection(DatabaseAbstract? database, string toParse) {
         Database = database;
         if (Database != null) {
-            Database.Disposing += Database_Disposing;
+            Database.DisposingEvent += Database_Disposing;
         }
 
         KeyName = string.Empty;
@@ -168,7 +168,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         IsDisposed = true;
         //PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
         //PermissionGroups_Show.Clear();
-        if (Database != null) { Database.Disposing += Database_Disposing; }
+        if (Database != null) { Database.DisposingEvent += Database_Disposing; }
         Database = null;
         //base.Dispose(disposing);
     }

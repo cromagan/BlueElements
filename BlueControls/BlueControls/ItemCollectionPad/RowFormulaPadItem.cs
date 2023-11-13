@@ -54,7 +54,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public RowFormulaPadItem(string internalname, DatabaseAbstract? database, string rowkey, string layoutFileName) : base(internalname) {
         Database = database;
-        if (Database != null) { Database.Disposing += _Database_Disposing; }
+        if (Database != null) { Database.DisposingEvent += _Database_Disposing; }
         _rowKey = rowkey ?? string.Empty;
         _layoutFileName = layoutFileName;
     }
@@ -129,7 +129,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
             case "database":
                 Database = DatabaseAbstract.GetById(new ConnectionInfo(value.FromNonCritical(), null, string.Empty), false, null, true);
-                Database.Disposing += _Database_Disposing;
+                Database.DisposingEvent += _Database_Disposing;
                 return true;
 
             case "rowid": // TODO: alt
@@ -205,7 +205,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     //}
 
     private void _Database_Disposing(object sender, System.EventArgs e) {
-        Database.Disposing -= _Database_Disposing;
+        Database.DisposingEvent -= _Database_Disposing;
         Database = null;
         RemovePic();
     }

@@ -46,7 +46,7 @@ using static BlueBasics.Constants;
 namespace BlueDatabase;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanDropMessages {
+public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessages {
 
     #region Fields
 
@@ -150,7 +150,9 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     public event EventHandler<CancelReasonEventArgs>? CanDoScript;
 
-    public event EventHandler? Disposing;
+    public event EventHandler? Disposed;
+
+    public event EventHandler? DisposingEvent;
 
     public event EventHandler<MessageEventArgs>? DropMessage;
 
@@ -1635,6 +1637,8 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         CanDoScript?.Invoke(this, e);
     }
 
+    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+
     public void OnInvalidateView() {
         if (IsDisposed) { return; }
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
@@ -2152,7 +2156,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         if (IsDisposed) { return; }
         IsDisposed = true;
 
-        OnDisposing();
+        OnDisposingEvent();
         _ = AllFiles.Remove(this);
 
         //base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
@@ -2168,6 +2172,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
         Column.Dispose();
         //Cell?.Dispose();
         Row.Dispose();
+        OnDisposed();
     }
 
     protected void Initialize() {
@@ -2265,7 +2270,7 @@ public abstract class DatabaseAbstract : IDisposableExtended, IHasKeyName, ICanD
 
     private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
 
-    private void OnDisposing() => Disposing?.Invoke(this, System.EventArgs.Empty);
+    private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
     //private void OnIsTableVisibleForUser(VisibleEventArgs e) {
     //    if (IsDisposed) { return; }

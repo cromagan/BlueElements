@@ -50,7 +50,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public RowCollection(DatabaseAbstract database) {
         Database = database;
-        Database.Disposing += Database_Disposing;
+        Database.DisposingEvent += Database_Disposing;
         //Initialize();
     }
 
@@ -116,7 +116,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             //    return null;
             //}
 
-            return _internal.Values.FirstOrDefault(thisRow => thisRow != null && thisRow.MatchesTo(filter));
+            return _internal.Values.FirstOrDefault(thisRow => thisRow != null && thisRow.MatchesTo(filter.ToList()));
 
             //FilterCollection d = new(filter[0].database);
             //d.AddRange(filter);
@@ -461,7 +461,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    if (database is not DatabaseAbstract db) { return "Verlinkung zur Datenbank fehlhlerhaft"; }
     //    if (db.IsDisposed) { return "Datenbank verworfen"; }
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
-    IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
 
     public bool HasPendingWorker() {
         if (_pendingworker.Count > 0) { return true; }
@@ -501,7 +501,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public bool Remove(FilterCollection? fc, List<RowItem>? pinned, string comment) {
-        var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(fc) select thisrowitem.KeyName).Select(dummy => dummy).ToList();
+        var keys = (from thisrowitem in _internal.Values where thisrowitem != null && thisrowitem.MatchesTo(fc.ToList()) select thisrowitem.KeyName).Select(dummy => dummy).ToList();
         var did = false;
 
         foreach (var thisKey in keys) {
@@ -689,7 +689,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            if (Database != null && !Database.IsDisposed) { Database.Disposing -= Database_Disposing; }
+            if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
             Database = null;
             _internal.Clear();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
@@ -706,7 +706,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //        }
     //    }
     //}
-    private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
+    //private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
 
     private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 

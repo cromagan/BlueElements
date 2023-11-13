@@ -53,7 +53,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public RowEntryPadItem(string intern, DatabaseAbstract? db) : base(intern) {
         _itemSends = new();
 
-        OutputDatabase = db;
+        DatabaseOutput = db;
     }
 
     public RowEntryPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
@@ -69,19 +69,20 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         set => _itemSends.ChildIdsSet(value, this);
     }
 
+    public DatabaseAbstract? DatabaseInput => DatabaseOutput;
+
+    public DatabaseAbstract? DatabaseOutput {
+        get => _itemSends.DatabaseOutputGet();
+        set => _itemSends.DatabaseOutputSet(value, this);
+    }
+
     public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann die Zeile aus einem übergrordnetetn Element empfangen uns weitergeben.\r\nUnsichtbares Element, wird nicht angezeigt.";
     public List<int> InputColorId => new() { OutputColorId };
-    public DatabaseAbstract? InputDatabase => OutputDatabase;
     public override bool MustBeInDrawingArea => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
         set => _itemSends.OutputColorIdSet(value, this);
-    }
-
-    public DatabaseAbstract? OutputDatabase {
-        get => _itemSends.OutputDatabaseGet();
-        set => _itemSends.OutputDatabaseSet(value, this);
     }
 
     protected override int SaveOrder => 1;
@@ -93,7 +94,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new RowEntryControl(OutputDatabase);
+        var con = new RowEntryControl(DatabaseOutput);
         //con.DoInputSettings(parent, this);
         con.DoOutputSettings(parent, this);
         return con;
@@ -103,7 +104,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (InputDatabase is null || InputDatabase.IsDisposed) {
+        if (DatabaseInput is null || DatabaseInput.IsDisposed) {
             return "Quelle fehlt";
         }
 
@@ -145,8 +146,8 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public override string ReadableText() {
         var txt = "Eingangs-Zeile: ";
 
-        if (this.IsOk() && InputDatabase != null) {
-            return txt + InputDatabase.Caption;
+        if (this.IsOk() && DatabaseInput != null) {
+            return txt + DatabaseInput.Caption;
         }
 
         return txt + ErrorReason();

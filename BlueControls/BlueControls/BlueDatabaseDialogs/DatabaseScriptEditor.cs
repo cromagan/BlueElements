@@ -67,7 +67,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         }
 
         Database.EventScriptErrorMessage = string.Empty;
-        Database.Disposing += Database_Disposing;
+        Database.DisposingEvent += Database_DisposingEvent;
         Database.CanDoScript += Database_CanDoScript;
 
         FormManager.Current.RegisterForm(this);
@@ -244,7 +244,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         e.CancelReason = "Skript-Editor geöffnet";
     }
 
-    private void Database_Disposing(object sender, System.EventArgs e) {
+    private void Database_DisposingEvent(object sender, System.EventArgs e) {
         RemoveDatabase();
         Close();
     }
@@ -339,7 +339,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     private void RemoveDatabase() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         Item = null;
-        Database.Disposing -= Database_Disposing;
+        Database.DisposingEvent -= Database_DisposingEvent;
         Database.CanDoScript -= Database_CanDoScript;
         Database = null;
     }

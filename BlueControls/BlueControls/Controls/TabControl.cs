@@ -24,14 +24,21 @@ using System.Windows.Forms;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using System;
 
 namespace BlueControls.Controls;
 
-public class TabControl : AbstractTabControl, IControlAcceptSomething {
+public class TabControl : AbstractTabControl, IControlAcceptSomething, IControlSendSomething {
 
     #region Constructors
 
     public TabControl() : base() => BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? DisposingEvent;
 
     #endregion
 
@@ -42,34 +49,73 @@ public class TabControl : AbstractTabControl, IControlAcceptSomething {
         set => base.BackColor = value;
     }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> GetFilterFrom { get; } = new();
+    public List<IControlAcceptSomething> Childs { get; } = new();
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? InputFilter { get; set; } = null;
+    public DatabaseAbstract? DatabaseOutput { get; set; }
+
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? FilterInput { get; set; } = null;
+
+    public FilterCollection? FilterOutput { get; set; } = null;
+
+    public List<IControlSendSomething> Parents { get; } = new();
 
     #endregion
 
     #region Methods
 
-    public void ParentDataChanged() {
-        InputFilter = this.FilterOfSender();
-        Invalidate();
+    public void FilterInput_Changed(object sender, System.EventArgs e) {
+        FilterInput = this.FilterOfSender();
 
-        var row = InputFilter?.RowSingleOrNull;
-        if (db != Database && rowkey == RowKey) { return; }
-        Database = db;
-        RowKey = rowkey ?? string.Empty;
-        DoTabChilds();
+        //// Dieses DoChilds unterscheidet sich von IControlSend:
+        //// Da das TabControl kein Send - Control an sich ist, aber trotzdem die Tabs befüllen muss
+        //foreach (var thisTab in TabPages) {
+        //    if (thisTab is TabPage tp) {
+        //        foreach (var thisControl in tp.Controls) {
+        //            if (thisControl is ConnectedFormulaView cfw) {
+        //                cfw.GenerateView();
+        //                foreach (var thisControl2 in cfw.Controls) {
+        //                    if (thisControl2 is IControlAcceptSomething iar) {
+        //                        iar.FilterOutput_Changed();
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
+        Invalidate();
     }
 
-    public void ParentDataChanging() { }
+    public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
+    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+
+    protected override void Dispose(bool disposing) {
+        OnDisposingEvent();
+
+        base.Dispose(disposing);
+        if (disposing) {
+            _bitmapOfControl?.Dispose();
+            _bitmapOfControl = null;
+        }
+    }
+
+    protected override void Dispose(bool disposing) {
+        OnDisposingEvent();
+
+        base.Dispose(disposing);
+        //if (disposing) {
+        //    _bitmapOfControl?.Dispose();
+        //    _bitmapOfControl = null;
+        //}
+    }
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
@@ -82,26 +128,6 @@ public class TabControl : AbstractTabControl, IControlAcceptSomething {
     }
 
     protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.TabStrip_Back);
-
-    private void DoTabChilds() {
-        // Dieses DoChilds unterscheidet sich von IControlSend:
-        // Da das TabControl kein Send - Control an sich ist, aber trotzdem die Tabs befüllen muss
-        foreach (var thisTab in TabPages) {
-            if (thisTab is TabPage tp) {
-                foreach (var thisControl in tp.Controls) {
-                    if (thisControl is ConnectedFormulaView cfw) {
-                        cfw.GenerateView();
-                        foreach (var thisControl2 in cfw.Controls) {
-                            if (thisControl2 is IControlRowInput iar) {
-                                iar.SetData(Database, RowKey);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        Invalidate();
-    }
 
     #endregion
 }
