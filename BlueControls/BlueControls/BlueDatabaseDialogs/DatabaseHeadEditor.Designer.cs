@@ -475,7 +475,6 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tblUndo.DropMessages = false;
-            this.tblUndo.InputDatabase = null;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
             this.tblUndo.OutputDatabase = null;

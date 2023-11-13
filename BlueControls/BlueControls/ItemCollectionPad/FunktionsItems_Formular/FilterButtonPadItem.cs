@@ -34,11 +34,11 @@ using BlueDatabase;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IAutosizable {
+public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
+    private readonly ItemAcceptSomething _itemAccepts;
     private string _anzeige = string.Empty;
     private int _enabledwhenrows = 0;
     private ExtText? _eTxt;

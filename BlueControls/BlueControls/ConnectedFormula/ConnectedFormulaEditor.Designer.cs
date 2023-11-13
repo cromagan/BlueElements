@@ -39,7 +39,6 @@ namespace BlueControls.Forms {
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
             this.btnBild = new BlueControls.Controls.Button();
-            this.btnVariable = new BlueControls.Controls.Button();
             this.btnFileExplorer = new BlueControls.Controls.Button();
             this.btnFeldHinzu = new BlueControls.Controls.Button();
             this.grpOptik = new BlueControls.Controls.GroupBox();
@@ -51,7 +50,6 @@ namespace BlueControls.Forms {
             this.btnDropdownmenu = new BlueControls.Controls.Button();
             this.btnFilterConverter = new BlueControls.Controls.Button();
             this.btnBenutzerFilterWahl = new BlueControls.Controls.Button();
-            this.btnZeileZuFilter = new BlueControls.Controls.Button();
             this.grpArbeitsbereich = new BlueControls.Controls.GroupBox();
             this.btnArbeitsbereich = new BlueControls.Controls.Button();
             this.tabFile = new System.Windows.Forms.TabPage();
@@ -225,7 +223,6 @@ namespace BlueControls.Forms {
             // 
             this.grpFelder.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpFelder.Controls.Add(this.btnBild);
-            this.grpFelder.Controls.Add(this.btnVariable);
             this.grpFelder.Controls.Add(this.btnFileExplorer);
             this.grpFelder.Controls.Add(this.btnFeldHinzu);
             this.grpFelder.Dock = System.Windows.Forms.DockStyle.Left;
@@ -249,19 +246,6 @@ namespace BlueControls.Forms {
             this.btnBild.TabIndex = 5;
             this.btnBild.Text = "Bild";
             this.btnBild.Click += new System.EventHandler(this.btnBild_Click);
-            // 
-            // btnVariable
-            // 
-            this.btnVariable.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnVariable.ImageCode = "Variable";
-            this.btnVariable.Location = new System.Drawing.Point(8, 24);
-            this.btnVariable.Name = "btnVariable";
-            this.btnVariable.QuickInfo = "Ein Feld, das eine Variable \r\neines Zeilen-Skriptes dargestellen kann.\r\nImmer sch" +
-    "reibgeschützt.";
-            this.btnVariable.Size = new System.Drawing.Size(136, 22);
-            this.btnVariable.TabIndex = 4;
-            this.btnVariable.Text = "Variable anzeigen";
-            this.btnVariable.Click += new System.EventHandler(this.btnVariable_Click);
             // 
             // btnFileExplorer
             // 
@@ -336,7 +320,6 @@ namespace BlueControls.Forms {
             this.groupBox1.Controls.Add(this.btnDropdownmenu);
             this.groupBox1.Controls.Add(this.btnFilterConverter);
             this.groupBox1.Controls.Add(this.btnBenutzerFilterWahl);
-            this.groupBox1.Controls.Add(this.btnZeileZuFilter);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Left;
             this.groupBox1.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.groupBox1.Location = new System.Drawing.Point(72, 0);
@@ -405,20 +388,6 @@ namespace BlueControls.Forms {
             this.btnBenutzerFilterWahl.TabIndex = 2;
             this.btnBenutzerFilterWahl.Text = "Benutzer-Filter Wahl";
             this.btnBenutzerFilterWahl.Click += new System.EventHandler(this.btnBenutzerFilterWahl_Click);
-            // 
-            // btnZeileZuFilter
-            // 
-            this.btnZeileZuFilter.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnZeileZuFilter.ImageCode = "Zeile|16";
-            this.btnZeileZuFilter.Location = new System.Drawing.Point(0, 2);
-            this.btnZeileZuFilter.Name = "btnZeileZuFilter";
-            this.btnZeileZuFilter.QuickInfo = "Dieses Element kann eine Zeile empfangen, auf dessen Zellen zugreifen,<br>und ein" +
-    "en neuen Filter für eine andere Datenbank zurück geben.<br>Unsichtbares Element," +
-    " es wird nicht angezeigt.";
-            this.btnZeileZuFilter.Size = new System.Drawing.Size(64, 66);
-            this.btnZeileZuFilter.TabIndex = 1;
-            this.btnZeileZuFilter.Text = "Filter aus Zeile";
-            this.btnZeileZuFilter.Click += new System.EventHandler(this.btnZeileZuFilter_Click);
             // 
             // grpArbeitsbereich
             // 
@@ -601,7 +570,6 @@ namespace BlueControls.Forms {
         private Button btnFileExplorer;
         private GroupBox groupBox1;
         private GroupBox grpOptik;
-        private Button btnVariable;
         private TabPage tabPage1;
         private Button btnRegisterKarte;
         private Button btnBild;
@@ -611,7 +579,6 @@ namespace BlueControls.Forms {
         private Button btnDropdownmenu;
         private Button btnFilterConverter;
         private Button btnBenutzerFilterWahl;
-        private Button btnZeileZuFilter;
         private GroupBox grpArbeitsbereich;
         private Button btnArbeitsbereich;
         private GroupBox groupBox2;

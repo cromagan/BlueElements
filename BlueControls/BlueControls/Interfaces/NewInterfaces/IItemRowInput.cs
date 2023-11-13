@@ -22,7 +22,7 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Das Steuerelement, das die Eingangszeile eine Formulars empfangen kann
 /// </summary>
-public interface IItemRowInput : IItemSendRow {
+public interface IItemRowInput : IItemSendSomething {
 }
 
 public static class IItemRowInputExtension {

@@ -35,12 +35,12 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow, IAutosizable {
+public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
-    private readonly ItemSendRow _itemSends;
+    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemSendSomething _itemSends;
     private string _anzeige = string.Empty;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
     private string _überschrift = string.Empty;
@@ -105,7 +105,6 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-    public DatabaseAbstract? InputDatabase => _itemAccepts.InputDatabase(this);
 
     public DatabaseAbstract? InputDatabaseMustBe => OutputDatabase;
     public override bool MustBeInDrawingArea => true;
@@ -183,6 +182,12 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
+    }
+
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        _itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string tag, string value) {
@@ -267,12 +272,6 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, true);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        _itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

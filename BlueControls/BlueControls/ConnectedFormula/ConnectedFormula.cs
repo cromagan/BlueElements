@@ -946,7 +946,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         _databaseFiles.Clear();
 
         //foreach (var thisit in PadData) {
-        //    if (thisit is IItemSendRow rwf) {
+        //    if (thisit is IItemSendSomething rwf) {
         //        if (rwf.OutputDatabase != null) {
         //            _ = _databaseFiles.AddIfNotExists(rwf.OutputDatabase.ConnectionData.UniqueID);
         //            _id = Math.Max(_id, rwf.InputColorId);

@@ -43,11 +43,10 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
-public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserControl //
+public partial class FileBrowser : GenericControl, IControlAcceptSomething   //UserControl //
 {
     #region Fields
 
-    private IControlSendRow? _getRowFrom;
     private string _lastcheck = string.Empty;
     private string _originalText = string.Empty;
     private string _sort = "Name";
@@ -80,20 +79,17 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
         }
     }
 
-    public IControlSendRow? GetRowFrom {
-        get => _getRowFrom;
-        set {
-            if (_getRowFrom == value) { return; }
-            if (_getRowFrom != null) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Änderung nicht erlaubt");
-            }
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public List<IControlSendSomething> GetFilterFrom { get; } = new();
 
-            _getRowFrom = value;
-            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
-        }
-    }
-
-    public RowItem? LastInputRow { get; }
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? InputFilter { get; set; } = null;
 
     public string OriginalText {
         get => _originalText;
@@ -150,6 +146,18 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
         return exekey.GetValue("").ToString();
     }
 
+    public void ParentDataChanged() {
+        InputFilter = this.FilterOfSender();
+        Invalidate();
+
+        var row = InputFilter?.RowSingleOrNull;
+        row?.CheckRowDataIfNeeded();
+        ParseVariables(row?.LastCheckedEventArgs?.Variables);
+        CreateWatcher();
+    }
+
+    public void ParentDataChanging() { RemoveWatcher(); }
+
     public void ParentPath() => btnZurück_Click(null, System.EventArgs.Empty);
 
     public bool ParseVariables(VariableCollection? list) {
@@ -166,16 +174,6 @@ public partial class FileBrowser : GenericControl, IControlAcceptRow   //UserCon
     }
 
     public void Reload() => ÖffnePfad(txbPfad.Text);
-
-    public void SetData(DatabaseAbstract? database, string rowkey) {
-        if (this.InputDatabase() != database) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
-        }
-
-        var row = database?.Row.SearchByKey(rowkey);
-        row?.CheckRowDataIfNeeded();
-        ParseVariables(row?.LastCheckedEventArgs?.Variables);
-    }
 
     protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
 

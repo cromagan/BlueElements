@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -42,14 +43,18 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Erzeut ein FlexiControllForCell
 /// Standard-Bearbeitungs-Feld
 /// </summary>
-public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptRow, IHasVersion, IAutosizable {
+public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IHasVersion, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptRow _itemAccepts;
+    private readonly ItemAcceptSomething _itemAccepts;
+
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
+
     private ColumnItem? _column;
+
     private string _columnName = string.Empty;
+
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -118,7 +123,13 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
     }
 
-    public IItemSendRow? GetRowFrom {
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ReadOnlyCollection<string> GetFilterFrom { get; set; }
+
+    public IItemSendSomething? GetRowFrom {
         get => _itemAccepts.GetRowFromGet(this);
         set => _itemAccepts.GetRowFromSet(value, this);
     }

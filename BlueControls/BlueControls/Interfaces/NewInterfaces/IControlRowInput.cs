@@ -22,7 +22,7 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Der einzige Eintiegspunkt eines Formulares
 /// </summary>
-public interface IControlRowInput : IControlSendSomething, IControlAcceptRow {
+public interface IControlRowInput : IControlSendSomething, IControlAcceptSomething {
 }
 
 public static class IControlRowInputInputExtension {

@@ -60,27 +60,23 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         Pad.AddCentered(x);
 
-        if (l is IItemSendRow isr && x is IItemAcceptRow iar) {
+        if (l is IItemSendSomething isr && x is IItemAcceptSomething iar) {
             iar.GetRowFrom = isr;
         }
 
-        if (l is IItemSendFilter && x is IItemAcceptFilter iaf) {
+        if (l is IItemSendSomething && x is IItemAcceptSomething iaf) {
             iaf.GetFilterFrom = new List<string> { l.KeyName }.AsReadOnly();
         }
 
-        if (x is IItemAcceptRow iar2 && iar2.GetRowFrom == null) {
-            iar2.Datenquelle_wählen();
-        }
-
-        if (x is IItemSendRow isr2) {
+        if (x is IItemSendSomething isr2) {
             isr2.Datenbank_wählen();
         }
 
-        if (x is IItemSendFilter isf2) {
+        if (x is IItemSendSomething isf2) {
             isf2.Datenbank_wählen();
         }
 
-        if (x is IItemAcceptFilter iaf2 && iaf2.GetFilterFrom.Count == 0) {
+        if (x is IItemAcceptSomething iaf2 && iaf2.GetFilterFrom.Count == 0) {
             iaf2.Datenquellen_bearbeiten();
         }
     }
@@ -212,12 +208,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
         AddCentered(x);
     }
 
-    private void btnVariable_Click(object sender, System.EventArgs e) {
-        var x = new VariableFieldPadItem(string.Empty);
-
-        AddCentered(x);
-    }
-
     private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
 
     private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
@@ -240,25 +230,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         EditBoxRow.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", CFormula, r, true);
     }
 
-    private void btnZeileZuFilter_Click(object sender, System.EventArgs e) {
-        var x = new InputRowOutputFilterPadItem(string.Empty);
-        AddCentered(x);
-    }
-
     private void CheckButtons() { }
-
-    //private void ChooseDatabaseAndId(IItemSendRow? it) {
-    //    if (CFormula == null || it == null) { return; }
-
-    //    it.Datenbank_wählen();
-
-    //    //var db = CommonDialogs.ChooseKnownDatabase();
-
-    //    //if (db == null) { return; }
-
-    //    //it.OutputDatabase = db;
-    //    //it.Id = CFormula.NextId();
-    //}
 
     private void FormulaSet(string? filename, ReadOnlyCollection<string>? notAllowedchilds) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);

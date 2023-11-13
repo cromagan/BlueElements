@@ -18,19 +18,18 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using BlueBasics;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSendRow, IControlRowInput {
+internal class RowEntryControl : GenericControl, IControlAcceptSomething, IControlSendSomething, IControlRowInput {
 
     #region Fields
 
-    private readonly List<IControlAcceptRow> _childs = new();
-
-    private IControlSendRow? _getRowFrom;
+    private readonly List<IControlAcceptSomething> _childs = new();
 
     #endregion
 
@@ -42,46 +41,50 @@ internal class RowEntryControl : GenericControl, IControlAcceptRow, IControlSend
 
     #region Properties
 
-    public IControlSendRow? GetRowFrom {
-        get => _getRowFrom;
-        set {
-            if (_getRowFrom == value) { return; }
-            if (_getRowFrom != null) {
-                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
-            }
+    public FilterCollection? Filter { get; }
 
-            _getRowFrom = value;
-            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
-        }
-    }
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public List<IControlSendSomething> GetFilterFrom { get; } = new();
 
-    public RowItem? LastInputRow { get; private set; }
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? InputFilter { get; set; } = null;
+
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 
     #region Methods
 
-    public void ChildAdd(IControlAcceptRow c) {
+    public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.AddIfNotExists(c);
-        this.DoChilds(_childs, LastInputRow);
+        this.DoChilds(_childs);
     }
 
-    public void SetData(DatabaseAbstract? database, string rowkey) {
-        //if(OutputDatabase== null) { return; }
+    public void ParentDataChanged() {
+        InputFilter = this.FilterOfSender();
+        Invalidate();
 
-        if (OutputDatabase != database) {
+        var row = InputFilter?.RowSingleOrNull;
+
+        if (OutputDatabase != InputFilter?.Database) {
             return;
-            //            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
         }
 
-        var r = database?.Row.SearchByKey(rowkey);
+        var r = OutputDatabase?.Row.SearchByKey(rowkey);
         if (r == LastInputRow) { return; }
 
         LastInputRow = r;
         this.DoChilds(_childs, LastInputRow);
     }
+
+    public void ParentDataChanging() { }
 
     #endregion
 }

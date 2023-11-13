@@ -18,26 +18,36 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using BlueBasics;
+using System.ComponentModel;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class ConnectedFormulaFilterButton : Button, IControlAcceptFilter {
+internal class ConnectedFormulaFilterButton : Button, IControlAcceptSomething {
 
     #region Properties
 
-    public List<IControlSendFilter> GetFilterFrom { get; } = new();
+    public List<IControlSendSomething> GetFilterFrom { get; } = new();
 
-    public DatabaseAbstract? InputDatabase { get; set; }
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? InputFilter { get; set; }
 
     #endregion
 
     #region Methods
 
-    public void FilterFromParentsChanged() { }
+    public void ParentDataChanged() {
+        InputFilter = this.FilterOfSender();
+        Invalidate();
+    }
+
+    public void ParentDataChanging() {
+        throw new System.NotImplementedException();
+    }
 
     #endregion
 }

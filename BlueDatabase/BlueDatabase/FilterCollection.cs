@@ -18,17 +18,16 @@
 #nullable enable
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
@@ -47,6 +46,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         Database = database;
         if (Database != null && !Database.IsDisposed) {
             Database.Disposing += Database_Disposing;
+            Database.Row.RowRemoving += Row_RowRemoving;
         }
     }
 
@@ -99,6 +99,15 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
             if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
             if (_rows == null) { _rows = CalculateFilteredRows(); }
             return _rows.AsReadOnly();
+        }
+    }
+
+    public RowItem? RowSingleOrNull {
+        get {
+            if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+            if (_rows == null) { _rows = CalculateFilteredRows(); }
+            if (_rows.Count != 1) { return null; }
+            return _rows[0];
         }
     }
 
@@ -265,7 +274,9 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
     }
 
-    public void RemoveOtherAndAddIfNotExists(FilterCollection fc) {
+    public void RemoveOtherAndAddIfNotExists(FilterCollection? fc) {
+        if (fc == null) { return; }
+
         foreach (var thisFi in fc) {
             RemoveOtherAndAddIfNotExists(thisFi);
         }
@@ -362,6 +373,7 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
                 //base.Dispose(disposing);
                 if (Database != null) {
                     Database.Disposing -= Database_Disposing;
+                    Database.Row.RowRemoving -= Row_RowRemoving;
                     Database = null;
                 }
                 _rows = null;
@@ -377,6 +389,12 @@ public sealed class FilterCollection : ObservableCollection<FilterItem>, IParsea
         if (IsDisposed) { return; }
         Invalidate_FilteredRows();
         OnChanged();
+    }
+
+    private void Row_RowRemoving(object sender, RowReasonEventArgs e) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (_rows == null) { return; }
+        if (_rows.Contains(e.Row)) { _rows = null; }
     }
 
     #endregion

@@ -147,9 +147,6 @@
     <Compile Include="ConnectedFormula\FilterChangeControl.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\InputRowOutputFilterControl.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="ConnectedFormula\RowEntryControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -158,12 +155,6 @@
     </Compile>
     <Compile Include="ConnectedFormula\FlexiControlForFilterNew.Designer.cs">
       <DependentUpon>FlexiControlForFilterNew.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ConnectedFormula\FlexiControlVariable.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="ConnectedFormula\FlexiControlVariable.Designer.cs">
-      <DependentUpon>FlexiControlVariable.cs</DependentUpon>
     </Compile>
     <Compile Include="ConnectedFormula\FlexiControlRowSelector.cs">
       <SubType>Component</SubType>
@@ -198,19 +189,11 @@
     <Compile Include="Interfaces\NewInterfaces\IAutosizable.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemRowInput.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlRowInput.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IControlAcceptFilter.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IControlSendFilter.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IControlAcceptRow.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IControlSendRow.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlAcceptSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IHasVersion.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemAcceptSomething.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IItemAcceptRow.cs" />
     <Compile Include="Interfaces\NewInterfaces\IControlSendSomething.cs" />
     <Compile Include="Interfaces\NewInterfaces\IItemSendSomething.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IItemSendRow.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IItemSendFilter.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IItemAcceptFilter.cs" />
     <Compile Include="Interfaces\IHasConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormulaView.cs">
@@ -404,10 +387,8 @@
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\DropDownSelectRowPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\ScriptChangeFilterPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\InputFilterOutputFilterPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\InputRowOutputFilterPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TabFormulaPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\Abstract\FakeControlPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\VariableFieldPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\FileExplorerPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\EditFieldPadItem.cs" />
     <Compile Include="ItemCollectionPad\Abstract\FixedRectanglePadItem.cs" />
@@ -681,10 +662,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="ConnectedFormula\FlexiControlForFilterNew.resx">
       <DependentUpon>FlexiControlForFilterNew.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ConnectedFormula\FlexiControlVariable.resx">
-      <DependentUpon>FlexiControlVariable.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\Caption.resx">

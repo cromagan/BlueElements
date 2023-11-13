@@ -36,12 +36,12 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Per Tabellenansicht
 /// </summary>
 
-public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendRow, IAutosizable {
+public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
-    private readonly ItemSendRow _itemSends;
+    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemSendSomething _itemSends;
 
     #endregion
 

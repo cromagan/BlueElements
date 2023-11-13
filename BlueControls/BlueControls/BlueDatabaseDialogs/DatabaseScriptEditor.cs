@@ -31,7 +31,6 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.BlueDatabaseDialogs;
 

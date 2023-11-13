@@ -56,7 +56,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptFilter, IControlSendRow {
+public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptSomething, IControlSendSomething {
 
     #region Fields
 
@@ -66,7 +66,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
     public static readonly int RowCaptionSizeY = 50;
-    private readonly List<IControlAcceptRow> _childs = new();
+    private readonly List<IControlAcceptSomething> _childs = new();
     private readonly List<string> _collapsed = new();
     private readonly object _lockUserAction = new();
     private int _arrangementNr = 1;
@@ -273,12 +273,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
-    public List<IControlSendFilter> GetFilterFrom { get; } = new();
+    public List<IControlSendSomething> GetFilterFrom { get; } = new();
 
-    public DatabaseAbstract? InputDatabase { get => Database; set => DatabaseSet(value, string.Empty); }
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? InputFilter { get; set; } = null;
 
     public DatabaseAbstract? OutputDatabase { get => Database; set => DatabaseSet(value, string.Empty); }
-
     public List<RowItem> PinnedRows { get; } = new();
 
     public DateTime PowerEdit {
@@ -862,7 +865,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (CursorPosRow?.Row != null && CursorPosRow?.Row.Database != db) { CursorPosRow = null; }
     }
 
-    public void ChildAdd(IControlAcceptRow c) {
+    public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.AddIfNotExists(c);
         this.DoChilds(_childs, CursorPosRow?.Row);
@@ -1208,36 +1211,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Database.Export_HTML(filename, CurrentArrangement, RowsVisibleUnique(), execute);
     }
 
-    public void FilterFromParentsChanged() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
-        if (Filter == null) { return; }
-
-        var _filterFromParents = this.FilterOfSender();
-
-        var t = "Übergeordnetes Element";
-
-        foreach (var thisFi in _filterFromParents) {
-            thisFi.Herkunft = t;
-        }
-
-        Filter.RemoveRange(t);
-
-        Filter.RemoveOtherAndAddIfNotExists(_filterFromParents);
-
-        //_filterall = new FilterCollection(Database);
-        //_filterall.AddIfNotExists(Filter);
-
-        //if (_filterFromParents != null) { _filterall.AddIfNotExists(_filterFromParents); }
-
-        //_filterall = new FilterCollection(Database);
-        //_filterall.AddIfNotExists(Filter);
-
-        //if (_filterFromParents != null) { _filterall.AddIfNotExists(_filterFromParents); }
-
-        //Invalidate_SortedRowData();
-        //OnFilterChanged();
-    }
-
     /// <summary>
     /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
     /// </summary>
@@ -1305,6 +1278,40 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _searchAndReplace.Show();
         }
     }
+
+    public void ParentDataChanged() {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Filter == null) { return; }
+
+        InputFilter = this.FilterOfSender();
+
+        var t = "Übergeordnetes Element";
+
+        if (InputFilter != null) {
+            foreach (var thisFi in InputFilter) {
+                thisFi.Herkunft = t;
+            }
+        }
+
+        Filter.RemoveRange(t);
+
+        Filter.RemoveOtherAndAddIfNotExists(InputFilter);
+
+        //_filterall = new FilterCollection(Database);
+        //_filterall.AddIfNotExists(Filter);
+
+        //if (_filterFromParents != null) { _filterall.AddIfNotExists(_filterFromParents); }
+
+        //_filterall = new FilterCollection(Database);
+        //_filterall.AddIfNotExists(Filter);
+
+        //if (_filterFromParents != null) { _filterall.AddIfNotExists(_filterFromParents); }
+
+        //Invalidate_SortedRowData();
+        //OnFilterChanged();
+    }
+
+    public void ParentDataChanging() { }
 
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist

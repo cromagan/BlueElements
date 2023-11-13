@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -38,13 +39,12 @@ using MessageBox = BlueControls.Forms.MessageBox;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone, IControlAcceptRow {
+public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone, IControlAcceptSomething {
 
     #region Fields
 
     private Bitmap? _bitmap;
     private string _filename = string.Empty;
-    private IControlSendRow? _getRowFrom;
     private string _originalText = string.Empty;
     private int _panelMoveDirection;
 
@@ -88,20 +88,13 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    public IControlSendRow? GetRowFrom {
-        get => _getRowFrom;
-        set {
-            if (_getRowFrom == value) { return; }
-            if (_getRowFrom != null) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Änderung nicht erlaubt");
-            }
+    public List<IControlSendSomething> GetFilterFrom { get; } = new();
 
-            _getRowFrom = value;
-            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
-        }
-    }
-
-    public RowItem? LastInputRow { get; }
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? InputFilter { get; set; }
 
     public string OriginalText {
         get => _originalText;
@@ -177,6 +170,17 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
+    public void ParentDataChanged() {
+        InputFilter = this.FilterOfSender();
+        Invalidate();
+
+        var row = InputFilter?.RowSingleOrNull;
+        row?.CheckRowDataIfNeeded();
+        ParseVariables(row?.LastCheckedEventArgs?.Variables);
+    }
+
+    public void ParentDataChanging() { }
+
     public bool ParseVariables(VariableCollection? list) {
         if (IsDisposed) { return false; }
 
@@ -188,16 +192,6 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
         FileName = ct;
         return ct == OriginalText;
-    }
-
-    public void SetData(DatabaseAbstract? database, string rowkey) {
-        if (this.InputDatabase() != database) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken inkonsitent!");
-        }
-
-        var row = database?.Row.SearchByKey(rowkey);
-        row?.CheckRowDataIfNeeded();
-        ParseVariables(row?.LastCheckedEventArgs?.Variables);
     }
 
     protected override void DrawControl(Graphics gr, States vState) {

@@ -36,11 +36,11 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.
 /// Unsichtbares Element, wird nicht angezeigt.
 /// </summary>
-public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemSendRow, IItemRowInput {
+public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemSendSomething, IItemRowInput {
 
     #region Fields
 
-    private readonly ItemSendRow _itemSends;
+    private readonly ItemSendSomething _itemSends;
 
     #endregion
 

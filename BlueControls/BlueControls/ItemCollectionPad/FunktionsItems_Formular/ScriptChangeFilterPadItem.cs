@@ -31,12 +31,12 @@ using BlueDatabase;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
+public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
-    private readonly ItemSendFilter _itemSends;
+    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemSendSomething _itemSends;
 
     #endregion
 

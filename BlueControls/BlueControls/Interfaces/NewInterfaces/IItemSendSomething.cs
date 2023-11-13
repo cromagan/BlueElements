@@ -61,23 +61,6 @@ public static class ItemSendSomethingExtension {
 
     #region Methods
 
-    public static void Datenbank_wählen(this IItemSendSomething item) {
-        var db = CommonDialogs.ChooseKnownDatabase("Ausgangs-Datenbank wählen:", string.Empty);
-        if (db == null) { return; }
-        item.OutputDatabase = db;
-
-        if (item is IItemAcceptSomething ias) {
-            if (ias.InputDatabase != ias.InputDatabaseMustBe && ias.InputDatabaseMustBe != null) {
-                if (ias is IItemAcceptFilter iaf) {
-                    iaf.GetFilterFrom = new List<string>().AsReadOnly();
-                }
-                if (ias is IItemAcceptRow iar) {
-                    iar.GetRowFrom = null;
-                }
-            }
-        }
-    }
-
     public static void Datenbankkopf(this IItemSendSomething item) {
         if (item.OutputDatabase is not DatabaseAbstract db || db.IsDisposed) { return; }
         TableView.OpenDatabaseHeadEditor(db);
@@ -218,11 +201,20 @@ public class ItemSendSomething {
         remove.CalculateInputColorIds();
     }
 
+    internal string ErrorReason(IItemSendSomething item) {
+        var d = item.OutputDatabase;
+        if (d == null || d.IsDisposed) {
+            return "Ausgehende Datenbank nicht angegeben.";
+        }
+
+        return string.Empty;
+    }
+
     protected List<GenericControl> GetStyleOptions(IItemSendSomething item, int widthOfControl) {
         var l = new List<GenericControl>();
         l.Add(new FlexiControl("Ausgang:", widthOfControl));
 
-        l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
+        //l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
 
         if (item.OutputDatabase is not DatabaseAbstract db || db.IsDisposed) { return l; }
 

@@ -18,41 +18,50 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using BlueBasics;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class FilterChangeControl : GenericControl, IControlAcceptFilter, IControlSendFilter {
+internal class FilterChangeControl : GenericControl, IControlAcceptSomething, IControlSendSomething {
 
     #region Fields
 
-    private readonly List<IControlAcceptFilter> _childs = new();
+    private readonly List<IControlAcceptSomething> _childs = new();
 
     #endregion
 
     #region Properties
 
-    public FilterItem? Filter { get; }
+    public FilterCollection? Filter { get; }
+    public List<IControlSendSomething> GetFilterFrom { get; } = new();
 
-    public List<IControlSendFilter> GetFilterFrom { get; } = new();
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? InputFilter { get; set; } = null;
 
-    public DatabaseAbstract? InputDatabase { get; set; }
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 
     #region Methods
 
-    public void ChildAdd(IControlAcceptFilter c) {
+    public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.AddIfNotExists(c);
         this.DoChilds(_childs);
     }
 
-    public void FilterFromParentsChanged() { }
+    public void ParentDataChanged() {
+        InputFilter = this.FilterOfSender();
+        Invalidate();
+    }
+
+    public void ParentDataChanging() { }
 
     #endregion
 }

@@ -17,23 +17,17 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-public class TabControl : AbstractTabControl, IControlAcceptRow {
-
-    #region Fields
-
-    private IControlSendRow? _getRowFrom;
-
-    #endregion
+public class TabControl : AbstractTabControl, IControlAcceptSomething {
 
     #region Constructors
 
@@ -52,36 +46,30 @@ public class TabControl : AbstractTabControl, IControlAcceptRow {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public DatabaseAbstract? Database { get; private set; }
+    public List<IControlSendSomething> GetFilterFrom { get; } = new();
 
-    public IControlSendRow? GetRowFrom {
-        get => _getRowFrom;
-        set {
-            if (_getRowFrom == value) { return; }
-            if (_getRowFrom != null) {
-                Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Änderung nicht erlaubt");
-            }
-
-            _getRowFrom = value;
-            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
-        }
-    }
-
-    public RowItem? LastInputRow { get; }
-
-    [DefaultValue("")]
-    public string RowKey { get; private set; } = string.Empty;
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? InputFilter { get; set; } = null;
 
     #endregion
 
     #region Methods
 
-    public void SetData(DatabaseAbstract? db, string rowkey) {
+    public void ParentDataChanged() {
+        InputFilter = this.FilterOfSender();
+        Invalidate();
+
+        var row = InputFilter?.RowSingleOrNull;
         if (db != Database && rowkey == RowKey) { return; }
         Database = db;
         RowKey = rowkey ?? string.Empty;
         DoTabChilds();
     }
+
+    public void ParentDataChanging() { }
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);

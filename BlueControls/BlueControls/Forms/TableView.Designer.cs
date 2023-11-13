@@ -902,7 +902,6 @@ namespace BlueControls.Forms {
             // 
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Table.DropMessages = false;
-            this.Table.InputDatabase = null;
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
             this.Table.OutputDatabase = null;

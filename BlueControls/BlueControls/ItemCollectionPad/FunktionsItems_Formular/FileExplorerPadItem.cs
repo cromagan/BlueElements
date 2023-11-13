@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -32,13 +33,16 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosizable {
+public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptRow _itemAccepts;
+    private readonly ItemAcceptSomething _itemAccepts;
+
     private bool _bei_Bedarf_Erzeugen;
+
     private bool _leere_Ordner_Löschen;
+
     private string _pfad = string.Empty;
 
     #endregion
@@ -55,6 +59,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
     #region Properties
 
     public static string ClassId => "FI-FileExplorer";
+
     public bool AutoSizeableHeight => true;
 
     [Description("Ob das Verzeichniss bei Bedarf erzeugt werden soll.")]
@@ -72,7 +77,13 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
 
     public override string Description => "Dieses Element erzeugt eine File-Explorer-Steuerelement,\r\nwmit welchem interagiert werden kann.";
 
-    public IItemSendRow? GetRowFrom {
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ReadOnlyCollection<string> GetFilterFrom { get; set; }
+
+    public IItemSendSomething? GetRowFrom {
         get => _itemAccepts.GetRowFromGet(this);
         set => _itemAccepts.GetRowFromSet(value, this);
     }
@@ -156,6 +167,12 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
         return l;
     }
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
+    }
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         if (_itemAccepts.ParseThis(tag, value)) { return true; }
@@ -228,12 +245,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptRow, IAutosiza
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        //_itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

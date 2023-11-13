@@ -19,7 +19,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
@@ -43,12 +45,13 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
 /// </summary>
-public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptRow, IAutosizable {
+public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptSomething, IAutosizable {
 
     #region Fields
 
     private readonly List<string> _childs = new();
-    private readonly ItemAcceptRow _itemAccepts;
+
+    private readonly ItemAcceptSomething _itemAccepts;
 
     #endregion
 
@@ -73,6 +76,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     #region Properties
 
     public static string ClassId => "FI-ChildFormula";
+
     public bool AutoSizeableHeight => true;
 
     /// <summary>
@@ -82,7 +86,13 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public override string Description => "Dieses Element erzeugt ein Tab-Control, dass weitere Unterformulare enthalten kann.\r\nEs kann eine Zeile empfangen, welche an die Unterformulare weitergegeben wird.";
 
-    public IItemSendRow? GetRowFrom {
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ReadOnlyCollection<string> GetFilterFrom { get; set; }
+
+    public IItemSendSomething? GetRowFrom {
         get => _itemAccepts.GetRowFromGet(this);
         set => _itemAccepts.GetRowFromSet(value, this);
     }
@@ -239,6 +249,12 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return l;
     }
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
+    }
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         if (_itemAccepts.ParseThis(tag, value)) { return true; }
@@ -341,12 +357,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        //_itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     //protected override AbstractPadItem? TryCreate(string id, string name) {

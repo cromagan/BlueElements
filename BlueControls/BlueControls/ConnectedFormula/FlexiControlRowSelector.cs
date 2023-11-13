@@ -18,7 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueControls.Controls;
@@ -31,15 +31,13 @@ using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControlAcceptFilter {
+internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IControlAcceptSomething {
 
     #region Fields
 
-    private readonly List<IControlAcceptRow> _childs = new();
+    private readonly List<IControlAcceptSomething> _childs = new();
 
     private readonly string _showformat;
-    private FilterCollection? _fc;
-    private RowItem? _row;
 
     #endregion
 
@@ -61,34 +59,35 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
     #region Properties
 
-    public List<IControlSendFilter> GetFilterFrom { get; } = new();
-    public DatabaseAbstract? InputDatabase { get; set; }
-    public DatabaseAbstract? OutputDatabase { get; set; }
+    public FilterCollection? Filter { get; }
+    public List<IControlSendSomething> GetFilterFrom { get; } = new();
 
-    public RowItem? Row {
-        get => IsDisposed ? null : _row;
-        private set {
-            if (IsDisposed) { return; }
-            if (value == _row) { return; }
-            _row = value;
-            this.DoChilds(_childs, _row);
-        }
-    }
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? InputFilter { get; set; } = null;
+
+    public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 
     #region Methods
 
-    public void ChildAdd(IControlAcceptRow c) {
+    public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.AddIfNotExists(c);
         this.DoChilds(_childs, _row);
     }
 
-    public void FilterFromParentsChanged() {
-        _fc = null;
+    public void ParentDataChanged() {
+        InputFilter = this.FilterOfSender();
         Invalidate();
+
+        var row = InputFilter?.RowSingleOrNull;
     }
+
+    public void ParentDataChanging() { }
 
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
@@ -105,7 +104,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        if (_fc == null) {
+        if (InputFilter == null) {
             UpdateMyCollection();
         }
         base.DrawControl(gr, state);
@@ -136,10 +135,10 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendRow, IControl
 
         #region Zeilen erzeugen
 
-        _fc = this.FilterOfSender();
-        if (_fc == null) { return; }
+        InputFilter = this.FilterOfSender();
+        if (InputFilter == null) { return; }
 
-        var f = _fc.Rows;
+        var f = InputFilter.Rows;
         if (f != null) {
             foreach (var thisR in f) {
                 if (cb?.Item?[thisR.KeyName] == null) {

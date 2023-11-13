@@ -38,12 +38,12 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
 /// </summary>
 
-public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IAutosizable {
+public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptFilter _itemAccepts;
-    private readonly ItemSendFilter _itemSends;
+    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemSendSomething _itemSends;
     private string _anzeige = string.Empty;
     private string _überschrift = string.Empty;
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;

@@ -18,7 +18,6 @@
 #nullable enable
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -26,7 +25,6 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -36,8 +34,6 @@ using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueDatabase.DatabaseAbstract;
-using static BlueBasics.Extensions;
-using BlueScript;
 
 namespace BlueDatabase;
 

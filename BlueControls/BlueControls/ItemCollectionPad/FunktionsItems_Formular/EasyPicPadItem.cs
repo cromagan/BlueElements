@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -32,11 +33,12 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow, IAutosizable {
+public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSomething, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptRow _itemAccepts;
+    private readonly ItemAcceptSomething _itemAccepts;
+
     private string _bild_Dateiname = string.Empty;
 
     #endregion
@@ -53,6 +55,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
     #region Properties
 
     public static string ClassId => "FI-EasyPic";
+
     public bool AutoSizeableHeight => true;
 
     [Description("Der Datename des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
@@ -70,7 +73,13 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
 
     public override string Description => "Dieses Element erzeugt eine Bild-Steuerelement,\r\nwelches dann auch bearbeitet werden kann.";
 
-    public IItemSendRow? GetRowFrom {
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ReadOnlyCollection<string> GetFilterFrom { get; set; }
+
+    public IItemSendSomething? GetRowFrom {
         get => _itemAccepts.GetRowFromGet(this);
         set => _itemAccepts.GetRowFromSet(value, this);
     }
@@ -119,6 +128,12 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
         return l;
+    }
+
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        //_itemSends.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string tag, string value) {
@@ -178,12 +193,6 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptRow
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        //_itemSends.ParseFinished(this);
-        _itemAccepts.ParseFinished(this);
     }
 
     #endregion

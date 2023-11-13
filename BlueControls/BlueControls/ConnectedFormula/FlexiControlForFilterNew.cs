@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -30,11 +29,11 @@ using BlueDatabase;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilter, IControlSendFilter {
+public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSomething, IControlSendSomething {
 
     #region Fields
 
-    private readonly List<IControlAcceptFilter> _childs = new();
+    private readonly List<IControlAcceptSomething> _childs = new();
 
     #endregion
 
@@ -54,23 +53,33 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptFilt
 
     #region Properties
 
-    public FilterItem? Filter { get; }
-    public List<IControlSendFilter> GetFilterFrom { get; } = new();
-    public DatabaseAbstract? InputDatabase { get; set; }
+    public FilterCollection? Filter { get; }
+    public List<IControlSendSomething> GetFilterFrom { get; } = new();
+
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? InputFilter { get; set; } = null;
+
     public DatabaseAbstract? OutputDatabase { get; set; }
 
     #endregion
 
     #region Methods
 
-    public void ChildAdd(IControlAcceptFilter c) {
+    public void ChildAdd(IControlAcceptSomething c) {
         if (IsDisposed) { return; }
         _childs.AddIfNotExists(c);
         this.DoChilds(_childs);
     }
 
-    //public FlexiControlForFilter() : this(null, null) { }
-    public void FilterFromParentsChanged() { }
+    public void ParentDataChanged() {
+        InputFilter = this.FilterOfSender();
+        Invalidate();
+    }
+
+    public void ParentDataChanging() { }
 
     internal bool WasThisValueClicked() {
         var cb = GetComboBox();
