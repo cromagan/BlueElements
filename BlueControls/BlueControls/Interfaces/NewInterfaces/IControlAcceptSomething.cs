@@ -63,7 +63,7 @@ public static class IControlAcceptSomethingExtension {
     #region Methods
 
     /// <summary>
-    /// Nachdem das Controll erzeugt wurde, werden hiermit die Einstellungen vom IItemAcceptSomething übernommen.
+    /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom IItemAcceptSomething übernommen.
     /// </summary>
     /// <param name="dest"></param>
     /// <param name="parent"></param>
@@ -85,12 +85,12 @@ public static class IControlAcceptSomethingExtension {
     }
 
     public static FilterCollection? FilterOfSender(this IControlAcceptSomething item) {
-        if (item.FilterInput?.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        //if (item.FilterInput?.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
 
         FilterCollection? fc = null;
 
         foreach (var thiss in item.Parents) {
-            if (thiss.FilterOutput is FilterCollection fi) {
+            if (!thiss.IsDisposed &&  thiss.FilterOutput is FilterCollection fi) {
                 if (fc == null) { fc = new FilterCollection(fi.Database); }
                 fc.AddIfNotExists(fi);
             }

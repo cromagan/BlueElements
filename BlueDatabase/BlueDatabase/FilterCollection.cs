@@ -84,6 +84,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         get => _database;
         set {
             if (IsDisposed) { return; }
+            //if (value == null) { Develop.DebugPrint(FehlerArt.Fehler, "Datenbank null"); }
             if (_database == value) { return; }
 
             if (_database != null) {
@@ -189,16 +190,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     //    if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
     //    AddIfNotExists(new FilterItem(Database, filterType, filterBy));
     //}
-    /// <summary>
-    /// Erstellt einen Filter, der die erste Spalte als Filter hat, mit dem Wert der Zeile.
-    /// </summary>
-    /// <param name="row"></param>
-    public void Add(RowItem row) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
-        if (db.Column.First() is not ColumnItem column) { return; }
-
-        Add(column, FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, row.CellFirstString());
-    }
 
     //public void Add(FilterType filterType, string filterBy) {
     //    if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }

@@ -190,6 +190,15 @@ public static class Converter {
         //return 0;
     }
 
+    public static T EnsureNotNull<T>(T? value) where T : class {
+        if (value == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Wert ist null!");
+            throw new ArgumentNullException();
+        }
+
+        return value;
+    }
+
     public static byte[] FileToByte(string dateiname) {
         FileStream obFi = new(dateiname, FileMode.Open, FileAccess.Read);
         BinaryReader r = new(obFi);

@@ -37,6 +37,8 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
 
     #region Properties
 
+    public DatabaseAbstract? DatabaseInput { get; }
+
     /// <summary>
     /// Welcher Datenbank die eingehenden Filter entsprechen müssen.
     /// Wenn NULL zurück gegeben wird, ist freie Datenbankwahl
@@ -109,7 +111,7 @@ public static class ItemAcceptSomethingExtensions {
         // Die Items, die man noch wählen könnte
         foreach (var thisR in item.Parent) {
             if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendSomething rfp) {
-                if (!item.Parents.Contains(rfp.KeyName)) {
+                if (!item.Parents.Contains(rfp.KeyName) && item != rfp) {
                     if (matchDB == null || matchDB == rfp.DatabaseOutput) {
                         _ = x.Add("Hinzu: " + rfp.ReadableText(), "+|" + rfp.KeyName, rfp.SymbolForReadableText(), true, "1");
                     }
@@ -183,8 +185,6 @@ public class ItemAcceptSomething {
     private readonly List<string> _getFilterFromKeys = new();
 
     private ReadOnlyCollection<IItemSendSomething>? _getFilterFrom;
-
-    private string? _getValueFromkey;
 
     private List<int> _inputColorId = new();
 
@@ -303,12 +303,6 @@ public class ItemAcceptSomething {
         switch (tag) {
             case "getvaluefrom":
             case "getvaluefromkey":
-                _getValueFromkey = value.FromNonCritical();
-
-                //var l = GetRowFromGet(this);
-
-                return true;
-
             case "getfilterfromkeys":
                 var tmp = value.FromNonCritical().SplitBy("|");
                 _getFilterFromKeys.Clear();

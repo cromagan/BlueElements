@@ -217,7 +217,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         if (CFormula?.PadData != null) {
             foreach (var thisItem in CFormula.PadData) {
-                if (thisItem is IItemRowInput iri) {
+                if (thisItem is RowEntryPadItem iri) {
                     db = iri.DatabaseOutput;
                 }
             }

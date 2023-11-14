@@ -36,9 +36,11 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.
 /// Unsichtbares Element, wird nicht angezeigt.
 /// </summary>
-public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemSendSomething, IItemRowInput {
+public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething {
 
     #region Fields
+
+    private readonly ItemAcceptSomething _itemAccepts;
 
     private readonly ItemSendSomething _itemSends;
 
@@ -51,6 +53,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public RowEntryPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
 
     public RowEntryPadItem(string intern, DatabaseAbstract? db) : base(intern) {
+        _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
@@ -69,21 +72,31 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public DatabaseAbstract? DatabaseInput => DatabaseOutput;
+    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public DatabaseAbstract? DatabaseInputMustBe => DatabaseOutput;
 
     public DatabaseAbstract? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet();
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann die Zeile aus einem übergrordnetetn Element empfangen uns weitergeben.\r\nUnsichtbares Element, wird nicht angezeigt.";
+    public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann\r\ndie Zeile aus einem übergerordneten Element empfangen uns weitergeben.\r\n\r\nUnsichtbares Element, wird nicht angezeigt.";
+
     public List<int> InputColorId => new() { OutputColorId };
+
     public override bool MustBeInDrawingArea => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
         set => _itemSends.OutputColorIdSet(value, this);
     }
+
+    public ReadOnlyCollection<string> Parents {
+        get => _itemAccepts.GetFilterFromKeysGet();
+        set => _itemAccepts.GetFilterFromKeysSet(value, this);
+    }
+
+    public bool WaitForDatabase => false;
 
     protected override int SaveOrder => 1;
 
@@ -93,10 +106,12 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public void AddChild(IHasKeyName add) => _itemSends.AddChild(this, add);
 
+    public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
+
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new RowEntryControl(DatabaseOutput);
-        //con.DoInputSettings(parent, this);
         con.DoOutputSettings(parent, this);
+        con.DoInputSettings(parent, this);
         return con;
     }
 
@@ -104,12 +119,18 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         var b = base.ErrorReason();
         if (!string.IsNullOrEmpty(b)) { return b; }
 
-        if (DatabaseInput is null || DatabaseInput.IsDisposed) {
-            return "Quelle fehlt";
-        }
+        b = _itemAccepts.ErrorReason(this);
+        if (!string.IsNullOrEmpty(b)) { return b; }
 
         b = _itemSends.ErrorReason(this);
         if (!string.IsNullOrEmpty(b)) { return b; }
+
+        //if (DatabaseOutput is null || DatabaseOutput.IsDisposed) {
+        //    return "Ausgangsdatenbank fehlt";
+        //}
+
+        //b = _itemSends.ErrorReason(this);
+        //if (!string.IsNullOrEmpty(b)) { return b; }
 
         return string.Empty;
     }
@@ -128,11 +149,12 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
         _itemSends.ParseFinished(this);
-        //_itemAccepts.ParseFinished(this);
+        _itemAccepts.ParseFinished(this);
     }
 
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
+        if (_itemAccepts.ParseThis(tag, value)) { return true; }
         if (_itemSends.ParseThis(tag, value)) { return true; }
 
         switch (tag) {
@@ -146,8 +168,8 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public override string ReadableText() {
         var txt = "Eingangs-Zeile: ";
 
-        if (this.IsOk() && DatabaseInput != null) {
-            return txt + DatabaseInput.Caption;
+        if (this.IsOk() && DatabaseOutput != null) {
+            return txt + DatabaseOutput.Caption;
         }
 
         return txt + ErrorReason();
@@ -166,6 +188,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = new();
+        result.AddRange(_itemAccepts.ParsableTags());
         result.AddRange(_itemSends.ParsableTags());
         return result.Parseable(base.ToString());
     }
@@ -173,7 +196,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     internal override void AddedToCollection() {
         base.AddedToCollection();
         _itemSends.DoCreativePadAddedToCollection(this);
-        //_itemAccepts.DoCreativePadAddedToCollection(this);
+        _itemAccepts.DoCreativePadAddedToCollection(this);
         //RepairConnections();
     }
 
@@ -182,16 +205,14 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         // Deswegen ist InputColorID nur Fake
 
         if (!forPrinting) {
-            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
+            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, OutputColorId);
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
     }
 
     #endregion
-
-    // Dummy, wird nicht benötigt
 }

@@ -221,7 +221,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         return result.Parseable(base.ToString());
     }
 
-    protected static void DrawArrow(Graphics gr, RectangleF positionModified, float zoom, string symbol, int colorId, Alignment al, float valueArrow, float valueSymbol, float xmod) {
+    protected static void DrawArrow(Graphics gr, RectangleF positionModified, float zoom, int colorId, Alignment al, float valueArrow, float valueSymbol, float xmod) {
         var p = positionModified.PointOf(al);
         var width = (int)(zoom * 25);
         var height = (int)(zoom * 12);
@@ -250,14 +250,14 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         //var sy2 = QuickImage.Get(x);
         //gr.DrawImage(sy2, p.X - (sy2.Width / 2) + xmod, p.Y - valueSymbol);
 
-        if (!string.IsNullOrEmpty(symbol)) {
-            var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
-            var sy = QuickImage.Get(co);
-            gr.DrawImage(sy, p.X - (sy.Width / 2) + xmod, p.Y - valueSymbol);
-        }
+        //if (!string.IsNullOrEmpty(symbol)) {
+        //    var co = QuickImage.GenerateCode(symbol, (int)(5 * zoom), (int)(5 * zoom), ImageCodeEffect.Ohne, string.Empty, string.Empty, 120, 120, 0, 20, string.Empty);
+        //    var sy = QuickImage.Get(co);
+        //    gr.DrawImage(sy, p.X - (sy.Width / 2) + xmod, p.Y - valueSymbol);
+        //}
     }
 
-    protected void DrawArrorInput(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, string symbol, List<int>? colorId) {
+    protected void DrawArrorInput(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, List<int>? colorId) {
         if (forPrinting) { return; }
 
         var arrowY = (int)(zoom * 12) * 0.35f;
@@ -272,16 +272,16 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         var start = -((colorId.Count - 1) * width / 2);
 
         foreach (var thisColorId in colorId) {
-            DrawArrow(gr, positionModified, zoom, symbol, thisColorId, Alignment.Top_HorizontalCenter, arrowY, symbolY, start);
+            DrawArrow(gr, positionModified, zoom, thisColorId, Alignment.Top_HorizontalCenter, arrowY, symbolY, start);
             start += width;
         }
     }
 
-    protected void DrawArrowOutput(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, string symbol, int colorId) {
+    protected void DrawArrowOutput(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, int colorId) {
         if (forPrinting) { return; }
         var arrowY = (int)(zoom * 12) * 0.45f;
         var symbolY = (int)(zoom * 12) * 0.02f;
-        DrawArrow(gr, positionModified, zoom, symbol, colorId, Alignment.Bottom_HorizontalCenter, arrowY, symbolY, 0);
+        DrawArrow(gr, positionModified, zoom, colorId, Alignment.Bottom_HorizontalCenter, arrowY, symbolY, 0);
     }
 
     protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, List<int>? id, bool drawSymbol, bool drawText, bool transparent) {

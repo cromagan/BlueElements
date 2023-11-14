@@ -59,6 +59,18 @@ public static class ItemSendSomethingExtension {
 
     #region Methods
 
+    public static void Datenbank_wählen(this IItemSendSomething item) {
+        var db = CommonDialogs.ChooseKnownDatabase("Ausgangs-Datenbank wählen: ", string.Empty);
+        if (db == null) { return; }
+        item.DatabaseOutput = db;
+
+        if (item is IItemAcceptSomething ias) {
+            if (ias.DatabaseInput != ias.DatabaseInputMustBe && ias.DatabaseInputMustBe != null) {
+                ias.Parents = new List<string>().AsReadOnly();
+            }
+        }
+    }
+
     public static void Datenbankkopf(this IItemSendSomething item) {
         if (item.DatabaseOutput is not DatabaseAbstract db || db.IsDisposed) { return; }
         TableView.OpenDatabaseHeadEditor(db);
@@ -145,7 +157,7 @@ public class ItemSendSomething {
         var l = new List<GenericControl>();
         l.Add(new FlexiControl("Ausgang:", widthOfControl));
 
-        //l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
+        l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
 
         if (item.DatabaseOutput is not DatabaseAbstract db || db.IsDisposed) { return l; }
 

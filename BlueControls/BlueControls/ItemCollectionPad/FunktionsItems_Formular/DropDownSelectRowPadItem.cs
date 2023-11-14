@@ -97,22 +97,22 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         set => _itemSends.ChildIdsSet(value, this);
     }
 
+    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public DatabaseAbstract? DatabaseInputMustBe => DatabaseOutput;
+
+    public DatabaseAbstract? DatabaseOutput {
+        get => _itemSends.DatabaseOutputGet();
+        set => _itemSends.DatabaseOutputSet(value, this);
+    }
+
     public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen eine per Dropdownmenu zu wählen.\r\n\r\nFalls die Filterung nur eine Zeile ergibt, wird diese automatisch gewählt.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
-    public DatabaseAbstract? DatabaseInputMustBe => DatabaseOutput;
-
     public override bool MustBeInDrawingArea => true;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
         set => _itemSends.OutputColorIdSet(value, this);
-    }
-
-    public DatabaseAbstract? DatabaseOutput {
-        get => _itemSends.DatabaseOutputGet();
-        set => _itemSends.DatabaseOutputSet(value, this);
     }
 
     public ReadOnlyCollection<string> Parents {
@@ -264,7 +264,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", OutputColorId);
+            DrawArrowOutput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, OutputColorId);
             DrawFakeControl(gr, positionModified, zoom, CaptionPosition, _überschrift, EditTypeFormula.Textfeld_mit_Auswahlknopf);
             DrawColorScheme(gr, positionModified, zoom, null, true, true, true);
         } else {
@@ -272,7 +272,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, true);
-        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
     }
 
     #endregion

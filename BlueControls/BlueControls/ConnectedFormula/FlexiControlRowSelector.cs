@@ -101,9 +101,14 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     protected override void OnValueChanged() {
         base.OnValueChanged();
 
-        var fi = new FilterItem(FilterOutput.Database?.Column.First(), FilterType.Istgleich, Value);
+        var row = FilterInput?.Database?.Row.SearchByKey(Value);
 
-        FilterOutput.RemoveOtherAndAddIfNotExists(fi);
+        if (row == null) {
+            FilterOutput.Clear();
+            return;
+        }
+
+        FilterOutput.RemoveOtherAndAddIfNotExists(new FilterItem(row));
     }
 
     private void UpdateMyCollection() {
@@ -128,7 +133,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
 
         #region Zeilen erzeugen
 
-        FilterInput = this.FilterOfSender();
+        //FilterInput = this.FilterOfSender();
         if (FilterInput == null) { return; }
 
         var f = FilterInput.Rows;

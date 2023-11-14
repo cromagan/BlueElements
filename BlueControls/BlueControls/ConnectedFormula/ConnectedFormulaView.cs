@@ -264,7 +264,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     public void SetToRow(RowItem? row) {
         FilterOutput.Clear();
         if (row == null) { return; }
-        FilterOutput.Add(row);
+        FilterOutput.Add(new FilterItem(row));
     }
 
     /// <summary>

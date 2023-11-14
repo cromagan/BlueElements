@@ -191,7 +191,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
         DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei", EditTypeFormula.Listbox);
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
     }
 
     #endregion

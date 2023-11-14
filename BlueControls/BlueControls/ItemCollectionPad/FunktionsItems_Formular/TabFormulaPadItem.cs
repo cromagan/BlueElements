@@ -122,7 +122,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
         // ist das eigentlich nicht nötig
 
-        #region  Tabs erstellen
+        q
 
         foreach (var thisc in _childs) {
             ConnectedFormula.ConnectedFormula? cf;
@@ -191,8 +191,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
                         #endregion
                     }
-
-                    #endregion Die Werte in ConnectedFormulaView richtig stellen
 
                     //if (cc != null) {
                     //    cc.UserGroup = myGroup;
@@ -354,7 +352,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
-        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, "Zeile", InputColorId);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
     }
 
     //protected override AbstractPadItem? TryCreate(string id, string name) {

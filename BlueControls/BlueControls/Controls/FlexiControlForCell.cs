@@ -125,10 +125,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
     }
 
     public void FilterInput_Changed(object sender, System.EventArgs e) {
-        FilterInput = this.FilterOfSender();
-
-        UpdateColumnData();
-
         if (FilterInput?.Database is DatabaseAbstract db) {
             db.Cell.CellValueChanged += Database_CellValueChanged;
             db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
@@ -137,6 +133,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
             db.DisposingEvent += _Database_Disposing;
             db.Disposed += _Database_Disposed;
         }
+
+        FilterInput = this.FilterOfSender();
+        UpdateColumnData();
         SetValueFromCell();
         CheckEnabledState();
 
@@ -195,7 +194,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabled
             return;
         }
         FilterInput = new FilterCollection(row.Database);
-        FilterInput.Add(row);
+        FilterInput.Add(new FilterItem(row));
     }
 
     internal void CheckEnabledState() {

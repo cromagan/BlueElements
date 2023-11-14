@@ -123,6 +123,12 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
 
+    /// <summary>
+    /// Erstellt einen Filter, der die erste Spalte als Filter hat, mit dem Wert der Zeile.
+    /// </summary>
+    /// <param name="row"></param>
+    public FilterItem(RowItem row) : this(EnsureNotNull(row.Database?.Column.First()), row) { }
+
     #endregion
 
     #region Events
