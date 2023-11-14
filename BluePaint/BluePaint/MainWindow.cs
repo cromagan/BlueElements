@@ -29,6 +29,8 @@ using static BlueBasics.BitmapExt;
 using static BlueBasics.IO;
 using static BlueBasics.Extensions;
 using MessageBox = BlueControls.Forms.MessageBox;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
 
 namespace BluePaint;
 

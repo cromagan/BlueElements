@@ -18,6 +18,8 @@
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls;
+using BlueControls.Forms;
 
 namespace BluePaint;
 
