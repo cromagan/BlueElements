@@ -104,7 +104,6 @@
     <Compile Include="Enums\SortierTyp.cs" />
     <Compile Include="EventArgs\CancelReasonEventArgs.cs" />
     <Compile Include="EventArgs\MessageEventArgs.cs" />
-    <Compile Include="EventArgs\MultiUserFileBackGroundWorker.cs" />
     <Compile Include="EventArgs\MultiUserToListEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserParseEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserHasPendingChangesEventArgs.cs" />

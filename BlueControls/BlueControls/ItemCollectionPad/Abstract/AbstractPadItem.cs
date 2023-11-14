@@ -40,10 +40,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
 
     #region Fields
 
-    public static readonly BlueFont? CellFont = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
-
-    public static readonly BlueFont? ChapterFont = Skin.GetBlueFont(Design.Table_Cell_Chapter, States.Standard);
-
     public static readonly BlueFont? ColumnFont = Skin.GetBlueFont(Design.Table_Column, States.Standard);
 
     /// <summary>
@@ -357,8 +353,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
 
     //    ParseFinished(parsestring);
     //}
-
-    public override void ParseFinished(string parsed) => base.ParseFinished(parsed);
 
     public override bool ParseThis(string key, string value) {
         switch (key) {

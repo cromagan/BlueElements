@@ -146,7 +146,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public BlueControls.ItemCollectionList.ItemCollectionList Item { get; }
+    public ItemCollectionList.ItemCollectionList Item { get; }
 
     [DefaultValue(false)]
     public bool MoveAllowed {
@@ -189,7 +189,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public BlueControls.ItemCollectionList.ItemCollectionList Suggestions { get; } = new(true);
+    public ItemCollectionList.ItemCollectionList Suggestions { get; } = new(true);
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
@@ -238,7 +238,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public new bool Focused() => base.Focused || Plus.Focused || Minus.Focused || Up.Focused || Down.Focused || SliderY.Focused() || FilterCap.Focused || FilterTxt.Focused;
 
-    public void GetContextMenuItems(MouseEventArgs? e, BlueControls.ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
     public void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
 

@@ -703,8 +703,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //        newFiles.GenerateAndAdd(neu);
     //        delList.GenerateAndAdd(thisf);
     //    }
-    public static BlueControls.ItemCollectionList.ItemCollectionList UndoItems(DatabaseAbstract? db, string cellkey) {
-        BlueControls.ItemCollectionList.ItemCollectionList i = new(BlueListBoxAppearance.KontextMenu, false) {
+    public static ItemCollectionList.ItemCollectionList UndoItems(DatabaseAbstract? db, string cellkey) {
+        ItemCollectionList.ItemCollectionList i = new(BlueListBoxAppearance.KontextMenu, false) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
         };
 
@@ -1593,7 +1593,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             state ^= States.Standard_HasFocus;
         }
 
-        if (Database is not DatabaseAbstract db || DesignMode || ShowWaitScreen || _drawing) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed || DesignMode || ShowWaitScreen || _drawing) {
             DrawWaitScreen(gr);
             return;
         }

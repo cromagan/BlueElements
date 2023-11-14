@@ -159,7 +159,7 @@ public partial class TextGenerator : UserControl {
         textBox1.Text = txt;
     }
 
-    private void lstAuswahl_ItemClicked(object sender, BlueControls.EventArgs.AbstractListItemEventArgs e) => GenerateItemsAndText();
+    private void lstAuswahl_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) => GenerateItemsAndText();
 
     private string RowString(RowItem thisRow) {
         var stufe = 0;

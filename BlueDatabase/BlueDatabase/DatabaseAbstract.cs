@@ -1066,7 +1066,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             if (sc.ChangeValues && changevalues && scf.AllOk) {
                 if (row != null && !row.IsDisposed) {
-                    if (Column.SysRowChangeDate is not ColumnItem column) {
+                    if (Column.SysRowChangeDate is not ColumnItem) {
                         return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);
                     }
 

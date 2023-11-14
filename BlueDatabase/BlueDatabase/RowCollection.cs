@@ -557,9 +557,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     internal static List<RowItem> MatchesTo(FilterItem fi) {
         List<RowItem> l = new();
 
-        if (fi.Database is not DatabaseAbstract db) { return l; }
+        if (fi.Database is not DatabaseAbstract db || db.IsDisposed) { return l; }
 
-        l.AddRange(fi.Database.Row.Where(thisRow => thisRow.MatchesTo(fi)));
+        l.AddRange(db.Row.Where(thisRow => thisRow.MatchesTo(fi)));
         return l;
     }
 

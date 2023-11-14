@@ -107,10 +107,12 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         FilterInput = this.FilterOfSender();
         Invalidate();
 
-        FilterOutput.Clear();
-        if (FilterInput == null || FilterOutput.Database != FilterInput.Database) { return; }
+        if (FilterInput == null || FilterOutput.Database != FilterInput.Database) {
+            FilterOutput.Clear();
+            return;
+        }
 
-        FilterOutput.AddIfNotExists(FilterInput);
+        FilterOutput.ChangeTo(FilterInput);
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
@@ -261,11 +263,13 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
             Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Element wird von Parents gesteuert!");
         }
 
-        FilterInput?.Clear();
-        if (row == null) { return; }
-        FilterInput = new FilterCollection(new FilterItem(row));
+        if (row == null) {
+            FilterOutput.Clear();
+            return;
+        }
+        //FilterInput = new FilterCollection(new FilterItem(row));
 
-        FilterOutput.Add(new FilterItem(row));
+        FilterOutput.RemoveOtherAndAddIfNotExists(new FilterItem(row));
     }
 
     /// <summary>

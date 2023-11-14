@@ -40,6 +40,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     private FilterType _filterType = FilterType.KeinFilter;
 
+    private ReadOnlyCollection<string> _searchValue = new List<string>().AsReadOnly();
+
     #endregion
 
     #region Constructors
@@ -170,7 +172,17 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public bool IsDisposed { get; private set; }
     public string KeyName { get; private set; }
-    public ReadOnlyCollection<string> SearchValue { get; private set; }
+
+    public ReadOnlyCollection<string> SearchValue {
+        get => _searchValue;
+        private set {
+            if (IsDisposed) { return; }
+            if (!value.IsDifferentTo(_searchValue)) { return; }
+            OnChanging();
+            _searchValue = value;
+            OnChanged();
+        }
+    }
 
     #endregion
 
@@ -178,22 +190,15 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public void Changeto(FilterType type, IEnumerable<string> searchvalue) {
         if (IsDisposed) { return; }
-        var l = new List<string>();
-        l.AddRange(searchvalue);
-
-        SearchValue = l.SortedDistinctList().AsReadOnly();
+        var svl = searchvalue.ToList();
+        if (type == _filterType && !svl.IsDifferentTo(_searchValue)) { return; }
         OnChanging();
         _filterType = type;
+        _searchValue = svl.SortedDistinctList().AsReadOnly();
         OnChanged();
     }
 
-    public void Changeto(FilterType type, string searchvalue) {
-        if (IsDisposed) { return; }
-        SearchValue = new List<string> { searchvalue }.AsReadOnly();
-        OnChanging();
-        _filterType = type;
-        OnChanged();
-    }
+    public void Changeto(FilterType type, string searchvalue) => Changeto(type, new List<string> { searchvalue });
 
     public void Dispose() {
         IsDisposed = true;
@@ -205,21 +210,11 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         }
     }
 
-    public bool Equals(FilterItem? thisFilter) {
-        if (thisFilter == null) { return false; }
-
-        if (thisFilter.FilterType == FilterType) {
-            if (thisFilter.Column == Column) {
-                if (thisFilter.Herkunft == Herkunft) {
-                    if (thisFilter.SearchValue.JoinWithCr() == SearchValue.JoinWithCr()) {
-                        return true;
-                    }
-                }
-            }
-        }
-
-        return false;
-    }
+    public bool Equals(FilterItem? thisFilter) => thisFilter != null &&
+                                                  thisFilter.FilterType == FilterType &&
+                                                  thisFilter.Column == Column &&
+                                                  thisFilter.Herkunft == Herkunft &&
+                                                  thisFilter.SearchValue.JoinWithCr() == SearchValue.JoinWithCr();
 
     public string ErrorReason() {
         if (_filterType == FilterType.KeinFilter) { return "'Kein Filter' angegeben"; }

@@ -181,7 +181,7 @@ public partial class FormulaView : FormWithStatusBar {
         #region Vorhanden Buttons löschen
 
         foreach (var thisControl in groupBox.Controls) {
-            if (thisControl is BlueControls.Controls.Button btb) {
+            if (thisControl is Button btb) {
                 btb.Click -= Btb_Click;
                 btb.Dispose();
             }
@@ -201,7 +201,7 @@ public partial class FormulaView : FormWithStatusBar {
 
         foreach (var script in scripts) {
             if (script.ManualExecutable) {
-                var btb = new BlueControls.Controls.Button();
+                var btb = new Button();
                 btb.Click += Btb_Click;
                 btb.Name = "BTB_" + script.KeyName;
                 groupBox.Controls.Add(btb);

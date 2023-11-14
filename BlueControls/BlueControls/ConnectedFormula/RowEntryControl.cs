@@ -54,10 +54,12 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
         FilterInput = this.FilterOfSender();
         Invalidate();
 
-        FilterOutput.Clear();
-        if (FilterInput == null || FilterOutput.Database != FilterInput.Database) { return; }
+        if (FilterInput == null || FilterOutput.Database != FilterInput.Database) {
+            FilterOutput.Clear();
+            return;
+        }
 
-        FilterOutput.AddIfNotExists(FilterInput);
+        FilterOutput.ChangeTo(FilterInput);
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }

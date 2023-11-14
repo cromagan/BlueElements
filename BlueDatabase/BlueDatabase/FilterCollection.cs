@@ -21,7 +21,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Data.Common;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -93,6 +95,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             }
             OnChanging();
             _database = value;
+            Invalidate_FilteredRows();
             OnChanged();
             if (_database != null) {
                 _database.DisposingEvent += Database_Disposing;
@@ -200,16 +203,32 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         Add(fi);
     }
 
-    public void AddIfNotExists(List<FilterItem> fi) {
-        foreach (var thisFilter in fi) {
-            AddIfNotExists(thisFilter);
+    public void AddIfNotExists(List<FilterItem> filterItems) {
+        if (IsDisposed || !filterItems.Any()) { return; }
+
+        var newItems = filterItems.Where(item => !Exists(item)).ToList();
+
+        if (newItems.Any()) {
+            OnChanging();
+            _internal.AddRange(newItems);
+            Invalidate_FilteredRows();
+            OnChanged();
         }
     }
 
-    public void AddIfNotExists(FilterCollection fc) {
-        foreach (var thisFilter in fc) {
-            AddIfNotExists(thisFilter);
-        }
+    public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
+
+    /// <summary>
+    /// Effizente Methode um wenige Events auszulösen
+    /// </summary>
+    /// <param name="fc"></param>
+    public void ChangeTo(FilterCollection fc) {
+        OnChanging();
+        _database = fc.Database;
+        _internal.Clear();
+        _internal.AddRange(fc.ToList());
+        Invalidate_FilteredRows();
+        OnChanged();
     }
 
     public void Clear() {
@@ -217,6 +236,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (_internal.Count == 0) { return; }
         OnChanging();
         _internal.Clear();
+        Invalidate_FilteredRows();
         OnChanged();
     }
 
@@ -292,28 +312,39 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         Remove(tmp);
     }
 
-    public void Remove(FilterItem fi) => Remove(fi, true);
-
-    public void Remove(FilterItem fi, bool throwChangedEvent) {
+    public void Remove(FilterItem fi) {
         if (IsDisposed) { return; }
         if (!_internal.Contains(fi)) { return; }
 
-        if (throwChangedEvent) { OnChanging(); }
-
+        OnChanging();
         _internal.Remove(fi);
-        if (throwChangedEvent) { OnChanged(); }
+        Invalidate_FilteredRows();
+        OnChanged();
     }
 
     public void Remove_RowFilter() => Remove(null as ColumnItem);
 
+    /// <summary>
+    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="filterType"></param>
+    /// <param name="filterBy"></param>
+    /// <param name="herkunft"></param>
     public void RemoveOtherAndAddIfNotExists(ColumnItem column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 
+    /// <summary>
+    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
+    /// </summary>
     public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, string filterBy, string herkunft) {
         var column = Database?.Column.Exists(columnName);
         if (column == null || column.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
         RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
     }
 
+    /// <summary>
+    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
+    /// </summary>
     public void RemoveOtherAndAddIfNotExists(FilterCollection? fc) {
         if (fc == null) { return; }
 
@@ -322,13 +353,36 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
+    /// <summary>
+    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
+    /// </summary>
     public void RemoveOtherAndAddIfNotExists(FilterItem fi) {
         if (Exists(fi)) { return; }
-        Remove(fi.Column);
-        if (Exists(fi)) { return; } // Falls ein Event ausgelöst wurde, und es nun doch schon das ist
-        Add(fi);
+
+        var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column).ToList();
+
+        if (existingColumnFilter.Count == 0) {
+            Add(fi);
+            return;
+        }
+
+        if (existingColumnFilter.Count == 1) {
+            existingColumnFilter[0].Changeto(fi.FilterType, fi.SearchValue);
+            return;
+        }
+
+        OnChanging();
+        foreach (var thisItem in existingColumnFilter) {
+            _internal.Remove(thisItem);
+        }
+        _internal.Add(fi);
+        Invalidate_FilteredRows();
+        OnChanged();
     }
 
+    /// <summary>
+    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
+    /// </summary>
     public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, List<string>? filterBy, string herkunft) {
         var column = Database?.Column.Exists(columnName);
         if (column == null || column.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
@@ -358,11 +412,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                     OnChanging();
                     did = true;
                 }
-                Remove(thisItem, false);
+                _internal.Remove(thisItem);
             }
         }
 
-        if (did) { OnChanged(); }
+        if (did) {
+            Invalidate_FilteredRows();
+            OnChanged();
+        }
     }
 
     public List<FilterItem> ToList() => _internal;

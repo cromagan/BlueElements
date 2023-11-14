@@ -365,7 +365,6 @@
     <Compile Include="frmBefehlsreferenz.Designer.cs">
       <DependentUpon>frmBefehlsreferenz.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\IDisabledReason.cs" />
     <Compile Include="Interfaces\IItemToControl.cs" />
     <Compile Include="Interfaces\IBackgroundNone.cs" />
     <Compile Include="Interfaces\IMoveable.cs" />
@@ -495,7 +494,6 @@
     <Compile Include="EventArgs\BasicListItemEventArgs.cs" />
     <Compile Include="EventArgs\ContextMenuInitEventArgs.cs" />
     <Compile Include="EventArgs\FilterComandEventArgs.cs" />
-    <Compile Include="EventArgs\ListOfBasicListItemEventArgs.cs" />
     <Compile Include="Controls\FlexiControl.cs">
       <SubType>Component</SubType>
     </Compile>

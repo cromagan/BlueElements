@@ -40,7 +40,7 @@ using static BlueBasics.IO;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForCell : FlexiControl, IContextMenu, IDisabledReason, IControlAcceptSomething {
+public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlAcceptSomething {
 
     #region Fields
 

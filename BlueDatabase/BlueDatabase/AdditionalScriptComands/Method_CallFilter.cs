@@ -67,7 +67,7 @@ public class Method_CallFilter : Method {
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
         //var db = MyDatabase(s);
-        if (allFi.Database is not DatabaseAbstract db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
+        if (allFi.Database is not DatabaseAbstract db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var r = allFi.Rows;
         if (r.Count == 0) { return DoItFeedback.Null(); }

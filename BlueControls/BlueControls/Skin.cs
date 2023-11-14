@@ -1235,8 +1235,8 @@ public static class Skin {
     /// <param name="sheetStyle"></param>
     /// <returns></returns>
 
-    public static BlueControls.ItemCollectionList.ItemCollectionList GetFonts(RowItem? sheetStyle) {
-        BlueControls.ItemCollectionList.ItemCollectionList rahms = new(false)
+    public static ItemCollectionList.ItemCollectionList GetFonts(RowItem? sheetStyle) {
+        ItemCollectionList.ItemCollectionList rahms = new(false)
         {
             //   Rahms.GenerateAndAdd(New ItemCollection.TextListItem(CInt(PadStyles.Undefiniert).ToString, "Ohne Rahmen", ImageCode.Kreuz))
             { "Haupt-Überschrift", ((int)PadStyles.Style_Überschrift_Haupt).ToString(), GetBlueFont(PadStyles.Style_Überschrift_Haupt, sheetStyle).SymbolForReadableText() },
@@ -1251,7 +1251,7 @@ public static class Skin {
         return rahms;
     }
 
-    public static BlueControls.ItemCollectionList.ItemCollectionList GetRahmenArt(RowItem? sheetStyle, bool mitOhne) {
+    public static ItemCollectionList.ItemCollectionList GetRahmenArt(RowItem? sheetStyle, bool mitOhne) {
         ItemCollectionList.ItemCollectionList rahms = new(false);
         if (mitOhne) {
             _ = rahms.Add("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString(), ImageCode.Kreuz);
