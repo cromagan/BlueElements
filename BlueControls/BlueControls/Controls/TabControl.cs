@@ -17,28 +17,17 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueDatabase;
-using System;
 
 namespace BlueControls.Controls;
 
-public class TabControl : AbstractTabControl, IControlAcceptSomething, IControlSendSomething {
+public class TabControl : AbstractTabControl {
 
     #region Constructors
 
     public TabControl() : base() => BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler? DisposingEvent;
 
     #endregion
 
@@ -49,64 +38,13 @@ public class TabControl : AbstractTabControl, IControlAcceptSomething, IControlS
         set => base.BackColor = value;
     }
 
-    public List<IControlAcceptSomething> Childs { get; } = new();
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; }
-
-    public FilterCollection FilterOutput { get; } = new();
-
-    public List<IControlSendSomething> Parents { get; } = new();
-
     #endregion
 
     #region Methods
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
-        FilterInput = this.FilterOfSender();
-
-        //// Dieses DoChilds unterscheidet sich von IControlSend:
-        //// Da das TabControl kein Send - Control an sich ist, aber trotzdem die Tabs befüllen muss
-        //foreach (var thisTab in TabPages) {
-        //    if (thisTab is TabPage tp) {
-        //        foreach (var thisControl in tp.Controls) {
-        //            if (thisControl is ConnectedFormulaView cfw) {
-        //                cfw.GenerateView();
-        //                foreach (var thisControl2 in cfw.Controls) {
-        //                    if (thisControl2 is IControlAcceptSomething iar) {
-        //                        iar.FilterOutput_Changed();
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-        Invalidate();
-    }
-
-    public void FilterInput_Changing(object sender, System.EventArgs e) { }
-
-    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
-
-    protected override void Dispose(bool disposing) {
-        OnDisposingEvent();
-
-        base.Dispose(disposing);
-        if (disposing) {
-            FilterInput?.Dispose();
-            FilterOutput.Dispose();
-            FilterInput = null;
-        }
-    }
-
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
-        if (e.Control is not TabPage tp) {
-            return;
-        }
+        if (e.Control is not TabPage tp) { return; }
 
         tp.BackColor = Skin.Color_Back(Design.TabStrip_Body, States.Standard);
         Invalidate();

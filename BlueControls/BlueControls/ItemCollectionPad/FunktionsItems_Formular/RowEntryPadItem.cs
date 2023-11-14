@@ -112,6 +112,12 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         var con = new RowEntryControl(DatabaseOutput);
         con.DoOutputSettings(parent, this);
         con.DoInputSettings(parent, this);
+
+        // Besonderheit:
+        // RowEntryPadItem hat niemals Parents. Da der Wert manuell gesucht und gesetzt wird.
+        // Aber wenn es in einem unterformular ist, hat das Connected-Formula die eigentlichen Parents.
+        con.ConnectChildParents(parent.Parents);
+
         return con;
     }
 

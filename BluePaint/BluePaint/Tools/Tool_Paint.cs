@@ -19,7 +19,6 @@
 
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.EventArgs;
 using static BlueBasics.BitmapExt;
 
 namespace BluePaint;

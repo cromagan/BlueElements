@@ -113,7 +113,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         FilterOutput.AddIfNotExists(FilterInput);
     }
 
-    public void FilterInput_Changing(object sender, System.EventArgs e) => throw new NotImplementedException();
+    public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
     public void GenerateView() {
         if (_generated) { return; }
@@ -161,7 +161,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
                         //c.Height = (int)(ua.Height / Umrechnungsfaktor2);
 
                         if (thisit is TabFormulaPadItem c3) {
-                            c3.CreateTabs((TabControl)c);
+                            c3.CreateTabs((TabControl)c, this, c3);
                         }
                     }
                 }

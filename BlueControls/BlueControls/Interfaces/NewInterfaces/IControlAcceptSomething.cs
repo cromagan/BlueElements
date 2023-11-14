@@ -62,6 +62,32 @@ public static class IControlAcceptSomethingExtension {
 
     #region Methods
 
+    public static void ConnectChildParents(this IControlAcceptSomething child, List<IControlSendSomething> parents) {
+        foreach (var thisParent in parents) {
+            child.ConnectChildParents(thisParent);
+        }
+    }
+
+    public static void ConnectChildParents(this IControlAcceptSomething child, IControlSendSomething parent) {
+        parent.Childs.Add(child);
+        child.Parents.Add(parent);
+
+        parent.FilterOutput.Changing += child.FilterInput_Changing;
+        parent.FilterOutput.Changed += child.FilterInput_Changed;
+        parent.FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
+        //child.DisposingEvent += Child_DisposingEvent;
+        //parent.DisposingEvent += Parent_DisposingEvent;
+    }
+
+    public static void DisconnectChildParents(this IControlAcceptSomething child, IControlSendSomething parent) {
+        parent.Childs.Remove(child);
+        child.Parents.Remove(parent);
+
+        parent.FilterOutput.Changing -= child.FilterInput_Changing;
+        parent.FilterOutput.Changed -= child.FilterInput_Changed;
+        parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
+    }
+
     /// <summary>
     /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom IItemAcceptSomething übernommen.
     /// </summary>
@@ -78,7 +104,7 @@ public static class IControlAcceptSomethingExtension {
                 var ff = parent.SearchOrGenerate(itc);
 
                 if (ff is IControlSendSomething ffx) {
-                    ffx.ConnectChildParents(dest);
+                    dest.ConnectChildParents(ffx);
                 }
             }
         }
@@ -90,13 +116,27 @@ public static class IControlAcceptSomethingExtension {
         FilterCollection? fc = null;
 
         foreach (var thiss in item.Parents) {
-            if (!thiss.IsDisposed &&  thiss.FilterOutput is FilterCollection fi) {
+            if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
                 if (fc == null) { fc = new FilterCollection(fi.Database); }
                 fc.AddIfNotExists(fi);
             }
         }
 
         return fc;
+    }
+
+    private static void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {
+        if (sender is IControlSendSomething parent) {
+            foreach (var child in parent.Childs) {
+                child.FilterInput_Changing(parent, System.EventArgs.Empty);
+                child.DisconnectChildParents(parent);
+                //parent.FilterOutput.Changing -= child.FilterInput_Changing;
+                //parent.FilterOutput.Changed -= child.FilterInput_Changed;
+                //parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
+                //child.DisposingEvent += Child_DisposingEvent;
+                //item.DisposingEvent += Parent_DisposingEvent;
+            }
+        }
     }
 
     #endregion

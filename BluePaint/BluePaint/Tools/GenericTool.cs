@@ -20,8 +20,6 @@
 using System;
 using System.Drawing;
 using BlueBasics;
-using BlueControls.Controls;
-using BlueControls.EventArgs;
 using BluePaint.EventArgs;
 
 namespace BluePaint;

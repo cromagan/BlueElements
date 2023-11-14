@@ -110,19 +110,18 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new TabControl();
-
-        con.DoInputSettings(parent, this);
-        //con.DoOutputSettings(this);
+        con.Name = this.DefaultItemToControlName();
+        // Die Input-Settings werden direkt auf das erzeugte
+        //con.DoInputSettings(parent, this);
+        //con.DoOutputSettings(parent, this);
         return con;
     }
 
-    public void CreateTabs(TabControl c3) {
+    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView, TabFormulaPadItem item) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
         // ist das eigentlich nicht nötig
-
-        q
 
         foreach (var thisc in _childs) {
             ConnectedFormula.ConnectedFormula? cf;
@@ -147,7 +146,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
             TabPage? existTab = null;
 
-            foreach (var thisTab in c3.TabPages) {
+            foreach (var thisTab in tabctrl.TabPages) {
                 if (thisTab is TabPage tb) {
                     if (tb.Name == thisc.FileNameWithoutSuffix()) {
                         existTab = tb;
@@ -170,13 +169,19 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                             Name = thisc.FileNameWithoutSuffix(),
                             Text = thisc.FileNameWithoutSuffix()
                         };
-                        c3.TabPages.Add(t);
+                        tabctrl.TabPages.Add(t);
 
                         cc = new ConnectedFormulaView(pg);
                         t.Controls.Add(cc);
                         cc.InitFormula(cf, null);
                         cc.Dock = DockStyle.Fill;
+                        //cc.DoOutputSettings(parentView, item);
+                        //dest.Name = source.DefaultItemToControlName();
+                        cc.DoInputSettings(parentView, this);
+                        var f = cc.FilterOfSender();
+                        cc.FilterOutput.Database = f?.Database;
                         cc.GenerateView();
+                        // cc.FilterInput_Changed(this, System.EventArgs.Empty);
 
                         #endregion
                     } else {
@@ -207,7 +212,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                             }
                         }
 
-                        c3.TabPages.Remove(existTab);
+                        tabctrl.TabPages.Remove(existTab);
                         existTab.Dispose();
 
                         #endregion

@@ -44,43 +44,9 @@ public static class IControlSendSomethingExtension {
 
     #region Methods
 
-    public static void ConnectChildParents(this IControlSendSomething parent, IControlAcceptSomething child) {
-        parent.Childs.Add(child);
-        child.Parents.Add(parent);
-
-        parent.FilterOutput.Changing += child.FilterInput_Changing;
-        parent.FilterOutput.Changed += child.FilterInput_Changed;
-        parent.FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
-        //child.DisposingEvent += Child_DisposingEvent;
-        //parent.DisposingEvent += Parent_DisposingEvent;
-    }
-
-    public static void DisconnectChildParents(this IControlSendSomething parent, IControlAcceptSomething child) {
-        parent.Childs.Remove(child);
-        child.Parents.Remove(parent);
-
-        parent.FilterOutput.Changing -= child.FilterInput_Changing;
-        parent.FilterOutput.Changed -= child.FilterInput_Changed;
-        parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
-    }
-
     public static void DoOutputSettings(this IControlSendSomething dest, ConnectedFormulaView parent, IItemSendSomething source) {
         dest.Name = source.DefaultItemToControlName();
         dest.FilterOutput.Database = source.DatabaseOutput;
-    }
-
-    private static void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {
-        if (sender is IControlSendSomething parent) {
-            foreach (var child in parent.Childs) {
-                child.FilterInput_Changing(parent, System.EventArgs.Empty);
-                parent.DisconnectChildParents(child);
-                //parent.FilterOutput.Changing -= child.FilterInput_Changing;
-                //parent.FilterOutput.Changed -= child.FilterInput_Changed;
-                //parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
-                //child.DisposingEvent += Child_DisposingEvent;
-                //item.DisposingEvent += Parent_DisposingEvent;
-            }
-        }
     }
 
     #endregion
