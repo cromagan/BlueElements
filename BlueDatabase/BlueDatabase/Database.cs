@@ -34,7 +34,7 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public sealed class Database : DatabaseAbstract {
+public class Database : DatabaseAbstract {
 
     #region Fields
 

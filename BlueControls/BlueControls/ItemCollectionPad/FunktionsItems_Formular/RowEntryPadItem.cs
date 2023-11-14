@@ -114,9 +114,8 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         con.DoInputSettings(parent, this);
 
         // Besonderheit:
-        // RowEntryPadItem hat niemals Parents. Da der Wert manuell gesucht und gesetzt wird.
-        // Aber wenn es in einem unterformular ist, hat das Connected-Formula die eigentlichen Parents.
-        con.ConnectChildParents(parent.Parents);
+        // RowEntryPadItem hat niemals Parents.
+        // Wird nachträglich bei OnControlAdded des ConnectedFormulaView gesetzt
 
         return con;
     }

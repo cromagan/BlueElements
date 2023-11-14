@@ -32,6 +32,7 @@ using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -253,8 +254,8 @@ public partial class TableView : FormWithStatusBar {
             case "erweitert":
                 Visible = false;
                 List<RowItem> selectedRows = new();
-                if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead && CFO.ShowingRow != null) {
-                    selectedRows.Add(CFO.ShowingRow);
+                if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead && CFO.ShowingRow is RowItem r) {
+                    selectedRows.Add(r);
                 } else {
                     selectedRows = Table.RowsVisibleUnique();
                 }
@@ -384,15 +385,6 @@ public partial class TableView : FormWithStatusBar {
             }
         }
 
-        //if (btnDrucken != null) {
-        //    btnDrucken.Item.Clear();
-        //    _ = btnDrucken.Item.Add("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28));
-        //    _ = btnDrucken.Item.AddSeparator();
-        //    _ = btnDrucken.Item.Add("CSV-Format für Excel in die Zwischenablage", "csv", QuickImage.Get(ImageCode.Excel, 28));
-        //    _ = btnDrucken.Item.Add("HTML-Format für Internet-Seiten", "html", QuickImage.Get(ImageCode.Globus, 28));
-        //    _ = btnDrucken.Item.AddSeparator();
-        //    _ = btnDrucken.Item.Add("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28));
-        //}
         Check_OrderButtons();
 
         Table.ShowWaitScreen = false;
@@ -401,17 +393,11 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected virtual void FillFormula(RowItem? r) {
-        if (tbcSidebar.SelectedTab == tabFormula) {
-            if (CFO is null || CFO.IsDisposed) { return; }
+        if (CFO is null) { return; }
 
-            if (!CFO.Visible) { return; }
-
-            if (CFO.Width < 30 || CFO.Height < 10) { return; }
-
-            CFO.GetConnectedFormulaFromDatabase(r?.Database);
-            CFO.InitFormula(r?.Database);
-            CFO.SetToRow(r);
-        }
+        CFO.GetConnectedFormulaFromDatabase(r?.Database);
+        CFO.InitFormula(CFO.ConnectedFormula, r?.Database);
+        CFO.SetToRow(r);
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
@@ -785,12 +771,11 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnLoeschen_Click(object sender, System.EventArgs e) {
         if (chkAnsichtFormular.Checked) {
-            if (CFO.ShowingRow == null) {
+            if (CFO.ShowingRow is not RowItem tmpr) {
                 MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK");
                 return;
             }
 
-            var tmpr = CFO.ShowingRow;
             if (MessageBox.Show(
                     "Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?",
                     ImageCode.Warnung, "Ja", "Nein") != 0) {
@@ -1313,9 +1298,6 @@ public partial class TableView : FormWithStatusBar {
 
         DatabaseSet(db, (string)s[1]);
     }
-
-    private void tbcSidebar_SelectedIndexChanged(object sender, System.EventArgs e) =>
-        FillFormula(Table.CursorPosRow?.Row);
 
     private void txbTextSuche_Enter(object sender, System.EventArgs e) {
         if (btnTextSuche.Enabled) {

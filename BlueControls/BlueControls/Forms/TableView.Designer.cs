@@ -949,7 +949,6 @@ namespace BlueControls.Forms {
             this.tbcSidebar.TabDefault = null;
             this.tbcSidebar.TabDefaultOrder = null;
             this.tbcSidebar.TabIndex = 21;
-            this.tbcSidebar.SelectedIndexChanged += new System.EventHandler(this.tbcSidebar_SelectedIndexChanged);
             // 
             // tabFormula
             // 

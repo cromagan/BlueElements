@@ -116,7 +116,10 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
     public void GenerateView() {
+        if (IsDisposed) { return; }
         if (_generated) { return; }
+        if (!Visible) { return; }
+        if (Width < 30 || Height < 10) { return; }
 
         var unused = new List<Control>();
         foreach (var thisco in base.Controls) {
@@ -154,12 +157,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
                             }
                         }
 
-                        //var ua = thisit.UsedArea;
-                        //c.Left = (int)(ua.Left * addfactor);
-                        //c.Top = (int)(ua.Top / Umrechnungsfaktor2);
-                        //c.Width = (int)(ua.Width * addfactor);
-                        //c.Height = (int)(ua.Height / Umrechnungsfaktor2);
-
                         if (thisit is TabFormulaPadItem c3) {
                             c3.CreateTabs((TabControl)c, this, c3);
                         }
@@ -190,8 +187,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
         ConnectedFormula = null;
     }
-
-    public void InitFormula(DatabaseAbstract? database) => InitFormula(ConnectedFormula, database);
 
     public void InitFormula(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database) {
         if (IsDisposed) { return; }
@@ -262,8 +257,14 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     }
 
     public void SetToRow(RowItem? row) {
-        FilterOutput.Clear();
+        if (Parents.Count > 0) {
+            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Element wird von Parents gesteuert!");
+        }
+
+        FilterInput?.Clear();
         if (row == null) { return; }
+        FilterInput = new FilterCollection(new FilterItem(row));
+
         FilterOutput.Add(new FilterItem(row));
     }
 
@@ -292,12 +293,28 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         GenerateView();
     }
 
+    protected override void OnControlAdded(ControlEventArgs e) {
+        base.OnControlAdded(e);
+
+        if (e.Control is RowEntryControl rec) {
+            rec.ConnectChildParents(this);
+        }
+    }
+
     protected override void OnSizeChanged(System.EventArgs e) {
         if (IsDisposed) { return; }
         base.OnSizeChanged(e);
-        if (!_generated) { return; }
 
-        InvalidateView();
+        if (_generated) {
+            GenerateView();
+        } else {
+            InvalidateView();
+        }
+    }
+
+    protected override void OnVisibleChanged(System.EventArgs e) {
+        base.OnVisibleChanged(e);
+        GenerateView();
     }
 
     private void _cf_Changed(object sender, System.EventArgs e) => InvalidateView();

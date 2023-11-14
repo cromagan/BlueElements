@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueDatabase;
@@ -69,14 +70,15 @@ public static class IControlAcceptSomethingExtension {
     }
 
     public static void ConnectChildParents(this IControlAcceptSomething child, IControlSendSomething parent) {
-        parent.Childs.Add(child);
-        child.Parents.Add(parent);
+        child.Parents.AddIfNotExists(parent);
 
-        parent.FilterOutput.Changing += child.FilterInput_Changing;
-        parent.FilterOutput.Changed += child.FilterInput_Changed;
-        parent.FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
-        //child.DisposingEvent += Child_DisposingEvent;
-        //parent.DisposingEvent += Parent_DisposingEvent;
+        if (parent.Childs.AddIfNotExists(child)) {
+            parent.FilterOutput.Changing += child.FilterInput_Changing;
+            parent.FilterOutput.Changed += child.FilterInput_Changed;
+            parent.FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
+            //child.DisposingEvent += Child_DisposingEvent;
+            //parent.DisposingEvent += Parent_DisposingEvent;
+        }
     }
 
     public static void DisconnectChildParents(this IControlAcceptSomething child, IControlSendSomething parent) {
@@ -111,7 +113,8 @@ public static class IControlAcceptSomethingExtension {
     }
 
     public static FilterCollection? FilterOfSender(this IControlAcceptSomething item) {
-        //if (item.FilterInput?.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        if (item.Parents.Count == 0) { return null; }
+        if (item.Parents.Count == 1) { return item.Parents[0].FilterOutput; }
 
         FilterCollection? fc = null;
 
