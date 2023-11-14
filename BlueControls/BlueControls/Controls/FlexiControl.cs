@@ -130,11 +130,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public event EventHandler? ButtonClicked;
 
-    //public event EventHandler? NeedRefresh;
-
     [Obsolete("Value Changed benutzen", true)]
     public new event EventHandler? TextChanged;
 
+    //public event EventHandler? NeedRefresh;
     public event EventHandler? ValueChanged;
 
     #endregion
@@ -454,6 +453,26 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
         UpdateControls();
         return c;
+    }
+
+    protected override void Dispose(bool disposing) {
+        try {
+            if (disposing && components != null) {
+                _IdleTimer.Tick -= _IdleTimer_Tick;
+                _infoText = string.Empty;
+                //if (_BitmapOfControl != null) { _BitmapOfControl?.Dispose(); }
+                //DoInfoTextButton(); // Events entfernen!
+                RemoveAll(); // Events entfernen!
+
+                foreach (var thisc in Controls) {
+                    if (thisc is IDisposable d) { d.Dispose(); }
+                }
+
+                components?.Dispose();
+            }
+        } finally {
+            base.Dispose(disposing);
+        }
     }
 
     /// <summary>

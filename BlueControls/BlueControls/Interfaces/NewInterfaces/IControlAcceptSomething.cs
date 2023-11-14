@@ -81,13 +81,25 @@ public static class IControlAcceptSomethingExtension {
         }
     }
 
+    public static void DisconnectChildParents(this IControlAcceptSomething child, List<IControlSendSomething> parents) {
+        var p = new List<IControlSendSomething>();
+        p.AddRange(parents);
+
+        foreach (var parent in p) {
+            child.DisconnectChildParents(parent);
+        }
+    }
+
     public static void DisconnectChildParents(this IControlAcceptSomething child, IControlSendSomething parent) {
-        parent.Childs.Remove(child);
         child.Parents.Remove(parent);
 
-        parent.FilterOutput.Changing -= child.FilterInput_Changing;
-        parent.FilterOutput.Changed -= child.FilterInput_Changed;
-        parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
+        if (parent.Childs.Contains(child)) {
+            parent.Childs.Remove(child);
+
+            parent.FilterOutput.Changing -= child.FilterInput_Changing;
+            parent.FilterOutput.Changed -= child.FilterInput_Changed;
+            parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
+        }
     }
 
     /// <summary>
@@ -114,7 +126,7 @@ public static class IControlAcceptSomethingExtension {
 
     public static FilterCollection? FilterOfSender(this IControlAcceptSomething item) {
         if (item.Parents.Count == 0) { return null; }
-        if (item.Parents.Count == 1) { return item.Parents[0].FilterOutput; }
+        //if (item.Parents.Count == 1) { return item.Parents[0].FilterOutput; }
 
         FilterCollection? fc = null;
 

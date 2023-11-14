@@ -21,9 +21,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Data.Common;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -357,6 +355,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
     /// </summary>
     public void RemoveOtherAndAddIfNotExists(FilterItem fi) {
+        if (IsDisposed) { return; }
         if (Exists(fi)) { return; }
 
         var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column).ToList();

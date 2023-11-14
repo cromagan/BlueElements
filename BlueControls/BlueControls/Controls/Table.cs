@@ -2302,7 +2302,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
            rsd.UsedForRowSort(e.Column) ||
           (f != null && f.MayHasRowFilter(e.Column)) ||
             e.Column == Database?.Column.SysChapter) {
-            f.Invalidate_FilteredRows();
+            f?.Invalidate_FilteredRows();
             Invalidate_SortedRowData();
         }
 

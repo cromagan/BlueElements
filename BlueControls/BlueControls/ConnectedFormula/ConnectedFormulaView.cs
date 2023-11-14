@@ -169,6 +169,10 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
 
         foreach (var thisc in unused) {
+            if (thisc is IControlAcceptSomething child) {
+                child.DisconnectChildParents(child.Parents);
+            }
+
             base.Controls.Remove(thisc);
             thisc?.Dispose();
         }
@@ -245,7 +249,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         if (thisit == null) { return null; }
 
         foreach (var thisC in base.Controls) {
-            if (thisC is Control cx && cx.Name is string sx && sx == thisit.DefaultItemToControlName()) { return cx; }
+            if (thisC is Control cx && cx.Name is string sx && sx == thisit.DefaultItemToControlName() && !cx.IsDisposed) { return cx; }
         }
 
         var c = thisit.CreateControl(this);
@@ -259,6 +263,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     }
 
     public void SetToRow(RowItem? row) {
+        if (FilterOutput.IsDisposed) { return; }
+
         if (Parents.Count > 0) {
             Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Element wird von Parents gesteuert!");
         }
