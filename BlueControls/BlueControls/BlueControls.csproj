@@ -144,6 +144,9 @@
       <DependentUpon>ConnectedFormulaScriptEditor.cs</DependentUpon>
     </Compile>
     <Compile Include="ConnectedFormula\FormulaScriptDescription.cs" />
+    <Compile Include="ConnectedFormula\InputRowOutputFilterControl.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ConnectedFormula\RowEntryControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -379,7 +382,7 @@
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TableSelectRowPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\EasyPicPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\DropDownSelectRowPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\ScriptChangeFilterPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\FilterConverterElementPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\InputFilterOutputFilterPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TabFormulaPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\Abstract\FakeControlPadItem.cs" />

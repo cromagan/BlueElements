@@ -129,7 +129,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnFilterConverter_Click(object sender, System.EventArgs e) {
-        var x = new ScriptChangeFilterPadItem(string.Empty);
+        var x = new FilterConverterElementPadItem(string.Empty);
         AddCentered(x);
     }
 
