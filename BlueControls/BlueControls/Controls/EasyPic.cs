@@ -98,6 +98,8 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
+    public bool FilterManualSeted { get; set; } = false;
+
     public string OriginalText {
         get => _originalText;
         set {

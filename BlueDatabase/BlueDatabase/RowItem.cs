@@ -454,6 +454,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (fi.Database != Database) { return false; }
 
+        if (fi.FilterType == FilterType.AlwaysFalse) { return false; }
+
         fi.Column?.RefreshColumnsData();
 
         if (fi.FilterType is FilterType.KeinFilter or FilterType.GroﬂKleinEgal) { return true; } // Filter ohne Funktion

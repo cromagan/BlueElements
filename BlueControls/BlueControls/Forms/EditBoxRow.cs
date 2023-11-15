@@ -18,6 +18,7 @@
 #nullable enable
 
 using BlueDatabase;
+using static BlueControls.Interfaces.IControlAcceptSomethingExtension;
 
 namespace BlueControls.Forms;
 

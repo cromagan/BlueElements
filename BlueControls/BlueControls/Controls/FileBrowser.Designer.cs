@@ -21,6 +21,8 @@ namespace BlueControls.Controls {
             RemoveWatcher();
             if (disposing && (components != null)) {
                 components?.Dispose();
+                FilterInput?.Dispose();
+                FilterInput = null;
             }
             base.Dispose(disposing);
         }

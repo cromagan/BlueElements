@@ -35,6 +35,12 @@ public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
     /// </summary>
     public FilterCollection? FilterInput { get; set; }
 
+    /// <summary>
+    /// Wenn TRUE, sollte der Input Filter nicht mehr von den Parents verändert werden.
+    /// Wird z.B. durch SetToRow gesetzt.
+    /// </summary>
+    public bool FilterManualSeted { get; set; }
+
     public string Name { get; set; }
 
     public List<IControlSendSomething> Parents { get; }
@@ -70,6 +76,10 @@ public static class IControlAcceptSomethingExtension {
     }
 
     public static void ConnectChildParents(this IControlAcceptSomething child, IControlSendSomething parent) {
+        if (child.FilterManualSeted) {
+            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
+        }
+
         child.Parents.AddIfNotExists(parent);
 
         if (parent.Childs.AddIfNotExists(child)) {
@@ -125,8 +135,11 @@ public static class IControlAcceptSomethingExtension {
     }
 
     public static FilterCollection? FilterOfSender(this IControlAcceptSomething item) {
+        if (item.FilterManualSeted) { return item.FilterInput; }
         if (item.Parents.Count == 0) { return null; }
-        //if (item.Parents.Count == 1) { return item.Parents[0].FilterOutput; }
+        if (item.Parents.Count == 1) {
+            if (item.Parents[0].FilterOutput.Clone() is FilterCollection fc2) { return fc2; }
+        }
 
         FilterCollection? fc = null;
 
@@ -138,6 +151,31 @@ public static class IControlAcceptSomethingExtension {
         }
 
         return fc;
+    }
+
+    public static void SetToRow(this IControlAcceptSomething item, RowItem? row) {
+        if (item.Parents.Count > 0) {
+            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Element wird von Parents gesteuert!");
+        }
+
+        item.FilterManualSeted = true;
+
+        if (row?.Database == null && item.FilterInput == null) { return; }
+
+        if (row?.Database is DatabaseAbstract db && !db.IsDisposed) {
+            item.FilterInput ??= new FilterCollection(db);
+            item.FilterInput.Database = db;
+        }
+
+        if (item.FilterInput != null) {
+            item.FilterInput.Clear();
+            if (row == null) {
+                item.FilterInput.Add(new FilterItem());
+            } else {
+                item.FilterInput.Add(new FilterItem(row));
+            }
+        }
+        item.FilterInput_Changed(item, System.EventArgs.Empty);
     }
 
     private static void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {

@@ -82,6 +82,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
+    public bool FilterManualSeted { get; set; } = false;
     public FilterCollection FilterOutput { get; } = new();
 
     public string Page { get; } = "Head";
@@ -176,6 +177,10 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
             base.Controls.Remove(thisc);
             thisc?.Dispose();
         }
+
+        if (_generated) {
+            FilterInput_Changed(this, System.EventArgs.Empty);
+        }
     }
 
     public void GetConnectedFormulaFromDatabase(DatabaseAbstract? database) {
@@ -260,22 +265,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
         base.Controls.Add(c);
         return c;
-    }
-
-    public void SetToRow(RowItem? row) {
-        if (FilterOutput.IsDisposed) { return; }
-
-        if (Parents.Count > 0) {
-            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Element wird von Parents gesteuert!");
-        }
-
-        if (row == null) {
-            FilterOutput.Clear();
-            return;
-        }
-        //FilterInput = new FilterCollection(new FilterItem(row));
-
-        FilterOutput.RemoveOtherAndAddIfNotExists(new FilterItem(row));
     }
 
     /// <summary>

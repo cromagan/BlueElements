@@ -20,6 +20,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -64,6 +65,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
+    public bool FilterManualSeted { get; set; } = false;
     public FilterCollection FilterOutput { get; } = new();
 
     public List<IControlSendSomething> Parents { get; } = new();
@@ -73,6 +75,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     #region Methods
 
     public void FilterInput_Changed(object sender, System.EventArgs e) {
+        if(FilterManualSeted) { Develop.DebugPrint("Steuerleement unterstütz keine Manuellen Filter"); }
         FilterInput = null;
         Invalidate();
     }

@@ -34,19 +34,10 @@ internal class ConnectedFormulaFilterButton : Button, IControlAcceptSomething {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
+    public bool FilterManualSeted { get; set; } = false;
     public List<IControlSendSomething> Parents { get; } = new();
 
     #endregion
-
-
-    protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-        if (disposing) {
-            FilterInput?.Dispose();
-            //FilterOutput.Dispose();
-            FilterInput = null;
-        }
-    }
 
     #region Methods
 
@@ -57,6 +48,15 @@ internal class ConnectedFormulaFilterButton : Button, IControlAcceptSomething {
 
     public void FilterInput_Changing(object sender, System.EventArgs e) {
         throw new System.NotImplementedException();
+    }
+
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+        if (disposing) {
+            FilterInput?.Dispose();
+            //FilterOutput.Dispose();
+            FilterInput = null;
+        }
     }
 
     #endregion

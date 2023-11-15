@@ -97,6 +97,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
+    public bool FilterManualSeted { get; set; } = false;
     public List<IControlSendSomething> Parents { get; } = new();
 
     #endregion
@@ -187,15 +188,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
-    public void SetToRow(RowItem? row) {
-        if (row == null) {
-            FilterInput = null;
-            return;
-        }
-        FilterInput = new FilterCollection(row.Database);
-        FilterInput.Add(new FilterItem(row));
-    }
 
     internal void CheckEnabledState() {
         var (column, row) = GetTmpVariables();

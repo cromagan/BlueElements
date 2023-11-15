@@ -454,6 +454,9 @@ public sealed class MultiUserFile : IDisposableExtended {
     /// </summary>
     /// <param name="mustSave"></param>
     public bool Save(bool mustSave) {
+
+        return false;
+
         if (IsInSaveingLoop) { return false; }
         if (string.IsNullOrEmpty(Filename)) { return false; }
 

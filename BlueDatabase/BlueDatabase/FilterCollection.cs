@@ -238,13 +238,16 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnChanged();
     }
 
+    /// <summary>
+    /// Klont die Filter Collection. Auch alle Filter werden ein Klon. Vorberechnete Zeilen werden weitergegeben.
+    /// </summary>
+    /// <returns></returns>
     public object Clone() {
-        var x = new FilterCollection(Database);
-        foreach (var thisf in _internal) {
-            x.Add(thisf);
-        }
-
-        return x;
+        var fc = new FilterCollection(Database);
+        fc._internal.AddIfNotExists(_internal.CloneWithClones());
+        fc._rows = new List<RowItem>();
+        fc._rows.AddRange(Rows);
+        return fc;
     }
 
     public bool Contains(FilterItem filter) => _internal.Contains(filter);
@@ -354,9 +357,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <summary>
     /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
     /// </summary>
-    public void RemoveOtherAndAddIfNotExists(FilterItem fi) {
+    public void RemoveOtherAndAddIfNotExists(FilterItem? fi) {
         if (IsDisposed) { return; }
-        if (Exists(fi)) { return; }
+        if (fi == null || Exists(fi)) { return; }
 
         var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column).ToList();
 

@@ -62,61 +62,33 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     #region Fields
 
     public static readonly int AutoFilterSize = 22;
-
     public static readonly SolidBrush BrushRedTransparent = new(Color.FromArgb(40, 255, 128, 128));
-
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
-
     public static readonly int ColumnCaptionSizeY = 22;
-
     public static readonly Pen PenRed1 = new(Color.Red, 1);
-
     public static readonly int RowCaptionSizeY = 50;
-
-    public FilterCollection? Filter;
-
+    public readonly FilterCollection Filter = new();
     private readonly List<string> _collapsed = new();
-
     private readonly object _lockUserAction = new();
-
     private int _arrangementNr = 1;
-
     private AutoFilter? _autoFilter;
-
     private BlueFont _cellFont = BlueFont.DefaultFont;
-
     private BlueFont _chapterFont = BlueFont.DefaultFont;
-
     private BlueFont _columnFilterFont = BlueFont.DefaultFont;
-
     private BlueFont _columnFont = BlueFont.DefaultFont;
-
     private DateTime? _databaseDrawError;
-
     private BlueTableAppearance _design = BlueTableAppearance.Standard;
-
     private bool _drawing;
-
     private int? _headSize;
-
     private bool _isinClick;
-
     private bool _isinDoubleClick;
-
     private bool _isinKeyDown;
-
     private bool _isinMouseDown;
-
     private bool _isinMouseEnter;
-
     private bool _isinMouseLeave;
-
     private bool _isinMouseMove;
-
     private bool _isinMouseWheel;
-
     private bool _isinSizeChanged;
-
     private bool _isinVisibleChanged;
 
     /// <summary>
@@ -125,33 +97,19 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private ColumnItem? _mouseOverColumn;
 
     private RowData? _mouseOverRow;
-
     private string _mouseOverText = string.Empty;
-
     private BlueFont _newRowFont = BlueFont.DefaultFont;
-
     private Progressbar? _pg;
-
     private int _pix16 = 16;
-
     private int _pix18 = 18;
-
     private int _rowCaptionFontY = 26;
-
     private List<RowData>? _rowsFilteredAndPinned;
-
     private SearchAndReplace? _searchAndReplace;
-
     private bool _showNumber;
-
     private RowSortDefinition? _sortDefinitionTemporary;
-
     private string _storedView = string.Empty;
-
     private Rectangle _tmpCursorRect = Rectangle.Empty;
-
     private RowItem? _unterschiede;
-
     private int _wiederHolungsSpaltenWidth;
 
     #endregion
@@ -165,6 +123,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         InitializeSkin();
         MouseHighlight = false;
+        Filter.Changed += Filter_Changed;
     }
 
     #endregion
@@ -236,7 +195,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public ColumnItem? CursorPosColumn { get; private set; }
-
     public RowData? CursorPosRow { get; private set; }
 
     /// <summary>
@@ -276,6 +234,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
+    public bool FilterManualSeted { get; set; } = false;
     public FilterCollection FilterOutput { get; } = new();
 
     [DefaultValue(1.0f)]
@@ -971,6 +930,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         ShowWaitScreen = true;
         Refresh(); // um die Uhr anzuzeigen
         Database = db;
+        Filter.Database = db;
         _databaseDrawError = null;
         InitializeSkin(); // Neue Schriftgrößen
         if (Database is DatabaseAbstract db2 && !db2.IsDisposed) {
@@ -993,8 +953,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db2.DisposingEvent += _Database_Disposing;
             db2.InvalidateView += Database_InvalidateView;
             //db2.IsTableVisibleForUser += Database_IsTableVisibleForUser;
-            Filter = new FilterCollection(db2);
-            Filter.Changed += Filter_Changed;
         }
 
         ParseView(viewCode);
@@ -1364,7 +1322,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void ResetView() {
-        Filter = null;
+        Filter.Clear();
 
         PinnedRows.Clear();
         _collapsed.Clear();
@@ -2401,15 +2359,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
-        Filter ??= new FilterCollection(Database);
-
         switch (e.Comand.ToLower()) {
             case "":
                 break;
 
             case "filter":
-                Filter.Remove(e.Column);
-                Filter.Add(e.Filter);
+                Filter.RemoveOtherAndAddIfNotExists(e.Filter);
+                //Filter.Remove(e.Column);
+                //Filter.Add(e.Filter);
                 break;
 
             case "filterdelete":
@@ -3528,7 +3485,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         break;
 
                     case "filters":
-                        Filter = new FilterCollection(Database, pair.Value.FromNonCritical());
+                        Filter.Database = Database;
+                        Filter.Clear();
+                        Filter.Parse(pair.Value.FromNonCritical());
                         break;
 
                     case "sliderx":

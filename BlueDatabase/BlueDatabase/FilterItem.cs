@@ -30,16 +30,13 @@ using static BlueBasics.Converter;
 
 namespace BlueDatabase;
 
-public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IReadableTextWithChanging, ICanBeEmpty, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtended, IChangedFeedback {
+public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IReadableTextWithChanging, ICanBeEmpty, IErrorCheckable, IHasDatabase, IHasKeyName, IDisposableExtended, IChangedFeedback, ICloneable {
 
     #region Fields
 
-    public string Herkunft = string.Empty;
-
     private ColumnItem? _column;
-
     private FilterType _filterType = FilterType.KeinFilter;
-
+    private string _herkunft = string.Empty;
     private ReadOnlyCollection<string> _searchValue = new List<string>().AsReadOnly();
 
     #endregion
@@ -112,7 +109,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         Database = column.Database;
         _column = column;
         _filterType = filterType;
-        Herkunft = herkunft;
+        _herkunft = herkunft;
 
         _column?.RefreshColumnsData();
 
@@ -170,6 +167,17 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         }
     }
 
+    public string Herkunft {
+        get => _herkunft;
+        set {
+            if (IsDisposed) { return; }
+            if (value == _herkunft) { return; }
+            OnChanging();
+            _herkunft = value;
+            OnChanged();
+        }
+    }
+
     public bool IsDisposed { get; private set; }
     public string KeyName { get; private set; }
 
@@ -200,6 +208,16 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public void Changeto(FilterType type, string searchvalue) => Changeto(type, new List<string> { searchvalue });
 
+    public object? Clone() {
+        if (Database is not DatabaseAbstract db || db.IsDisposed || IsDisposed) { return null; }
+        var fi = new FilterItem(db, _filterType, _searchValue);
+        fi.Column = _column;
+        fi.Herkunft = _herkunft;
+        fi.KeyName = KeyName;
+        fi.Database = Database;
+        return fi;
+    }
+
     public void Dispose() {
         IsDisposed = true;
 
@@ -211,10 +229,10 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     }
 
     public bool Equals(FilterItem? thisFilter) => thisFilter != null &&
-                                                  thisFilter.FilterType == FilterType &&
-                                                  thisFilter.Column == Column &&
-                                                  thisFilter.Herkunft == Herkunft &&
-                                                  thisFilter.SearchValue.JoinWithCr() == SearchValue.JoinWithCr();
+                                                  thisFilter.FilterType == _filterType &&
+                                                  thisFilter.Column == _column &&
+                                                  thisFilter._herkunft == _herkunft &&
+                                                  thisFilter.SearchValue.JoinWithCr() == _searchValue.JoinWithCr();
 
     public string ErrorReason() {
         if (_filterType == FilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
@@ -286,7 +304,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                 return true;
 
             case "herkunft":
-                Herkunft = value.FromNonCritical();
+                _herkunft = value.FromNonCritical();
                 return true;
 
             case "id":
@@ -374,8 +392,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
             result.ParseableAdd("Database", Database);
             result.ParseableAdd("ColumnName", _column);
-            result.ParseableAdd("Values", SearchValue);
-            result.ParseableAdd("Herkunft", Herkunft);
+            result.ParseableAdd("Values", _searchValue);
+            result.ParseableAdd("Herkunft", _herkunft);
             return result.Parseable();
         } catch {
             Develop.CheckStackForOverflow();
