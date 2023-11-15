@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
@@ -28,15 +29,21 @@ using BlueControls.Controls;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using BlueDatabase.Enums;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething {
+public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething, IAutosizable {
 
     #region Fields
 
     private readonly ItemAcceptSomething _itemAccepts;
     private readonly ItemSendSomething _itemSends;
+
+    private string _anzeige = string.Empty;
+    private string _überschrift = string.Empty;
+    private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
 
@@ -59,7 +66,30 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
 
     #region Properties
 
-    public static string ClassId => "FI-ChangeFilterWithScriptElement";
+    public static string ClassId => "FI-FilterConverterElement";
+
+    [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
+    public string Anzeige {
+        get => _anzeige;
+        set {
+            if (IsDisposed) { return; }
+            if (_anzeige == value) { return; }
+            _anzeige = value;
+            OnChanged();
+        }
+    }
+
+    public bool AutoSizeableHeight => false;
+
+    public ÜberschriftAnordnung CaptionPosition {
+        get => _überschriftanordung;
+        set {
+            if (IsDisposed) { return; }
+            if (_überschriftanordung == value) { return; }
+            _überschriftanordung = value;
+            OnChanged();
+        }
+    }
 
     public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();
@@ -74,7 +104,7 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public override string Description => "Dieses Element kann Filter empfangen, und per Skript einen komplett anderen Filter ausgeben.\r\nWird verwendet, wenn z.b. Zwei Werte gefiltert werden, aber in Wirklichkeit ein komplett anderer Filter verwendet werden soll.\r\nUnsichtbares element, wird nicht angezeigt.";
+    public override string Description => "Dieses Element kann Filter empfangen, und einen komplett anderen Filter ausgeben.\r\nWird verwendet, wenn z.b. Zwei Werte gefiltert werden, aber in Wirklichkeit ein komplett anderer Filter verwendet werden soll.\r\nUnsichtbares element, wird nicht angezeigt.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
@@ -90,7 +120,17 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public bool WaitForDatabase => false;
+    public string Überschrift {
+        get => _überschrift;
+        set {
+            if (IsDisposed) { return; }
+            if (_überschrift == value) { return; }
+            _überschrift = value;
+            OnChanged();
+        }
+    }
+
+    public bool WaitForDatabase => true;
     protected override int SaveOrder => 1;
 
     #endregion
@@ -102,10 +142,15 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FilterChangeControl();
-
+        var con = new FlexiControlForFilterNew(DatabaseOutput) {
+            //EditType = _bearbeitung,
+            //CaptionPosition = CaptionPosition,
+            //Name = DefaultItemToControlName()
+        };
+        //return con;
         con.DoOutputSettings(parent, this);
         con.DoInputSettings(parent, this);
+
         return con;
     }
 
@@ -123,8 +168,18 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();// {
+        List<GenericControl> l = new();
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
+        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
+
+        l.Add(new FlexiControl());
+
+        l.Add(new FlexiControlForProperty<string>(() => Überschrift));
+        l.Add(new FlexiControlForProperty<string>(() => Anzeige));
+
+        var u = new ItemCollectionList.ItemCollectionList(false);
+        u.AddRange(typeof(ÜberschriftAnordnung));
+        l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
 
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
@@ -142,16 +197,29 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
         if (base.ParseThis(tag, value)) { return true; }
         if (_itemSends.ParseThis(tag, value)) { return true; }
         if (_itemAccepts.ParseThis(tag, value)) { return true; }
+
         switch (tag) {
             case "id":
                 //Id = IntParse(value);
+                return true;
+
+            case "caption":
+                _überschriftanordung = (ÜberschriftAnordnung)IntParse(value);
+                return true;
+
+            case "captiontext":
+                _überschrift = value.FromNonCritical();
+                return true;
+
+            case "showformat":
+                _anzeige = value.FromNonCritical();
                 return true;
         }
         return false;
     }
 
     public override string ReadableText() {
-        var txt = "Filter aus Skript: ";
+        var txt = "Filter: ";
 
         if (this.IsOk() && DatabaseOutput != null) {
             return txt + DatabaseOutput.Caption;
@@ -173,8 +241,13 @@ public class ScriptChangeFilterPadItem : FakeControlPadItem, IReadableText, IIte
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = new();
+
         result.AddRange(_itemAccepts.ParsableTags());
         result.AddRange(_itemSends.ParsableTags());
+
+        result.ParseableAdd("CaptionText", _überschrift);
+        result.ParseableAdd("ShowFormat", _anzeige);
+        result.ParseableAdd("Caption", _überschriftanordung);
         return result.Parseable(base.ToString());
     }
 

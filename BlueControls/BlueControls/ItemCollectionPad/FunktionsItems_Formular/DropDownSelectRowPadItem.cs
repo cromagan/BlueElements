@@ -105,7 +105,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen eine per Dropdownmenu zu wählen.\r\n\r\nFalls die Filterung nur eine Zeile ergibt, wird diese automatisch gewählt.";
+    public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen eine per Dropdownmenu zu wählen.\r\n\r\nFalls die Vorfilterung nur eine Zeile ergibt, wird diese automatisch gewählt.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => true;

@@ -305,8 +305,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         base.OnSizeChanged(e);
 
         if (_generated) {
-            GenerateView();
-        } else {
             InvalidateView();
         }
     }
