@@ -169,13 +169,15 @@ public class BitmapListItem : AbstractListItem {
             ok = true;
             if (_bitmap != null) {
                 try {
-                    areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
-                    var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_bitmap.Width,
-                        (drawingCoordinates.Height - (Padding * 2) - (_captionlines * ConstMy)) / (double)_bitmap.Height);
-                    scaledImagePosition = new RectangleF(((drawingCoordinates.Width - (_bitmap.Width * scale)) / 2) + drawingCoordinates.Left,
-                        ((drawingCoordinates.Height - (_bitmap.Height * scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2),
-                        _bitmap.Width * scale,
-                        _bitmap.Height * scale);
+                    lock (_bitmap) {
+                        areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
+                        var scale = (float)Math.Min((drawingCoordinates.Width - (Padding * 2)) / (double)_bitmap.Width,
+                            (drawingCoordinates.Height - (Padding * 2) - (_captionlines * ConstMy)) / (double)_bitmap.Height);
+                        scaledImagePosition = new RectangleF(((drawingCoordinates.Width - (_bitmap.Width * scale)) / 2) + drawingCoordinates.Left,
+                            ((drawingCoordinates.Height - (_bitmap.Height * scale)) / 2) + drawingCoordinates.Top - (_captionlines * ConstMy / 2),
+                            _bitmap.Width * scale,
+                            _bitmap.Height * scale);
+                    }
                 } catch {
                     ok = false;
                 }

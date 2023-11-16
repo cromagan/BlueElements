@@ -157,11 +157,18 @@ public class ItemSendSomething {
         var l = new List<GenericControl>();
         l.Add(new FlexiControl("Ausgang:", widthOfControl));
 
-        l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
 
-        if (item.DatabaseOutput is not DatabaseAbstract db || db.IsDisposed) { return l; }
+        if (item.DatabaseOutput is not DatabaseAbstract db || db.IsDisposed) {
 
-        l.Add(new FlexiControlForDelegate(item.Datenbankkopf, "Datenbank: '" + db.Caption + "'", ImageCode.Stift));
+            l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
+            return l;
+        }
+
+        l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank ändern (gewählt: " + db.Caption + ")", ImageCode.Datenbank));
+
+
+
+        l.Add(new FlexiControlForDelegate(item.Datenbankkopf, "Datenbank-Kopf von '" + db.Caption + "'", ImageCode.Stift));
 
         return l;
     }

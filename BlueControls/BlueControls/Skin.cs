@@ -1198,7 +1198,12 @@ public static class Skin {
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
             if (font == null) { return new Size(3, 3); }
-            if (qi != null) { pSize = ((Bitmap)qi).Size; }
+
+            if (qi != null) {
+                lock (qi) {
+                    pSize = ((Bitmap)qi).Size;
+                }
+            }
             if (!string.IsNullOrEmpty(text)) { tSize = BlueFont.MeasureString(text, font); }
 
             if (!string.IsNullOrEmpty(text)) {

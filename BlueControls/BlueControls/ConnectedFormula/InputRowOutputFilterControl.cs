@@ -43,7 +43,6 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
         _inputcolumn = inputcolumn;
         _outputcolumn = outputcolumn;
         _type = type;
-        //Visible = false;
     }
 
     #endregion
@@ -60,7 +59,6 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
     public bool FilterManualSeted { get; set; } = false;
     public FilterCollection FilterOutput { get; } = new();
-    public DatabaseAbstract? OutputDatabase { get; set; }
     public List<IControlSendSomething> Parents { get; } = new();
 
     #endregion
@@ -71,25 +69,25 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
         FilterInput = this.FilterOfSender();
         Invalidate();
 
-        var LastInputRow = FilterInput?.RowSingleOrNull;
-        LastInputRow?.CheckRowDataIfNeeded();
+        var lastInputRow = FilterInput?.RowSingleOrNull;
+        lastInputRow?.CheckRowDataIfNeeded();
 
-        if (LastInputRow == null) {
+        if (lastInputRow == null || _outputcolumn == null || _inputcolumn == null) {
             FilterOutput.Clear();
             return;
         }
 
         switch (_type) {
             case FilterTypeRowInputItem.Ist_GrossKleinEgal:
-                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, LastInputRow.CellGetString(_inputcolumn)));
+                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, lastInputRow.CellGetString(_inputcolumn)));
                 return;
 
             case FilterTypeRowInputItem.Ist_genau:
-                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich, LastInputRow.CellGetString(_inputcolumn)));
+                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich, lastInputRow.CellGetString(_inputcolumn)));
                 return;
 
             case FilterTypeRowInputItem.Ist_eines_der_Wörter_GrossKleinEgal:
-                var list = LastInputRow.CellGetString(_inputcolumn).HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
+                var list = lastInputRow.CellGetString(_inputcolumn).HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
                 FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_ODER_GroßKleinEgal, list));
 
                 //List<string> names = new();
