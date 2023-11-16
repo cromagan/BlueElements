@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -30,13 +31,9 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
     #region Fields
 
-    private readonly List<IControlAcceptFilter> _childs = new();
-
     private readonly ColumnItem? _inputcolumn;
     private readonly ColumnItem? _outputcolumn;
     private readonly FilterTypeRowInputItem _type;
-    private FilterItem? _filter;
-    private IControlSendRow? _getRowFrom;
 
     #endregion
 
@@ -53,78 +50,47 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
     #region Properties
 
-    public FilterItem? Filter {
-        get => _filter;
-        set {
-            if (_filter?.Equals(value) ?? false) { return; }
-            _filter = value;
-            this.DoChilds(_childs);
+    public List<IControlAcceptSomething> Childs { get; } = new();
 
-            if (_filter != null) {
-                Text = "Filter: " + _filter.ReadableText();
-            } else {
-                Text = string.Empty;
-            }
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection? FilterInput { get; set; }
 
-            Invalidate();
-        }
-    }
-
-    public IControlSendRow? GetRowFrom {
-        get => _getRowFrom;
-        set {
-            if (_getRowFrom == value) { return; }
-            if (_getRowFrom != null) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Änderung nicht erlaubt");
-            }
-
-            _getRowFrom = value;
-            if (_getRowFrom != null) { _getRowFrom.ChildAdd(this); }
-        }
-    }
-
-    public RowItem? LastInputRow { get; private set; }
+    public bool FilterManualSeted { get; set; } = false;
+    public FilterCollection FilterOutput { get; } = new();
     public DatabaseAbstract? OutputDatabase { get; set; }
+    public List<IControlSendSomething> Parents { get; } = new();
 
     #endregion
 
     #region Methods
 
-    public void ChildAdd(IControlAcceptFilter c) {
-        if (IsDisposed) { return; }
-        _childs.AddIfNotExists(c);
-        this.DoChilds(_childs);
-    }
+    public void FilterInput_Changed(object sender, System.EventArgs e) {
+        FilterInput = this.FilterOfSender();
+        Invalidate();
 
-    public void SetData(DatabaseAbstract? db, string rowkey) {
-        if (db is null || _inputcolumn == null || _outputcolumn == null) {
-            Filter = new FilterItem();
-            return;
-        }
-
-        var nr = db.Row.SearchByKey(rowkey);
-        if (nr == LastInputRow) { return; }
-
-        LastInputRow = nr;
+        var LastInputRow = FilterInput?.RowSingleOrNull;
         LastInputRow?.CheckRowDataIfNeeded();
 
         if (LastInputRow == null) {
-            Filter = new FilterItem();
+            FilterOutput.Clear();
             return;
         }
 
         switch (_type) {
             case FilterTypeRowInputItem.Ist_GrossKleinEgal:
-                Filter = new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, LastInputRow.CellGetString(_inputcolumn));
+                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, LastInputRow.CellGetString(_inputcolumn)));
                 return;
 
             case FilterTypeRowInputItem.Ist_genau:
-                Filter = new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich, LastInputRow.CellGetString(_inputcolumn));
+                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich, LastInputRow.CellGetString(_inputcolumn)));
                 return;
 
             case FilterTypeRowInputItem.Ist_eines_der_Wörter_GrossKleinEgal:
                 var list = LastInputRow.CellGetString(_inputcolumn).HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
-                Filter = new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_ODER_GroßKleinEgal, list);
+                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_ODER_GroßKleinEgal, list));
 
                 //List<string> names = new();
                 //names.AddRange(_outputcolumn.GetUcaseNamesSortedByLenght());
@@ -141,10 +107,12 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
             default:
                 Develop.DebugPrint(_type);
-                Filter = new FilterItem();
+                FilterOutput.Clear();
                 return;
         }
     }
+
+    public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
     #endregion
 }

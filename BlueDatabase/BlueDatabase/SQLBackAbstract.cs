@@ -65,8 +65,6 @@ public abstract class SqlBackAbstract {
 
     #region Properties
 
-    public static DateTime LastLoadUtc { get; protected set; } = DateTime.UtcNow;
-
     public abstract string ColumnPropertyPrimary { get; }
     public abstract string ColumnTypeDate { get; }
     public string ColumnTypeVarChar15 => VarChar(15);
@@ -449,18 +447,15 @@ public abstract class SqlBackAbstract {
                         _ = db.Cell.SetValueInternal(cx, r, reader[z].ToString(), Reason.LoadReload);
                     }
                 }
-
-  
             }
         }
 
         //Ja, alle Rows den Stempel geben.
         // Wenn die Zeile nicht mehr existent ist, würde der Befehl unendlich oft versuchen
         // Die Zeile aus der Datenbank zu erhalten
-        foreach(var thisr in row) {
+        foreach (var thisr in row) {
             thisr.IsInCache = DateTime.UtcNow;
         }
-
 
         return string.Empty; // db.Row.DoLinkedDatabase(row);
     }
@@ -794,7 +789,7 @@ public abstract class SqlBackAbstract {
     /// <param name="fromDate"></param>
     /// <param name="toDate"></param>
     /// <returns>Gibt NULL zurück, wenn die Daten nicht geladen werden konnten</returns>
-    internal List<UndoItem> GetLastChanges(List<DatabaseSqlLite> db, DateTime fromDate, DateTime toDate) {
+    internal List<UndoItem>? GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromDate, DateTime toDate) {
         lock (_getChanges) {
             var commandText = @"select TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, CMT, TIMECODEUTC from " + SysUndo + " ";
 

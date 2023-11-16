@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueBasics.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -37,7 +38,7 @@ public class Method_RowUnique : Method {
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                           "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
-                                          "Werden mehrere Zeilen gefunden, werden die Zeilen bis auf eine gelöscht.\r\n" +
+                                          "Werden mehrere Zeilen gefunden, wird das Skript abgebrochen.\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
 
     public override bool EndlessArgs => true;
@@ -56,13 +57,14 @@ public class Method_RowUnique : Method {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-        if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
+        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
         var r = allFi.Rows;
 
         if (r.Count > 1) { return new DoItFeedback(infos.Data, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
 
         if (r.Count == 0) {
+            if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }
             var nr = RowCollection.GenerateAndAdd(allFi, "Skript Befehl 'RowUnique'");
             if (nr == null) { return new DoItFeedback(infos.Data, "Neue Zeile konnte nicht erstellt werden"); }
             return Method_Row.RowToObjectFeedback(nr);

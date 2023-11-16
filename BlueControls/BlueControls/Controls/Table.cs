@@ -921,7 +921,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db1.ProgressbarInfo -= _Database_ProgressbarInfo;
             db1.DisposingEvent -= _Database_Disposing;
             db1.InvalidateView -= Database_InvalidateView;
-            if (Filter != null) { Filter.Changed -= Filter_Changed; }
+            //if (Filter != null) { Filter.Changed -= Filter_Changed; }
             //db.IsTableVisibleForUser -= Database_IsTableVisibleForUser;
             DatabaseAbstract.ForceSaveAll();
             MultiUserFile.ForceLoadSaveAll();
@@ -1520,6 +1520,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
+                Filter.Changed -= Filter_Changed;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
                 FilterInput?.Dispose();
                 FilterOutput.Dispose();
@@ -3485,9 +3486,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         break;
 
                     case "filters":
+                        Filter.Changed -= Filter_Changed;
                         Filter.Database = Database;
                         Filter.Clear();
                         Filter.Parse(pair.Value.FromNonCritical());
+                        Filter.Changed += Filter_Changed;
                         break;
 
                     case "sliderx":

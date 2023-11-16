@@ -156,7 +156,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void Add(FilterItem fi) {
         if (IsDisposed) { return; }
 
-        if (fi.Database != Database) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
+        if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
 
         OnChanging();
 
@@ -215,6 +215,16 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
+
+    public void ChangeTo(FilterItem fi) {
+        if (Exists(fi) && _internal.Count == 1) { return; }
+        OnChanging();
+        _database = fi.Database;
+        _internal.Clear();
+        _internal.Add(fi);
+        Invalidate_FilteredRows();
+        OnChanged();
+    }
 
     /// <summary>
     /// Effizente Methode um wenige Events auszulösen

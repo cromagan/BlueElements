@@ -105,6 +105,7 @@
     <Compile Include="AdditionalScriptComands\VariableDatabase.cs" />
     <Compile Include="AdditionalScriptComands\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptComands\VariableFilterItem.cs" />
+    <Compile Include="DatabaseMU.cs" />
     <Compile Include="EventArgs\CellValueEventArgs.cs" />
     <Compile Include="ConnetionInfo.cs" />
     <Compile Include="DatabaseAbstract.cs" />

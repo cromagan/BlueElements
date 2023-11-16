@@ -75,7 +75,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     #region Methods
 
     public void FilterInput_Changed(object sender, System.EventArgs e) {
-        if(FilterManualSeted) { Develop.DebugPrint("Steuerleement unterstütz keine Manuellen Filter"); }
+        if (FilterManualSeted) { Develop.DebugPrint("Steuerleement unterstütz keine Manuellen Filter"); }
         FilterInput = null;
         Invalidate();
     }
@@ -111,7 +111,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
             return;
         }
 
-        FilterOutput.RemoveOtherAndAddIfNotExists(new FilterItem(row));
+        FilterOutput.ChangeTo(new FilterItem(row));
     }
 
     private void UpdateMyCollection() {

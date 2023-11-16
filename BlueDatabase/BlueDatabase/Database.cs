@@ -38,8 +38,6 @@ public class Database : DatabaseAbstract {
 
     #region Fields
 
-    private readonly string _tablename;
-
     private string _canWriteError = string.Empty;
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private string _editNormalyError = string.Empty;
@@ -59,18 +57,15 @@ public class Database : DatabaseAbstract {
     public Database(string filename, bool readOnly, string freezedReason, bool create, NeedPassword? needPassword) : this(null, filename, readOnly, freezedReason, create, filename.FileNameWithoutSuffix(), needPassword) { }
 
     private Database(Stream? stream, string filename, bool readOnly, string freezedReason, bool create, string tablename, NeedPassword? needPassword) : base(readOnly, freezedReason) {
-        //Develop.StartService();
+        TableName = MakeValidTableName(tablename);
 
-        _tablename = MakeValidTableName(tablename);
-
-        if (!IsValidTableName(_tablename, false)) {
+        if (!IsValidTableName(TableName, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
         }
 
         Initialize();
 
         if (!string.IsNullOrEmpty(filename)) {
-            //DropConstructorMessage?.Invoke(this, new MessageEventArgs(enFehlerArt.Info, "Lade Datenbank aus Dateisystem: \row\n" + filename.FileNameWithoutSuffix()));
             LoadFromFile(filename, create, needPassword);
         } else if (stream != null) {
             LoadFromStream(stream);
@@ -85,10 +80,7 @@ public class Database : DatabaseAbstract {
 
     public static string DatabaseId => nameof(Database);
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
-    public string Filename { get; private set; } = string.Empty;
-    public override string TableName => _tablename;
-
-    public override bool UndoLoaded => true;
+    public string Filename { get; protected set; } = string.Empty;
 
     #endregion
 
@@ -103,178 +95,6 @@ public class Database : DatabaseAbstract {
 
         return new Database(ci, readOnly, needPassword);
     }
-
-    public static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {
-        string colName = string.Empty;
-        string rowKey = string.Empty;
-        string value;
-        DatabaseDataType type;
-
-        switch ((Routinen)bLoaded[pointer]) {
-            //case Routinen.CellFormat: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode3(bLoaded, pointer + 5);
-            //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringWin1252();
-            //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
-            //        //var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
-            //        pointer += 11 + les + 4;
-            //        break;
-            //    }
-            //case Routinen.CellFormatUTF8: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode3(bLoaded, pointer + 5);
-            //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringUtf8();
-            //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
-            //        // var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
-            //        pointer += 11 + les + 4;
-            //        break;
-            //    }
-            //case Routinen.CellFormatUTF8_V400: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode7(bLoaded, pointer + 5);
-            //        rowKey = NummerCode7(bLoaded, pointer + 12);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 19, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringUtf8();
-            //        //var  width = NummerCode2(bLoaded, pointer + 19 + les);
-            //        //var  height = NummerCode2(bLoaded, pointer + 19 + les + 2);
-            //        pointer += 19 + les + 4;
-            //        break;
-            //    }
-            case Routinen.CellFormatUTF8_V401: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    rowKey = NummerCode7(bLoaded, pointer + 5).ToString();
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 12, b, 0, les);
-                    value = b.ToStringUtf8();
-                    pointer += 12 + les;
-                    //colKey = -1;
-                    break;
-                }
-
-            //case Routinen.DatenAllgemein: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = -1;
-            //        rowKey = -1;
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 5, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringWin1252();
-            //        //width = 0;
-            //        //height = 0;
-            //        pointer += 5 + les;
-            //        break;
-            //    }
-            case Routinen.DatenAllgemeinUTF8: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-                    var les = NummerCode3(bLoaded, pointer + 2);
-                    rowKey = string.Empty;
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
-                    value = b.ToStringUtf8();
-                    //width = 0;
-                    //height = 0;
-                    pointer += 5 + les;
-                    break;
-                }
-            //case Routinen.Column: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode3(bLoaded, pointer + 5);
-            //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringWin1252();
-            //        //width = 0;
-            //        //height = 0;
-            //        pointer += 11 + les;
-            //        break;
-            //    }
-            //case Routinen.ColumnUTF8: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode3(bLoaded, pointer + 5);
-            //        rowKey = NummerCode3(bLoaded, pointer + 8);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringUtf8();
-            //        //width = 0;
-            //        //height = 0;
-            //        pointer += 11 + les;
-            //        break;
-            //    }
-            //case Routinen.ColumnUTF8_V400: {
-            //        type = (DatabaseDataType)bLoaded[pointer + 1];
-            //        var les = NummerCode3(bLoaded, pointer + 2);
-            //        //colKey = NummerCode7(bLoaded, pointer + 5);
-            //        rowKey = NummerCode7(bLoaded, pointer + 12);
-            //        var cellContentByte = new byte[les];
-            //        Buffer.BlockCopy(bLoaded, pointer + 19, cellContentByte, 0, les);
-            //        value = cellContentByte.ToStringUtf8();
-            //        //width = 0;
-            //        //height = 0;
-            //        pointer += 19 + les;
-            //        break;
-            //    }
-            case Routinen.ColumnUTF8_V401: {
-                    type = (DatabaseDataType)bLoaded[pointer + 1];
-
-                    var cles = NummerCode1(bLoaded, pointer + 2);
-                    var cb = new byte[cles];
-                    Buffer.BlockCopy(bLoaded, pointer + 3, cb, 0, cles);
-                    colName = cb.ToStringUtf8();
-
-                    var les = NummerCode3(bLoaded, pointer + 3 + cles);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointer + 6 + cles, b, 0, les);
-                    value = b.ToStringUtf8();
-
-                    pointer += 6 + les + cles;
-                    break;
-                }
-
-            case Routinen.CellFormatUTF8_V402: {
-                    type = DatabaseDataType.UTF8Value_withoutSizeData;
-
-                    var lenghtRowKey = NummerCode1(bLoaded, pointer + 1);
-                    var rowKeyByte = new byte[lenghtRowKey];
-                    Buffer.BlockCopy(bLoaded, pointer + 2, rowKeyByte, 0, lenghtRowKey);
-                    rowKey = rowKeyByte.ToStringUtf8();
-
-                    var lenghtValue = NummerCode2(bLoaded, pointer + 2 + lenghtRowKey);
-                    var valueByte = new byte[lenghtValue];
-                    Buffer.BlockCopy(bLoaded, pointer + 2 + lenghtRowKey + 2, valueByte, 0, lenghtValue);
-                    value = valueByte.ToStringUtf8();
-
-                    pointer += 2 + lenghtRowKey + 2 + lenghtValue;
-
-                    break;
-                }
-
-            default: {
-                    type = 0;
-                    value = string.Empty;
-                    //width = 0;
-                    //height = 0;
-                    Develop.DebugPrint(FehlerArt.Fehler, $"Laderoutine nicht definiert: {bLoaded[pointer]}");
-                    break;
-                }
-        }
-
-        return (pointer, type, value, colName, rowKey);
-    }
-
-    // Dateibasierte Systeme haben immer den Undo-Speicher
 
     public static void Parse(byte[] data, DatabaseAbstract db, NeedPassword? needPassword) {
         var pointer = 0;
@@ -400,6 +220,7 @@ public class Database : DatabaseAbstract {
         if (IntParse(db.LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))) { db.Freeze("Datenbankversions-Konflikt"); }
     }
 
+    // Dateibasierte Systeme haben immer den Undo-Speicher
     public static void SaveToByteList(ColumnItem c, ref List<byte> l) {
         if (c.Database is not DatabaseAbstract db) { return; }
 
@@ -690,7 +511,7 @@ public class Database : DatabaseAbstract {
         }
     }
 
-    public override void GetUndoCache() { }
+    public override List<UndoItem>? GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) => new();
 
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
@@ -897,14 +718,14 @@ public class Database : DatabaseAbstract {
         return r;
     }
 
+    protected override IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer() => new List<DatabaseAbstract>();
+
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
 
     private static int NummerCode2(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 255) + b[pointer + 1];
 
-    //protected override string SpecialErrorReason(ErrorReason mode) => _muf.ErrorReason(mode);
     private static int NummerCode3(IReadOnlyList<byte> b, int pointer) => (b[pointer] * 65025) + (b[pointer + 1] * 255) + b[pointer + 2];
 
-    //private static int NummerCode2(IReadOnlyList<byte> cellContentByte, int pointer) => (cellContentByte[pointer] * 255) + cellContentByte[pointer + 1];
     private static long NummerCode7(IReadOnlyList<byte> b, int pointer) {
         long nu = 0;
         for (var n = 0; n < 7; n++) {
@@ -913,10 +734,177 @@ public class Database : DatabaseAbstract {
         return nu;
     }
 
-    private static void SaveToByteList(ICollection<byte> list, long numberToAdd, int byteCount) {
-        //var tmp = numberToAdd;
-        //var nn = byteCount;
+    private static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {
+        string colName = string.Empty;
+        string rowKey = string.Empty;
+        string value;
+        DatabaseDataType type;
 
+        switch ((Routinen)bLoaded[pointer]) {
+            //case Routinen.CellFormat: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringWin1252();
+            //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
+            //        //var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
+            //        pointer += 11 + les + 4;
+            //        break;
+            //    }
+            //case Routinen.CellFormatUTF8: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
+            //        //var width = NummerCode2(bLoaded, pointer + 11 + les);
+            //        // var height = NummerCode2(bLoaded, pointer + 11 + les + 2);
+            //        pointer += 11 + les + 4;
+            //        break;
+            //    }
+            //case Routinen.CellFormatUTF8_V400: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode7(bLoaded, pointer + 5);
+            //        rowKey = NummerCode7(bLoaded, pointer + 12);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 19, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
+            //        //var  width = NummerCode2(bLoaded, pointer + 19 + les);
+            //        //var  height = NummerCode2(bLoaded, pointer + 19 + les + 2);
+            //        pointer += 19 + les + 4;
+            //        break;
+            //    }
+            case Routinen.CellFormatUTF8_V401: {
+                    type = (DatabaseDataType)bLoaded[pointer + 1];
+                    var les = NummerCode3(bLoaded, pointer + 2);
+                    rowKey = NummerCode7(bLoaded, pointer + 5).ToString();
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 12, b, 0, les);
+                    value = b.ToStringUtf8();
+                    pointer += 12 + les;
+                    //colKey = -1;
+                    break;
+                }
+
+            //case Routinen.DatenAllgemein: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = -1;
+            //        rowKey = -1;
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 5, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringWin1252();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 5 + les;
+            //        break;
+            //    }
+            case Routinen.DatenAllgemeinUTF8: {
+                    type = (DatabaseDataType)bLoaded[pointer + 1];
+                    var les = NummerCode3(bLoaded, pointer + 2);
+                    rowKey = string.Empty;
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 5, b, 0, les);
+                    value = b.ToStringUtf8();
+                    //width = 0;
+                    //height = 0;
+                    pointer += 5 + les;
+                    break;
+                }
+            //case Routinen.Column: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringWin1252();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 11 + les;
+            //        break;
+            //    }
+            //case Routinen.ColumnUTF8: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode3(bLoaded, pointer + 5);
+            //        rowKey = NummerCode3(bLoaded, pointer + 8);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 11, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 11 + les;
+            //        break;
+            //    }
+            //case Routinen.ColumnUTF8_V400: {
+            //        type = (DatabaseDataType)bLoaded[pointer + 1];
+            //        var les = NummerCode3(bLoaded, pointer + 2);
+            //        //colKey = NummerCode7(bLoaded, pointer + 5);
+            //        rowKey = NummerCode7(bLoaded, pointer + 12);
+            //        var cellContentByte = new byte[les];
+            //        Buffer.BlockCopy(bLoaded, pointer + 19, cellContentByte, 0, les);
+            //        value = cellContentByte.ToStringUtf8();
+            //        //width = 0;
+            //        //height = 0;
+            //        pointer += 19 + les;
+            //        break;
+            //    }
+            case Routinen.ColumnUTF8_V401: {
+                    type = (DatabaseDataType)bLoaded[pointer + 1];
+
+                    var cles = NummerCode1(bLoaded, pointer + 2);
+                    var cb = new byte[cles];
+                    Buffer.BlockCopy(bLoaded, pointer + 3, cb, 0, cles);
+                    colName = cb.ToStringUtf8();
+
+                    var les = NummerCode3(bLoaded, pointer + 3 + cles);
+                    var b = new byte[les];
+                    Buffer.BlockCopy(bLoaded, pointer + 6 + cles, b, 0, les);
+                    value = b.ToStringUtf8();
+
+                    pointer += 6 + les + cles;
+                    break;
+                }
+
+            case Routinen.CellFormatUTF8_V402: {
+                    type = DatabaseDataType.UTF8Value_withoutSizeData;
+
+                    var lenghtRowKey = NummerCode1(bLoaded, pointer + 1);
+                    var rowKeyByte = new byte[lenghtRowKey];
+                    Buffer.BlockCopy(bLoaded, pointer + 2, rowKeyByte, 0, lenghtRowKey);
+                    rowKey = rowKeyByte.ToStringUtf8();
+
+                    var lenghtValue = NummerCode2(bLoaded, pointer + 2 + lenghtRowKey);
+                    var valueByte = new byte[lenghtValue];
+                    Buffer.BlockCopy(bLoaded, pointer + 2 + lenghtRowKey + 2, valueByte, 0, lenghtValue);
+                    value = valueByte.ToStringUtf8();
+
+                    pointer += 2 + lenghtRowKey + 2 + lenghtValue;
+
+                    break;
+                }
+
+            default: {
+                    type = 0;
+                    value = string.Empty;
+                    //width = 0;
+                    //height = 0;
+                    Develop.DebugPrint(FehlerArt.Fehler, $"Laderoutine nicht definiert: {bLoaded[pointer]}");
+                    break;
+                }
+        }
+
+        return (pointer, type, value, colName, rowKey);
+    }
+
+    private static void SaveToByteList(ICollection<byte> list, long numberToAdd, int byteCount) {
         do {
             byteCount--;
             var te = (long)Math.Pow(255, byteCount);
@@ -926,14 +914,6 @@ public class Database : DatabaseAbstract {
             list.Add(mu);
             numberToAdd %= te;
         } while (byteCount > 0);
-
-        //if (nn == 3) {
-        //    if (NummerCode3(list.ToArray(), list.Count - nn) != tmp) { Debugger.Break(); }
-        //}
-
-        //if (nn == 7) {
-        //    if (NummerCode7(list.ToArray(), list.Count - nn) != tmp) { Debugger.Break(); }
-        //}
     }
 
     private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
@@ -1032,6 +1012,4 @@ public class Database : DatabaseAbstract {
     }
 
     #endregion
-
-    // Wird automatisch immer eingelesen
 }

@@ -855,7 +855,7 @@ public partial class TableView : FormWithStatusBar {
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(true);
         DatabaseAbstract.ForceSaveAll();
-        DatabaseSqlLite.CheckSysUndoNow();
+        DatabaseAbstract.CheckSysUndoNow();
     }
 
     private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {

@@ -208,9 +208,10 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
         SuspendLayout();
 
+        FilterOutput.Clear();
+
         if (oldf != cf) {
             if (oldf != null) {
-                FilterOutput.Clear();
                 oldf.Loaded -= _cf_Loaded;
                 oldf.Changed -= _cf_Changed;
             }
@@ -226,7 +227,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
         if (FilterOutput.Database != database) {
             if (FilterOutput.Database is DatabaseAbstract db1) {
-                FilterOutput.Clear();
                 db1.DisposingEvent -= _Database_DisposingEvent;
             }
             InvalidateView();
@@ -237,8 +237,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
             }
         }
 
-        FilterOutput.Clear();
-
         ResumeLayout();
         Invalidate();
     }
@@ -247,8 +245,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         _generated = false;
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
-
-    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     public Control? SearchOrGenerate(IItemToControl? thisit) {
         if (thisit == null) { return null; }

@@ -40,21 +40,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     /// </summary>
     public readonly SqlBackAbstract? SQL;
 
-    private static bool _isInTimer;
-
-    /// <summary>
-    /// Der Globale Timer, der die Sys_Undo Datenbank abfrägt
-    /// </summary>
-    private static Timer? _timer;
-
-    /// <summary>
-    /// Der Zeitstempel der letzten Abfrage des _timer
-    /// </summary>
-    private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
-
-    private readonly string _tablename = string.Empty;
-    private bool _undoLoaded;
-
     #endregion
 
     #region Constructors
@@ -70,9 +55,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         SQL = sql;
         sql.RepairAll(tablename);
 
-        _tablename = MakeValidTableName(tablename);
+        TableName = MakeValidTableName(tablename);
 
-        if (!IsValidTableName(_tablename, false)) {
+        if (!IsValidTableName(TableName, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
         }
 
@@ -99,10 +84,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
-    public override string TableName => _tablename;
-
-    public override bool UndoLoaded => _undoLoaded;
-
     #endregion
 
     #region Methods
@@ -116,42 +97,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         var at = sql.Tables();
         if (at == null || !at.Contains(ci.TableName)) { return null; }
         return new DatabaseSqlLite(ci, readOnly);
-    }
-
-    public static void CheckSysUndoNow() {
-        if (_isInTimer) { return; }
-        _isInTimer = true;
-
-        var fd = DateTime.UtcNow;
-
-        try {
-            var done = new List<DatabaseAbstract>();
-
-            foreach (var thisDb in AllFiles) {
-                if (!done.Contains(thisDb)) {
-                    if (thisDb is DatabaseSqlLite thisDbSqlLite) {
-                        if (thisDbSqlLite.SQL != null) {
-                            var db = LoadedDatabasesWithThisSql(thisDbSqlLite.SQL);
-                            done.AddRange(db);
-
-                            var erg = thisDbSqlLite.SQL.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
-                            if (erg == null) { _isInTimer = false; return; } // Später ein neuer Versuch
-
-                            foreach (var thisdb in db) {
-                                thisdb.DoLastChanges(erg);
-                                thisdb.TryToSetMeTemporaryMaster();
-                            }
-                        }
-                    }
-                }
-            }
-        } catch {
-            _isInTimer = false;
-            return;
-        }
-
-        _timerTimeStamp = fd;
-        _isInTimer = false;
     }
 
     public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, string mustBeFreezed) {
@@ -218,17 +163,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return string.Empty;
     }
 
-    public override void GetUndoCache() {
-        if (UndoLoaded) { return; }
-        if (SQL == null) { return; }
-
-        var undos = SQL.GetLastChanges(new List<DatabaseSqlLite> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1));
-
-        Undo.Clear();
-        Undo.AddRange(undos);
-
-        _undoLoaded = true;
-    }
+    public override List<UndoItem>? GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) => SQL?.GetLastChanges(db, fromUTC, toUTC);
 
     public override string? NextRowKey() {
         if (!Row.IsNewRowPossible()) {
@@ -358,156 +293,20 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
-    private static void CheckSysUndo(object state) {
-        if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
-        if (DateTime.UtcNow.Subtract(LastLoadUtc).TotalSeconds < 5) { return; }
-
-        if (CriticalState()) { return; }
-        CheckSysUndoNow();
-    }
-
-    private static List<DatabaseSqlLite> LoadedDatabasesWithThisSql(SqlBackAbstract sql) {
+    protected override IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer() {
         var oo = new List<DatabaseSqlLite>();
+
+        if (SQL == null) { return oo; }
+
         foreach (var thisDb in AllFiles) {
             if (thisDb is DatabaseSqlLite thidDbsqllIte) {
-                if (sql.ConnectionString == thidDbsqllIte.SQL?.ConnectionString) {
+                if (SQL.ConnectionString == thidDbsqllIte.SQL?.ConnectionString) {
                     oo.Add(thidDbsqllIte);
                 }
             }
         }
 
         return oo;
-    }
-
-    private void DoLastChanges(List<UndoItem>? data) {
-        if (data == null) { return; }
-        if (IsDisposed) { return; }
-        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
-
-        if (IsInCache == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank noch nicht korrekt geladen!");
-            return;
-        }
-
-        try {
-            var rk = new List<string>();
-            var cek = new List<string>();
-
-            foreach (var thisWork in data) {
-                if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
-                    Undo.Add(thisWork);
-
-                    if (thisWork.Comand.IsObsolete()) {
-                        // Nix tun
-                    } else if (thisWork.Comand.IsCommand()) {
-
-                        #region Befehle
-
-                        switch (thisWork.Comand) {
-                            case DatabaseDataType.Comand_RemoveColumn:
-                                _ = Column.SetValueInternal(thisWork.Comand, Reason.LoadReload, thisWork.ColName);
-                                break;
-
-                            //case DatabaseDataType.Comand_AddColumnByKey:
-                            //case DatabaseDataType.Comand_AddColumn:
-                            //    _ = Column.SetValueInternal(t, true, columnname);
-                            //    var c = Column.SearchByKey(LongParse(columnkey));
-                            //    var name = _sql.GetLastColumnName(TableName, c.KeyName);
-                            //    _ = SetValueInternal(DatabaseDataType.ColumnName, name, c.Name, null, true);
-                            //    c.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
-                            //    break;
-
-                            case DatabaseDataType.Comand_AddColumnByName:
-                                _ = Column.SetValueInternal(thisWork.Comand, Reason.LoadReload, thisWork.ChangedTo); // ColumName kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Spalte bekannt ist und nicht gespeichert wird
-                                var c2 = Column.Exists(thisWork.ChangedTo);
-                                //var columnname = _sql.GetLastColumnName(TableName, c.KeyName);
-                                //_ = SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
-                                c2?.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
-                                break;
-
-                            case DatabaseDataType.Comand_AddRow:
-                                _ = Row.SetValueInternal(thisWork.Comand, thisWork.ChangedTo, null, Reason.LoadReload); // RowKey kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Zeile bekannt ist und nicht gespeichert wird
-                                _ = rk.AddIfNotExists(thisWork.ChangedTo); // Nachher auch laden
-                                break;
-
-                            case DatabaseDataType.Comand_RemoveRow:
-                                var r = Row.SearchByKey(thisWork.RowKey);
-                                _ = Row.SetValueInternal(thisWork.Comand, r?.KeyName, r, Reason.LoadReload);
-                                break;
-
-                            default:
-                                Develop.DebugPrint(thisWork.Comand);
-                                break;
-                        }
-
-                        #endregion
-                    } else if (!string.IsNullOrEmpty(thisWork.RowKey)) {
-
-                        #region Zeilen zum neu Einlesen merken uns Spaltenbreite invalidieren
-
-                        var c = Column.Exists(thisWork.ColName);
-                        var r = Row.SearchByKey(thisWork.RowKey);
-                        if (r != null && c != null) {
-                            // Kann sein, dass der Benutzer hier ja schon eine Zeile oder so gelöscht hat,
-                            // aber anderer PC hat bei der noch vorhandenen Zeile eine Änderung
-                            if (thisWork.DateTimeUtc > r.IsInCache || thisWork.DateTimeUtc > c.IsInCache) {
-                                _ = rk.AddIfNotExists(r.KeyName);
-                                _ = cek.AddIfNotExists(CellCollection.KeyOfCell(c, r));
-                                c.Invalidate_ContentWidth();
-                            }
-                        }
-
-                        #endregion
-                    } else if (thisWork.Comand.IsDatabaseTag()) {
-
-                        #region Datenbank-Styles
-
-                        var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Comand, DatabaseProperty, SysStyle);
-                        if (v != null) { _ = SetValueInternal(thisWork.Comand, v, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow); }
-
-                        #endregion
-                    } else if (thisWork.Comand.IsColumnTag()) {
-
-                        #region Spalten-Styles
-
-                        var c = Column.Exists(thisWork.ColName);
-                        if (c != null && !c.IsDisposed) {
-                            var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Comand, c.KeyName, SysStyle);
-                            if (v != null) { _ = SetValueInternal(thisWork.Comand, v, c, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow); }
-                        }
-
-                        #endregion
-                    }
-                }
-            }
-
-            var (_, errormessage) = RefreshRowData(rk, true);
-            if (!string.IsNullOrEmpty(errormessage)) {
-                OnDropMessage(FehlerArt.Fehler, errormessage);
-            }
-
-            foreach (var thisc in cek) {
-                Cell.DataOfCellKey(thisc, out var c, out var r);
-                if (c != null && r != null) {
-                    Cell.OnCellValueChanged(new EventArgs.CellChangedEventArgs(c, r, Reason.LoadReload));
-                }
-            }
-
-            OnInvalidateView();
-        } catch {
-            Develop.CheckStackForOverflow();
-            DoLastChanges(data);
-        }
-
-        //if (_loadingCount < 1) { Develop.DebugPrint("Loading <0!"); }
-        //_loadingCount--;
-    }
-
-    private void GenerateTimer() {
-        if (_timer != null) { return; }
-        _timerTimeStamp = DateTime.UtcNow.AddMinutes(-5);
-        _timer = new Timer(CheckSysUndo);
-        _ = _timer.Change(10000, 10000);
     }
 
     private void LoadFromSqlBack(List<FilterItem>? preselection) {

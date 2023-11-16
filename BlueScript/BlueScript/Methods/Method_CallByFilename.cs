@@ -40,7 +40,7 @@ public class Method_CallByFilename : Method {
                                             "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
     public override bool EndlessArgs => false;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO;
     public override string Returns => string.Empty;
@@ -74,9 +74,10 @@ public class Method_CallByFilename : Method {
             tmpv.AddRange(varCol);
             if (addMe != null) { tmpv.Add(addMe); }
 
-            scx = Script.Parse(varCol, scp, reducedscripttext, lineadd, subname);
+            scx = Script.Parse(tmpv, scp, reducedscripttext, lineadd, subname);
 
-            if (scx.AllOk) {
+            if (!scx.AllOk) {
+                // Beim Abbruch sollen die aktuellen Variabeln angezeigt werden
                 varCol.Clear();
                 varCol.AddRange(tmpv);
             }
