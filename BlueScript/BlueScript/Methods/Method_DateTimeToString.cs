@@ -35,7 +35,7 @@ internal class Method_DateTimeToString : Method {
     public override string Comand => "datetimetostring";
     public override string Description => "Wandelt eine Zeitangabe in einen String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  " + Format_Date7 + "\rAchtung: Groß-Kleinschreibung ist wichtig!";
     public override bool EndlessArgs => false;
-    
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableString.ShortName_Plain;

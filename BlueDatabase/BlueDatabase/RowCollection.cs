@@ -22,6 +22,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -414,7 +415,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var u = Generic.UserName;
         var d = DateTime.UtcNow;
 
-        var s = db.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key, comment, u, d);
+        var s = db.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key, u, d, comment);
         if (!string.IsNullOrEmpty(s)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen: " + s);
             throw new Exception();
@@ -428,7 +429,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (fullprocessing) {
             if (db.Column.SysRowCreator is ColumnItem src) { item.CellSet(src, u); }
-            if (db.Column.SysRowCreateDate is ColumnItem scd) { item.CellSet(scd, d.ToString(Constants.Format_Date5)); }
+            if (db.Column.SysRowCreateDate is ColumnItem scd) { item.CellSet(scd, d.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture)); }
 
             // Dann die Inital-Werte reinschreiben
             foreach (var thisColum in db.Column) {
@@ -492,7 +493,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var r = SearchByKey(key);
 
         if (r == null || r.IsDisposed) { return false; }
-        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, r, string.Empty, key, comment, Generic.UserName, DateTime.UtcNow));
+        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, r, string.Empty, key, Generic.UserName, DateTime.UtcNow, comment));
     }
 
     public bool Remove(FilterItem fi, List<RowItem>? pinned, string comment) {

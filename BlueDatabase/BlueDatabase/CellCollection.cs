@@ -21,6 +21,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Text.RegularExpressions;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -575,7 +576,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     public void Set(ColumnItem? column, RowItem? row, bool value) => Set(column, row, value.ToPlusMinus());
 
-    public void Set(ColumnItem? column, RowItem? row, DateTime value) => Set(column, row, value.ToString(Constants.Format_Date5));
+    public void Set(ColumnItem? column, RowItem? row, DateTime value) => Set(column, row, value.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
 
     public void Set(ColumnItem? column, RowItem? row, List<string>? value) => Set(column, row, value.JoinWithCr());
 
@@ -771,9 +772,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         string message;
 
         if (isSystem) {
-            message = db.ChangeData(DatabaseDataType.SystemValue, column, row, oldValue, value, "SystemSet", user, datetimeutc);
+            message = db.ChangeData(DatabaseDataType.SystemValue, column, row, oldValue, value, user, datetimeutc, "SystemSet");
         } else {
-            message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, string.Empty, user, datetimeutc);
+            message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, user, datetimeutc, string.Empty);
         }
 
         if (!string.IsNullOrEmpty(message)) {
@@ -793,7 +794,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!isSystem) {
             DoSpecialFormats(column, row, oldValue, false);
             if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueCore(src, row, user, user, datetimeutc, true); }
-            if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueCore(scd, row, datetimeutc.ToString(Constants.Format_Date5), user, datetimeutc, true); }
+            if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueCore(scd, row, datetimeutc.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), user, datetimeutc, true); }
 
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {
                 if (db.Column.SysRowState is ColumnItem srs && srs != column) { SetValueCore(srs, row, string.Empty, user, datetimeutc, true); }

@@ -130,6 +130,11 @@ public enum DatabaseDataType : byte {
     EventScriptVersion = 72,
     EventScriptErrorMessage = 73,
 
+    /// <summary>
+    /// Datum/Uhrzeit, bis zu dem die Undos engelesen und fest verankert wurden.
+    /// </summary>
+    FileStateUTCDate = 74,
+
     //Info_ColumDataSart = 100,
     //Info_ColumnDataEnd = 199,
     ColumnName = 100,

@@ -40,6 +40,7 @@ using BlueScript.Structures;
 using BlueScript.Enums;
 using BlueScript;
 using static BlueBasics.Generic;
+using System.Globalization;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -97,7 +98,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         _muf.ParseExternal += ParseExternal;
         _muf.ToListOfByte += ToListOfByte;
         _muf.Saving += _muf_Saving;
-        _createDate = DateTime.UtcNow.ToString(Constants.Format_Date5);
+        _createDate = DateTime.UtcNow.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture);
         _creator = UserName;
         PadData = new ItemCollectionPad.ItemCollectionPad();
 

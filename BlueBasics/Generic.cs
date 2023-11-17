@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -332,7 +333,7 @@ public static class Generic {
     }
 
     public static string UniqueInternal() {
-        var neueZeit = DateTime.UtcNow.ToString(Constants.Format_Date7).ReduceToChars(Constants.Char_Numerals);
+        var neueZeit = DateTime.UtcNow.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture).ReduceToChars(Constants.Char_Numerals);
         if (neueZeit == _uniqueInternalLastTime) {
             _uniqueInternalCount++;
         } else {

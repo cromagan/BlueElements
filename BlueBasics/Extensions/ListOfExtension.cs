@@ -182,7 +182,12 @@ public static partial class Extensions {
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value) {
         if (value == null) { return; }
-        col.Add(tagname + "=" + ((DateTime)value).ToString(Constants.Format_Date5));
+        col.Add(tagname + "=" + ((DateTime)value).ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
+    }
+
+    public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value, string format) {
+        if (value == null) { return; }
+        col.Add(tagname + "=" + ((DateTime)value).ToString(format, CultureInfo.InvariantCulture));
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, Color value) => col.Add(tagname + "=" + value.ToHtmlCode());

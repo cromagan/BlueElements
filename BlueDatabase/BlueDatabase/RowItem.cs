@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -371,7 +372,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisColumn in db.Column) {
             var value = sdb.Cell.GetStringCore(sdb.Column[thisColumn.KeyName], source);
 
-            _ = db.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, string.Empty, Generic.UserName, DateTime.UtcNow);
+            _ = db.ChangeData(DatabaseDataType.Value_withoutSizeData, thisColumn, source, string.Empty, value, Generic.UserName, DateTime.UtcNow, string.Empty);
 
             //Database.Cell.SetValueBehindLinkedValue(thisColumn, this, sdb.Cell.GetStringBehindLinkedValue(sdb.Column[thisColumn.KeyName], source), false);
         }
@@ -591,7 +592,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             return;
         }
         if (columnVar is VariableDateTime vd) {
-            var x = vd.ValueDate.ToString(Constants.Format_Date7);
+            var x = vd.ValueDate.ToString(Constants.Format_Date9, CultureInfo.InvariantCulture);
             x = x.TrimEnd(".000");
             x = x.TrimEnd(".0");
             x = x.TrimEnd("00:00:00");

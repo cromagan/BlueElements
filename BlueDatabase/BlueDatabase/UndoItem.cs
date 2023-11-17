@@ -30,7 +30,7 @@ public class UndoItem : IParseable {
 
     #region Constructors
 
-    public UndoItem(string tablename, DatabaseDataType comand, string column, string row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) {
+    public UndoItem(string tablename, DatabaseDataType comand, string column, string row, string previousValue, string changedTo, string user, DateTime timeutc, string comment) {
         Comand = comand;
         ColName = column;
         RowKey = row;
@@ -42,7 +42,7 @@ public class UndoItem : IParseable {
         Comment = comment;
     }
 
-    public UndoItem(string tablename, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, string comment, DateTime timeutc) : this(tablename, comand, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, comment, timeutc) { }
+    public UndoItem(string tablename, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment) : this(tablename, comand, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment) { }
 
     public UndoItem(string s) => this.Parse(s);
 
@@ -66,7 +66,7 @@ public class UndoItem : IParseable {
 
     public string RowKey { get; private set; } = string.Empty;
 
-    public string TableName { get; } = string.Empty;
+    public string TableName { get; private set; } = string.Empty;
 
     public string User { get; private set; } = string.Empty;
 
@@ -78,6 +78,10 @@ public class UndoItem : IParseable {
 
     public bool ParseThis(string key, string value) {
         switch (key) {
+            case "t":
+                TableName = value;
+                return true;
+
             case "undotype":
             case "st":
                 //_state = (ItemState)IntParse(pair.Value);
@@ -139,10 +143,11 @@ public class UndoItem : IParseable {
     public new string ToString() {
         List<string> result = new();
 
+        result.ParseableAdd("T", TableName);
         result.ParseableAdd("CO", Comand);
         result.ParseableAdd("CN", ColName);
         result.ParseableAdd("RK", RowKey);
-        result.ParseableAdd("D", DateTimeUtc);
+        result.ParseableAdd("D", DateTimeUtc, Constants.Format_Date9);
         result.ParseableAdd("U", User);
         result.ParseableAdd("P", PreviousValue);
         result.ParseableAdd("C", ChangedTo);

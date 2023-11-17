@@ -23,6 +23,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
@@ -208,7 +209,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
 
         if (i == null) { return; }
 
-        var dateiPng = TempFile(txbPfad.Text.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString(Constants.Format_Date4), "PNG");
+        var dateiPng = TempFile(txbPfad.Text.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString(Constants.Format_Date4, CultureInfo.InvariantCulture), "PNG");
         i.Save(dateiPng, ImageFormat.Png);
         i.Dispose();
         CollectGarbage();

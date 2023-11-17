@@ -979,13 +979,13 @@ namespace BlueControls.Forms {
             // 
             // LoadTab
             // 
-            this.LoadTab.Filter = "*.BDB Datenbanken|*.BDB|*.* Alle Dateien|*";
+            this.LoadTab.Filter = "*.BDB Datenbanken|*.BDB|*.MBDB Datenbanken|*.MBDB|*.* Alle Dateien|*";
             this.LoadTab.Title = "Bitte Datenbank laden!";
             this.LoadTab.FileOk += new System.ComponentModel.CancelEventHandler(this.LoadTab_FileOk);
             // 
             // SaveTab
             // 
-            this.SaveTab.Filter = "*.BDB Datenbanken|*.BDB|*.* Alle Dateien|*";
+            this.SaveTab.Filter = "*.BDB Datenbanken|*.BDB|*.MBDB Datenbanken|*.MBDB|*.* Alle Dateien|*";
             this.SaveTab.Title = "Bitte neuen Dateinamen der Datenbank wählen.";
             // 
             // TableView

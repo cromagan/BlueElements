@@ -44,9 +44,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
     #region Constructors
 
-    public DatabaseSqlLite(ConnectionInfo ci, bool readOnly) : this(((DatabaseSqlLite?)ci.Provider)?.SQL, readOnly, ci.MustBeFreezed, ci.TableName) { }
+    public DatabaseSqlLite(ConnectionInfo ci, bool readOnly) : this(ci.TableName, readOnly, ci.MustBeFreezed, ((DatabaseSqlLite?)ci.Provider)?.SQL) { }
 
-    public DatabaseSqlLite(SqlBackAbstract? sql, bool readOnly, string freezedReason, string tablename) : base(readOnly, freezedReason) {
+    public DatabaseSqlLite(string tablename, bool readOnly, string freezedReason, SqlBackAbstract? sql) : base(tablename, readOnly, freezedReason) {
         if (sql == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL-Verbindung übergeben: " + tablename);
             return;
@@ -83,6 +83,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             return connectionData;
         }
     }
+
+    protected override bool DoCellChanges => false;
 
     #endregion
 
@@ -250,6 +252,11 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
+    public override void RepairAfterParse() {
+        IsInCache = DateTime.UtcNow;
+        base.RepairAfterParse();
+    }
+
     //    LoadFromSQLBack();
     //}
     public override bool Save() => SQL != null;
@@ -261,17 +268,17 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return base.IsNewRowPossible();
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type.IsObsolete()) { return string.Empty; }
 
-        if (reason != Reason.LoadReload) {
+        if (reason != Reason.LoadReload && type != DatabaseDataType.SystemValue) {
             if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
             _ = SQL?.SetValueInternal(this, type, value, column, row, user, datetimeutc);
         }
 
-        return base.SetValueInternal(type, value, column, row, reason, user, datetimeutc);
+        return base.SetValueInternal(type, value, column, row, reason, user, datetimeutc, comment);
     }
 
     protected override void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment) {

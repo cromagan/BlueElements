@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -737,8 +738,8 @@ public partial class TableView : FormWithStatusBar {
         DatabaseAbstract.ForceSaveAll();
         MultiUserFile.ForceLoadSaveAll();
 
-        if (Table.Database is Database bdb) {
-            _ = ExecuteFile(bdb.Filename.FilePath());
+        if (Table.Database is Database db && !db.IsDisposed) {
+            _ = ExecuteFile(db.Filename.FilePath());
         }
     }
 
@@ -792,7 +793,7 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnNeu_Click(object sender, System.EventArgs e) {
         var r = Table.Database?.Column.First()?.SortType == SortierTyp.Datum_Uhrzeit
-            ? Table.Database?.Row.GenerateAndAdd(NameRepair(DateTime.Now.ToString(Constants.Format_Date5), null), "Benutzer: +")
+            ? Table.Database?.Row.GenerateAndAdd(NameRepair(DateTime.Now.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), null), "Benutzer: +")
             : Table.Database?.Row.GenerateAndAdd(NameRepair("Neuer Eintrag", null), "Benutzer: +");
         Table.CursorPos_Set(Table.Database?.Column.First(), Table.RowsFilteredAndPinned().Get(r), true);
     }

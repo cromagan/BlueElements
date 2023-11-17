@@ -33,6 +33,7 @@ using static BlueBasics.IO;
 using static BlueDatabase.DatabaseAbstract;
 using BlueDatabase.EventArgs;
 using System.Diagnostics;
+using System.Globalization;
 
 namespace BlueDatabase;
 
@@ -141,7 +142,7 @@ public abstract class SqlBackAbstract {
 
         if (!Directory.Exists(pathadditionalcsv)) { return "Backup-Verzeichniss existiert nicht."; }
 
-        var d = DateTime.UtcNow.ToString(Format_Date10);
+        var d = DateTime.UtcNow.ToString(Format_Date10, CultureInfo.InvariantCulture);
 
         var file = pathadditionalcsv.CheckPath() + "SYS_STYLE_" + d + ".csv";
         if (FileExists(file)) { return string.Empty; }
@@ -354,7 +355,7 @@ public abstract class SqlBackAbstract {
                 if (!t.IsObsolete()) {
                     string? ok;
                     if (k[1].Equals(DatabaseProperty, StringComparison.OrdinalIgnoreCase)) {
-                        ok = db.SetValueInternal(t, thisstyle.Value, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow);
+                        ok = db.SetValueInternal(t, thisstyle.Value, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow, "GetStyleData");
                     } else {
                         var column = db.Column.Exists(k[1]); // Exists, kann sein dass noch ein Eintrag in der SysSytle ist, aber die Spalte schon gelöscjht wurde
                         ok = column?.SetValueInternal(t, thisstyle.Value, Reason.LoadReload);
@@ -706,7 +707,7 @@ public abstract class SqlBackAbstract {
             //  type != DatabaseDataType.SystemValue wird oben schon abgefragt
             var l = new List<CellValueEventArgs> { new(column, value) };
 
-            if (db.Column.SysRowChangeDate is ColumnItem srd && column != srd) { l.Add(new CellValueEventArgs(srd, datetimeutc.ToString(Format_Date7))); }
+            if (db.Column.SysRowChangeDate is ColumnItem srd && column != srd) { l.Add(new CellValueEventArgs(srd, datetimeutc.ToString(Format_Date9, CultureInfo.InvariantCulture))); }
             if (db.Column.SysRowChanger is ColumnItem src && column != src) { l.Add(new CellValueEventArgs(src, user)); }
 
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {
@@ -821,8 +822,8 @@ public abstract class SqlBackAbstract {
                                              reader[4].ToString(),
                                              reader[5].ToString(),
                                              reader[6].ToString(),
-                                             reader[7].ToString(),
-                                             DateTimeParse(reader[8].ToString()));
+                                             DateTimeParse(reader[8].ToString()),
+                                             reader[7].ToString());
                         fb.Add(wi);
                     }
                 }
@@ -939,7 +940,7 @@ public abstract class SqlBackAbstract {
 
         var l = new List<string>();
 
-        var d = compareDate.ToString(Format_Date10);
+        var d = compareDate.ToString(Format_Date10, CultureInfo.InvariantCulture);
 
         foreach (var thist in tbl) {
             l.Add("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -977,7 +978,7 @@ public abstract class SqlBackAbstract {
 
     protected string Dbval(DateTime date) =>
         "to_timestamp(" +
-        Dbval(date.ToString(Format_Date9)) + ", " +
+        Dbval(date.ToString(Format_Date9, CultureInfo.InvariantCulture)) + ", " +
         Dbval(Format_Date9.ToUpper().Replace(":MM:", ":MI:").Replace("HH:", "HH24:").Replace(".FFF", ".FF3")) +
         ")";
 
@@ -1017,7 +1018,7 @@ public abstract class SqlBackAbstract {
 
             #region Kopie des aktuellen Standes erstellen
 
-            var d = DateTime.UtcNow.ToString(Format_Date10);
+            var d = DateTime.UtcNow.ToString(Format_Date10, CultureInfo.InvariantCulture);
 
             foreach (var thist in tbl) {
                 var ntc = "BAK_" + thist.ToUpper() + "_" + d;
@@ -1103,7 +1104,7 @@ public abstract class SqlBackAbstract {
 
         try {
             if (Log.Count > 2000) { Log.RemoveAt(0); }
-            Log.Add("[" + DateTime.UtcNow.ToString(Format_Date) + "]\r\n" + command.CommandText);
+            Log.Add("[" + DateTime.UtcNow.ToString(Format_Date, CultureInfo.InvariantCulture) + "]\r\n" + command.CommandText);
             _ = command.ExecuteNonQuery();
             transaction.Commit();
             return string.Empty;

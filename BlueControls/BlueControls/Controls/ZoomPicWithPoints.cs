@@ -35,6 +35,7 @@ using BlueControls.ItemCollectionList;
 using static BlueBasics.IO;
 using static BlueBasics.Extensions;
 using Orientation = BlueBasics.Enums.Orientation;
+using System.Globalization;
 
 namespace BlueControls.Controls;
 
@@ -199,7 +200,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             Bmp?.Save(path, ImageFormat.Png);
 
             Tags.TagSet("Erstellt", Generic.UserName);
-            Tags.TagSet("Datum", DateTime.UtcNow.ToString(Constants.Format_Date5));
+            Tags.TagSet("Datum", DateTime.UtcNow.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
             Tags.WriteAllText(pathtxt, Constants.Win1252, false);
         } catch {
             Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);

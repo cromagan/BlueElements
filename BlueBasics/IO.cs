@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -292,7 +293,7 @@ public static class IO {
             "VCF" => FileFormat.Visitenkarte,
             "MP3" or "WAV" or "AAC" => FileFormat.Sound,
             "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
-            "DB" or "MDB" or "BDB" => FileFormat.Database,
+            "DB" or "MDB" or "BDB" or "MBDB" => FileFormat.Database,
             "LNK" or "URL" => FileFormat.Link,
             "BCR" => FileFormat.BlueCreativeFile,
             _ => FileFormat.Unknown
@@ -337,7 +338,7 @@ public static class IO {
     public static string GetFileInfo(string filename, bool mustDo) {
         try {
             FileInfo f = new(filename);
-            return f.LastWriteTimeUtc.ToString(Constants.Format_Date) + "-" + f.Length;
+            return f.LastWriteTimeUtc.ToString(Constants.Format_Date, CultureInfo.InvariantCulture) + "-" + f.Length;
         } catch {
             if (!mustDo) { return string.Empty; }
             Develop.CheckStackForOverflow();
@@ -421,7 +422,7 @@ public static class IO {
     public static string TempFile(string pfad, string wunschname, string suffix) {
         if (string.IsNullOrEmpty(pfad)) { pfad = Path.GetTempPath(); }
         if (string.IsNullOrEmpty(suffix)) { suffix = "tmp"; }
-        if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName + DateTime.UtcNow.ToString(Constants.Format_Date6); }
+        if (string.IsNullOrEmpty(wunschname)) { wunschname = UserName + DateTime.UtcNow.ToString(Constants.Format_Date6, CultureInfo.InvariantCulture); }
         var z = -1;
         pfad = pfad.CheckPath();
         if (!DirectoryExists(pfad)) { _ = Directory.CreateDirectory(pfad); }

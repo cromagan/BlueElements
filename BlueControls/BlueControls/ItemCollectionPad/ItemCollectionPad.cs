@@ -25,6 +25,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Windows.Data;
@@ -88,7 +89,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         SheetSizeInMm = Size.Empty;
         RandinMm = Padding.Empty;
         _idCount++;
-        Caption = "#" + DateTime.UtcNow.ToString(Constants.Format_Date) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
+        Caption = "#" + DateTime.UtcNow.ToString(Constants.Format_Date, CultureInfo.InvariantCulture) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         _sheetStyle = null;
         _sheetStyleScale = 1f;

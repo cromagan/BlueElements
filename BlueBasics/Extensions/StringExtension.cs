@@ -117,7 +117,7 @@ public static partial class Extensions {
                 return compareKeySNok + isValue;
 
             case SortierTyp.Datum_Uhrzeit:
-                return DateTimeTryParse(isValue, out var d) ? compareKeySNok + d.ToString(Constants.Format_Date) : compareKeySNok + isValue;
+                return DateTimeTryParse(isValue, out var d) ? compareKeySNok + d.ToString(Constants.Format_Date, CultureInfo.InvariantCulture) : compareKeySNok + isValue;
 
             default:
                 Develop.DebugPrint(format);

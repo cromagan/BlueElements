@@ -54,12 +54,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? DisposingEvent;
-
-    #endregion
-
     #region Properties
 
     public List<IControlAcceptSomething> Childs { get; } = new();

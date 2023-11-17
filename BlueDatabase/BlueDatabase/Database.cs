@@ -56,7 +56,7 @@ public class Database : DatabaseAbstract {
 
     public Database(string filename, bool readOnly, string freezedReason, bool create, NeedPassword? needPassword) : this(null, filename, readOnly, freezedReason, create, filename.FileNameWithoutSuffix(), needPassword) { }
 
-    private Database(Stream? stream, string filename, bool readOnly, string freezedReason, bool create, string tablename, NeedPassword? needPassword) : base(readOnly, freezedReason) {
+    private Database(Stream? stream, string filename, bool readOnly, string freezedReason, bool create, string tablename, NeedPassword? needPassword) : base(tablename, readOnly, freezedReason) {
         TableName = MakeValidTableName(tablename);
 
         if (!IsValidTableName(TableName, false)) {
@@ -82,6 +82,8 @@ public class Database : DatabaseAbstract {
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
     public string Filename { get; protected set; } = string.Empty;
 
+    protected override bool DoCellChanges => true;
+
     #endregion
 
     #region Methods
@@ -90,9 +92,8 @@ public class Database : DatabaseAbstract {
         if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
 
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
-
+        if (ci.AdditionalData.FileSuffix().ToUpper() is not "BDB" or "MDB") { return null; }
         if (!FileExists(ci.AdditionalData)) { return null; }
-
         return new Database(ci, readOnly, needPassword);
     }
 
@@ -181,7 +182,7 @@ public class Database : DatabaseAbstract {
 
                 #endregion
 
-                var fehler = db.SetValueInternal(type, value, column, row, Reason.LoadReload, UserName, DateTime.UtcNow);
+                var fehler = db.SetValueInternal(type, value, column, row, Reason.LoadReload, UserName, DateTime.UtcNow, "Parsen");
 
                 if (type == DatabaseDataType.EOF) { break; }
 
@@ -201,7 +202,7 @@ public class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload, UserName, DateTime.UtcNow);
+                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload, UserName, DateTime.UtcNow, "Parsen");
             }
         }
 
@@ -327,6 +328,7 @@ public class Database : DatabaseAbstract {
             //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
             SaveToByteList(l, DatabaseDataType.Creator, db.Creator);
             SaveToByteList(l, DatabaseDataType.CreateDateUTC, db.CreateDate);
+            SaveToByteList(l, DatabaseDataType.FileStateUTCDate, db.FileStateUTCDate);
             SaveToByteList(l, DatabaseDataType.Caption, db.Caption);
 
             SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
@@ -611,6 +613,8 @@ public class Database : DatabaseAbstract {
     }
 
     public override void RepairAfterParse() {
+        // Nicht IsInCache setzen, weil ansonsten DatabaseMU nicht mehr funktioniert
+
         base.RepairAfterParse();
 
         if (!string.IsNullOrEmpty(Filename)) {
@@ -697,10 +701,10 @@ public class Database : DatabaseAbstract {
         list.AddRange(b);
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {
+    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        var r = base.SetValueInternal(type, value, column, row, reason, user, datetimeutc);
+        var r = base.SetValueInternal(type, value, column, row, reason, user, datetimeutc, comment);
 
         if (type == DatabaseDataType.UndoInOne) {
             Undo.Clear();

@@ -104,12 +104,12 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     private string _creator = string.Empty;
 
     private string _eventScriptErrorMessage = string.Empty;
-
     private string _eventScriptTmp = string.Empty;
 
     //private string _timeCode = string.Empty;
     private string _eventScriptVersion = string.Empty;
 
+    private string _fileStateUTCDate;
     private double _globalScale;
 
     private string _globalShowPass = string.Empty;
@@ -135,9 +135,10 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #region Constructors
 
-    protected DatabaseAbstract(bool readOnly, string freezedReason) {
+    protected DatabaseAbstract(string tablename, bool readOnly, string freezedReason) {
         Develop.StartService();
 
+        TableName = tablename;
         _readOnly = readOnly;
         FreezedReason = freezedReason;
 
@@ -205,7 +206,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         set {
             if (_additionalFilesPfad == value) { return; }
             AdditionalFilesPfadtmp = null;
-            _ = ChangeData(DatabaseDataType.AdditionalFilesPath, null, null, _additionalFilesPfad, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.AdditionalFilesPath, null, null, _additionalFilesPfad, value, UserName, DateTime.UtcNow, string.Empty);
             Cell.InvalidateAllSizes();
         }
     }
@@ -224,7 +225,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _caption;
         set {
             if (_caption == value) { return; }
-            _ = ChangeData(DatabaseDataType.Caption, null, null, _caption, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.Caption, null, null, _caption, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -236,7 +237,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => new(_columnArrangements);
         set {
             if (_columnArrangements.ToString(false) == value.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements.ToString(false), value.ToString(false), string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.ColumnArrangement, null, null, _columnArrangements.ToString(false), value.ToString(false), UserName, DateTime.UtcNow, string.Empty);
             OnViewChanged();
         }
     }
@@ -247,7 +248,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _createDate;
         set {
             if (_createDate == value) { return; }
-            _ = ChangeData(DatabaseDataType.CreateDateUTC, null, null, _createDate, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.CreateDateUTC, null, null, _createDate, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -255,7 +256,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _creator.Trim();
         set {
             if (_creator == value) { return; }
-            _ = ChangeData(DatabaseDataType.Creator, null, null, _creator, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.Creator, null, null, _creator, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -263,7 +264,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => new(_datenbankAdmin);
         set {
             if (!_datenbankAdmin.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr(), string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.DatabaseAdminGroups, null, null, _datenbankAdmin.JoinWithCr(), value.JoinWithCr(), UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -278,7 +279,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             l.Sort();
 
             if (_eventScriptTmp == l.ToString(false)) { return; }
-            _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.EventScript, null, null, _eventScriptTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty);
 
             EventScriptErrorMessage = string.Empty;
         }
@@ -288,7 +289,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _eventScriptErrorMessage;
         set {
             if (_eventScriptErrorMessage == value) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptErrorMessage, null, null, _eventScriptErrorMessage, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.EventScriptErrorMessage, null, null, _eventScriptErrorMessage, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -296,13 +297,22 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _eventScriptVersion;
         set {
             if (_eventScriptVersion == value) { return; }
-            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion, value, UserName, DateTime.UtcNow, string.Empty);
+        }
+    }
+
+    public string FileStateUTCDate {
+        get => _fileStateUTCDate.Trim();
+        set {
+            if (_fileStateUTCDate == value) { return; }
+            _ = ChangeData(DatabaseDataType.FileStateUTCDate, null, null, _fileStateUTCDate, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
     /// <summary>
     /// Der FreezedReason kann niemals wieder rückgänig gemacht werden.
-    /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehten
+    /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehten.
+    /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
     /// </summary>
     public string FreezedReason { get; private set; }
 
@@ -310,7 +320,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _globalScale;
         set {
             if (Math.Abs(_globalScale - value) < 0.0001) { return; }
-            _ = ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture), string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.GlobalScale, null, null, _globalScale.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture), UserName, DateTime.UtcNow, string.Empty);
             Cell.InvalidateAllSizes();
         }
     }
@@ -319,7 +329,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _globalShowPass;
         set {
             if (_globalShowPass == value) { return; }
-            _ = ChangeData(DatabaseDataType.GlobalShowPass, null, null, _globalShowPass, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.GlobalShowPass, null, null, _globalShowPass, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -328,9 +338,9 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     public bool IsDisposed { get; private set; }
 
     /// <summary>
-    /// Letzter Lade-Stand der Daten. Wird in OnLoaded gesetzt
+    /// Letzter Lade-Stand der Daten. Wird in RepairAfterParse gesetzt
     /// </summary>
-    public DateTime? IsInCache { get; private set; }
+    public DateTime IsInCache { get; protected set; } = new DateTime(0);
 
     public string KeyName {
         get {
@@ -349,7 +359,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => new(_permissionGroupsNewRow);
         set {
             if (!_permissionGroupsNewRow.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.PermissionGroupsNewRow, null, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr(), string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.PermissionGroupsNewRow, null, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr(), UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -373,7 +383,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             if (_sortDefinition != null) { alt = _sortDefinition.ToString(); }
             if (value != null) { neu = value.ToString(); }
             if (alt == neu) { return; }
-            _ = ChangeData(DatabaseDataType.SortDefinition, null, null, alt, neu, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.SortDefinition, null, null, alt, neu, UserName, DateTime.UtcNow, string.Empty);
 
             OnSortParameterChanged();
         }
@@ -387,7 +397,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _standardFormulaFile;
         set {
             if (_standardFormulaFile == value) { return; }
-            _ = ChangeData(DatabaseDataType.StandardFormulaFile, null, null, _standardFormulaFile, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.StandardFormulaFile, null, null, _standardFormulaFile, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -397,7 +407,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => new(_tags);
         set {
             if (!_tags.IsDifferentTo(value)) { return; }
-            _ = ChangeData(DatabaseDataType.Tags, null, null, _tags.JoinWithCr(), value.JoinWithCr(), string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.Tags, null, null, _tags.JoinWithCr(), value.JoinWithCr(), UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -405,7 +415,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _temporaryDatabaseMasterTimeUtc;
         private set {
             if (_temporaryDatabaseMasterTimeUtc == value) { return; }
-            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, null, null, _temporaryDatabaseMasterTimeUtc, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterTimeUTC, null, null, _temporaryDatabaseMasterTimeUtc, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -413,7 +423,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _temporaryDatabaseMasterUser.Trim();
         private set {
             if (_temporaryDatabaseMasterUser == value) { return; }
-            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterUser, null, null, _temporaryDatabaseMasterUser, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.TemporaryDatabaseMasterUser, null, null, _temporaryDatabaseMasterUser, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
@@ -427,7 +437,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             l.Sort();
 
             if (_variableTmp == l.ToString(true)) { return; }
-            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, l.ToString(true), string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty);
             //OnViewChanged();
         }
     }
@@ -438,11 +448,17 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         get => _zeilenQuickInfo;
         set {
             if (_zeilenQuickInfo == value) { return; }
-            _ = ChangeData(DatabaseDataType.RowQuickInfo, null, null, _zeilenQuickInfo, value, string.Empty, UserName, DateTime.UtcNow);
+            _ = ChangeData(DatabaseDataType.RowQuickInfo, null, null, _zeilenQuickInfo, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
 
     protected string? AdditionalFilesPfadtmp { get; set; }
+
+    /// <summary>
+    /// Gibt an, ob bei DoLastChanges die Zellen geändert werden sollen.
+    /// Bei Ja, die Zellen, bei nein werden die Rows refreshed.
+    /// </summary>
+    protected abstract bool DoCellChanges { get; }
 
     #endregion
 
@@ -509,7 +525,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     if (erg == null) { _isInTimer = false; return; } // Später ein neuer Versuch
 
                     foreach (var thisdb in db) {
-                        thisdb.DoLastChanges(erg);
+                        thisdb.DoLastChanges(erg, fd);
                         thisdb.TryToSetMeTemporaryMaster();
                     }
                 }
@@ -569,7 +585,9 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                 }
             }
 
-            if (d.AdditionalData.ToLower().EndsWith(".mdb") || d.AdditionalData.ToLower().EndsWith(".bdb")) {
+            if (d.AdditionalData.ToLower().EndsWith(".mdb") ||
+                d.AdditionalData.ToLower().EndsWith(".bdb") ||
+                d.AdditionalData.ToLower().EndsWith(".mbdb")) {
                 if (d.AdditionalData.Equals(ci.AdditionalData, StringComparison.OrdinalIgnoreCase)) {
                     return thisFile; // Multiuser - nicht multiuser konflikt
                 }
@@ -611,6 +629,9 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             if (ci.AdditionalData.FileSuffix().ToLower() is "mdb" or "bdb") {
                 return new Database(ci.AdditionalData, readOnly, ci.MustBeFreezed, false, needPassword);
             }
+            if (ci.AdditionalData.FileSuffix().ToLower() is "mbdb") {
+                return new DatabaseMU(ci.AdditionalData, readOnly, ci.MustBeFreezed, false, needPassword);
+            }
         }
 
         #endregion
@@ -619,7 +640,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
                 var h = thisSql.HandleMe(ci);
                 if (h != null) {
-                    return new DatabaseSqlLite(h, readOnly, ci.MustBeFreezed, ci.TableName);
+                    return new DatabaseSqlLite(ci.TableName, readOnly, ci.MustBeFreezed, h);
                 }
             }
         }
@@ -833,14 +854,14 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     /// <param name="row"></param>
     /// <param name="previousValue"></param>
     /// <param name="changedTo"></param>
-    /// <param name="comment"></param>
     /// <param name="user"></param>
     /// <param name="datetimeutc"></param>
-    public string ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string comment, string user, DateTime datetimeutc) {
+    /// <param name="comment"></param>
+    public string ChangeData(DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
 
-        var f = SetValueInternal(comand, changedTo, column, row, Reason.SetComand, user, datetimeutc);
+        var f = SetValueInternal(comand, changedTo, column, row, Reason.SetComand, user, datetimeutc, comment);
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -920,6 +941,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         //TimeCode = sourceDatabase.TimeCode;
         CreateDate = sourceDatabase.CreateDate;
         Creator = sourceDatabase.Creator;
+        FileStateUTCDate = sourceDatabase.FileStateUTCDate;
         //Filename - nope
         //Tablename - nope
         //TimeCode - nope
@@ -1836,7 +1858,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     }
 
     public virtual void RepairAfterParse() {
-        IsInCache ??= DateTime.UtcNow;
+        // Nicht IsInCache setzen, weil ansonsten DatabaseMU nicht mehr funktioniert
 
         if (!string.IsNullOrEmpty(EditableErrorReason(this, EditableErrorReasonType.EditAcut))) { return; }
 
@@ -1917,7 +1939,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         }
 
         if (reason == Reason.LoadReload) {
-            SetValueInternal(DatabaseDataType.ColumnArrangement, x.ToString(false), null, null, Reason.LoadReload, UserName, DateTime.UtcNow);
+            SetValueInternal(DatabaseDataType.ColumnArrangement, x.ToString(false), null, null, Reason.LoadReload, UserName, DateTime.UtcNow, "AutoRepair");
         } else {
             ColumnArrangements = x.AsReadOnly();
         }
@@ -1928,7 +1950,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     /// Echtzeitbasierte Systeme sollten diese Routine verwenden, um den Wert ebenfalls fest zu verankern (sofern !IsLoading && !Readonly)
     /// Nur von Laderoutinen aufzurufen, oder von ChangeData, wenn der Wert bereits fest in der Datenbank verankert ist.
     /// Vorsicht beim Überschreiben:
-    /// Da in Columns und Cells abgesprungen wird, und diese nicht überschrieben werden können,
+    /// Da in Columns und Cells abgesprungen wird, und diese nicht überschrieben werden können.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="value"></param>
@@ -1938,7 +1960,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     /// <param name="user"></param>
     /// <param name="datetimeutc"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc) {
+    internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (reason != Reason.LoadReload && !string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return string.Empty; }
@@ -2030,6 +2052,10 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             case DatabaseDataType.Creator:
                 _creator = value;
+                break;
+
+            case DatabaseDataType.FileStateUTCDate:
+                _fileStateUTCDate = value;
                 break;
 
             case DatabaseDataType.CreateDateUTC:
@@ -2197,7 +2223,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
         if (type == DatabaseDataType.SystemValue) { return; }
 
-        Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, comment, datetimeutc));
+        Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment));
     }
 
     protected void CreateWatcher() {
@@ -2230,7 +2256,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         OnDisposed();
     }
 
-    protected void DoLastChanges(List<UndoItem>? data) {
+    protected void DoLastChanges(List<UndoItem>? data, DateTime toUTC) {
         if (data == null) { return; }
         if (IsDisposed) { return; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
@@ -2239,6 +2265,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank noch nicht korrekt geladen!");
             return;
         }
+
+        data = data.OrderBy(obj => obj.DateTimeUtc).ToList();
 
         try {
             var rk = new List<string>();
@@ -2258,15 +2286,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                             case DatabaseDataType.Comand_RemoveColumn:
                                 _ = Column.SetValueInternal(thisWork.Comand, Reason.LoadReload, thisWork.ColName);
                                 break;
-
-                            //case DatabaseDataType.Comand_AddColumnByKey:
-                            //case DatabaseDataType.Comand_AddColumn:
-                            //    _ = Column.SetValueInternal(t, true, columnname);
-                            //    var c = Column.SearchByKey(LongParse(columnkey));
-                            //    var name = _sql.GetLastColumnName(TableName, c.KeyName);
-                            //    _ = SetValueInternal(DatabaseDataType.ColumnName, name, c.Name, null, true);
-                            //    c.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
-                            //    break;
 
                             case DatabaseDataType.Comand_AddColumnByName:
                                 _ = Column.SetValueInternal(thisWork.Comand, Reason.LoadReload, thisWork.ChangedTo); // ColumName kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Spalte bekannt ist und nicht gespeichert wird
@@ -2301,11 +2320,16 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                         if (r != null && c != null) {
                             // Kann sein, dass der Benutzer hier ja schon eine Zeile oder so gelöscht hat,
                             // aber anderer PC hat bei der noch vorhandenen Zeile eine Änderung
-                            if (thisWork.DateTimeUtc > r.IsInCache || thisWork.DateTimeUtc > c.IsInCache) {
-                                _ = rk.AddIfNotExists(r.KeyName);
-                                _ = cek.AddIfNotExists(CellCollection.KeyOfCell(c, r));
-                                c.Invalidate_ContentWidth();
+
+                            if (DoCellChanges) {
+                                _ = SetValueInternal(thisWork.Comand, thisWork.ChangedTo, c, r, Reason.LoadReload, thisWork.User, thisWork.DateTimeUtc, "DoLastChanges");
+                            } else {
+                                if (thisWork.DateTimeUtc > r.IsInCache || thisWork.DateTimeUtc > c.IsInCache) {
+                                    _ = rk.AddIfNotExists(r.KeyName);
+                                    _ = cek.AddIfNotExists(CellCollection.KeyOfCell(c, r));
+                                }
                             }
+                            c.Invalidate_ContentWidth();
                         }
 
                         #endregion
@@ -2314,7 +2338,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                         #region Datenbank-Styles
 
                         //var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Comand, DatabaseProperty, SysStyle);
-                        _ = SetValueInternal(thisWork.Comand, string.Empty, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow);
+                        _ = SetValueInternal(thisWork.Comand, string.Empty, null, null, Reason.LoadReload, thisWork.User, thisWork.DateTimeUtc, "DoLastChanges");
 
                         #endregion
                     } else if (thisWork.Comand.IsColumnTag()) {
@@ -2324,7 +2348,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                         var c = Column.Exists(thisWork.ColName);
                         if (c != null && !c.IsDisposed) {
                             //var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Comand, c.KeyName, SysStyle);
-                            _ = SetValueInternal(thisWork.Comand, string.Empty, c, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow);
+                            _ = SetValueInternal(thisWork.Comand, string.Empty, c, null, Reason.LoadReload, thisWork.User, thisWork.DateTimeUtc, "DoLastChanges");
                         }
 
                         #endregion
@@ -2332,9 +2356,11 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                 }
             }
 
-            var (_, errormessage) = RefreshRowData(rk, true);
-            if (!string.IsNullOrEmpty(errormessage)) {
-                OnDropMessage(FehlerArt.Fehler, errormessage);
+            if (!DoCellChanges) {
+                var (_, errormessage) = RefreshRowData(rk, true);
+                if (!string.IsNullOrEmpty(errormessage)) {
+                    OnDropMessage(FehlerArt.Fehler, errormessage);
+                }
             }
 
             foreach (var thisc in cek) {
@@ -2344,10 +2370,11 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                 }
             }
 
+            IsInCache = toUTC;
             OnInvalidateView();
         } catch {
             Develop.CheckStackForOverflow();
-            DoLastChanges(data);
+            DoLastChanges(data, toUTC);
         }
     }
 
@@ -2367,7 +2394,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         _datenbankAdmin.Clear();
         _globalShowPass = string.Empty;
         _creator = UserName;
-        _createDate = DateTime.UtcNow.ToString(Format_Date5);
+        _createDate = DateTime.UtcNow.ToString(Format_Date9, CultureInfo.InvariantCulture);
+        _fileStateUTCDate = "01.01.2000"; // Wichtig, dass das Datum bei Datenbanken ohne den Wert immer alles laden
         _caption = string.Empty;
         LoadedVersion = DatabaseVersion;
         _globalScale = 1f;
@@ -2413,7 +2441,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         if (DateTime.UtcNow.Subtract(d).TotalMinutes < 60 && !string.IsNullOrEmpty(TemporaryDatabaseMasterUser)) { return; }
 
         TemporaryDatabaseMasterUser = UserName;
-        TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString(Format_Date5);
+        TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString(Format_Date5, CultureInfo.InvariantCulture);
     }
 
     private static void CheckSysUndo(object state) {
