@@ -31,7 +31,7 @@ internal class Method_IsNullOrZero : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { Variable.Any_Variable } };
-    public override string Comand => "isnullorzero";
+    public override string Command => "isnullorzero";
     public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist, keinen Inhalt hat, oder dem Zahlenwert 0 entspricht. Falls die Variable existiert, muss diese dem Typ Numeral entsprechen.";
     public override bool EndlessArgs => false;
     

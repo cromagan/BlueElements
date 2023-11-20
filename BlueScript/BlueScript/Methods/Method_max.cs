@@ -30,7 +30,7 @@ internal class Method_Max : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { FloatVal };
-    public override string Comand => "max";
+    public override string Command => "max";
     public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.";
     public override bool EndlessArgs => true;
     

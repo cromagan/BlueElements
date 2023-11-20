@@ -31,7 +31,7 @@ internal class Method_Break : Method {
     #region Properties
 
     public override List<List<string>> Args => new();
-    public override string Comand => "break";
+    public override string Command => "break";
     public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;

@@ -137,7 +137,7 @@ public static class ItemAcceptSomethingExtensions {
         }
 
         x.AddSeparator();
-        _ = x.Add(ContextMenuComands.Abbruch);
+        _ = x.Add(ContextMenuCommands.Abbruch);
 
         var it = InputBoxListBoxStyle.Show("Aktion wählen:", x, AddType.None, true);
 

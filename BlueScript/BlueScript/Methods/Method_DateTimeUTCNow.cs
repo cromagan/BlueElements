@@ -32,7 +32,7 @@ internal class Method_DateTimeNowUTC : Method {
     #region Properties
 
     public override List<List<string>> Args => new();
-    public override string Comand => "datetimeutcnow";
+    public override string Command => "datetimeutcnow";
     public override string Description => "Gibt die akutelle UTC-Uhrzeit zurück.";
     public override bool EndlessArgs => false;
     

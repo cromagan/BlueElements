@@ -30,7 +30,7 @@ internal class Method_Min : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { FloatVal };
-    public override string Comand => "min";
+    public override string Command => "min";
     public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.";
     public override bool EndlessArgs => true;
     

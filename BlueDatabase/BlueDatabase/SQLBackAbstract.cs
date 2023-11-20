@@ -102,11 +102,11 @@ public abstract class SqlBackAbstract {
         return SetStyleData(tablename, DatabaseDataType.ColumnName, columnName.ToUpper(), columnName.ToUpper());
     }
 
-    public string AddUndo(string tablename, DatabaseDataType comand, string? columname, string rowKey, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment) {
+    public string AddUndo(string tablename, DatabaseDataType command, string? columname, string rowKey, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment) {
         if (!OpenConnection()) { return "Es konnte keine Verbindung zur Datenbank aufgebaut werden"; }
 
-        if (comand == DatabaseDataType.SystemValue) { return "System-Values werden nicht geloggt."; }
-        if (comand.IsObsolete()) { return "Obsoloete Befehle werden nicht geloggt."; }
+        if (command == DatabaseDataType.SystemValue) { return "System-Values werden nicht geloggt."; }
+        if (command.IsObsolete()) { return "Obsoloete Befehle werden nicht geloggt."; }
 
         //var ck = columnKey is not null and > (-1) ? columnKey.ToString() : string.Empty;
         var rk = rowKey ?? string.Empty;
@@ -114,7 +114,7 @@ public abstract class SqlBackAbstract {
         var cmdString = "INSERT INTO " + SysUndo +
             " (TABLENAME, COMAND, COLUMNNAME, ROWKEY, PREVIOUSVALUE, CHANGEDTO, USERNAME, TIMECODEUTC, CMT) VALUES (" +
              Dbval(tablename.ToUpper()) + "," +
-             Dbval(comand.ToString()) + "," +
+             Dbval(command.ToString()) + "," +
              Dbval(columname) + "," +
              Dbval(rk) + "," +
              Dbval(previousValue) + "," +
@@ -722,21 +722,21 @@ public abstract class SqlBackAbstract {
 
         if (type.IsCommand()) {
             switch (type) {
-                //case DatabaseDataType.Comand_AddColumn:
-                //case DatabaseDataType.Comand_AddColumnByKey:
+                //case DatabaseDataType.Command_AddColumn:
+                //case DatabaseDataType.Command_AddColumnByKey:
                 //    return AddColumnToMain(tablename, ColumnItem.TmpNewDummy, (long)columnkey);
 
-                case DatabaseDataType.Comand_AddColumnByName:
+                case DatabaseDataType.Command_AddColumnByName:
                     return AddColumnToMain(db.TableName, value, false);
 
-                case DatabaseDataType.Comand_RemoveColumn:
+                case DatabaseDataType.Command_RemoveColumn:
                     if (column == null) { return "Spalte nicht definiert!"; }
                     return RemoveColumn(db.TableName, column.KeyName.ToUpper(), false);
 
-                case DatabaseDataType.Comand_RemoveRow:
+                case DatabaseDataType.Command_RemoveRow:
                     return RemoveRow(db.TableName, value, false);
 
-                case DatabaseDataType.Comand_AddRow:
+                case DatabaseDataType.Command_AddRow:
                     return string.Empty;//  AddRow(db.TableName, LongParse(value));
 
                 default:
@@ -855,7 +855,7 @@ public abstract class SqlBackAbstract {
     //        return GetLastColumnName(tablename, key);
     //    }
     //}
-    internal void LoadColumns(string tablename, RowCollection rows, List<ColumnItem> columns, bool addmissingRows, List<FilterItem>? preselection) {
+    internal void LoadColumns(string tablename, RowCollection rows, List<ColumnItem> columns, bool addmissingRows) {
         if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
             throw new Exception();
@@ -911,7 +911,7 @@ public abstract class SqlBackAbstract {
             var row = rows.SearchByKey(rk);
 
             if ((row == null || row.IsDisposed) && addmissingRows) {
-                _ = rows.SetValueInternal(DatabaseDataType.Comand_AddRow, rk, null, Reason.LoadReload);
+                _ = rows.ExecuteCommand(DatabaseDataType.Command_AddRow, rk, null, Reason.LoadReload);
                 row = rows.SearchByKey(rk);
             }
 

@@ -31,7 +31,7 @@ internal class Method_EndsWith : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, BoolVal, StringVal };
-    public override string Comand => "endswith";
+    public override string Command => "endswith";
     public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
     public override bool EndlessArgs => true;
     

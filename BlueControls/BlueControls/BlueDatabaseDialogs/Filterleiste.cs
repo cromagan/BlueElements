@@ -272,11 +272,11 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
     private void _table_ViewChanged(object sender, System.EventArgs e) => FillFilters();
 
-    private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
+    private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
         if (_table?.Filter == null) { return; }
 
         _table.Filter.Remove(e.Column);
-        if (e.Comand != "Filter") { return; }
+        if (e.Command != "Filter") { return; }
 
         if (e.Filter == null) { return; }
         _table.Filter.Add(e.Filter);
@@ -427,7 +427,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         var p = f.PointToScreen(Point.Empty);
         autofilter.Position_LocateToPosition(p with { Y = p.Y + f.Height });
         autofilter.Show();
-        autofilter.FilterComand += AutoFilter_FilterComand;
+        autofilter.FilterCommand += AutoFilter_FilterCommand;
         Develop.Debugprint_BackgroundThread();
     }
 

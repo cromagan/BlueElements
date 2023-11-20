@@ -32,7 +32,7 @@ internal class Method_MoveDirectory : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
-    public override string Comand => "movedirectory";
+    public override string Command => "movedirectory";
     public override string Description => "Verschiebt einen Ordner.";
     public override bool EndlessArgs => false;
   

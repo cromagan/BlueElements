@@ -34,7 +34,7 @@ internal class Method_BackupControl : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
-    public override string Comand => "backupcontrol";
+    public override string Command => "backupcontrol";
     public override string Description => "Durchsucht das Verzeichnis nach Dateien mit dem angegebenen Filter. Löscht Dateien nach bestimmten Datumsangaben.";
     public override bool EndlessArgs => false;
   

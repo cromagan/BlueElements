@@ -2353,14 +2353,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void AutoFilter_Close() {
         if (_autoFilter != null) {
-            _autoFilter.FilterComand -= AutoFilter_FilterComand;
+            _autoFilter.FilterCommand -= AutoFilter_FilterCommand;
             _autoFilter?.Dispose();
             _autoFilter = null;
         }
     }
 
-    private void AutoFilter_FilterComand(object sender, FilterComandEventArgs e) {
-        switch (e.Comand.ToLower()) {
+    private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
+        switch (e.Command.ToLower()) {
             case "":
                 break;
 
@@ -2449,7 +2449,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     break;
                 }
             default:
-                Develop.DebugPrint("Unbekannter Comand:   " + e.Comand);
+                Develop.DebugPrint("Unbekannter Command:   " + e.Command);
                 break;
         }
         OnAutoFilterClicked(new FilterEventArgs(e.Filter));
@@ -2468,7 +2468,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _autoFilter = new AutoFilter(columnviewitem.Column, Filter, PinnedRows);
         _autoFilter.Position_LocateToPosition(new Point(screenx + (int)columnviewitem.OrderTmpSpalteX1, screeny + HeadSize(ca)));
         _autoFilter.Show();
-        _autoFilter.FilterComand += AutoFilter_FilterComand;
+        _autoFilter.FilterCommand += AutoFilter_FilterCommand;
         Develop.Debugprint_BackgroundThread();
     }
 
@@ -3206,7 +3206,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     BlueFont.DrawString(gr, db.FreezedReason, (Font)_columnFont, Brushes.Blue, 52, 12);
                 }
             }
-            if (db.AmITemporaryMaster()) { gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, 0); }
+
+            if (db.AmITemporaryMaster(false)) {
+                gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8), 0, 0);
+            } else if (db.AmITemporaryMaster(true)) {
+                gr.DrawImage(QuickImage.Get(ImageCode.Stern, 8, Color.Blue, Color.Transparent), 0, 0);
+            }
         } catch {
             Invalidate();
             //Develop.DebugPrint(ex);
@@ -3264,7 +3269,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <returns></returns>
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         FloatingForm.Close(this);
-        if (string.IsNullOrEmpty(e.ClickedComand)) { return; }
+        if (string.IsNullOrEmpty(e.ClickedCommand)) { return; }
 
         var ca = CurrentArrangement;
         if (ca == null) { return; }
@@ -3274,7 +3279,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (ck?.Column == null) { return; }
 
-        var toAdd = e.ClickedComand;
+        var toAdd = e.ClickedCommand;
         var toRemove = string.Empty;
         if (toAdd == "#Erweitert") {
             Cell_Edit(ca, ck.Column, ck.RowData, false);

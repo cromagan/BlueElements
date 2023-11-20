@@ -33,7 +33,7 @@ internal class Method_FreeFileName : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
-    public override string Comand => "freefilename";
+    public override string Command => "freefilename";
     public override string Description => "Gibt einen zufälligen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.";
     public override bool EndlessArgs => false;
     

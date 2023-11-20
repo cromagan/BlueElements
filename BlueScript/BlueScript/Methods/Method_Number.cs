@@ -32,7 +32,7 @@ internal class Method_Number : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, FloatVal };
-    public override string Comand => "number";
+    public override string Command => "number";
     public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
     public override bool EndlessArgs => false;
     

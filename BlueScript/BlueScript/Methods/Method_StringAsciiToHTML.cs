@@ -32,7 +32,7 @@ internal class Method_StringAsciiToHTML : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, BoolVal };
-    public override string Comand => "stringasciitohtml";
+    public override string Command => "stringasciitohtml";
     public override string Description => "Ersetzt einen ASCII-String zu einem HTML-String. Beispiel: aus ä wird &auml;  Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
     public override bool EndlessArgs => false;
     

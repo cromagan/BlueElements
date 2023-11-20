@@ -27,20 +27,20 @@ namespace BlueControls {
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.lstComands = new BlueControls.Controls.ListBox();
+            this.lstCommands = new BlueControls.Controls.ListBox();
             this.txbComms = new BlueControls.Controls.TextBox();
             this.SuspendLayout();
             // 
-            // lstComands
+            // lstCommands
             // 
-            this.lstComands.AddAllowed = BlueControls.Enums.AddType.None;
-            this.lstComands.Dock = System.Windows.Forms.DockStyle.Left;
-            this.lstComands.FilterAllowed = true;
-            this.lstComands.Location = new System.Drawing.Point(0, 0);
-            this.lstComands.Name = "lstComands";
-            this.lstComands.Size = new System.Drawing.Size(272, 450);
-            this.lstComands.TabIndex = 3;
-            this.lstComands.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstComands_ItemClicked);
+            this.lstCommands.AddAllowed = BlueControls.Enums.AddType.None;
+            this.lstCommands.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lstCommands.FilterAllowed = true;
+            this.lstCommands.Location = new System.Drawing.Point(0, 0);
+            this.lstCommands.Name = "lstCommands";
+            this.lstCommands.Size = new System.Drawing.Size(272, 450);
+            this.lstCommands.TabIndex = 3;
+            this.lstCommands.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstCommands_ItemClicked);
             // 
             // txbComms
             // 
@@ -58,7 +58,7 @@ namespace BlueControls {
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
             this.Controls.Add(this.txbComms);
-            this.Controls.Add(this.lstComands);
+            this.Controls.Add(this.lstCommands);
             this.Name = "Befehlsreferenz";
             this.Text = "Befehlsübersicht";
             this.ResumeLayout(false);
@@ -67,7 +67,7 @@ namespace BlueControls {
 
         #endregion
 
-        private ListBox lstComands;
+        private ListBox lstCommands;
         private TextBox txbComms;
     }
 }

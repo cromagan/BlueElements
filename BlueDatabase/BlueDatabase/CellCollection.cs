@@ -631,7 +631,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
 
-        if (reason != Reason.LoadReload) {
+        if (reason == Reason.SetCommand) {
             if (column.ScriptType != ScriptType.Nicht_vorhanden) {
                 Database?.Row.AddRowWithChangedValue(row);
             }
@@ -693,7 +693,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (row == null || row.IsDisposed) { return string.Empty; }
         if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
 
-        db.RefreshCellData(column, row, Reason.SetComand);
+        db.RefreshCellData(column, row, Reason.SetCommand);
 
         var cellKey = KeyOfCell(column, row);
 
@@ -803,7 +803,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         column.Invalidate_ContentWidth();
         row.InvalidateCheckData();
-        OnCellValueChanged(new CellChangedEventArgs(column, row, Reason.SetComand));
+        OnCellValueChanged(new CellChangedEventArgs(column, row, Reason.SetCommand));
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {

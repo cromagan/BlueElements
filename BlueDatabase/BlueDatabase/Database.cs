@@ -79,7 +79,9 @@ public class Database : DatabaseAbstract {
     #region Properties
 
     public static string DatabaseId => nameof(Database);
+
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
+
     public string Filename { get; protected set; } = string.Empty;
 
     protected override bool DoCellChanges => true;
@@ -119,7 +121,7 @@ public class Database : DatabaseAbstract {
                 if (!string.IsNullOrEmpty(rowKey)) {
                     row = db.Row.SearchByKey(rowKey);
                     if (row == null || row.IsDisposed) {
-                        _ = db.Row.SetValueInternal(DatabaseDataType.Comand_AddRow, rowKey, null, Reason.LoadReload);
+                        _ = db.Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, null, Reason.LoadReload);
                         row = db.Row.SearchByKey(rowKey);
                     }
                     if (row == null || row.IsDisposed) {
@@ -138,7 +140,7 @@ public class Database : DatabaseAbstract {
                 //    column = db.Column.SearchByKey(colKey);
                 //    if (Column  ==null || Column .IsDisposed) {
                 //        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
-                //        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByKey, true, string.Empty);
+                //        _ = db.Column.SetValueInternal(DatabaseDataType.Command_AddColumnByKey, true, string.Empty);
                 //        column = db.Column.SearchByKey(colKey);
                 //    }
                 //    if (Column  ==null || Column .IsDisposed) {
@@ -154,7 +156,7 @@ public class Database : DatabaseAbstract {
                     column = db.Column.Exists(columname);
                     if (column == null || column.IsDisposed) {
                         if (type != DatabaseDataType.ColumnName) { Develop.DebugPrint(type + " an erster Stelle!"); }
-                        _ = db.Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, Reason.LoadReload, columname);
+                        _ = db.Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, Reason.LoadReload, columname);
                         column = db.Column.Exists(columname);
                     }
                     if (column == null || column.IsDisposed) {
@@ -202,7 +204,7 @@ public class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                _ = db.SetValueInternal(DatabaseDataType.Comand_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload, UserName, DateTime.UtcNow, "Parsen");
+                _ = db.SetValueInternal(DatabaseDataType.Command_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload, UserName, DateTime.UtcNow, "Parsen");
             }
         }
 
@@ -376,7 +378,7 @@ public class Database : DatabaseAbstract {
             List<string> works2 = new();
             foreach (var thisWorkItem in db.Undo) {
                 if (thisWorkItem != null) {
-                    if (thisWorkItem.Comand != DatabaseDataType.Value_withoutSizeData) {
+                    if (thisWorkItem.Command != DatabaseDataType.Value_withoutSizeData) {
                         works2.Add(thisWorkItem.ToString());
                     } else {
                         if (thisWorkItem.LogsUndo(db)) {
@@ -627,6 +629,8 @@ public class Database : DatabaseAbstract {
     public override bool Save() {
         if (_isInSave) { return false; }
 
+        if (!HasPendingChanges) { return false; }
+
         _isInSave = true;
         var v = SaveInternal();
         _isInSave = false;
@@ -722,7 +726,39 @@ public class Database : DatabaseAbstract {
         return r;
     }
 
+    protected override void DoWorkAfterLastChanges() { }
+
     protected override IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer() => new List<DatabaseAbstract>();
+
+    protected bool SaveInternal() {
+        var m = EditableErrorReason(EditableErrorReasonType.Save);
+        if (!string.IsNullOrEmpty(m)) { return false; }
+
+        if (string.IsNullOrEmpty(Filename)) { return false; }
+
+        var tmpFileName = WriteTempFileToDisk();
+
+        if (string.IsNullOrEmpty(tmpFileName)) { return false; }
+
+        if (FileExists(Backupdateiname())) {
+            if (!DeleteFile(Backupdateiname(), false)) { return false; }
+        }
+
+        // Haupt-Datei wird zum Backup umbenannt
+        if (!MoveFile(Filename, Backupdateiname(), false)) { return false; }
+
+        if (FileExists(Filename)) {
+            // Paralleler Prozess hat gespeichert?!?
+            _ = DeleteFile(tmpFileName, false);
+            return false;
+        }
+
+        // --- TmpFile wird zum Haupt ---
+        _ = MoveFile(tmpFileName, Filename, true);
+
+        HasPendingChanges = false;
+        return true;
+    }
 
     private static int NummerCode1(IReadOnlyList<byte> b, int pointer) => b[pointer];
 
@@ -963,38 +999,6 @@ public class Database : DatabaseAbstract {
             bLoaded = MultiUserFile.UnzipIt(bLoaded);
         }
         return bLoaded;
-    }
-
-    private bool SaveInternal() {
-        var m = EditableErrorReason(EditableErrorReasonType.Save);
-        if (!string.IsNullOrEmpty(m)) { return false; }
-
-        if (string.IsNullOrEmpty(Filename)) { return false; }
-
-        if (!HasPendingChanges) { return false; }
-
-        var tmpFileName = WriteTempFileToDisk();
-
-        if (string.IsNullOrEmpty(tmpFileName)) { return false; }
-
-        if (FileExists(Backupdateiname())) {
-            if (!DeleteFile(Backupdateiname(), false)) { return false; }
-        }
-
-        // Haupt-Datei wird zum Backup umbenannt
-        if (!MoveFile(Filename, Backupdateiname(), false)) { return false; }
-
-        if (FileExists(Filename)) {
-            // Paralleler Prozess hat gespeichert?!?
-            _ = DeleteFile(tmpFileName, false);
-            return false;
-        }
-
-        // --- TmpFile wird zum Haupt ---
-        _ = MoveFile(tmpFileName, Filename, true);
-
-        HasPendingChanges = false;
-        return true;
     }
 
     private string WriteTempFileToDisk() {

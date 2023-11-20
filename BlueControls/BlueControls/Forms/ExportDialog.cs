@@ -275,14 +275,14 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        _ = e.UserMenu.Add(ContextMenuComands.DateiPfad÷ffnen);
-        _ = e.UserMenu.Add(ContextMenuComands.Kopieren);
+        _ = e.UserMenu.Add(ContextMenuCommands.DateiPfad÷ffnen);
+        _ = e.UserMenu.Add(ContextMenuCommands.Kopieren);
     }
 
     private void lstExported_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem is not TextListItem tl) { return; }
 
-        switch (e.ClickedComand) {
+        switch (e.ClickedCommand) {
             case "DateiPfad÷ffnen":
                 _ = ExecuteFile(tl.KeyName.FilePath());
                 break;

@@ -31,7 +31,7 @@ internal class Method_StartsWith : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, BoolVal, StringVal };
-    public override string Comand => "startswith";
+    public override string Command => "startswith";
     public override string Description => "Prüft, ob der String mit einem der angegeben Strings startet.";
     public override bool EndlessArgs => true;
     

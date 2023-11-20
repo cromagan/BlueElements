@@ -27,18 +27,18 @@ public readonly struct CanDoFeedback {
         ContinueOrErrorPosition = errorposition;
         ErrorMessage = errormessage;
         MustAbort = mustabort;
-        ComandText = string.Empty;
+        CommandText = string.Empty;
         AttributText = string.Empty;
         CodeBlockAfterText = string.Empty;
         CurrentReducedScriptText = reducedscript;
         Data = ld;
     }
 
-    public CanDoFeedback(string reducedscript, int continuePosition, string comandText, string attributtext, string codeblockaftertext, LogData ld) {
+    public CanDoFeedback(string reducedscript, int continuePosition, string commandText, string attributtext, string codeblockaftertext, LogData ld) {
         ContinueOrErrorPosition = continuePosition;
         ErrorMessage = string.Empty;
         MustAbort = false;
-        ComandText = comandText;
+        CommandText = commandText;
         AttributText = attributtext;
         CodeBlockAfterText = codeblockaftertext;
         CurrentReducedScriptText = reducedscript;
@@ -66,7 +66,7 @@ public readonly struct CanDoFeedback {
     /// <summary>
     /// Der Text, mit dem eingestiegen wird. Also der Befehl mit dem StartString.
     /// </summary>
-    public string ComandText { get; }
+    public string CommandText { get; }
 
     /// <summary>
     /// Die Position, wo der Fehler stattgefunfden hat ODER die Position wo weiter geparsesd werden muss

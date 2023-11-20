@@ -34,7 +34,7 @@ internal class Method_LoadTextFile : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "loadtextfile";
+    public override string Command => "loadtextfile";
     public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
     public override bool EndlessArgs => false;
     

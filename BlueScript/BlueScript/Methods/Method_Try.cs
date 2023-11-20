@@ -31,7 +31,7 @@ internal class Method_Try : Method {
     #region Properties
 
     public override List<List<string>> Args => new();
-    public override string Comand => "try";
+    public override string Command => "try";
 
     public override string Description => "Führt den Codeblock innerhalb der geschweiften Klammern aus.\r\n" +
                                           "Tritt währenddessen ein Fehler auf, wird der Codeblock verlassen und die weiteren Befehle innerhalb des Codeblocks ignoriert.\r\n" +

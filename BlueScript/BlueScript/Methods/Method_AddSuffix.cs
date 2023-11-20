@@ -31,7 +31,7 @@ internal class Method_AddSuffix : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { ListStringVar, StringVal };
-    public override string Comand => "addsuffix";
+    public override string Command => "addsuffix";
     public override string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
     public override bool EndlessArgs => false;
   

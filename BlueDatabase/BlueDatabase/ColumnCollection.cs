@@ -247,7 +247,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    Develop.DebugPrint(FehlerArt.Fehler, "Schlüssel belegt!");
         //    return null;
         //}
-        _ = Database?.ChangeData(DatabaseDataType.Comand_AddColumnByName, null, null, string.Empty, internalName, Generic.UserName, DateTime.UtcNow, string.Empty);
+        _ = Database?.ChangeData(DatabaseDataType.Command_AddColumnByName, null, null, string.Empty, internalName, Generic.UserName, DateTime.UtcNow, string.Empty);
         var item = Exists(internalName);
         if (item == null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen.");
@@ -406,7 +406,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public bool Remove(ColumnItem column, string comment) {
         if (column == null || column.IsDisposed) { return false; }
-        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveColumn, column, null, string.Empty, column.KeyName, Generic.UserName, DateTime.UtcNow, comment));
+        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, Generic.UserName, DateTime.UtcNow, comment));
     }
 
     public void Repair() {
@@ -474,7 +474,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         ok = Database.Cell.ChangeColumnName(oldName, newName);
         if (!ok) { return false; }
-        Database?.RepairColumnArrangements(Reason.SetComand);
+        Database?.RepairColumnArrangements(Reason.SetCommand);
         //Database?.RepairViews();
         return true;
     }
@@ -511,16 +511,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    internal void OnColumnRemoving(ColumnReasonEventArgs e) {
-        e.Column.Changed -= OnColumnChanged;
-        ColumnRemoving?.Invoke(this, e);
-    }
-
-    internal string SetValueInternal(DatabaseDataType type, Reason reason, string name) {
+    internal string ExecuteCommand(DatabaseDataType type, Reason reason, string name) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank verworfen!"; }
         //if (key is null or < 0) { return "Schlüsselfehler"; }
 
-        //if (type == DatabaseDataType.Comand_AddColumnByKey) {
+        //if (type == DatabaseDataType.Command_AddColumnByKey) {
         //    var c = SearchByKey(key);
         //    if (c != null && !c.IsDisposed) { return "Bereits vorhanden!"; }
 
@@ -535,7 +530,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         //    return string.Empty;
         //}
 
-        if (type == DatabaseDataType.Comand_AddColumnByName) {
+        if (type == DatabaseDataType.Command_AddColumnByName) {
             var c = Exists(name);
             if (c != null && !c.IsDisposed) { return "Bereits vorhanden!"; }
 
@@ -550,7 +545,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             return string.Empty;
         }
 
-        if (type == DatabaseDataType.Comand_RemoveColumn) {
+        if (type == DatabaseDataType.Command_RemoveColumn) {
             var c = Exists(name);
             if (c == null) { return "Spalte nicht gefunden!"; }
 
@@ -571,6 +566,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
 
         return "Befehl unbekannt";
+    }
+
+    internal void OnColumnRemoving(ColumnReasonEventArgs e) {
+        e.Column.Changed -= OnColumnChanged;
+        ColumnRemoving?.Invoke(this, e);
     }
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();

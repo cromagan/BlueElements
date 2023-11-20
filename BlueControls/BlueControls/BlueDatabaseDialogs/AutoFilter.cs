@@ -61,7 +61,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Events
 
-    public event EventHandler<FilterComandEventArgs>? FilterComand;
+    public event EventHandler<FilterCommandEventArgs>? FilterCommand;
 
     #endregion
 
@@ -239,10 +239,10 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         ChangeDesign();
     }
 
-    private void CloseAndDispose(string comand, FilterItem? newFilter) {
+    private void CloseAndDispose(string command, FilterItem? newFilter) {
         if (IsClosed) { return; }
         Close();
-        OnFilterComand(new FilterComandEventArgs(comand, _column, newFilter));
+        OnFilterCommand(new FilterCommandEventArgs(command, _column, newFilter));
     }
 
     private void FiltItems_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -263,7 +263,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         }
     }
 
-    private void OnFilterComand(FilterComandEventArgs e) => FilterComand?.Invoke(this, e);
+    private void OnFilterCommand(FilterCommandEventArgs e) => FilterCommand?.Invoke(this, e);
 
     private void sFilter_ItemClicked(object sender, AbstractListItemEventArgs e) {
         switch (e.Item.KeyName.ToLower()) {

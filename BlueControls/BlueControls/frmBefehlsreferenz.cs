@@ -12,14 +12,14 @@ public partial class Befehlsreferenz : Form {
 
     public Befehlsreferenz() {
         InitializeComponent();
-        WriteComandsToList();
+        WriteCommandsToList();
     }
 
     #endregion
 
     #region Methods
 
-    private void lstComands_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void lstCommands_ItemClicked(object sender, AbstractListItemEventArgs e) {
         var co = string.Empty;
         if (e.Item is ReadableListItem r && r.Item is Method thisc) {
             co += thisc.HintText();
@@ -27,13 +27,13 @@ public partial class Befehlsreferenz : Form {
         txbComms.Text = co;
     }
 
-    private void WriteComandsToList() {
-        lstComands.Item.Clear();
+    private void WriteCommandsToList() {
+        lstCommands.Item.Clear();
 
-        if (Script.Comands == null) { return; }
+        if (Script.Commands == null) { return; }
 
-        foreach (var thisc in Script.Comands) {
-            _ = lstComands.Item.Add(thisc);
+        foreach (var thisc in Script.Commands) {
+            _ = lstCommands.Item.Add(thisc);
         }
     }
 

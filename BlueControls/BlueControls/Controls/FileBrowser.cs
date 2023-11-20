@@ -146,11 +146,11 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
 
         var shellKey = mainkey.OpenSubKey("shell");
         if (shellKey == null) { return string.Empty; }
-        var shellComand = shellKey.GetValue("");
+        var shellCommand = shellKey.GetValue("");
 
-        if (shellComand == null) { return string.Empty; }
+        if (shellCommand == null) { return string.Empty; }
 
-        var exekey = shellKey.OpenSubKey(shellComand.ToString());
+        var exekey = shellKey.OpenSubKey(shellCommand.ToString());
         if (exekey == null) { return string.Empty; }
         exekey = exekey.OpenSubKey("command");
         if (exekey == null) { return string.Empty; }
@@ -278,11 +278,11 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
         if (e.HotItem is not BitmapListItem it) { return; }
         //if (it.Tag is not List<string> tags) { return; }
 
-        //_ = e.UserMenu.Add(ContextMenuComands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
-        //_ = e.UserMenu.Add(ContextMenuComands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
+        //_ = e.UserMenu.Add(ContextMenuCommands.Ausschneiden, !tags.TagGet("Folder").FromPlusMinus());
+        //_ = e.UserMenu.Add(ContextMenuCommands.Einfügen, tags.TagGet("Folder").FromPlusMinus() && !string.IsNullOrEmpty(_ausschneiden));
         //_ = e.UserMenu.AddSeparator();
-        _ = e.UserMenu.Add(ContextMenuComands.Umbenennen, FileExists(it.KeyName));
-        _ = e.UserMenu.Add(ContextMenuComands.Löschen, FileExists(it.KeyName));
+        _ = e.UserMenu.Add(ContextMenuCommands.Umbenennen, FileExists(it.KeyName));
+        _ = e.UserMenu.Add(ContextMenuCommands.Löschen, FileExists(it.KeyName));
         _ = e.UserMenu.AddSeparator();
         _ = e.UserMenu.Add("Im Explorer öffnen", "Explorer", QuickImage.Get(ImageCode.Ordner));
     }
@@ -290,7 +290,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
     private void lsbFiles_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem is not BitmapListItem it) { return; }
 
-        switch (e.ClickedComand) {
+        switch (e.ClickedCommand) {
             case "Löschen":
                 var I = new FileInfo(it.KeyName);
                 var silent = !I.Attributes.HasFlag(FileAttributes.ReadOnly);
@@ -340,7 +340,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
             //    break;
 
             default:
-                Develop.DebugPrint(e.ClickedComand);
+                Develop.DebugPrint(e.ClickedCommand);
                 break;
         }
     }

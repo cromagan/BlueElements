@@ -34,7 +34,7 @@ internal class Method_ExtractText : Method {
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
 
-    public override string Comand => "extracttext";
+    public override string Command => "extracttext";
 
     public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt eine Liste mit allen Funden zurück.\r\n" +
                                               "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";

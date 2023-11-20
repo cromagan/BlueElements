@@ -34,7 +34,7 @@ internal class Method_SaveImage : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, new List<string> { VariableBitmap.ShortName_Variable } };
-    public override string Comand => "saveimage";
+    public override string Command => "saveimage";
     public override string Description => "Speichert das Bild auf die Festplatte";
     public override bool EndlessArgs => true;
   

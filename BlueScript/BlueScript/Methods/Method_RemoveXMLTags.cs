@@ -32,7 +32,7 @@ internal class Method_RemoveXMLTags : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "removexmltags";
+    public override string Command => "removexmltags";
     public override string Description => "Entfernt aus dem Text < > Tags.";
     public override bool EndlessArgs => false;
     

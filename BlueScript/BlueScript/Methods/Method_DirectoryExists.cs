@@ -34,7 +34,7 @@ internal class Method_DirectoryExists : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "directoryexists";
+    public override string Command => "directoryexists";
     public override string Description => "Prüft, ob ein Verzeichnis existiert";
     public override bool EndlessArgs => false;
     

@@ -31,7 +31,7 @@ internal class Method_ToLower : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "tolower";
+    public override string Command => "tolower";
     public override string Description => "Gibt den Text in Kleinbuchstaben zurück";
     public override bool EndlessArgs => false;
     

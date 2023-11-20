@@ -32,7 +32,7 @@ internal class Method_CountString : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
-    public override string Comand => "countstring";
+    public override string Command => "countstring";
     public override string Description => "Zählt wie oft der Suchstring im Text vorkommt.";
     public override bool EndlessArgs => false;
     

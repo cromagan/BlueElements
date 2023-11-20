@@ -7,14 +7,14 @@ using BlueScript.Variables;
 using System.Collections.Generic;
 using static BlueBasics.Converter;
 
-namespace BildzeichenListe.AdditionalScriptComands;
+namespace BildzeichenListe.AdditionalScriptMethods;
 
 public class Method_StringToDateTime : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "stringtodatetime";
+    public override string Command => "stringtodatetime";
     public override string Description => "Wandelt einen Time-String ein Datum um.";
     public override bool EndlessArgs => false;
     

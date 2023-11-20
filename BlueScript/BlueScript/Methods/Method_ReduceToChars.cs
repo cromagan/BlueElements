@@ -32,7 +32,7 @@ internal class Method_ReduceToChars : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
-    public override string Comand => "reducetochars";
+    public override string Command => "reducetochars";
     public override string Description => "Entfernt aus dem Text alle Zeichen die nicht erlaubt sind";
     public override bool EndlessArgs => false;
     

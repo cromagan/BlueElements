@@ -31,7 +31,7 @@ internal class Method_Replace : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
-    public override string Comand => "replace";
+    public override string Command => "replace";
     public override string Description => "Ersetzt in einem Text einen Text durch einen anderen Text";
     public override bool EndlessArgs => false;
     

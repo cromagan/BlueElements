@@ -34,7 +34,7 @@ public class Script {
 
     #region Fields
 
-    public static List<Method>? Comands;
+    public static List<Method>? Commands;
     public static List<Variable>? VarTypes;
 
     #endregion
@@ -42,7 +42,7 @@ public class Script {
     #region Constructors
 
     public Script(VariableCollection? variablen, string additionalFilesPath, ScriptProperties scp) {
-        Comands ??= GetInstaceOfType<Method>();
+        Commands ??= GetInstaceOfType<Method>();
         if (VarTypes == null) {
             VarTypes = GetInstaceOfType<Variable>("NAME");
             VarTypes.Sort();
@@ -78,12 +78,12 @@ public class Script {
 
     #region Methods
 
-    public static DoItWithEndedPosFeedback ComandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
-        if (Comands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
+    public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
+        if (Commands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
         #region Befehle prüfen
 
-        foreach (var thisC in Comands) {
+        foreach (var thisC in Commands) {
             var f = thisC.CanDo(varCol, scp, scriptText, pos, expectedvariablefeedback, ld);
             if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
@@ -101,16 +101,16 @@ public class Script {
             var maxl = scriptText.Length;
 
             foreach (var thisV in varCol) {
-                var comandtext = thisV.KeyName + "=";
-                var l = comandtext.Length;
+                var commandtext = thisV.KeyName + "=";
+                var l = commandtext.Length;
                 if (pos + l < maxl) {
-                    if (string.Equals(scriptText.Substring(pos, l), comandtext, StringComparison.OrdinalIgnoreCase)) {
+                    if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
                         var f = Method.GetEnd(scriptText, pos + l - 1, 1, ";", ld);
                         if (!f.AllOk) {
                             return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", ld);
                         }
-                        var infos = new CanDoFeedback(scriptText, f.ContinuePosition, comandtext, f.AttributeText, string.Empty, ld);
-                        var fn = Method.VariablenBerechnung(infos, scp, comandtext + f.AttributeText + ";", varCol, false);
+                        var infos = new CanDoFeedback(scriptText, f.ContinuePosition, commandtext, f.AttributeText, string.Empty, ld);
+                        var fn = Method.VariablenBerechnung(infos, scp, commandtext + f.AttributeText + ";", varCol, false);
                         return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript);
                     }
                 }
@@ -121,7 +121,7 @@ public class Script {
 
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var f in Comands.Select(thisC => thisC.CanDo(varCol, scp, scriptText, pos, !expectedvariablefeedback, ld))) {
+        foreach (var f in Commands.Select(thisC => thisC.CanDo(varCol, scp, scriptText, pos, !expectedvariablefeedback, ld))) {
             if (f.MustAbort) {
                 return new DoItWithEndedPosFeedback(f.ErrorMessage, ld);
             }
@@ -160,7 +160,7 @@ public class Script {
                 pos++;
                 ld.LineAdd(1);
             } else {
-                var f = ComandOrVarOnPosition(varCol, scp, redScriptText, pos, false, ld);
+                var f = CommandOrVarOnPosition(varCol, scp, redScriptText, pos, false, ld);
                 if (!f.AllOk) {
                     return new ScriptEndedFeedback(varCol, ld.Protocol, false, true, false, false);
                 }

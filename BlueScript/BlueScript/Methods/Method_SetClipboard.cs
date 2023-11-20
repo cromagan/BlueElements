@@ -32,7 +32,7 @@ internal class Method_SetClipboard : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "setclipboard";
+    public override string Command => "setclipboard";
     public override string Description => "Speichert den Text im Clipboard.";
     public override bool EndlessArgs => false;
   

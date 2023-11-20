@@ -154,8 +154,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         var symb = ImageCode.Fragezeichen;
         var alt = work.PreviousValue;
         var neu = work.ChangedTo;
-        //var aenderung = work.Comand.ToString();
-        switch (work.Comand) {
+        //var aenderung = work.Command.ToString();
+        switch (work.Command) {
             //case DatabaseDataType.UTF8Value_withoutSizeData:
             case DatabaseDataType.Value_withoutSizeData:
                 symb = ImageCode.Stift;
@@ -189,7 +189,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             //    symb = ImageCode.Layout;
             //    break;
 
-            case DatabaseDataType.Comand_AddRow:
+            case DatabaseDataType.Command_AddRow:
                 //aenderung = "Neue Zeile";
                 symb = ImageCode.PlusZeichen;
                 break;
@@ -209,12 +209,12 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 neu = "[Spaltenanordnung neu]";
                 break;
 
-            case DatabaseDataType.Comand_RemoveRow:
+            case DatabaseDataType.Command_RemoveRow:
                 //aenderung = "Zeile gelöscht";
                 symb = ImageCode.MinusZeichen;
                 break;
         }
-        r.CellSet("Aenderung", work.Comand.ToString());
+        r.CellSet("Aenderung", work.Command.ToString());
         r.CellSet("symbol", symb + "|24");
         r.CellSet("Wertalt", alt);
         r.CellSet("Wertneu", neu);
@@ -325,8 +325,8 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out _); }
 
         _ = e.UserMenu.Add("Sortierung", true);
-        _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
-        _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
+        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Format.CanBeChangedByRules());
+        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Format.CanBeChangedByRules());
     }
 
     private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
@@ -339,7 +339,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         if (column == null) { return; }
 
-        switch (e.ClickedComand) {
+        switch (e.ClickedCommand) {
             case "SpaltenSortierungAZ":
                 tbl.SortDefinitionTemporary = new RowSortDefinition(tbl.Database, column.KeyName, false);
                 break;

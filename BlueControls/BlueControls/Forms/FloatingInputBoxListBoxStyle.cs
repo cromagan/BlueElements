@@ -94,10 +94,10 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (thisContextMenu.Count > 0) {
             if (par != null) {
                 _ = thisContextMenu.AddSeparator();
-                _ = thisContextMenu.Add(ContextMenuComands.WeitereBefehle);
+                _ = thisContextMenu.Add(ContextMenuCommands.WeitereBefehle);
             }
             _ = thisContextMenu.AddSeparator();
-            _ = thisContextMenu.Add(ContextMenuComands.Abbruch);
+            _ = thisContextMenu.Add(ContextMenuCommands.Abbruch);
             List<object?> infos = new()
             {
                 userMenu,
@@ -168,25 +168,25 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         var ob = (IContextMenu)infos[2];
         Close(BlueListBoxAppearance.KontextMenu);
         Close(ob);
-        if (e.ClickedComand.ToLower() == "weiterebefehle") {
+        if (e.ClickedCommand.ToLower() == "weiterebefehle") {
             var par = ob.ParentControlWithCommands();
             if (par != null) {
                 ContextMenuShow(par, null);
             }
             return;
         }
-        if (e.ClickedComand.ToLower() == "abbruch") { return; }
+        if (e.ClickedCommand.ToLower() == "abbruch") { return; }
 
-        ContextMenuItemClickedEventArgs ex = new(e.ClickedComand, hotItem);
+        ContextMenuItemClickedEventArgs ex = new(e.ClickedCommand, hotItem);
         bool done;
-        if (userMmenu[e.ClickedComand] == null) {
+        if (userMmenu[e.ClickedCommand] == null) {
             done = ob.ContextMenuItemClickedInternalProcessig(sender, ex);
         } else {
             done = true; //keine Prüfung implementiert
             ob.OnContextMenuItemClicked(ex);
         }
         if (!done) {
-            Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.ClickedComand);
+            Develop.DebugPrint("Kontextmenu-Befehl nicht ausgeführt: " + e.ClickedCommand);
         }
     }
 

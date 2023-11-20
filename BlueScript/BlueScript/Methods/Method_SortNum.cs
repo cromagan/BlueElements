@@ -31,7 +31,7 @@ internal class Method_SortNum : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { ListStringVar, FloatVal };
-    public override string Comand => "sortnum";
+    public override string Command => "sortnum";
     public override string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
     public override bool EndlessArgs => false;
   

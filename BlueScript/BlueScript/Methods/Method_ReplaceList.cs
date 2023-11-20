@@ -34,7 +34,7 @@ internal class Method_ReplaceList : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { ListStringVar, BoolVal, BoolVal, StringVal, StringVal };
-    public override string Comand => "replacelist";
+    public override string Command => "replacelist";
     public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
     public override bool EndlessArgs => false;
   

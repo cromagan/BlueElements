@@ -32,7 +32,7 @@ internal class Method_TrimEnd : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
-    public override string Comand => "trimend";
+    public override string Command => "trimend";
     public override string Description => "Entfernt die angegebenen Texte am Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
     public override bool EndlessArgs => true;
 

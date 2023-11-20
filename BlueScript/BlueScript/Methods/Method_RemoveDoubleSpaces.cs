@@ -31,7 +31,7 @@ internal class Method_RemoveDoubleSpaces : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "removedoublespaces";
+    public override string Command => "removedoublespaces";
     public override string Description => "Entfernt aus dem Text unnötige Leerzeichen, Tabs etc.\r\nKann dazu verwendet werden, um Code-Dateien (z.B. HTML) zu standardisieren.";
     public override bool EndlessArgs => false;
     

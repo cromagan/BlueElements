@@ -31,7 +31,7 @@ internal class Method_Exists : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { Variable.Any_Variable } };
-    public override string Comand => "exists";
+    public override string Command => "exists";
     public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
     public override bool EndlessArgs => false;
     

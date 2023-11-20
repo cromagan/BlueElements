@@ -31,7 +31,7 @@ internal class Method_ToUpper : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "toupper";
+    public override string Command => "toupper";
     public override string Description => "Gibt den Text in Großbuchstaben zurück";
     public override bool EndlessArgs => false;
     

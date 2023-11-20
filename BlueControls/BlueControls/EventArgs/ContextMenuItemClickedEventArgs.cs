@@ -23,16 +23,16 @@ public class ContextMenuItemClickedEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public ContextMenuItemClickedEventArgs(string clickedComand, object? hotItem) {
+    public ContextMenuItemClickedEventArgs(string clickedCommand, object? hotItem) {
         HotItem = hotItem;
-        ClickedComand = clickedComand;
+        ClickedCommand = clickedCommand;
     }
 
     #endregion
 
     #region Properties
 
-    public string ClickedComand { get; }
+    public string ClickedCommand { get; }
     public object? HotItem { get; }
 
     #endregion

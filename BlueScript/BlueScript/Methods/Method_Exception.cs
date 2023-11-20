@@ -31,7 +31,7 @@ internal class Method_Exception : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "Exception";
+    public override string Command => "Exception";
     public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
     public override bool EndlessArgs => false;
   

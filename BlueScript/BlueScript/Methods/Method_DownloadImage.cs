@@ -40,7 +40,7 @@ internal class Method_DownloadImage : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
-    public override string Comand => "downloadimage";
+    public override string Command => "downloadimage";
     public override string Description => "Lädt das angegebene Bild aus dem Internet.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
     public override bool EndlessArgs => false;
     

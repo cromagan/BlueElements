@@ -32,7 +32,7 @@ internal class Method_ClipboardText : Method {
     #region Properties
 
     public override List<List<string>> Args => new();
-    public override string Comand => "clipboardtext";
+    public override string Command => "clipboardtext";
     public override string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.\r\nMit SetClipoard kann ein Wert in das Clipboard geschrieben werden.";
     public override bool EndlessArgs => false;
     

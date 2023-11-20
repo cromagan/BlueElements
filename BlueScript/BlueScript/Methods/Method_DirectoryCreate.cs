@@ -34,7 +34,7 @@ internal class Method_DirectoryCreate : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "directorycreate";
+    public override string Command => "directorycreate";
     public override string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
     public override bool EndlessArgs => false;
     

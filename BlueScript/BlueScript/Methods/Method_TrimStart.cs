@@ -32,7 +32,7 @@ internal class Method_TrimStart : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
-    public override string Comand => "trimstart";
+    public override string Command => "trimstart";
     public override string Description => "Entfernt die angegebenen Texte am Anfang des Strings. Groß und Kleinschreibung wird ignoriert.";
     public override bool EndlessArgs => true;
     

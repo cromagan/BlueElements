@@ -31,7 +31,7 @@ internal class Method_AddPrefix : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { ListStringVar, StringVal };
-    public override string Comand => "addprefix";
+    public override string Command => "addprefix";
     public override string Description => "Fügt am Anfang jedes Listenobjekts einen Text hinzu.";
     public override bool EndlessArgs => false;
   

@@ -32,7 +32,7 @@ internal class Method_AddDays : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { DateTimeVar, FloatVal };
-    public override string Comand => "adddays";
+    public override string Command => "adddays";
     public override string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu. Dabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt. Der Rückgabwert erfolgt immer im Format " + Format_Date7;
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;

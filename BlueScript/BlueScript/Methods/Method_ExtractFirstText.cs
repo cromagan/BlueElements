@@ -34,7 +34,7 @@ internal class Method_ExtractFirstText : Method {
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
 
-    public override string Comand => "extractfirsttext";
+    public override string Command => "extractfirsttext";
 
     public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt einen String mit dem ersten Fund zurück.\r\n" +
                                               "Wird kein Text gefunden, wird der Defaultwert zurück gegeben.\r\n" +

@@ -33,7 +33,7 @@ public class Method_CallByFilename : Method {
 
     public override List<List<string>> Args => new() { StringVal, BoolVal };
 
-    public override string Comand => "callbyfilename";
+    public override string Command => "callbyfilename";
 
     public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.\r\n" +
                                                 "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +

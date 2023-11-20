@@ -33,7 +33,7 @@ internal class Method_ExtractTags : Method {
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, StringVal };
 
-    public override string Comand => "extracttags";
+    public override string Command => "extracttags";
 
     public override string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
                                               "Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.\r\n" +

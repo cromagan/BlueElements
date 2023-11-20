@@ -31,7 +31,7 @@ internal class Method_Element : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { ListStringVar, FloatVal };
-    public override string Comand => "element";
+    public override string Command => "element";
     public override string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
     public override bool EndlessArgs => false;
     

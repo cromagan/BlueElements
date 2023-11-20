@@ -31,7 +31,7 @@ internal class Method_Contains : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Variable, VariableListString.ShortName_Variable }, BoolVal, new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
-    public override string Comand => "contains";
+    public override string Command => "contains";
     public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
     public override bool EndlessArgs => true;
     

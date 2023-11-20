@@ -32,7 +32,7 @@ internal class Method_StringToUTF8 : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "stringtoutf8";
+    public override string Command => "stringtoutf8";
     public override string Description => "Ersetzt einen ASCII-String nach UTF8.";
     public override bool EndlessArgs => false;
     

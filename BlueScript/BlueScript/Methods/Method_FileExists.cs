@@ -34,7 +34,7 @@ internal class Method_FileExists : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "fileexists";
+    public override string Command => "fileexists";
     public override string Description => "Prüft, ob eine Datei existiert";
     public override bool EndlessArgs => false;
     

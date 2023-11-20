@@ -31,7 +31,7 @@ internal class Method_Clear : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { ListStringVar };
-    public override string Comand => "clear";
+    public override string Command => "clear";
     public override string Description => "Entfernt alle Einträge einer Liste";
     public override bool EndlessArgs => false;
   

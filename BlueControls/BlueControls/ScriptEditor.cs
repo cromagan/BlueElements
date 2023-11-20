@@ -75,7 +75,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
     #region Methods
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-        switch (e.ClickedComand.ToLower()) {
+        switch (e.ClickedCommand.ToLower()) {
             case "variableninhalt kopieren":
                 _ = Generic.CopytoClipboard(_lastVariableContent);
                 return true;
@@ -119,7 +119,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
 
     protected virtual void OpenAdditionalFileFolder() { }
 
-    protected void WriteComandsToList() {
+    protected void WriteCommandsToList() {
         if (!_menuDone) {
             _menuDone = true;
             _popupMenu = new AutocompleteMenu(txtSkript) {
@@ -128,10 +128,10 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
                 AllowTabKey = true
             };
             List<AutocompleteItem> items = new();
-            if (Script.Comands != null) {
-                foreach (var thisc in Script.Comands) {
+            if (Script.Commands != null) {
+                foreach (var thisc in Script.Commands) {
                     items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
-                    items.Add(new AutocompleteItem(thisc.Comand));
+                    items.Add(new AutocompleteItem(thisc.Command));
                     if (!string.IsNullOrEmpty(thisc.Returns)) {
                         items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
                     }
@@ -169,7 +169,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         }
 
         grpVariablen.WriteVariablesToTable(ex.Feedback.Variables);
-        WriteComandsToList();
+        WriteCommandsToList();
 
         if (ex.Feedback.AllOk) {
             Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
@@ -191,13 +191,13 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
     private void TxtSkript_TextChanged(object sender, TextChangedEventArgs e) => OnChanged();
 
     private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
-        if (Script.Comands == null) { return; }
+        if (Script.Commands == null) { return; }
 
         try {
             _lastWord = string.Empty;
             _lastVariableContent = string.Empty;
-            foreach (var thisc in Script.Comands) {
-                if (thisc.Comand.Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
+            foreach (var thisc in Script.Commands) {
+                if (thisc.Command.Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
                     e.ToolTipTitle = thisc.Syntax;
                     e.ToolTipText = thisc.HintText();
                     return;

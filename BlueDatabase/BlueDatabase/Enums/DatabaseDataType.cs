@@ -272,17 +272,17 @@ public enum DatabaseDataType : byte {
 
     SystemValue = 205,
 
-    Comand_RemoveRow = 220,
-    Comand_AddRow = 221,
+    Command_RemoveRow = 220,
+    Command_AddRow = 221,
 
-    //dummyComand_AddUndo = 222,
-    Comand_RemoveColumn = 223,
+    //dummyCommand_AddUndo = 222,
+    Command_RemoveColumn = 223,
 
     //AddColumnKeyInfo = 224,
     //AddColumnNameInfo = 225,
-    //Comand_AddColumn = 226,
-    //Comand_AddColumnByKey = 227,
-    Comand_AddColumnByName = 228,
+    //Command_AddColumn = 226,
+    //Command_AddColumnByKey = 227,
+    Command_AddColumnByName = 228,
 
     //UndoCount = 249,
     //PendingsInOne = 250,

@@ -422,12 +422,12 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         UpdateSideOptionMenu();
     }
 
-    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuComands.Bearbeiten);
+    private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuCommands.Bearbeiten);
 
     private void Childs_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem is not AbstractListItem it) { return; }
 
-        if (e.ClickedComand.ToLower() == "bearbeiten") {
+        if (e.ClickedCommand.ToLower() == "bearbeiten") {
             MultiUserFile.SaveAll(false);
 
             var x = new ConnectedFormulaEditor(it.KeyName, CFormula?.NotAllowedChilds);

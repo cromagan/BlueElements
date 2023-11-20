@@ -48,7 +48,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     private readonly List<IMoveable> _itemsToMove = new();
     private string _currentPage = string.Empty;
-    private IMouseAndKeyHandle? _givesMouseComandsTo;
+    private IMouseAndKeyHandle? _givesMouseCommandsTo;
     private ItemCollectionPad.ItemCollectionPad? _item;
     private AbstractPadItem? _lastClickedItem;
     private string _lastQuickInfo = string.Empty;
@@ -182,7 +182,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         if (e.HotItem is AbstractPadItem item) { thisItem = item; }
         var done = false;
         if (thisItem != null) {
-            switch (e.ClickedComand.ToLower()) {
+            switch (e.ClickedCommand.ToLower()) {
                 case "#vordergrund":
                     done = true;
                     thisItem.Parent?.InDenVordergrund(thisItem);
@@ -231,8 +231,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
         if (hasbase) { base.OnKeyUp(e); }
         if (!EditAllowed || _item == null) { return; }
-        if (_givesMouseComandsTo != null) {
-            if (_givesMouseComandsTo.KeyUp(this, e, Zoom, ShiftX, ShiftY)) { return; }
+        if (_givesMouseCommandsTo != null) {
+            if (_givesMouseCommandsTo.KeyUp(this, e, Zoom, ShiftX, ShiftY)) { return; }
         }
         var multi = 1f;
         if (_item.SnapMode == SnapMode.SnapToGrid) {
@@ -385,7 +385,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         _lastQuickInfo = string.Empty;
         if (HotItem is IMouseAndKeyHandle ho2) {
             if (ho2.MouseDown(this, e, Zoom, ShiftX, ShiftY)) {
-                _givesMouseComandsTo = ho2;
+                _givesMouseCommandsTo = ho2;
                 return;
             }
         }
@@ -413,13 +413,13 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             CheckHotItem(e, false); // Für QuickInfo usw.
         }
         if (!EditAllowed) { return; }
-        if (_givesMouseComandsTo != null) {
-            if (e.Button == MouseButtons.None && HotItem != _givesMouseComandsTo) {
-                _givesMouseComandsTo = null;
+        if (_givesMouseCommandsTo != null) {
+            if (e.Button == MouseButtons.None && HotItem != _givesMouseCommandsTo) {
+                _givesMouseCommandsTo = null;
                 Invalidate();
             } else {
-                if (!_givesMouseComandsTo.MouseMove(this, e, Zoom, ShiftX, ShiftY)) {
-                    _givesMouseComandsTo = null;
+                if (!_givesMouseCommandsTo.MouseMove(this, e, Zoom, ShiftX, ShiftY)) {
+                    _givesMouseCommandsTo = null;
                     Invalidate();
                 } else {
                     return;
@@ -428,7 +428,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         } else {
             if (HotItem is IMouseAndKeyHandle ho2) {
                 if (ho2.MouseMove(this, e, Zoom, ShiftX, ShiftY)) {
-                    _givesMouseComandsTo = ho2;
+                    _givesMouseCommandsTo = ho2;
                     Invalidate();
                     return;
                 }
@@ -452,9 +452,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     internal void DoMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (_givesMouseComandsTo != null) {
-            if (!_givesMouseComandsTo.MouseUp(this, e, Zoom, ShiftX, ShiftY)) {
-                _givesMouseComandsTo = null;
+        if (_givesMouseCommandsTo != null) {
+            if (!_givesMouseCommandsTo.MouseUp(this, e, Zoom, ShiftX, ShiftY)) {
+                _givesMouseCommandsTo = null;
             } else {
                 return;
             }
@@ -522,7 +522,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                     p2.Draw(gr, Zoom, ShiftX, ShiftY, Design.Button_EckpunktSchieber, States.Standard);
                 }
             }
-            if (_givesMouseComandsTo is AbstractPadItem pa) {
+            if (_givesMouseCommandsTo is AbstractPadItem pa) {
                 var drawingCoordinates = pa.UsedArea.ZoomAndMoveRect(Zoom, ShiftX, ShiftY, false);
                 gr.DrawRectangle(new Pen(Brushes.Red, 3), drawingCoordinates);
             }

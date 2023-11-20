@@ -32,7 +32,7 @@ internal class Method_MoveFile : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal };
-    public override string Comand => "movefile";
+    public override string Command => "movefile";
     public override string Description => "Verschiebt eine Datei.";
     public override bool EndlessArgs => false;
   

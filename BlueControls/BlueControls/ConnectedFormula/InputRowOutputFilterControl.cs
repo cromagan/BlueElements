@@ -20,7 +20,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;

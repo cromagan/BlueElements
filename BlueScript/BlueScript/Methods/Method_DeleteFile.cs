@@ -34,7 +34,7 @@ internal class Method_DeleteFile : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "deletefile";
+    public override string Command => "deletefile";
     public override string Description => "Löscht die Datei aus dem Dateisystem. Gibt TRUE zurück, wenn die Datei nicht (mehr) existiert.";
     public override bool EndlessArgs => false;
     

@@ -241,7 +241,7 @@ public static class Develop {
         DebugPrint(fehler ? FehlerArt.Fehler : FehlerArt.Warnung, "Es wird von einem Unterthread zugegriffen.");
     }
 
-    public static void DebugPrint_MissingCommand(string comand) => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + comand);
+    public static void DebugPrint_MissingCommand(string command) => DebugPrint(FehlerArt.Warnung, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + command);
 
     public static void DebugPrint_NichtImplementiert() {
         if (IsHostRunning()) { Debugger.Break(); }

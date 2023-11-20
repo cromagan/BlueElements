@@ -440,7 +440,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             case EditTypeFormula.Button:
-                c = Control_Create_ButtonComand();
+                c = Control_Create_ButtonCommand();
                 break;
 
             case EditTypeFormula.SwapListBox:
@@ -569,7 +569,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                         break;
 
                     case EditTypeFormula.Button:
-                        button.Click += ComandButton_Click;
+                        button.Click += CommandButton_Click;
                         break;
 
                     case EditTypeFormula.Farb_Auswahl_Dialog:
@@ -624,7 +624,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                         break;
 
                     case EditTypeFormula.Button:
-                        button.Click -= ComandButton_Click;
+                        button.Click -= CommandButton_Click;
                         break;
 
                     case EditTypeFormula.Farb_Auswahl_Dialog:
@@ -793,7 +793,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert();
 
-    private void ComandButton_Click(object sender, System.EventArgs e) {
+    private void CommandButton_Click(object sender, System.EventArgs e) {
         if (_editType != EditTypeFormula.Button) { return; }
         ValueSet(true.ToPlusMinus(), false, true); // Geklickt, wurde hiermit vermerkt
         OnButtonClicked();
@@ -817,10 +817,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
     /// </summary>
-    private Button Control_Create_ButtonComand() {
+    private Button Control_Create_ButtonCommand() {
         Button control = new() {
             Enabled = Enabled,
-            Name = "ComandButton",
+            Name = "CommandButton",
             Checked = false,
             ButtonStyle = ButtonStyle.Button,
             Text = _caption

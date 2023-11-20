@@ -31,7 +31,7 @@ internal class Method_Do : Method {
     #region Properties
 
     public override List<List<string>> Args => new();
-    public override string Comand => "do";
+    public override string Command => "do";
     public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => true;

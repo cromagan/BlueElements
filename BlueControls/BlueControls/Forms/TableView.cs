@@ -480,25 +480,25 @@ public partial class TableView : FormWithStatusBar {
             }
 
             _ = e.UserMenu.Add("Sortierung", true);
-            _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungAZ, column != null && column.Format.CanBeCheckedByRules());
-            _ = e.UserMenu.Add(ContextMenuComands.SpaltenSortierungZA, column != null && column.Format.CanBeCheckedByRules());
+            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Format.CanBeCheckedByRules());
+            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Format.CanBeCheckedByRules());
             _ = e.UserMenu.AddSeparator();
             _ = e.UserMenu.Add("Zelle", true);
             _ = e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules());
             _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column != null && column.Format.CanBeChangedByRules());
             _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column != null && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add(ContextMenuComands.VorherigenInhaltWiederherstellen, editable && column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
-            _ = e.UserMenu.Add(ContextMenuComands.SuchenUndErsetzen, column != null && db.IsAdministrator());
+            _ = e.UserMenu.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
+            _ = e.UserMenu.Add(ContextMenuCommands.SuchenUndErsetzen, column != null && db.IsAdministrator());
             _ = e.UserMenu.AddSeparator();
             _ = e.UserMenu.Add("Spalte", true);
-            _ = e.UserMenu.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten, column != null && db.IsAdministrator());
+            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, column != null && db.IsAdministrator());
             _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && db.IsAdministrator());
             _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && db.IsAdministrator());
             _ = e.UserMenu.AddSeparator();
         }
 
         _ = e.UserMenu.Add("Zeile", true);
-        _ = e.UserMenu.Add(ContextMenuComands.ZeileLöschen, row != null && db.IsAdministrator());
+        _ = e.UserMenu.Add(ContextMenuCommands.ZeileLöschen, row != null && db.IsAdministrator());
         _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null && db.HasErrorCheckScript());
 
         foreach (var thiss in db.EventScript) {
@@ -523,7 +523,7 @@ public partial class TableView : FormWithStatusBar {
 
         //var editable = string.IsNullOrEmpty(CellCollection.ErrorReason(column, row, ErrorReason.EditAcut));
 
-        var ev = (e.ClickedComand + "|").SplitAndCutBy("|");
+        var ev = (e.ClickedCommand + "|").SplitAndCutBy("|");
 
         switch (ev[0]) {
             case "pinlösen":

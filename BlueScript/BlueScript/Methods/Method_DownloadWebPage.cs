@@ -38,7 +38,7 @@ internal class Method_DownloadWebPage : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
-    public override string Comand => "downloadwebpage";
+    public override string Command => "downloadwebpage";
     public override string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
     public override bool EndlessArgs => false;
     

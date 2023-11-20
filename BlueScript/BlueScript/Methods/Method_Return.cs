@@ -31,7 +31,7 @@ internal class Method_Return : Method {
     #region Properties
 
     public override List<List<string>> Args => new();
-    public override string Comand => "return";
+    public override string Command => "return";
     public override string Description => "Beendet das Skript oder Unterskript ohne Fehler.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;

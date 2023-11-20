@@ -32,7 +32,7 @@ internal class Method_DateTimeToString : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { DateTimeVar, StringVal };
-    public override string Comand => "datetimetostring";
+    public override string Command => "datetimetostring";
     public override string Description => "Wandelt eine Zeitangabe in einen String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  " + Format_Date7 + "\rAchtung: Groß-Kleinschreibung ist wichtig!";
     public override bool EndlessArgs => false;
 

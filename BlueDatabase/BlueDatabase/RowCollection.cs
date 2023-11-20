@@ -22,6 +22,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using BlueBasics;
@@ -215,7 +216,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return;
         }
 
-        if (db.AmITemporaryMaster() && age is < 0 or > 80) {
+        if (db.AmITemporaryMaster(false) && age is < 0 or > 80) {
             _ = _pendingChangedRows.AddIfNotExists(row.KeyName);
         }
     }
@@ -415,7 +416,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var u = Generic.UserName;
         var d = DateTime.UtcNow;
 
-        var s = db.ChangeData(DatabaseDataType.Comand_AddRow, null, null, string.Empty, key, u, d, comment);
+        var s = db.ChangeData(DatabaseDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment);
         if (!string.IsNullOrEmpty(s)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Erstellung fehlgeschlagen: " + s);
             throw new Exception();
@@ -493,7 +494,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var r = SearchByKey(key);
 
         if (r == null || r.IsDisposed) { return false; }
-        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Comand_RemoveRow, null, r, string.Empty, key, Generic.UserName, DateTime.UtcNow, comment));
+        return string.IsNullOrEmpty(Database?.ChangeData(DatabaseDataType.Command_RemoveRow, null, r, string.Empty, key, Generic.UserName, DateTime.UtcNow, comment));
     }
 
     public bool Remove(FilterItem fi, List<RowItem>? pinned, string comment) {
@@ -613,6 +614,40 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
+    internal string ExecuteCommand(DatabaseDataType type, string rowkey, RowItem? row, Reason reason) {
+        if (rowkey is null || string.IsNullOrWhiteSpace(rowkey)) { return "Schlüsselfehler"; }
+
+        var db = Database;
+        if (db == null || db.IsDisposed) { return "Datenbank verworfen"; }
+
+        if (type == DatabaseDataType.Command_AddRow) {
+            var c = new RowItem(db, rowkey);
+
+            return Add(c, reason);
+        }
+
+        if (type == DatabaseDataType.Command_RemoveRow) {
+            //var rowsToExpand = SearchByKey(key);
+            if (row == null || row.IsDisposed) { return "Zeile nicht vorhanden"; }
+
+            OnRowRemoving(new RowReasonEventArgs(row, reason));
+            foreach (var thisColumn in db.Column) {
+                if (thisColumn != null) {
+                    db.Cell.SetValueInternal(thisColumn, row, string.Empty, Reason.AdditionalWorkAfterComand);
+                    //db.ChangeData(DatabaseDataType.SystemValue, thisColumn, row, string.Empty, string.Empty, string.Empty, string.Empty, "SystemSet");
+                    //row.CellSet(thisColumnItem, string.Empty);
+                    //db.Cell.Delete(thisColumnItem, row.KeyName);
+                }
+            }
+
+            if (!_internal.TryRemove(row.KeyName, out _)) { return "Löschen nicht erfolgreich"; }
+            OnRowRemoved();
+            return string.Empty;
+        }
+
+        return "Befehl unbekannt";
+    }
+
     internal bool NeedDataCheck(string key) => _pendingChangedRows.Contains(key);
 
     //        default:
@@ -639,38 +674,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
-
-    internal string SetValueInternal(DatabaseDataType type, string rowkey, RowItem? row, Reason reason) {
-        if (rowkey is null || string.IsNullOrWhiteSpace(rowkey)) { return "Schlüsselfehler"; }
-
-        var db = Database;
-        if (db == null || db.IsDisposed) { return "Datenbank verworfen"; }
-
-        if (type == DatabaseDataType.Comand_AddRow) {
-            var c = new RowItem(db, rowkey);
-
-            return Add(c, reason);
-        }
-
-        if (type == DatabaseDataType.Comand_RemoveRow) {
-            //var rowsToExpand = SearchByKey(key);
-            if (row == null || row.IsDisposed) { return "Zeile nicht vorhanden"; }
-
-            OnRowRemoving(new RowReasonEventArgs(row, reason));
-            foreach (var thisColumnItem in db.Column) {
-                if (thisColumnItem != null) {
-                    row.CellSet(thisColumnItem, string.Empty);
-                    //db.Cell.Delete(thisColumnItem, row.KeyName);
-                }
-            }
-
-            if (!_internal.TryRemove(row.KeyName, out _)) { return "Löschen nicht erfolgreich"; }
-            OnRowRemoved();
-            return string.Empty;
-        }
-
-        return "Befehl unbekannt";
-    }
 
     /// <summary>
     /// Fügt eine Zeile hinzu, die im System fest verankert ist.

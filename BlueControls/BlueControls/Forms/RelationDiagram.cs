@@ -352,13 +352,13 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     private void Pad_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
         if (e.HotItem is not RowFormulaPadItem i) { return; }
 
-        switch (e.ClickedComand) {
+        switch (e.ClickedCommand) {
             case "Bez+":
                 BezPlus(i);
                 break;
 
             default:
-                Develop.DebugPrint(e.ClickedComand);
+                Develop.DebugPrint(e.ClickedCommand);
                 break;
         }
         //RepairLinesAndFullProcessing();

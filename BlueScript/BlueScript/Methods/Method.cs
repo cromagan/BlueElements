@@ -50,7 +50,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     public abstract List<List<string>> Args { get; }
 
-    public abstract string Comand { get; }
+    public abstract string Command { get; }
     public abstract string Description { get; }
 
     public abstract bool EndlessArgs { get; }
@@ -130,16 +130,16 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return new GetEndFeedback(pos + which.Length, txtBtw);
     }
 
-    public static GetEndFeedback ReplaceComandsAndVars(string txt, VariableCollection varCol, LogData ld, ScriptProperties scp) {
-        if (Script.Comands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert", ld); }
+    public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, LogData ld, ScriptProperties scp) {
+        if (Script.Commands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert", ld); }
 
         List<string> toSearch = new();
 
         #region Mögliche Methoden
 
-        foreach (var thisc in Script.Comands) {
+        foreach (var thisc in Script.Commands) {
             if (!string.IsNullOrEmpty(thisc.Returns)) {
-                toSearch.Add(thisc.Comand + thisc.StartSequence);
+                toSearch.Add(thisc.Command + thisc.StartSequence);
             }
         }
 
@@ -158,7 +158,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
             var (pos, _) = NextText(txt, posc, toSearch, true, false, KlammernStd);
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 
-            var f = Script.ComandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
+            var f = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
             if (!f.AllOk) { return new GetEndFeedback("Durch Befehl abgebrochen: " + txt, ld); }
 
             if (pos == 0 && txt.Length == f.Position) { return new GetEndFeedback(f.Variable); }
@@ -399,13 +399,13 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         }
         var maxl = scriptText.Length;
 
-        var comandtext = Comand + StartSequence;
-        var l = comandtext.Length;
+        var commandtext = Command + StartSequence;
+        var l = commandtext.Length;
         if (pos + l < maxl) {
-            if (string.Equals(scriptText.Substring(pos, l), comandtext, StringComparison.OrdinalIgnoreCase)) {
-                var f = GetEnd(scriptText, pos + Comand.Length, StartSequence.Length, EndSequence, ld);
+            if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
+                var f = GetEnd(scriptText, pos + Command.Length, StartSequence.Length, EndSequence, ld);
                 if (!f.AllOk) {
-                    return new CanDoFeedback(scriptText, f.ContinuePosition, "Fehler bei " + comandtext, true, ld);
+                    return new CanDoFeedback(scriptText, f.ContinuePosition, "Fehler bei " + commandtext, true, ld);
                 }
                 var cont = f.ContinuePosition;
                 var codebltxt = string.Empty;
@@ -420,7 +420,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
                     return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' kann in diesem Skript nicht benutzt werden.", true, ld);
                 }
 
-                return new CanDoFeedback(scriptText, cont, comandtext, f.AttributeText, codebltxt, ld);
+                return new CanDoFeedback(scriptText, cont, commandtext, f.AttributeText, codebltxt, ld);
             }
         }
 

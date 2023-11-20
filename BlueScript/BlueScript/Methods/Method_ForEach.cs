@@ -31,7 +31,7 @@ internal class Method_ForEach : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableUnknown.ShortName_Plain }, ListStringVar };
-    public override string Comand => "foreach";
+    public override string Command => "foreach";
     public override string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
     public override bool EndlessArgs => false;
     

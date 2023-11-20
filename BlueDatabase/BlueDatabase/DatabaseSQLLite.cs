@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Threading;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -62,7 +61,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
 
         Initialize();
-        LoadFromSqlBack(Preselection);
+        LoadFromSqlBack();
 
         TryToSetMeTemporaryMaster();
     }
@@ -206,7 +205,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         OnDropMessage(FehlerArt.Info, "Lade " + columns.Count + " Spalte(n) der Datenbank '" + TableName + "' nach.");
 
         try {
-            SQL.LoadColumns(TableName, Row, columns, false, Preselection);
+            SQL.LoadColumns(TableName, Row, columns, false);
         } catch {
             Develop.CheckStackForOverflow();
             RefreshColumnsData(columns);
@@ -300,6 +299,8 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
+    protected override void DoWorkAfterLastChanges() { }
+
     protected override IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer() {
         var oo = new List<DatabaseSqlLite>();
 
@@ -316,7 +317,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return oo;
     }
 
-    private void LoadFromSqlBack(List<FilterItem>? preselection) {
+    private void LoadFromSqlBack() {
         OnLoading();
         //Develop.DebugPrint(FehlerArt.DevelopInfo, "Loading++");
 
@@ -348,7 +349,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 foreach (var thisCol in columnsToLoad) {
                     var column = Column.Exists(thisCol);
                     if (column == null || column.IsDisposed) {
-                        _ = Column.SetValueInternal(DatabaseDataType.Comand_AddColumnByName, Reason.LoadReload, thisCol);
+                        _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, Reason.LoadReload, thisCol);
                         column = Column.Exists(thisCol);
 
                         if (column == null || column.IsDisposed) {
@@ -388,7 +389,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             foreach (var thisColumn in Column) {
                 thisColumn.IsInCache = null;
             }
-            SQL?.LoadColumns(TableName, Row, cl, true, preselection);
+            SQL?.LoadColumns(TableName, Row, cl, true);
 
             #endregion
 
@@ -396,7 +397,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             Cell.RemoveOrphans();
         } catch {
-            LoadFromSqlBack(preselection);
+            LoadFromSqlBack();
             return;
         }
 

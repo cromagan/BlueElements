@@ -32,7 +32,7 @@ internal class Method_Sort : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { ListStringVar, BoolVal };
-    public override string Comand => "sort";
+    public override string Command => "sort";
     public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
     public override bool EndlessArgs => false;
   

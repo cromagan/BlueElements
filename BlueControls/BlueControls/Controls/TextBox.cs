@@ -264,9 +264,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _cursorCharPos = IntParse(tags.TagGet("Cursorpos"));
         var word = tags.TagGet("Word");
 
-        var tmp = e.ClickedComand;
-        if (e.ClickedComand.StartsWith("#ChangeTo:")) {
-            newWord = e.ClickedComand.Substring(10);
+        var tmp = e.ClickedCommand;
+        if (e.ClickedCommand.StartsWith("#ChangeTo:")) {
+            newWord = e.ClickedCommand.Substring(10);
             tmp = "#ChangeTo";
         }
 
@@ -389,9 +389,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             }
         }
         if (this is not ComboBox cbx || cbx.DropDownStyle == ComboBoxStyle.DropDown) {
-            _ = items.Add(ContextMenuComands.Ausschneiden, (_markStart >= 0) && Enabled);
-            _ = items.Add(ContextMenuComands.Kopieren, _markStart >= 0);
-            _ = items.Add(ContextMenuComands.Einfügen, Clipboard.ContainsText() && Enabled);
+            _ = items.Add(ContextMenuCommands.Ausschneiden, (_markStart >= 0) && Enabled);
+            _ = items.Add(ContextMenuCommands.Kopieren, _markStart >= 0);
+            _ = items.Add(ContextMenuCommands.Einfügen, Clipboard.ContainsText() && Enabled);
             if (_formatierungErlaubt) {
                 _ = items.AddSeparator();
                 _ = items.Add("Sonderzeichen einfügen", "#Sonderzeichen", QuickImage.Get(ImageCode.Sonne, 16), _cursorCharPos > -1);

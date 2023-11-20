@@ -318,123 +318,123 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         return i;
     }
 
-    public TextListItem Add(ContextMenuComands comand, bool enabled = true) {
-        var @internal = comand.ToString();
+    public TextListItem Add(ContextMenuCommands command, bool enabled = true) {
+        var @internal = command.ToString();
         QuickImage? symbol;
         string? readableText;
-        switch (comand) {
-            case ContextMenuComands.DateiPfadÖffnen:
+        switch (command) {
+            case ContextMenuCommands.DateiPfadÖffnen:
                 readableText = "Dateipfad öffnen";
                 symbol = QuickImage.Get("Ordner|16");
                 break;
 
-            case ContextMenuComands.Abbruch:
+            case ContextMenuCommands.Abbruch:
                 readableText = "Abbrechen";
                 symbol = QuickImage.Get("TasteESC|16");
                 break;
 
-            case ContextMenuComands.Bearbeiten:
+            case ContextMenuCommands.Bearbeiten:
                 readableText = "Bearbeiten";
                 symbol = QuickImage.Get(ImageCode.Stift);
                 break;
 
-            case ContextMenuComands.Kopieren:
+            case ContextMenuCommands.Kopieren:
                 readableText = "Kopieren";
                 symbol = QuickImage.Get(ImageCode.Kopieren);
                 break;
 
-            case ContextMenuComands.InhaltLöschen:
+            case ContextMenuCommands.InhaltLöschen:
                 readableText = "Inhalt löschen";
                 symbol = QuickImage.Get(ImageCode.Radiergummi);
                 break;
 
-            case ContextMenuComands.ZeileLöschen:
+            case ContextMenuCommands.ZeileLöschen:
                 readableText = "Zeile löschen";
                 symbol = QuickImage.Get("Zeile|16|||||||||Kreuz");
                 break;
 
-            case ContextMenuComands.DateiÖffnen:
+            case ContextMenuCommands.DateiÖffnen:
                 readableText = "Öffnen / Ausführen";
                 symbol = QuickImage.Get(ImageCode.Blitz);
                 break;
 
-            case ContextMenuComands.SpaltenSortierungAZ:
+            case ContextMenuCommands.SpaltenSortierungAZ:
                 readableText = "Nach dieser Spalte aufsteigend sortieren";
                 symbol = QuickImage.Get("AZ|16|8");
                 break;
 
-            case ContextMenuComands.SpaltenSortierungZA:
+            case ContextMenuCommands.SpaltenSortierungZA:
                 readableText = "Nach dieser Spalte absteigend sortieren";
                 symbol = QuickImage.Get("ZA|16|8");
                 break;
 
-            case ContextMenuComands.Information:
+            case ContextMenuCommands.Information:
                 readableText = "Informationen anzeigen";
                 symbol = QuickImage.Get(ImageCode.Frage);
                 break;
 
-            case ContextMenuComands.ZellenInhaltKopieren:
+            case ContextMenuCommands.ZellenInhaltKopieren:
                 readableText = "Zelleninhalt kopieren";
                 symbol = QuickImage.Get(ImageCode.Kopieren);
                 break;
 
-            case ContextMenuComands.ZellenInhaltPaste:
+            case ContextMenuCommands.ZellenInhaltPaste:
                 readableText = "In Zelle einfügen";
                 symbol = QuickImage.Get(ImageCode.Clipboard);
                 break;
 
-            case ContextMenuComands.SpaltenEigenschaftenBearbeiten:
+            case ContextMenuCommands.SpaltenEigenschaftenBearbeiten:
                 readableText = "Spalteneigenschaften bearbeiten";
                 symbol = QuickImage.Get("Spalte|16|||||||||Stift");
                 break;
 
-            case ContextMenuComands.Speichern:
+            case ContextMenuCommands.Speichern:
                 readableText = "Speichern";
                 symbol = QuickImage.Get(ImageCode.Diskette);
                 break;
 
-            case ContextMenuComands.Löschen:
+            case ContextMenuCommands.Löschen:
                 readableText = "Löschen";
                 symbol = QuickImage.Get(ImageCode.Kreuz);
                 break;
 
-            case ContextMenuComands.Umbenennen:
+            case ContextMenuCommands.Umbenennen:
                 readableText = "Umbenennen";
                 symbol = QuickImage.Get(ImageCode.Stift);
                 break;
 
-            case ContextMenuComands.SuchenUndErsetzen:
+            case ContextMenuCommands.SuchenUndErsetzen:
                 readableText = "Suchen und ersetzen";
                 symbol = QuickImage.Get(ImageCode.Fernglas);
                 break;
 
-            case ContextMenuComands.Einfügen:
+            case ContextMenuCommands.Einfügen:
                 readableText = "Einfügen";
                 symbol = QuickImage.Get(ImageCode.Clipboard);
                 break;
 
-            case ContextMenuComands.Ausschneiden:
+            case ContextMenuCommands.Ausschneiden:
                 readableText = "Ausschneiden";
                 symbol = QuickImage.Get(ImageCode.Schere);
                 break;
 
-            case ContextMenuComands.VorherigenInhaltWiederherstellen:
+            case ContextMenuCommands.VorherigenInhaltWiederherstellen:
                 readableText = "Vorherigen Inhalt wieder herstellen";
                 symbol = QuickImage.Get(ImageCode.Undo);
                 break;
 
-            case ContextMenuComands.WeitereBefehle:
+            case ContextMenuCommands.WeitereBefehle:
                 readableText = "Weitere Befehle";
                 symbol = QuickImage.Get(ImageCode.Hierarchie);
                 break;
 
             default:
-                Develop.DebugPrint(comand);
+                Develop.DebugPrint(command);
                 readableText = @internal;
                 symbol = QuickImage.Get(ImageCode.Fragezeichen);
                 break;
         }
-        if (string.IsNullOrEmpty(@internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben:" + comand); }
+        if (string.IsNullOrEmpty(@internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben:" + command); }
         return Add(readableText, @internal, symbol, enabled);
     }
 

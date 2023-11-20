@@ -168,7 +168,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         if (t.Variable != null) { return new DoItFeedback(t.Variable); }
         if (txt != t.AttributeText) { return GetVariableByParsing(t.AttributeText, ld, varCol, scp); }
 
-        var t2 = Method.ReplaceComandsAndVars(txt, varCol, ld, scp);
+        var t2 = Method.ReplaceCommandsAndVars(txt, varCol, ld, scp);
         if (!t2.AllOk) { return new DoItFeedback(ld, "Befehls-Berechnungsfehler"); }
         if (t2.Variable != null) { return new DoItFeedback(t2.Variable); }
         if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, ld, varCol, scp); }

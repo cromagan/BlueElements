@@ -46,7 +46,7 @@ internal class Method_BitmapToBase64 : Method {
 
     #region Methods
 
-    public override string Comand => "bitmaptobase64";
+    public override string Command => "bitmaptobase64";
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

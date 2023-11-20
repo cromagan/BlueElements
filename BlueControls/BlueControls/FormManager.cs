@@ -111,6 +111,15 @@ public class FormManager : ApplicationContext {
             }
 
             ExecuteAtEnd?.Invoke();
+
+            var a = BlueDatabase.Database.AllFiles.Clone();
+            foreach (var thisDb in a) {
+                thisDb.Dispose();
+            }
+
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
+            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
+
             ExitThread();
             Develop.AbortExe();
         }

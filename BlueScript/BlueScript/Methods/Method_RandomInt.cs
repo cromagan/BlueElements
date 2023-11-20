@@ -32,7 +32,7 @@ internal class Method_RandomInt : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { FloatVal };
-    public override string Comand => "randomint";
+    public override string Command => "randomint";
     public override string Description => "Gibt eine nicht negative Zufalls-Ganzzahl zurück,\rdie kleiner als das angegebene Maximum ist.";
     public override bool EndlessArgs => false;
     

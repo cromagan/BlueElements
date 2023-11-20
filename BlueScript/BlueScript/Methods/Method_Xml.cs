@@ -26,14 +26,14 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace BlueDatabase.AdditionalScriptComands;
+namespace BlueDatabase.AdditionalScriptMethods;
 
 public class Method_Xml : Method {
 
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "xml";
+    public override string Command => "xml";
     public override string Description => "Erstellt ein XML-Dokument, der für andere Befehle verwendet werden kann.";
     public override bool EndlessArgs => true;
     

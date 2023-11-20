@@ -107,7 +107,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
         var (column, row) = GetTmpVariables();
 
-        switch (e.ClickedComand.ToLower()) {
+        switch (e.ClickedCommand.ToLower()) {
             case "spalteneigenschaftenbearbeiten":
                 TableView.OpenColumnEditor(column, null);
                 return true;
@@ -167,10 +167,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
         var (column, row) = GetTmpVariables();
         if (column?.Database != null && column.Database.IsAdministrator()) {
-            _ = items.Add(ContextMenuComands.SpaltenEigenschaftenBearbeiten);
+            _ = items.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
         }
         if (column?.Database != null && row != null && column.Database.IsAdministrator()) {
-            _ = items.Add(ContextMenuComands.VorherigenInhaltWiederherstellen);
+            _ = items.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen);
         }
         //if (Parent is Formula f) {
         //    ItemCollectionList x = new(BlueListBoxAppearance.KontextMenu, false);
@@ -330,7 +330,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
         if (e.HotItem is TextListItem t) {
             if (FileExists(t.KeyName)) {
-                _ = e.UserMenu.Add(ContextMenuComands.DateiÖffnen);
+                _ = e.UserMenu.Add(ContextMenuCommands.DateiÖffnen);
             }
         }
         if (e.HotItem is BitmapListItem) {
@@ -469,7 +469,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     }
 
     private void ListBox_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        switch (e.ClickedComand.ToLower()) {
+        switch (e.ClickedCommand.ToLower()) {
             case "dateiöffnen":
                 if (e.HotItem is TextListItem t) {
                     if (FileExists(t.KeyName)) {

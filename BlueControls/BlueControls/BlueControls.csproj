@@ -103,7 +103,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AdditionalScriptComands\Method_GenerateLayoutImage.cs" />
+    <Compile Include="AdditionalScriptMethods\Method_GenerateLayoutImage.cs" />
     <Compile Include="Allgemein.cs" />
     <Compile Include="BlueDatabaseDialogs\DatabaseScriptEditor.cs">
       <SubType>Form</SubType>
@@ -247,7 +247,7 @@
     <Compile Include="Enums\ComboboxStyle.cs" />
     <Compile Include="Enums\BlueListBoxAppearance.cs" />
     <Compile Include="Enums\AddType.cs" />
-    <Compile Include="Enums\ContextMenuComands.cs" />
+    <Compile Include="Enums\ContextMenuCommands.cs" />
     <Compile Include="Enums\CS.cs" />
     <Compile Include="Enums\ExStyle.cs" />
     <Compile Include="Enums\Kontur.cs" />
@@ -493,7 +493,7 @@
     </Compile>
     <Compile Include="EventArgs\BasicListItemEventArgs.cs" />
     <Compile Include="EventArgs\ContextMenuInitEventArgs.cs" />
-    <Compile Include="EventArgs\FilterComandEventArgs.cs" />
+    <Compile Include="EventArgs\FilterCommandEventArgs.cs" />
     <Compile Include="Controls\FlexiControl.cs">
       <SubType>Component</SubType>
     </Compile>

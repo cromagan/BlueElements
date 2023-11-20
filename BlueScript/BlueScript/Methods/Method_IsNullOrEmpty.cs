@@ -31,7 +31,7 @@ internal class Method_IsNullOrEmpty : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { Variable.Any_Variable } };
-    public override string Comand => "isnullorempty";
+    public override string Command => "isnullorempty";
     public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
     public override bool EndlessArgs => false;
     

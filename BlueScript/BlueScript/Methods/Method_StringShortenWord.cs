@@ -33,7 +33,7 @@ internal class Method_StringShortenWord : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
-    public override string Comand => "stringshortenword";
+    public override string Command => "stringshortenword";
     public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
     public override bool EndlessArgs => false;
     

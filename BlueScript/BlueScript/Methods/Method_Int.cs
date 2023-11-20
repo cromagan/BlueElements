@@ -31,7 +31,7 @@ internal class Method_Int : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { FloatVal };
-    public override string Comand => "int";
+    public override string Command => "int";
     public override string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
     public override bool EndlessArgs => false;
     

@@ -34,7 +34,7 @@ internal class Method_LoadImage : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "loadimage";
+    public override string Command => "loadimage";
     public override string Description => "Lädt das angegebene Bild aus dem Dateisystem.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
     public override bool EndlessArgs => false;
     

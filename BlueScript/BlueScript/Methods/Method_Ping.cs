@@ -32,7 +32,7 @@ internal class Method_Ping : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { StringVal };
-    public override string Comand => "ping";
+    public override string Command => "ping";
     public override string Description => "Pingt einen Server an und gibt dessen Reaktionszeit in Millsekunden zurück.\r\nTritt ein Fehler auf, für 9999 zurück gegeben.";
     public override bool EndlessArgs => false;
     

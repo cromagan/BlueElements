@@ -18,6 +18,7 @@
 namespace BlueDatabase.Enums;
 
 public enum Reason {
-    SetComand = 0,
-    LoadReload = 1
+    SetCommand = 0,
+    LoadReload = 1,
+    AdditionalWorkAfterComand = 2
 }

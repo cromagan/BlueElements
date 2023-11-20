@@ -30,8 +30,8 @@ public class UndoItem : IParseable {
 
     #region Constructors
 
-    public UndoItem(string tablename, DatabaseDataType comand, string column, string row, string previousValue, string changedTo, string user, DateTime timeutc, string comment) {
-        Comand = comand;
+    public UndoItem(string tablename, DatabaseDataType command, string column, string row, string previousValue, string changedTo, string user, DateTime timeutc, string comment) {
+        Command = command;
         ColName = column;
         RowKey = row;
         PreviousValue = previousValue;
@@ -42,7 +42,7 @@ public class UndoItem : IParseable {
         Comment = comment;
     }
 
-    public UndoItem(string tablename, DatabaseDataType comand, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment) : this(tablename, comand, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment) { }
+    public UndoItem(string tablename, DatabaseDataType command, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment) : this(tablename, command, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment) { }
 
     public UndoItem(string s) => this.Parse(s);
 
@@ -56,9 +56,15 @@ public class UndoItem : IParseable {
 
     public string ColName { get; private set; } = string.Empty;
 
-    public DatabaseDataType Comand { get; private set; } = 0;
+    public DatabaseDataType Command { get; private set; } = 0;
 
     public string Comment { get; private set; } = string.Empty;
+
+    /// <summary>
+    ///  Wird nicht vestringt!
+    ///  Welchen Usprung das Undo-Item hat
+    /// </summary>
+    public string Container { get; set; } = string.Empty;
 
     public DateTime DateTimeUtc { get; private set; } = DateTime.MinValue;
 
@@ -88,7 +94,7 @@ public class UndoItem : IParseable {
                 return true;
 
             case "co":
-                Comand = (DatabaseDataType)IntParse(value);
+                Command = (DatabaseDataType)IntParse(value);
                 return true;
 
             case "cn":
@@ -144,11 +150,11 @@ public class UndoItem : IParseable {
         List<string> result = new();
 
         result.ParseableAdd("T", TableName);
-        result.ParseableAdd("CO", Comand);
-        result.ParseableAdd("CN", ColName);
-        result.ParseableAdd("RK", RowKey);
+        result.ParseableAdd("CO", Command);
         result.ParseableAdd("D", DateTimeUtc, Constants.Format_Date9);
         result.ParseableAdd("U", User);
+        result.ParseableAdd("CN", ColName);
+        result.ParseableAdd("RK", RowKey);
         result.ParseableAdd("P", PreviousValue);
         result.ParseableAdd("C", ChangedTo);
         result.ParseableAdd("CMT", Comment);

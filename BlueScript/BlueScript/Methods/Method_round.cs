@@ -32,7 +32,7 @@ internal class Method_Round : Method {
     #region Properties
 
     public override List<List<string>> Args => new() { FloatVal, FloatVal };
-    public override string Comand => "round";
+    public override string Command => "round";
     public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
     public override bool EndlessArgs => false;
     
