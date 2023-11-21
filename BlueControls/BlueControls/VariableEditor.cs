@@ -185,7 +185,7 @@ public partial class VariableEditor : UserControl {
         tableVariablen.CellValueChanged += TableVariablen_CellValueChanged;
     }
 
-    private void TableVariablen_CellValueChanged(object sender, BlueDatabase.EventArgs.CellChangedEventArgs e) {
+    private void TableVariablen_CellValueChanged(object sender, BlueDatabase.EventArgs.CellEventArgs e) {
         var c = tableVariablen.Database?.Column.First();
         if (e.Column == c) {
             if (e.Row.CellIsNullOrEmpty(c))

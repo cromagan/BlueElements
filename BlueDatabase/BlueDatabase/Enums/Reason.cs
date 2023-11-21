@@ -20,5 +20,6 @@ namespace BlueDatabase.Enums;
 public enum Reason {
     SetCommand = 0,
     LoadReload = 1,
+    SystemSet = 1, // Ebenfalls ein, soll sehr sanft behandelt werden.
     AdditionalWorkAfterComand = 2
 }

@@ -25,6 +25,8 @@ using BlueBasics.Enums;
 using BlueDatabase.Enums;
 using System.Linq;
 using static BlueDatabase.SqlBackAbstract;
+using BlueDatabase.EventArgs;
+using System.Runtime.ConstrainedExecution;
 
 namespace BlueDatabase;
 
@@ -62,6 +64,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         Initialize();
         LoadFromSqlBack();
+        IsInCache = DateTime.UtcNow;
 
         TryToSetMeTemporaryMaster();
     }
@@ -82,8 +85,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
             return connectionData;
         }
     }
-
-    protected override bool DoCellChanges => false;
 
     #endregion
 
@@ -267,19 +268,6 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return base.IsNewRowPossible();
     }
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc, string comment) {
-        if (IsDisposed) { return "Datenbank verworfen!"; }
-
-        if (type.IsObsolete()) { return string.Empty; }
-
-        if (reason != Reason.LoadReload && type != DatabaseDataType.SystemValue) {
-            if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
-            _ = SQL?.SetValueInternal(this, type, value, column, row, user, datetimeutc);
-        }
-
-        return base.SetValueInternal(type, value, column, row, reason, user, datetimeutc, comment);
-    }
-
     protected override void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment) {
         base.AddUndo(type, column, row, previousValue, changedTo, userName, datetimeutc, comment);
 
@@ -299,7 +287,116 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
-    protected override void DoWorkAfterLastChanges() { }
+    protected override void DoWorkAfterLastChanges(List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
+        RefreshColumnsData(columnsAdded); // muss sein, alternativ alle geladenen Zeilen neu laden
+
+        var rows = new List<RowItem>();
+        rows.AddRange(rowsAdded);
+
+        foreach (var thisc in cellschanged) {
+            Cell.DataOfCellKey(thisc, out var c, out var r);
+            if (c != null && r != null) {
+                rows.AddIfNotExists(r);
+            }
+        }
+
+        RefreshRowData(rows, true);
+
+        //if (c != null) { colums.AddIfNotExists(c); }
+        //if (r != null) { rows.AddIfNotExists(r); }
+        //if (c != null && r != null) { _ = cells.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
+
+        //        if (thisWork.Command.IsObsolete()) {
+        //            // Nix tun
+        //        } else if (thisWork.Command.IsCommand()) {
+        //            #region Befehle
+
+        //            switch (thisWork.Command) {
+        //                case DatabaseDataType.Command_RemoveColumn:
+        //                    _ = Column.ExecuteCommand(thisWork.Command, thisWork.ColName);
+        //                    break;
+
+        //                case DatabaseDataType.Command_AddColumnByName:
+        //                    _ = Column.ExecuteCommand(thisWork.Command, thisWork.ChangedTo); // ColumName kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Spalte bekannt ist und nicht gespeichert wird
+        //                    var c2 = Column.Exists(thisWork.ChangedTo);
+        //                    //var columnname = _sql.GetLastColumnName(TableName, c.KeyName);
+        //                    //_ = SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
+        //                    c2?.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
+        //                    break;
+
+        //                case DatabaseDataType.Command_AddRow:
+        //                    _ = Row.ExecuteCommand(thisWork.Command, thisWork.ChangedTo, null); // RowKey kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Zeile bekannt ist und nicht gespeichert wird
+        //                    _ = rk.AddIfNotExists(thisWork.ChangedTo); // Nachher auch laden
+        //                    break;
+
+        //                case DatabaseDataType.Command_RemoveRow:
+        //                    if (Row.SearchByKey(thisWork.RowKey) is RowItem r) {
+        //                        _ = Row.ExecuteCommand(thisWork.Command, r.KeyName, r);
+        //                    }
+        //                    break;
+
+        //                default:
+        //                    Develop.DebugPrint(thisWork.Command);
+        //                    break;
+        //            }
+
+        //            #endregion
+        //        } else if (!string.IsNullOrEmpty(thisWork.RowKey)) {
+        //            #region Zeilen zum neu Einlesen merken uns Spaltenbreite invalidieren
+
+        //            var c = Column.Exists(thisWork.ColName);
+        //            var r = Row.SearchByKey(thisWork.RowKey);
+        //            if (r != null && c != null) {
+        //                // Kann sein, dass der Benutzer hier ja schon eine Zeile oder so gelöscht hat,
+        //                // aber anderer PC hat bei der noch vorhandenen Zeile eine Änderung
+
+        //                if (DoCellChanges) {
+        //                    _ = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo);
+        //                } else {
+        //                    if (thisWork.DateTimeUtc > r.IsInCache || thisWork.DateTimeUtc > c.IsInCache) {
+        //                        _ = rk.AddIfNotExists(r.KeyName);
+        //                        _ = cek.AddIfNotExists(CellCollection.KeyOfCell(c, r));
+        //                    }
+        //                }
+        //                c.Invalidate_ContentWidth();
+        //            }
+
+        //            #endregion
+        //        } else if (thisWork.Command.IsDatabaseTag()) {
+        //            #region Datenbank-Styles
+
+        //            //var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Command, DatabaseProperty, SysStyle);
+        //            _ = SetValueInternal(thisWork.Command, null, null, thisWork.ChangedTo);
+
+        //            #endregion
+        //        } else if (thisWork.Command.IsColumnTag()) {
+        //            #region Spalten-Styles
+
+        //            var column = Column.Exists(thisWork.ColName);
+        //            if (column != null && !column.IsDisposed) {
+        //                //var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Command, c.KeyName, SysStyle);
+        //                _ = column.SetValueInternal(thisWork.Command, thisWork.ChangedTo);
+        //            }
+
+        //            #endregion
+        //        }
+        //    }
+        //}
+
+        //if (!DoCellChanges) {
+        //    var (_, errormessage) = RefreshRowData(rk, true);
+        //    if (!string.IsNullOrEmpty(errormessage)) {
+        //        OnDropMessage(FehlerArt.Fehler, errormessage);
+        //    }
+        //}
+
+        //foreach (var thisc in cells) {
+        //    Cell.DataOfCellKey(thisc, out var c, out var r);
+        //    if (c != null && r != null) {
+        //        Cell.OnCellValueChanged(new CellEventArgs(c, r));
+        //    }
+        //}
+    }
 
     protected override IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer() {
         var oo = new List<DatabaseSqlLite>();
@@ -315,6 +412,16 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
 
         return oo;
+    }
+
+    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
+        if (IsDisposed) { return "Datenbank verworfen!"; }
+
+        if (type.IsObsolete()) { return string.Empty; }
+
+        if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
+        if (SQL == null) { return "SQL-Verbindung verloren!"; }
+        return SQL.WriteValueToServer(this, type, value, column, row, user, datetimeutc);
     }
 
     private void LoadFromSqlBack() {
@@ -349,7 +456,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 foreach (var thisCol in columnsToLoad) {
                     var column = Column.Exists(thisCol);
                     if (column == null || column.IsDisposed) {
-                        _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, Reason.LoadReload, thisCol);
+                        _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, thisCol, Reason.LoadReload);
                         column = Column.Exists(thisCol);
 
                         if (column == null || column.IsDisposed) {

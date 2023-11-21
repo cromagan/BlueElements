@@ -46,13 +46,17 @@ internal class DatabaseMU : Database {
     #region Constructors
 
     public DatabaseMU(string filename, bool readOnly, string freezedReason, bool create, NeedPassword? needPassword) : base(filename, readOnly, freezedReason, create, needPassword) {
-        StartWriter();
+        //IsInCache = FileStateUTCDate;
+
         CheckSysUndoNow();
+        StartWriter();
     }
 
     public DatabaseMU(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : base(ci, readOnly, needPassword) {
-        StartWriter();
+        //IsInCache = FileStateUTCDate;
+
         CheckSysUndoNow();
+        StartWriter();
     }
 
     #endregion
@@ -60,8 +64,6 @@ internal class DatabaseMU : Database {
     #region Properties
 
     public new static string DatabaseId => nameof(DatabaseMU);
-
-    protected override bool DoCellChanges => true;
 
     #endregion
 
@@ -121,7 +123,7 @@ internal class DatabaseMU : Database {
 
             var frgma = Directory.GetFiles(Filename.FilePath(), "*." + SuffixOfFragments(), SearchOption.AllDirectories).ToList();
 
-            if (!frgma.Contains(_myFragmentsFilename)) { return null; }
+            if (!frgma.Contains(_myFragmentsFilename) && !string.IsNullOrEmpty(_myFragmentsFilename)) { return null; }
 
             frgma.Remove(_myFragmentsFilename);
 
@@ -187,25 +189,6 @@ internal class DatabaseMU : Database {
 
     public string SuffixOfFragments() => "frg";
 
-    internal override string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc, string comment) {
-        if (IsDisposed) { return "Datenbank verworfen!"; }
-
-        if (type.IsObsolete()) { return string.Empty; }
-
-        if (reason != Reason.LoadReload && type != DatabaseDataType.SystemValue) {
-            if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
-            if (_writer == null) { return "Schreibmodus deaktiviert"; }
-            var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment);
-
-            lock (_writer) {
-                _writer.WriteLine(l.ToString());
-                _written = true;
-            }
-        }
-
-        return base.SetValueInternal(type, value, column, row, reason, user, datetimeutc, comment);
-    }
-
     protected override void Dispose(bool disposing) {
         if (disposing) {
             if (_writer != null) {
@@ -222,7 +205,7 @@ internal class DatabaseMU : Database {
         base.Dispose(disposing);
     }
 
-    protected override void DoWorkAfterLastChanges() {
+    protected override void DoWorkAfterLastChanges(List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
         if (_changesCount.Count() < 50) { return; }
         if (!AmITemporaryMaster(false)) { return; }
 
@@ -252,7 +235,7 @@ internal class DatabaseMU : Database {
 
         var tmp = _fileStateUTCDate;
 
-        _fileStateUTCDate = IsInCache.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture);
+        _fileStateUTCDate = IsInCache;
         // Nicht FileStateUTCDate - sonst springt der Writer an!
 
         if (!SaveInternal()) {
@@ -290,9 +273,25 @@ internal class DatabaseMU : Database {
         return oo;
     }
 
-    private void StartWriter() {
-        IsInCache = DateTimeParse(FileStateUTCDate);
+    protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
+        if (IsDisposed) { return "Datenbank verworfen!"; }
 
+        if (type.IsObsolete()) { return string.Empty; }
+
+        if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
+        if (_writer == null) { return "Schreibmodus deaktiviert"; }
+
+        var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment);
+
+        lock (_writer) {
+            _writer.WriteLine(l.ToString());
+            _written = true;
+        }
+
+        return string.Empty;
+    }
+
+    private void StartWriter() {
         if (string.IsNullOrEmpty(FragmengtsPath())) {
             Freeze("Fragmentpfad nicht gesetzt. Stand: " + IsInCache.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
             return;

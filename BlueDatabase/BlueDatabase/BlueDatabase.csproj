@@ -113,11 +113,11 @@
     <Compile Include="Enums\Reason.cs" />
     <Compile Include="EventArgs\CellEditBlockReasonEventArgs.cs" />
     <Compile Include="EventArgs\CellChangedEventArgs.cs" />
-    <Compile Include="EventArgs\ColumnReasonEventArgs.cs" />
+    <Compile Include="EventArgs\ColumnChangedEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="ColumnFormatHolder.cs" />
     <Compile Include="DatabaseScriptDescription.cs" />
-    <Compile Include="EventArgs\RowReasonEventArgs.cs" />
+    <Compile Include="EventArgs\RowChangedEventArgs.cs" />
     <Compile Include="Interfaces\IColumnInputFormat.cs" />
     <Compile Include="Interfaces\IHasChangeabelDatabase.cs" />
     <Compile Include="Interfaces\IHasDatabase.cs" />

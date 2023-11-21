@@ -51,13 +51,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Events
 
-    public event EventHandler<ColumnReasonEventArgs>? ColumnAdded;
+    public event EventHandler<ColumnChangedEventArgs>? ColumnAdded;
 
     public event EventHandler<ColumnEventArgs>? ColumnInternalChanged;
 
     public event EventHandler? ColumnRemoved;
 
-    public event EventHandler<ColumnReasonEventArgs>? ColumnRemoving;
+    public event EventHandler<ColumnChangedEventArgs>? ColumnRemoving;
 
     #endregion
 
@@ -128,7 +128,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         GetSystems();
 
-        OnColumnAdded(new ColumnReasonEventArgs(column, reason));
+        OnColumnAdded(new ColumnChangedEventArgs(column, reason));
         return string.Empty;
     }
 
@@ -511,31 +511,20 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    internal string ExecuteCommand(DatabaseDataType type, Reason reason, string name) {
+    internal string ExecuteCommand(DatabaseDataType type, string name, Reason reason) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank verworfen!"; }
-        //if (key is null or < 0) { return "Schlüsselfehler"; }
-
-        //if (type == DatabaseDataType.Command_AddColumnByKey) {
-        //    var c = SearchByKey(key);
-        //    if (c != null && !c.IsDisposed) { return "Bereits vorhanden!"; }
-
-        //    c = new ColumnItem(Database, (long)key);
-        //    _ = Add(c);
-
-        //    if (!isLoading) {
-        //        Database.RepairColumnArrangements();
-        //        Database.RepairViews();
-        //    }
-
-        //    return string.Empty;
-        //}
 
         if (type == DatabaseDataType.Command_AddColumnByName) {
             var c = Exists(name);
             if (c != null && !c.IsDisposed) { return "Bereits vorhanden!"; }
 
             c = new ColumnItem(Database, name);
-            _ = Add(c, reason);
+            var f = Add(c, reason);
+            if (!string.IsNullOrEmpty(f)) { return f; }
+
+            if (reason == Reason.SetCommand) {
+                Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
+            }
 
             if (reason != Reason.LoadReload) {
                 // Wichtig! NICHT bei LoadReload - da werden ja noch weitere Spalten erstellt
@@ -549,7 +538,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             var c = Exists(name);
             if (c == null) { return "Spalte nicht gefunden!"; }
 
-            OnColumnRemoving(new ColumnReasonEventArgs(c, reason));
+            OnColumnRemoving(new ColumnChangedEventArgs(c, reason));
             if (!_internal.TryRemove(name.ToUpper(), out _)) { return "Löschen nicht erfolgreich"; }
             OnColumnRemoved();
 
@@ -568,7 +557,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return "Befehl unbekannt";
     }
 
-    internal void OnColumnRemoving(ColumnReasonEventArgs e) {
+    internal void OnColumnRemoving(ColumnChangedEventArgs e) {
         e.Column.Changed -= OnColumnChanged;
         ColumnRemoving?.Invoke(this, e);
     }
@@ -607,7 +596,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
 
-    private void OnColumnAdded(ColumnReasonEventArgs e) {
+    private void OnColumnAdded(ColumnChangedEventArgs e) {
         e.Column.Changed += OnColumnChanged;
         ColumnAdded?.Invoke(this, e);
     }

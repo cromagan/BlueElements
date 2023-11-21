@@ -42,6 +42,8 @@ using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using Timer = System.Threading.Timer;
 using static BlueBasics.Constants;
+using System.Drawing;
+using System.Runtime.ConstrainedExecution;
 
 namespace BlueDatabase;
 
@@ -76,7 +78,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     /// </summary>
     protected readonly List<UndoItem> _changesCount = new();
 
-    protected string _fileStateUTCDate;
+    protected DateTime _fileStateUTCDate;
     private static bool _isInTimer;
 
     private static DateTime _lastTableCheck = new(1900, 1, 1);
@@ -109,7 +111,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     private string _eventScriptErrorMessage = string.Empty;
     private string _eventScriptTmp = string.Empty;
 
-    //private string _timeCode = string.Empty;
     private string _eventScriptVersion = string.Empty;
 
     private double _globalScale;
@@ -200,6 +201,9 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     public static List<ConnectionInfo> Allavailabletables { get; } = new();
 
+    /// <summary>
+    ///  Wann die Datei zuletzt geladen wurde. Einzige funktion, zu viele Ladezyklen hintereinander verhinden.
+    /// </summary>
     public static DateTime LastLoadUtc { get; set; } = DateTime.UtcNow;
 
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
@@ -303,13 +307,13 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         }
     }
 
-    public string FileStateUTCDate {
-        get => _fileStateUTCDate.Trim();
-        set {
-            if (_fileStateUTCDate == value) { return; }
-            _ = ChangeData(DatabaseDataType.FileStateUTCDate, null, null, _fileStateUTCDate, value, UserName, DateTime.UtcNow, string.Empty);
-        }
-    }
+    /// <summary>
+    /// Der Wert wird im System verankert und gespeichert.
+    /// Bei Datenbanken, die Daten nachladen können, ist das der Stand, zu dem alle Daten fest abgespeichert sind.
+    /// Kann hier nur gelesen werden! Da eine Änderung über die Property  die Datei wieder auf ungespeichert setzen würde, würde hier eine
+    /// Kettenreaktion ausgelöst werden.
+    /// </summary>
+    public DateTime FileStateUTCDate => _fileStateUTCDate;
 
     /// <summary>
     /// Der FreezedReason kann niemals wieder rückgänig gemacht werden.
@@ -455,12 +459,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     }
 
     protected string? AdditionalFilesPfadtmp { get; set; }
-
-    /// <summary>
-    /// Gibt an, ob bei DoLastChanges die Zellen geändert werden sollen.
-    /// Bei Ja, die Zellen, bei nein werden die Rows refreshed.
-    /// </summary>
-    protected abstract bool DoCellChanges { get; }
 
     #endregion
 
@@ -867,26 +865,17 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
 
-        var f = SetValueInternal(command, changedTo, column, row, Reason.SetCommand, user, datetimeutc, comment);
+        if (!ReadOnly) {
+            var f2 = WriteValueToDiscOrServer(command, changedTo, column, row, user, datetimeutc, comment);
+            if (!string.IsNullOrEmpty(f2)) { return f2; }
+        }
 
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        //if (isLoading) { return f; }
-
-        //if (ReadOnly) {
-        //    //if (command == DatabaseDataType.ColumnContentWidth) { return string.Empty; }
-        //    ////if (command == DatabaseDataType.FirstColumn) { return string.Empty; }
-        //    //if (!string.IsNullOrEmpty(TableName)) {
-        //    //    Develop.DebugPrint(FehlerArt.Warnung, "Datei ist Readonly, " + command + ", " + TableName);
-        //    //}
-        //    return "Schreibschutz aktiv";
-        //}
+        var f = SetValueInternal(command, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
+        if (!string.IsNullOrEmpty(f.error)) { return f.error; }
 
         if (LogUndo) {
             AddUndo(command, column, row, previousValue, changedTo, user, datetimeutc, comment);
         }
-
-        //if (command != DatabaseDataType.AutoExport) { SetUserDidSomething(); } // Ansonsten wir der Export dauernd unterbrochen
 
         return string.Empty;
     }
@@ -947,7 +936,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         //TimeCode = sourceDatabase.TimeCode;
         CreateDate = sourceDatabase.CreateDate;
         Creator = sourceDatabase.Creator;
-        FileStateUTCDate = sourceDatabase.FileStateUTCDate;
+        //FileStateUTCDate = sourceDatabase.FileStateUTCDate;
         //Filename - nope
         //Tablename - nope
         //TimeCode - nope
@@ -1226,8 +1215,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     }
 
     public string Export_CSV(FirstRow firstRow, ColumnItem column, IEnumerable<RowItem> sortedRows) =>
-                    //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-                    Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
+                        //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
+                        Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
     public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
         columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
@@ -1878,147 +1867,74 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     public void SetReadOnly() => ReadOnly = true;
 
-    public override string ToString() {
-        if (IsDisposed) { return string.Empty; }
-        return base.ToString() + " " + TableName;
-    }
-
-    internal void DevelopWarnung(string t) {
-        try {
-            t += "\r\nColumn-Count: " + Column.Count;
-            t += "\r\nRow-Count: " + Row.Count;
-            t += "\r\nTable: " + ConnectionData.TableName;
-            t += "\r\nID: " + ConnectionData.DatabaseId;
-        } catch { }
-        Develop.DebugPrint(FehlerArt.Warnung, t);
-    }
-
-    //    _variables.Clear();
-    //    if (!isLoading) { Variables = new VariableCollection(); }
-    //}
-    internal virtual bool IsNewRowPossible() => string.IsNullOrWhiteSpace(EditableErrorReason(EditableErrorReasonType.EditNormaly));
-
-    //    //    _variables.RemoveAt(_variables.Count - 1);
-    //    //}
-    internal void OnDropMessage(FehlerArt type, string message) {
-        if (IsDisposed) { return; }
-        if (!DropMessages) { return; }
-        DropMessage?.Invoke(this, new MessageEventArgs(type, message));
-    }
-
-    //public void Variables_RemoveAll(bool isLoading) {
-    //    //while (_variables.Count > 0) {
-    //    //    //var va = _variables[_eventScript.Count - 1];
-    //    //    //ev.Changed -= EventScript_Changed;
-    internal void OnProgressbarInfo(ProgressbarEventArgs e) {
-        if (IsDisposed) { return; }
-        ProgressbarInfo?.Invoke(this, e);
-    }
-
-    //public void Variables_Add(VariableString va, bool isLoading) {
-    //    _variables.Add(va);
-    //    if (!isLoading) { Variables = new VariableCollection(_variables); }
-    //}
-    internal void RefreshCellData(ColumnItem column, RowItem row, Reason reason) {
-        if (reason is Reason.LoadReload or Reason.AdditionalWorkAfterComand) { return; }
-
-        if (column.IsInCache != null) { return; }
-
-        var (_, errormessage) = RefreshRowData(row, false);
-        if (!string.IsNullOrEmpty(errormessage)) {
-            OnDropMessage(FehlerArt.Fehler, errormessage);
-        }
-    }
-
-    //internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    GenerateLayoutInternal?.Invoke(this, e);
-    //}
-    internal void RepairColumnArrangements(Reason reason) {
-        //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
-
-        var x = _columnArrangements.CloneWithClones();
-
-        for (var z = 0; z < Math.Max(2, x.Count); z++) {
-            if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
-            ColumnViewCollection.Repair(x[z], z);
-        }
-
-        if (reason is Reason.LoadReload or Reason.AdditionalWorkAfterComand) {
-            SetValueInternal(DatabaseDataType.ColumnArrangement, x.ToString(false), null, null, Reason.LoadReload, UserName, DateTime.UtcNow, "AutoRepair");
-        } else {
-            ColumnArrangements = x.AsReadOnly();
-        }
-    }
-
     /// <summary>
     /// Diese Routine setzt Werte auf den richtigen Speicherplatz und führt Commands aus.
-    /// Echtzeitbasierte Systeme sollten diese Routine verwenden, um den Wert ebenfalls fest zu verankern (sofern !IsLoading && !Readonly)
-    /// Nur von Laderoutinen aufzurufen, oder von ChangeData, wenn der Wert bereits fest in der Datenbank verankert ist.
-    /// Vorsicht beim Überschreiben:
-    /// Da in Columns und Cells abgesprungen wird, und diese nicht überschrieben werden können.
+    /// Es wird WriteValueToDiscOrServer aufgerufen - echtzeitbasierte Systeme können dort den Wert speichern
     /// </summary>
     /// <param name="type"></param>
     /// <param name="value"></param>
     /// <param name="column"></param>
     /// <param name="row"></param>
     /// <param name="reason"></param>
-    /// <param name="user"></param>
-    /// <param name="datetimeutc"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    internal virtual string SetValueInternal(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, Reason reason, string user, DateTime datetimeutc, string comment) {
-        if (IsDisposed) { return "Datenbank verworfen!"; }
-        if (reason != Reason.LoadReload && !string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
-        if (type.IsObsolete()) { return string.Empty; }
+    public (string error, ColumnItem? columnchanged, RowItem? rowchanged) SetValueInternal(DatabaseDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
+        if (IsDisposed) { return ("Datenbank verworfen!", null, null); }
+        if (reason != Reason.LoadReload && !string.IsNullOrEmpty(FreezedReason)) { return ("Datenbank eingefroren: " + FreezedReason, null, null); }
+        if (type.IsObsolete()) { return (string.Empty, null, null); }
 
         LastChange = DateTime.UtcNow;
 
         if (type.IsCellValue()) {
-            if (column == null || row == null) {
+            if (column?.Database is not DatabaseAbstract db || row == null) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte/Zeile ist null! " + type);
-                return "Wert nicht gesetzt!";
+                return ("Wert nicht gesetzt!", null, null);
             }
+            column.Invalidate_ContentWidth();
+            //row.InvalidateCheckData();
 
-            return Cell.SetValueInternal(column, row, value, reason);
+            var f = Cell.SetValueInternal(column, row, value, reason);
+
+            if (!string.IsNullOrEmpty(f)) { return (f, null, null); }
+            Cell.DoSystemColumns(db, column, row, user, datetimeutc, reason);
+
+            return (string.Empty, column, row);
         }
 
         if (type.IsColumnTag()) {
             if (column == null || column.IsDisposed || Column.IsDisposed) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
-                return "Wert nicht gesetzt!";
+                return ("Wert nicht gesetzt!", null, null);
             }
-            return column.SetValueInternal(type, value, reason);
+            column.Invalidate_ContentWidth();
+            return (column.SetValueInternal(type, value), column, null);
         }
 
         if (type.IsCommand()) {
             switch (type) {
                 case DatabaseDataType.Command_RemoveColumn:
                     var c = Column.Exists(value);
-                    if (c == null) { return string.Empty; }
-                    return Column.ExecuteCommand(type, reason, c.KeyName);
+                    if (c == null) { return (string.Empty, null, null); }
+                    return (Column.ExecuteCommand(type, c.KeyName, reason), c, null);
 
                 case DatabaseDataType.Command_AddColumnByName:
-                    var f2 = Column.ExecuteCommand(type, reason, value);
+                    var f2 = Column.ExecuteCommand(type, value, reason);
+                    if (!string.IsNullOrEmpty(f2)) { return (f2, null, null); }
 
-                    if (reason != Reason.LoadReload) {
-                        var thisColumn = Column.Exists(value);
-                        if (thisColumn != null) { thisColumn.IsInCache = DateTime.UtcNow; }
-                    }
+                    var thisColumn = Column.Exists(value);
+                    if (thisColumn == null) { return ("Hinzufügen fehlgeschlagen", null, null); }
 
-                    return f2;
+                    return (string.Empty, column, null);
 
                 case DatabaseDataType.Command_RemoveRow:
-                    return Row.ExecuteCommand(type, row?.KeyName, row, reason);
+                    var r = Row.SearchByKey(value);
+                    if (r == null) { return (string.Empty, null, null); }
+                    return (Row.ExecuteCommand(type, r.KeyName, reason), null, r);
 
                 case DatabaseDataType.Command_AddRow:
-                    var f1 = Row.ExecuteCommand(type, value, null, reason);
-
-                    if (reason != Reason.LoadReload) {
-                        var thisRow = Row.SearchByKey(value);
-                        if (thisRow != null && !thisRow.IsDisposed) { thisRow.IsInCache = DateTime.UtcNow; }
-                    }
-
-                    return f1;
+                    var f1 = Row.ExecuteCommand(type, value, reason);
+                    if (!string.IsNullOrEmpty(f1)) { return (f1, null, null); }
+                    var thisRow = Row.SearchByKey(value);
+                    return (string.Empty, null, thisRow);
 
                 default:
                     if (LoadedVersion == DatabaseVersion) {
@@ -2027,7 +1943,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                             Develop.DebugPrint(FehlerArt.Fehler, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + ConnectionData);
                         }
                     }
-                    return "Befehl unbekannt.";
+                    return ("Befehl unbekannt.", null, null);
             }
         }
 
@@ -2050,18 +1966,12 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             case DatabaseDataType.Werbung:
                 break;
 
-            //case DatabaseDataType.CryptionState:
-            //    break;
-
-            //case DatabaseDataType.CryptionTest:
-            //    break;
-
             case DatabaseDataType.Creator:
                 _creator = value;
                 break;
 
             case DatabaseDataType.FileStateUTCDate:
-                _fileStateUTCDate = value;
+                _fileStateUTCDate = DateTimeParse(value);
                 break;
 
             case DatabaseDataType.CreateDateUTC:
@@ -2088,10 +1998,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                 _caption = value;
                 break;
 
-            //case DatabaseDataType.TimeCode:
-            //    _timeCode = value;
-            //    break;
-
             case DatabaseDataType.GlobalScale:
                 _globalScale = DoubleParse(value);
                 break;
@@ -2099,10 +2005,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             case DatabaseDataType.AdditionalFilesPath:
                 _additionalFilesPfad = value;
                 break;
-
-            //case DatabaseDataType.FirstColumn:
-            //    _firstColumn = value;
-            //    break;
 
             case DatabaseDataType.StandardFormulaFile:
                 _standardFormulaFile = value;
@@ -2115,24 +2017,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             case DatabaseDataType.Tags:
                 _tags.SplitAndCutByCr(value);
                 break;
-
-            //case enDatabaseDataType.BinaryDataInOne:
-            //    break;
-
-            //case DatabaseDataType.Layouts:
-            //    var _layouts = value.SplitAndCutByCrToList();
-            //    foreach (var thisLayout in _layouts) {
-            //        WriteAllText(TempFile("C:\\01_data", TableName, "BCR"), thisLayout, Constants.Win1252, false);
-            //    }
-            //    break;
-
-            //case DatabaseDataType.AutoExport:
-            //    _export.Clear();
-            //    List<string> ae = new(value.SplitAndCutByCr());
-            //    foreach (var t in ae) {
-            //        _export.Add(new ExportDefinition(this, t));
-            //    }
-            //    break;
 
             case DatabaseDataType.EventScript:
                 _eventScriptTmp = value;
@@ -2191,7 +2075,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                 break;
 
             case DatabaseDataType.EOF:
-                return string.Empty;
+                return (string.Empty, null, null);
 
             default:
                 // Variable type
@@ -2202,16 +2086,84 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     }
                 }
 
-                return "Datentyp unbekannt.";
+                return ("Datentyp unbekannt.", null, null);
         }
-        return string.Empty;
+        return (string.Empty, null, null);
     }
 
-    //internal void RepairViews() {
-    //    var lay = (LayoutCollection)Layouts.Clone();
-    //    lay.Check();
-    //    Layouts = lay;
+    public override string ToString() {
+        if (IsDisposed) { return string.Empty; }
+        return base.ToString() + " " + TableName;
+    }
+
+    internal void DevelopWarnung(string t) {
+        try {
+            t += "\r\nColumn-Count: " + Column.Count;
+            t += "\r\nRow-Count: " + Row.Count;
+            t += "\r\nTable: " + TableName;
+            t += "\r\nID: " + ConnectionData.DatabaseId;
+        } catch { }
+        Develop.DebugPrint(FehlerArt.Warnung, t);
+    }
+
+    //    _variables.Clear();
+    //    if (!isLoading) { Variables = new VariableCollection(); }
     //}
+    internal virtual bool IsNewRowPossible() => string.IsNullOrWhiteSpace(EditableErrorReason(EditableErrorReasonType.EditNormaly));
+
+    //    //    _variables.RemoveAt(_variables.Count - 1);
+    //    //}
+    internal void OnDropMessage(FehlerArt type, string message) {
+        if (IsDisposed) { return; }
+        if (!DropMessages) { return; }
+        DropMessage?.Invoke(this, new MessageEventArgs(type, message));
+    }
+
+    //public void Variables_RemoveAll(bool isLoading) {
+    //    //while (_variables.Count > 0) {
+    //    //    //var va = _variables[_eventScript.Count - 1];
+    //    //    //ev.Changed -= EventScript_Changed;
+    internal void OnProgressbarInfo(ProgressbarEventArgs e) {
+        if (IsDisposed) { return; }
+        ProgressbarInfo?.Invoke(this, e);
+    }
+
+    //public void Variables_Add(VariableString va, bool isLoading) {
+    //    _variables.Add(va);
+    //    if (!isLoading) { Variables = new VariableCollection(_variables); }
+    //}
+    internal void RefreshCellData(ColumnItem column, RowItem row, Reason reason) {
+        if (reason is Reason.LoadReload or Reason.AdditionalWorkAfterComand) { return; }
+
+        if (column.IsInCache != null || row.IsInCache != null) { return; }
+
+        var (_, errormessage) = RefreshRowData(row, false);
+        if (!string.IsNullOrEmpty(errormessage)) {
+            OnDropMessage(FehlerArt.Fehler, errormessage);
+        }
+    }
+
+    //internal void OnGenerateLayoutInternal(GenerateLayoutInternalEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    GenerateLayoutInternal?.Invoke(this, e);
+    //}
+    internal void RepairColumnArrangements(Reason reason) {
+        //if (ReadOnly) { return; }  // Gibt fehler bei Datenbanken, die nur Temporär erzeugt werden!
+
+        var x = _columnArrangements.CloneWithClones();
+
+        for (var z = 0; z < Math.Max(2, x.Count); z++) {
+            if (x.Count < z + 1) { x.Add(new ColumnViewCollection(this, string.Empty)); }
+            ColumnViewCollection.Repair(x[z], z);
+        }
+
+        if (reason is Reason.LoadReload or Reason.AdditionalWorkAfterComand) {
+            SetValueInternal(DatabaseDataType.ColumnArrangement, null, null, x.ToString(false), UserName, DateTime.UtcNow, Reason.LoadReload);
+        } else {
+            ColumnArrangements = x.AsReadOnly();
+        }
+    }
+
     /// <summary>
     /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
     /// </summary>
@@ -2275,110 +2227,32 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         data = data.OrderBy(obj => obj.DateTimeUtc).ToList();
 
         try {
-            var rk = new List<string>();
-            var cek = new List<string>();
+            List<ColumnItem> columnsAdded = new();
+            List<RowItem> rowsAdded = new();
+            List<string> cellschanged = new();
 
             foreach (var thisWork in data) {
                 if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
                     Undo.Add(thisWork);
                     _changesCount.Add(thisWork);
 
-                    if (thisWork.Command.IsObsolete()) {
-                        // Nix tun
-                    } else if (thisWork.Command.IsCommand()) {
+                    var c = Column.Exists(thisWork.ColName);
+                    var r = Row.SearchByKey(thisWork.RowKey);
+                    var erg = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.LoadReload);
 
-                        #region Befehle
-
-                        switch (thisWork.Command) {
-                            case DatabaseDataType.Command_RemoveColumn:
-                                _ = Column.ExecuteCommand(thisWork.Command, Reason.LoadReload, thisWork.ColName);
-                                break;
-
-                            case DatabaseDataType.Command_AddColumnByName:
-                                _ = Column.ExecuteCommand(thisWork.Command, Reason.LoadReload, thisWork.ChangedTo); // ColumName kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Spalte bekannt ist und nicht gespeichert wird
-                                var c2 = Column.Exists(thisWork.ChangedTo);
-                                //var columnname = _sql.GetLastColumnName(TableName, c.KeyName);
-                                //_ = SetValueInternal(DatabaseDataType.ColumnKey, columnkey, c2.Name, null, true);
-                                c2?.RefreshColumnsData(); // muss sein, alternativ alle geladenen Zeilen neu laden
-                                break;
-
-                            case DatabaseDataType.Command_AddRow:
-                                _ = Row.ExecuteCommand(thisWork.Command, thisWork.ChangedTo, null, Reason.LoadReload); // RowKey kann nicht benutzt werden, da beim erstellen der SYS_Undo keine Zeile bekannt ist und nicht gespeichert wird
-                                _ = rk.AddIfNotExists(thisWork.ChangedTo); // Nachher auch laden
-                                break;
-
-                            case DatabaseDataType.Command_RemoveRow:
-                                var r = Row.SearchByKey(thisWork.RowKey);
-                                _ = Row.ExecuteCommand(thisWork.Command, r?.KeyName, r, Reason.LoadReload);
-                                break;
-
-                            default:
-                                Develop.DebugPrint(thisWork.Command);
-                                break;
-                        }
-
-                        #endregion
-                    } else if (!string.IsNullOrEmpty(thisWork.RowKey)) {
-
-                        #region Zeilen zum neu Einlesen merken uns Spaltenbreite invalidieren
-
-                        var c = Column.Exists(thisWork.ColName);
-                        var r = Row.SearchByKey(thisWork.RowKey);
-                        if (r != null && c != null) {
-                            // Kann sein, dass der Benutzer hier ja schon eine Zeile oder so gelöscht hat,
-                            // aber anderer PC hat bei der noch vorhandenen Zeile eine Änderung
-
-                            if (DoCellChanges) {
-                                _ = SetValueInternal(thisWork.Command, thisWork.ChangedTo, c, r, Reason.LoadReload, thisWork.User, thisWork.DateTimeUtc, "DoLastChanges");
-                            } else {
-                                if (thisWork.DateTimeUtc > r.IsInCache || thisWork.DateTimeUtc > c.IsInCache) {
-                                    _ = rk.AddIfNotExists(r.KeyName);
-                                    _ = cek.AddIfNotExists(CellCollection.KeyOfCell(c, r));
-                                }
-                            }
-                            c.Invalidate_ContentWidth();
-                        }
-
-                        #endregion
-                    } else if (thisWork.Command.IsDatabaseTag()) {
-
-                        #region Datenbank-Styles
-
-                        //var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Command, DatabaseProperty, SysStyle);
-                        _ = SetValueInternal(thisWork.Command, thisWork.ChangedTo, null, null, Reason.LoadReload, thisWork.User, thisWork.DateTimeUtc, "DoLastChanges");
-
-                        #endregion
-                    } else if (thisWork.Command.IsColumnTag()) {
-
-                        #region Spalten-Styles
-
-                        var c = Column.Exists(thisWork.ColName);
-                        if (c != null && !c.IsDisposed) {
-                            //var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Command, c.KeyName, SysStyle);
-                            _ = c.SetValueInternal(thisWork.Command, thisWork.ChangedTo, Reason.LoadReload);
-                        }
-
-                        #endregion
+                    if (!string.IsNullOrEmpty(erg.error)) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + erg.error);
+                        return;
                     }
-                }
-            }
 
-            if (!DoCellChanges) {
-                var (_, errormessage) = RefreshRowData(rk, true);
-                if (!string.IsNullOrEmpty(errormessage)) {
-                    OnDropMessage(FehlerArt.Fehler, errormessage);
-                }
-            }
-
-            foreach (var thisc in cek) {
-                Cell.DataOfCellKey(thisc, out var c, out var r);
-                if (c != null && r != null) {
-                    Cell.OnCellValueChanged(new EventArgs.CellChangedEventArgs(c, r, Reason.LoadReload));
+                    if (c == null && erg.columnchanged != null) { columnsAdded.AddIfNotExists(erg.columnchanged); }
+                    if (r == null && erg.rowchanged != null) { rowsAdded.AddIfNotExists(erg.rowchanged); }
+                    if (erg.rowchanged != null && erg.columnchanged != null) { cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
                 }
             }
 
             IsInCache = toUTC;
-            DoWorkAfterLastChanges();
+            DoWorkAfterLastChanges(columnsAdded, rowsAdded, cellschanged);
             OnInvalidateView();
         } catch {
             Develop.CheckStackForOverflow();
@@ -2386,7 +2260,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         }
     }
 
-    protected abstract void DoWorkAfterLastChanges();
+    protected abstract void DoWorkAfterLastChanges(List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged);
 
     protected void GenerateTimer() {
         if (_pendingChangesTimer != null) { return; }
@@ -2405,7 +2279,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         _globalShowPass = string.Empty;
         _creator = UserName;
         _createDate = DateTime.UtcNow.ToString(Format_Date9, CultureInfo.InvariantCulture);
-        _fileStateUTCDate = "01.01.2000"; // Wichtig, dass das Datum bei Datenbanken ohne den Wert immer alles laden
+        _fileStateUTCDate = new DateTime(0); // Wichtig, dass das Datum bei Datenbanken ohne den Wert immer alles laden
         _caption = string.Empty;
         LoadedVersion = DatabaseVersion;
         _globalScale = 1f;
@@ -2422,7 +2296,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     protected void OnLoaded() {
         if (IsDisposed) { return; }
-        IsInCache = DateTime.UtcNow;
+        IsInCache = FileStateUTCDate;
         Loaded?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -2448,6 +2322,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         TemporaryDatabaseMasterUser = UserName + "-" + Environment.MachineName;
         TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString(Format_Date5, CultureInfo.InvariantCulture);
     }
+
+    protected abstract string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment);
 
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
@@ -2498,16 +2374,15 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
 
-    //private void OnIsTableVisibleForUser(VisibleEventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    IsTableVisibleForUser?.Invoke(this, e);
-    //}
-
     private void OnSortParameterChanged() {
         if (IsDisposed) { return; }
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
+    //private void OnIsTableVisibleForUser(VisibleEventArgs e) {
+    //    if (IsDisposed) { return; }
+    //    IsTableVisibleForUser?.Invoke(this, e);
+    //}
     private bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
         var tmpName = UserName.ToUpper();
         var tmpGroup = UserGroup.ToUpper();

@@ -355,10 +355,10 @@ public abstract class SqlBackAbstract {
                 if (!t.IsObsolete()) {
                     string? ok;
                     if (k[1].Equals(DatabaseProperty, StringComparison.OrdinalIgnoreCase)) {
-                        ok = db.SetValueInternal(t, thisstyle.Value, null, null, Reason.LoadReload, Generic.UserName, DateTime.UtcNow, "GetStyleData");
+                        ok = db.SetValueInternal(t, null, null, thisstyle.Value, Generic.UserName, DateTime.UtcNow, Reason.LoadReload).error;
                     } else {
                         var column = db.Column.Exists(k[1]); // Exists, kann sein dass noch ein Eintrag in der SysSytle ist, aber die Spalte schon gelöscjht wurde
-                        ok = column?.SetValueInternal(t, thisstyle.Value, Reason.LoadReload);
+                        ok = column?.SetValueInternal(t, thisstyle.Value);
                     }
 
                     if (!string.IsNullOrEmpty(ok)) {
@@ -650,17 +650,44 @@ public abstract class SqlBackAbstract {
     }
 
     /// <summary>
+    /// Gibt alle verfügbaren Tabellen - außer die Systemtabellen - zurück
+    /// </summary>
+    /// <returns></returns>
+    public List<string>? Tables() {
+        var l = AllTables();
+
+        if (l == null) { return null; }
+
+        //_ = l.Remove(SysStyle);
+        //_ = l.Remove(SysUndo);
+
+        var l2 = new List<string>();
+
+        foreach (var thiss in l) {
+            var thiss2 = thiss.ToUpper();
+
+            if (!thiss2.StartsWith("SYS_") && !thiss2.StartsWith("BAK_")) {
+                l2.Add(thiss2);
+            }
+        }
+
+        return l2;
+    }
+
+    public abstract string VarChar(int lenght);
+
+    /// <summary>
     /// Führt eine eine Änderung im BackEnd aus
     /// </summary>
     /// <param name="db"></param>
     /// <param name="type"></param>
     /// <param name="value"></param>
-    /// <param name="column"></param>
+    /// <param name="column">Benötigt die echte Spalte - nicht nur den Namen, um multiple Befehle berechnen zu können</param>
     /// <param name="row"></param>
     /// <param name="user"></param>
     /// <param name="datetimeutc"></param>
     /// <returns></returns>
-    public string SetValueInternal(DatabaseSqlLite db, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc) {
+    public string WriteValueToServer(DatabaseSqlLite db, DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc) {
         if (!IsValidTableName(db.TableName, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + db.TableName);
             return "Tabellenname ungültig: " + db.TableName;
@@ -750,33 +777,6 @@ public abstract class SqlBackAbstract {
         _ = CloseConnection();
         return string.Empty;
     }
-
-    /// <summary>
-    /// Gibt alle verfügbaren Tabellen - außer die Systemtabellen - zurück
-    /// </summary>
-    /// <returns></returns>
-    public List<string>? Tables() {
-        var l = AllTables();
-
-        if (l == null) { return null; }
-
-        //_ = l.Remove(SysStyle);
-        //_ = l.Remove(SysUndo);
-
-        var l2 = new List<string>();
-
-        foreach (var thiss in l) {
-            var thiss2 = thiss.ToUpper();
-
-            if (!thiss2.StartsWith("SYS_") && !thiss2.StartsWith("BAK_")) {
-                l2.Add(thiss2);
-            }
-        }
-
-        return l2;
-    }
-
-    public abstract string VarChar(int lenght);
 
     //    if (allcols.Count > 0) {
     //        Develop.DebugPrint(FehlerArt.Fehler, "Zusätzliche Spalten dem Server vorhanden: " + allcols.JoinWith(", "));
@@ -911,7 +911,7 @@ public abstract class SqlBackAbstract {
             var row = rows.SearchByKey(rk);
 
             if ((row == null || row.IsDisposed) && addmissingRows) {
-                _ = rows.ExecuteCommand(DatabaseDataType.Command_AddRow, rk, null, Reason.LoadReload);
+                _ = rows.ExecuteCommand(DatabaseDataType.Command_AddRow, rk, Reason.LoadReload);
                 row = rows.SearchByKey(rk);
             }
 

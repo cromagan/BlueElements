@@ -21,11 +21,11 @@ using BlueDatabase.Enums;
 
 namespace BlueDatabase.EventArgs;
 
-public class ColumnReasonEventArgs : ColumnEventArgs {
+public class ColumnChangedEventArgs : ColumnEventArgs {
 
     #region Constructors
 
-    public ColumnReasonEventArgs(ColumnItem column, Reason reason) : base(column) => Reason = reason;
+    public ColumnChangedEventArgs(ColumnItem column, Reason reason) : base(column) => Reason = reason;
 
     #endregion
 

@@ -20,9 +20,11 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -295,7 +297,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (column == null || column.IsDisposed) {
             db.DevelopWarnung("Spalte ungültig!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + db.ConnectionData.TableName);
+            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + db.TableName);
             return;
         }
 
@@ -346,6 +348,16 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         //if (column.KeyColumnKey > -1) {
         //    ChangeValueOfKey(currentValue, column, row.KeyName);
         //}
+    }
+
+    public void DoSystemColumns(DatabaseAbstract db, ColumnItem column, RowItem row, string user, DateTime datetimeutc, Reason reason) {
+        // Die unterschiedlichen Reasons in der Routine beachten!
+        if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueInternal(src, row, user, Reason.SystemSet); }
+        if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueInternal(scd, row, datetimeutc.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), Reason.SystemSet); }
+
+        if (column.ScriptType != ScriptType.Nicht_vorhanden) {
+            if (db.Column.SysRowState is ColumnItem srs && srs != column) { SetValueInternal(srs, row, string.Empty, reason); }
+        }
     }
 
     public bool GetBoolean(ColumnItem? column, RowItem? row) => GetString(column, row).FromPlusMinus();// Main Method
@@ -411,11 +423,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (column == null || column.IsDisposed) {
                 Database?.DevelopWarnung("Spalte ungültig!");
-                Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + Database?.ConnectionData.TableName);
+                Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + Database?.TableName);
                 return string.Empty;
             }
             if (row == null || row.IsDisposed) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + Database.ConnectionData.TableName);
+                Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + Database.TableName);
                 return string.Empty;
             }
 
@@ -542,36 +554,39 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    public void Set(ColumnItem? column, RowItem? row, string value) // Main Method
+    public string Set(ColumnItem? column, RowItem? row, string value) // Main Method
     {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!");
-            return;
-        }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank ungültig!"; }
 
-        if (column == null || column.IsDisposed) {
-            db.DevelopWarnung("Spalte ungültig!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + db.ConnectionData.TableName);
-            return;
-        }
+        if (column == null || column.IsDisposed) { return "Spalte ungültig!"; }
 
-        if (row == null || row.IsDisposed) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!<br>" + db.ConnectionData.TableName);
-            return;
-        }
+        if (row == null || row.IsDisposed) { return "Zeile ungültig!"; }
 
-        if (!string.IsNullOrEmpty(db.FreezedReason)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank eingefroren!<br>" + db.ConnectionData.TableName);
-            return;
-        }
+        if (!string.IsNullOrEmpty(db.FreezedReason)) { return "Datenbank eingefroren!"; }
 
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
             lrow?.CellSet(lcolumn, value);
-            return;
+            return string.Empty;
         }
 
-        SetValueCore(column, row, value, UserName, DateTime.UtcNow, false);
+        value = column.AutoCorrect(value, true);
+        var oldValue = GetStringCore(column, row);
+        if (value == oldValue) { return string.Empty; }
+
+        column.UcaseNamesSortedByLenght = null;
+
+        var message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, UserName, DateTime.UtcNow, string.Empty);
+
+        if (!string.IsNullOrEmpty(message)) { return message; }
+
+        if (value != GetStringCore(column, row)) { return "Nachprüfung fehlgeschlagen"; }
+
+        DoSpecialFormats(column, row, oldValue, false);
+
+        //DoSystemColumns(db, column, row, UserName, DateTime.UtcNow, Reason.SystemSet);
+
+        return string.Empty;
     }
 
     public void Set(ColumnItem? column, RowItem? row, bool value) => Set(column, row, value.ToPlusMinus());
@@ -636,6 +651,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 Database?.Row.AddRowWithChangedValue(row);
             }
         }
+
+        column.Invalidate_ContentWidth();
+        row.InvalidateCheckData();
+        OnCellValueChanged(new CellChangedEventArgs(column, row, reason));
+
         return string.Empty;
     }
 
@@ -737,73 +757,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         } catch {
             Develop.CheckStackForOverflow(); // Um Rauszufinden, ob endlos-Schleifen öfters  vorkommen. Zuletzt 24.11.2020
         }
-    }
-
-    internal void SetValueCore(ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, bool isSystem) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Datenbank ungültig!");
-            return;
-        }
-
-        if (column == null || column.IsDisposed) {
-            db.DevelopWarnung("Spalte ungültig!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Spalte ungültig!<br>" + db.ConnectionData.TableName);
-            return;
-        }
-        if (row == null || row.IsDisposed) {
-            db.DevelopWarnung("Zeile ungültig!!");
-            Develop.DebugPrint(FehlerArt.Fehler, "Zeile ungültig!!<br>" + db.ConnectionData.TableName);
-            return;
-        }
-
-        if (isSystem) {
-            if (!column.IsSystemColumn()) {
-                Develop.DebugPrint(FehlerArt.Fehler, "SystemSet nur bei System-Spalten möglich: " + column);
-                return;
-            }
-        } else {
-            value = column.AutoCorrect(value, true);
-        }
-
-        var oldValue = GetStringCore(column, row);
-
-        if (value == oldValue) { return; }
-
-        string message;
-
-        if (isSystem) {
-            message = db.ChangeData(DatabaseDataType.SystemValue, column, row, oldValue, value, user, datetimeutc, "SystemSet");
-        } else {
-            message = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldValue, value, user, datetimeutc, string.Empty);
-        }
-
-        if (!string.IsNullOrEmpty(message)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Wert nicht gesetzt: " + message);
-            return;
-        }
-
-        column.UcaseNamesSortedByLenght = null;
-
-        var checkValue = GetStringCore(column, row);
-        //if (ContainsKey(cellKey)) { checkValue = this[cellKey].Value; }
-        if (checkValue != value) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Nachprüfung fehlgeschlagen:\r\n" + checkValue + "\r\n" + value);
-            return;
-        }
-
-        if (!isSystem) {
-            DoSpecialFormats(column, row, oldValue, false);
-            if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueCore(src, row, user, user, datetimeutc, true); }
-            if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueCore(scd, row, datetimeutc.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), user, datetimeutc, true); }
-
-            if (column.ScriptType != ScriptType.Nicht_vorhanden) {
-                if (db.Column.SysRowState is ColumnItem srs && srs != column) { SetValueCore(srs, row, string.Empty, user, datetimeutc, true); }
-            }
-        }
-
-        column.Invalidate_ContentWidth();
-        row.InvalidateCheckData();
-        OnCellValueChanged(new CellChangedEventArgs(column, row, Reason.SetCommand));
     }
 
     private static bool CompareValues(string istValue, string filterValue, FilterType typ) {
@@ -927,11 +880,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
             if (targetColumn != null && targetRow != null && string.IsNullOrEmpty(fehler) && row != null && db != null) {
-                db.Cell.SetValueCore(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
+                row.CellSet(column, targetRow.KeyName); //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
                 return (targetColumn, targetRow, fehler, cr);
             }
 
-            if (string.IsNullOrEmpty(editableError) && row != null && db != null) { db.Cell.SetValueCore(column, row, string.Empty, UserName, DateTime.UtcNow, false); }
+            if (string.IsNullOrEmpty(editableError) && row != null && db != null) { row.CellSet(column, string.Empty); }
             return (targetColumn, targetRow, fehler, cr);
         }
 
@@ -1007,17 +960,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    //    var ownRow = _database.Row.SearchByKey(rowKey);
-    //    var rows = keyc.Format == DataFormat.RelationText
-    //        ? ConnectedRowsOfRelations(ownRow.CellGetString(keyc), ownRow)
-    //        : RowCollection.MatchesTo(new FilterItem(keyc, FilterType.Istgleich_GroßKleinEgal, ownRow.CellGetString(keyc)));
-    //    rows.Remove(ownRow);
-    //    if (rows.Count < 1) { return; }
-    //    foreach (var thisRow in rows) {
-    //        thisRow.CellSet(column, currentvalue);
-    //    }
-    //}
-
     private void RelationTextNameChanged(ColumnItem columnToRepair, string rowKey, string oldValue, string newValue) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
@@ -1039,13 +981,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
     }
-
-    /// <summary>
-    /// Ändert die anderen Zeilen dieser Spalte, so dass der verknüpfte Text bei dieser und den anderen Spalten gleich ist ab.
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <param name="previewsValue"></param>
 
     private void RepairRelationText(ColumnItem column, RowItem row, string previewsValue) {
         var currentString = GetString(column, row);
@@ -1077,6 +1012,22 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         MakeNewRelations(column, row, oldBz, newBz);
     }
 
+    //    var ownRow = _database.Row.SearchByKey(rowKey);
+    //    var rows = keyc.Format == DataFormat.RelationText
+    //        ? ConnectedRowsOfRelations(ownRow.CellGetString(keyc), ownRow)
+    //        : RowCollection.MatchesTo(new FilterItem(keyc, FilterType.Istgleich_GroßKleinEgal, ownRow.CellGetString(keyc)));
+    //    rows.Remove(ownRow);
+    //    if (rows.Count < 1) { return; }
+    //    foreach (var thisRow in rows) {
+    //        thisRow.CellSet(column, currentvalue);
+    //    }
+    //}
+    /// <summary>
+    /// Ändert die anderen Zeilen dieser Spalte, so dass der verknüpfte Text bei dieser und den anderen Spalten gleich ist ab.
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <param name="previewsValue"></param>
     private string? TextSizeKey(ColumnItem? column, string text) {
         if (column?.Database is not DatabaseAbstract db || db.IsDisposed || column.IsDisposed) { return null; }
         return db.TableName + "|" + column.KeyName + "|" + text;

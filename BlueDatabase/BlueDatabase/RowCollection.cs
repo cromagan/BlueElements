@@ -72,7 +72,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public event EventHandler<DoRowAutomaticEventArgs>? DoSpecialRules;
 
-    public event EventHandler<RowReasonEventArgs>? RowAdded;
+    public event EventHandler<RowChangedEventArgs>? RowAdded;
 
     public event EventHandler<RowCheckedEventArgs>? RowChecked;
 
@@ -80,7 +80,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public event EventHandler? RowRemoved;
 
-    public event EventHandler<RowReasonEventArgs>? RowRemoving;
+    public event EventHandler<RowChangedEventArgs>? RowRemoving;
 
     #endregion
 
@@ -614,29 +614,29 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
-    internal string ExecuteCommand(DatabaseDataType type, string rowkey, RowItem? row, Reason reason) {
-        if (rowkey is null || string.IsNullOrWhiteSpace(rowkey)) { return "Schlüsselfehler"; }
-
-        var db = Database;
-        if (db == null || db.IsDisposed) { return "Datenbank verworfen"; }
+    internal string ExecuteCommand(DatabaseDataType type, string rowkey, Reason reason) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank verworfen"; }
 
         if (type == DatabaseDataType.Command_AddRow) {
-            var c = new RowItem(db, rowkey);
+            var row = SearchByKey(rowkey);
+            if (row != null && !row.IsDisposed) { return "Bereits vorhanden!"; }
 
-            return Add(c, reason);
+            var c = new RowItem(db, rowkey);
+            var f = Add(c, reason);
+            if (reason == Reason.SetCommand) {
+                Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
+            }
+            return f;
         }
 
         if (type == DatabaseDataType.Command_RemoveRow) {
-            //var rowsToExpand = SearchByKey(key);
-            if (row == null || row.IsDisposed) { return "Zeile nicht vorhanden"; }
+            var row = SearchByKey(rowkey);
+            if (row == null) { return "Zeile nicht gefunden!"; }
 
-            OnRowRemoving(new RowReasonEventArgs(row, reason));
+            OnRowRemoving(new RowChangedEventArgs(row, reason));
             foreach (var thisColumn in db.Column) {
                 if (thisColumn != null) {
                     db.Cell.SetValueInternal(thisColumn, row, string.Empty, Reason.AdditionalWorkAfterComand);
-                    //db.ChangeData(DatabaseDataType.SystemValue, thisColumn, row, string.Empty, string.Empty, string.Empty, string.Empty, "SystemSet");
-                    //row.CellSet(thisColumnItem, string.Empty);
-                    //db.Cell.Delete(thisColumnItem, row.KeyName);
                 }
             }
 
@@ -666,7 +666,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //        case enDatabaseDataType.LastRowKey:
     //            //_LastRowKey = LongParse(value);
     //            break;
-    internal void OnRowRemoving(RowReasonEventArgs e) {
+    internal void OnRowRemoving(RowChangedEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
         e.Row.DoSpecialRules -= OnDoSpecialRules;
         e.Row.RowGotData -= OnRowGotData;
@@ -682,7 +682,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns></returns>
     private string Add(RowItem row, Reason reason) {
         if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
-        OnRowAdded(new RowReasonEventArgs(row, reason));
+        OnRowAdded(new RowChangedEventArgs(row, reason));
         return string.Empty;
     }
 
@@ -714,7 +714,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
 
-    private void OnRowAdded(RowReasonEventArgs e) {
+    private void OnRowAdded(RowChangedEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
         e.Row.DoSpecialRules += OnDoSpecialRules;
         e.Row.RowGotData += OnRowGotData;

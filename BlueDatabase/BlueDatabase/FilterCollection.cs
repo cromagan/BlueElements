@@ -504,7 +504,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnChanging();
     }
 
-    private void Row_RowRemoving(object sender, RowReasonEventArgs e) {
+    private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (_rows == null) { return; }
         if (_rows.Contains(e.Row)) { _rows = null; }

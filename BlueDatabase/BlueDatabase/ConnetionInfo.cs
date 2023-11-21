@@ -106,10 +106,10 @@ public class ConnectionInfo : IReadableTextWithKey {
         #endregion
     }
 
-    public ConnectionInfo(string tablename, DatabaseAbstract? provider, string connectionString, string additionalInfo, string mustbefreezed) {
+    public ConnectionInfo(string tablename, DatabaseAbstract? provider, string databaseID, string additionalInfo, string mustbefreezed) {
         TableName = tablename.ToUpper();
         Provider = provider;
-        DatabaseId = connectionString;
+        DatabaseId = databaseID;
         AdditionalData = additionalInfo;
         MustBeFreezed = mustbefreezed;
     }

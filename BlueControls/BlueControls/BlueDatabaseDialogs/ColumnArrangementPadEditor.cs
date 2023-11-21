@@ -466,7 +466,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         var dbColumnCombi = new List<string>();
         foreach (var thisc in db.Column) {
             if (thisc.LinkedDatabase != null) {
-                var dbN = thisc.LinkedDatabase.ConnectionData.TableName + "|" + thisc.LinkedCellFilter.JoinWithCr();
+                var dbN = thisc.LinkedDatabase.TableName + "|" + thisc.LinkedCellFilter.JoinWithCr();
                 _ = dbColumnCombi.AddIfNotExists(dbN);
             }
         }
@@ -481,11 +481,11 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
                     if (c.LinkedDatabase != null) {
                         // String als Namen als eindeutige Kennung
-                        var toCheckCombi = c.LinkedDatabase.ConnectionData.TableName + "|" + c.LinkedCellFilter.JoinWithCr();
+                        var toCheckCombi = c.LinkedDatabase.TableName + "|" + c.LinkedCellFilter.JoinWithCr();
 
                         if (toCheckCombi == thisCombi) {
                             if (Pad.Item[toCheckCombi] is not GenericPadItem databItem) {
-                                var nam = c.LinkedDatabase.ConnectionData.TableName;
+                                var nam = c.LinkedDatabase.TableName;
                                 databItem = new GenericPadItem(toCheckCombi, nam, new Size((int)(anyitem.UsedArea.Height / 2), (int)anyitem.UsedArea.Height));
                                 Pad.Item.Add(databItem);
                                 if (it != null) {

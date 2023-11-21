@@ -2198,45 +2198,22 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    //    for (var z = 0; z <= 999; z++) {
-    //        var w = (EditTypeFormula)z;
-    //        if (w.ToString() != z.ToString()) {
-    //            if (UserEditDialogTypeInFormula(w)) {
-    //                return w;
-    //            }
-    //        }
-    //    }
-    //    return EditTypeFormula.None;
-    //}
     /// <summary>
     /// Setzt den Wert in die dazugehörige Variable.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="newvalue"></param>
     /// <returns></returns>
-    internal string SetValueInternal(DatabaseDataType type, string newvalue, Reason reason) {
+    internal string SetValueInternal(DatabaseDataType type, string newvalue) {
         if (type.IsObsolete()) { return string.Empty; }
 
         switch (type) {
-            //case DatabaseDataType.ColumnKey:
-            //    var nkey = LongParse(newvalue);
-
-            //    if (nkey == 0 && newvalue.Contains(",")) {
-            //        // Wiederverwendeter wert:  co_DauerFilterPos = 194 {x=0, y=0}
-            //        return string.Empty;
-            //    }
-
-            //    _key = nkey;
-            //    //Invalidate_TmpVariablesx();
-            //    break;
-
             case DatabaseDataType.ColumnName:
-
                 var nname = newvalue.ToUpper();
 
-                if (reason == Reason.LoadReload && nname != _name) {
-                    return "Namen Inkonsistent: " + nname + " " + _name;
-                }
+                //if (reason == Reason.LoadReload && nname != _name) {
+                //    return "Namen Inkonsistent: " + nname + " " + _name;
+                //}
 
                 var ok = Database?.Column.ChangeName(_name, nname) ?? false;
 
@@ -2246,7 +2223,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 }
 
                 _name = nname;
-                //Invalidate_TmpVariablesx();
                 break;
 
             case DatabaseDataType.ColumnCaption:
@@ -2394,10 +2370,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _afterEditAutoCorrect = newvalue.FromPlusMinus();
                 break;
 
-            //case DatabaseDataType.SaveContent:
-            //    _saveContent = newvalue.FromPlusMinus();
-            //    break;
-
             case DatabaseDataType.AutoRemoveCharAfterEdit:
                 _autoRemove = newvalue;
                 break;
@@ -2405,10 +2377,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             case DatabaseDataType.ColumnAdminInfo:
                 _adminInfo = newvalue;
                 break;
-
-            //case DatabaseDataType.ColumnTimeCode:
-            //    _timecode = newvalue;
-            //    break;
 
             case DatabaseDataType.ColumnContentWidth:
                 _contentwidth = IntParse(newvalue);
@@ -2466,10 +2434,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _cellInitValue = newvalue;
                 break;
 
-            //case DatabaseDataType.KeyColumnKey:
-            //    _keyColumnKey = LongParse(newvalue);
-            //    break;
-
             case DatabaseDataType.ColumnNameOfLinkedDatabase:
 
                 if (newvalue.IsFormat(FormatHolder.Integer)) {
@@ -2478,15 +2442,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                     _linkedCell_ColumnNameOfLinkedDatabase = newvalue;
                 }
 
-                //var l = LongParse(newvalue);
-                //if (l < 0) {
-                //    _linkedCell_ColumnNameOfLinkedDatabase = string.Empty;
-                //} else
-                //if (l > 0) {
-                //    _linkedCell_ColumnNameOfLinkedDatabase = Database?.Column.SearchByKey(l)?.Name ?? string.Empty;
-                //} else {
-                //    _linkedCell_ColumnNameOfLinkedDatabase = newvalue;
-                //}
                 break;
 
             case DatabaseDataType.SortType:
@@ -2496,10 +2451,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                     _sortType = (SortierTyp)LongParse(newvalue);
                 }
                 break;
-
-            //case DatabaseDataType.MakeSuggestionFromSameKeyColumn:
-            //    _vorschlagsColumn = LongParse(newvalue);
-            //    break;
 
             case DatabaseDataType.ColumnAlign:
                 var tmpalign = (AlignmentHorizontal)IntParse(newvalue);
@@ -2516,11 +2467,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         return string.Empty;
     }
 
-    //    foreach (int z1 in Enum.GetValues(t)) {
-    //        if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
-    //            l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString(), null, false, true, string.Empty));
-    //        }
-    //    }
     private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellChangedEventArgs e) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
@@ -2537,22 +2483,13 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    //    var t = typeof(EditTypeFormula);
     private void _TMP_LinkedDatabase_Disposing(object sender, System.EventArgs e) {
         Invalidate_LinkedDatabase();
         Database?.Dispose();
     }
 
-    //        case FormatHolder.PhoneNumber:
-    //            SetFormatForPhoneNumber();
-    //            break;
-    //internal EditTypeFormula CheckFormulaEditType(EditTypeFormula toCheck) {
-    //    if (UserEditDialogTypeInFormula(toCheck)) { return toCheck; }// Alles OK!
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
-    //        case FormatHolder.IntegerPositive:
-    //            SetFormatForIntegerPositive();
-    //            break;
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
@@ -2562,23 +2499,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             Invalidate_LinkedDatabase();
             Database = null;
 
-            //DropDownItems.Changed -= DropDownItems_ListOrItemChanged;
-            //DropDownItems?.Dispose();
-
-            //LinkedCellFilter.Changed -= LinkedCellFilters_ListOrItemChanged;
-            //LinkedCellFilter?.Dispose();
-
-            //Tags.Changed -= Tags_ListOrItemChanged;
-            //Tags?.Dispose();
-
-            //PermissionGroupsChangeCell.Changed -= PermissionGroups_ChangeCell_ListOrItemChanged;
-            //PermissionGroupsChangeCell?.Dispose();
-
-            //OpticalReplace.Changed -= OpticalReplacer_ListOrItemChanged;
-            //OpticalReplace?.Dispose();
-
-            //AfterEditAutoReplace.Changed -= AfterEdit_AutoReplace_ListOrItemChanged;
-            //AfterEditAutoReplace?.Dispose();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
             IsDisposed = true;
