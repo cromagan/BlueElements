@@ -93,7 +93,9 @@ public partial class PadEditorReadOnly : FormWithStatusBar {
                 }
             } else {
                 tabSeiten.Visible = false;
-                tabSeiten.TabPages.Clear();
+                if (tabSeiten.TabPages.Count > 0) {
+                    tabSeiten.TabPages.Clear();
+                }
             }
 
             tabSeiten.SelectedTab = later;

@@ -355,7 +355,7 @@ public abstract class SqlBackAbstract {
                 if (!t.IsObsolete()) {
                     string? ok;
                     if (k[1].Equals(DatabaseProperty, StringComparison.OrdinalIgnoreCase)) {
-                        ok = db.SetValueInternal(t, null, null, thisstyle.Value, Generic.UserName, DateTime.UtcNow, Reason.LoadReload).error;
+                        ok = db.SetValueInternal(t, null, null, thisstyle.Value, Generic.UserName, DateTime.UtcNow, Reason.InitialLoad).Error;
                     } else {
                         var column = db.Column.Exists(k[1]); // Exists, kann sein dass noch ein Eintrag in der SysSytle ist, aber die Spalte schon gelöscjht wurde
                         ok = column?.SetValueInternal(t, thisstyle.Value);
@@ -445,7 +445,7 @@ public abstract class SqlBackAbstract {
                 for (var z = 1; z < dt.Columns.Count; z++) {
                     var cx = db.Column.Exists(dt.Columns[z].ColumnName);
                     if (cx != null) {
-                        _ = db.Cell.SetValueInternal(cx, r, reader[z].ToString(), Reason.LoadReload);
+                        _ = db.Cell.SetValueInternal(cx, r, reader[z].ToString(), Reason.InitialLoad);
                     }
                 }
             }
@@ -466,6 +466,7 @@ public abstract class SqlBackAbstract {
             if (Connection == null) { return false; }
             if (Connection.State == ConnectionState.Closed) {
                 Connection.Open();
+                Develop.CheckStackForOverflow();
             }
 
             return Connection.State == ConnectionState.Open;
@@ -911,7 +912,7 @@ public abstract class SqlBackAbstract {
             var row = rows.SearchByKey(rk);
 
             if ((row == null || row.IsDisposed) && addmissingRows) {
-                _ = rows.ExecuteCommand(DatabaseDataType.Command_AddRow, rk, Reason.LoadReload);
+                _ = rows.ExecuteCommand(DatabaseDataType.Command_AddRow, rk, Reason.InitialLoad);
                 row = rows.SearchByKey(rk);
             }
 
@@ -919,7 +920,7 @@ public abstract class SqlBackAbstract {
 
             if (row != null && !row.IsDisposed) {
                 for (var z = 1; z < dt.Columns.Count; z++) {
-                    _ = db.Cell.SetValueInternal(columnsToLoad[z - 1], row, reader[z].ToString(), Reason.LoadReload);
+                    _ = db.Cell.SetValueInternal(columnsToLoad[z - 1], row, reader[z].ToString(), Reason.InitialLoad);
                 }
             }
         }

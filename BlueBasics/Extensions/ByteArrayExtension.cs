@@ -15,7 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
+using System;
 using System.Collections.Generic;
+using System.IO.Compression;
+using System.IO;
 using System.Text;
 
 namespace BlueBasics;
@@ -23,6 +28,8 @@ namespace BlueBasics;
 public static partial class Extensions {
 
     #region Methods
+
+    public static bool isZipped(this byte[] data) => data.Length > 4 && BitConverter.ToInt32(data, 0) == 67324752;
 
     public static string ToStringUtf8(this byte[] b) => Encoding.UTF8.GetString(b);
 
@@ -35,5 +42,51 @@ public static partial class Extensions {
         // var enc1252 = Encoding.GetEncoding(1252);
         Encoding.GetEncoding(1252).GetString(b);
 
+    public static byte[]? UnzipIt(this byte[] data) {
+        try {
+            using MemoryStream originalFileStream = new(data);
+            using ZipArchive zipArchive = new(originalFileStream);
+            var entry = zipArchive.GetEntry("Main.bin");
+            if (entry != null) {
+                using var stream = entry.Open();
+                using MemoryStream ms = new();
+                stream.CopyTo(ms);
+                return ms.ToArray();
+            }
+        } catch { }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Gibt die Bytes aus Main.bin zurück
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
+    public static byte[]? ZipIt(this byte[] data) {
+        try {
+            // https://stackoverflow.com/questions/17217077/create-zip-file-from-byte
+            using MemoryStream compressedFileStream = new();
+            // Create an archive and store the stream in memory.
+            using (ZipArchive zipArchive = new(compressedFileStream, ZipArchiveMode.Create, false)) {
+                // Create a zip entry for each attachment
+                var zipEntry = zipArchive.CreateEntry("Main.bin");
+                // Get the stream of the attachment
+                using MemoryStream originalFileStream = new(data);
+                using var zipEntryStream = zipEntry.Open();
+                // Copy the attachment stream to the zip entry stream
+                originalFileStream.CopyTo(zipEntryStream);
+            }
+            return compressedFileStream.ToArray();
+        } catch { }
+        return null;
+    }
+
     #endregion
+
+    /// <summary>
+    /// Schreibt die Daten nach Main.bin
+    /// </summary>
+    /// <param name="data"></param>
+    /// <returns></returns>
 }

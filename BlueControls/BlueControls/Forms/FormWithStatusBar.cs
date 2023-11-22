@@ -31,9 +31,9 @@ public partial class FormWithStatusBar : Form {
     #region Fields
 
     /// <summary>
-    /// FormManager kennt manache Forms gar nicht, z.b. Splash Screen. Deswegen eigene Collection
+    /// FormManager kennt manche Forms gar nicht, z.b. Splash Screen. Deswegen eigene Collection
     /// </summary>
-    public static List<FormWithStatusBar> Forms = new();
+    private static readonly List<FormWithStatusBar> _formsWithStatusBar = new();
 
     private DateTime _lastMessage = DateTime.UtcNow;
 
@@ -43,7 +43,7 @@ public partial class FormWithStatusBar : Form {
 
     public FormWithStatusBar() : base() {
         InitializeComponent();
-        Forms.Add(this);
+        _formsWithStatusBar.AddIfNotExists(this);
     }
 
     #endregion
@@ -73,8 +73,8 @@ public partial class FormWithStatusBar : Form {
 
         var did = false;
         try {
-            foreach (var thisf in Forms) {
-                if (thisf is FormWithStatusBar fd) {
+            foreach (var thisf in _formsWithStatusBar) {
+                if (thisf is FormWithStatusBar fd && fd.Visible && !fd.InvokeRequired) {
                     var x = fd.UpdateStatus(type, text, did);
                     if (x) { did = true; }
                 }
@@ -136,7 +136,7 @@ public partial class FormWithStatusBar : Form {
     internal static void GotMessageDropMessage(object sender, MessageEventArgs e) => UpdateStatusBar(e.Type, e.Message, true);
 
     protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e) {
-        Forms.Remove(this);
+        _formsWithStatusBar.Remove(this);
         base.OnFormClosed(e);
     }
 
@@ -150,6 +150,7 @@ public partial class FormWithStatusBar : Form {
             timMessageClearer.Enabled = false;
             return;
         }
+        if (capStatusBar.InvokeRequired) { return; }
 
         if (DateTime.UtcNow.Subtract(_lastMessage).TotalSeconds >= MessageSeconds) {
             timMessageClearer.Enabled = false;

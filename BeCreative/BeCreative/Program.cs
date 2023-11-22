@@ -18,10 +18,8 @@ namespace BeCreative {
 
             Develop.StartService();
             Generic.UserGroup = Constants.Administrator;
-            FormManager.NewModeSelectionForm = Start.NewForm;
             FormManager.ExecuteAtEnd = Start.Ende;
-            FormManager.StartForm = new Start();
-            Application.Run(FormManager.Current);
+            Application.Run(FormManager.Starter(typeof(Start), typeof(Start)));
             //Application.Run(new Start());
             //BlueBasics.Develop.TraceLogging_End();
         }

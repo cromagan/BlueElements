@@ -218,20 +218,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
     }
 
-    public static byte[] UnzipIt(byte[] data) {
-        using MemoryStream originalFileStream = new(data);
-        using ZipArchive zipArchive = new(originalFileStream);
-        var entry = zipArchive.GetEntry("Main.bin");
-        if (entry != null) {
-            using var stream = entry.Open();
-            using MemoryStream ms = new();
-            stream.CopyTo(ms);
-            return ms.ToArray();
-        }
-
-        return Array.Empty<byte>();
-    }
-
     // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
@@ -549,22 +535,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         return true;
     }
 
-    //private static byte[] ZipIt(byte[] data) {
-    //    // https://stackoverflow.com/questions/17217077/create-zip-file-from-byte
-    //    using MemoryStream compressedFileStream = new();
-    //    // Create an archive and store the stream in memory.
-    //    using (ZipArchive zipArchive = new(compressedFileStream, ZipArchiveMode.Create, false)) {
-    //        // Create a zip entry for each attachment
-    //        var zipEntry = zipArchive.CreateEntry("Main.bin");
-    //        // Get the stream of the attachment
-    //        using MemoryStream originalFileStream = new(data);
-    //        using var zipEntryStream = zipEntry.Open();
-    //        // Copy the attachment stream to the zip entry stream
-    //        originalFileStream.CopyTo(zipEntryStream);
-    //    }
-    //    return compressedFileStream.ToArray();
-    //}
-
     private string Backupdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 
     private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
@@ -705,9 +675,9 @@ public sealed class MultiUserFile : IDisposableExtended {
             }
         }
 
-        if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
+        if (bLoaded.isZipped()) {
             // Gezipte Daten-Kennung gefunden
-            var tmp = UnzipIt(bLoaded);
+            var tmp = bLoaded.UnzipIt();
 
             if (tmp is byte[] bok) { bLoaded = bok; }
         }

@@ -619,7 +619,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (type == DatabaseDataType.Command_AddRow) {
             var row = SearchByKey(rowkey);
-            if (row != null && !row.IsDisposed) { return "Bereits vorhanden!"; }
+            if (row != null && !row.IsDisposed) { return "Zeile " + rowkey+ " bereits vorhanden!"; }
 
             var c = new RowItem(db, rowkey);
             var f = Add(c, reason);

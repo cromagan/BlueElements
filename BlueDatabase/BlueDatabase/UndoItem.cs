@@ -102,7 +102,7 @@ public class UndoItem : IParseable {
                 return true;
 
             case "rk":
-                RowKey = value;
+                RowKey = value.FromNonCritical(); // Schlüssel könnten + Zeichen enthalten
                 return true;
 
             case "cell":

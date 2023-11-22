@@ -15,11 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+
 namespace BlueDatabase.Enums;
 
 public enum Reason {
     SetCommand = 0,
-    LoadReload = 1,
+    InitialLoad = 1,
     SystemSet = 1, // Ebenfalls ein, soll sehr sanft behandelt werden.
-    AdditionalWorkAfterComand = 2
+    UpdateChanges = 2,
+    AdditionalWorkAfterComand = 3
 }

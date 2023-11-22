@@ -456,7 +456,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
                 foreach (var thisCol in columnsToLoad) {
                     var column = Column.Exists(thisCol);
                     if (column == null || column.IsDisposed) {
-                        _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, thisCol, Reason.LoadReload);
+                        _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, thisCol, Reason.InitialLoad);
                         column = Column.Exists(thisCol);
 
                         if (column == null || column.IsDisposed) {
@@ -482,7 +482,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             //#endregion
 
-            RepairColumnArrangements(Reason.LoadReload);
+            RepairColumnArrangements(Reason.InitialLoad);
 
             #region Alle ZEILENKEYS laden
 

@@ -52,10 +52,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.GroupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // capStatusBar
-            // 
-            this.capStatusBar.Size = new System.Drawing.Size(731, 24);
-            // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Location = new System.Drawing.Point(0, 302);

@@ -70,7 +70,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         Database.DisposingEvent += Database_DisposingEvent;
         Database.CanDoScript += Database_CanDoScript;
 
-        FormManager.Current.RegisterForm(this);
+        FormManager.RegisterForm(this);
     }
 
     #endregion

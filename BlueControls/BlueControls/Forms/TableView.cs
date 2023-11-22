@@ -59,7 +59,7 @@ public partial class TableView : FormWithStatusBar {
 
     public TableView() : this(null, true, true) { }
 
-    public TableView(DatabaseAbstract? database, bool loadTabVisible, bool adminTabVisible) {
+    public TableView(DatabaseAbstract? database, bool loadTabVisible, bool adminTabVisible) : base() {
         InitializeComponent();
 
         if (!adminTabVisible) {

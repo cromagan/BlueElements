@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using BlueBasics;
 
@@ -30,38 +31,16 @@ public class FormManager : ApplicationContext {
 
     #region Fields
 
+    public static Type? _lastWindow;
     public static dExecuteAtEnd? ExecuteAtEnd = null;
-    public static bool First = true;
-    public static bool FirstWindowShown;
-    public static dNewModeSelectionForm? NewModeSelectionForm = null;
-    public static Form? StartForm;
 
-    //I'm using Lazy here, because an exception is thrown if any Forms have been
-    //created before calling Application.SetCompatibleTextRenderingDefault(false)
-    //in the Program class
-    private static readonly Lazy<FormManager> _current = new();
+    //public static dNewModeSelectionForm? NewModeSelectionForm = null;
 
-    private static readonly List<Form> Forms = new();
+    private static readonly List<Form> _forms = new();
+
+    private static FormManager? _current;
+
     private Form? _lastStartForm;
-
-    #endregion
-
-    #region Constructors
-
-    //Startup forms should be created and shown in the constructor
-    public FormManager() {
-        if (!First || StartForm == null) { return; }
-        First = false;
-
-        _lastStartForm = StartForm;
-        StartForm.Show();
-        RegisterForm(StartForm);
-        StartForm.BringToFront();
-
-        StartForm = null;
-
-        FirstWindowShown = true;
-    }
 
     #endregion
 
@@ -69,17 +48,49 @@ public class FormManager : ApplicationContext {
 
     public delegate void dExecuteAtEnd();
 
-    public delegate Form? dNewModeSelectionForm();
-
     #endregion
 
     #region Properties
 
-    public static FormManager Current => _current.Value;
+    public static bool Running { get; private set; }
 
     #endregion
 
+    //public delegate Form? dNewModeSelectionForm();
+
     #region Methods
+
+    public static void RegisterForm(Form frm) {
+        if (_current == null) {
+            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "FormManager nicht gestartert!");
+            return;
+        }
+        _current.RegisterFormInternal(frm);
+    }
+
+    //public static List<T> GetInstaceOfType<T>(params object[] constructorArgs) where T : class {
+    //    List<T> l = new();
+    //    foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+    //        try {
+    //            foreach (var thist in thisas.GetTypes()) {
+    //                if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
+    //                    l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+    //                }
+    //            }
+    //        } catch { }
+    //    }
+    //    return l;
+    //}
+    public static FormManager Starter(Type startform, Type? lastWindow) {
+        if (_current != null) { Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Doppelter Start"); }
+
+        var tmp = new FormManager(); // temporär! Weil ansonsten startet true gilt und bei initialisieren der Fenster unerwartete Effekte auftreten können
+        _lastWindow = lastWindow;
+        Running = true;
+        tmp._lastStartForm = CreateForm(startform, tmp);
+        _current = tmp;
+        return _current;
+    }
 
     //Any form which might be the last open form in the application should be created with this
     public T CreateForm<T>() where T : Form, new() {
@@ -88,28 +99,32 @@ public class FormManager : ApplicationContext {
         return ret;
     }
 
-    public void RegisterForm(Form frm) {
-        if (Forms.Contains(frm)) { return; }
+    private static Form? CreateForm(Type? frm, FormManager? fm) {
+        if (fm == null || frm == null) { return null; }
 
-        frm.FormClosed += onFormClosed;
-        Forms.Add(frm);
+        var f = Activator.CreateInstance(frm);
+
+        if (f is Form fr) {
+            fr.Show();
+            fr.BringToFront();
+
+            fm.RegisterFormInternal(fr);
+            return fr;
+        }
+
+        return null;
     }
 
     //When each form closes, close the application if no other open forms
     private void onFormClosed(object sender, System.EventArgs e) {
-        _ = Forms.Remove((Form)sender);
-        if (FirstWindowShown && !Forms.Any()) {
+        _ = _forms.Remove((Form)sender);
+        if (!_forms.Any()) {
             if (sender != _lastStartForm) {
-                // Delegate muss auf null geprüt werden!
-                _lastStartForm = NewModeSelectionForm?.Invoke();
-
-                if (_lastStartForm != null) {
-                    Current.RegisterForm(_lastStartForm);
-                    _lastStartForm.Show();
-                    return;
-                }
+                _lastStartForm = CreateForm(_lastWindow, _current);
+                if (_lastStartForm != null) { return; }
             }
 
+            Running = false;
             ExecuteAtEnd?.Invoke();
 
             var a = BlueDatabase.Database.AllFiles.Clone();
@@ -123,6 +138,13 @@ public class FormManager : ApplicationContext {
             ExitThread();
             Develop.AbortExe();
         }
+    }
+
+    private void RegisterFormInternal(Form frm) {
+        if (_forms.Contains(frm)) { return; }
+
+        frm.FormClosed += onFormClosed;
+        _forms.Add(frm);
     }
 
     #endregion

@@ -66,7 +66,7 @@ public class ConnectionInfo : IReadableTextWithKey {
 
             TableName = MakeValidTableName(uniqueId.FileNameWithoutSuffix());
             Provider = null;
-            DatabaseId = preveredFileFormatId ?? Database.DatabaseId;
+            DatabaseId = preveredFileFormatId ?? DatabaseMU.DatabaseId;
             AdditionalData = uniqueId;
             MustBeFreezed = mustbefreezed;
 

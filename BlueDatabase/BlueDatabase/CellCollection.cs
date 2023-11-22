@@ -24,6 +24,7 @@ using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -566,6 +567,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = LinkedCellData(column, row, true, !string.IsNullOrEmpty(value));
+
+            //return db.ChangeData(DatabaseDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
             lrow?.CellSet(lcolumn, value);
             return string.Empty;
         }
@@ -652,9 +655,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             }
         }
 
-        column.Invalidate_ContentWidth();
-        row.InvalidateCheckData();
-        OnCellValueChanged(new CellChangedEventArgs(column, row, reason));
+        if (reason is Reason.SetCommand or Reason.UpdateChanges) {
+            column.Invalidate_ContentWidth();
+            row.InvalidateCheckData();
+            OnCellValueChanged(new CellChangedEventArgs(column, row, reason));
+        }
 
         return string.Empty;
     }
@@ -879,12 +884,20 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         #region Subroutine Ergebnis
 
         (ColumnItem? column, RowItem? row, string info, bool canrepair) Ergebnis(string fehler) {
-            if (targetColumn != null && targetRow != null && string.IsNullOrEmpty(fehler) && row != null && db != null) {
-                row.CellSet(column, targetRow.KeyName); //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
-                return (targetColumn, targetRow, fehler, cr);
-            }
+            if (db != null && column != null && row != null) {
+                var oldvalue = db.Cell.GetStringCore(column, row);
+                var newvalue = targetRow?.KeyName ?? string.Empty;
+                if (targetColumn == null || !string.IsNullOrEmpty(fehler)) { newvalue = string.Empty; }
+                //Nicht CellSet! Damit wird der Wert der Ziel-Datenbank verändert
+                //row.CellSet(column, targetRow.KeyName);
+                //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
-            if (string.IsNullOrEmpty(editableError) && row != null && db != null) { row.CellSet(column, string.Empty); }
+                if (oldvalue != newvalue) {
+                    fehler = db.ChangeData(DatabaseDataType.Value_withoutSizeData, column, row, oldvalue, newvalue, UserName, DateTime.UtcNow, string.Empty);
+                }
+            } else {
+                if (string.IsNullOrEmpty(fehler)) { fehler = "Datenbankfehler"; }
+            }
             return (targetColumn, targetRow, fehler, cr);
         }
 

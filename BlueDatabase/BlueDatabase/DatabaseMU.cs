@@ -33,7 +33,7 @@ namespace BlueDatabase;
 
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-internal class DatabaseMU : Database {
+public class DatabaseMU : Database {
 
     #region Fields
 
@@ -48,6 +48,8 @@ internal class DatabaseMU : Database {
     public DatabaseMU(string filename, bool readOnly, string freezedReason, bool create, NeedPassword? needPassword) : base(filename, readOnly, freezedReason, create, needPassword) {
         //IsInCache = FileStateUTCDate;
 
+        Directory.CreateDirectory(FragmengtsPath());
+        Directory.CreateDirectory(OldFragmengtsPath());
         CheckSysUndoNow();
         StartWriter();
     }
@@ -55,6 +57,8 @@ internal class DatabaseMU : Database {
     public DatabaseMU(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : base(ci, readOnly, needPassword) {
         //IsInCache = FileStateUTCDate;
 
+        Directory.CreateDirectory(FragmengtsPath());
+        Directory.CreateDirectory(OldFragmengtsPath());
         CheckSysUndoNow();
         StartWriter();
     }
@@ -75,7 +79,7 @@ internal class DatabaseMU : Database {
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
         if (ci.AdditionalData.FileSuffix().ToUpper() is not "MBDB") { return null; }
         if (!FileExists(ci.AdditionalData)) { return null; }
-        return new Database(ci, readOnly, needPassword);
+        return new DatabaseMU(ci, readOnly, needPassword);
     }
 
     public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, string mustBeFreezed) {
@@ -121,7 +125,7 @@ internal class DatabaseMU : Database {
 
             #region Alle Fragment-Dateien im Verzeichniss ermitteln und eigene Ausfiltern (frgma)
 
-            var frgma = Directory.GetFiles(Filename.FilePath(), "*." + SuffixOfFragments(), SearchOption.AllDirectories).ToList();
+            var frgma = Directory.GetFiles(FragmengtsPath(), "*." + SuffixOfFragments(), SearchOption.TopDirectoryOnly).ToList();
 
             if (!frgma.Contains(_myFragmentsFilename) && !string.IsNullOrEmpty(_myFragmentsFilename)) { return null; }
 
@@ -149,7 +153,11 @@ internal class DatabaseMU : Database {
             var l = new List<UndoItem>();
 
             foreach (var thisf in frgm) {
-                var fil = File.ReadAllText(thisf, System.Text.Encoding.UTF8);
+                var reader = new StreamReader(new FileStream(thisf, FileMode.Open, FileAccess.Read, FileShare.ReadWrite), System.Text.Encoding.UTF8);
+                var fil = reader.ReadToEnd();
+                reader.Close();
+
+                //var fil = File.ReadAllText(thisf, System.Text.Encoding.UTF8);
                 var fils = fil.SplitAndCutByCrToList();
 
                 foreach (var thist in fils) {
@@ -206,7 +214,7 @@ internal class DatabaseMU : Database {
     }
 
     protected override void DoWorkAfterLastChanges(List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
-        if (_changesCount.Count() < 50) { return; }
+        if (_changesNotIncluded.Count() < 50) { return; }
         if (!AmITemporaryMaster(false)) { return; }
 
         if (!Directory.Exists(OldFragmengtsPath())) { return; }
@@ -215,7 +223,7 @@ internal class DatabaseMU : Database {
 
         var allfiles = new List<string>();
 
-        foreach (var thisch in _changesCount) {
+        foreach (var thisch in _changesNotIncluded) {
             allfiles.AddIfNotExists(thisch.Container);
         }
 
@@ -223,7 +231,7 @@ internal class DatabaseMU : Database {
 
         #region Dateien, mit jungen Ändeurngen wieder entfernen, damit ander Datenbanken noch zugriff haben
 
-        foreach (var thisch in _changesCount) {
+        foreach (var thisch in _changesNotIncluded) {
             if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalMinutes < 10) {
                 allfiles.Remove(thisch.Container);
             }
@@ -231,7 +239,9 @@ internal class DatabaseMU : Database {
 
         #endregion
 
-        if (allfiles.Count < 10) { return; }
+        if (allfiles.Count < 10 && _changesNotIncluded.Count() < 300) { return; }
+
+        if (allfiles.Count < 2) { return; }
 
         var tmp = _fileStateUTCDate;
 
@@ -244,7 +254,7 @@ internal class DatabaseMU : Database {
         }
 
         OnInvalidateView();
-        _changesCount.Clear();
+        _changesNotIncluded.Clear();
 
         var pf = OldFragmengtsPath();
 
@@ -299,13 +309,11 @@ internal class DatabaseMU : Database {
 
         _myFragmentsFilename = TempFile(FragmengtsPath(), TableName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString(Constants.Format_Date4, CultureInfo.InvariantCulture), SuffixOfFragments());
 
-        _writer = new StreamWriter(new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read));
+        _writer = new StreamWriter(new FileStream(_myFragmentsFilename, FileMode.Append, FileAccess.Write, FileShare.Read), System.Text.Encoding.UTF8);
 
         _writer.AutoFlush = true;
         _writer.WriteLine("- DB " + DatabaseVersion);
         _writer.WriteLine("- User " + UserName);
-
-        Directory.CreateDirectory(OldFragmengtsPath());
     }
 
     #endregion

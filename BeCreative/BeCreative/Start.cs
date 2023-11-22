@@ -60,10 +60,6 @@ namespace BeCreative {
             TraceLogging_End();
         }
 
-        internal static System.Windows.Forms.Form NewForm() {
-            return new Start();
-        }
-
         private void btnBildEditor_Click(object sender, EventArgs e) {
             DoForm(new MainWindow(true));
         }
@@ -89,7 +85,7 @@ namespace BeCreative {
         }
 
         private void DoForm(System.Windows.Forms.Form frm) {
-            FormManager.Current.RegisterForm(frm);
+            FormManager.RegisterForm(frm);
             frm.Show();
             Close();
             frm.BringToFront();

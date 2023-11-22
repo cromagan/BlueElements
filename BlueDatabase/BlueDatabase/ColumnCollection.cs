@@ -516,7 +516,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         if (type == DatabaseDataType.Command_AddColumnByName) {
             var c = Exists(name);
-            if (c != null && !c.IsDisposed) { return "Bereits vorhanden!"; }
+            if (c != null && !c.IsDisposed) { return "Spalte " + name +" bereits vorhanden!"; }
 
             c = new ColumnItem(Database, name);
             var f = Add(c, reason);
@@ -526,7 +526,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
 
-            if (reason != Reason.LoadReload) {
+            if (reason is not Reason.InitialLoad and not Reason.UpdateChanges) {
                 // Wichtig! NICHT bei LoadReload - da werden ja noch weitere Spalten erstellt
                 Database.RepairColumnArrangements(reason);
             }
@@ -542,7 +542,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (!_internal.TryRemove(name.ToUpper(), out _)) { return "Löschen nicht erfolgreich"; }
             OnColumnRemoved();
 
-            if (reason != Reason.LoadReload) {
+            if (reason is not Reason.InitialLoad and not Reason.UpdateChanges) {
                 // Wichtig! Nicht bei LoadReload, da werden evtl. noch weitere Spalten modifiziert
 
                 Database.RepairColumnArrangements(reason);

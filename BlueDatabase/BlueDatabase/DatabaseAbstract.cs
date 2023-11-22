@@ -76,7 +76,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     /// <summary>
     ///  So viele Änderungen sind seit dem letzten Speichern auf der Festplatte gezählt worden
     /// </summary>
-    protected readonly List<UndoItem> _changesCount = new();
+    protected readonly List<UndoItem> _changesNotIncluded = new();
 
     protected DateTime _fileStateUTCDate;
     private static bool _isInTimer;
@@ -871,7 +871,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         }
 
         var f = SetValueInternal(command, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
-        if (!string.IsNullOrEmpty(f.error)) { return f.error; }
+        if (!string.IsNullOrEmpty(f.Error)) { return f.Error; }
 
         if (LogUndo) {
             AddUndo(command, column, row, previousValue, changedTo, user, datetimeutc, comment);
@@ -1877,9 +1877,9 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     /// <param name="row"></param>
     /// <param name="reason"></param>
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
-    public (string error, ColumnItem? columnchanged, RowItem? rowchanged) SetValueInternal(DatabaseDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
+    public (string Error, ColumnItem? Columnchanged, RowItem? Rowchanged) SetValueInternal(DatabaseDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
         if (IsDisposed) { return ("Datenbank verworfen!", null, null); }
-        if (reason != Reason.LoadReload && !string.IsNullOrEmpty(FreezedReason)) { return ("Datenbank eingefroren: " + FreezedReason, null, null); }
+        if ((reason is not Reason.InitialLoad and not Reason.UpdateChanges) && !string.IsNullOrEmpty(FreezedReason)) { return ("Datenbank eingefroren: " + FreezedReason, null, null); }
         if (type.IsObsolete()) { return (string.Empty, null, null); }
 
         LastChange = DateTime.UtcNow;
@@ -2133,7 +2133,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     //    if (!isLoading) { Variables = new VariableCollection(_variables); }
     //}
     internal void RefreshCellData(ColumnItem column, RowItem row, Reason reason) {
-        if (reason is Reason.LoadReload or Reason.AdditionalWorkAfterComand) { return; }
+        if (reason is Reason.InitialLoad or Reason.UpdateChanges or Reason.AdditionalWorkAfterComand) { return; }
 
         if (column.IsInCache != null || row.IsInCache != null) { return; }
 
@@ -2157,8 +2157,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             ColumnViewCollection.Repair(x[z], z);
         }
 
-        if (reason is Reason.LoadReload or Reason.AdditionalWorkAfterComand) {
-            SetValueInternal(DatabaseDataType.ColumnArrangement, null, null, x.ToString(false), UserName, DateTime.UtcNow, Reason.LoadReload);
+        if (reason is Reason.InitialLoad or Reason.UpdateChanges or Reason.AdditionalWorkAfterComand) {
+            SetValueInternal(DatabaseDataType.ColumnArrangement, null, null, x.ToString(false), UserName, DateTime.UtcNow, reason);
         } else {
             ColumnArrangements = x.AsReadOnly();
         }
@@ -2234,20 +2234,20 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             foreach (var thisWork in data) {
                 if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
                     Undo.Add(thisWork);
-                    _changesCount.Add(thisWork);
+                    _changesNotIncluded.Add(thisWork);
 
                     var c = Column.Exists(thisWork.ColName);
                     var r = Row.SearchByKey(thisWork.RowKey);
-                    var erg = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.LoadReload);
+                    var erg = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.UpdateChanges);
 
-                    if (!string.IsNullOrEmpty(erg.error)) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + erg.error);
+                    if (!string.IsNullOrEmpty(erg.Error)) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + erg.Error + " / " + TableName);
                         return;
                     }
 
-                    if (c == null && erg.columnchanged != null) { columnsAdded.AddIfNotExists(erg.columnchanged); }
-                    if (r == null && erg.rowchanged != null) { rowsAdded.AddIfNotExists(erg.rowchanged); }
-                    if (erg.rowchanged != null && erg.columnchanged != null) { cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
+                    if (c == null && erg.Columnchanged != null) { columnsAdded.AddIfNotExists(erg.Columnchanged); }
+                    if (r == null && erg.Rowchanged != null) { rowsAdded.AddIfNotExists(erg.Rowchanged); }
+                    if (erg.Rowchanged != null && erg.Columnchanged != null) { cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
                 }
             }
 

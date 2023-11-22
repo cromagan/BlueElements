@@ -45,7 +45,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
         Formula = formula;
         //Formula.DisposingEvent += Database_DisposingEvent;
 
-        FormManager.Current.RegisterForm(this);
+        FormManager.RegisterForm(this);
     }
 
     #endregion

@@ -486,7 +486,7 @@ public class Database : DatabaseAbstract {
                 if (!string.IsNullOrEmpty(rowKey)) {
                     row = Row.SearchByKey(rowKey);
                     if (row == null || row.IsDisposed) {
-                        _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.LoadReload);
+                        _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.InitialLoad);
                         row = Row.SearchByKey(rowKey);
                     }
                     if (row == null || row.IsDisposed) {
@@ -521,7 +521,7 @@ public class Database : DatabaseAbstract {
                     column = Column.Exists(columname);
                     if (column == null || column.IsDisposed) {
                         if (command != DatabaseDataType.ColumnName) { Develop.DebugPrint(command + " an erster Stelle!"); }
-                        _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.LoadReload);
+                        _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.InitialLoad);
                         column = Column.Exists(columname);
                     }
                     if (column == null || column.IsDisposed) {
@@ -551,8 +551,8 @@ public class Database : DatabaseAbstract {
 
                 if (command == DatabaseDataType.EOF) { break; }
 
-                var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.LoadReload);
-                if (!string.IsNullOrEmpty(fehler.error)) {
+                var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.InitialLoad);
+                if (!string.IsNullOrEmpty(fehler.Error)) {
                     Freeze("Datenbank-Ladefehler");
                     Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + fehler);
                 }
@@ -568,7 +568,7 @@ public class Database : DatabaseAbstract {
 
         foreach (var thisColumn in l) {
             if (!columnUsed.Contains(thisColumn)) {
-                _ = Column.ExecuteCommand(DatabaseDataType.Command_RemoveColumn, column.KeyName, Reason.LoadReload);
+                _ = Column.ExecuteCommand(DatabaseDataType.Command_RemoveColumn, column.KeyName, Reason.InitialLoad);
                 //_ = SetValueInternal(DatabaseDataType.Command_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload, UserName, DateTime.UtcNow, "Parsen");
             }
         }
@@ -965,13 +965,16 @@ public class Database : DatabaseAbstract {
     /// <returns></returns>
     private byte[]? LoadBytesFromDisk(EditableErrorReasonType checkmode) {
         var startTime = DateTime.UtcNow;
-        byte[] bLoaded;
+        byte[]? bLoaded;
         while (true) {
             try {
                 var f = EditableErrorReason(checkmode);
                 if (string.IsNullOrEmpty(f)) {
                     //var tmpLastSaveCode1 = GetFileInfo(Filename, true);
                     bLoaded = File.ReadAllBytes(Filename);
+
+                    if (bLoaded.isZipped()) { bLoaded = bLoaded.UnzipIt(); }
+
                     //tmpLastSaveCode2 = GetFileInfo(Filename, true);
                     //if (tmpLastSaveCode1 == tmpLastSaveCode2) { break; }
                     //f = "Datei wurde während des Ladens verändert.";
@@ -994,7 +997,7 @@ public class Database : DatabaseAbstract {
 
         if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
             // Gezipte Daten-Kennung gefunden
-            bLoaded = MultiUserFile.UnzipIt(bLoaded);
+            bLoaded = bLoaded.UnzipIt();
         }
         return bLoaded;
     }
@@ -1007,10 +1010,12 @@ public class Database : DatabaseAbstract {
 
         if (dataUncompressed == null) { return string.Empty; }
 
+        var datacompressed = dataUncompressed.ZipIt();
+
         var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpper());
 
         using FileStream x = new(tmpFileName, FileMode.Create, FileAccess.Write, FileShare.None);
-        x.Write(dataUncompressed, 0, dataUncompressed.Length);
+        x.Write(datacompressed, 0, datacompressed.Length);
         x.Flush();
         x.Close();
 
