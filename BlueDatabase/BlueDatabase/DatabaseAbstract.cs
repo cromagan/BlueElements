@@ -517,15 +517,16 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             foreach (var thisDb in AllFiles) {
                 if (!done.Contains(thisDb)) {
+                    thisDb.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Überprüfe auf Veränderungen von '" + thisDb.GetType().Name + "'");
                     var db = thisDb.LoadedDatabasesWithSameServer();
                     done.AddRange(db);
                     done.Add(thisDb);
 
                     var erg = thisDb.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
-                    if (erg == null) { _isInTimer = false; return; } // Später ein neuer Versuch
+                    if (erg.Changes == null) { _isInTimer = false; return; } // Später ein neuer Versuch
 
                     foreach (var thisdb in db) {
-                        thisdb.DoLastChanges(erg, fd);
+                        thisdb.DoLastChanges(erg.Files, erg.Changes, fd);
                         thisdb.TryToSetMeTemporaryMaster();
                     }
                 }
@@ -835,6 +836,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     public bool AmITemporaryMaster(bool checkUpcomingTo) {
         if (ReadOnly) { return false; }
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return false; }
         if (TemporaryDatabaseMasterUser != UserName + "-" + Environment.MachineName) { return false; }
 
         var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
@@ -1412,7 +1414,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         return r;
     }
 
-    public abstract List<UndoItem>? GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC);
+    public abstract (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC);
 
     public string GetLayout(string ca) {
         if (FileExists(ca)) { return ca; }
@@ -1445,7 +1447,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         var undos = GetLastChanges(new List<DatabaseAbstract> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1));
 
         Undo.Clear();
-        Undo.AddRange(undos);
+        Undo.AddRange(undos.Changes);
 
         UndoLoaded = true;
     }
@@ -1936,6 +1938,9 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     var thisRow = Row.SearchByKey(value);
                     return (string.Empty, null, thisRow);
 
+                case DatabaseDataType.Command_DummyForFileDeletion:
+                    return (string.Empty, null, null);
+
                 default:
                     if (LoadedVersion == DatabaseVersion) {
                         Freeze("Ladefehler der Datenbank");
@@ -2214,7 +2219,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         OnDisposed();
     }
 
-    protected void DoLastChanges(List<UndoItem>? data, DateTime toUTC) {
+    protected void DoLastChanges(List<string>? files, List<UndoItem>? data, DateTime toUTC) {
         if (data == null) { return; }
         if (IsDisposed) { return; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
@@ -2230,6 +2235,15 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             List<ColumnItem> columnsAdded = new();
             List<RowItem> rowsAdded = new();
             List<string> cellschanged = new();
+            List<string> myfiles = new();
+
+            if (files != null) {
+                foreach (var thisf in files) {
+                    if (thisf.Contains("\\" + TableName.ToUpper() + "-")) {
+                        myfiles.AddIfNotExists(thisf);
+                    }
+                }
+            }
 
             foreach (var thisWork in data) {
                 if (TableName == thisWork.TableName && thisWork.DateTimeUtc > IsInCache) {
@@ -2252,15 +2266,15 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             }
 
             IsInCache = toUTC;
-            DoWorkAfterLastChanges(columnsAdded, rowsAdded, cellschanged);
+            DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, cellschanged);
             OnInvalidateView();
         } catch {
             Develop.CheckStackForOverflow();
-            DoLastChanges(data, toUTC);
+            DoLastChanges(files, data, toUTC);
         }
     }
 
-    protected abstract void DoWorkAfterLastChanges(List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged);
+    protected abstract void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged);
 
     protected void GenerateTimer() {
         if (_pendingChangesTimer != null) { return; }
@@ -2318,6 +2332,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
 
         if (DateTime.UtcNow.Subtract(d).TotalMinutes < 60 && !string.IsNullOrEmpty(TemporaryDatabaseMasterUser)) { return; }
+
+        if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return; }
 
         TemporaryDatabaseMasterUser = UserName + "-" + Environment.MachineName;
         TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString(Format_Date5, CultureInfo.InvariantCulture);

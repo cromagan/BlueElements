@@ -352,6 +352,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public void DoSystemColumns(DatabaseAbstract db, ColumnItem column, RowItem row, string user, DateTime datetimeutc, Reason reason) {
+
+        if(reason == Reason.InitialLoad) { return; }
+
         // Die unterschiedlichen Reasons in der Routine beachten!
         if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueInternal(src, row, user, Reason.SystemSet); }
         if (db.Column.SysRowChangeDate is ColumnItem scd && scd != column) { SetValueInternal(scd, row, datetimeutc.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), Reason.SystemSet); }

@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -39,7 +40,6 @@ public class DatabaseMU : Database {
 
     private string _myFragmentsFilename = string.Empty;
     private StreamWriter? _writer;
-    private bool _written = false;
 
     #endregion
 
@@ -50,8 +50,9 @@ public class DatabaseMU : Database {
 
         Directory.CreateDirectory(FragmengtsPath());
         Directory.CreateDirectory(OldFragmengtsPath());
-        CheckSysUndoNow();
-        StartWriter();
+        _timerTimeStamp = DateTime.UtcNow.AddSeconds(-170);
+        //CheckSysUndoNow();
+        //StartWriter();
     }
 
     public DatabaseMU(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : base(ci, readOnly, needPassword) {
@@ -59,8 +60,9 @@ public class DatabaseMU : Database {
 
         Directory.CreateDirectory(FragmengtsPath());
         Directory.CreateDirectory(OldFragmengtsPath());
-        CheckSysUndoNow();
-        StartWriter();
+        _timerTimeStamp = DateTime.UtcNow.AddSeconds(-170);
+        //CheckSysUndoNow();
+        //StartWriter();
     }
 
     #endregion
@@ -107,7 +109,7 @@ public class DatabaseMU : Database {
         return Filename.FilePath() + "Frgm\\";
     }
 
-    public override List<UndoItem>? GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) {
+    public override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) {
         if (string.IsNullOrEmpty(FragmengtsPath())) { return new(); }
 
         if (db.Count() == 0) { return new(); }
@@ -127,13 +129,13 @@ public class DatabaseMU : Database {
 
             var frgma = Directory.GetFiles(FragmengtsPath(), "*." + SuffixOfFragments(), SearchOption.TopDirectoryOnly).ToList();
 
-            if (!frgma.Contains(_myFragmentsFilename) && !string.IsNullOrEmpty(_myFragmentsFilename)) { return null; }
+            if (!frgma.Contains(_myFragmentsFilename) && !string.IsNullOrEmpty(_myFragmentsFilename)) { return (null, null); }
 
             frgma.Remove(_myFragmentsFilename);
 
             #endregion
 
-            #region Alle Fragments ermitteln, wo die Datenbank aktuell im Speicher ist (frgm)
+            #region Alle Fragments-Dateien ermitteln, wo die Datenbank aktuell im Speicher ist (frgm)
 
             var frgm = new List<string>();
 
@@ -174,9 +176,9 @@ public class DatabaseMU : Database {
                 }
             }
 
-            return l;
+            return (l, frgm);
         } catch { }
-        return null;
+        return (null, null);
     }
 
     public string OldFragmengtsPath() {
@@ -185,7 +187,7 @@ public class DatabaseMU : Database {
     }
 
     public override bool Save() {
-        if (_writer == null) { return false; }
+        if (_writer == null) { return true; }
 
         try {
             lock (_writer) {
@@ -205,7 +207,6 @@ public class DatabaseMU : Database {
                     _writer.Flush();
                     _writer.Close();
                     _writer.Dispose();
-                    if (!_written) { IO.DeleteFile(_myFragmentsFilename, false); }
                 }
                 _writer = null;
             }
@@ -213,54 +214,50 @@ public class DatabaseMU : Database {
         base.Dispose(disposing);
     }
 
-    protected override void DoWorkAfterLastChanges(List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
-        if (_changesNotIncluded.Count() < 50) { return; }
-        if (!AmITemporaryMaster(false)) { return; }
+    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
+        if (files == null) { return; }
+        if (files.Count < 1) { return; }
+
+        if (_changesNotIncluded.Count() > 0 && !AmITemporaryMaster(false)) { return; }
 
         if (!Directory.Exists(OldFragmengtsPath())) { return; }
 
-        #region Alle Dateien ermitteln (allfiles)
-
-        var allfiles = new List<string>();
-
-        foreach (var thisch in _changesNotIncluded) {
-            allfiles.AddIfNotExists(thisch.Container);
-        }
-
-        #endregion
+        files ??= new List<string>();
 
         #region Dateien, mit jungen Ändeurngen wieder entfernen, damit ander Datenbanken noch zugriff haben
 
         foreach (var thisch in _changesNotIncluded) {
             if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalMinutes < 10) {
-                allfiles.Remove(thisch.Container);
+                files.Remove(thisch.Container);
             }
         }
 
         #endregion
 
-        if (allfiles.Count < 10 && _changesNotIncluded.Count() < 300) { return; }
+        var x = DateTime.UtcNow;
 
-        if (allfiles.Count < 2) { return; }
+        if (_changesNotIncluded.Count() > 50 || (files.Count > 3 && _changesNotIncluded.Count() > 0)) {
+            var tmp = _fileStateUTCDate;
 
-        var tmp = _fileStateUTCDate;
+            _fileStateUTCDate = IsInCache;
+            // Nicht FileStateUTCDate - sonst springt der Writer an!
+            OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
+            if (!SaveInternal()) {
+                _fileStateUTCDate = tmp;
+                return;
+            }
 
-        _fileStateUTCDate = IsInCache;
-        // Nicht FileStateUTCDate - sonst springt der Writer an!
-
-        if (!SaveInternal()) {
-            _fileStateUTCDate = tmp;
-            return;
+            OnInvalidateView();
+            _changesNotIncluded.Clear();
         }
 
-        OnInvalidateView();
-        _changesNotIncluded.Clear();
+        if (_changesNotIncluded.Count == 0) {
+            var pf = OldFragmengtsPath();
 
-        var pf = OldFragmengtsPath();
-
-        foreach (var thisf in allfiles) {
-            if (thisf.Contains("\\" + TableName.ToUpper() + "-")) {
+            foreach (var thisf in files) {
+                OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
                 IO.MoveFile(thisf, pf + thisf.FileNameWithSuffix(), false);
+                if (DateTime.Now.Subtract(x).TotalSeconds > 10) { break; }
             }
         }
     }
@@ -289,13 +286,14 @@ public class DatabaseMU : Database {
         if (type.IsObsolete()) { return string.Empty; }
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
+
+        if (_writer == null) { StartWriter(); }
         if (_writer == null) { return "Schreibmodus deaktiviert"; }
 
         var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment);
 
         lock (_writer) {
             _writer.WriteLine(l.ToString());
-            _written = true;
         }
 
         return string.Empty;
@@ -306,6 +304,7 @@ public class DatabaseMU : Database {
             Freeze("Fragmentpfad nicht gesetzt. Stand: " + IsInCache.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
             return;
         }
+        CheckSysUndoNow();
 
         _myFragmentsFilename = TempFile(FragmengtsPath(), TableName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString(Constants.Format_Date4, CultureInfo.InvariantCulture), SuffixOfFragments());
 
@@ -314,6 +313,10 @@ public class DatabaseMU : Database {
         _writer.AutoFlush = true;
         _writer.WriteLine("- DB " + DatabaseVersion);
         _writer.WriteLine("- User " + UserName);
+
+        var l = new UndoItem(TableName, DatabaseDataType.Command_DummyForFileDeletion, string.Empty, string.Empty, string.Empty, string.Empty, UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt");
+        _writer.WriteLine(l.ToString());
+        _writer.Flush();
     }
 
     #endregion

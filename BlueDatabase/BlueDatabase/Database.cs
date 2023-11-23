@@ -390,7 +390,7 @@ public class Database : DatabaseAbstract {
         }
     }
 
-    public override List<UndoItem>? GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) => new();
+    public override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) => (new(), null);
 
     public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
@@ -704,7 +704,7 @@ public class Database : DatabaseAbstract {
         list.AddRange(b);
     }
 
-    protected override void DoWorkAfterLastChanges(List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
+    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
         foreach (var thisro in rowsAdded) { thisro.IsInCache = DateTime.UtcNow; }
         foreach (var thisco in columnsAdded) { thisco.IsInCache = DateTime.UtcNow; }
     }

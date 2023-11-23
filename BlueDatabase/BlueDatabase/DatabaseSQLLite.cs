@@ -165,7 +165,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return string.Empty;
     }
 
-    public override List<UndoItem>? GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) => SQL?.GetLastChanges(db, fromUTC, toUTC);
+    public override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) => (SQL?.GetLastChanges(db, fromUTC, toUTC), null);
 
     public override string? NextRowKey() {
         if (!Row.IsNewRowPossible()) {
@@ -287,7 +287,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
-    protected override void DoWorkAfterLastChanges(List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
+    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
         RefreshColumnsData(columnsAdded); // muss sein, alternativ alle geladenen Zeilen neu laden
 
         var rows = new List<RowItem>();

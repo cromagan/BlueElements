@@ -516,7 +516,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         if (type == DatabaseDataType.Command_AddColumnByName) {
             var c = Exists(name);
-            if (c != null && !c.IsDisposed) { return "Spalte " + name +" bereits vorhanden!"; }
+            if (c != null && !c.IsDisposed) { return "Spalte " + name + " bereits vorhanden!"; }
 
             c = new ColumnItem(Database, name);
             var f = Add(c, reason);
