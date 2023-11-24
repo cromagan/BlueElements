@@ -104,6 +104,16 @@ public class DatabaseMU : Database {
         return gb;
     }
 
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists, string mustBeeFreezed) {
+        if (string.IsNullOrEmpty(Filename)) { return null; }
+
+        var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".mbdb";
+
+        if (checkExists && !File.Exists(f)) { return null; }
+
+        return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
+    }
+
     public string FragmengtsPath() {
         if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
         return Filename.FilePath() + "Frgm\\";

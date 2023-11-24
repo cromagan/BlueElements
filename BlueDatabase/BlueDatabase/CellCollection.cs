@@ -207,7 +207,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }
 
-        if (fi.Count == 0 && column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
+        if (fi.Count == 0 || column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
         var fc = new FilterCollection(fi[0].Database);
         fc.AddIfNotExists(fi);

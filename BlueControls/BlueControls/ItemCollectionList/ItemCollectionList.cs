@@ -196,7 +196,14 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
                 var (fc, info) = CellCollection.GetFilterFromLinkedCellData(db2, column, checkedItemsAtRow);
                 if (!string.IsNullOrEmpty(info)) {
-                    Notification.Show("Keine Zeilen in der Quell-Datenbank vorhanden.", ImageCode.Information);
+                    Notification.Show(info, ImageCode.Information);
+                    return;
+                }
+
+                if(fc == null) {
+                    Notification.Show("Keine Filterung definiert.", ImageCode.Information);
+                    return;
+
                 }
 
                 l.AddRange(targetColumn.Contents(fc, null));
