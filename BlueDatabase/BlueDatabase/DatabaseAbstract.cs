@@ -637,14 +637,14 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
         #endregion
 
-        if (SqlBackAbstract.ConnectedSqlBack != null) {
-            foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
-                var h = thisSql.HandleMe(ci);
-                if (h != null) {
-                    return new DatabaseSqlLite(ci.TableName, readOnly, ci.MustBeFreezed, h);
-                }
-            }
-        }
+        //if (SqlBackAbstract.ConnectedSqlBack != null) {
+        //    foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
+        //        var h = thisSql.HandleMe(ci);
+        //        if (h != null) {
+        //            return new DatabaseSqlLite(ci.TableName, readOnly, ci.MustBeFreezed, h);
+        //        }
+        //    }
+        //}
 
         #region Zu guter Letzte, den Tablenamen nehmen...
 
@@ -1506,7 +1506,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     OnDropMessage(FehlerArt.Warnung, "Abbruch, leerer Spaltenname.");
                     return "Abbruch,<br>leerer Spaltenname.";
                 }
-                zeil[0][spaltNo] = SqlBackAbstract.MakeValidColumnName(zeil[0][spaltNo]);
+                zeil[0][spaltNo] = ColumnItem.MakeValidColumnName(zeil[0][spaltNo]);
 
                 var col = Column.Exists(zeil[0][spaltNo]);
                 if (col == null) {

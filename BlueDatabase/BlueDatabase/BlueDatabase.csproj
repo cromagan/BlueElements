@@ -109,7 +109,6 @@
     <Compile Include="EventArgs\CellValueEventArgs.cs" />
     <Compile Include="ConnetionInfo.cs" />
     <Compile Include="DatabaseAbstract.cs" />
-    <Compile Include="DatabaseSQLLite.cs" />
     <Compile Include="Enums\Reason.cs" />
     <Compile Include="EventArgs\CellEditBlockReasonEventArgs.cs" />
     <Compile Include="EventArgs\CellChangedEventArgs.cs" />
@@ -121,11 +120,9 @@
     <Compile Include="Interfaces\IColumnInputFormat.cs" />
     <Compile Include="Interfaces\IHasChangeabelDatabase.cs" />
     <Compile Include="Interfaces\IHasDatabase.cs" />
-    <Compile Include="SQLBackMicrosoftCE.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
     <Compile Include="Enums\Ansicht.cs" />
-    <Compile Include="SQLBackAbstract.cs" />
     <Compile Include="Enums\AlignmentHorizontal.cs" />
     <Compile Include="Enums\EditTypeFormula.cs" />
     <Compile Include="Enums\ScriptType.cs" />
@@ -168,10 +165,6 @@
   <ItemGroup>
     <EmbeddedResource Include="DatabaseAbstract.resx">
       <DependentUpon>DatabaseAbstract.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DatabaseSQLLite.resx">
-      <DependentUpon>DatabaseSQLLite.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Database.resx">
