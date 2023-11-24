@@ -207,9 +207,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }
 
-        if (fi.Count == 0 || column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
+        if (fi.Count == 0 && column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
-        var fc = new FilterCollection(fi[0].Database);
+        var fc = new FilterCollection(linkedDatabase);
         fc.AddIfNotExists(fi);
 
         return (fc, string.Empty);
@@ -352,8 +352,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public void DoSystemColumns(DatabaseAbstract db, ColumnItem column, RowItem row, string user, DateTime datetimeutc, Reason reason) {
-
-        if(reason == Reason.InitialLoad) { return; }
+        if (reason == Reason.InitialLoad) { return; }
 
         // Die unterschiedlichen Reasons in der Routine beachten!
         if (db.Column.SysRowChanger is ColumnItem src && src != column) { SetValueInternal(src, row, user, Reason.SystemSet); }
