@@ -45,35 +45,13 @@ public class Database : DatabaseAbstract {
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private bool _isInSave;
 
+    public Database(string tablename) : base(tablename) {    }
+
     #endregion
 
     #region Constructors
 
-    public Database(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : this(ci.AdditionalData, readOnly, ci.MustBeFreezed, false, needPassword) { }
 
-    public Database(Stream stream, string tablename) : this(stream, string.Empty, true, "Stream-Datenbank", false, tablename, null) { }
-
-    public Database(bool readOnly, string freezedReason, string tablename) : this(null, string.Empty, readOnly, freezedReason, true, tablename, null) { }
-
-    public Database(string filename, bool readOnly, string freezedReason, bool create, NeedPassword? needPassword) : this(null, filename, readOnly, freezedReason, create, filename.FileNameWithoutSuffix(), needPassword) { }
-
-    private Database(Stream? stream, string filename, bool readOnly, string freezedReason, bool create, string tablename, NeedPassword? needPassword) : base(tablename, readOnly, freezedReason) {
-        TableName = MakeValidTableName(tablename);
-
-        if (!IsValidTableName(TableName, false)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
-        }
-
-        Initialize();
-
-        if (!string.IsNullOrEmpty(filename)) {
-            LoadFromFile(filename, create, needPassword);
-        } else if (stream != null) {
-            LoadFromStream(stream);
-        }
-
-        TryToSetMeTemporaryMaster();
-    }
 
     #endregion
 
@@ -95,7 +73,10 @@ public class Database : DatabaseAbstract {
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
         if (ci.AdditionalData.FileSuffix().ToUpper() is not "BDB" or "MDB") { return null; }
         if (!FileExists(ci.AdditionalData)) { return null; }
-        return new Database(ci, readOnly, needPassword);
+
+        var db = new Database(ci.TableName);
+        db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
+        return db;
     }
 
     // Dateibasierte Systeme haben immer den Undo-Speicher
@@ -392,7 +373,7 @@ public class Database : DatabaseAbstract {
 
     public override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) => (new(), null);
 
-    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword) {
+    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
@@ -427,9 +408,17 @@ public class Database : DatabaseAbstract {
         Parse(bLoaded, needPassword);
 
         RepairAfterParse();
+        CheckSysUndoNow();
+        if(ronly) {  SetReadOnly(); }
+        Freeze(freeze);
         OnLoaded();
+
+        if(!string.IsNullOrEmpty(FreezedReason)) { return; }
+
         CreateWatcher();
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
+
+        TryToSetMeTemporaryMaster();
     }
 
     public void LoadFromStream(Stream stream) {
@@ -440,6 +429,8 @@ public class Database : DatabaseAbstract {
             r.Close();
         }
 
+
+        if(bLoaded.isZipped()) { bLoaded = bLoaded.UnzipIt(); }
         //if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
         //    // Gezipte Daten-Kennung gefunden
         //    bLoaded = MultiUserFile.UnzipIt(bLoaded);
@@ -448,9 +439,10 @@ public class Database : DatabaseAbstract {
         Parse(bLoaded, null);
 
         RepairAfterParse();
+        Freeze("Streams-Datenbank");
         OnLoaded();
-        CreateWatcher();
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
+        //CreateWatcher();
+        //_ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
     }
 
     public override string NextRowKey() {
@@ -704,7 +696,7 @@ public class Database : DatabaseAbstract {
         list.AddRange(b);
     }
 
-    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
+    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged, DateTime starttimeUTC) {
         foreach (var thisro in rowsAdded) { thisro.IsInCache = DateTime.UtcNow; }
         foreach (var thisco in columnsAdded) { thisco.IsInCache = DateTime.UtcNow; }
     }

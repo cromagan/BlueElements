@@ -44,18 +44,8 @@ public class DatabaseMU : Database {
     #endregion
 
     #region Constructors
+    public DatabaseMU(string tablename) : base(tablename) {
 
-    public DatabaseMU(string filename, bool readOnly, string freezedReason, bool create, NeedPassword? needPassword) : base(filename, readOnly, freezedReason, create, needPassword) {
-        //IsInCache = FileStateUTCDate;
-
-        Directory.CreateDirectory(FragmengtsPath());
-        Directory.CreateDirectory(OldFragmengtsPath());
-        _timerTimeStamp = DateTime.UtcNow.AddSeconds(-170);
-        //CheckSysUndoNow();
-        //StartWriter();
-    }
-
-    public DatabaseMU(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) : base(ci, readOnly, needPassword) {
         //IsInCache = FileStateUTCDate;
 
         Directory.CreateDirectory(FragmengtsPath());
@@ -81,7 +71,10 @@ public class DatabaseMU : Database {
         if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
         if (ci.AdditionalData.FileSuffix().ToUpper() is not "MBDB") { return null; }
         if (!FileExists(ci.AdditionalData)) { return null; }
-        return new DatabaseMU(ci, readOnly, needPassword);
+
+        var db = new DatabaseMU(ci.TableName);
+        db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
+        return db;
     }
 
     public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, string mustBeFreezed) {
@@ -224,9 +217,10 @@ public class DatabaseMU : Database {
         base.Dispose(disposing);
     }
 
-    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
+    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged, DateTime starttimeUTC) {
         if (files == null) { return; }
         if (files.Count < 1) { return; }
+        if (DateTime.Now.Subtract(starttimeUTC).TotalSeconds > 10) { return; }
 
         if (_changesNotIncluded.Count() > 0 && !AmITemporaryMaster(false)) { return; }
 
@@ -234,17 +228,26 @@ public class DatabaseMU : Database {
 
         files ??= new List<string>();
 
-        #region Dateien, mit jungen Ändeurngen wieder entfernen, damit ander Datenbanken noch zugriff haben
+        #region Dateien, mit jungen Änderungen wieder entfernen, damit ander Datenbanken noch zugriff haben
 
         foreach (var thisch in _changesNotIncluded) {
-            if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalMinutes < 10) {
+            if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalMinutes < 30) {
                 files.Remove(thisch.Container);
             }
         }
 
         #endregion
 
-        var x = DateTime.UtcNow;
+
+        #region Dateien, mit jungen Änderungen wieder entfernen um Performanter zu sein
+
+        foreach (var thisch in _changesNotIncluded) {
+            if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalHours < 5) {
+                files.Remove(thisch.Container);
+            }
+        }
+
+        #endregion
 
         if (_changesNotIncluded.Count() > 50 || (files.Count > 3 && _changesNotIncluded.Count() > 0)) {
             var tmp = _fileStateUTCDate;
@@ -264,10 +267,12 @@ public class DatabaseMU : Database {
         if (_changesNotIncluded.Count == 0) {
             var pf = OldFragmengtsPath();
 
+            files.Shuffle();
+
             foreach (var thisf in files) {
                 OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
                 IO.MoveFile(thisf, pf + thisf.FileNameWithSuffix(), false);
-                if (DateTime.Now.Subtract(x).TotalSeconds > 10) { break; }
+                if (DateTime.Now.Subtract(starttimeUTC).TotalSeconds > 10) { break; }
             }
         }
     }

@@ -51,7 +51,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         Database = database;
         Database.DisposingEvent += _database_Disposing;
         //       Cell = New Dictionary(Of String, CellItem)
-        Initialize();
+        //Initialize();
     }
 
     #endregion
@@ -447,7 +447,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    public void Initialize() => Clear();
 
     public bool IsInCache(ColumnItem? column, RowItem? row) {
         if (column == null || column.IsDisposed) { return false; }

@@ -44,30 +44,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     #endregion
 
     #region Constructors
-
-    public DatabaseSqlLite(ConnectionInfo ci, bool readOnly) : this(ci.TableName, readOnly, ci.MustBeFreezed, ((DatabaseSqlLite?)ci.Provider)?.SQL) { }
-
-    public DatabaseSqlLite(string tablename, bool readOnly, string freezedReason, SqlBackAbstract? sql) : base(tablename, readOnly, freezedReason) {
-        if (sql == null) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Keine SQL-Verbindung übergeben: " + tablename);
-            return;
-        }
-
-        SQL = sql;
-        sql.RepairAll(tablename);
-
-        TableName = MakeValidTableName(tablename);
-
-        if (!IsValidTableName(TableName, false)) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
-        }
-
-        Initialize();
-        LoadFromSqlBack();
-        IsInCache = DateTime.UtcNow;
-
-        TryToSetMeTemporaryMaster();
-    }
+    public DatabaseSqlLite(string tablename) : base(tablename) { }
 
     #endregion
 
@@ -287,7 +264,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
     }
 
-    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged) {
+    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged, DateTime startTimeUtc) {
         RefreshColumnsData(columnsAdded); // muss sein, alternativ alle geladenen Zeilen neu laden
 
         var rows = new List<RowItem>();
@@ -424,7 +401,10 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         return SQL.WriteValueToServer(this, type, value, column, row, user, datetimeutc);
     }
 
-    private void LoadFromSqlBack() {
+    internal void LoadFromSqlBack(NeedPassword? needPassword, string freeze, bool readOnly, SqlBackAbstract sql) {
+
+        SQL = sql;
+
         OnLoading();
         //Develop.DebugPrint(FehlerArt.DevelopInfo, "Loading++");
 
@@ -504,16 +484,22 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
             Cell.RemoveOrphans();
         } catch {
-            LoadFromSqlBack();
+            LoadFromSqlBack(needPassword, freeze, readOnly, sql);
             return;
         }
 
         RepairAfterParse();
+        CheckSysUndoNow();
+        Freeze(freeze);
+        if(ReadOnly) { SetReadOnly(); }
+
+
         OnLoaded();
         CreateWatcher();
         GenerateTimer();
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
     }
+
 
     #endregion
 }

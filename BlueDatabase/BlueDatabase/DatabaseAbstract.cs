@@ -74,7 +74,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     protected static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
 
     /// <summary>
-    ///  So viele Änderungen sind seit dem letzten Speichern auf der Festplatte gezählt worden
+    ///  So viele Änderungen sind seit dem letzten erstellen der Komplett-Datenbank erstellen auf Festplatte gezählt worden
     /// </summary>
     protected readonly List<UndoItem> _changesNotIncluded = new();
 
@@ -138,28 +138,68 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #region Constructors
 
-    protected DatabaseAbstract(string tablename, bool readOnly, string freezedReason) {
+
+
+    public DatabaseAbstract(string tablename) {
+
+        // Keine Konstruktoren mit Dateiname, Filestreams oder sonst was.
+        // Weil das OnLoaded-Ereigniss nicht richtig ausgelöst wird.
         Develop.StartService();
-
-        TableName = tablename;
-        _readOnly = readOnly;
-        FreezedReason = freezedReason;
-
-        Cell = new CellCollection(this);
 
         QuickImage.NeedImage += QuickImage_NeedImage;
 
+
+
+
+        TableName = MakeValidTableName(tablename);
+
+        if (!IsValidTableName(TableName, false)) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + tablename);
+        }
+
+        Cell = new CellCollection(this);
         Row = new RowCollection(this);
         Column = new ColumnCollection(this);
-
         Undo = new List<UndoItem>();
+
+
+        //_columnArrangements.Clear();
+        //_permissionGroupsNewRow.Clear();
+        //_tags.Clear();
+        //_datenbankAdmin.Clear();
+        //_globalShowPass = string.Empty;
+        _creator = UserName;
+        _createDate = DateTime.UtcNow.ToString(Format_Date9, CultureInfo.InvariantCulture);
+        _fileStateUTCDate = new DateTime(0); // Wichtig, dass das Datum bei Datenbanken ohne den Wert immer alles laden
+        //_caption = string.Empty;
+        LoadedVersion = DatabaseVersion;
+        //_globalScale = 1f;
+        _additionalFilesPfad = "AdditionalFiles";
+        //_zeilenQuickInfo = string.Empty;
+        //_sortDefinition = null;
+        //EventScript_RemoveAll(true);
+        //_variables.Clear();
+        _variableTmp = string.Empty;
+        //Undo.Clear();
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
         // Die Events registriert werden, um z.B: das Passwort abzufragen
         // Zusätzlich werden z.B: Filter für den Export erstellt - auch der muss die Datenbank finden können.
         // Zusätzlich muss der Tablename stimme, dass in Added diesen verwerten kann.
         AllFiles.Add(this);
-        FreezedReason = freezedReason;
     }
 
     #endregion
@@ -320,7 +360,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehten.
     /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
     /// </summary>
-    public string FreezedReason { get; private set; }
+    public string FreezedReason { get; private set; } = string.Empty;
 
     public double GlobalScale {
         get => _globalScale;
@@ -511,6 +551,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         _isInTimer = true;
 
         var fd = DateTime.UtcNow;
+        var start = DateTime.UtcNow;
 
         try {
             var done = new List<DatabaseAbstract>();
@@ -526,7 +567,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     if (erg.Changes == null) { _isInTimer = false; return; } // Später ein neuer Versuch
 
                     foreach (var thisdb in db) {
-                        thisdb.DoLastChanges(erg.Files, erg.Changes, fd);
+                        thisdb.DoLastChanges(erg.Files, erg.Changes, fd, start);
                         thisdb.TryToSetMeTemporaryMaster();
                     }
                 }
@@ -628,23 +669,29 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
         if (FileExists(ci.AdditionalData)) {
             if (ci.AdditionalData.FileSuffix().ToLower() is "mdb" or "bdb") {
-                return new Database(ci.AdditionalData, readOnly, ci.MustBeFreezed, false, needPassword);
+                var db = new Database(ci.TableName);
+                db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
+                return db;
             }
             if (ci.AdditionalData.FileSuffix().ToLower() is "mbdb") {
-                return new DatabaseMU(ci.AdditionalData, readOnly, ci.MustBeFreezed, false, needPassword);
+                var db = new DatabaseMU(ci.TableName);
+                db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
+                return db;
             }
         }
 
         #endregion
 
-        //if (SqlBackAbstract.ConnectedSqlBack != null) {
-        //    foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
-        //        var h = thisSql.HandleMe(ci);
-        //        if (h != null) {
-        //            return new DatabaseSqlLite(ci.TableName, readOnly, ci.MustBeFreezed, h);
-        //        }
-        //    }
-        //}
+        if (SqlBackAbstract.ConnectedSqlBack != null) {
+            foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
+                var h = thisSql.HandleMe(ci);
+                if (h != null) {
+                    var db = new DatabaseSqlLite(ci.TableName);
+                   db.LoadFromSqlBack(needPassword, ci.MustBeFreezed, readOnly,h );
+                    return db;
+                }
+            }
+        }
 
         #region Zu guter Letzte, den Tablenamen nehmen...
 
@@ -736,17 +783,18 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                         break;
                 }
                 if (FileExists(pf)) {
-                    var ci = new ConnectionInfo(pf, Database.DatabaseId, string.Empty);
-
-                    var tmp = GetById(ci, false, null, true);
-                    if (tmp != null) { return tmp; }
-                    tmp = new Database(pf, false, string.Empty, false, null);
-                    return tmp;
+                    var db = new Database(name);
+                    db.LoadFromFile(pf, false, null, string.Empty, false);
+                    return db;
                 }
             } while (pf != string.Empty);
         }
         var d = GetEmmbedResource(assembly, name);
-        if (d != null) { return new Database(d, name.ToUpper().TrimEnd(".MDB").TrimEnd(".BDB")); }
+        if (d != null) {
+            var db = new Database(name);
+            db.LoadFromStream(d);
+            return db;
+        }
         if (fehlerAusgeben) { Develop.DebugPrint(FehlerArt.Fehler, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
         return null;
     }
@@ -2219,7 +2267,14 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         OnDisposed();
     }
 
-    protected void DoLastChanges(List<string>? files, List<UndoItem>? data, DateTime toUTC) {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="files"></param>
+    /// <param name="data"></param>
+    /// <param name="toUTC"></param>
+    /// <param name="startTimeUTC">Nur um die Zeot stoppen zu können und lange Prozesse zu kürzen</param>
+    protected void DoLastChanges(List<string>? files, List<UndoItem>? data, DateTime toUTC, DateTime startTimeUTC) {
         if (data == null) { return; }
         if (IsDisposed) { return; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return; }
@@ -2266,15 +2321,23 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             }
 
             IsInCache = toUTC;
-            DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, cellschanged);
+            DoWorkAfterLastChanges(myfiles, columnsAdded, rowsAdded, cellschanged, startTimeUTC);
             OnInvalidateView();
         } catch {
             Develop.CheckStackForOverflow();
-            DoLastChanges(files, data, toUTC);
+            DoLastChanges(files, data, toUTC, startTimeUTC);
         }
     }
 
-    protected abstract void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged);
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="files"></param>
+    /// <param name="columnsAdded"></param>
+    /// <param name="rowsAdded"></param>
+    /// <param name="cellschanged"></param>
+    /// <param name="startTimeUTC">Nur um die Zeot stoppen zu können und lange Prozesse zu kürzen</param>
+    protected abstract void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged, DateTime starttimeUTC);
 
     protected void GenerateTimer() {
         if (_pendingChangesTimer != null) { return; }
@@ -2283,28 +2346,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         _ = _pendingChangesTimer.Change(10000, 10000);
     }
 
-    protected void Initialize() {
-        Cell.Initialize();
-
-        _columnArrangements.Clear();
-        _permissionGroupsNewRow.Clear();
-        _tags.Clear();
-        _datenbankAdmin.Clear();
-        _globalShowPass = string.Empty;
-        _creator = UserName;
-        _createDate = DateTime.UtcNow.ToString(Format_Date9, CultureInfo.InvariantCulture);
-        _fileStateUTCDate = new DateTime(0); // Wichtig, dass das Datum bei Datenbanken ohne den Wert immer alles laden
-        _caption = string.Empty;
-        LoadedVersion = DatabaseVersion;
-        _globalScale = 1f;
-        _additionalFilesPfad = "AdditionalFiles";
-        _zeilenQuickInfo = string.Empty;
-        _sortDefinition = null;
-        EventScript_RemoveAll(true);
-        _variables.Clear();
-        _variableTmp = string.Empty;
-        Undo.Clear();
-    }
 
     protected abstract IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer();
 

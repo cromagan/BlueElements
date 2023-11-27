@@ -815,7 +815,7 @@ public partial class TableView : FormWithStatusBar {
             _ = DeleteFile(SaveTab.FileName, true);
         }
 
-        var db = new Database(false, string.Empty, SaveTab.FileName.FileNameWithoutSuffix());
+        var db = new Database(SaveTab.FileName.FileNameWithoutSuffix());
         db.SaveAsAndChangeTo(SaveTab.FileName);
         _ = SwitchTabToDatabase(new ConnectionInfo(SaveTab.FileName, PreveredDatabaseID, string.Empty));
     }
