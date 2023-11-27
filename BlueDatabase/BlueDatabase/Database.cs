@@ -373,7 +373,7 @@ public class Database : DatabaseAbstract {
 
     public override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) => (new(), null);
 
-    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
+    public virtual void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(FehlerArt.Fehler, "Dateiname nicht angegeben!"); }
@@ -410,7 +410,7 @@ public class Database : DatabaseAbstract {
         RepairAfterParse();
         CheckSysUndoNow();
         if(ronly) {  SetReadOnly(); }
-        Freeze(freeze);
+        if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         OnLoaded();
 
         if(!string.IsNullOrEmpty(FreezedReason)) { return; }
@@ -439,7 +439,7 @@ public class Database : DatabaseAbstract {
         Parse(bLoaded, null);
 
         RepairAfterParse();
-        Freeze("Streams-Datenbank");
+        Freeze("Stream-Datenbank");
         OnLoaded();
         //CreateWatcher();
         //_ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);

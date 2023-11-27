@@ -77,6 +77,7 @@ public class BackupVerwalter {
         if (string.IsNullOrEmpty(path)) { return "Kein Verzeichniss angebeben."; }
         if (string.IsNullOrEmpty(search)) { return "Kein Suchpattern angebeben."; }
 
+
         var fix = Directory.GetFiles(path, search, SearchOption.TopDirectoryOnly);
 
         if (fix.Length == 0) { return string.Empty; }

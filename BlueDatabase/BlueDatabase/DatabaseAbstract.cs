@@ -113,7 +113,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     private string _eventScriptVersion = string.Empty;
 
-    private double _globalScale;
+    private double _globalScale = 1f;
 
     private string _globalShowPass = string.Empty;
 
@@ -473,7 +473,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         }
     }
 
-    public bool UndoLoaded { get; protected set; }
+    //public bool UndoLoaded { get; protected set; }
 
     public VariableCollection Variables {
         get => new(_variables);
@@ -551,7 +551,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         _isInTimer = true;
 
         var fd = DateTime.UtcNow;
-        var start = DateTime.UtcNow;
+
 
         try {
             var done = new List<DatabaseAbstract>();
@@ -566,6 +566,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     var erg = thisDb.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
                     if (erg.Changes == null) { _isInTimer = false; return; } // Später ein neuer Versuch
 
+                    var start = DateTime.UtcNow;
                     foreach (var thisdb in db) {
                         thisdb.DoLastChanges(erg.Files, erg.Changes, fd, start);
                         thisdb.TryToSetMeTemporaryMaster();
@@ -682,16 +683,16 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
         #endregion
 
-        if (SqlBackAbstract.ConnectedSqlBack != null) {
-            foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
-                var h = thisSql.HandleMe(ci);
-                if (h != null) {
-                    var db = new DatabaseSqlLite(ci.TableName);
-                   db.LoadFromSqlBack(needPassword, ci.MustBeFreezed, readOnly,h );
-                    return db;
-                }
-            }
-        }
+        //if (SqlBackAbstract.ConnectedSqlBack != null) {
+        //    foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
+        //        var h = thisSql.HandleMe(ci);
+        //        if (h != null) {
+        //            var db = new DatabaseSqlLite(ci.TableName);
+        //           db.LoadFromSqlBack(needPassword, ci.MustBeFreezed, readOnly,h );
+        //            return db;
+        //        }
+        //    }
+        //}
 
         #region Zu guter Letzte, den Tablenamen nehmen...
 
@@ -1489,16 +1490,19 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         return GetById(x, readOnly, null, true);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
-    public void GetUndoCache() {
-        if (UndoLoaded) { return; }
+    //public void GetUndoCache() {
+    //    if (UndoLoaded) { return; }
 
-        var undos = GetLastChanges(new List<DatabaseAbstract> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1));
+    //    var undos = GetLastChanges(new List<DatabaseAbstract> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1));
 
-        Undo.Clear();
-        Undo.AddRange(undos.Changes);
+    //    Undo.Clear();
 
-        UndoLoaded = true;
-    }
+    //    if(undos.co)
+
+    //    Undo.AddRange(undos.Changes);
+
+    //    UndoLoaded = true;
+    //}
 
     public bool HasErrorCheckScript() {
         if (!IsRowScriptPossible(true)) { return false; }
@@ -1986,7 +1990,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     var thisRow = Row.SearchByKey(value);
                     return (string.Empty, null, thisRow);
 
-                case DatabaseDataType.Command_DummyForFileDeletion:
+                case DatabaseDataType.Command_NewStart:
                     return (string.Empty, null, null);
 
                 default:
@@ -2007,7 +2011,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             case DatabaseDataType.Version:
                 LoadedVersion = value.Trim();
                 if (LoadedVersion != DatabaseVersion) {
-                    Initialize();
+                    Freeze("Versions-Konflikt");
                     LoadedVersion = value.Trim();
                 } else {
                     //Cell.RemoveOrphans();
@@ -2351,7 +2355,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     protected void OnLoaded() {
         if (IsDisposed) { return; }
-        IsInCache = FileStateUTCDate;
+        //IsInCache = FileStateUTCDate;
         Loaded?.Invoke(this, System.EventArgs.Empty);
     }
 

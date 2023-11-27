@@ -289,6 +289,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool ShowWaitScreen { get; set; } = true;
 
     [Browsable(false)]
@@ -668,7 +671,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         };
 
         if (db is DatabaseAbstract database) {
-            database.GetUndoCache();
+            //database.GetUndoCache();
 
             if (database.Undo.Count == 0) { return i; }
 

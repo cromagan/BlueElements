@@ -284,7 +284,7 @@ public enum DatabaseDataType : byte {
     //Command_AddColumnByKey = 227,
     Command_AddColumnByName = 228,
 
-    Command_DummyForFileDeletion = 229,
+    Command_NewStart = 229,
 
     //UndoCount = 249,
     //PendingsInOne = 250,

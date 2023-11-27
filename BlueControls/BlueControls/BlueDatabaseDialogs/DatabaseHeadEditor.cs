@@ -213,6 +213,24 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 //aenderung = "Zeile gelöscht";
                 symb = ImageCode.MinusZeichen;
                 break;
+
+
+            case DatabaseDataType.Command_NewStart:
+                symb = ImageCode.Abspielen;
+                neu = "Benutzer: " + work.User;
+                break;
+
+
+            case DatabaseDataType.TemporaryDatabaseMasterTimeUTC:
+                symb = ImageCode.Uhr;
+                break;
+
+            case DatabaseDataType.TemporaryDatabaseMasterUser:
+                symb = ImageCode.Person;
+                break;
+
+
+
         }
         r.CellSet("Aenderung", work.Command.ToString());
         r.CellSet("symbol", symb + "|24");
@@ -287,11 +305,11 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         tblUndo.Arrangement = 1;
 
         if (Database is DatabaseAbstract db) {
-            if (!db.UndoLoaded) {
-                UpdateStatusBar(FehlerArt.Info, "Lade Undo-Speicher", true);
+            //if (!db.UndoLoaded) {
+            //    UpdateStatusBar(FehlerArt.Info, "Lade Undo-Speicher", true);
 
-                db.GetUndoCache();
-            }
+            //    db.GetUndoCache();
+            //}
             UpdateStatusBar(FehlerArt.Info, "Erstelle Tabellen Ansicht des Undo-Speichers", true);
 
             foreach (var thisUndo in db.Undo) {
