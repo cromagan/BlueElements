@@ -106,7 +106,6 @@
     <Compile Include="AdditionalScriptMethods\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptMethods\VariableFilterItem.cs" />
     <Compile Include="DatabaseMU.cs" />
-    <Compile Include="DatabaseSQLLite.cs" />
     <Compile Include="EventArgs\CellValueEventArgs.cs" />
     <Compile Include="ConnetionInfo.cs" />
     <Compile Include="DatabaseAbstract.cs" />
@@ -171,9 +170,6 @@
     <EmbeddedResource Include="Database.resx">
       <DependentUpon>Database.cs</DependentUpon>
       <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DatabaseSQLLite.resx">
-      <DependentUpon>DatabaseSQLLite.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

@@ -20,12 +20,9 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Data.Common;
 using System.Drawing;
 using System.Globalization;
 using System.Text.RegularExpressions;
-using System.Threading;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;

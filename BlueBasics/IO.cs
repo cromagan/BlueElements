@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
-using System.IO.Compression;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -164,9 +163,9 @@ public static class IO {
         return nn;
     }
 
-    public static bool CopyFile(string source, string target, bool toBeSure) => ProcessFile(TryCopyFile, source, target, toBeSure);
+    public static bool CopyFile(string source, string target, bool toBeSure) => ProcessFile(TryCopyFile, source, target, 5, toBeSure);
 
-    public static bool DeleteDir(string directory, bool toBeSure) => ProcessFile(TryDeleteDir, directory, directory, toBeSure);
+    public static bool DeleteDir(string directory, bool toBeSure) => ProcessFile(TryDeleteDir, directory, directory, 5, toBeSure);
 
     /// <summary>
     ///
@@ -201,7 +200,7 @@ public static class IO {
         return did;
     }
 
-    public static bool DeleteFile(string file, bool toBeSure) => !FileExists(file) || ProcessFile(TryDeleteFile, file, file, toBeSure);
+    public static bool DeleteFile(string file, bool toBeSure) => !FileExists(file) || ProcessFile(TryDeleteFile, file, file, 5, toBeSure);
 
     public static bool DirectoryExists(string pfad) => pfad.Length >= 3 && Directory.Exists(pfad.CheckPath());
 
@@ -374,9 +373,13 @@ public static class IO {
         return x;
     }
 
-    public static bool MoveDirectory(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveDirectory, oldName, newName, toBeSure);
+    public static bool MoveDirectory(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveDirectory, oldName, newName, 5, toBeSure);
 
-    public static bool MoveFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, toBeSure);
+    public static bool MoveFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, 5, toBeSure);
+
+
+    public static bool MoveFile(string oldName, string newName, int tries, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, tries, toBeSure);
+
 
     /// <summary>
     /// Gibt einen höher gelegenden Ordner mit abschließenden \ zurück
@@ -493,12 +496,12 @@ public static class IO {
     /// <param name="file2"></param>
     /// <param name="toBeSure">Stellt sicher, dass der Befehl ausgeführt wird. Ansonsten wird das Programm abgebrochen</param>
     /// <returns>True bei Erfolg</returns>
-    private static bool ProcessFile(DoThis processMethod, string file1, string file2, bool toBeSure) {
-        var tries = 0;
+    private static bool ProcessFile(DoThis processMethod, string file1, string file2, int tries, bool toBeSure) {
+        var mytry = 0;
         var startTime = DateTime.UtcNow;
         while (!processMethod(file1, file2)) {
-            tries++;
-            if (tries > 5) {
+            mytry++;
+            if (mytry > tries) {
                 if (!toBeSure) { return false; }
                 if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 60) { Develop.DebugPrint(FehlerArt.Fehler, "Datei-Befehl konnte nicht ausgeführt werden:\r\n" + file1 + "\r\n" + file2); }
             }

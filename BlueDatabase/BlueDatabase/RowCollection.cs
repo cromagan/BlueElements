@@ -22,7 +22,6 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data.Common;
 using System.Globalization;
 using System.Linq;
 using BlueBasics;
@@ -619,7 +618,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (type == DatabaseDataType.Command_AddRow) {
             var row = SearchByKey(rowkey);
-            if (row != null && !row.IsDisposed) { return "Zeile " + rowkey+ " bereits vorhanden!"; }
+            if (row != null && !row.IsDisposed) { return string.Empty; } // "Zeile " + rowkey+ " bereits vorhanden!";
 
             var c = new RowItem(db, rowkey);
             var f = Add(c, reason);

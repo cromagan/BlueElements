@@ -42,8 +42,6 @@ using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using Timer = System.Threading.Timer;
 using static BlueBasics.Constants;
-using System.Drawing;
-using System.Runtime.ConstrainedExecution;
 
 namespace BlueDatabase;
 
@@ -546,7 +544,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
-    public static void CheckSysUndoNow(ICollection<DatabaseAbstract> offDatabases) {
+    public static void CheckSysUndoNow(ICollection<DatabaseAbstract> offDatabases, bool mustDoIt) {
         if (_isInTimer) { return; }
         _isInTimer = true;
 
@@ -559,12 +557,30 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             foreach (var thisDb in offDatabases) {
                 if (!done.Contains(thisDb)) {
                     thisDb.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Überprüfe auf Veränderungen von '" + thisDb.GetType().Name + "'");
-                    var db = thisDb.LoadedDatabasesWithSameServer();
-                    done.AddRange(db);
-                    done.Add(thisDb);
+
+                    #region Datenbanken des gemeinsamen Servers ermittelen
+                    var dbwss = thisDb.LoadedDatabasesWithSameServer();
+                    done.AddRange(dbwss);
+                    done.Add(thisDb); // Falls LoadedDatabasesWithSameServer einen Fehler versursacht
+                    #endregion
+
+
+                    #region Auf Eigangs Datenbanken beschränken
+                    var db = new List<DatabaseAbstract>();
+                    foreach (var thisDb2 in dbwss) {
+                        if (offDatabases.Contains(thisDb2)) { db.Add(thisDb2); }
+                    }
+                    #endregion
+
+
 
                     var erg = thisDb.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
-                    if (erg.Changes == null) { _isInTimer = false; return; } // Später ein neuer Versuch
+                    if (erg.Changes == null) {
+                        if(mustDoIt) { Develop.DebugPrint(FehlerArt.Fehler, "Aktualiserung fehlgeschlagen!"); }
+                        // Später ein neuer Versuch
+                        _isInTimer = false;
+                        return;
+                    } 
 
                     var start = DateTime.UtcNow;
                     foreach (var thisdb in db) {
@@ -2391,7 +2407,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         if (DateTime.UtcNow.Subtract(LastLoadUtc).TotalSeconds < 5) { return; }
 
         if (CriticalState()) { return; }
-        CheckSysUndoNow(DatabaseAbstract.AllFiles);
+        CheckSysUndoNow(DatabaseAbstract.AllFiles, false);
     }
 
     private void Checker_Tick(object state) {

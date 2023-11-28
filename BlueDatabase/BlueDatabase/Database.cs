@@ -25,7 +25,6 @@ using System.IO;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.MultiUserFile;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
@@ -408,7 +407,7 @@ public class Database : DatabaseAbstract {
         Parse(bLoaded, needPassword);
 
         RepairAfterParse();
-        CheckSysUndoNow(new List<DatabaseAbstract>() { this });
+        CheckSysUndoNow(new List<DatabaseAbstract>() { this }, true);
         if(ronly) {  SetReadOnly(); }
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         OnLoaded();
@@ -701,7 +700,7 @@ public class Database : DatabaseAbstract {
         foreach (var thisco in columnsAdded) { thisco.IsInCache = DateTime.UtcNow; }
     }
 
-    protected override IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer() => new List<DatabaseAbstract>();
+    protected override IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer() => new List<DatabaseAbstract>() { this };
 
     protected bool SaveInternal() {
         var m = EditableErrorReason(EditableErrorReasonType.Save);

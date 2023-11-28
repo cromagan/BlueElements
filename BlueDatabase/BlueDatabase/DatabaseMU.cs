@@ -20,13 +20,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using BlueBasics;
 using BlueDatabase.Enums;
-using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 
@@ -158,7 +156,7 @@ public class DatabaseMU : Database {
 
             #endregion
 
-            if (frgm.Count == 0) { return new(); }
+            if (frgm.Count == 0) { return (new(), new()); }
 
             var l = new List<UndoItem>();
 
@@ -223,6 +221,7 @@ public class DatabaseMU : Database {
     }
 
     protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged, DateTime starttimeUTC) {
+        base.DoWorkAfterLastChanges (files, columnsAdded, rowsAdded, cellschanged, starttimeUTC);
         if (files == null || files.Count < 1) { return; }
         if (DateTime.UtcNow.Subtract(starttimeUTC).TotalSeconds > 120) { return; }
         if (!Directory.Exists(OldFragmengtsPath())) { return; }
@@ -279,7 +278,7 @@ public class DatabaseMU : Database {
 
         foreach (var thisf in files) {
             OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
-            IO.MoveFile(thisf, pf + thisf.FileNameWithSuffix(), false);
+            IO.MoveFile(thisf, pf + thisf.FileNameWithSuffix(),1, false);
             if (DateTime.Now.Subtract(starttimeUTC).TotalSeconds > 120) { break; }
         }
 
