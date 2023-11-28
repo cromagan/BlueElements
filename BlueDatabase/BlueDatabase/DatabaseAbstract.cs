@@ -546,7 +546,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
-    public static void CheckSysUndoNow() {
+    public static void CheckSysUndoNow(ICollection<DatabaseAbstract> offDatabases) {
         if (_isInTimer) { return; }
         _isInTimer = true;
 
@@ -556,7 +556,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         try {
             var done = new List<DatabaseAbstract>();
 
-            foreach (var thisDb in AllFiles) {
+            foreach (var thisDb in offDatabases) {
                 if (!done.Contains(thisDb)) {
                     thisDb.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Überprüfe auf Veränderungen von '" + thisDb.GetType().Name + "'");
                     var db = thisDb.LoadedDatabasesWithSameServer();
@@ -2391,7 +2391,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         if (DateTime.UtcNow.Subtract(LastLoadUtc).TotalSeconds < 5) { return; }
 
         if (CriticalState()) { return; }
-        CheckSysUndoNow();
+        CheckSysUndoNow(DatabaseAbstract.AllFiles);
     }
 
     private void Checker_Tick(object state) {

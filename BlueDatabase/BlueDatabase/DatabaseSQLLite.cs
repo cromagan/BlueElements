@@ -489,9 +489,9 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
         }
 
         RepairAfterParse();
-        CheckSysUndoNow();
-        Freeze(freeze);
-        if(ReadOnly) { SetReadOnly(); }
+        CheckSysUndoNow(DatabaseAbstract.AllFiles);
+        if (!string.IsNullOrEmpty(freeze)){ Freeze(freeze); }
+        if (ReadOnly) { SetReadOnly(); }
 
 
         OnLoaded();

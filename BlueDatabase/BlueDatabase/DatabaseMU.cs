@@ -329,7 +329,7 @@ public class DatabaseMU : Database {
         }
         CheckPath();
 
-        CheckSysUndoNow();
+        //CheckSysUndoNow();
 
         _myFragmentsFilename = TempFile(FragmengtsPath(), TableName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString(Constants.Format_Date4, CultureInfo.InvariantCulture), SuffixOfFragments());
 

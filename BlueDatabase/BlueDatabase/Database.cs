@@ -408,7 +408,7 @@ public class Database : DatabaseAbstract {
         Parse(bLoaded, needPassword);
 
         RepairAfterParse();
-        CheckSysUndoNow();
+        CheckSysUndoNow(new List<DatabaseAbstract>() { this });
         if(ronly) {  SetReadOnly(); }
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         OnLoaded();
