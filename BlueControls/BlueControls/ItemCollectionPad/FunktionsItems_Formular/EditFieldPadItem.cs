@@ -295,15 +295,9 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         OnChanged();
     }
 
-    //public bool Hintergrund_Weiß_Füllen { get; set; }
     [Description("Wählt die Spalte, die angezeigt werden soll.\r\nDiese bestimmt maßgeblich die Eigenschaften")]
     public void Spalte_wählen() {
         if (IsDisposed) { return; }
-
-        //if (DatabaseInput ? == null) {
-        //    MessageBox.Show("Zuerst Datenquelle wählen.");
-        //    return;
-        //}
 
         if (DatabaseInput is not DatabaseAbstract db || db.IsDisposed) {
             MessageBox.Show("Quelle fehlerhaft!");

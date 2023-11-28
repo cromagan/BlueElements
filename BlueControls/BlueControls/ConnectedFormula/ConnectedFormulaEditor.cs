@@ -208,6 +208,11 @@ public partial class ConnectedFormulaEditor : PadEditor {
         AddCentered(x);
     }
 
+    private void btnTextGenerator_Click(object sender, System.EventArgs e) {
+        var x = new TextGeneratorPadItem(string.Empty);
+        AddCentered(x);
+    }
+
     private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
 
     private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {

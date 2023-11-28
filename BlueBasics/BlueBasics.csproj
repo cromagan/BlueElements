@@ -117,7 +117,7 @@
     <Compile Include="Cryptogaphy.cs" />
     <Compile Include="HTML.cs" />
     <Compile Include="Interfaces\ICanDropMessages.cs" />
-    <Compile Include="Interfaces\IDisposableExtended - Kopieren.cs" />
+    <Compile Include="Interfaces\IDisposableExtendedWithEvent.cs" />
     <Compile Include="Interfaces\IHasKeyName.cs" />
     <Compile Include="Interfaces\IErrorCheckable.cs" />
     <Compile Include="Interfaces\IDisposableExtended.cs" />

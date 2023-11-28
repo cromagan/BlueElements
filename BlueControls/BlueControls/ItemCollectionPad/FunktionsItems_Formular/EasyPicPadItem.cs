@@ -58,7 +58,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
 
     public bool AutoSizeableHeight => true;
 
-    [Description("Der Datename des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
+    [Description("Der Dateiname des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
     public string Bild_Dateiname {
         get => _bild_Dateiname;
 

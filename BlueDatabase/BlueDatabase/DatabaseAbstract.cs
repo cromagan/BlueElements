@@ -136,18 +136,12 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #region Constructors
 
-
-
     public DatabaseAbstract(string tablename) {
-
         // Keine Konstruktoren mit Dateiname, Filestreams oder sonst was.
         // Weil das OnLoaded-Ereigniss nicht richtig ausgelöst wird.
         Develop.StartService();
 
         QuickImage.NeedImage += QuickImage_NeedImage;
-
-
-
 
         TableName = MakeValidTableName(tablename);
 
@@ -159,7 +153,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         Row = new RowCollection(this);
         Column = new ColumnCollection(this);
         Undo = new List<UndoItem>();
-
 
         //_columnArrangements.Clear();
         //_permissionGroupsNewRow.Clear();
@@ -179,19 +172,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         //_variables.Clear();
         _variableTmp = string.Empty;
         //Undo.Clear();
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
         // Die Events registriert werden, um z.B: das Passwort abzufragen
@@ -550,7 +530,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
         var fd = DateTime.UtcNow;
 
-
         try {
             var done = new List<DatabaseAbstract>();
 
@@ -559,32 +538,33 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     thisDb.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Überprüfe auf Veränderungen von '" + thisDb.GetType().Name + "'");
 
                     #region Datenbanken des gemeinsamen Servers ermittelen
+
                     var dbwss = thisDb.LoadedDatabasesWithSameServer();
                     done.AddRange(dbwss);
                     done.Add(thisDb); // Falls LoadedDatabasesWithSameServer einen Fehler versursacht
+
                     #endregion
 
-
                     #region Auf Eigangs Datenbanken beschränken
+
                     var db = new List<DatabaseAbstract>();
                     foreach (var thisDb2 in dbwss) {
                         if (offDatabases.Contains(thisDb2)) { db.Add(thisDb2); }
                     }
+
                     #endregion
 
-
-
-                    var erg = thisDb.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
-                    if (erg.Changes == null) {
-                        if(mustDoIt) { Develop.DebugPrint(FehlerArt.Fehler, "Aktualiserung fehlgeschlagen!"); }
+                    var (changes, files) = thisDb.GetLastChanges(db, _timerTimeStamp.AddSeconds(-0.01), fd);
+                    if (changes == null) {
+                        if (mustDoIt) { Develop.DebugPrint(FehlerArt.Fehler, "Aktualiserung fehlgeschlagen!"); }
                         // Später ein neuer Versuch
                         _isInTimer = false;
                         return;
-                    } 
+                    }
 
                     var start = DateTime.UtcNow;
                     foreach (var thisdb in db) {
-                        thisdb.DoLastChanges(erg.Files, erg.Changes, fd, start);
+                        thisdb.DoLastChanges(files, changes, fd, start);
                         thisdb.TryToSetMeTemporaryMaster();
                     }
                 }
@@ -937,8 +917,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             if (!string.IsNullOrEmpty(f2)) { return f2; }
         }
 
-        var f = SetValueInternal(command, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
-        if (!string.IsNullOrEmpty(f.Error)) { return f.Error; }
+        var (error, _, _) = SetValueInternal(command, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
+        if (!string.IsNullOrEmpty(error)) { return error; }
 
         if (LogUndo) {
             AddUndo(command, column, row, previousValue, changedTo, user, datetimeutc, comment);
@@ -2288,7 +2268,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="files"></param>
     /// <param name="data"></param>
@@ -2327,16 +2307,16 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
                     var c = Column.Exists(thisWork.ColName);
                     var r = Row.SearchByKey(thisWork.RowKey);
-                    var erg = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.UpdateChanges);
+                    var (Error, Columnchanged, Rowchanged) = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.UpdateChanges);
 
-                    if (!string.IsNullOrEmpty(erg.Error)) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + erg.Error + " / " + TableName);
+                    if (!string.IsNullOrEmpty(Error)) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + Error + " / " + TableName);
                         return;
                     }
 
-                    if (c == null && erg.Columnchanged != null) { columnsAdded.AddIfNotExists(erg.Columnchanged); }
-                    if (r == null && erg.Rowchanged != null) { rowsAdded.AddIfNotExists(erg.Rowchanged); }
-                    if (erg.Rowchanged != null && erg.Columnchanged != null) { cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
+                    if (c == null && Columnchanged != null) { columnsAdded.AddIfNotExists(Columnchanged); }
+                    if (r == null && Rowchanged != null) { rowsAdded.AddIfNotExists(Rowchanged); }
+                    if (Rowchanged != null && Columnchanged != null) { cellschanged.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
                 }
             }
 
@@ -2350,7 +2330,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     }
 
     /// <summary>
-    /// 
+    ///
     /// </summary>
     /// <param name="files"></param>
     /// <param name="columnsAdded"></param>
@@ -2365,7 +2345,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         _pendingChangesTimer = new Timer(CheckSysUndo);
         _ = _pendingChangesTimer.Change(10000, 10000);
     }
-
 
     protected abstract IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer();
 
