@@ -73,6 +73,12 @@ public static class IInputFormatExtensions {
         t.FormatierungErlaubt = source.FormatierungErlaubt;
     }
 
+    /// <summary>
+    /// Prüft den Text, ob er mit dem geforderten Format (z.B. FormatHolder.Filepath) übereinstimmt
+    /// </summary>
+    /// <param name="txt"></param>
+    /// <param name="formatToCheck">z.B. FormatHolder.Filepath</param>
+    /// <returns></returns>
     public static bool IsFormat(this string txt, IInputFormat formatToCheck) {
         var l = new List<string>();
 

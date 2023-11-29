@@ -53,6 +53,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo = new BlueControls.Controls.Caption();
             this.GlobalTab = new BlueControls.Controls.TabControl();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
+            this.butSystemspaltenErstellen = new BlueControls.Controls.Button();
             this.btnOptimize = new BlueControls.Controls.Button();
             this.txbStandardFormulaFile = new BlueControls.Controls.TextBox();
             this.capStandardFormulaFile = new BlueControls.Controls.Caption();
@@ -69,7 +70,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.btnClipboard = new BlueControls.Controls.Button();
             this.tblUndo = new BlueControls.Controls.Table();
             this.capBinInfo = new BlueControls.Controls.Caption();
-            this.butSystemspaltenErstellen = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -274,7 +274,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capInfo.CausesValidation = false;
             this.capInfo.Location = new System.Drawing.Point(8, 56);
             this.capInfo.Name = "capInfo";
-            this.capInfo.Size = new System.Drawing.Size(608, 90);
+            this.capInfo.Size = new System.Drawing.Size(608, 144);
             this.capInfo.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // GlobalTab
@@ -299,13 +299,13 @@ namespace BlueControls.BlueDatabaseDialogs
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabAllgemein.Controls.Add(this.txbZeilenQuickInfo);
             this.tabAllgemein.Controls.Add(this.butSystemspaltenErstellen);
             this.tabAllgemein.Controls.Add(this.btnOptimize);
             this.tabAllgemein.Controls.Add(this.txbStandardFormulaFile);
             this.tabAllgemein.Controls.Add(this.capStandardFormulaFile);
             this.tabAllgemein.Controls.Add(this.txbAdditionalFiles);
             this.tabAllgemein.Controls.Add(this.capAdditional);
-            this.tabAllgemein.Controls.Add(this.txbZeilenQuickInfo);
             this.tabAllgemein.Controls.Add(this.capZeilenQuickInfo);
             this.tabAllgemein.Controls.Add(this.txbGlobalScale);
             this.tabAllgemein.Controls.Add(this.capGlobalScale);
@@ -321,6 +321,17 @@ namespace BlueControls.BlueDatabaseDialogs
             this.tabAllgemein.Size = new System.Drawing.Size(1233, 678);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
+            // 
+            // butSystemspaltenErstellen
+            // 
+            this.butSystemspaltenErstellen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.butSystemspaltenErstellen.ImageCode = "Spalte|16";
+            this.butSystemspaltenErstellen.Location = new System.Drawing.Point(8, 632);
+            this.butSystemspaltenErstellen.Name = "butSystemspaltenErstellen";
+            this.butSystemspaltenErstellen.Size = new System.Drawing.Size(200, 32);
+            this.butSystemspaltenErstellen.TabIndex = 49;
+            this.butSystemspaltenErstellen.Text = "Alle Systemspalten erstellen";
+            this.butSystemspaltenErstellen.Click += new System.EventHandler(this.butSystemspaltenErstellen_Click);
             // 
             // btnOptimize
             // 
@@ -377,17 +388,17 @@ namespace BlueControls.BlueDatabaseDialogs
             this.txbZeilenQuickInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.txbZeilenQuickInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbZeilenQuickInfo.Location = new System.Drawing.Point(8, 176);
+            this.txbZeilenQuickInfo.Location = new System.Drawing.Point(8, 216);
             this.txbZeilenQuickInfo.MultiLine = true;
             this.txbZeilenQuickInfo.Name = "txbZeilenQuickInfo";
-            this.txbZeilenQuickInfo.Size = new System.Drawing.Size(608, 230);
+            this.txbZeilenQuickInfo.Size = new System.Drawing.Size(608, 190);
             this.txbZeilenQuickInfo.TabIndex = 43;
             this.txbZeilenQuickInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capZeilenQuickInfo
             // 
             this.capZeilenQuickInfo.CausesValidation = false;
-            this.capZeilenQuickInfo.Location = new System.Drawing.Point(8, 160);
+            this.capZeilenQuickInfo.Location = new System.Drawing.Point(8, 200);
             this.capZeilenQuickInfo.Name = "capZeilenQuickInfo";
             this.capZeilenQuickInfo.Size = new System.Drawing.Size(152, 18);
             this.capZeilenQuickInfo.Text = "Zeilen-Quick-Info: ";
@@ -474,9 +485,9 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tblUndo.DropMessages = false;
+            this.tblUndo.FilterManualSeted = false;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
-            this.tblUndo.ShowWaitScreen = true;
             this.tblUndo.Size = new System.Drawing.Size(1233, 624);
             this.tblUndo.TabIndex = 0;
             this.tblUndo.Text = "UndoTab";
@@ -492,17 +503,6 @@ namespace BlueControls.BlueDatabaseDialogs
             this.capBinInfo.Size = new System.Drawing.Size(1039, 24);
             this.capBinInfo.Text = "Die hier aufgeführten Binärdaten können - falls es ein Bild ist - mit DB_Dateinam" +
     "e mit Suffix angesprochen werden.";
-            // 
-            // butSystemspaltenErstellen
-            // 
-            this.butSystemspaltenErstellen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.butSystemspaltenErstellen.ImageCode = "Spalte|16";
-            this.butSystemspaltenErstellen.Location = new System.Drawing.Point(8, 632);
-            this.butSystemspaltenErstellen.Name = "butSystemspaltenErstellen";
-            this.butSystemspaltenErstellen.Size = new System.Drawing.Size(200, 32);
-            this.butSystemspaltenErstellen.TabIndex = 49;
-            this.butSystemspaltenErstellen.Text = "Alle Systemspalten erstellen";
-            this.butSystemspaltenErstellen.Click += new System.EventHandler(this.butSystemspaltenErstellen_Click);
             // 
             // DatabaseHeadEditor
             // 

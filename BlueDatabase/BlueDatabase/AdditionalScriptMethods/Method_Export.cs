@@ -106,7 +106,7 @@ internal class Method_Export : Method_Database {
             switch (attvar.ValueStringGet(1).ToUpper()) {
                 case "MDB":
                 case "BDB": {
-                        var bytes = Database.ToListOfByte(db, 100);
+                        var bytes = Database.ToListOfByte(db, 100, db.FileStateUTCDate);
 
                         if (bytes == null) { return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Daten."); }
 

@@ -44,7 +44,7 @@ public class Database : DatabaseAbstract {
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private bool _isInSave;
 
-    public Database(string tablename) : base(tablename) {    }
+    public Database(string tablename) : base(tablename) { }
 
     #endregion
 
@@ -150,11 +150,9 @@ public class Database : DatabaseAbstract {
     }
 
     public static bool SaveToFile(DatabaseAbstract db, int minLen, string filn) {
-        var bytes = ToListOfByte(db, minLen);
+        var bytes = ToListOfByte(db, minLen, db.FileStateUTCDate);
 
-        if (bytes == null) {
-            return false;
-        }
+        if (bytes == null) { return false; }
 
         try {
             using FileStream x = new(filn, FileMode.Create, FileAccess.Write, FileShare.None);
@@ -166,7 +164,7 @@ public class Database : DatabaseAbstract {
         return true;
     }
 
-    public static List<byte>? ToListOfByte(DatabaseAbstract db, int minLen) {
+    public static List<byte>? ToListOfByte(DatabaseAbstract db, int minLen, DateTime fileStateUTCDateToSave) {
         try {
             var x = db.LastChange;
             List<byte> l = new();
@@ -185,7 +183,7 @@ public class Database : DatabaseAbstract {
             //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
             SaveToByteList(l, DatabaseDataType.Creator, db.Creator);
             SaveToByteList(l, DatabaseDataType.CreateDateUTC, db.CreateDate);
-            SaveToByteList(l, DatabaseDataType.FileStateUTCDate, db.FileStateUTCDate.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture));
+            SaveToByteList(l, DatabaseDataType.FileStateUTCDate, fileStateUTCDateToSave.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture));
             SaveToByteList(l, DatabaseDataType.Caption, db.Caption);
 
             SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
@@ -245,7 +243,7 @@ public class Database : DatabaseAbstract {
 
             var undoCount = 5000;
             //SaveToByteList(l, DatabaseDataType.UndoCount, db.UndoCount.ToString());
-            if (works2.Count > undoCount) { works2.RemoveRange(0, works2.Count - undoCount); }
+            if (works2.Count > undoCount) { works2.RemoveRange(0, works2.Count - undoCount); }  
             SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
             SaveToByteList(l, DatabaseDataType.EOF, "END");
 
@@ -259,7 +257,7 @@ public class Database : DatabaseAbstract {
             return l;
         } catch {
             Develop.CheckStackForOverflow();
-            return ToListOfByte(db, minLen);
+            return ToListOfByte(db, minLen, fileStateUTCDateToSave);
         }
     }
 
@@ -408,11 +406,11 @@ public class Database : DatabaseAbstract {
 
         RepairAfterParse();
         CheckSysUndoNow(new List<DatabaseAbstract>() { this }, true);
-        if(ronly) {  SetReadOnly(); }
+        if (ronly) { SetReadOnly(); }
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         OnLoaded();
 
-        if(!string.IsNullOrEmpty(FreezedReason)) { return; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return; }
 
         CreateWatcher();
         _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
@@ -429,7 +427,7 @@ public class Database : DatabaseAbstract {
         }
 
 
-        if(bLoaded.isZipped()) { bLoaded = bLoaded.UnzipIt(); }
+        if (bLoaded.isZipped()) { bLoaded = bLoaded.UnzipIt(); }
         //if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
         //    // Gezipte Daten-Kennung gefunden
         //    bLoaded = MultiUserFile.UnzipIt(bLoaded);
@@ -622,7 +620,7 @@ public class Database : DatabaseAbstract {
         if (!HasPendingChanges) { return false; }
 
         _isInSave = true;
-        var v = SaveInternal();
+        var v = SaveInternal(_fileStateUTCDate);
         _isInSave = false;
         OnInvalidateView();
         return v;
@@ -636,7 +634,7 @@ public class Database : DatabaseAbstract {
 
         Filename = newFileName;
 
-        var l = ToListOfByte(this, 100);
+        var l = ToListOfByte(this, 100, _fileStateUTCDate);
 
         if (l == null) { return; }
 
@@ -702,13 +700,13 @@ public class Database : DatabaseAbstract {
 
     protected override IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer() => new List<DatabaseAbstract>() { this };
 
-    protected bool SaveInternal() {
+    protected bool SaveInternal(DateTime setfileStateUTCDateTo) {
         var m = EditableErrorReason(EditableErrorReasonType.Save);
         if (!string.IsNullOrEmpty(m)) { return false; }
 
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
-        var tmpFileName = WriteTempFileToDisk();
+        var tmpFileName = WriteTempFileToDisk(setfileStateUTCDateTo);
 
         if (string.IsNullOrEmpty(tmpFileName)) { return false; }
 
@@ -729,6 +727,7 @@ public class Database : DatabaseAbstract {
         _ = MoveFile(tmpFileName, Filename, true);
 
         HasPendingChanges = false;
+        _fileStateUTCDate = setfileStateUTCDateTo;
         return true;
     }
 
@@ -993,11 +992,11 @@ public class Database : DatabaseAbstract {
         return bLoaded;
     }
 
-    private string WriteTempFileToDisk() {
+    private string WriteTempFileToDisk(DateTime setfileStateUTCDateTo) {
         var f = EditableErrorReason(EditableErrorReasonType.Save);
         if (!string.IsNullOrEmpty(f)) { return string.Empty; }
 
-        var dataUncompressed = ToListOfByte(this, 1200)?.ToArray();
+        var dataUncompressed = ToListOfByte(this, 1200, setfileStateUTCDateTo)?.ToArray();
 
         if (dataUncompressed == null) { return string.Empty; }
 
@@ -1009,6 +1008,8 @@ public class Database : DatabaseAbstract {
         x.Write(datacompressed, 0, datacompressed.Length);
         x.Flush();
         x.Close();
+
+
 
         return tmpFileName;
     }

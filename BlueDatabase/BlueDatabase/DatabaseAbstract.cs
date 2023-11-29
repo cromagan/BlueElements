@@ -1935,10 +1935,16 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         LastChange = DateTime.UtcNow;
 
         if (type.IsCellValue()) {
-            if (column?.Database is not DatabaseAbstract db || row == null) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Spalte/Zeile ist null! " + type);
+            if (column?.Database is not DatabaseAbstract db) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
                 return ("Wert nicht gesetzt!", null, null);
             }
+
+            if (row == null) {
+                Develop.DebugPrint(FehlerArt.Warnung, "Zeile ist null! " + type);
+                return ("Wert nicht gesetzt!", null, null);
+            }
+
             column.Invalidate_ContentWidth();
             //row.InvalidateCheckData();
 
@@ -2310,7 +2316,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     var (Error, Columnchanged, Rowchanged) = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.UpdateChanges);
 
                     if (!string.IsNullOrEmpty(Error)) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + Error + " / " + TableName);
+                        Freeze("Datenbank-Fehler: " + Error + " " + thisWork.ToString());
+                        //Develop.DebugPrint(FehlerArt.Fehler, "Fehler beim Nachladen: " + Error + " / " + TableName);
                         return;
                     }
 

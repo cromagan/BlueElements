@@ -18,10 +18,12 @@
 #nullable enable
 
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -151,6 +153,11 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         r.CellSet("AenderZeit", work.DateTimeUtc);
         r.CellSet("Kommentar", work.Comment);
 
+        if(work.Container.IsFormat(FormatHolder.FilepathAndName)) {
+            r.CellSet("Herkunft", work.Container.FileNameWithoutSuffix());
+        }
+        
+
         var symb = ImageCode.Fragezeichen;
         var alt = work.PreviousValue;
         var neu = work.ChangedTo;
@@ -217,7 +224,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
             case DatabaseDataType.Command_NewStart:
                 symb = ImageCode.Abspielen;
-                neu = "Benutzer: " + work.User;
+                //neu = "Benutzer: " + work.User;
                 break;
 
 
@@ -262,9 +269,10 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         }
 
         var t = "<b>Tabelle:</b> <tab>" + Database.TableName + "<br>";
-        t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueId + "<br>";
         t += "<b>Zeilen:</b> <tab>" + (Database.Row.Count() - 1) + "<br>";
-        t += "<b>Temporärer Master:</b>  <tab>" + Database.TemporaryDatabaseMasterTimeUtc + " " + Database.TemporaryDatabaseMasterUser;
+        t += "<b>Temporärer Master:</b>  <tab>" + Database.TemporaryDatabaseMasterTimeUtc + " " + Database.TemporaryDatabaseMasterUser + "<br>";
+        t += "<b>Letzte Komplettierung:</b> <tab>" + Database.FileStateUTCDate.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture) + "<br>";
+        t += "<b>ID:</b> <tab>" + Database.ConnectionData.UniqueId + "<br>";
         capInfo.Text = t.TrimEnd("<br>");
     }
 
@@ -283,6 +291,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         _ = x.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
         _ = x.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
+        _ = x.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder.Text);
         foreach (var thisColumn in x.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
@@ -295,7 +304,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         x.RepairAfterParse();
 
         var car = x.ColumnArrangements.CloneWithClones();
-        car[1].ShowColumns("ColumnName", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar");
+        car[1].ShowColumns("ColumnName", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar", "Herkunft");
 
         x.ColumnArrangements = new(car);
 

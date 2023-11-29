@@ -220,8 +220,11 @@ public class DatabaseMU : Database {
         base.Dispose(disposing);
     }
 
+    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
+
     protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged, DateTime starttimeUTC) {
         base.DoWorkAfterLastChanges (files, columnsAdded, rowsAdded, cellschanged, starttimeUTC);
+        if(ReadOnly) { return; }
         if (files == null || files.Count < 1) { return; }
         if (DateTime.UtcNow.Subtract(starttimeUTC).TotalSeconds > 120) { return; }
         if (!Directory.Exists(OldFragmengtsPath())) { return; }
@@ -239,14 +242,14 @@ public class DatabaseMU : Database {
 
         #region Bei Bedarf neue Komplett-Datenbank erstellen
         if (_changesNotIncluded.Count() > 0  && AmITemporaryMaster(false)) {
-            if (files.Count > 3 || _changesNotIncluded.Count() > 50) {
-                var tmp = _fileStateUTCDate;
+            if (files.Count > 10 || _changesNotIncluded.Count() > 50) {
+                //var tmp = _fileStateUTCDate;
 
-                _fileStateUTCDate = IsInCache;
+                //_fileStateUTCDate = IsInCache;
                 // Nicht FileStateUTCDate - sonst springt der Writer an!
                 OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Erstelle neue Komplett-Datenbank: " + TableName);
-                if (!SaveInternal()) {
-                    _fileStateUTCDate = tmp;
+                if (!SaveInternal(IsInCache)) {
+                    //_fileStateUTCDate = tmp;
                     return;
                 }
 
@@ -261,9 +264,9 @@ public class DatabaseMU : Database {
 
         if (_changesNotIncluded.Count() > 0) {
             foreach (var thisch in _changesNotIncluded) {
-                if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalHours < 12) {
+                //if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalHours < 12) {
                     files.Remove(thisch.Container);
-                }
+                //}
             }
         }
 
@@ -338,7 +341,7 @@ public class DatabaseMU : Database {
         _writer.WriteLine("- DB " + DatabaseVersion);
         _writer.WriteLine("- User " + UserName);
 
-        var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, string.Empty, UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt");
+        var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt");
         _writer.WriteLine(l.ToString());
         _writer.Flush();
     }
