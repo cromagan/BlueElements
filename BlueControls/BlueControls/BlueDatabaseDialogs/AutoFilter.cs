@@ -49,12 +49,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     #region Constructors
 
-    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned) : base(Design.Form_AutoFilter) {
+    public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth) : base(Design.Form_AutoFilter) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
 
         _column = column;
-        GenerateAll(fc, pinned);
+        GenerateAll(fc, pinned, minWidth);
     }
 
     #endregion
@@ -83,7 +83,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         return column.Contents(fc2, pinned);
     }
 
-    public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned) {
+    public void GenerateAll(FilterCollection? fc, List<RowItem>? pinned, int minWidth) {
         var nochOk = true;
         var listFilterString = Autofilter_ItemList(_column, fc, pinned);
         //var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
@@ -98,7 +98,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         }
         lColumn ??= _column;
 
-        Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), lColumn.ContentWidth);
+        Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), minWidth);
         lsbFilterItems.Item.Clear();
         lsbFilterItems.CheckBehavior = CheckBehavior.MultiSelection;
 
@@ -112,7 +112,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         var prefSize = lsbFilterItems.Item.CalculateColumnAndSize();
         lsbFilterItems.Anchor = AnchorStyles.Left | AnchorStyles.Top;
-        lsbFilterItems.Width = Math.Min(lColumn.ContentWidth, Width - (Skin.PaddingSmal * 2));
+        lsbFilterItems.Width = Math.Min(minWidth, Width - (Skin.PaddingSmal * 2));
         lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, prefSize.Width);
         lsbFilterItems.Height = Math.Max(lsbFilterItems.Height, prefSize.Height);
         lsbFilterItems.Width = Math.Max(lsbFilterItems.Width, Width - (Skin.PaddingSmal * 2));

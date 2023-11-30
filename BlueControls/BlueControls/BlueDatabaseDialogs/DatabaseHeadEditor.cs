@@ -254,9 +254,11 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 thisColumn.MultiLine = true;
                 thisColumn.TextBearbeitungErlaubt = false;
                 thisColumn.DropdownBearbeitungErlaubt = false;
-                thisColumn.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text;
+                thisColumn.BehaviorOfImageAndText = BildTextVerhalten.Nur_Text;
             }
         }
+
+        if (x.Column.Exists("Symbol") is ColumnItem c) { c.BehaviorOfImageAndText = BildTextVerhalten.Bild_oder_Text; }
 
         x.RepairAfterParse();
 

@@ -42,6 +42,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     #region Fields
 
     public static readonly string TmpNewDummy = "TMPNEWDUMMY";
+    public int? Contentwidth;
     public DateTime? IsInCache = null;
 
     //public string _timecode;
@@ -75,7 +76,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     private string _captionGroup3;
     private string _cellInitValue;
     private string _constantHeightOfImageCode;
-    private int _contentwidth;
     private TranslationType _doOpticalTranslation;
     private bool _dropdownAllesAbwählenErlaubt;
     private bool _dropdownBearbeitungErlaubt;
@@ -171,8 +171,8 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         _adminInfo = string.Empty;
         _maxTextLenght = 4000;
         _maxCellLenght = 4000;
-        _contentwidth = -1;
-        ContentWidthIsValid = false;
+        Contentwidth = null;
+        //ContentWidthIsValid = false;
         _captionBitmapCode = string.Empty;
         _filterOptions = FilterOptions.Enabled | FilterOptions.TextFilterEnabled | FilterOptions.ExtendedFilterEnabled;
         //_AutofilterErlaubt = true;
@@ -459,17 +459,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public int ContentWidth {
-        get => _contentwidth;
-        set {
-            if (IsDisposed) { return; }
-            if (_contentwidth == value) { return; }
-            _ = Database?.ChangeData(DatabaseDataType.ColumnContentWidth, this, null, _contentwidth.ToString(), value.ToString(), Generic.UserName, DateTime.UtcNow, string.Empty);
-            OnChanged();
-        }
-    }
-
-    public bool ContentWidthIsValid { get; private set; }
     public DatabaseAbstract? Database { get; private set; }
 
     public TranslationType DoOpticalTranslation {
@@ -1139,7 +1128,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public void CloneFrom(ColumnItem source, bool nameAndKeyToo, bool changeWidth) {
+    public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
         if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut))) { return; }
 
         if (source.Database != null) { source.Repair(); }
@@ -1164,14 +1153,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         PermissionGroupsChangeCell = source.PermissionGroupsChangeCell;
         Tags = source.Tags;
         AdminInfo = source.AdminInfo;
-        //TimeCode = source.TimeCode;
-        if (changeWidth) {
-            ContentWidth = source.ContentWidth;
-            ContentWidthIsValid = source.ContentWidthIsValid;
-        } else {
-            Invalidate_ContentWidth();
-        }
-
+        Invalidate_ContentWidth();
         FilterOptions = source.FilterOptions;
         IgnoreAtRowFilter = source.IgnoreAtRowFilter;
         DropdownBearbeitungErlaubt = source.DropdownBearbeitungErlaubt;
@@ -2162,7 +2144,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// <summary>
     /// Wenn sich ein Zelleninhalt verändert hat, muss die Spalte neu berechnet werden.
     /// </summary>
-    internal void Invalidate_ContentWidth() => ContentWidthIsValid = false;
+    internal void Invalidate_ContentWidth() => Contentwidth = null;
 
     internal void Invalidate_Head() {
         TmpCaptionTextSize = new SizeF(-1, -1);
@@ -2190,13 +2172,13 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 ScriptType = ScriptType.Nicht_vorhanden;
             }
 
-            // Beeinflussst stark den Áufbau bei großen Zeilen.
-            // Aber erst ab 20, da es ansonsten wenige verschiedene Einträge sind, es und es sich nicht reniert.
-            // Zudem können zu kleine Werte ein Berechnungsfehler sein
-            Invalidate_ContentWidth();
-            if (ContentWidth > 20 && FixedColumnWidth == 0) {
-                FixedColumnWidth = ContentWidth;
-            }
+            //// Beeinflussst stark den Áufbau bei großen Zeilen.
+            //// Aber erst ab 20, da es ansonsten wenige verschiedene Einträge sind, es und es sich nicht reniert.
+            //// Zudem können zu kleine Werte ein Berechnungsfehler sein
+            //Invalidate_ContentWidth();
+            //if (_contentwidth is int v && v > 20 && FixedColumnWidth == 0) {
+            //    FixedColumnWidth = v;
+            //}
         }
     }
 
@@ -2380,10 +2362,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _adminInfo = newvalue;
                 break;
 
-            case DatabaseDataType.ColumnContentWidth:
-                _contentwidth = IntParse(newvalue);
-                ContentWidthIsValid = true;
-                break;
+            //case DatabaseDataType.ColumnContentWidth:
+            //    _contentwidth = IntParse(newvalue);
+            //    ContentWidthIsValid = true;
+            //    break;
 
             case DatabaseDataType.CaptionBitmapCode:
                 _captionBitmapCode = newvalue;

@@ -423,7 +423,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         if (f.Filter.Column == null) { return; }
 
         //f.Enabled = false;
-        AutoFilter autofilter = new(f.Filter.Column, _table.Filter, _table.PinnedRows);
+        AutoFilter autofilter = new(f.Filter.Column, _table.Filter, _table.PinnedRows, f.Width);
         var p = f.PointToScreen(Point.Empty);
         autofilter.Position_LocateToPosition(p with { Y = p.Y + f.Height });
         autofilter.Show();

@@ -234,7 +234,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
+    [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool FilterManualSeted { get; set; } = false;
+
     public FilterCollection FilterOutput { get; } = new();
 
     [DefaultValue(1.0f)]
@@ -338,7 +343,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (column.IsDisposed) { return 16; }
         if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return 16; }
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
-        if (column.ContentWidthIsValid) { return column.ContentWidth; }
+        if (column.Contentwidth is int v) { return v; }
 
         column.RefreshColumnsData();
 
@@ -366,7 +371,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return CalculateColumnContentWidth(table, column, cellFont, pix16);
         }
 
-        column.ContentWidth = newContentWidth;
+        column.Contentwidth = newContentWidth;
         return newContentWidth;
     }
 
@@ -2018,8 +2023,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         return;
                     }
 
-                    if (_mouseOverRow != null && _mouseOverColumn.Format == DataFormat.Button) {
-                        OnButtonCellClicked(new CellEventArgs(_mouseOverColumn, _mouseOverRow?.Row));
+                    if (_mouseOverRow?.Row is RowItem r && _mouseOverColumn.Format == DataFormat.Button) {
+                        OnButtonCellClicked(new CellEventArgs(_mouseOverColumn, r));
                         Invalidate();
                     }
                 }
@@ -2468,7 +2473,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
         //Database.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
         //OnBeforeAutoFilterShow(new ColumnEventArgs(columnviewitem.Column));
-        _autoFilter = new AutoFilter(columnviewitem.Column, Filter, PinnedRows);
+        _autoFilter = new AutoFilter(columnviewitem.Column, Filter, PinnedRows, Column_DrawWidth(columnviewitem, DisplayRectangleWithoutSlider()));
         _autoFilter.Position_LocateToPosition(new Point(screenx + (int)columnviewitem.OrderTmpSpalteX1, screeny + HeadSize(ca)));
         _autoFilter.Show();
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
@@ -2738,7 +2743,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
 
         if (viewItem?.Column == null) { return 0; }
-        if (viewItem.TmpDrawWidth != null) { return (int)viewItem.TmpDrawWidth; }
+        if (viewItem.TmpDrawWidth is int v) { return v; }
 
         if (_design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
             viewItem.TmpDrawWidth = displayRectangleWoSlider.Width - 1;
@@ -2746,7 +2751,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         if (viewItem.TmpReduced) {
-            viewItem.TmpDrawWidth = 16;
+            viewItem.TmpDrawWidth = _pix16;
         } else {
             viewItem.TmpDrawWidth = viewItem.ViewType == ViewType.PermanentColumn
                 ? Math.Min(CalculateColumnContentWidth(this, viewItem.Column, (Font)_cellFont, _pix16), (int)(displayRectangleWoSlider.Width * 0.3))
@@ -3005,7 +3010,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
         if (Database.Column.First() is ColumnItem columnFirst && viewItem.Column == columnFirst && UserEdit_NewRowAllowed()) {
-            Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle((int)viewItem.OrderTmpSpalteX1 + 1, (int)(-SliderY.Value + HeadSize(ca) + 1), (int)viewItem.TmpDrawWidth - 2, 16 - 2), this, false, _newRowFont, Translate);
+            Skin.Draw_FormatedText(gr, "[Neue Zeile]", QuickImage.Get(ImageCode.PlusZeichen, _pix16), Alignment.Left, new Rectangle((int)viewItem.OrderTmpSpalteX1 + 1, (int)(-SliderY.Value + HeadSize(ca) + 1), Column_DrawWidth(viewItem, displayRectangleWoSlider) - 2, 16 - 2), this, false, _newRowFont, Translate);
         }
 
         for (var zei = firstVisibleRow; zei <= lastVisibleRow; zei++) {
@@ -3068,7 +3073,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void Draw_Column_Head_Captions(Graphics gr, ColumnViewCollection ca) {
+    private void Draw_Column_Head_Captions(Graphics gr, ColumnViewCollection ca, Rectangle displayRectangleWoSlider) {
         var bvi = new ColumnViewItem?[3];
         var lcbvi = new ColumnViewItem[3];
         ColumnViewItem? lastViewItem = null;
@@ -3076,12 +3081,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         for (var x = 0; x < ca.Count + 1; x++) {
             var viewItem = x < ca.Count ? ca[x] : null;
+
+            var tmpw = Column_DrawWidth(viewItem, displayRectangleWoSlider);
+
             if (viewItem != null && viewItem.ViewType == ViewType.PermanentColumn) {
-                permaX = Math.Max(permaX, (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth);
+                permaX = Math.Max(permaX, (int)viewItem.OrderTmpSpalteX1 + tmpw);
             }
             if (viewItem == null ||
                 viewItem.ViewType == ViewType.PermanentColumn ||
-                (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth > permaX) {
+                (int)viewItem.OrderTmpSpalteX1 + tmpw > permaX) {
                 for (var u = 0; u < 3; u++) {
                     var n = viewItem?.Column.CaptionGroup(u);
                     var v = bvi[u]?.Column.CaptionGroup(u);
@@ -3089,9 +3097,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         if (!string.IsNullOrEmpty(v) && lastViewItem != null) {
                             var le = Math.Max(0, (int)bvi[u].OrderTmpSpalteX1);
                             //int RE = (int)LastViewItem.OrderTMP_Spalte_X1 - 1 ;
-                            var re = (int)lastViewItem.OrderTmpSpalteX1 + (int)lastViewItem.TmpDrawWidth - 1;
+                            var re = (int)lastViewItem.OrderTmpSpalteX1 + Column_DrawWidth(lastViewItem, displayRectangleWoSlider) - 1;
                             if (viewItem?.ViewType != ViewType.PermanentColumn && bvi[u].ViewType != ViewType.PermanentColumn) { le = Math.Max(le, permaX); }
-                            if (viewItem?.ViewType != ViewType.PermanentColumn && bvi[u].ViewType == ViewType.PermanentColumn) { re = Math.Max(re, (int)lcbvi[u].OrderTmpSpalteX1 + (int)lcbvi[u].TmpDrawWidth); }
+                            if (viewItem?.ViewType != ViewType.PermanentColumn && bvi[u].ViewType == ViewType.PermanentColumn) {
+                                var tmp2 = Column_DrawWidth(lcbvi[u], displayRectangleWoSlider);
+                                re = Math.Max(re, (int)lcbvi[u].OrderTmpSpalteX1 + tmp2);
+                            }
                             if (le < re) {
                                 Rectangle r = new(le, u * ColumnCaptionSizeY, re - le, ColumnCaptionSizeY);
                                 gr.FillRectangle(new SolidBrush(bvi[u].Column.BackColor), r);
@@ -3180,7 +3191,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         DrawControl(gr, state);
                         return;
                     }
-                    permaX = Math.Max(permaX, (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth);
+
+                    permaX = Math.Max(permaX, (int)viewItem.OrderTmpSpalteX1 + Column_DrawWidth(viewItem, displayRectangleWoSlider));
                 }
             }
 
@@ -3194,7 +3206,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnHead, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
 
             /// Überschriften 1-3 Zeichnen
-            Draw_Column_Head_Captions(gr, ca);
+            Draw_Column_Head_Captions(gr, ca, displayRectangleWoSlider);
             Skin.Draw_Border(gr, Enums.Design.Table_And_Pad, state, displayRectangleWoSlider);
 
             ////gr.Clear(Color.White);
@@ -3202,7 +3214,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             //return;
 
-            if (db.HasPendingChanges && !!string.IsNullOrEmpty(db.Filename)) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
+            if (db.HasPendingChanges && !string.IsNullOrEmpty(db.Filename)) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
             if (db.ReadOnly) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8);
                 if (!string.IsNullOrEmpty(db.FreezedReason)) {
@@ -3230,7 +3242,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (viewItem?.Column != null) {
                 lfdno++;
                 if (IsOnScreen(viewItem, displayRectangleWoSlider)) {
-                    if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (viewItem.OrderTmpSpalteX1 ?? 0) + (viewItem.TmpDrawWidth ?? 0) > permaX) ||
+                    if ((col == TableDrawColumn.NonPermament && viewItem.ViewType != ViewType.PermanentColumn && (viewItem.OrderTmpSpalteX1 ?? 0) + Column_DrawWidth(viewItem, displayRectangleWoSlider) > permaX) ||
                         (col == TableDrawColumn.Permament && viewItem.ViewType == ViewType.PermanentColumn)) {
                         switch (type) {
                             case TableDrawType.ColumnBackBody:

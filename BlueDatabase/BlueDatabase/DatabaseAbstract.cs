@@ -956,7 +956,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     public void CloneFrom(DatabaseAbstract sourceDatabase, bool cellDataToo, bool tagsToo) {
         _ = sourceDatabase.Save();
 
-        Column.CloneFrom(sourceDatabase, cellDataToo);
+        Column.CloneFrom(sourceDatabase);
 
         if (cellDataToo) { Row.CloneFrom(sourceDatabase); }
 
@@ -1414,7 +1414,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     /// <summary>
     /// Friert die Datenbank komplett ein, nur noch Ansicht möglich.
-    /// Setzt auch ReadOnly
+    /// Setzt auch ReadOnly.
     /// </summary>
     /// <param name="reason"></param>
     public void Freeze(string reason) {

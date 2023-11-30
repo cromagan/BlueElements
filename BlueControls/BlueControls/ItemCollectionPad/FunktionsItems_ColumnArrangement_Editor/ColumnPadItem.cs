@@ -157,7 +157,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
             return;
         }
 
-        var wi = Math.Max(Column.ContentWidth, 24);
+        var wi = Math.Max(Column.Contentwidth ?? 0, 24);
 
         var bmp = new Bitmap(Math.Max((int)(wi * 0.7), 30), 300);
         var gr = Graphics.FromImage(bmp);

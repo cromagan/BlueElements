@@ -44,13 +44,11 @@ public class Database : DatabaseAbstract {
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
     private bool _isInSave;
 
-    public Database(string tablename) : base(tablename) { }
-
     #endregion
 
     #region Constructors
 
-
+    public Database(string tablename) : base(tablename) { }
 
     #endregion
 
@@ -59,8 +57,6 @@ public class Database : DatabaseAbstract {
     public static string DatabaseId => nameof(Database);
 
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
-
- 
 
     #endregion
 
@@ -122,7 +118,7 @@ public class Database : DatabaseAbstract {
         SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), name);
         SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.Quickinfo, name);
         SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, name);
-        SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
+        //SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
         SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
         SaveToByteList(l, DatabaseDataType.AllowedChars, c.AllowedChars, name);
         SaveToByteList(l, DatabaseDataType.MaxTextLenght, c.MaxTextLenght.ToString(), name);
@@ -243,7 +239,7 @@ public class Database : DatabaseAbstract {
 
             var undoCount = 5000;
             //SaveToByteList(l, DatabaseDataType.UndoCount, db.UndoCount.ToString());
-            if (works2.Count > undoCount) { works2.RemoveRange(0, works2.Count - undoCount); }  
+            if (works2.Count > undoCount) { works2.RemoveRange(0, works2.Count - undoCount); }
             SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
             SaveToByteList(l, DatabaseDataType.EOF, "END");
 
@@ -426,7 +422,6 @@ public class Database : DatabaseAbstract {
             bLoaded = r.ReadBytes((int)stream.Length);
             r.Close();
         }
-
 
         if (bLoaded.isZipped()) { bLoaded = bLoaded.UnzipIt(); }
         //if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
@@ -1001,8 +996,6 @@ public class Database : DatabaseAbstract {
         x.Write(datacompressed, 0, datacompressed.Length);
         x.Flush();
         x.Close();
-
-
 
         return tmpFileName;
     }

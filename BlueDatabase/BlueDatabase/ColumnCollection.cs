@@ -479,7 +479,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return true;
     }
 
-    internal void CloneFrom(DatabaseAbstract sourceDatabase, bool changeWidth) {
+    internal void CloneFrom(DatabaseAbstract sourceDatabase) {
         // Spalten, die zu viel sind, löschen
         var names = new List<ColumnItem>();
         foreach (var thisColumn in this) {
@@ -496,7 +496,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, thisColumn.Suffix, null, thisColumn.Quickinfo);
 
             if (l != null) {
-                l.CloneFrom(thisColumn, true, changeWidth);
+                l.CloneFrom(thisColumn, true);
 
                 if (l.KeyName != thisColumn.KeyName) {
                     Develop.DebugPrint(FehlerArt.Fehler, "Name nicht korrekt!");
@@ -516,7 +516,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         if (type == DatabaseDataType.Command_AddColumnByName) {
             var c = Exists(name);
-            if (c != null && !c.IsDisposed) { return string.Empty ; }//"Spalte " + name + " bereits vorhanden!"
+            if (c != null && !c.IsDisposed) { return string.Empty; }//"Spalte " + name + " bereits vorhanden!"
 
             c = new ColumnItem(Database, name);
             var f = Add(c, reason);
