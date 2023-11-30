@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Windows.Forms;
@@ -32,6 +33,7 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using BlueScript.Variables;
 using static BlueBasics.Converter;
 
 namespace BlueControls.BlueDatabaseDialogs;
@@ -60,15 +62,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     public DatabaseAbstract? Database { get; private set; }
 
     #endregion
-
-    //public static void FormularWandeln(Database _database, string fn) {
-    //    var x = new ConnectedFormula.ConnectedFormula();
-    //    var tmp = new Formula();
-    //    tmp.Size = x.PadData.SheetSizeInPix.ToSize();
-    //    tmp.Database = _database;
-    //    tmp.GenerateTabsToNewFormula(x);
-    //    x.SaveAsAndChangeTo(fn);
-    //}
 
     #region Methods
 
@@ -125,26 +118,25 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         lbxSortierSpalten.Suggestions.Clear();
         lbxSortierSpalten.Suggestions.AddRange(db.Column, false);
 
+        variableEditor.WriteVariablesToTable(Database?.Variables);
+
+        GenerateUndoTabelle();
+
         GenerateInfoText();
     }
 
     private void AddUndoToTable(UndoItem work) {
-        //if (tblUndo.Database?.Row[work.ToString()] != null) { return; }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        if (Database is not DatabaseAbstract dbx || dbx.IsDisposed) { return; }
-
-        //var cd = work.CellKey.SplitAndCutBy("|");
-        //dbx.Cell.DataOfCellKey(work.CellKey, out var col, out var row);
         var r = tblUndo?.Database?.Row.GenerateAndAdd(work.ToString(), "New Undo Item");
         if (r == null) { return; }
 
         r.CellSet("ColumnName", work.ColName);
         r.CellSet("RowKey", work.RowKey);
-        //r.CellSet("index", index);
-        if (dbx.Column.Exists(work.ColName) is ColumnItem col && !col.IsDisposed) {
+        if (db.Column.Exists(work.ColName) is ColumnItem col && !col.IsDisposed) {
             r.CellSet("columnCaption", col.Caption);
         }
-        if (dbx.Row.SearchByKey(work.RowKey) is RowItem row && !row.IsDisposed) {
+        if (db.Row.SearchByKey(work.RowKey) is RowItem row && !row.IsDisposed) {
             r.CellSet("RowFirst", row.CellFirstString());
         } else if (!string.IsNullOrEmpty(work.RowKey)) {
             r.CellSet("RowFirst", "[gelöscht]");
@@ -153,28 +145,18 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         r.CellSet("AenderZeit", work.DateTimeUtc);
         r.CellSet("Kommentar", work.Comment);
 
-        if(work.Container.IsFormat(FormatHolder.FilepathAndName)) {
+        if (work.Container.IsFormat(FormatHolder.FilepathAndName)) {
             r.CellSet("Herkunft", work.Container.FileNameWithoutSuffix());
         }
-        
 
         var symb = ImageCode.Fragezeichen;
         var alt = work.PreviousValue;
         var neu = work.ChangedTo;
-        //var aenderung = work.Command.ToString();
+
         switch (work.Command) {
-            //case DatabaseDataType.UTF8Value_withoutSizeData:
             case DatabaseDataType.Value_withoutSizeData:
                 symb = ImageCode.Stift;
-                //aenderung = "Wert geändert";
                 break;
-
-            //case DatabaseDataType.AutoExport:
-            //    aenderung = "Export ausgeführt oder geändert";
-            //    alt = string.Empty;
-            //    neu = string.Empty;
-            //    symb = ImageCode.Karton;
-            //    break;
 
             case DatabaseDataType.DatabaseVariables:
                 alt = "[Variablen alt]";
@@ -183,50 +165,28 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
                 break;
 
             case DatabaseDataType.EventScript:
-                //aenderung = "Import Script geändert";
                 alt = "[Skript alt]";
                 neu = "[Skript neu]";
                 symb = ImageCode.Skript;
                 break;
 
-            //case DatabaseDataType.Layouts:
-            //    //aenderung = "Layouts verändert";
-            //    alt = "[Layout alt]";
-            //    neu = "[Layout neu]";
-            //    symb = ImageCode.Layout;
-            //    break;
-
             case DatabaseDataType.Command_AddRow:
-                //aenderung = "Neue Zeile";
                 symb = ImageCode.PlusZeichen;
                 break;
 
-            //case DatabaseDataType.RulesScript:
-            //    //case enDatabaseDataType.Rules_ALT:
-            //    aenderung = "Regeln verändert";
-            //    symb = ImageCode.Formel;
-            //    alt = string.Empty;
-            //    neu = string.Empty;
-            //    break;
-
             case DatabaseDataType.ColumnArrangement:
-                //aenderung = "Spalten-Anordnungen verändert";
                 symb = ImageCode.Spalte;
                 alt = "[Spaltenanordnung alt]";
                 neu = "[Spaltenanordnung neu]";
                 break;
 
             case DatabaseDataType.Command_RemoveRow:
-                //aenderung = "Zeile gelöscht";
                 symb = ImageCode.MinusZeichen;
                 break;
 
-
             case DatabaseDataType.Command_NewStart:
                 symb = ImageCode.Abspielen;
-                //neu = "Benutzer: " + work.User;
                 break;
-
 
             case DatabaseDataType.TemporaryDatabaseMasterTimeUTC:
                 symb = ImageCode.Uhr;
@@ -235,9 +195,6 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
             case DatabaseDataType.TemporaryDatabaseMasterUser:
                 symb = ImageCode.Person;
                 break;
-
-
-
         }
         r.CellSet("Aenderung", work.Command.ToString());
         r.CellSet("symbol", symb + "|24");
@@ -331,11 +288,11 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         x.Freeze("Nur Ansicht");
     }
 
-    private void GlobalTab_Selecting(object sender, TabControlCancelEventArgs e) {
-        if (e.TabPage == tabUndo) {
-            if (tblUndo.Database is null) { GenerateUndoTabelle(); }
-        }
-    }
+    //private void GlobalTab_Selecting(object sender, TabControlCancelEventArgs e) {
+    //    if (e.TabPage == tabUndo) {
+    //        if (tblUndo.Database is null) { GenerateUndoTabelle(); }
+    //    }
+    //}
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
@@ -404,6 +361,20 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         var colnam = lbxSortierSpalten.Item.Select(thisk => ((ColumnItem)((ReadableListItem)thisk).Item).KeyName).ToList();
         Database.SortDefinition = new RowSortDefinition(Database, colnam, btnSortRichtung.Checked);
+
+        #endregion
+
+        #region Variablen
+
+        // Identisch in DatabaseHeadEditor und DatabaseScriptEditor
+        var l = variableEditor.GetVariables();
+        var l2 = new List<VariableString>();
+        foreach (var thisv in l) {
+            if (thisv is VariableString vs) {
+                l2.Add(vs);
+            }
+        }
+        Database.Variables = new VariableCollection(l2);
 
         #endregion
     }

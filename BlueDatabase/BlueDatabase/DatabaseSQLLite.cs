@@ -392,9 +392,11 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
     }
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
-        if (IsDisposed) { return "Datenbank verworfen!"; }
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+        HasPendingChanges = false; // Datenbank kann keine Pendungs haben
 
-        if (type.IsObsolete()) { return string.Empty; }
+        if (type == DatabaseDataType.UndoInOne) { return string.empty; }
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
         if (SQL == null) { return "SQL-Verbindung verloren!"; }
@@ -490,7 +492,7 @@ public sealed class DatabaseSqlLite : DatabaseAbstract {
 
         RepairAfterParse();
         CheckSysUndoNow(DatabaseAbstract.AllFiles);
-        if (!string.IsNullOrEmpty(freeze)){ Freeze(freeze); }
+        if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         if (ReadOnly) { SetReadOnly(); }
 
 

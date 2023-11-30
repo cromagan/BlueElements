@@ -395,6 +395,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         #endregion
 
+
+        #region Variablen
+        // Identisch in DatabaseHeadEditor und DatabaseScriptEditor
         var l = variableEditor.GetVariables();
         var l2 = new List<VariableString>();
         foreach (var thisv in l) {
@@ -402,8 +405,10 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
                 l2.Add(vs);
             }
         }
-
         Database.Variables = new VariableCollection(l2);
+        #endregion
+
+     
     }
 
     #endregion

@@ -3202,7 +3202,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             //return;
 
-            if (db.HasPendingChanges) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
+            if (db.HasPendingChanges && !!string.IsNullOrEmpty(db.Filename)) { gr.DrawImage(QuickImage.Get(ImageCode.Stift, 16), 16, 8); }
             if (db.ReadOnly) {
                 gr.DrawImage(QuickImage.Get(ImageCode.Schloss, 32), 16, 8);
                 if (!string.IsNullOrEmpty(db.FreezedReason)) {

@@ -19,7 +19,6 @@ using System;
 
 namespace BlueControls.Enums;
 
-[Flags]
 public enum ButtonStyle {
     Button = 0,
     Button_Big = 32768,

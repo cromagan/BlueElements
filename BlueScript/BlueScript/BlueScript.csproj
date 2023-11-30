@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Methods\Method_Ping.cs" />
+    <Compile Include="Methods\Method_SaveText.cs" />
     <Compile Include="ScriptDescription.cs" />
     <Compile Include="Enums\MethodType.cs" />
     <Compile Include="Enums\ScriptIssueType.cs" />

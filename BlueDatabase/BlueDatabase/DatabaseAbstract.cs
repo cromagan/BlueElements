@@ -42,6 +42,7 @@ using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using Timer = System.Threading.Timer;
 using static BlueBasics.Constants;
+using System.Runtime.Remoting.Messaging;
 
 namespace BlueDatabase;
 
@@ -51,9 +52,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     #region Fields
 
     public const string DatabaseVersion = "4.02";
-
     public static readonly ObservableCollection<DatabaseAbstract> AllFiles = new();
-
     public static List<Type>? DatabaseTypes;
 
     /// <summary>
@@ -78,45 +77,26 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     protected DateTime _fileStateUTCDate;
     private static bool _isInTimer;
-
     private static DateTime _lastTableCheck = new(1900, 1, 1);
-
     private readonly List<ColumnViewCollection> _columnArrangements = new();
-
     private readonly List<string> _datenbankAdmin = new();
-
     private readonly List<DatabaseScriptDescription> _eventScript = new();
-
     private readonly List<string> _permissionGroupsNewRow = new();
-
     private readonly List<string> _tags = new();
-
     private readonly List<Variable> _variables = new();
-
     private string _additionalFilesPfad = string.Empty;
-
     private string _cachePfad = string.Empty;
-
     private string _caption = string.Empty;
     private Timer? _checker;
-
     private int _checkerTickCount = -5;
-
     private string _createDate = string.Empty;
-
     private string _creator = string.Empty;
-
     private string _eventScriptErrorMessage = string.Empty;
     private string _eventScriptTmp = string.Empty;
-
     private string _eventScriptVersion = string.Empty;
-
     private double _globalScale = 1f;
-
     private string _globalShowPass = string.Empty;
-
     private bool _readOnly;
-
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -125,11 +105,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     private string _standardFormulaFile = string.Empty;
 
     private string _temporaryDatabaseMasterTimeUtc = string.Empty;
-
     private string _temporaryDatabaseMasterUser = string.Empty;
-
     private string _variableTmp = string.Empty;
-
     private string _zeilenQuickInfo = string.Empty;
 
     #endregion
@@ -254,7 +231,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     }
 
     public CellCollection Cell { get; }
-
     public ColumnCollection Column { get; }
 
     public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
@@ -324,6 +300,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             _ = ChangeData(DatabaseDataType.EventScriptVersion, null, null, _eventScriptVersion, value, UserName, DateTime.UtcNow, string.Empty);
         }
     }
+
+    public string Filename { get; protected set; } = string.Empty;
 
     /// <summary>
     /// Der Wert wird im System verankert und gespeichert.
@@ -458,8 +436,10 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         set {
             var l = new List<VariableString>();
             l.AddRange(value.ToListVariableString());
+            foreach (var thisv in l) {
+                thisv.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
+            }
             l.Sort();
-
             if (_variableTmp == l.ToString(true)) { return; }
             _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty);
             //OnViewChanged();
@@ -535,7 +515,11 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             foreach (var thisDb in offDatabases) {
                 if (!done.Contains(thisDb)) {
-                    thisDb.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Überprüfe auf Veränderungen von '" + thisDb.GetType().Name + "'");
+                    if (offDatabases.Count == 1) {
+                        thisDb.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Überprüfe auf Veränderungen von '" + offDatabases.First().TableName + "'");
+                    } else {
+                        thisDb.OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Überprüfe auf Veränderungen von " + offDatabases.Count + " Datenbanken des Typs '" + thisDb.GetType().Name + "'");
+                    }
 
                     #region Datenbanken des gemeinsamen Servers ermittelen
 
@@ -545,7 +529,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
                     #endregion
 
-                    #region Auf Eigangs Datenbanken beschränken
+                    #region Auf Eingangs Datenbanken beschränken
 
                     var db = new List<DatabaseAbstract>();
                     foreach (var thisDb2 in dbwss) {
@@ -911,6 +895,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     public string ChangeData(DatabaseDataType command, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment) {
         if (IsDisposed) { return "Datenbank verworfen!"; }
         if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren: " + FreezedReason; }
+        if (command.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
         if (!ReadOnly) {
             var f2 = WriteValueToDiscOrServer(command, changedTo, column, row, user, datetimeutc, comment);
@@ -2089,7 +2074,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                 break;
 
             case DatabaseDataType.DatabaseVariables:
-                _variableTmp = value;
                 _variables.Clear();
                 List<string> va = new(value.SplitAndCutByCr());
                 foreach (var t in va) {
@@ -2098,6 +2082,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     l.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
                     _variables.Add(l);
                 }
+                _variables.Sort();
+                _variableTmp = _variables.ToString(true);
                 break;
 
             case DatabaseDataType.ColumnArrangement:
@@ -2130,7 +2116,12 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                 break;
 
             case DatabaseDataType.UndoInOne:
-                // Muss eine übergeordnete Routine bei Befarf abfangen
+                Undo.Clear();
+                var uio = value.SplitAndCutByCr();
+                for (var z = 0; z <= uio.GetUpperBound(0); z++) {
+                    UndoItem tmpWork = new(uio[z]);
+                    Undo.Add(tmpWork);
+                }
                 break;
 
             case DatabaseDataType.EOF:
@@ -2386,7 +2377,13 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         TemporaryDatabaseMasterTimeUtc = DateTime.UtcNow.ToString(Format_Date5, CultureInfo.InvariantCulture);
     }
 
-    protected abstract string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment);
+    protected virtual string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
+        if (IsDisposed) { return "Datenbank verworfen!"; }
+        if (!string.IsNullOrEmpty(FreezedReason)) { return "Datenbank eingefroren!"; } // Sicherheitshalber!
+        if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
+
+        return string.Empty;
+    }
 
     private static void CheckSysUndo(object state) {
         if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }

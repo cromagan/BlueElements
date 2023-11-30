@@ -223,8 +223,8 @@ public class DatabaseMU : Database {
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
 
     protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged, DateTime starttimeUTC) {
-        base.DoWorkAfterLastChanges (files, columnsAdded, rowsAdded, cellschanged, starttimeUTC);
-        if(ReadOnly) { return; }
+        base.DoWorkAfterLastChanges(files, columnsAdded, rowsAdded, cellschanged, starttimeUTC);
+        if (ReadOnly) { return; }
         if (files == null || files.Count < 1) { return; }
         if (DateTime.UtcNow.Subtract(starttimeUTC).TotalSeconds > 120) { return; }
         if (!Directory.Exists(OldFragmengtsPath())) { return; }
@@ -241,7 +241,7 @@ public class DatabaseMU : Database {
 
 
         #region Bei Bedarf neue Komplett-Datenbank erstellen
-        if (_changesNotIncluded.Count() > 0  && AmITemporaryMaster(false)) {
+        if (_changesNotIncluded.Count() > 0 && AmITemporaryMaster(false)) {
             if (files.Count > 10 || _changesNotIncluded.Count() > 50) {
                 //var tmp = _fileStateUTCDate;
 
@@ -265,7 +265,7 @@ public class DatabaseMU : Database {
         if (_changesNotIncluded.Count() > 0) {
             foreach (var thisch in _changesNotIncluded) {
                 //if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalHours < 12) {
-                    files.Remove(thisch.Container);
+                files.Remove(thisch.Container);
                 //}
             }
         }
@@ -281,7 +281,7 @@ public class DatabaseMU : Database {
 
         foreach (var thisf in files) {
             OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
-            IO.MoveFile(thisf, pf + thisf.FileNameWithSuffix(),1, false);
+            IO.MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
             if (DateTime.Now.Subtract(starttimeUTC).TotalSeconds > 120) { break; }
         }
 
@@ -306,9 +306,10 @@ public class DatabaseMU : Database {
     }
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
-        if (IsDisposed) { return "Datenbank verworfen!"; }
 
-        if (type.IsObsolete()) { return string.Empty; }
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+        HasPendingChanges = false; // Datenbank kann keine Pendings haben
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
 

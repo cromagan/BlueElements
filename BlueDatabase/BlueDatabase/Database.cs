@@ -60,7 +60,7 @@ public class Database : DatabaseAbstract {
 
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
 
-    public string Filename { get; protected set; } = string.Empty;
+ 
 
     #endregion
 
@@ -405,6 +405,7 @@ public class Database : DatabaseAbstract {
         Parse(bLoaded, needPassword);
 
         RepairAfterParse();
+        IsInCache = FileStateUTCDate;
         CheckSysUndoNow(new List<DatabaseAbstract>() { this }, true);
         if (ronly) { SetReadOnly(); }
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
@@ -732,16 +733,8 @@ public class Database : DatabaseAbstract {
     }
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
-        if (IsDisposed) { return "Datenbank verworfen!"; }
-
-        if (type == DatabaseDataType.UndoInOne) {
-            Undo.Clear();
-            var uio = value.SplitAndCutByCr();
-            for (var z = 0; z <= uio.GetUpperBound(0); z++) {
-                UndoItem tmpWork = new(uio[z]);
-                Undo.Add(tmpWork);
-            }
-        }
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         HasPendingChanges = true;
 
