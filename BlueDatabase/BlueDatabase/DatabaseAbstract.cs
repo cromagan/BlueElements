@@ -50,8 +50,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #region Fields
 
-    #region Fields
-
     public const string DatabaseVersion = "4.02";
     public static readonly ObservableCollection<DatabaseAbstract> AllFiles = new();
     public static List<Type>? DatabaseTypes;
@@ -112,10 +110,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #endregion
 
-    #endregion
-
-    #region Constructors
-
     #region Constructors
 
     public DatabaseAbstract(string tablename) {
@@ -164,19 +158,11 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #endregion
 
-    #endregion
-
-    #region Delegates
-
     #region Delegates
 
     public delegate string NeedPassword();
 
     #endregion
-
-    #endregion
-
-    #region Events
 
     #region Events
 
@@ -203,10 +189,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     public event EventHandler? ViewChanged;
 
     #endregion
-
-    #endregion
-
-    #region Properties
 
     #region Properties
 
@@ -473,15 +455,9 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #endregion
 
-    #endregion
-
-    u
-
     #region Methods
 
-    #region Methods
-
-public static List<ConnectionInfo> AllAvailableTables(string mustBeFreezed) {
+    public static List<ConnectionInfo> AllAvailableTables(string mustBeFreezed) {
         if (DateTime.UtcNow.Subtract(_lastTableCheck).TotalMinutes < 1) {
             return AllavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
@@ -2450,8 +2426,6 @@ public static List<ConnectionInfo> AllAvailableTables(string mustBeFreezed) {
             }
         } catch { }
     }
-
-    #endregion
 
     #endregion
 }
