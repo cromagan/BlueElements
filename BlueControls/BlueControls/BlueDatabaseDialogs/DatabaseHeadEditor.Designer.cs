@@ -54,12 +54,12 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.tabRechte = new System.Windows.Forms.TabPage();
             this.tabSortierung = new System.Windows.Forms.TabPage();
+            this.tabVariablen = new System.Windows.Forms.TabPage();
+            this.variableEditor = new BlueControls.VariableEditor();
             this.tabUndo = new System.Windows.Forms.TabPage();
             this.tblUndo = new BlueControls.Controls.Table();
             this.grpUndoActions = new BlueControls.Controls.GroupBox();
             this.btnClipboard = new BlueControls.Controls.Button();
-            this.tabVariablen = new System.Windows.Forms.TabPage();
-            this.variableEditor = new BlueControls.VariableEditor();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -67,9 +67,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAllgemein.SuspendLayout();
             this.tabRechte.SuspendLayout();
             this.tabSortierung.SuspendLayout();
+            this.tabVariablen.SuspendLayout();
             this.tabUndo.SuspendLayout();
             this.grpUndoActions.SuspendLayout();
-            this.tabVariablen.SuspendLayout();
             this.SuspendLayout();
             // 
             // capStatusBar
@@ -100,7 +100,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // PermissionGroups_NewRow
             // 
             this.PermissionGroups_NewRow.AddAllowed = BlueControls.Enums.AddType.Text;
-            this.PermissionGroups_NewRow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.PermissionGroups_NewRow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.PermissionGroups_NewRow.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             this.PermissionGroups_NewRow.FilterAllowed = true;
@@ -132,7 +132,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // DatenbankAdmin
             // 
             this.DatenbankAdmin.AddAllowed = BlueControls.Enums.AddType.Text;
-            this.DatenbankAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.DatenbankAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.DatenbankAdmin.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             this.DatenbankAdmin.FilterAllowed = true;
@@ -223,8 +223,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbTags
             // 
-            this.txbTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.txbTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txbTags.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbTags.Location = new System.Drawing.Point(624, 24);
@@ -271,8 +271,8 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // GlobalTab
             // 
-            this.GlobalTab.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.GlobalTab.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.GlobalTab.Controls.Add(this.tabAllgemein);
             this.GlobalTab.Controls.Add(this.tabRechte);
@@ -287,6 +287,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.GlobalTab.TabDefault = null;
             this.GlobalTab.TabDefaultOrder = null;
             this.GlobalTab.TabIndex = 21;
+            this.GlobalTab.SelectedIndexChanged += new System.EventHandler(this.GlobalTab_SelectedIndexChanged);
             // 
             // tabAllgemein
             // 
@@ -316,7 +317,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // txbZeilenQuickInfo
             // 
-            this.txbZeilenQuickInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.txbZeilenQuickInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.txbZeilenQuickInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
             this.txbZeilenQuickInfo.Location = new System.Drawing.Point(8, 216);
@@ -449,6 +450,26 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabSortierung.TabIndex = 2;
             this.tabSortierung.Text = "Sortierung";
             // 
+            // tabVariablen
+            // 
+            this.tabVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabVariablen.Controls.Add(this.variableEditor);
+            this.tabVariablen.Location = new System.Drawing.Point(4, 25);
+            this.tabVariablen.Name = "tabVariablen";
+            this.tabVariablen.Padding = new System.Windows.Forms.Padding(3);
+            this.tabVariablen.Size = new System.Drawing.Size(1233, 678);
+            this.tabVariablen.TabIndex = 7;
+            this.tabVariablen.Text = "Variablen";
+            // 
+            // variableEditor
+            // 
+            this.variableEditor.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.variableEditor.Editabe = true;
+            this.variableEditor.Location = new System.Drawing.Point(3, 3);
+            this.variableEditor.Name = "variableEditor";
+            this.variableEditor.Size = new System.Drawing.Size(1227, 672);
+            this.variableEditor.TabIndex = 1;
+            // 
             // tabUndo
             // 
             this.tabUndo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -464,7 +485,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tblUndo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tblUndo.DropMessages = false;
-            this.tblUndo.FilterManualSeted = false;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
             this.tblUndo.Size = new System.Drawing.Size(1233, 608);
@@ -496,26 +516,6 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.btnClipboard.Text = "In die Zwischenablage";
             this.btnClipboard.Click += new System.EventHandler(this.btnClipboard_Click);
             // 
-            // tabVariablen
-            // 
-            this.tabVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabVariablen.Controls.Add(this.variableEditor);
-            this.tabVariablen.Location = new System.Drawing.Point(4, 25);
-            this.tabVariablen.Name = "tabVariablen";
-            this.tabVariablen.Padding = new System.Windows.Forms.Padding(3);
-            this.tabVariablen.Size = new System.Drawing.Size(1233, 678);
-            this.tabVariablen.TabIndex = 7;
-            this.tabVariablen.Text = "Variablen";
-            // 
-            // variableEditor
-            // 
-            this.variableEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.variableEditor.Editabe = true;
-            this.variableEditor.Location = new System.Drawing.Point(3, 3);
-            this.variableEditor.Name = "variableEditor";
-            this.variableEditor.Size = new System.Drawing.Size(1227, 672);
-            this.variableEditor.TabIndex = 1;
-            // 
             // DatabaseHeadEditor
             // 
             this.ClientSize = new System.Drawing.Size(1244, 756);
@@ -535,9 +535,9 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAllgemein.ResumeLayout(false);
             this.tabRechte.ResumeLayout(false);
             this.tabSortierung.ResumeLayout(false);
+            this.tabVariablen.ResumeLayout(false);
             this.tabUndo.ResumeLayout(false);
             this.grpUndoActions.ResumeLayout(false);
-            this.tabVariablen.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }

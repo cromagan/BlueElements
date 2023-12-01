@@ -880,7 +880,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         if (!string.IsNullOrEmpty(error)) { return error; }
 
         if (LogUndo) {
-            AddUndo(command, column, row, previousValue, changedTo, user, datetimeutc, comment);
+            AddUndo(command, column, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]");
         }
 
         return string.Empty;
@@ -2171,14 +2171,14 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     /// <param name="changedTo"></param>
     /// <param name="userName"></param>
     /// <param name="comment"></param>
-    protected virtual void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment) {
+    protected virtual void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment, string container) {
         if (IsDisposed) { return; }
         if (type.IsObsolete()) { return; }
         // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
 
         if (type == DatabaseDataType.SystemValue) { return; }
 
-        Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment));
+        Undo.Add(new UndoItem(TableName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container));
     }
 
     protected void CreateWatcher() {

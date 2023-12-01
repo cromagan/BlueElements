@@ -72,14 +72,14 @@ internal class Method_SaveText : Method {
 
         switch (attvar.ValueStringGet(1).ToUpper()) {
             case "UTF8":
-                if (!IO.WriteAllText(filn, attvar.ValueStringGet(0), System.Text.Encoding.UTF8, false)) {
+                if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), System.Text.Encoding.UTF8, false)) {
                     return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei.");
                 }
 
                 break;
 
             case "WIN1252":
-                if (!IO.WriteAllText(filn, attvar.ValueStringGet(0), Constants.Win1252, false)) {
+                if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), Constants.Win1252, false)) {
                     return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei.");
                 }
                 break;

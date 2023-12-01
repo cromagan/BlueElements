@@ -30,7 +30,7 @@ public class UndoItem : IParseable {
 
     #region Constructors
 
-    public UndoItem(string tablename, DatabaseDataType command, string column, string row, string previousValue, string changedTo, string user, DateTime timeutc, string comment) {
+    public UndoItem(string tablename, DatabaseDataType command, string column, string row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container) {
         Command = command;
         ColName = column;
         RowKey = row;
@@ -42,7 +42,7 @@ public class UndoItem : IParseable {
         Comment = comment;
     }
 
-    public UndoItem(string tablename, DatabaseDataType command, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment) : this(tablename, command, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment) { }
+    public UndoItem(string tablename, DatabaseDataType command, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container) : this(tablename, command, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container) { }
 
     public UndoItem(string s) => this.Parse(s);
 

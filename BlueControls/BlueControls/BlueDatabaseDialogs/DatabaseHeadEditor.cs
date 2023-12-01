@@ -42,6 +42,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     #region Fields
 
+    public bool undoDone = false;
     private bool _frmHeadEditorFormClosingIsin;
 
     #endregion
@@ -120,7 +121,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         variableEditor.WriteVariablesToTable(Database?.Variables);
 
-        GenerateUndoTabelle();
+        //GenerateUndoTabelle();
 
         GenerateInfoText();
     }
@@ -295,6 +296,13 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     //        if (tblUndo.Database is null) { GenerateUndoTabelle(); }
     //    }
     //}
+
+    private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) {
+        if (GlobalTab.SelectedTab == tabUndo && !undoDone) {
+            undoDone = true;
+            GenerateUndoTabelle();
+        }
+    }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 

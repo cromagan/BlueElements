@@ -42,25 +42,16 @@ public class DatabaseMU : Database {
     #endregion
 
     #region Constructors
+
     public DatabaseMU(string tablename) : base(tablename) { }
 
     #endregion
 
-    public override void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
-
-        if (FileExists(fileNameToLoad)) {
-            Filename = fileNameToLoad;
-            Directory.CreateDirectory(FragmengtsPath());
-            Directory.CreateDirectory(OldFragmengtsPath());
-            Filename = string.Empty;
-        }
-
-        base.LoadFromFile(fileNameToLoad, createWhenNotExisting, needPassword, freeze, ronly);
-    }
-
     #region Properties
 
     public new static string DatabaseId => nameof(DatabaseMU);
+
+    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
 
     #endregion
 
@@ -187,6 +178,17 @@ public class DatabaseMU : Database {
         return (null, null);
     }
 
+    public override void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
+        if (FileExists(fileNameToLoad)) {
+            Filename = fileNameToLoad;
+            Directory.CreateDirectory(FragmengtsPath());
+            Directory.CreateDirectory(OldFragmengtsPath());
+            Filename = string.Empty;
+        }
+
+        base.LoadFromFile(fileNameToLoad, createWhenNotExisting, needPassword, freeze, ronly);
+    }
+
     public string OldFragmengtsPath() {
         if (string.IsNullOrEmpty(Filename)) { return string.Empty; }
         return Filename.FilePath() + "Frgm-Done\\";
@@ -220,8 +222,6 @@ public class DatabaseMU : Database {
         base.Dispose(disposing);
     }
 
-    public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
-
     protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged, DateTime starttimeUTC) {
         base.DoWorkAfterLastChanges(files, columnsAdded, rowsAdded, cellschanged, starttimeUTC);
         if (ReadOnly) { return; }
@@ -239,8 +239,8 @@ public class DatabaseMU : Database {
 
         #endregion
 
-
         #region Bei Bedarf neue Komplett-Datenbank erstellen
+
         if (_changesNotIncluded.Count() > 0 && AmITemporaryMaster(false)) {
             if (files.Count > 10 || _changesNotIncluded.Count() > 50) {
                 //var tmp = _fileStateUTCDate;
@@ -257,8 +257,8 @@ public class DatabaseMU : Database {
                 _changesNotIncluded.Clear();
             }
         }
-        #endregion
 
+        #endregion
 
         #region Dateien, mit zu jungen Änderungen entfernen
 
@@ -272,9 +272,6 @@ public class DatabaseMU : Database {
 
         #endregion
 
-
-
-
         var pf = OldFragmengtsPath();
 
         files.Shuffle();
@@ -284,7 +281,6 @@ public class DatabaseMU : Database {
             IO.MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
             if (DateTime.UtcNow.Subtract(starttimeUTC).TotalSeconds > 20) { break; }
         }
-
     }
 
     protected override IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer() {
@@ -306,7 +302,6 @@ public class DatabaseMU : Database {
     }
 
     protected override string WriteValueToDiscOrServer(DatabaseDataType type, string value, ColumnItem? column, RowItem? row, string user, DateTime datetimeutc, string comment) {
-
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
         HasPendingChanges = false; // Datenbank kann keine Pendings haben
@@ -316,13 +311,20 @@ public class DatabaseMU : Database {
         if (_writer == null) { StartWriter(); }
         if (_writer == null) { return "Schreibmodus deaktiviert"; }
 
-        var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment);
+        var l = new UndoItem(TableName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
 
         lock (_writer) {
             _writer.WriteLine(l.ToString());
         }
 
         return string.Empty;
+    }
+
+    private void CheckPath() {
+        if (string.IsNullOrEmpty(Filename)) { return; }
+
+        Directory.CreateDirectory(FragmengtsPath());
+        Directory.CreateDirectory(OldFragmengtsPath());
     }
 
     private void StartWriter() {
@@ -342,17 +344,9 @@ public class DatabaseMU : Database {
         _writer.WriteLine("- DB " + DatabaseVersion);
         _writer.WriteLine("- User " + UserName);
 
-        var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt");
+        var l = new UndoItem(TableName, DatabaseDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, "Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
         _writer.WriteLine(l.ToString());
         _writer.Flush();
-    }
-
-    private void CheckPath() {
-        if (string.IsNullOrEmpty(Filename)) { return; }
-
-        Directory.CreateDirectory(FragmengtsPath());
-        Directory.CreateDirectory(OldFragmengtsPath());
-
     }
 
     #endregion
