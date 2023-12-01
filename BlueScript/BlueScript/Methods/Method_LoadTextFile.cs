@@ -23,7 +23,6 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.IO;
 
 namespace BlueScript.Methods;
 
@@ -33,16 +32,16 @@ internal class Method_LoadTextFile : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal };
+    public override List<List<string>> Args => new() { StringVal, StringVal };
     public override string Command => "loadtextfile";
     public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
     public override bool EndlessArgs => false;
-    
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => VariableString.ShortName_Variable;
     public override string StartSequence => "(";
-    public override string Syntax => "LoadTextFile(Filename)";
+    public override string Syntax => "LoadTextFile(Filename, UTF8/WIN1252)";
 
     #endregion
 
@@ -62,9 +61,21 @@ internal class Method_LoadTextFile : Method {
             return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + attvar.ValueStringGet(0));
         }
 
+        string importText;
         try {
-            var importText = File.ReadAllText(attvar.ValueStringGet(0), Constants.Win1252);
-            //var bmp = (Bitmap)BitmapExt.Image_FromFile(attvar.ValueString(0))!;
+            switch (attvar.ValueStringGet(1).ToUpper()) {
+                case "UTF8":
+                    importText = System.IO.File.ReadAllText(attvar.ValueStringGet(0), System.Text.Encoding.UTF8);
+                    break;
+
+                case "WIN1252":
+                    importText = System.IO.File.ReadAllText(attvar.ValueStringGet(0), Constants.Win1252);
+                    break;
+
+                default:
+                    return new DoItFeedback(infos.Data, "Import-Format unbekannt.");
+            }
+
             return new DoItFeedback(importText);
         } catch {
             return new DoItFeedback(infos.Data, "Datei konnte nicht geladen werden: " + attvar.ValueStringGet(0));

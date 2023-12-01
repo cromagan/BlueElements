@@ -226,7 +226,7 @@ public class DatabaseMU : Database {
         base.DoWorkAfterLastChanges(files, columnsAdded, rowsAdded, cellschanged, starttimeUTC);
         if (ReadOnly) { return; }
         if (files == null || files.Count < 1) { return; }
-        if (DateTime.UtcNow.Subtract(starttimeUTC).TotalSeconds > 120) { return; }
+        if (DateTime.UtcNow.Subtract(starttimeUTC).TotalSeconds > 20) { return; }
         if (!Directory.Exists(OldFragmengtsPath())) { return; }
 
         #region Dateien, mit jungen Änderungen wieder entfernen, damit andere Datenbanken noch Zugriff haben
@@ -282,7 +282,7 @@ public class DatabaseMU : Database {
         foreach (var thisf in files) {
             OnDropMessage(BlueBasics.Enums.FehlerArt.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
             IO.MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
-            if (DateTime.Now.Subtract(starttimeUTC).TotalSeconds > 120) { break; }
+            if (DateTime.UtcNow.Subtract(starttimeUTC).TotalSeconds > 20) { break; }
         }
 
     }

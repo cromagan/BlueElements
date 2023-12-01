@@ -42,12 +42,13 @@ using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using Timer = System.Threading.Timer;
 using static BlueBasics.Constants;
-using System.Runtime.Remoting.Messaging;
 
 namespace BlueDatabase;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
 public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessages {
+
+    #region Fields
 
     #region Fields
 
@@ -111,6 +112,10 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #endregion
 
+    #endregion
+
+    #region Constructors
+
     #region Constructors
 
     public DatabaseAbstract(string tablename) {
@@ -159,11 +164,19 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #endregion
 
+    #endregion
+
+    #region Delegates
+
     #region Delegates
 
     public delegate string NeedPassword();
 
     #endregion
+
+    #endregion
+
+    #region Events
 
     #region Events
 
@@ -179,7 +192,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     public event EventHandler? Loaded;
 
-    //public event EventHandler<VisibleEventArgs>? IsTableVisibleForUser;
     public event EventHandler? Loading;
 
     public event EventHandler<ProgressbarEventArgs>? ProgressbarInfo;
@@ -192,9 +204,13 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #endregion
 
+    #endregion
+
     #region Properties
 
-    public static List<ConnectionInfo> Allavailabletables { get; } = new();
+    #region Properties
+
+    public static List<ConnectionInfo> AllavailableTables { get; } = new();
 
     /// <summary>
     ///  Wann die Datei zuletzt geladen wurde. Einzige funktion, zu viele Ladezyklen hintereinander verhinden.
@@ -340,7 +356,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     public bool IsDisposed { get; private set; }
 
     /// <summary>
-    /// Letzter Lade-Stand der Daten. Wird in RepairAfterParse gesetzt
+    /// Letzter Lade-Stand der Daten.
     /// </summary>
     public DateTime IsInCache { get; protected set; } = new DateTime(0);
 
@@ -429,8 +445,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         }
     }
 
-    //public bool UndoLoaded { get; protected set; }
-
     public VariableCollection Variables {
         get => new(_variables);
         set {
@@ -442,7 +456,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             l.Sort();
             if (_variableTmp == l.ToString(true)) { return; }
             _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty);
-            //OnViewChanged();
         }
     }
 
@@ -460,11 +473,17 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     #endregion
 
+    #endregion
+
+    u
+
     #region Methods
 
-    public static List<ConnectionInfo> AllAvailableTables(string mustBeFreezed) {
+    #region Methods
+
+public static List<ConnectionInfo> AllAvailableTables(string mustBeFreezed) {
         if (DateTime.UtcNow.Subtract(_lastTableCheck).TotalMinutes < 1) {
-            return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
+            return AllavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
 
         // Wird benutzt, um z.b. das Dateisystem nicht doppelt und dreifach abzufragen.
@@ -486,7 +505,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
                     #region prüfen, ob schon voranden, z.b. DatabaseAbstract.AllFiles
 
-                    foreach (var checkme in Allavailabletables) {
+                    foreach (var checkme in AllavailableTables) {
                         if (string.Equals(checkme.TableName, thistable.TableName, StringComparison.InvariantCultureIgnoreCase)) {
                             canadd = false;
                             break;
@@ -495,13 +514,13 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
                     #endregion
 
-                    if (canadd) { Allavailabletables.Add(thistable); }
+                    if (canadd) { AllavailableTables.Add(thistable); }
                 }
             }
         }
 
         _lastTableCheck = DateTime.UtcNow;
-        return Allavailabletables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
+        return AllavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
     public static void CheckSysUndoNow(ICollection<DatabaseAbstract> offDatabases, bool mustDoIt) {
@@ -663,17 +682,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
         #endregion
 
-        //if (SqlBackAbstract.ConnectedSqlBack != null) {
-        //    foreach (var thisSql in SqlBackAbstract.ConnectedSqlBack) {
-        //        var h = thisSql.HandleMe(ci);
-        //        if (h != null) {
-        //            var db = new DatabaseSqlLite(ci.TableName);
-        //           db.LoadFromSqlBack(needPassword, ci.MustBeFreezed, readOnly,h );
-        //            return db;
-        //        }
-        //    }
-        //}
-
         #region Zu guter Letzte, den Tablenamen nehmen...
 
         foreach (var thisFile in AllFiles) {
@@ -811,8 +819,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         return t;
     }
 
-    //    return null;
-    //}
     public static string UniqueKeyValue() {
         var x = 9999;
         do {
@@ -834,11 +840,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         } while (true);
     }
 
-    //    foreach (var thisDb in alf) {
-    //        if (thisDb.ConnectionDataOfOtherTable(tablename, true) is ConnectionInfo ci) {
-    //            return ci;
-    //        }
-    //    }
     /// <summary>
     /// Der komplette Pfad mit abschließenden \
     /// </summary>
@@ -858,9 +859,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         return string.Empty;
     }
 
-    //public static ConnectionInfo? ProviderOf(string tablename) {
-    //    var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
-    //    alf.AddRange(AllFiles);
     public abstract List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, string mustBeFreezed);
 
     public bool AmITemporaryMaster(bool checkUpcomingTo) {
@@ -1471,20 +1469,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         return GetById(x, readOnly, null, true);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
-    //public void GetUndoCache() {
-    //    if (UndoLoaded) { return; }
-
-    //    var undos = GetLastChanges(new List<DatabaseAbstract> { this }, new DateTime(2000, 1, 1), new DateTime(2100, 1, 1));
-
-    //    Undo.Clear();
-
-    //    if(undos.co)
-
-    //    Undo.AddRange(undos.Changes);
-
-    //    UndoLoaded = true;
-    //}
-
     public bool HasErrorCheckScript() {
         if (!IsRowScriptPossible(true)) { return false; }
 
@@ -1720,8 +1704,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
     }
 
-    //    Export = new(ex);
-    //}
     public bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
             if (thisFile is Database db) {
@@ -1758,15 +1740,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
     }
 
-    //    foreach (var thisExport in ex) {
-    //        if (thisExport != null) {
-    //            if (thisExport.Typ == ExportTyp.EinzelnMitFormular) {
-    //                if (thisExport.ExportFormularId == layoutId) {
-    //                    thisExport.LastExportTimeUtc = new DateTime(1900, 1, 1);
-    //                }
-    //            }
-    //        }
-    //    }
     public void OnScriptError(RowScriptCancelEventArgs e) {
         if (IsDisposed) { return; }
         ScriptError?.Invoke(this, e);
@@ -1805,8 +1778,6 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         }
     }
 
-    //public void InvalidateExports(string layoutId) {
-    //    if (ReadOnly) { return; }
     public List<string> Permission_AllUsed(bool cellLevel) {
         List<string> e = new();
         foreach (var thisColumnItem in Column) {
@@ -2479,6 +2450,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             }
         } catch { }
     }
+
+    #endregion
 
     #endregion
 }
