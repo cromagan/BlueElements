@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,17 +17,15 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-// ReSharper disable once UnusedMember.Global
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_If : Method {
+public class Method_If : Method {
 
     #region Fields
 
@@ -48,7 +46,7 @@ internal class Method_If : Method {
     public override string Command => "if";
     public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
     public override bool EndlessArgs => false;
-    
+
     public override bool GetCodeBlockAfter => true;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => string.Empty;
