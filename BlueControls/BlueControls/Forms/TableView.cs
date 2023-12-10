@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -51,7 +51,6 @@ public partial class TableView : FormWithStatusBar {
     private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
     private bool _firstOne = true;
     private List<string> _settings = new();
-    private string _settingsfilename = string.Empty;
 
     #endregion
 
@@ -93,20 +92,6 @@ public partial class TableView : FormWithStatusBar {
     #region Properties
 
     public string PreveredDatabaseID { get; set; } = Database.DatabaseId;
-
-    /// <summary>
-    /// Einstellungsdatei der TableView
-    /// </summary>
-    ///
-    [DefaultValue("")]
-    public string SettingsFilename {
-        get => _settingsfilename;
-        set {
-            if (_settingsfilename == value) { return; }
-            _settingsfilename = value;
-            LoadSettingsFromDisk();
-        }
-    }
 
     #endregion
 
@@ -304,7 +289,7 @@ public partial class TableView : FormWithStatusBar {
                 TabControlAction.Selected));
     }
 
-    protected virtual void CheckButtons() {
+    protected void CheckButtons() {
         var datenbankDa = Table.Database != null && !Table.Database.IsDisposed;
         btnNeuDB.Enabled = true;
         btnOeffnen.Enabled = true;
@@ -343,7 +328,7 @@ public partial class TableView : FormWithStatusBar {
         FilterLeiste.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
     }
 
-    protected virtual void DatabaseSet(DatabaseAbstract db, string toParse) {
+    protected virtual void DatabaseSet(DatabaseAbstract? db, string toParse) {
         if (db != null && !db.IsDisposed) {
             DropMessages = db.IsAdministrator();
         }
@@ -492,6 +477,10 @@ public partial class TableView : FormWithStatusBar {
             _ = e.UserMenu.AddSeparator();
             _ = e.UserMenu.Add("Spalte", true);
             _ = e.UserMenu.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, column != null && db.IsAdministrator());
+
+            _ = e.UserMenu.Add("Gesamten Spalteninhalt kopieren", "CopyAll", ImageCode.Clipboard, column != null && db.IsAdministrator());
+            _ = e.UserMenu.Add("Gesamten Spalteninhalt kopieren + sortieren", "CopyAll2", ImageCode.Clipboard, column != null && db.IsAdministrator());
+
             _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && db.IsAdministrator());
             _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && db.IsAdministrator());
             _ = e.UserMenu.AddSeparator();
@@ -604,7 +593,7 @@ public partial class TableView : FormWithStatusBar {
 
                 var split = false;
                 if (column.MultiLine) {
-                    split = MessageBox.Show("Zeilen als ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
+                    split = MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
                 }
 
                 column.Statisik(Table.RowsVisibleUnique(), !split);
@@ -622,8 +611,31 @@ public partial class TableView : FormWithStatusBar {
                     row.CheckRowDataIfNeeded();
                     MessageBox.Show("Datenüberprüfung:\r\n" + row.LastCheckedMessage, ImageCode.HäkchenDoppelt, "Ok");
                 }
-
                 break;
+
+            case "CopyAll": {
+                    if (!db.IsAdministrator() || column == null) { return; }
+                    var txt = tbl.Export_CSV(FirstRow.Without, column);
+                    //txt = txt.TrimStart("Deutsch;\r\n");
+                    //txt = txt.TrimStart("Englisch;\r\n");
+                    txt = txt.Replace("|", "\r\n");
+                    txt = txt.Replace(";", string.Empty);
+                    _ = CopytoClipboard(txt);
+                    Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+                    break;
+                }
+            case "CopyAll2": {
+                    if (!db.IsAdministrator() || column == null) { return; }
+                    var txt = tbl.Export_CSV(FirstRow.Without, column);
+                    //txt = txt.TrimStart("Deutsch;\r\n");
+                    //txt = txt.TrimStart("Englisch;\r\n");
+                    txt = txt.Replace("|", "\r\n");
+                    txt = txt.Replace(";", string.Empty);
+                    var l = txt.SplitAndCutByCrToList().SortedDistinctList().JoinWithCr();
+                    _ = CopytoClipboard(l);
+                    Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+                    break;
+                }
         }
     }
 
@@ -634,7 +646,7 @@ public partial class TableView : FormWithStatusBar {
         CheckButtons();
     }
 
-    protected virtual void Table_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
+    protected void Table_EnabledChanged(object sender, System.EventArgs e) => Check_OrderButtons();
 
     protected virtual void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
         if (InvokeRequired) {
@@ -659,7 +671,7 @@ public partial class TableView : FormWithStatusBar {
         FillFormula(e.Row);
     }
 
-    protected virtual void Table_ViewChanged(object sender, System.EventArgs e) =>
+    protected void Table_ViewChanged(object sender, System.EventArgs e) =>
         Table.WriteColumnArrangementsInto(cbxColumnArr, Table.Database, Table.Arrangement);
 
     protected virtual void Table_VisibleRowsChanged(object sender, System.EventArgs e) {
@@ -1050,7 +1062,7 @@ public partial class TableView : FormWithStatusBar {
         chkAnsichtFormular.Checked = _ansicht == Ansicht.Überschriften_und_Formular;
         chkAnsichtTableFormular.Checked = _ansicht == Ansicht.Tabelle_und_Formular_nebeneinander;
 
-        Table.Filter?.Clear();
+        Table.Filter.Clear();
 
         switch (_ansicht) {
             case Ansicht.Nur_Tabelle:
@@ -1223,7 +1235,7 @@ public partial class TableView : FormWithStatusBar {
         }
     }
 
-    private string SettingsFileName() => !string.IsNullOrEmpty(_settingsfilename) ? _settingsfilename.CheckFile() : Application.StartupPath + "\\" + Name + "-Settings.ini";
+    private string SettingsFileName() => Application.StartupPath + "\\" + Name + "-Settings.ini";
 
     private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
         column = Table.View_ColumnFirst();

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -20,11 +20,8 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using static BlueBasics.BitmapExt;
-using static BlueBasics.Converter;
 
 namespace BluePaint;
 
@@ -70,17 +67,6 @@ public partial class Tool_Eraser : GenericTool {
         //}
     }
 
-    public override void ExcuteCommand(string command) {
-        var c = command.SplitAndCutBy(";");
-        if (c[0] == "Replace") {
-            var originalPic = OnNeedCurrentPic();
-            var cc = Color.FromArgb(IntParse(c[1]));
-            OnOverridePic(ReplaceColor(originalPic, cc, Color.Transparent));
-        } else {
-            Develop.DebugPrint_NichtImplementiert();
-        }
-    }
-
     public override void MouseDown(MouseEventArgs1_1 e, Bitmap? originalPic) {
         OnForceUndoSaving();
         MouseMove(new MouseEventArgs1_1DownAndCurrent(e, e), originalPic);
@@ -97,10 +83,6 @@ public partial class Tool_Eraser : GenericTool {
     }
 
     public override void MouseUp(MouseEventArgs1_1DownAndCurrent e, Bitmap? originalPic) {
-        if (e == null) {
-            Develop.DebugPrint(FehlerArt.Warnung, "e = null");
-            return;
-        }
         if (e.Current.Button != MouseButtons.Left) { return; }
 
         if (Razi.Checked) { return; }

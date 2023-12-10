@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
 using BlueBasics;
 using BlueScript.Enums;
@@ -27,7 +28,7 @@ using BlueScript.Variables;
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_BitmapToBase64 : Method {
 
     #region Properties

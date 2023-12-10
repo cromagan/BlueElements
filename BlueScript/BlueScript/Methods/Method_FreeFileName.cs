@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,17 +17,18 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_FreeFileName : Method {
 
     #region Properties
@@ -64,7 +65,7 @@ internal class Method_FreeFileName : Method {
         do {
             var p = string.Empty;
             while (p.Length < 20) {
-                var pos = Constants.GlobalRND.Next(zeichen.Length);
+                var pos = Constants.GlobalRnd.Next(zeichen.Length);
                 p += zeichen.Substring(pos, 1);
             }
 

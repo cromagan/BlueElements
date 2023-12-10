@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -33,7 +33,7 @@ using FastColoredTextBoxNS;
 
 namespace BlueControls;
 
-public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IChangedFeedback //UserControl, IContextMenu//
+public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended, IChangedFeedback //UserControl, IContextMenu//
 {
     #region Fields
 
@@ -84,7 +84,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
             _ = items.Add("Variableninhalt kopieren");
         }
@@ -94,7 +94,7 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
 
     public void Message(string txt) => txbSkriptInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
 
-    public virtual void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
@@ -115,31 +115,6 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
             }
         }
         base.Dispose(disposing);
-    }
-
-    protected virtual void OpenAdditionalFileFolder() { }
-
-    protected void WriteCommandsToList() {
-        if (!_menuDone) {
-            _menuDone = true;
-            _popupMenu = new AutocompleteMenu(txtSkript) {
-                //popupMenu.Items.ImageList = imageList1;
-                SearchPattern = @"[\w\.:=!<>]",
-                AllowTabKey = true
-            };
-            List<AutocompleteItem> items = new();
-            if (Script.Commands != null) {
-                foreach (var thisc in Script.Commands) {
-                    items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
-                    items.Add(new AutocompleteItem(thisc.Command));
-                    if (!string.IsNullOrEmpty(thisc.Returns)) {
-                        items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
-                    }
-                }
-            }
-            //set as autocomplete source
-            _popupMenu.Items.SetAutocompleteItems(items);
-        }
     }
 
     private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
@@ -171,16 +146,14 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
         grpVariablen.WriteVariablesToTable(ex.Feedback.Variables);
         WriteCommandsToList();
 
-        if (ex.Feedback.AllOk) {
-            Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
-        } else {
-            Message(ex.Feedback.ProtocolText);
-        }
+        Message(ex.Feedback.AllOk ? "Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden." : ex.Feedback.ProtocolText);
     }
 
     private void btnZusatzDateien_Click(object sender, System.EventArgs e) => OpenAdditionalFileFolder();
 
     private void OnExecuteScript(ScriptEventArgs scriptEventArgs) => ExecuteScript?.Invoke(this, scriptEventArgs);
+
+    private void OpenAdditionalFileFolder() { }
 
     private void TxtSkript_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button == MouseButtons.Right) {
@@ -225,6 +198,29 @@ public partial class ScriptEditor : GroupBox, IContextMenu, IDisposableExtended,
             }
         } catch (Exception ex) {
             Develop.DebugPrint("Fehler beim Tooltip generieren", ex);
+        }
+    }
+
+    private void WriteCommandsToList() {
+        if (!_menuDone) {
+            _menuDone = true;
+            _popupMenu = new AutocompleteMenu(txtSkript) {
+                //popupMenu.Items.ImageList = imageList1;
+                SearchPattern = @"[\w\.:=!<>]",
+                AllowTabKey = true
+            };
+            List<AutocompleteItem> items = new();
+            if (Script.Commands != null) {
+                foreach (var thisc in Script.Commands) {
+                    items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
+                    items.Add(new AutocompleteItem(thisc.Command));
+                    if (!string.IsNullOrEmpty(thisc.Returns)) {
+                        items.Add(new SnippetAutocompleteItem("var " + thisc.Returns + " = " + thisc.Syntax + "; "));
+                    }
+                }
+            }
+            //set as autocomplete source
+            _popupMenu.Items.SetAutocompleteItems(items);
         }
     }
 

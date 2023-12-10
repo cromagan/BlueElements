@@ -1,3 +1,5 @@
+using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
@@ -17,42 +19,42 @@ namespace BlueControls.Forms {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.components = new System.ComponentModel.Container();
-            this.capStatusBar = new BlueControls.Controls.Caption();
-            this.pnlStatusBar = new System.Windows.Forms.Panel();
-            this.timMessageClearer = new System.Windows.Forms.Timer(this.components);
+            this.components = new Container();
+            this.capStatusBar = new Caption();
+            this.pnlStatusBar = new Panel();
+            this.timMessageClearer = new Timer(this.components);
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
             // capStatusBar
             // 
             this.capStatusBar.CausesValidation = false;
-            this.capStatusBar.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.capStatusBar.Location = new System.Drawing.Point(0, 0);
+            this.capStatusBar.Dock = DockStyle.Fill;
+            this.capStatusBar.Location = new Point(0, 0);
             this.capStatusBar.Name = "capStatusBar";
-            this.capStatusBar.Size = new System.Drawing.Size(287, 24);
+            this.capStatusBar.Size = new Size(287, 24);
             this.capStatusBar.Translate = false;
             // 
             // pnlStatusBar
             // 
             this.pnlStatusBar.Controls.Add(this.capStatusBar);
-            this.pnlStatusBar.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.pnlStatusBar.Location = new System.Drawing.Point(0, 148);
+            this.pnlStatusBar.Dock = DockStyle.Bottom;
+            this.pnlStatusBar.Location = new Point(0, 148);
             this.pnlStatusBar.Name = "pnlStatusBar";
-            this.pnlStatusBar.Size = new System.Drawing.Size(287, 24);
+            this.pnlStatusBar.Size = new Size(287, 24);
             this.pnlStatusBar.TabIndex = 96;
             // 
             // timMessageClearer
             // 
             this.timMessageClearer.Interval = 1000;
-            this.timMessageClearer.Tick += new System.EventHandler(this.timMessageClearer_Tick);
+            this.timMessageClearer.Tick += new EventHandler(this.timMessageClearer_Tick);
             // 
             // FormWithStatusBar
             // 
-            this.ClientSize = new System.Drawing.Size(287, 172);
+            this.ClientSize = new Size(287, 172);
             this.Controls.Add(this.pnlStatusBar);
             this.Name = "FormWithStatusBar";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+            this.StartPosition = FormStartPosition.Manual;
             this.Text = "(c) Christian Peter";
             this.pnlStatusBar.ResumeLayout(false);
             this.ResumeLayout(false);
@@ -61,6 +63,6 @@ namespace BlueControls.Forms {
         protected Caption capStatusBar;
         protected Panel pnlStatusBar;
         private Timer timMessageClearer;
-        private System.ComponentModel.IContainer components;
+        private IContainer components;
     }
 }

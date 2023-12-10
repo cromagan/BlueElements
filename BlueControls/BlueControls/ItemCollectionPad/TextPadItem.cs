@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -136,6 +136,11 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
         return l;
     }
 
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        InvalidateText();
+    }
+
     public override bool ParseThis(string tag, string value) {
         if (base.ParseThis(tag, value)) { return true; }
         switch (tag) {
@@ -170,15 +175,11 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
         if (IsDisposed) { return false; }
         var nt = variable.ReplaceInText(_textReplaced);
 
-        if (nt is string txt) {
-            if (txt == _textReplaced) { return false; }
-            _textReplaced = txt;
-            InvalidateText();
-            OnChanged();
-            return true;
-        }
-
-        return false;
+        if (nt == _textReplaced) { return false; }
+        _textReplaced = nt;
+        InvalidateText();
+        OnChanged();
+        return true;
     }
 
     public bool ResetVariables() {
@@ -226,11 +227,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
         }
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        InvalidateText();
     }
 
     //protected override AbstractPadItem? TryCreate(string id, string name) {

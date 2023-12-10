@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,18 +17,18 @@
 
 #nullable enable
 
-using BlueBasics;
-using BlueBasics.Interfaces;
-using BlueDatabase;
-using BlueScript.Enums;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
+using BlueBasics;
+using BlueBasics.Interfaces;
+using BlueScript.Enums;
+using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
 internal class Method_SaveImage : Method {
 
     #region Properties
@@ -37,7 +37,7 @@ internal class Method_SaveImage : Method {
     public override string Command => "saveimage";
     public override string Description => "Speichert das Bild auf die Festplatte";
     public override bool EndlessArgs => true;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override string Returns => string.Empty;

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -20,10 +20,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using BlueBasics.Interfaces;
 
 namespace BlueDatabase;
 
@@ -121,6 +122,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownWerteAndererZellenAnzeigen = false
     };
 
+    // ReSharper disable once UnusedMember.Global
     public new static readonly ColumnFormatHolder FloatPositive = new(FormatHolder.FloatPositive) {
         Format = DataFormat.Text,
         Align = AlignmentHorizontal.Rechts,
@@ -211,6 +213,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
         DropdownWerteAndererZellenAnzeigen = false
     };
 
+    // ReSharper disable once UnusedMember.Global
     public new static readonly ColumnFormatHolder TextMitFormatierung = new(FormatHolder.TextMitFormatierung) {
         Format = DataFormat.Text,
         Align = AlignmentHorizontal.Links,
@@ -261,7 +264,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 
     #region Constructors
 
-    public ColumnFormatHolder(FormatHolder vorlage) : base(vorlage.Name) {
+    private ColumnFormatHolder(FormatHolder vorlage) : base(vorlage.Name) {
         AllFormats.Add(this);
         this.GetStyleFrom(vorlage);
     }

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -15,34 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
-
 namespace BlueControls.Enums;
 
 public enum HintergrundArt {
     Unbekannt = -1,
     Ohne = 0,
     Solide = 2,
-    Verlauf_Vertical_2 = 20,
-
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    Verlauf_Vertical_3 = 21,
-
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    Verlauf_Horizontal_2 = 30,
-
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    Verlauf_Horizontal_3 = 31,
-
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    Verlauf_Diagonal_3 = 41,
-
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    Glossy = 50,
-
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    Verlauf_Vertikal_Glanzpunkt = 51,
-
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    GlossyPressed = 52
+    Verlauf_Vertical_2 = 20
 }

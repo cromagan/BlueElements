@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -43,11 +43,11 @@ public static class IAutosizableExtension {
 
     #region Fields
 
-    public static float GridSize = 8;// PixelToMm(4f, ItemCollectionPad.Dpi);
+    public const float GridSize = 8; // PixelToMm(4f, ItemCollectionPad.Dpi);
 
-    public static float MinHeigthCapAndBox = 48;
-    public static float MinHeigthCaption = 16;
-    public static float MinHeigthTextBox = 24;
+    public const float MinHeigthCapAndBox = 48;
+    public const float MinHeigthCaption = 16;
+    public const float MinHeigthTextBox = 24;
 
     #endregion
 

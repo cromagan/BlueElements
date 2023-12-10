@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -168,8 +168,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         var row = db2.Row.GenerateAndAdd(s, first.JoinWithCr(), false, true, comment);
 
-        if (row == null || row.IsDisposed) { return null; }
-
         foreach (var thisfi in fc) {
             if (thisfi.Column is ColumnItem c) {
                 row.CellSet(c, thisfi.SearchValue.ToList());
@@ -298,7 +296,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
-        Database.RefreshRowData(rows, false);
+        Database.RefreshRowData(rows);
 
         var txt = "Skript wird ausgeführt: " + scriptname;
 
@@ -464,10 +462,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
 
-    public bool HasPendingWorker() {
-        if (_pendingworker.Count > 0) { return true; }
-        return false;
-    }
+    public bool HasPendingWorker() => _pendingworker.Count > 0;
 
     //public string DoLinkedDatabase(List<RowItem> rowsToExpand) {
     //    if (rowsToExpand.Count == 0) { return string.Empty; }
@@ -481,12 +476,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
 
         return Database.IsNewRowPossible();
-    }
-
-    public bool IsWorkPendung(RowItem r) {
-        if (_pendingChangedRows.Contains(r.KeyName)) { return true; }
-        if (_pendingChangedBackgroundRow.Contains(r.KeyName)) { return true; }
-        return false;
     }
 
     public bool Remove(string key, string comment) {
@@ -564,17 +553,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return l;
     }
 
-    internal static List<RowItem> MatchesTo(List<FilterItem>? fi) {
-        List<RowItem> l = new();
-
-        if (fi == null || fi.Count < 1) { return l; }
-        var db = fi[0].Database;
-        if (db == null || db.IsDisposed) { return l; }
-
-        l.AddRange(db.Row.Where(thisRow => thisRow.MatchesTo(fi)));
-        return l;
-    }
-
     internal void AddRowsForValueChangedEvent() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
         if (!db.IsRowScriptPossible(true)) { return; }
@@ -647,37 +625,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return "Befehl unbekannt";
     }
 
-    internal bool NeedDataCheck(string key) => _pendingChangedRows.Contains(key);
-
-    //        default:
-    //            if (type.ToString(false) == ((int)type).ToString(false)) {
-    //                Develop.DebugPrint(enFehlerArt.Info, "Laden von Datentyp '" + type + "' nicht definiert.<br>Wert: " + value + "<br>Datei: " + database.Filename);
-    //            } else {
-    //                return "Interner Fehler: Für den Datentyp  '" + type + "'  wurde keine Laderegel definiert.";
-    //            }
-    //            break;
-    //    }
-    //    return string.Empty;
-    //}
-
-    //internal string SetValueInternal(enDatabaseDataType type, string value) {
-    //    switch (type) {
-    //        case enDatabaseDataType.LastRowKey:
-    //            //_LastRowKey = LongParse(value);
-    //            break;
-    internal void OnRowRemoving(RowChangedEventArgs e) {
-        e.Row.RowChecked -= OnRowChecked;
-        e.Row.DoSpecialRules -= OnDoSpecialRules;
-        e.Row.RowGotData -= OnRowGotData;
-        RowRemoving?.Invoke(this, e);
-    }
-
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
     /// <summary>
     /// Fügt eine Zeile hinzu, die im System fest verankert ist.
     /// </summary>
     /// <param name="row"></param>
+    /// <param name="reason"></param>
     /// <returns></returns>
     private string Add(RowItem row, Reason reason) {
         if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
@@ -701,6 +655,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
     }
 
+    private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
+
     //internal void Repair() {
     //    foreach (var ThisRowItem in _Internal.Values) {
     //        if (ThisRowItem != null) {
@@ -710,9 +666,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    }
     //}
     //private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
-
-    private void OnDoSpecialRules(object sender, DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
-
     private void OnRowAdded(RowChangedEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
         e.Row.DoSpecialRules += OnDoSpecialRules;
@@ -726,6 +679,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private void OnRowGotData(object sender, RowEventArgs e) => RowGotData?.Invoke(this, e);
 
     private void OnRowRemoved() => RowRemoved?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnRowRemoving(RowChangedEventArgs e) {
+        e.Row.RowChecked -= OnRowChecked;
+        e.Row.DoSpecialRules -= OnDoSpecialRules;
+        e.Row.RowGotData -= OnRowGotData;
+        RowRemoving?.Invoke(this, e);
+    }
 
     private void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         var rk = (string)e.Argument;

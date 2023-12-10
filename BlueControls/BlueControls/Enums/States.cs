@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -38,8 +38,8 @@ public enum States {
     Checked_MousePressed = Standard_MousePressed | Checked,
     Checked_HasFocus_MousePressed = Standard_HasFocus_MousePressed | Checked,
     Checked_MouseOver_HasFocus_MousePressed = Standard_MouseOver_HasFocus_MousePressed | Checked,
-    Checked_MouseOver_HasFocus = Standard_MouseOver_HasFocus | Checked,
-    Checked_MouseOver_MousePressed = Standard_MouseOver_MousePressed | Checked
+    Checked_MouseOver_HasFocus = Standard_MouseOver_HasFocus | Checked
+    //Checked_MouseOver_MousePressed = Standard_MouseOver_MousePressed | Checked
     //Checked_Disabled = Checked Or Standard_Disabled
     //Checked_MouseOver = Checked Or Standard_MouseOverx
     //Checked_HasFocus = Checked Or Standard_HasFocus

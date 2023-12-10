@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -71,7 +71,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         if (column == null || column.IsDisposed) { return new(); }
 
         if (fc == null || fc.Count < 0) { return column.Contents(); }
-        FilterCollection fc2 = (FilterCollection)fc.Clone();
+        var fc2 = (FilterCollection)fc.Clone();
         fc2.Remove(column);
 
         //foreach (var thisFilter in filter) {

@@ -2,10 +2,10 @@ using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueDatabase.Enums;
 using Button = BlueControls.Controls.Button;
 using ColorDialog = System.Windows.Forms.ColorDialog;
 using ComboBox = BlueControls.Controls.ComboBox;
@@ -119,7 +119,7 @@ namespace BlueControls.Forms {
             // 
             // txbRasterFangen
             // 
-            this.txbRasterFangen.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.Float;
+            this.txbRasterFangen.AdditionalFormatCheck = AdditionalCheck.Float;
             this.txbRasterFangen.AllowedChars = "0123456789,";
             this.txbRasterFangen.Cursor = Cursors.IBeam;
             this.txbRasterFangen.Location = new Point(128, 46);
@@ -133,7 +133,7 @@ namespace BlueControls.Forms {
             // 
             // txbRasterAnzeige
             // 
-            this.txbRasterAnzeige.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.Float;
+            this.txbRasterAnzeige.AdditionalFormatCheck = AdditionalCheck.Float;
             this.txbRasterAnzeige.AllowedChars = "0123456789,";
             this.txbRasterAnzeige.Cursor = Cursors.IBeam;
             this.txbRasterAnzeige.Location = new Point(128, 24);

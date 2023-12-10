@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -102,11 +102,11 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override Control CreateControl(ConnectedFormulaView parent) {
-        var con = new TextGenerator() {
+        var con = new TextGenerator {
             Text_Spalte = _textc,
             AuswahlSpalte1 = _auswahl1,
             AuswahlSpalte2 = _auswahl2,
-            AuswahlSpalte3 = _auswahl3,
+            AuswahlSpalte3 = _auswahl3
         };
 
         con.DoInputSettings(parent, this);
@@ -172,7 +172,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     }
 
     public override string ReadableText() {
-        var txt = "Text-Generator: ";
+        const string txt = "Text-Generator: ";
 
         if (this.IsOk() && DatabaseInput != null) {
             return txt + DatabaseInput.Caption;

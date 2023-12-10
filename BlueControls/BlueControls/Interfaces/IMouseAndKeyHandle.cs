@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -23,13 +23,13 @@ public interface IMouseAndKeyHandle {
 
     #region Methods
 
-    bool KeyUp(object sender, KeyEventArgs e, float zoom, float shiftX, float shiftY);
+    bool KeyUp(KeyEventArgs e, float zoom, float shiftX, float shiftY);
 
-    bool MouseDown(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY);
+    bool MouseDown(MouseEventArgs e, float zoom, float shiftX, float shiftY);
 
-    bool MouseMove(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY);
+    bool MouseMove(MouseEventArgs e, float zoom, float shiftX, float shiftY);
 
-    bool MouseUp(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY);
+    bool MouseUp(MouseEventArgs e, float zoom, float shiftX, float shiftY);
 
     #endregion
 

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,9 +17,9 @@
 
 #nullable enable
 
-using BlueControls.EventArgs;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueControls.EventArgs;
 using static BlueBasics.BitmapExt;
 
 namespace BluePaint;

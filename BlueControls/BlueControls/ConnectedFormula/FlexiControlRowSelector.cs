@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -27,7 +27,6 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using ComboBox = BlueControls.Controls.ComboBox;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -140,18 +139,16 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
         if (FilterInput == null) { return; }
 
         var f = FilterInput.Rows;
-        if (f != null) {
-            foreach (var thisR in f) {
-                if (cb?.Item?[thisR.KeyName] == null) {
-                    var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
-                    _ = cb?.Item?.Add(tmpQuickInfo, thisR.KeyName);
-                    //cb.Item.Add(thisR, string.Empty);
-                } else {
-                    foreach (var thisIt in ex) {
-                        if (thisIt.KeyName == thisR.KeyName) {
-                            _ = ex.Remove(thisIt);
-                            break;
-                        }
+        foreach (var thisR in f) {
+            if (cb?.Item?[thisR.KeyName] == null) {
+                var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
+                _ = cb?.Item?.Add(tmpQuickInfo, thisR.KeyName);
+                //cb.Item.Add(thisR, string.Empty);
+            } else {
+                foreach (var thisIt in ex) {
+                    if (thisIt.KeyName == thisR.KeyName) {
+                        _ = ex.Remove(thisIt);
+                        break;
                     }
                 }
             }

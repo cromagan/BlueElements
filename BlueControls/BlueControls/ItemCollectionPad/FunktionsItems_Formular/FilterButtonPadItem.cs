@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -31,6 +31,7 @@ using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -185,7 +186,7 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
     }
 
     public override string ReadableText() {
-        var txt = "Knopf ";
+        const string txt = "Knopf ";
 
         if (this.IsOk() && DatabaseInput != null) {
             return txt + DatabaseInput.Caption;
@@ -225,7 +226,7 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
         }
 
         _eTxt ??= new ExtText(Design.Button, States.Standard);
-        Controls.Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(ImageCode.PlusZeichen), Alignment.Top_HorizontalCenter, false, _eTxt, "xxx", positionModified.ToRect(), false);
+        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(ImageCode.PlusZeichen), Alignment.Top_HorizontalCenter, false, _eTxt, "xxx", positionModified.ToRect(), false);
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,14 +17,15 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
+// ReSharper disable once UnusedMember.Global
 public class Method_SoftMessage : Method_Database {
 
     #region Properties
@@ -33,7 +34,7 @@ public class Method_SoftMessage : Method_Database {
     public override string Command => "softmessage";
     public override string Description => "Gibt in der Statusleiste einen Nachricht aus, wenn ein Steuerelement vorhanden ist, dass diese anzeigen kann.";
     public override bool EndlessArgs => true;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database;
     public override string Returns => string.Empty;

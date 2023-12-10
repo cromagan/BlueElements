@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -19,9 +19,11 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.ItemCollectionList;
+using BlueScript.EventArgs;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -103,7 +105,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
 
     #region Methods
 
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
         if (Formula == null || Formula.IsDisposed) { return; }
 
@@ -158,7 +160,7 @@ public sealed partial class ConnectedFormulaScriptEditor {
         Item.ManualExecutable = chkExternVerfügbar.Checked;
     }
 
-    private void eventScriptEditor_ExecuteScript(object sender, BlueScript.EventArgs.ScriptEventArgs e) {
+    private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
         if (Formula == null || Formula.IsDisposed) {
             e.Feedback = new ScriptEndedFeedback("Keine Formular geladen.", false, false, "Allgemein");
             return;

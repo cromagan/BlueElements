@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -134,7 +134,7 @@ public sealed class LastFilesCombo : ComboBox {
         Item.Clear();
         for (var z = _settings.Count - 1; z >= 0; z--) {
             var x = _settings[z].SplitAndCutBy("|");
-            if (x != null && x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && Item[x[0]] is null) {
+            if (x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && Item[x[0]] is null) {
                 if (!_mustExists || FileExists(x[0])) {
                     nr++;
                     if (nr < MaxCount) {

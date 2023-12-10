@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -21,6 +21,7 @@ using System;
 using System.Drawing;
 using BlueBasics;
 using BlueControls.Enums;
+using static BlueBasics.Constants;
 
 namespace BlueControls.Extended_Text;
 
@@ -51,11 +52,7 @@ internal class ExtCharImageCode : ExtChar {
         if (_qi == null) { return; }
 
         try {
-            if (Math.Abs(zoom - 1) < 0.001) {
-                gr.DrawImage(_qi, drawX, drawY);
-            } else {
-                gr.DrawImage(_qi.Scale(zoom), drawX, drawY);
-            }
+            gr.DrawImage(Math.Abs(zoom - 1) < DefaultTolerance ? _qi : _qi.Scale(zoom), drawX, drawY);
         } catch { }
     }
 

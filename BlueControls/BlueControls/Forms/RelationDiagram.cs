@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -108,15 +108,16 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         Database = null;
     }
 
-    private void BezPlus(RowFormulaPadItem? initialItem) {
+    private void BezPlus(RowFormulaPadItem initialItem) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (_column == null || initialItem.Row == null || db.Column.First() is not ColumnItem cf) { return; }
 
         // Den Beziehungstext holen
-        var t = initialItem?.Row.CellGetString(_column).ToUpper();
+        var t = initialItem.Row.CellGetString(_column).ToUpper();
         if (string.IsNullOrEmpty(t)) { return; }
         // Alle möglichen Namen holen
         List<string> names = new();
-        names.AddRange(db.Column.First().GetUcaseNamesSortedByLenght());
+        names.AddRange(cf.GetUcaseNamesSortedByLenght());
         // Namen ermitteln, die relevant sind
         List<string> bez = new();
         foreach (var thisN in names.Where(t.Contains)) {

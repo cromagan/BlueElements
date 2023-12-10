@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -27,6 +27,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using static BlueBasics.Converter;
+using static BlueBasics.Constants;
 
 namespace BlueControls;
 
@@ -47,7 +48,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     /// <summary>
     /// Die Schriftart, mit allen Attributen, die nativ unterstützt werden.
     /// </summary>
-    private Font? _font;
+    private Font _font = new Font("Arial", 9);
 
     /// <summary>
     /// Die Schriftart, ohne den Stilen Strikeout und Underline
@@ -57,7 +58,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     private float _kapitälchenPlus = -1;
     private QuickImage? _nameInStyleSym;
     private float _oberlänge = -1;
-    private Pen? _pen;
+    private Pen _pen = new Pen(Brushes.Red);
     private BitmapExt? _sampleTextSym;
     private float _sizeTestedAndFailed = float.MaxValue;
     private float _sizeTestedAndOk = float.MinValue;
@@ -93,7 +94,6 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     internal bool Outline { get; private set; }
     internal float Size { get; private set; } = 9;
     internal bool StrikeOut { get; private set; }
-
     internal bool Underline { get; private set; }
 
     #endregion
@@ -276,7 +276,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     }
 
     public Font Font(float zoom) {
-        if (Math.Abs(zoom - 1) < 0.001d && SizeOk(_font.Size)) { return _font; }
+        if (Math.Abs(zoom - 1) < DefaultTolerance && SizeOk(_font.Size)) { return _font; }
 
         var emSize = _fontOl.Size * zoom / Skin.Scale;
         return SizeOk(emSize) ? new Font(FontName, emSize, _font.Style, _font.Unit)
@@ -284,7 +284,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     }
 
     public Font FontWithoutLines(float zoom) {
-        if (Math.Abs(zoom - 1) < 0.001 && SizeOk(_fontOl.Size)) { return _fontOl; }
+        if (Math.Abs(zoom - 1) < DefaultTolerance && SizeOk(_fontOl.Size)) { return _fontOl; }
         var gr = _fontOl.Size * zoom / Skin.Scale;
 
         return SizeOk(gr) ? new Font(FontName, gr, _fontOl.Style, _fontOl.Unit)
@@ -442,7 +442,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         return false;
     }
 
-    public Pen Pen(float zoom) => Math.Abs(zoom - 1) < 0.001 ? _pen : GeneratePen(zoom);
+    public Pen Pen(float zoom) => Math.Abs(zoom - 1) < DefaultTolerance ? _pen : GeneratePen(zoom);
 
     public string ReadableText() {
         var t = FontName + ", " + Size + " pt, ";
@@ -478,11 +478,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
 
         BitmapExt bmp = new(32, 12);
         using (var gr = Graphics.FromImage(bmp)) {
-            if (ColorMain.GetBrightness() > 0.9F) {
-                gr.Clear(Color.FromArgb(200, 200, 200));
-            } else {
-                gr.Clear(Color.White);
-            }
+            gr.Clear(ColorMain.GetBrightness() > 0.9F ? Color.FromArgb(200, 200, 200) : Color.White);
             gr.SmoothingMode = SmoothingMode.HighQuality;
             gr.DrawLine(Pen(1f), 3, 4, 29, 8);
         }
@@ -494,7 +490,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         return _symbolOfLineSym;
     }
 
-    public new string ToString() => BlueFont.ToString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
+    public new string ToString() => ToString(FontName, Size, Bold, Italic, Underline, StrikeOut, Outline, ColorMain.ToHtmlCode(), ColorOutline.ToHtmlCode(), Kapitälchen, OnlyUpper, OnlyLower);
 
     internal SizeF CharSize(char c) {
         if (c <= _charSize.GetUpperBound(0)) {

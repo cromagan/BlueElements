@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -41,7 +41,7 @@ public class BitmapExt : IDisposableExtended {
 
     #region Fields
 
-    public PixelFormat Pixelformat = PixelFormat.Format32bppArgb;
+    private const PixelFormat Pixelformat = PixelFormat.Format32bppArgb;
 
     private Bitmap? _bitmap;
 
@@ -58,35 +58,19 @@ public class BitmapExt : IDisposableExtended {
         }
     }
 
-    public BitmapExt(string filename, bool setDummyPicIfFails) => FromFile(filename, setDummyPicIfFails);
-
     public BitmapExt(int width, int height) => EmptyBitmap(width, height);
 
-    public BitmapExt() => EmptyBitmap(1, 1);
-
-    public BitmapExt(Icon icon) : this(icon.ToBitmap()) { }
-
-    /// <summary>
-    /// Achtung, das eingehende Bild wird geclont!
-    /// </summary>
-    /// <param name="bmp"></param>
-    public BitmapExt(Bitmap bmp) => CloneFromBitmap(bmp);
+    protected BitmapExt() => EmptyBitmap(1, 1);
 
     #endregion
 
     #region Properties
 
-    public int[]? Bits { get; private set; }
-
     public int Height { get; private set; }
-
     public bool IsDisposed { get; private set; }
-
-    public Size Size => new(Width, Height);
-
     public int Width { get; private set; }
-
-    protected GCHandle BitsHandle { get; private set; }
+    private int[]? Bits { get; set; }
+    private GCHandle BitsHandle { get; set; }
 
     #endregion
 
@@ -196,17 +180,6 @@ public class BitmapExt : IDisposableExtended {
         }
     }
 
-    public static void AllePixelZuWeiß(Bitmap pic, double nearBlackSchwelle) {
-        for (var x = 0; x < pic.Width; x++) {
-            for (var y = 0; y < pic.Height; y++) {
-                var ca = pic.GetPixel(x, y);
-                if (!ca.IsNearBlack(nearBlackSchwelle)) {
-                    pic.SetPixel(x, y, Color.FromArgb(ca.A, 255, 255, 255));
-                }
-            }
-        }
-    }
-
     public static Bitmap? Area(Bitmap sourceBitmap, Rectangle r) {
         if (r.Width < 2 || r.Height < 2) { return null; }
         Bitmap clipedArea = new(r.Width, r.Height);
@@ -252,9 +225,7 @@ public class BitmapExt : IDisposableExtended {
                 }
             }
         }
-        bool IsWhite(int x, int y) {
-            return x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
-        }
+        bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
     }
 
     public static Bitmap? AutoCrop(Bitmap? pic, double minBrightness) {
@@ -410,6 +381,7 @@ public class BitmapExt : IDisposableExtended {
         return bmp;
     }
 
+    // ReSharper disable once UnusedMember.Global
     public static Bitmap? ImageBlurFilter(Bitmap? bmp, BlurType blurType) {
         if (bmp == null) { return null; }
 
@@ -608,8 +580,8 @@ public class BitmapExt : IDisposableExtended {
                 var byteOffset = (offsetY * sourceData.Stride) + (offsetX * 4);
                 neighbourPixels.Clear();
                 for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
-                    for (var Filter = -filterOffset; Filter <= filterOffset; Filter++) {
-                        var calcOffset = byteOffset + (Filter * 4) + (filterY * sourceData.Stride);
+                    for (var filter = -filterOffset; filter <= filterOffset; filter++) {
+                        var calcOffset = byteOffset + (filter * 4) + (filterY * sourceData.Stride);
                         neighbourPixels.Add(BitConverter.ToInt32(pixelBuffer, calcOffset));
                     }
                 }
@@ -666,51 +638,10 @@ public class BitmapExt : IDisposableExtended {
         return target;
     }
 
-    /// <summary>
-    /// Helligkeit, Kontrast und Gammawert eines Bitmaps ändern
-    /// </summary>
-    /// <param name="inBitmap">Bitmap-Objekt</param>
-    /// <param name="brightness">Heligkeit (-1 bis 1) 0 = Normal</param>
-    /// <param name="contrast">Kontrast (-1 bis 1) 0 = Normal</param>
-    /// <param name="gamma">Gammawert (0 bis 2) 1 = Normal</param>
-    /// <returns>Bitmap-Objekt</returns>
-    public static Bitmap SetBrightnessContrastGamma(Bitmap inBitmap, float brightness, float contrast, float gamma) {
-        // Min/Max
-        if (brightness > 1) { brightness = 1; }
-        if (brightness < -1) { brightness = -1; }
-        if (contrast > 1) { contrast = 1; }
-        if (contrast < -1) { contrast = -1; }
-        // Gammawert darf nicht = 0 sein (Bug in GDI+)
-        if (gamma == 0) { gamma = Convert.ToSingle(gamma + 1.0E-45); }
-        // Zur korrekten Darstellung:
-        var diff = (brightness / 2) - (contrast / 2);
-        // ColorMatrix erstellen
-        ColorMatrix matrix = new(new[]
-        {
-            new[] {1 + contrast, 0, 0, 0, 0}, new[] {0, 1 + contrast, 0, 0, 0},
-            new[] {0, 0, 1 + contrast, 0, 0}, new float[] {0, 0, 0, 1, 0},
-            new[] {brightness + diff, brightness + diff, brightness + diff, 0, 1}
-        });
-        // Neue Bitmap erstellen
-        Bitmap newBmp = new(inBitmap.Width, inBitmap.Height, PixelFormat.Format24bppRgb);
-        // ImageAttribute-Objekt erstellen
-        using ImageAttributes imageAttr = new();
-        // ColorMatrix für das ImageAttribute-Objekt setzen
-        imageAttr.SetColorMatrix(matrix);
-        // Gamma für das ImageAttribute-Objekt setzen
-        imageAttr.SetGamma(gamma);
-        // Graphics-Objekt von NewBmp erstellen
-        using var newBmpGra = Graphics.FromImage(newBmp);                     // InBitmap in das Graphics-Objekt zeichnen
-        newBmpGra.DrawImage(inBitmap, new Rectangle(0, 0, inBitmap.Width, inBitmap.Height), 0, 0, inBitmap.Width, inBitmap.Height, GraphicsUnit.Pixel, imageAttr);
-        // Graphics-Objekt löschen
-        // ImageAttribute-Objekt löschen
-        return newBmp;
-    }
-
-    public static List<Bitmap?> SplitTiff(string fileName, int maxSize) {
+    public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
         // Open a Stream and decode a TIFF image
         FileStream imageStreamSource = new(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-        List<Bitmap?> l = new();
+        List<Bitmap> l = new();
         var frames = 1;
         try {
             TiffBitmapDecoder decoder = new(imageStreamSource,
@@ -722,7 +653,7 @@ public class BitmapExt : IDisposableExtended {
                 l.Clear();
                 Generic.CollectGarbage();
                 var x = (Bitmap?)Image_FromFile(fileName);
-                l.Add(x.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
+                if (x != null) l.Add(x.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
                 if (frames > 1) {
                     Bitmap x2 = new(200, 200);
                     var gr = Graphics.FromImage(x2);
@@ -811,85 +742,7 @@ public class BitmapExt : IDisposableExtended {
 
     public void MakeTransparent(Color color) => _bitmap?.MakeTransparent(color);
 
-    public void Resize(int width, int height, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
-        if (_bitmap == null) { return; }
-        if (collectGarbage) { Generic.CollectGarbage(); }
-        if (width < 1) { width = 1; }
-        if (height < 1) { height = 1; }
-        var scale = Math.Min(width / (double)Width, height / (double)Height);
-
-        switch (sizeMode) {
-            case SizeModes.EmptySpace:
-                break;
-
-            case SizeModes.BildAbschneiden:
-                break;
-
-            case SizeModes.Breite_oder_Höhe_Anpassen_MitVergrößern:
-                // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                width = (int)(scale * Width);
-                height = (int)(scale * Height);
-                break;
-
-            case SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern:
-                // Bei diesem Modus werden die Rückgabehöhe oder breite verändert!!!
-                if (scale >= 1) { return; }
-                width = (int)(scale * Width);
-                height = (int)(scale * Height);
-                break;
-
-            case SizeModes.Verzerren:
-                scale = 1; // Dummy setzen
-                break;
-
-            default:
-                Develop.DebugPrint(sizeMode);
-                return;
-        }
-        var nw = (int)(Width * scale);
-        var nh = (int)(Height * scale);
-        if (sizeMode == SizeModes.Verzerren) {
-            nw = width;
-            nh = height;
-        }
-        try {
-            var oldBmp = _bitmap;
-            EmptyBitmap(width, height);
-            using var gr = Graphics.FromImage(_bitmap);
-            gr.InterpolationMode = interpolationMode;
-            gr.PixelOffsetMode = PixelOffsetMode.Half;
-            // 20000 / 4 = 5000, also noch 1000 zum kleiner machen
-            if (Width > 20000 && nw < 4000) {
-                var tmp = (Bitmap)oldBmp.GetThumbnailImage((int)(oldBmp.Width / 4.0), (int)(oldBmp.Height / 4.0), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else if (oldBmp.Width > 15000 && nw < 4000) {
-                var tmp = (Bitmap)oldBmp.GetThumbnailImage((int)(oldBmp.Width / 3.0), (int)(oldBmp.Height / 3.0), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else if (oldBmp.Width > 10000 && nw < 2500) {
-                var tmp = (Bitmap)oldBmp.GetThumbnailImage((int)(oldBmp.Width / 3.0), (int)(oldBmp.Height / 3.0), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else if (oldBmp.Width > 8000 && nw < 2000) {
-                var tmp = (Bitmap)oldBmp.GetThumbnailImage((int)(oldBmp.Width / 2.5), (int)(oldBmp.Height / 2.5), null, IntPtr.Zero);
-                gr.DrawImage(tmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            } else {
-                gr.DrawImage(oldBmp, (int)((width - nw) / 2.0), (int)((height - nh) / 2.0), nw, nh);
-            }
-        } catch (Exception ex) {
-            Develop.DebugPrint("Resize fehlgeschlagen", ex);
-            // if (!collectGarbage) { Generic.CollectGarbage(); }
-            // if (sizeMode == enSizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern)
-            // {
-            //    return (Bitmap)bmp.GetThumbnailImage(nw, nh, null, IntPtr.Zero);
-            // }
-            // return null;
-        }
-    }
-
     public void Save(string name, ImageFormat imageFormat) => _bitmap?.Save(name, imageFormat);
-
-    public void SetPixel(int x, int y, Color colour) {
-        if (Bits != null) Bits[x + (y * Width)] = colour.ToArgb();
-    }
 
     protected void EmptyBitmap(int width, int height) {
         Width = width;
@@ -921,11 +774,11 @@ public class BitmapExt : IDisposableExtended {
                 double red = 0;
                 var byteOffset = (offsetY * sourceData.Stride) + (offsetX * 4);
                 for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
-                    for (var Filter = -filterOffset; Filter <= filterOffset; Filter++) {
-                        var calcOffset = byteOffset + (Filter * 4) + (filterY * sourceData.Stride);
-                        blue += pixelBuffer[calcOffset] * filterMatrix[filterY + filterOffset, Filter + filterOffset];
-                        green += pixelBuffer[calcOffset + 1] * filterMatrix[filterY + filterOffset, Filter + filterOffset];
-                        red += pixelBuffer[calcOffset + 2] * filterMatrix[filterY + filterOffset, Filter + filterOffset];
+                    for (var filter = -filterOffset; filter <= filterOffset; filter++) {
+                        var calcOffset = byteOffset + (filter * 4) + (filterY * sourceData.Stride);
+                        blue += pixelBuffer[calcOffset] * filterMatrix[filterY + filterOffset, filter + filterOffset];
+                        green += pixelBuffer[calcOffset + 1] * filterMatrix[filterY + filterOffset, filter + filterOffset];
+                        red += pixelBuffer[calcOffset + 2] * filterMatrix[filterY + filterOffset, filter + filterOffset];
                     }
                 }
                 blue = (factor * blue) + bias;

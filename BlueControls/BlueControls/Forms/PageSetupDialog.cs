@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -125,8 +125,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
     }
 
     private void DrawSampleAndCheckButton() {
-        var makeP = true;
-        if (!Breite.Text.IsNumeral()) { makeP = false; }
+        var makeP = !Breite.Text.IsNumeral();
         if (!Höhe.Text.IsNumeral()) { makeP = false; }
         if (!Oben.Text.IsNumeral()) { makeP = false; }
         if (!Unten.Text.IsNumeral()) { makeP = false; }

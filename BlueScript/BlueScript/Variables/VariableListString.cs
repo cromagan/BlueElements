@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -37,7 +37,7 @@ public class VariableListString : Variable {
 
     #region Constructors
 
-    public VariableListString(string name, List<string>? value, bool ronly, bool system, string comment) : base(name,
+    public VariableListString(string name, IReadOnlyCollection<string>? value, bool ronly, bool system, string comment) : base(name,
         ronly, system, comment) {
         _list = new List<string>();
         if (value != null) {
@@ -50,7 +50,7 @@ public class VariableListString : Variable {
     /// <summary>
     /// Wichtig für: GetEnumerableOfType Variable("NAME");
     /// </summary>
-    public VariableListString(List<string>? value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableListString(IReadOnlyCollection<string>? value) : this(DummyName(), value, true, false, string.Empty) { }
 
     public VariableListString(IEnumerable<string> value) : this(value.ToList()) { }
 

@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -86,30 +86,13 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
 
     public ColumnViewItem? this[ColumnItem? vColumn] {
         get {
-            if (vColumn == null) { return null; }
-
-            return _internal.FirstOrDefault(thisViewItem => thisViewItem != null && thisViewItem.Column == vColumn);
+            return vColumn == null ? null : _internal.FirstOrDefault(thisViewItem => thisViewItem != null && thisViewItem.Column == vColumn);
         }
     }
 
     #endregion
 
     #region Methods
-
-    /// <summary>
-    /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
-    /// </summary>
-    /// <param name="columnName"></param>
-    /// <param name="ca"></param>
-    public static void Hide(string columnName, ColumnViewCollection ca) {
-        foreach (var thisViewItem in ca) {
-            if (thisViewItem != null && (thisViewItem.Column == null || string.Equals(thisViewItem.Column.KeyName, columnName, StringComparison.OrdinalIgnoreCase))) {
-                ca.Remove(thisViewItem);
-                Hide(columnName, ca);
-                return;
-            }
-        }
-    }
 
     /// <summary>
     /// Static, um klar zumachen, dass die Collection nicht direkt bearbeitet werden kann.
@@ -304,7 +287,7 @@ public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableEx
         }
     }
 
-    public List<ColumnItem> ReducedColumns() {
+    public IEnumerable<ColumnItem> ReducedColumns() {
         var x = new List<ColumnItem>();
         foreach (var thiscol in _internal) {
             if (thiscol?.Column != null && thiscol.TmpReduced) { x.Add(thiscol.Column); }

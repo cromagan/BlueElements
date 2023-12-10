@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueControls.ItemCollectionPad.Temporär;
+using static BlueBasics.Constants;
 
 namespace BlueControls.ItemCollectionPad.Abstract;
 
@@ -245,7 +246,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
             for (var index = 0; index < polygons[pgon].Count; index++) {
                 var testPoint = polygons[pgon][index];
                 if (testPoint.X < curPoint.X ||
-                    (testPoint.X == curPoint.X &&
+                    (Math.Abs(testPoint.X - curPoint.X) < DefaultTolerance &&
                      testPoint.Y > curPoint.Y)) {
                     curPgon = pgon;
                     curIndex = index;

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -77,7 +77,6 @@ public class BackupVerwalter {
         if (string.IsNullOrEmpty(path)) { return "Kein Verzeichniss angebeben."; }
         if (string.IsNullOrEmpty(search)) { return "Kein Suchpattern angebeben."; }
 
-
         var fix = Directory.GetFiles(path, search, SearchOption.TopDirectoryOnly);
 
         if (fix.Length == 0) { return string.Empty; }
@@ -101,7 +100,7 @@ public class BackupVerwalter {
         var von = 0;
         var bis = multi;
 
-        int filc = 0;
+        var filc = 0;
 
         _deletable = new List<string>();
 

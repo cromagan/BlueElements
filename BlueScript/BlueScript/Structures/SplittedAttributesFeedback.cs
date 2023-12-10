@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,11 +17,11 @@
 
 #nullable enable
 
-using BlueScript.Enums;
-using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using BlueScript.Enums;
+using BlueScript.Variables;
 
 namespace BlueScript.Structures;
 

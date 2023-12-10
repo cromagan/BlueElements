@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -24,13 +24,13 @@ using System.Drawing.Imaging;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BluePaint.EventArgs;
 using static BlueBasics.BitmapExt;
 using static BlueBasics.IO;
 using static BlueBasics.Extensions;
 using MessageBox = BlueControls.Forms.MessageBox;
-using BlueControls.EventArgs;
-using BlueControls.Forms;
 
 namespace BluePaint;
 
@@ -164,7 +164,7 @@ public partial class MainWindow {
     private void btnGrößeÄndern_Click(object sender, System.EventArgs e) => SetTool(new Tool_Resize());
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (!IsSaved() || e.Item == null) { return; }
+        if (!IsSaved()) { return; }
         LoadFromDisk(e.Item.KeyName);
     }
 
@@ -240,21 +240,28 @@ public partial class MainWindow {
     private void Dummy_Click(object sender, System.EventArgs e) => SetTool(new Tool_DummyGenerator());
 
     private bool IsSaved() {
-        if (_isSaved) { return true; }
-        if (string.IsNullOrEmpty(_filename)) { return true; }
-        switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", ImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
-            case 0:
-                Speichern();
-                break;
-
-            case 1:
-                _isSaved = true;
+        while (true) {
+            if (_isSaved) {
                 return true;
+            }
 
-            case 2:
-                return false;
+            if (string.IsNullOrEmpty(_filename)) {
+                return true;
+            }
+
+            switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", ImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
+                case 0:
+                    Speichern();
+                    break;
+
+                case 1:
+                    _isSaved = true;
+                    return true;
+
+                case 2:
+                    return false;
+            }
         }
-        return IsSaved();
     }
 
     private void Kontrast_Click(object sender, System.EventArgs e) => SetTool(new Tool_Kontrast());

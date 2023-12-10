@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -23,7 +23,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 
-namespace BlueDatabase;
+namespace BlueScript;
 
 public abstract class ScriptDescription : IParseable, IReadableTextWithChangingAndKey, IDisposableExtended, IErrorCheckable, IHasKeyName, IChangedFeedback, IComparable {
 
@@ -49,7 +49,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
 
     #region Constructors
 
-    public ScriptDescription(string name, string script) {
+    protected ScriptDescription(string name, string script) {
         _keyName = name;
         _scriptText = script;
         _manualexecutable = false;
@@ -59,7 +59,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
         _image = string.Empty;
     }
 
-    public ScriptDescription() : this(string.Empty, string.Empty) { }
+    protected ScriptDescription() : this(string.Empty, string.Empty) { }
 
     #endregion
 
@@ -82,6 +82,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
     #region Properties
 
     public string AdminInfo {
+        //TODO: Implementieren
         get => _admininfo;
         set {
             if (IsDisposed) { return; }
@@ -185,7 +186,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
         return string.Empty;
     }
 
-    public void OnChanged() => Changed?.Invoke(this, EventArgs.Empty);
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     public void ParseFinished(string parsed) { }
 

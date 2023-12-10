@@ -1,26 +1,16 @@
-﻿using System.ComponentModel;
-using System.ComponentModel.Design;
-using BlueBasics.Interfaces;
-using BlueControls.Controls;
-using BlueDatabase;
+﻿#nullable enable
 
-#nullable enable
+using System.ComponentModel;
+using System.ComponentModel.Design;
 
 namespace BlueControls.Designer_Support;
 
 public sealed class TextBoxActionList : DesignerActionList {
 
-    #region Fields
-
-    private readonly TextBox _reverenceControl;
-
-    #endregion
-
     #region Constructors
 
     public TextBoxActionList(IComponent component) : base(component) {
         // Save a reference to the control we are designing.
-        _reverenceControl = (TextBox)component;
         // Save a reference to the DesignerActionUIService
         //  DesignerService = ctypex(GetService(GetType(DesignerActionUIService)), DesignerActionUIService)
         //Makes the Smart Tags open automatically
@@ -29,26 +19,22 @@ public sealed class TextBoxActionList : DesignerActionList {
 
     #endregion
 
-    #region Properties
-
-    public IInputFormat? TextFormat {
-        get {
-            //for (var z = 0; z < 100; z++) {
-            //    var st = (VarType)z;
-            //    if (st.ToString() == z.ToString()) {
-            //        continue;
-            //    }
-            foreach (var thisFormat in FormatHolder.AllFormats) {
-                //var x = new TextBox();
-                //x.GetStyleFrom(st);
-                if (thisFormat.IsFormatIdentical(_reverenceControl)) { return thisFormat; }
-            }
-            return null;
-        }
-        set => _reverenceControl.GetStyleFrom(value);
-    }
-
-    #endregion
+    //public IInputFormat? TextFormat {
+    //    get {
+    //        //for (var z = 0; z < 100; z++) {
+    //        //    var st = (VarType)z;
+    //        //    if (st.ToString() == z.ToString()) {
+    //        //        continue;
+    //        //    }
+    //        foreach (var thisFormat in FormatHolder.AllFormats) {
+    //            //var x = new TextBox();
+    //            //x.GetStyleFrom(st);
+    //            if (thisFormat.IsFormatIdentical(_reverenceControl)) { return thisFormat; }
+    //        }
+    //        return null;
+    //    }
+    //    set => _reverenceControl.GetStyleFrom(value);
+    //}
 
     //public bool Checked {
     //    get => ReverenceControl.Checked;

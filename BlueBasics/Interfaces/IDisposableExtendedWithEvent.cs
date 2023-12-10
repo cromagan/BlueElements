@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -31,6 +31,7 @@ public interface IDisposableExtendedWithEvent : IDisposableExtended {
 
     #region Methods
 
+    // ReSharper disable once UnusedMemberInSuper.Global
     public void OnDisposingEvent();
 
     #endregion

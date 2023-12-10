@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,15 +17,17 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics;
 using BlueScript;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
+// ReSharper disable once UnusedMember.Global
 internal class Method_Call : Method_Database {
 
     #region Properties
@@ -69,13 +71,13 @@ internal class Method_Call : Method_Database {
             }
         }
 
-        (string f, string error) = Script.ReduceText(sc.ScriptText);
+        var (f, error) = Script.ReduceText(sc.ScriptText);
 
         if (!string.IsNullOrEmpty(error)) {
             return new DoItFeedback(infos.Data, "Fehler in Unter-Skript " + vs + ": " + error);
         }
 
-        var scx = BlueScript.Methods.Method_CallByFilename.CallSub(varCol, scp, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null);
+        var scx = Method_CallByFilename.CallSub(varCol, scp, infos, "Subroutinen-Aufruf [" + vs + "]", f, attvar.ValueBoolGet(1), 0, vs, null);
         if (!scx.AllOk) { return scx; }
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }

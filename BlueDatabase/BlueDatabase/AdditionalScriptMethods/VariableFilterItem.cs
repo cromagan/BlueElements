@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -34,11 +34,11 @@ public class VariableFilterItem : Variable {
 
     #region Constructors
 
-    public VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _filter = value;
+    public VariableFilterItem(FilterItem value) : this(DummyName(), value, true, false, string.Empty) { }
 
     public VariableFilterItem(string name) : this(name, null!, true, false, string.Empty) { }
 
-    public VariableFilterItem(FilterItem value) : this(DummyName(), value, true, false, string.Empty) { }
+    private VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _filter = value;
 
     #endregion
 
@@ -50,7 +50,7 @@ public class VariableFilterItem : Variable {
 
     public FilterItem FilterItem {
         get => _filter;
-        set {
+        private set {
             if (ReadOnly) { return; }
             _filter = value;
         }

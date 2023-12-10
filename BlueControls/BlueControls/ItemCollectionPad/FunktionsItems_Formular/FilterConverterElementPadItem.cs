@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -152,7 +152,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         var i = _itemAccepts.DatabaseInput(this)?.Column.Exists(_eingangsWertSpalte);
         var o = DatabaseOutput?.Column.Exists(_filterSpalte);
         var con = new InputRowOutputFilterControl(i, o, _filtertype);
-        con.DoOutputSettings(parent, this);
+        con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);
 
         return con;
@@ -245,7 +245,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     }
 
     public override string ReadableText() {
-        var txt = "Filter aus Zeile: ";
+        const string txt = "Filter aus Zeile: ";
 
         if (this.IsOk() && DatabaseOutput != null) {
             return txt + DatabaseOutput.Caption;

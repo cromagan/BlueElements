@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -15,15 +15,17 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueDatabase;
-using System.Collections.Generic;
-using BlueControls.Interfaces;
-using System.ComponentModel;
-using BlueControls.Enums;
-using System.Drawing;
-
 #nullable enable
+
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using BlueBasics;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueControls.Interfaces;
+using BlueDatabase;
 
 namespace BlueControls.Controls;
 
@@ -32,12 +34,9 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
     #region Fields
 
     private readonly List<ColumnItem> _auswahlc = new();
+    private readonly string _auswahlSpalte2 = string.Empty;
+    private readonly string _auswahlSpalte3 = string.Empty;
     private string _auswahlSpalte1 = string.Empty;
-
-    private string _auswahlSpalte2 = string.Empty;
-
-    private string _auswahlSpalte3 = string.Empty;
-
     private ColumnItem? _textc;
     private string _textSpalte = string.Empty;
 
@@ -229,7 +228,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
                     if (thisChecked.CountString(";") + 1 == r.CountString(";") && r.StartsWith(thisChecked)) { add = true; }
                 }
                 if (add) {
-                    var rvis = string.Empty.PadLeft((r.CountString(";") - 2) * 5) + r.Substring(r.LastIndexOf(";") + 1);
+                    var rvis = string.Empty.PadLeft((r.CountString(";") - 2) * 5) + r.Substring(r.LastIndexOf(";", StringComparison.Ordinal) + 1);
 
                     _ = lstAuswahl.Item.Add(rvis, r);
                 }
@@ -247,7 +246,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
         textBox1.Text = txt;
     }
 
-    private void lstAuswahl_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) => GenerateItemsAndText();
+    private void lstAuswahl_ItemClicked(object sender, AbstractListItemEventArgs e) => GenerateItemsAndText();
 
     private string RowString(RowItem thisRow) {
         var stufe = 0;

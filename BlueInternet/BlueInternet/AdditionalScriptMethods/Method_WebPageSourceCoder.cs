@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -62,7 +62,7 @@ internal class Method_WebPageSourceCode : Method_WebPage {
         try {
             Generic.CollectGarbage();
 
-            var script = @"document.documentElement.outerHTML";
+            const string script = @"document.documentElement.outerHTML";
 
             var task = DoTask(wb, script);
 

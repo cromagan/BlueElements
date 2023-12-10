@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -23,11 +23,13 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Text;
+using System.Windows.Data;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
+using static BlueBasics.Constants;
 
 namespace BlueBasics;
 
@@ -92,7 +94,7 @@ public sealed class QuickImage : IReadableText, IStringable {
         CorrectSize(-1, -1, bmp);
 
         if (Pics.Count == 0) {
-            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(Pics, new object());
+            BindingOperations.EnableCollectionSynchronization(Pics, new object());
         }
 
         _ = Pics.TryAdd(Code, this);
@@ -255,7 +257,7 @@ public sealed class QuickImage : IReadableText, IStringable {
         var x = new QuickImage(code);
 
         if (Pics.Count == 0) {
-            System.Windows.Data.BindingOperations.EnableCollectionSynchronization(Pics, new object());
+            BindingOperations.EnableCollectionSynchronization(Pics, new object());
         }
 
         _ = Pics.TryAdd(code, x);
@@ -285,14 +287,12 @@ public sealed class QuickImage : IReadableText, IStringable {
 
     public static implicit operator Bitmap(QuickImage qi) => qi._bitmap;
 
-    public string CompareKey() => ToString();
-
     public void OnNeedImage(NeedImageEventArgs e) => NeedImage?.Invoke(this, e);
 
     public string ReadableText() => string.Empty;
 
     public QuickImage Scale(double zoom) {
-        if (Math.Abs(zoom - 1f) < 0.001) { return this; }
+        if (Math.Abs(zoom - 1f) < DefaultTolerance) { return this; }
 
         zoom = Math.Max(zoom, 0.001);
 

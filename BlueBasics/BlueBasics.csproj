@@ -107,14 +107,12 @@
     <Compile Include="EventArgs\MultiUserToListEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserParseEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserHasPendingChangesEventArgs.cs" />
-    <Compile Include="Extensions\DataTableExtensions.cs" />
     <Compile Include="FormatHolder.cs" />
     <Compile Include="ImageMatrix.cs" />
     <Compile Include="Enums\BlurType.cs" />
     <Compile Include="Enums\EditableErrorReasonType.cs" />
     <Compile Include="EventArgs\NeedImageEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />
-    <Compile Include="Cryptogaphy.cs" />
     <Compile Include="HTML.cs" />
     <Compile Include="Interfaces\ICanDropMessages.cs" />
     <Compile Include="Interfaces\IDisposableExtendedWithEvent.cs" />
@@ -150,7 +148,6 @@
     <Compile Include="IO.cs" />
     <Compile Include="Interfaces\IChangedFeedback.cs" />
     <Compile Include="Extensions\CollectionExtension.cs" />
-    <Compile Include="Interfaces\IntegerArrayExtension.cs" />
     <Compile Include="Interfaces\IParseable.cs" />
     <Compile Include="Interfaces\IReadableTextWithChanging.cs" />
     <Compile Include="Extensions\ListOfExtension.cs" />

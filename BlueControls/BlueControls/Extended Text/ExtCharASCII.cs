@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -60,7 +60,7 @@ public class ExtCharAscii : ExtChar {
             Font?.DrawString(gr, _char.ToString(), drawX, drawY, zoom, StringFormat.GenericTypographic);
         } catch { }
 
-        //if (Math.Abs(zoom - 1) < 0.001) {
+        //if (Math.Abs(zoom - 1) < DefaultTolerance) {
         //    var BNR = QuickImage.Get(_Char - (int)enASCIIKey.ImageStart);
         //    if (BNR == null) { return; }
         //    // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)

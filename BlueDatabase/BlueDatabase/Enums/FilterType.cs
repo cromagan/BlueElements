@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -59,6 +59,7 @@ public enum FilterType {
     Ungleich_MultiRowIgnorieren_UND_GroßKleinEgal = Ungleich_MultiRowIgnorieren | UND | GroßKleinEgal,
     Ungleich_MultiRowIgnorieren_GroßKleinEgal = Ungleich_MultiRowIgnorieren | GroßKleinEgal,
     Instr_GroßKleinEgal = Instr | GroßKleinEgal,
-    Instr_ODER_GroßKleinEgal = Instr | GroßKleinEgal | ODER,
+
+    //Instr_ODER_GroßKleinEgal = Instr | GroßKleinEgal | ODER,
     Instr_UND_GroßKleinEgal = Instr | GroßKleinEgal | UND
 }

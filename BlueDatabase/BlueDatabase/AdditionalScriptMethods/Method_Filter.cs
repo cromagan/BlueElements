@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,16 +17,17 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class Method_Filter : Method_Database {
 
     #region Properties

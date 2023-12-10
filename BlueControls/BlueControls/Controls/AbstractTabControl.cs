@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -70,7 +70,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     public TabPage? TabDefault { get; set; }
 
     [Category("Verhalten")]
-    public string[] TabDefaultOrder { get; set; }
+    public string[]? TabDefaultOrder { get; set; }
 
     protected override bool ScaleChildren => false;
 

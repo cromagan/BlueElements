@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -21,8 +21,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Windows.Forms;
@@ -35,7 +35,7 @@ using BlueControls.ItemCollectionList;
 using static BlueBasics.IO;
 using static BlueBasics.Extensions;
 using Orientation = BlueBasics.Enums.Orientation;
-using System.Globalization;
+using static BlueBasics.Constants;
 
 namespace BlueControls.Controls;
 
@@ -119,22 +119,6 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return new Tuple<Bitmap?, List<string>>(bmp, tags);
     }
 
-    public static Tuple<Bitmap?, List<string>> ResizeData(Bitmap? pic, List<string> tags, int width, int height) {
-        var zoomx = (float)width / pic.Width;
-        var zoomy = (float)height / pic.Height;
-        var pic2 = pic.Resize(width, height, SizeModes.Verzerren, InterpolationMode.HighQualityBicubic, true);
-        List<string> tags2 = new(tags);
-        var names = tags2.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
-        foreach (var thisO in names) {
-            var s = tags2.TagGet(thisO);
-            PointM thisP = new(null, s);
-            thisP.X *= zoomx;
-            thisP.Y *= zoomy;
-            tags2.TagSet(thisP.KeyName, thisP.ToString());
-        }
-        return new Tuple<Bitmap?, List<string>>(pic2, tags2);
-    }
-
     public BitmapListItem GenerateBitmapListItem() {
         WritePointsInTags();
         return GenerateBitmapListItem(Bmp, Tags);
@@ -165,14 +149,6 @@ public partial class ZoomPicWithPoints : ZoomPic {
         Invalidate();
     }
 
-    public void PointRemove(string name) {
-        var p = _points.Get(name);
-        if (p == null) { return; }
-        _ = _points.Remove(p);
-        WritePointsInTags();
-        Invalidate();
-    }
-
     public void PointSet(string name, int x, int y) => PointSet(name, x, (float)y);
 
     public void PointSet(string name, float x, float y) {
@@ -184,7 +160,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             Invalidate();
             return;
         }
-        if (p.X != x || p.Y != y) {
+        if (Math.Abs(p.X - x) > DefaultTolerance || Math.Abs(p.Y - y) > DefaultTolerance) {
             p.X = x;
             p.Y = y;
             Invalidate();

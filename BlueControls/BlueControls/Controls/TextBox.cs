@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -34,7 +34,6 @@ using BlueControls.Interfaces;
 using BlueDatabase.EventArgs;
 using static BlueBasics.Converter;
 using Clipboard = System.Windows.Clipboard;
-using MessageBox = BlueControls.Forms.MessageBox;
 using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
@@ -353,7 +352,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         return false;
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
         AbortSpellChecking();
 
         var tmp = Cursor_PosAt(e.X, e.Y);
@@ -423,21 +422,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
-    /// <summary>
-    /// Prüft - bei Multiline Zeile für Zeile - ob der Text in der Textbox zulässig ist.
-    /// </summary>
-    /// <param name="mitMeldung"></param>
-    /// <returns>Ergibt Wahr, wenn der komplette Text dem Format entspricht. Andernfalls Falsch.</returns>
-    /// <remarks></remarks>
-
-    public bool Text_IsOkay(bool mitMeldung) {
-        if (!_eTxt.PlainText.IsFormat(this)) {
-            if (mitMeldung) { MessageBox.Show("Ihre Eingabe entspricht nicht<br>dem erwarteten Format.", ImageCode.Warnung, "OK"); }
-            return false;
-        }
-        return true;
-    }
 
     public void Unmark(MarkState markstate) => _eTxt.Unmark(markstate);
 
@@ -662,7 +646,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         if (!Enabled) { return; }
         _lastUserActionForSpellChecking = DateTime.UtcNow;
-        if (_mouseValue != 0 || e == null) { return; }
+        if (_mouseValue != 0) { return; }
 
         switch (e.KeyCode) {
             case Keys.Left:
@@ -794,7 +778,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// <summary>
     /// Löst das Ereignis aus und setzt _LastUserChangingTime auf NULL.
     /// </summary>
-    protected virtual void OnTextChanged() {
+    protected void OnTextChanged() {
         Develop.SetUserDidSomething();
         TextChanged?.Invoke(this, System.EventArgs.Empty);
     }
@@ -997,7 +981,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         : _markStart > -1 && _markEnd < 0 ? _markEnd : _markStart > -1 && _markEnd > -1 ? _markEnd : -1;
 
     private void MarkAll() {
-        if (_eTxt != null && _eTxt.Count > 0) {
+        if (_eTxt.Count > 0) {
             _markStart = 0;
             _markEnd = _eTxt.Count;
             _cursorVisible = false;

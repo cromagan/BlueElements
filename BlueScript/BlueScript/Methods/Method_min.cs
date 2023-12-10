@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,14 +17,15 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Linq;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
 internal class Method_Min : Method {
 
     #region Properties
@@ -33,7 +34,7 @@ internal class Method_Min : Method {
     public override string Command => "min";
     public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.";
     public override bool EndlessArgs => true;
-    
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableFloat.ShortName_Plain;

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -117,7 +117,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         return con;
     }
 
-    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView, TabFormulaPadItem item) {
+    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -286,7 +286,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     }
 
     public override string ReadableText() {
-        var txt = "Formulare: ";
+        const string txt = "Formulare: ";
 
         if (this.IsOk() && DatabaseInput != null) {
             return txt + DatabaseInput.Caption;
@@ -393,7 +393,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
             }
         }
 
-        if (CFormula != null && CFormula.PadData != null) {
+        if (CFormula?.PadData != null) {
             foreach (var thisf in CFormula.PadData.AllPages()) {
                 if (!CFormula.NotAllowedChilds.Contains(thisf) && !string.Equals("Head", thisf, StringComparison.OrdinalIgnoreCase)) {
                     _ = childs.Suggestions.Add(thisf, ImageCode.Formel);

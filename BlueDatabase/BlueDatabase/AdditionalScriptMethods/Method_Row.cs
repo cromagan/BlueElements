@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,16 +17,17 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class Method_Row : Method {
 
     #region Properties
@@ -52,20 +53,7 @@ public class Method_Row : Method {
 
     #region Methods
 
-    public static RowItem? ObjectToRow(Variable? attribute) {
-        if (attribute is not VariableRowItem vro) { return null; }
-
-        //var d = attribute.ObjectData();
-        //if (d.ToUpper() == "NULL") { return null; }
-
-        //var d2 = d.SplitAndCutBy("|");
-
-        //var db = Database.GetByFilename(d2[0], true, false);
-
-        //return db?.Row.SearchByKey(LongParse(d2[1]));
-
-        return vro.RowItem;
-    }
+    public static RowItem? ObjectToRow(Variable? attribute) => attribute is not VariableRowItem vro ? null : vro.RowItem;
 
     public static DoItFeedback RowToObjectFeedback(RowItem? row) => new(new VariableRowItem(row));
 

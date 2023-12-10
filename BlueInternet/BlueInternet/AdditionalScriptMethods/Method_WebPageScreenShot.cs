@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -67,13 +67,13 @@ internal class Method_WebPageScreenShot : Method_WebPage {
 
         try {
             Generic.CollectGarbage();
-            string jsString = "Math.max(document.body.scrollHeight, " +
-                              "document.documentElement.scrollHeight, document.body.offsetHeight, " +
-                              "document.documentElement.offsetHeight, document.body.clientHeight, " +
-                              "document.documentElement.clientHeight);";
+            const string jsString = "Math.max(document.body.scrollHeight, " +
+                                    "document.documentElement.scrollHeight, document.body.offsetHeight, " +
+                                    "document.documentElement.offsetHeight, document.body.clientHeight, " +
+                                    "document.documentElement.clientHeight);";
 
             var executedScript = wb.EvaluateScriptAsync(jsString).Result.Result;
-            int width = 1280;
+            const int width = 1280;
             var height = Convert.ToInt32(executedScript);
 
             var size = new Size(width, height);

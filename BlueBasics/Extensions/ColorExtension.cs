@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -16,10 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
-using System.Linq;
 
 namespace BlueBasics;
 
@@ -28,56 +26,6 @@ public static partial class Extensions {
     #region Methods
 
     public static Color Brighten(this Color color, double value) => FromHsb(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 + value)), color.A);
-
-    /// <summary>
-    ///  weighed distance using hue, saturation and brightness
-    /// </summary>
-    /// <param name="target"></param>
-    /// <param name="colors"></param>
-    /// <param name="factorSat"></param>
-    /// <param name="factorBri"></param>
-    /// <returns></returns>
-    public static Color ClosestHsvColor(this Color target, List<Color> colors, float factorSat, float factorBri) {
-        // https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
-        var hue1 = target.GetHue();
-        var num1 = ColorNum(target, factorSat, factorBri);
-        var diffs = colors.Select(n => Math.Abs(ColorNum(n, factorSat, factorBri) - num1) + GetHueDistance(n.GetHue(), hue1));
-        var diffMin = diffs.Min(x => x);
-        return colors[diffs.ToList().FindIndex(n => n == diffMin)];
-    }
-
-    public static Color ClosestHueColor(this Color target, List<Color> colors) {
-        // https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
-        var hue1 = target.GetHue();
-        var diffs = colors.Select(n => GetHueDistance(n.GetHue(), hue1));
-        var diffMin = diffs.Min(n => n);
-        return colors[diffs.ToList().FindIndex(n => n == diffMin)];
-    }
-
-    public static Color ClosestRgbColor(this Color target, List<Color> colors) {
-        // https://stackoverflow.com/questions/27374550/how-to-compare-color-object-and-get-closest-color-in-an-color/27375621
-        var colorDiffs = colors.Select(n => ColorDiff(n, target)).Min(n => n);
-        return colors[colors.FindIndex(n => ColorDiff(n, target) == colorDiffs)];
-    }
-
-    /// <summary>
-    /// distance in RGB space
-    /// </summary>
-    /// <param name="c1"></param>
-    /// <param name="c2"></param>
-    /// <returns></returns>
-    public static int ColorDiff(this Color c1, Color c2) => (int)Math.Sqrt(((c1.R - c2.R) * (c1.R - c2.R))
-                                                                           + ((c1.G - c2.G) * (c1.G - c2.G))
-                                                                           + ((c1.B - c2.B) * (c1.B - c2.B)));
-
-    /// <summary>
-    /// weighed only by saturation and brightness (from my trackbars)
-    /// </summary>
-    /// <param name="c"></param>
-    /// <param name="factorSat"></param>
-    /// <param name="factorBri"></param>
-    /// <returns></returns>
-    public static float ColorNum(this Color c, float factorSat, float factorBri) => (c.GetSaturation() * factorSat) + (GetBrightness(c) * factorBri);
 
     public static Color Darken(this Color color, double value) => FromHsb(color.GetHue(), color.GetSaturation(), (float)(color.GetBrightness() * (1 - value)), color.A);
 
@@ -132,24 +80,6 @@ public static partial class Extensions {
         return Color.FromArgb(a, r, g, b);
     }
 
-    /// <summary>
-    ///  color brightness as perceived:
-    /// </summary>
-    /// <param name="c"></param>
-    /// <returns></returns>
-    public static float GetBrightness(this Color c) => ((c.R * 0.299f) + (c.G * 0.587f) + (c.B * 0.114f)) / 256f;
-
-    /// <summary>
-    /// distance between two hues:
-    /// </summary>
-    /// <param name="hue1"></param>
-    /// <param name="hue2"></param>
-    /// <returns></returns>
-    public static float GetHueDistance(this float hue1, float hue2) {
-        var d = Math.Abs(hue1 - hue2);
-        return d > 180 ? 360 - d : d;
-    }
-
     public static bool IsMagentaOrTransparent(this Color col) => col.ToArgb() == -65281 || col.A == 0;
 
     public static bool IsNearBlack(this Color color, double maxBrightness) => color.A != 0 && (color.ToArgb() == 0 || color.GetBrightness() <= maxBrightness);
@@ -167,21 +97,7 @@ public static partial class Extensions {
             (int)((color1.B * color1Prozent) + (color2.B * color2Prozent)));
     }
 
-    public static double OverlayMath(this int @base, int blend) {
-        var dbase = @base / 255.0;
-        var dblend = blend / 255.0;
-        return dbase < 0.5 ? 2 * dbase * dblend * 255 : (1 - (2 * (1 - dbase) * (1 - dblend))) * 255;
-    }
-
-    public static Color OverlayMix(this Color baseColor, Color blendColor, double opacity) => MixColor(Color.FromArgb((int)OverlayMath(baseColor.R, blendColor.R),
-        (int)OverlayMath(baseColor.G, blendColor.G),
-        (int)OverlayMath(baseColor.B, blendColor.B)), baseColor, opacity);
-
     public static Color SetAlpha(this Color color, byte newAlpha) => Color.FromArgb(newAlpha, color.R, color.G, color.B);
-
-    public static Color SoftLightMix(this Color baseColor, Color blendColor, double opacity) => MixColor(Color.FromArgb((int)SoftLightMath(baseColor.R, blendColor.R),
-        (int)SoftLightMath(baseColor.G, blendColor.G),
-        (int)SoftLightMath(baseColor.B, blendColor.B)), baseColor, opacity);
 
     public static Color ToGrey(this Color color) {
         var w = (int)Math.Min(255, ((color.R * 77) + (color.G * 150) + (color.B * 28)) / 255.0);
@@ -201,14 +117,6 @@ public static partial class Extensions {
             if (a.Length < 2) { a = "0" + a; }
         }
         return a + r + g + b;
-    }
-
-    private static double SoftLightMath(int @base, int blend) {
-        var dbase = @base / 255.0;
-        var dblend = blend / 255.0;
-        return dblend < 0.5
-            ? ((2 * dbase * dblend) + (Math.Pow(dbase, 2) * (1 - (2 * dblend)))) * 255
-            : ((Math.Sqrt(dbase) * ((2 * dblend) - 1)) + (2 * dbase * (1 - dblend))) * 255;
     }
 
     #endregion

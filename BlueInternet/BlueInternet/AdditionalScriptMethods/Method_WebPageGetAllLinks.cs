@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -56,7 +56,7 @@ internal class Method_WebPageGetAllLinks : Method_WebPage {
         if (wb.IsLoading) { return new DoItFeedback(infos.Data, "Ladeprozess aktiv"); }
 
         try {
-            var script = @"var inputs = document.getElementsByTagName('a');
+            const string script = @"var inputs = document.getElementsByTagName('a');
                             var ids = [];
                             for (var i = 0; i < inputs.length; i++) {
                                 if (inputs[i].id) {

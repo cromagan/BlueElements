@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -107,9 +107,11 @@ public sealed partial class ExportDialog : IHasDatabase {
     /// <param name="startNr"></param>
     /// <param name="layoutFileName"></param>
     /// <param name="rowsForExport"></param>
+    /// <param name="abstandMm"></param>
     /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat. -1 falls keine (gültige) Liste übergeben wurde.</returns>
-
     public static int GeneratePrintPad(CreativePad pad, int startNr, string layoutFileName, List<RowItem>? rowsForExport, float abstandMm) {
+        if (pad.Item == null) { return -1; }
+
         pad.Item.Clear();
         Generic.CollectGarbage();
 
@@ -133,8 +135,11 @@ public sealed partial class ExportDialog : IHasDatabase {
                 ChildPadItem it = new() {
                     PadInternal = new CreativePad(new ItemCollectionPad.ItemCollectionPad(layoutFileName))
                 };
-                it.PadInternal.Item.ResetVariables();
-                it.PadInternal.Item.ParseVariable(rowsForExport[startNr]);
+
+                if (it.PadInternal.Item is ItemCollectionPad.ItemCollectionPad icp) {
+                    icp.ResetVariables();
+                    icp.ParseVariable(rowsForExport[startNr]);
+                }
 
                 pad.Item.Add(it);
                 it.SetCoordinates(oneItem with { X = druckB.Left + (x * (oneItem.Width + abstand)), Y = druckB.Top + (y * (oneItem.Height + abstand)) }, true);

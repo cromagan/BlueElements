@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -30,6 +30,7 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
+using static BlueBasics.Constants;
 
 namespace BlueControls.ItemCollectionPad;
 
@@ -37,8 +38,8 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     #region Fields
 
-    public string Seite;
-    public List<AbstractPadItem>? ZoomItems;
+    public readonly string Seite;
+    public readonly List<AbstractPadItem>? ZoomItems;
     private string _name;
     private CreativePad? _padInternal;
     private Bitmap? _tmpBmp;
@@ -67,7 +68,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     public override string Description => string.Empty;
 
     [Description("Soll eine Umrandung einer anderen Ansicht hier angezeigt werden,<br>muss dessen Name hier eingegeben werden.")]
-    public List<string> Eingebettete_Ansichten { get; set; }
+    public List<string> Eingebettete_Ansichten { get; }
 
     [Description("Name und gleichzeitig eventuelle Beschriftung dieser Ansicht.")]
     public string Name {
@@ -118,13 +119,13 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         return l;
     }
 
-    public bool KeyUp(object sender, KeyEventArgs e, float cZoom, float shiftX, float shiftY) {
+    public bool KeyUp(KeyEventArgs e, float cZoom, float shiftX, float shiftY) {
         if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         PadInternal.DoKeyUp(e, false);
         return true;
     }
 
-    public bool MouseDown(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+    public bool MouseDown(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
         if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
         var l2 = PadInternal.Item.MaxBounds(ZoomItems);
@@ -149,7 +150,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         return true;
     }
 
-    public bool MouseMove(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+    public bool MouseMove(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
         if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
         var l2 = PadInternal.Item.MaxBounds(ZoomItems);
@@ -175,7 +176,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         return true;
     }
 
-    public bool MouseUp(object sender, MouseEventArgs e, float zoom, float shiftX, float shiftY) {
+    public bool MouseUp(MouseEventArgs e, float zoom, float shiftX, float shiftY) {
         if (PadInternal?.Item == null || PadInternal.Item.Count == 0) { return false; }
         var l1 = UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false);
         var l2 = PadInternal.Item.MaxBounds(ZoomItems);
@@ -296,7 +297,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
                 PadInternal.Item.SheetStyle = Parent.SheetStyle;
                 PadInternal.Item.SheetStyleScale = Parent.SheetStyleScale;
                 if (_tmpBmp != null) {
-                    if (_tmpBmp.Width != positionModified.Width || positionModified.Height != _tmpBmp.Height) {
+                    if (Math.Abs(_tmpBmp.Width - positionModified.Width) > IntTolerance || Math.Abs(positionModified.Height - _tmpBmp.Height) > IntTolerance) {
                         _tmpBmp?.Dispose();
                         RemovePic();
                         Generic.CollectGarbage();

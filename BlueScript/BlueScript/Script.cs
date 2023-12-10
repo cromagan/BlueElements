@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -109,7 +109,7 @@ public class Script {
                         if (!f.AllOk) {
                             return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", ld);
                         }
-                        var infos = new CanDoFeedback(scriptText, f.ContinuePosition, commandtext, f.AttributeText, string.Empty, ld);
+                        var infos = new CanDoFeedback(f.ContinuePosition, f.AttributeText, string.Empty, ld);
                         var fn = Method.VariablenBerechnung(infos, scp, commandtext + f.AttributeText + ";", varCol, false);
                         return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript);
                     }
@@ -221,7 +221,7 @@ public class Script {
     }
 
     public ScriptEndedFeedback Parse(int lineadd, string subname) {
-        (ReducedScriptText, string error) = ReduceText(ScriptText);
+        (ReducedScriptText, var error) = ReduceText(ScriptText);
 
         if (!string.IsNullOrEmpty(error)) {
             return new ScriptEndedFeedback(error, false, true, subname);

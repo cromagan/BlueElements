@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -83,7 +83,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     public FilterCollection FilterOutput { get; } = new();
 
-    public string Page { get; } = "Head";
+    public string Page { get; }
 
     public List<IControlSendSomething> Parents { get; } = new();
 
@@ -129,7 +129,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
             }
         }
 
-        if (ConnectedFormula != null && ConnectedFormula.PadData != null) {
+        if (ConnectedFormula?.PadData != null) {
             var l = ResizeControls(ConnectedFormula.PadData, Width, Height, Page);
 
             //var addfactor = Size.Width / ConnectedFormula.PadData.SheetSizeInPix.Width;
@@ -138,28 +138,28 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
                 if (thisit.IsVisibleOnPage(Page) && thisit is IItemToControl thisitco) {
                     var o = SearchOrGenerate(thisitco);
 
-                    if (o is Control c) {
-                        _ = unused.Remove(c);
+                    if (o != null) {
+                        _ = unused.Remove(o);
 
                         if (thisit is FakeControlPadItem cspi) {
-                            c.Visible = cspi.IsVisibleForMe();
+                            o.Visible = cspi.IsVisibleForMe();
                         } else {
-                            c.Visible = true;
+                            o.Visible = true;
                         }
 
                         if (thisit is IAutosizable) {
                             foreach (var (item, newpos) in l) {
                                 if (item == thisit) {
-                                    c.Left = (int)newpos.Left;
-                                    c.Top = (int)newpos.Top;
-                                    c.Width = (int)newpos.Width;
-                                    c.Height = (int)newpos.Height;
+                                    o.Left = (int)newpos.Left;
+                                    o.Top = (int)newpos.Top;
+                                    o.Width = (int)newpos.Width;
+                                    o.Height = (int)newpos.Height;
                                 }
                             }
                         }
 
                         if (thisit is TabFormulaPadItem c3) {
-                            c3.CreateTabs((TabControl)c, this, c3);
+                            c3.CreateTabs((TabControl)o, this);
                         }
                     }
                 }

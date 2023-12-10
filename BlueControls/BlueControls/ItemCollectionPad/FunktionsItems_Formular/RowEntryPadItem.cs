@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -110,7 +110,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new RowEntryControl(DatabaseOutput);
-        con.DoOutputSettings(parent, this);
+        con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);
 
         // Besonderheit:
@@ -171,7 +171,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     public override string ReadableText() {
-        var txt = "Eingangs-Zeile: ";
+        const string txt = "Eingangs-Zeile: ";
 
         if (this.IsOk() && DatabaseOutput != null) {
             return txt + DatabaseOutput.Caption;

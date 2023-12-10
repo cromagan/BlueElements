@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -24,7 +24,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -176,7 +175,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
         hotItem = null;
         if (_bitmap != null) {
             _ = items.Add("Externes Fenster öffnen", "ExF");
@@ -202,7 +201,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     //Inherits Windows.Forms.UserControl
     //UserControl überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
-    [DebuggerNonUserCode()]
+    [DebuggerNonUserCode]
     protected override void Dispose(bool disposing) {
         try {
             if (disposing && components != null) {

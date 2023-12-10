@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueDatabase;
+using BlueDatabase.EventArgs;
 using BlueScript.Variables;
 
 namespace BlueControls;
@@ -72,15 +73,6 @@ public partial class VariableEditor : UserControl {
     public RowItem? RowOfVariable(Variable variable) {
         if (tableVariablen?.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
         return db.Row[variable.KeyName];
-    }
-
-    public void WriteVariablesToTable(IReadOnlyCollection<Variable> variables) {
-        var l = new VariableCollection();
-
-        foreach (var v in variables) {
-            l.Add(v);
-        }
-        WriteVariablesToTable(l);
     }
 
     public void WriteVariablesToTable(VariableCollection? variables) {
@@ -185,7 +177,7 @@ public partial class VariableEditor : UserControl {
         tableVariablen.CellValueChanged += TableVariablen_CellValueChanged;
     }
 
-    private void TableVariablen_CellValueChanged(object sender, BlueDatabase.EventArgs.CellEventArgs e) {
+    private void TableVariablen_CellValueChanged(object sender, CellEventArgs e) {
         var c = tableVariablen.Database?.Column.First();
         if (e.Column == c) {
             if (e.Row.CellIsNullOrEmpty(c))

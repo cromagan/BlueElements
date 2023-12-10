@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -32,8 +32,10 @@ public interface IContextMenu {
 
     #region Events
 
+    // ReSharper disable once EventNeverSubscribedTo.Global
     event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
+    // ReSharper disable once EventNeverSubscribedTo.Global
     event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
 
     #endregion
@@ -58,9 +60,7 @@ public interface IContextMenu {
     /// <param name="e"></param>
     /// <param name="items"></param>
     /// <param name="hotItem"></param>
-    /// <param name="cancel"></param>
-    /// <param name="translate"></param>
-    void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate);
+    void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem);
 
     /// <summary>
     /// Hier wird dem übergeordneten Steuerelement die Möglichkeit gegeben, Einträge in das Kontextmenu hinzuzufügen.

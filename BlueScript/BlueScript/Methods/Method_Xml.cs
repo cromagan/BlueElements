@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,17 +17,16 @@
 
 #nullable enable
 
-using BlueScript;
-using BlueScript.Enums;
-using BlueScript.Methods;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using BlueScript.Enums;
+using BlueScript.Structures;
+using BlueScript.Variables;
 
-namespace BlueDatabase.AdditionalScriptMethods;
+namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
 public class Method_Xml : Method {
 
     #region Properties
@@ -36,7 +35,7 @@ public class Method_Xml : Method {
     public override string Command => "xml";
     public override string Description => "Erstellt ein XML-Dokument, der für andere Befehle verwendet werden kann.";
     public override bool EndlessArgs => true;
-    
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override string Returns => VariableXml.ShortName_Variable;

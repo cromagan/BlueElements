@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,23 +17,19 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-
 namespace BlueDatabase.EventArgs;
 
 public class DoRowAutomaticEventArgs : RowEventArgs {
 
     #region Constructors
 
-    public DoRowAutomaticEventArgs(RowItem row, ScriptEventTypes? eventn) : base(row) => Event = eventn;
+    public DoRowAutomaticEventArgs(RowItem row) : base(row) { }
 
     #endregion
 
     #region Properties
 
     public bool Done { get; set; }
-
-    public ScriptEventTypes? Event { get; set; }
 
     #endregion
 }

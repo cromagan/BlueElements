@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -18,9 +18,8 @@
 #nullable enable
 
 using System;
-using System.Collections.Generic;
-using System.IO.Compression;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 
 namespace BlueBasics;
@@ -29,11 +28,11 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static bool isZipped(this byte[] data) => data.Length > 4 && BitConverter.ToInt32(data, 0) == 67324752;
+    public static bool IsZipped(this byte[] data) => data.Length > 4 && BitConverter.ToInt32(data, 0) == 67324752;
 
     public static string ToStringUtf8(this byte[] b) => Encoding.UTF8.GetString(b);
 
-    public static string ToStringUtf8(this List<byte> b) => Encoding.UTF8.GetString(b.ToArray());
+    //public static string ToStringUtf8(this List<byte> b) => Encoding.UTF8.GetString(b.ToArray());
 
     // static Encoding enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
     public static string ToStringWin1252(this byte[] b) =>
@@ -83,10 +82,4 @@ public static partial class Extensions {
     }
 
     #endregion
-
-    /// <summary>
-    /// Schreibt die Daten nach Main.bin
-    /// </summary>
-    /// <param name="data"></param>
-    /// <returns></returns>
 }

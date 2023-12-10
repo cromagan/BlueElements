@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -109,7 +109,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new Table();
-        con.DoOutputSettings(parent, this);
+        con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);
         return con;
     }
@@ -156,7 +156,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     }
 
     public override string ReadableText() {
-        var txt = "Tabellenansicht: ";
+        const string txt = "Tabellenansicht: ";
 
         if (this.IsOk() && DatabaseOutput != null) {
             return txt + DatabaseOutput.Caption;

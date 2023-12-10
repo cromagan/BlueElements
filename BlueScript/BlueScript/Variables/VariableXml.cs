@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -19,10 +19,9 @@
 
 using System.Xml.Linq;
 using BlueScript.Structures;
-using BlueScript.Variables;
 using static BlueBasics.Interfaces.IParseableExtension;
 
-namespace BlueScript;
+namespace BlueScript.Variables;
 
 public class VariableXml : Variable {
 

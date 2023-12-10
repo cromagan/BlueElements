@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -25,6 +25,7 @@ using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using Orientation = BlueBasics.Enums.Orientation;
+using static BlueBasics.Constants;
 
 namespace BlueControls.Controls;
 
@@ -90,7 +91,7 @@ public partial class Slider : IBackgroundNone {
     public float Maximum {
         get => Math.Max(_minimum, _maximum);
         set {
-            if (_maximum == value) { return; }
+            if (Math.Abs(_maximum - value) < DefaultTolerance) { return; }
             _maximum = value;
             CheckButtonEnabledState();
             Invalidate();
@@ -102,7 +103,7 @@ public partial class Slider : IBackgroundNone {
     public float Minimum {
         get => Math.Min(_minimum, _maximum);
         set {
-            if (_minimum == value) { return; }
+            if (Math.Abs(_minimum - value) < DefaultTolerance) { return; }
             _minimum = value;
             CheckButtonEnabledState();
             Invalidate();
@@ -150,12 +151,12 @@ public partial class Slider : IBackgroundNone {
                 _lastFiredValue = value;
                 return;
             }
-            if (_value == value) { return; }
+            if (Math.Abs(_value - value) < DefaultTolerance) { return; }
             _value = value;
             Invalidate();
             CheckButtonEnabledState();
             lock (_lockRaiseEvent) {
-                if (_value == _lastFiredValue) { return; }
+                if (Math.Abs(_value - value) < DefaultTolerance) { return; }
                 _lastFiredValue = _value;
                 OnValueChanged();
             }

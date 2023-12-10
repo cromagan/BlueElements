@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -55,13 +55,12 @@ public sealed class ColumnViewItem : IParseable {
 
     public ColumnItem? Column { get; private set; }
     public int? OrderTmpSpalteX1 { get; set; }
-    public ColumnViewCollection Parent { get; }
     public Rectangle TmpAutoFilterLocation { get; set; }
     public int? TmpDrawWidth { get; set; }
     public bool TmpReduced { get; set; }
     public Rectangle TmpReduceLocation { get; set; }
-
     public ViewType ViewType { get; set; }
+    private ColumnViewCollection Parent { get; }
 
     #endregion
 
@@ -115,22 +114,6 @@ public sealed class ColumnViewItem : IParseable {
         result.ParseableAdd("Type", ViewType);
         result.ParseableAdd("ColumnName", Column);
         return result.Parseable();
-    }
-
-    internal bool NonPermanentPossible() {
-        //if (_arrangementNr < 1) {
-        //    return !thisViewItem.Column.IsFirst();
-        //}
-        var nx = NextVisible();
-        return nx == null || nx.ViewType != ViewType.PermanentColumn;
-    }
-
-    internal bool PermanentPossible() {
-        //if (_arrangementNr < 1) {
-        //    return thisViewItem.Column.IsFirst();
-        //}
-        var prev = PreviewsVisible();
-        return prev == null || prev.ViewType == ViewType.PermanentColumn;
     }
 
     #endregion

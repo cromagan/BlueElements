@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -93,9 +93,7 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
                 return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
             }
 
-            if (!task.IsFaulted && task.Result.Success && task.Result.Result is string result) {
-                if (result == "success") { return DoItFeedback.Null(); }
-            }
+            if (!task.IsFaulted && task.Result.Success && task.Result.Result is "success") { return DoItFeedback.Null(); }
 
             #endregion
 
@@ -117,10 +115,9 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
                 return new DoItFeedback(infos.Data, "Webseite konnte nicht neu geladen werden.");
             }
 
-            if (!task.IsFaulted && task.Result.Success && task.Result.Result is string result3) {
-                if (result3 == "success") { return DoItFeedback.Null(); }
-                //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
-            }
+            if (!task.IsFaulted && task.Result.Success && task.Result.Result is "success") { return DoItFeedback.Null(); }
+
+            //return new DoItFeedback(infos.Data, "Fehler: Der Button wurde nicht gefunden.");
 
             #endregion
 

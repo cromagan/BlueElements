@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -34,10 +34,10 @@ public struct DoItFeedback {
         Variable = variable;
     }
 
-    public DoItFeedback(LogData ld, string errormessage) {
+    public DoItFeedback(LogData? ld, string errormessage) {
         AllOk = false;
         Variable = null;
-        ld.AddMessage(errormessage);
+        ld?.AddMessage(errormessage);
     }
 
     public DoItFeedback(string valueString) {
@@ -80,7 +80,7 @@ public struct DoItFeedback {
         EndScript = endScript;
     }
 
-    public DoItFeedback(string[] list) {
+    public DoItFeedback(IEnumerable<string> list) {
         AllOk = true;
         Variable = new VariableListString(list);
     }
@@ -95,8 +95,8 @@ public struct DoItFeedback {
     #region Properties
 
     public bool AllOk { get; }
-    public bool BreakFired { get; set; } = false;
-    public bool EndScript { get; set; } = false;
+    public bool BreakFired { get; } = false;
+    public bool EndScript { get; } = false;
     public Variable? Variable { get; }
 
     #endregion

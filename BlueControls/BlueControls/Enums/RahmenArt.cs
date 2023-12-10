@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
-
 namespace BlueControls.Enums;
 
 public enum RahmenArt {
@@ -27,14 +25,5 @@ public enum RahmenArt {
     Solide_3px = 110,
     Solide_21px = 112,
 
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    Solide_1px_DuoColor = 120,
-
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    Solide_1px_DuoColor_NurOben = 121,
-
-    FocusDotLine = 150,
-
-    [Obsolete("Wird zukünftig entfernt werden", false)]
-    ShadowBox = 160
+    FocusDotLine = 150
 }

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,8 +17,8 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueScript.Structures;
 using static BlueBasics.Interfaces.IParseableExtension;
 
@@ -110,7 +110,7 @@ public class VariableUnknown : Variable {
         }
     }
 
-    protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => txt;
+    protected override object TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) => txt;
 
     #endregion
 }

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -53,14 +53,6 @@ public static class Extensions {
         txt = txt.Replace(ReplacerForQuotes, "\"");
         txt = txt.Replace(ReplacerForR, "\r");
         txt = txt.Replace(ReplacerForN, "\n");
-        return txt;
-    }
-
-    public static string RestoreEscape(this string txt) {
-        txt = txt.Replace(ReplacerForBackSlash, "\\\\");
-        txt = txt.Replace(ReplacerForQuotes, "\\\"");
-        txt = txt.Replace(ReplacerForR, "\\r");
-        txt = txt.Replace(ReplacerForN, "\\n");
         return txt;
     }
 

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,17 +17,20 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Text;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_LoadTextFile : Method {
 
     #region Properties
@@ -61,15 +64,15 @@ internal class Method_LoadTextFile : Method {
             return new DoItFeedback(infos.Data, "Datei nicht gefunden: " + attvar.ValueStringGet(0));
         }
 
-        string importText;
         try {
+            string importText;
             switch (attvar.ValueStringGet(1).ToUpper()) {
                 case "UTF8":
-                    importText = System.IO.File.ReadAllText(attvar.ValueStringGet(0), System.Text.Encoding.UTF8);
+                    importText = File.ReadAllText(attvar.ValueStringGet(0), Encoding.UTF8);
                     break;
 
                 case "WIN1252":
-                    importText = System.IO.File.ReadAllText(attvar.ValueStringGet(0), Constants.Win1252);
+                    importText = File.ReadAllText(attvar.ValueStringGet(0), Constants.Win1252);
                     break;
 
                 default:

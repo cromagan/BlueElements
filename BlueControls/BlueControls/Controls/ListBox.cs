@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -31,8 +31,8 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
-using BlueDatabase.Interfaces;
 using BlueControls.ItemCollectionList;
+using BlueDatabase.Interfaces;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
@@ -159,23 +159,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    public override string QuickInfoText {
-        get {
-            var t1 = base.QuickInfoText;
-            var t2 = string.Empty;
-            if (_mouseOverItem != null) { t2 = _mouseOverItem.QuickInfo; }
-            if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
-                return string.Empty;
-            }
-
-            if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
-                return t1 + "<br><hr><br>" + t2;
-            }
-
-            return t1 + t2; // Eins davon ist leer
-        }
-    }
-
     [DefaultValue(false)]
     public bool RemoveAllowed {
         get => _removeAllowed;
@@ -193,6 +176,23 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
+
+    protected override string QuickInfoText {
+        get {
+            var t1 = base.QuickInfoText;
+            var t2 = string.Empty;
+            if (_mouseOverItem != null) { t2 = _mouseOverItem.QuickInfo; }
+            if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
+                return string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(t1) && string.IsNullOrEmpty(t2)) {
+                return t1 + "<br><hr><br>" + t2;
+            }
+
+            return t1 + t2; // Eins davon ist leer
+        }
+    }
 
     #endregion
 
@@ -238,7 +238,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public new bool Focused() => base.Focused || Plus.Focused || Minus.Focused || Up.Focused || Down.Focused || SliderY.Focused() || FilterCap.Focused || FilterTxt.Focused;
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
     public void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
 

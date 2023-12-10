@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -36,7 +36,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     #region Fields
 
     private string _lastQuickInfo = string.Empty;
-    private string _layoutFileName = string.Empty;
+    private string _layoutFileName;
     private string _rowKey;
     private string _tmpQuickInfo = string.Empty;
 
@@ -55,7 +55,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public RowFormulaPadItem(string internalname, DatabaseAbstract? database, string rowkey, string layoutFileName) : base(internalname) {
         Database = database;
         if (Database != null) { Database.DisposingEvent += _Database_Disposing; }
-        _rowKey = rowkey ?? string.Empty;
+        _rowKey = rowkey;
         _layoutFileName = layoutFileName;
     }
 
@@ -178,23 +178,24 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         var lf = db.GetLayout(_layoutFileName);
 
         CreativePad pad = new(new ItemCollectionPad(lf));
-        pad.Item.ResetVariables();
-        pad.Item.ParseVariable(db, _rowKey);
-        var re = pad.Item.MaxBounds(string.Empty);
+        if (pad.Item is ItemCollectionPad icp) {
+            icp.ResetVariables();
+            icp.ParseVariable(db, _rowKey);
 
-        var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);
+            var re = icp.MaxBounds(string.Empty);
 
-        var mb = pad.Item.MaxBounds(string.Empty);
-        var zoomv = ItemCollectionPad.ZoomFitValue(mb, generatedBitmap.Size);
-        var centerpos = ItemCollectionPad.CenterPos(mb, generatedBitmap.Size, zoomv);
-        var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
-        pad.ShowInPrintMode = true;
-        pad.Unselect();
-        if (Parent.SheetStyle != null) { pad.Item.SheetStyle = Parent.SheetStyle; }
-        pad.Item.DrawCreativePadToBitmap(generatedBitmap, States.Standard, zoomv, slidervalues.X, slidervalues.Y, string.Empty);
-        //if (sizeChangeAllowed) { p_RU.SetTo(p_LO.X + GeneratedBitmap.Width, p_LO.Y + GeneratedBitmap.Height); }
-        //SizeChanged();
-        GeneratedBitmap = generatedBitmap;
+            var generatedBitmap = new Bitmap((int)re.Width, (int)re.Height);
+
+            var mb = icp.MaxBounds(string.Empty);
+            var zoomv = ItemCollectionPad.ZoomFitValue(mb, generatedBitmap.Size);
+            var centerpos = ItemCollectionPad.CenterPos(mb, generatedBitmap.Size, zoomv);
+            var slidervalues = ItemCollectionPad.SliderValues(mb, zoomv, centerpos);
+            pad.ShowInPrintMode = true;
+            pad.Unselect();
+            if (Parent.SheetStyle != null) { icp.SheetStyle = Parent.SheetStyle; }
+            pad.Item.DrawCreativePadToBitmap(generatedBitmap, States.Standard, zoomv, slidervalues.X, slidervalues.Y, string.Empty);
+            GeneratedBitmap = generatedBitmap;
+        }
     }
 
     //protected override AbstractPadItem? TryCreate(string id, string name) {

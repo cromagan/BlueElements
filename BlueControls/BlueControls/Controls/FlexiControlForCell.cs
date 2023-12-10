@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -164,7 +164,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
         }
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
         var (column, row) = GetTmpVariables();
         if (column?.Database != null && column.Database.IsAdministrator()) {
             _ = items.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten);
@@ -299,7 +299,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
                 listBox.ContextMenuItemClicked -= ListBox_ContextMenuItemClicked;
                 break;
 
-            case SwapListBox _:
+            case SwapListBox:
                 break;
 
             case Caption _:

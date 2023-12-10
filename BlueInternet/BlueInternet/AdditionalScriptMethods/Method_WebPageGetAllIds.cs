@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -66,7 +66,7 @@ internal class Method_WebPageGetAllIds : Method_WebPage {
             ////                }
             ////                ids;";
 
-            var script = @"var inputs = document.getElementsByTagName('input');
+            const string script = @"var inputs = document.getElementsByTagName('input');
                             var ids = [];
                             for (var i = 0; i < inputs.length; i++) {
                                 if (inputs[i].id) {

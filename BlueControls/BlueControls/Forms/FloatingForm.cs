@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -72,6 +72,7 @@ public partial class FloatingForm : Form {
     /// Floating Forms sind immer Topmost, darf aber hier nicht gesetzt werden und wird über
     /// CreateParams gesteuert. Wenn TopMost true wäre, würde das Form den Focus bekommen.
     /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public new bool TopMost {
         get => false;
         // ReSharper disable once ValueParameterNotUsed
@@ -93,20 +94,11 @@ public partial class FloatingForm : Form {
 
     public new void Close() {
         try {
-            if (AllBoxes != null && AllBoxes.Contains(this)) { _ = AllBoxes.Remove(this); }
+            if (AllBoxes.Contains(this)) { _ = AllBoxes.Remove(this); }
             base.Close();
         } catch {
             Close();
         }
-    }
-
-    public void Position_CenterScreen(Point bestPosition) {
-        var screenNr = Generic.PointOnScreenNr(bestPosition);
-        CheckMaxSize(screenNr);
-        StartPosition = FormStartPosition.CenterScreen;
-        var xpos = Screen.AllScreens[screenNr].WorkingArea.Left + ((Screen.AllScreens[screenNr].WorkingArea.Width - Width) / 2.0);
-        var ypos = Screen.AllScreens[screenNr].WorkingArea.Top + ((Screen.AllScreens[screenNr].WorkingArea.Height - Height) / 2.0);
-        Position_SetWindowIntoScreen(screenNr, (int)xpos, (int)ypos);
     }
 
     public void Position_LocateToMouse() {
@@ -148,8 +140,6 @@ public partial class FloatingForm : Form {
             Develop.DebugPrint("Floating Form konnte nicht angezeigt werden", ex);
         }
     }
-
-    public new void ShowDialog() => Develop.DebugPrint(FehlerArt.Fehler, "FloatingForms können nur mit Show aufgerufen werden.");
 
     internal static void Close(object? connectedControl, Design design) {
         foreach (var thisForm in AllBoxes) {

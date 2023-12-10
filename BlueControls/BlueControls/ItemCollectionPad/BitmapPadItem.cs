@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -41,7 +41,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     #region Fields
 
-    public List<QuickImage> Overlays;
+    public readonly List<QuickImage> Overlays;
     public int Padding;
 
     #endregion
@@ -166,8 +166,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
         if ("~" + variable.KeyName.ToLower() + "~" != Platzhalter_Für_Layout.ToLower()) { return false; }
         if (variable is not VariableBitmap vbmp) { return false; }
         var ot = vbmp.ValueBitmap;
-        if (ot is Bitmap bmp) {
-            Bitmap = bmp;
+        if (ot != null) {
+            Bitmap = ot;
             OnChanged();
             return true;
         }

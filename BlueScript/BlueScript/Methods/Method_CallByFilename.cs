@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,16 +17,17 @@
 
 #nullable enable
 
-using BlueScript.Enums;
-using BlueScript.Structures;
-using BlueScript.Variables;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using BlueScript.Enums;
+using BlueScript.Structures;
+using BlueScript.Variables;
 using static BlueBasics.IO;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once ClassNeverInstantiated.Global
 public class Method_CallByFilename : Method {
 
     #region Properties
@@ -112,7 +113,7 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback(infos.Data, "Fehler beim Lesen der Datei: " + vs);
         }
 
-        (f, string error) = Script.ReduceText(f);
+        (f, var error) = Script.ReduceText(f);
 
         if (!string.IsNullOrEmpty(error)) {
             return new DoItFeedback(infos.Data, "Fehler in Datei " + vs + ": " + error);

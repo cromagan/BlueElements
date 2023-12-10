@@ -6,9 +6,9 @@ using BlueControls.Controls;
 using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
+using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
 using TextBox = BlueControls.Controls.TextBox;
-
 
 namespace BlueControls.Forms {
     partial class TableView {
@@ -900,7 +900,6 @@ namespace BlueControls.Forms {
             // Table
             // 
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Table.DropMessages = false;
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
             this.Table.ShowWaitScreen = true;
@@ -1101,6 +1100,6 @@ namespace BlueControls.Forms {
         private Button btnSaveLoad;
         private Button btnSkripteBearbeiten;
         protected GroupBox grpAufgaben;
-        private Controls.ListBox lstAufgaben;
+        private ListBox lstAufgaben;
     }
 }

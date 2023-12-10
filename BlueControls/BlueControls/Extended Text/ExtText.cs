@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -60,8 +60,6 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
 
     private readonly RowItem? _row;
     private Design _design;
-    private Rectangle _drawingArea;
-    private Point _drawingPos;
     private int? _height;
     private States _state;
     private Size _textDimensions;
@@ -78,12 +76,12 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         _design = Design.Undefiniert;
         _state = States.Standard;
         _row = null;
-        _drawingPos = new Point(0, 0);
+        DrawingPos = new Point(0, 0);
         Ausrichtung = Alignment.Top_Left;
         MaxTextLenght = 4000;
         Multiline = true;
         AllowedChars = string.Empty;
-        _drawingArea = new Rectangle(0, 0, -1, -1);
+        DrawingArea = new Rectangle(0, 0, -1, -1);
         _textDimensions = Size.Empty;
         _width = null;
         _height = null;
@@ -113,7 +111,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
 
     #region Properties
 
-    public string AllowedChars { get; set; }
+    public string AllowedChars { get; set; } // Todo: Implementieren
 
     public Alignment Ausrichtung { get; set; }
 
@@ -132,20 +130,12 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     /// <summary>
     /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
     /// </summary>
-    public Rectangle DrawingArea {
-        get => _drawingArea;
-        set => _drawingArea = value;
-        //OnChanged();
-    }
+    public Rectangle DrawingArea { get; set; }
 
     /// <summary>
     /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
     /// </summary>
-    public Point DrawingPos {
-        get => _drawingPos;
-        set => _drawingPos = value;
-        //OnChanged();
-    }
+    public Point DrawingPos { get; set; }
 
     public string HtmlText {
         get {
@@ -161,7 +151,8 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     }
 
     public bool IsDisposed { get; private set; }
-    public int MaxTextLenght { get; }
+
+    public int MaxTextLenght { get; } // TODO: Implementieren
 
     public bool Multiline { get; set; }
 
@@ -240,20 +231,20 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
             cZ++;
             if (cZ > Count - 1) { break; }// Das Ende des Textes
             if (this[cZ].Size.Width > 0) {
-                var matchX = pixX >= _drawingPos.X + this[cZ].Pos.X && pixX <= _drawingPos.X + this[cZ].Pos.X + this[cZ].Size.Width;
-                var matchY = pixY >= _drawingPos.Y + this[cZ].Pos.Y && pixY <= _drawingPos.Y + this[cZ].Pos.Y + this[cZ].Size.Height;
+                var matchX = pixX >= DrawingPos.X + this[cZ].Pos.X && pixX <= DrawingPos.X + this[cZ].Pos.X + this[cZ].Size.Width;
+                var matchY = pixY >= DrawingPos.Y + this[cZ].Pos.Y && pixY <= DrawingPos.Y + this[cZ].Pos.Y + this[cZ].Size.Height;
 
                 if (matchX && matchY) { return cZ; }
 
                 double tmpDi;
                 if (!matchX && matchY) {
-                    tmpDi = Math.Abs(pixX - (_drawingPos.X + this[cZ].Pos.X + (this[cZ].Size.Width / 2.0)));
+                    tmpDi = Math.Abs(pixX - (DrawingPos.X + this[cZ].Pos.X + (this[cZ].Size.Width / 2.0)));
                     if (tmpDi < xDi) {
                         xNr = cZ;
                         xDi = tmpDi;
                     }
                 } else if (matchX && !matchY) {
-                    tmpDi = Math.Abs(pixY - (_drawingPos.Y + this[cZ].Pos.Y + (this[cZ].Size.Height / 2.0)));
+                    tmpDi = Math.Abs(pixY - (DrawingPos.Y + this[cZ].Pos.Y + (this[cZ].Size.Height / 2.0)));
                     if (tmpDi < yDi) {
                         yNr = cZ;
                         yDi = tmpDi;
@@ -331,8 +322,8 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         DrawStates(gr, zoom);
 
         foreach (var t in this) {
-            if (t.IsVisible(zoom, _drawingPos, _drawingArea)) {
-                t.Draw(gr, _drawingPos, zoom);
+            if (t.IsVisible(zoom, DrawingPos, DrawingArea)) {
+                t.Draw(gr, DrawingPos, zoom);
             }
         }
     }
@@ -797,10 +788,10 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
     }
 
     private void DrawZone(Graphics gr, float czoom, MarkState thisState, int markStart, int markEnd) {
-        var startX = (this[markStart].Pos.X * czoom) + _drawingPos.X;
-        var startY = (this[markStart].Pos.Y * czoom) + _drawingPos.Y;
-        var endX = (this[markEnd].Pos.X * czoom) + _drawingPos.X + (this[markEnd].Size.Width * czoom);
-        var endy = (this[markEnd].Pos.Y * czoom) + _drawingPos.Y + (this[markEnd].Size.Height * czoom);
+        var startX = (this[markStart].Pos.X * czoom) + DrawingPos.X;
+        var startY = (this[markStart].Pos.Y * czoom) + DrawingPos.Y;
+        var endX = (this[markEnd].Pos.X * czoom) + DrawingPos.X + (this[markEnd].Size.Width * czoom);
+        var endy = (this[markEnd].Pos.Y * czoom) + DrawingPos.Y + (this[markEnd].Size.Height * czoom);
 
         switch (thisState) {
             case MarkState.None:

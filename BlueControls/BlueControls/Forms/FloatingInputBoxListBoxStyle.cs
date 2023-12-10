@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -78,10 +78,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         ItemCollectionList.ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu, false);
         ItemCollectionList.ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
 
-        var cancel = false;
         var translate = true;
-        control.GetContextMenuItems(e, thisContextMenu, out var hotItem, ref cancel, ref translate);
-        if (cancel) { return; }
+        control.GetContextMenuItems(e, thisContextMenu, out var hotItem);
 
         ContextMenuInitEventArgs ec = new(hotItem, userMenu);
         control.OnContextMenuInit(ec);
@@ -194,7 +192,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
         // Nur Listboxen können überhaupt erst Checked werden!
         // Ob sie Checked wird, ist egal!
-        if (e.Item == null) { return; }
 
         // Einen Klick auf Überschriften einfach ignorieren, zB. kontextmenü
         if (!e.Item.IsClickable()) { return; }

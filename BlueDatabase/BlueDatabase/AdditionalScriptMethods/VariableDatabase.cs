@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -38,8 +38,6 @@ public class VariableDatabase : Variable {
 
     public VariableDatabase(string name) : this(name, null, true, false, string.Empty) { }
 
-    public VariableDatabase(DatabaseAbstract? value) : this(DummyName(), value, true, false, string.Empty) { }
-
     #endregion
 
     #region Properties
@@ -50,7 +48,7 @@ public class VariableDatabase : Variable {
 
     public DatabaseAbstract? Database {
         get => _db;
-        set {
+        private set {
             if (ReadOnly) { return; }
             _db = value;
         }

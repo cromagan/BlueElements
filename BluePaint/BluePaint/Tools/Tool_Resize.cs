@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -37,16 +37,6 @@ public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
     #endregion
 
     #region Methods
-
-    public override void ExcuteCommand(string command) {
-        var c = command.SplitAndCutBy(";");
-        if (c[0] == "ResizeProzent") {
-            flxProzent.ValueSet(c[1], true, true);
-            btnDoResize_Click(null, null);
-        } else {
-            Develop.DebugPrint_NichtImplementiert();
-        }
-    }
 
     internal override void PictureChangedByMainWindow() {
         base.PictureChangedByMainWindow();

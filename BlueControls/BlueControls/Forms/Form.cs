@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -38,11 +38,6 @@ public partial class Form : System.Windows.Forms.Form {
     /// Die Dicke des linken und rechen Randes einer Form in Pixel
     /// </summary>
     public const int BorderWidth = 16;
-
-    /// <summary>
-    /// Die Dicke des unteren Rahmens einer Form in Pixel
-    /// </summary>
-    public static readonly int BorderBottom = 8;
 
     /// <summary>
     /// Die Dicke des oberen Balken einer Form in Pixel
@@ -109,6 +104,7 @@ public partial class Form : System.Windows.Forms.Form {
     public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(Cursor.Position);
 
     // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
+    // ReSharper disable once UnusedMember.Global
     public new void PerformAutoScale() {
         // NIX TUN!!!!
     }

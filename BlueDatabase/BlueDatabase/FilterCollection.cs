@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -49,8 +49,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public FilterCollection(DatabaseAbstract? database) => Database = database;
 
-    public FilterCollection(DatabaseAbstract? database, string toParse) : this(database) => this.Parse(toParse);
-
     public FilterCollection(FilterItem fi) : this(fi.Database) => Add(fi);
 
     #endregion
@@ -73,12 +71,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Properties
 
-    public int Count {
-        get {
-            if (IsDisposed) { return 0; }
-            return _internal.Count;
-        }
-    }
+    public int Count => IsDisposed ? 0 : _internal.Count;
 
     public DatabaseAbstract? Database {
         get => _database;
@@ -127,7 +120,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public ReadOnlyCollection<RowItem> Rows {
         get {
             if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
-            if (_rows == null) { _rows = CalculateFilteredRows(); }
+            _rows ??= CalculateFilteredRows();
             return _rows.AsReadOnly();
         }
     }
@@ -135,9 +128,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public RowItem? RowSingleOrNull {
         get {
             if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
-            if (_rows == null) { _rows = CalculateFilteredRows(); }
-            if (_rows.Count != 1) { return null; }
-            return _rows[0];
+            _rows ??= CalculateFilteredRows();
+            return _rows.Count != 1 ? null : _rows[0];
         }
     }
 
@@ -271,14 +263,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
 
-    public bool Exists(FilterItem fi) {
-        foreach (var thisFilter in _internal) {
-            if (fi.Equals(thisFilter)) { return true; }
-        }
-
-        return false;
-    }
-
     IEnumerator IEnumerable.GetEnumerator() => _internal.GetEnumerator();
 
     public IEnumerator<FilterItem> GetEnumerator() => _internal.GetEnumerator();
@@ -292,10 +276,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public bool MayHasRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
-
-    public void OnChanging() => Changing?.Invoke(this, System.EventArgs.Empty);
-
-    public void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     public void ParseFinished(string parsed) { }
 
@@ -334,15 +314,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public void Remove_RowFilter() => Remove(null as ColumnItem);
-
-    /// <summary>
-    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="filterType"></param>
-    /// <param name="filterBy"></param>
-    /// <param name="herkunft"></param>
-    public void RemoveOtherAndAddIfNotExists(ColumnItem column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 
     /// <summary>
     /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
@@ -493,6 +464,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
+    private bool Exists(FilterItem fi) {
+        foreach (var thisFilter in _internal) {
+            if (fi.Equals(thisFilter)) { return true; }
+        }
+
+        return false;
+    }
+
     private void Filter_Changed(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         Invalidate_FilteredRows();
@@ -503,6 +482,19 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed) { return; }
         OnChanging();
     }
+
+    private void OnChanging() => Changing?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+
+    /// <summary>
+    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="filterType"></param>
+    /// <param name="filterBy"></param>
+    /// <param name="herkunft"></param>
+    private void RemoveOtherAndAddIfNotExists(ColumnItem column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }

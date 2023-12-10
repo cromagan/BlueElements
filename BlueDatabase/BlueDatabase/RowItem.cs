@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -61,8 +61,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    public RowItem(DatabaseAbstract database) : this(database, database.NextRowKey()) { }
-
     #endregion
 
     #region Destructors
@@ -86,11 +84,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     #endregion
 
     #region Properties
-
-    /// <summary>
-    /// Sehr rudimentäre Angabe!
-    /// </summary>
-    public static bool DoingScript { get; private set; }
 
     public DatabaseAbstract? Database { get; private set; }
 
@@ -209,24 +202,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return vars;
     }
 
-    public static bool IsValidRowKey(string name) {
-        if (string.IsNullOrWhiteSpace(name)) { return false; }
-        if (name.Length > 18) { return false; }
-        if (name.Length < 2) { return false; }
-
-        if (!name.ContainsOnlyChars(Constants.AllowedCharsVariableName + "/+")) { return false; }
-
-        if (!Constants.Char_AZ.Contains(name.Substring(0, 1).ToUpper())) { return false; }
-
-        return true;
-    }
-
-    public string CellFirstString() {
-        var fc = Database?.Column.First();
-        if (fc == null) { return string.Empty; }
-
-        return CellGetString(fc);
-    }
+    public string CellFirstString() => Database?.Column.First() is not ColumnItem fc ? string.Empty : CellGetString(fc);
 
     public bool CellGetBoolean(string columnName) => Database?.Cell.GetBoolean(Database?.Column[columnName], this) ?? default;
 
@@ -237,8 +213,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     public Color CellGetColor(ColumnItem? column) => Database?.Cell.GetColor(column, this) ?? default;
 
     public int CellGetColorBgr(ColumnItem? column) => Database?.Cell.GetColorBgr(column, this) ?? 0;
-
-    public string CellGetCompareKey(ColumnItem column) => Database?.Cell.CompareKey(column, this) ?? string.Empty;
 
     /// <summary>
     ///
@@ -277,7 +251,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return Database.Cell.GetString(column, this);
     }
 
-    public List<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? new();
+    public IEnumerable<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? new();
 
     public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database?.Column.Exists(columnName), this) ?? default;
 
@@ -611,17 +585,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return db.Column.SysRowChanger is ColumnItem src && CellGetString(src).Equals(Generic.UserName, StringComparison.OrdinalIgnoreCase);
     }
 
-    internal bool NeedDataCheck() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
-        return db.Row.NeedDataCheck(KeyName);
-    }
-
-    internal void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
-
-    internal void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
-
-    internal void OnRowGotData(RowEventArgs e) => RowGotData?.Invoke(this, e);
-
     internal double RowChangedXMinutesAgo() {
         if (IsDisposed) { return -1; }
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return -1; }
@@ -638,6 +601,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (e.Row != this) { return; }
         _tmpQuickInfo = null;
     }
+
+    private string CellGetCompareKey(ColumnItem column) => Database?.Cell.CompareKey(column, this) ?? string.Empty;
 
     private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
 
@@ -667,7 +632,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!string.IsNullOrEmpty(feh)) { return new ScriptEndedFeedback(feh, true, false, "Allgemein"); }
 
         // Zuerst die Aktionen ausführen und falls es einen Fehler gibt, die Spalten und Fehler auch ermitteln
-        DoingScript = true;
         var script = db.ExecuteScript(eventname, scriptname, changevalues, this, null);
 
         if (!script.AllOk) {
@@ -676,13 +640,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 db.EventScriptErrorMessage = "Zeile: " + CellFirstString() + "\r\n\r\n" + script.ProtocolText;
             }
 
-            DoingScript = false;
             return script;// (true, "<b>Das Skript ist fehlerhaft:</b>\r\n" + "Zeile: " + script.Line + "\r\n" + script.Error + "\r\n" + script.ErrorCode, script);
         }
 
         if (changevalues && db.Column.SysRowState is ColumnItem srs) {
             // Gucken, ob noch ein Fehler da ist, der von einer besonderen anderen Routine kommt. Beispiel Bildzeichen-Liste: Bandart und Einläufe
-            DoRowAutomaticEventArgs e = new(this, eventname);
+            DoRowAutomaticEventArgs e = new(this);
             OnDoSpecialRules(e);
 
             if (eventname is ScriptEventTypes.value_changed) {
@@ -694,8 +657,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 }
             }
         }
-
-        DoingScript = false;
 
         if (!changevalues) { return new ScriptEndedFeedback(string.Empty, false, false, "Allgemein"); }
 
@@ -735,6 +696,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         _tmpQuickInfo = ReplaceVariables(Database.ZeilenQuickInfo, true, false);
     }
+
+    private void OnDoSpecialRules(DoRowAutomaticEventArgs e) => DoSpecialRules?.Invoke(this, e);
+
+    private void OnRowChecked(RowCheckedEventArgs e) => RowChecked?.Invoke(this, e);
+
+    private void OnRowGotData(RowEventArgs e) => RowGotData?.Invoke(this, e);
 
     private bool RowFilterMatch(string searchText) {
         if (string.IsNullOrEmpty(searchText)) { return true; }

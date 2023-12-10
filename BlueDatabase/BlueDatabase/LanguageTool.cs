@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -59,10 +59,8 @@ public static class LanguageTool {
         foreach (var thisString in column.OpticalReplace) {
             var x = thisString.SplitBy("|");
 
-            if (x.Length == 2) { 
-
-
-            //if (!string.IsNullOrEmpty(x[0]) && !string.IsNullOrEmpty(x[1]) && x[0] == txt) { txt = x[1]; }
+            if (x.Length == 2) {
+                //if (!string.IsNullOrEmpty(x[0]) && !string.IsNullOrEmpty(x[1]) && x[0] == txt) { txt = x[1]; }
 
                 if (string.IsNullOrEmpty(x[0])) {
                     if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
@@ -72,7 +70,6 @@ public static class LanguageTool {
             }
             //if (x.Length == 1 && !thisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
         }
-
 
         if (style is ShortenStyle.Replaced or ShortenStyle.HTML || ot == txt) {
             return txt;

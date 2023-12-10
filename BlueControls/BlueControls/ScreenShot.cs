@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -95,8 +95,6 @@ public sealed partial class ScreenShot {
     }
 
     //public static Bitmap GrabArea(Rectangle r) => r.Width < 2 || r.Height < 2 ? null : Area(GrabAllScreens(), r);
-
-    public static ScreenData GrabArea() => GrabArea(null);
 
     /// <summary>
     /// Erstellt einen Screenshot, dann kann der User einen Bereich wählen - und gibt diesen zurück.

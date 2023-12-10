@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -33,8 +33,9 @@ public static partial class Extensions {
 
     #region Fields
 
-    public static readonly List<string> GeschKlammerAuf = new() { "{" };
+    //public static readonly List<string> GeschKlammerAuf = new() { "{" };
     public static readonly List<string> GeschKlammerZu = new() { "}" };
+
     public static readonly List<string> Gleich = new() { "=" };
     public static readonly List<string> KlammerAuf = new() { "(" };
     public static readonly List<List<string>> KlammernGeschweift = new() { new List<string> { "{", "}" } };
@@ -54,7 +55,7 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public static List<string> AllWords(this string input) {
+    public static ICollection<string> AllWords(this string input) {
         input = " " + input + " ";
         var position = 0;
         var lastSeperator = 0;
@@ -217,19 +218,28 @@ public static partial class Extensions {
     /// <param name="trimspace"></param>
     /// <returns></returns>
     public static string DeKlammere(this string txt, bool klammern, bool geschklammern, bool gänsef, bool trimspace) {
-        if (trimspace) { txt = txt.Trim(); }
+        while (true) {
+            if (trimspace) {
+                txt = txt.Trim();
+            }
 
-        if (klammern && txt.CanCut("(", ")")) {
-            return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace);
+            if (klammern && txt.CanCut("(", ")")) {
+                txt = txt.Substring(1, txt.Length - 2);
+                continue;
+            }
+
+            if (geschklammern && txt.CanCut("{", "}")) {
+                txt = txt.Substring(1, txt.Length - 2);
+                continue;
+            }
+
+            if (gänsef && txt.CanCut("\"", "\"")) {
+                txt = txt.Substring(1, txt.Length - 2);
+                continue;
+            }
+
+            return txt;
         }
-
-        if (geschklammern && txt.CanCut("{", "}")) {
-            return txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace);
-        }
-
-        return gänsef && txt.CanCut("\"", "\"")
-            ? txt.Substring(1, txt.Length - 2).DeKlammere(klammern, geschklammern, gänsef, trimspace)
-            : txt;
     }
 
     public static string FromNonCritical(this string txt) {
@@ -255,8 +265,6 @@ public static partial class Extensions {
         return txt;
     }
 
-    public static string FromNonCriticalWithQuote(this string txt) => txt.Substring(1, txt.Length - 2).FromNonCritical();
-
     public static bool FromPlusMinus(this string value) {
         if (string.IsNullOrEmpty(value)) { return false; }
         switch (value.ToLower()) {
@@ -276,8 +284,6 @@ public static partial class Extensions {
                 return false;
         }
     }
-
-    public static string GenerateSlash(this string txt) => txt.Replace("[Slash]", "/");
 
     /// <summary>
     /// Teilt einen String, der geparsed werden kann in seine Bestandteile auf.
@@ -581,13 +587,6 @@ public static partial class Extensions {
         }
     }
 
-    /// <summary>
-    /// Ersetzt < durch <<>
-    /// </summary>
-    /// <param name="tXt"></param>
-    /// <returns></returns>
-    public static string ReplaceLowerSign(this string tXt) => tXt.Replace("<", "<<>");
-
     public static string ReplaceWord(this string input, string alt, string replacement, RegexOptions options) {
         // return Regex.Replace(input, "\\b" + Alt + "\\b", replacement);
         if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(FehlerArt.Fehler, "Regex option nicht erlaubt."); }
@@ -675,7 +674,7 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="textToSplit"></param>
     /// <returns></returns>
-    public static List<string> SplitByCrToList(this string textToSplit) {
+    public static ICollection<string> SplitByCrToList(this string textToSplit) {
         List<string> w = new();
         if (string.IsNullOrEmpty(textToSplit)) { return w; }
         w.AddRange(textToSplit.SplitByCr());
@@ -863,11 +862,6 @@ public static partial class Extensions {
             tXt = tXt.Remove(0, was.Length);
         }
         return tXt;
-    }
-
-    public static byte[] Unicode_ToByte(this string? tXt) {
-        if (tXt == null || string.IsNullOrEmpty(tXt)) { return Array.Empty<byte>(); }
-        return Encoding.Unicode.GetBytes(tXt);
     }
 
     public static byte[] UTF8_ToByte(this string? tXt) {

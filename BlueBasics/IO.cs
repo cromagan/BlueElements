@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -172,7 +172,7 @@ public static class IO {
     /// </summary>
     /// <param name="filelist"></param>
     /// <returns>True, wenn mindestens eine Datei gelöscht wurde.</returns>
-    public static bool DeleteFile(List<string> filelist) {
+    public static bool DeleteFile(IEnumerable<string> filelist) {
         var lockMe = new object();
         var did = false;
 
@@ -377,9 +377,7 @@ public static class IO {
 
     public static bool MoveFile(string oldName, string newName, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, 5, toBeSure);
 
-
     public static bool MoveFile(string oldName, string newName, int tries, bool toBeSure) => ProcessFile(TryMoveFile, oldName, newName, tries, toBeSure);
-
 
     /// <summary>
     /// Gibt einen höher gelegenden Ordner mit abschließenden \ zurück
@@ -420,8 +418,6 @@ public static class IO {
         var ds = fullName.FileSuffix();
         return TempFile(dp, dn, ds);
     }
-
-    public static string TempFile() => TempFile(string.Empty, string.Empty, string.Empty);
 
     public static string TempFile(string pfad, string wunschname, string suffix) {
         if (string.IsNullOrEmpty(pfad)) { pfad = Path.GetTempPath(); }

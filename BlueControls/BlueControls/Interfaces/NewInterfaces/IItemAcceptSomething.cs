@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,16 +17,16 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueDatabase;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
 
 namespace BlueControls.Interfaces;
 
@@ -45,7 +45,9 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
     /// </summary>
     public DatabaseAbstract? DatabaseInputMustBe { get; }
 
+    // ReSharper disable once UnusedMemberInSuper.Global
     List<int> InputColorId { get; }
+
     public string Page { get; }
 
     public ItemCollectionPad.ItemCollectionPad? Parent { get; }
@@ -172,7 +174,7 @@ public static class ItemAcceptSomethingExtensions {
     #endregion
 }
 
-public class ItemAcceptSomething {
+public sealed class ItemAcceptSomething {
     //public void InputColorIdSet(IItemAcceptSomething item, List<int> value) {
     //    if (!_inputColorId.IsDifferentTo(value)) { return; }
 
@@ -289,7 +291,7 @@ public class ItemAcceptSomething {
         return _inputColorId;
     }
 
-    public virtual List<string> ParsableTags() {
+    public List<string> ParsableTags() {
         List<string> result = new();
         result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys);
         //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);

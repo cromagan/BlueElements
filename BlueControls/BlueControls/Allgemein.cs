@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -64,8 +64,7 @@ public static class Allgemein {
         ItemCollectionList.ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
 
         var cancel = false;
-        var translate = true;
-        par.GetContextMenuItems(null, thisContextMenu, out var hotItem, ref cancel, ref translate);
+        par.GetContextMenuItems(null, thisContextMenu, out var hotItem);
         if (cancel) { return null; }
 
         ContextMenuInitEventArgs ec = new(hotItem, userMenu);

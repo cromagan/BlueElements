@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,17 +17,18 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueDatabase;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
-using System.IO;
 
 namespace BlueScript.Methods;
 
+// ReSharper disable once UnusedMember.Global
 internal class Method_SaveText : Method {
 
     #region Properties
@@ -72,7 +73,7 @@ internal class Method_SaveText : Method {
 
         switch (attvar.ValueStringGet(1).ToUpper()) {
             case "UTF8":
-                if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), System.Text.Encoding.UTF8, false)) {
+                if (!IO.WriteAllText(filn, attvar.ValueStringGet(2), Encoding.UTF8, false)) {
                     return new DoItFeedback(infos.Data, "Fehler beim Erzeugen der Datei.");
                 }
 

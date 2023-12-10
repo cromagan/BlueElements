@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -21,7 +21,6 @@ namespace BlueScript.Enums;
 
 [Flags]
 public enum MethodType {
-    None = 0,
 
     /// <summary>
     /// Methoden, die eine Variable modifizieren oder für den normalen Betrieb benötigt werden.

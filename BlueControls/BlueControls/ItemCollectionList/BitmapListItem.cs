@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -33,12 +33,10 @@ public class BitmapListItem : AbstractListItem {
     #region Fields
 
     private const int ConstMy = 15;
+    private readonly int _captionlines = 2;
     private Bitmap? _bitmap;
 
     private string _caption;
-
-    private int _captionlines = 2;
-
     private List<string> _captiontmp = new();
 
     private string _imageFilename = string.Empty;
@@ -91,16 +89,16 @@ public class BitmapListItem : AbstractListItem {
         }
     }
 
-    public int CaptionLines {
-        get => _captionlines;
-        set {
-            if (value < 1) { value = 1; }
-            if (_captionlines == value) { return; }
-            _captionlines = value;
-            _captiontmp.Clear();
-            OnChanged();
-        }
-    }
+    //public int CaptionLines {
+    //    get => _captionlines;
+    //    set {
+    //        if (value < 1) { value = 1; }
+    //        if (_captionlines == value) { return; }
+    //        _captionlines = value;
+    //        _captiontmp.Clear();
+    //        OnChanged();
+    //    }
+    //}
 
     public List<QuickImage> Overlays { get; } = new();
 
@@ -117,7 +115,7 @@ public class BitmapListItem : AbstractListItem {
         return null;
     }
 
-    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpper().Contains(filterText.ToUpper()) || (_imageFilename != null && _imageFilename.ToUpper().Contains(filterText.ToUpper()));
+    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpper().Contains(filterText.ToUpper()) || _imageFilename.ToUpper().Contains(filterText.ToUpper());
 
     public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (style == BlueListBoxAppearance.FileSystem) {

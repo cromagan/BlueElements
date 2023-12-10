@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,14 +17,14 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using static BlueDatabase.DatabaseAbstract;
 
 namespace BlueControls.Interfaces;
@@ -95,7 +95,7 @@ public static class ItemSendSomethingExtension {
     #endregion
 }
 
-public class ItemSendSomething {
+public sealed class ItemSendSomething {
 
     #region Fields
 
@@ -110,7 +110,7 @@ public class ItemSendSomething {
 
     public void AddChild(IItemSendSomething item, IHasKeyName add) {
         var l = new List<string>();
-        if (item.ChildIds != null) { l.AddRange(item.ChildIds); }
+        l.AddRange(item.ChildIds);
         l.Add(add.KeyName);
         l = l.SortedDistinctList();
 
@@ -157,16 +157,12 @@ public class ItemSendSomething {
         var l = new List<GenericControl>();
         l.Add(new FlexiControl("Ausgang:", widthOfControl));
 
-
         if (item.DatabaseOutput is not DatabaseAbstract db || db.IsDisposed) {
-
             l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
             return l;
         }
 
         l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank ändern (gewählt: " + db.Caption + ")", ImageCode.Datenbank));
-
-
 
         l.Add(new FlexiControlForDelegate(item.Datenbankkopf, "Datenbank-Kopf von '" + db.Caption + "'", ImageCode.Stift));
 
@@ -183,7 +179,7 @@ public class ItemSendSomething {
         item.OnChanged();
     }
 
-    public virtual List<string> ParsableTags() {
+    public List<string> ParsableTags() {
         List<string> result = new();
 
         result.ParseableAdd("OutputDatabase", _databaseOutput);
@@ -195,7 +191,7 @@ public class ItemSendSomething {
 
     public void ParseFinished(IItemSendSomething item) { }
 
-    public virtual bool ParseThis(string tag, string value) {
+    public bool ParseThis(string tag, string value) {
         switch (tag) {
             case "database":
             case "outputdatabase":

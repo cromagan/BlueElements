@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -25,11 +25,12 @@ using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
+using BlueControls.ConnectedFormula;
 
 namespace BlueControls.Forms;
 
@@ -55,7 +56,14 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     #region Methods
 
-    private void AddCentered(FakeControlPadItem x) {
+    public static void OpenScriptEditor(ConnectedFormula.ConnectedFormula? f) {
+        if (f == null || f.IsDisposed) { return; }
+
+        var se = new ConnectedFormulaScriptEditor(f);
+        _ = se.ShowDialog();
+    }
+
+    private void AddCentered(AbstractPadItem x) {
         var l = Pad.LastClickedItem;
 
         Pad.AddCentered(x);
@@ -135,8 +143,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.ForceLoadSaveAll();
-
-        if (e.Item == null) { return; }
         FormulaSet(e.Item.KeyName, null);
     }
 
@@ -237,7 +243,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     private void CheckButtons() { }
 
-    private void FormulaSet(string? filename, ReadOnlyCollection<string>? notAllowedchilds) {
+    private void FormulaSet(string? filename, IReadOnlyCollection<string>? notAllowedchilds) {
         FormulaSet(null as ConnectedFormula.ConnectedFormula, notAllowedchilds);
 
         if (filename == null || !FileExists(filename)) {

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,13 +17,14 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
+// ReSharper disable once UnusedType.Global
 public class Method_SetError : Method_Database {
 
     #region Properties
@@ -33,8 +34,6 @@ public class Method_SetError : Method_Database {
     public override string Description => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden.";
 
     public override bool EndlessArgs => true;
-
-  
 
     public override bool GetCodeBlockAfter => false;
 

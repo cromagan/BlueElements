@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -20,14 +20,15 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
 using BlueBasics.MultiUserFile;
 using BlueControls.ConnectedFormula;
-using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueDatabase;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
+using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.Forms;
 
@@ -176,7 +177,7 @@ public partial class FormulaView : FormWithStatusBar {
         FormulaSet(LoadTab.FileName);
     }
 
-    private void UpdateScripts(ReadOnlyCollection<FormulaScriptDescription>? scripts, GroupBox groupBox) {
+    private void UpdateScripts(ReadOnlyCollection<FormulaScriptDescription>? scripts, Control groupBox) {
 
         #region Vorhanden Buttons löschen
 

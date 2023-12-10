@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -24,11 +24,11 @@ using System.Linq.Expressions;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
-using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
-using BlueBasics.Interfaces;
+using static BlueBasics.Constants;
 
 namespace BlueControls.Controls;
 
@@ -248,12 +248,12 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
             case Accessor<double> ad:
                 _ = DoubleTryParse(Value, out var d);
-                if (ad.Get() != d) { ad.Set(d); }
+                if (Math.Abs(ad.Get() - d) > DefaultTolerance) { ad.Set(d); }
                 break;
 
             case Accessor<float> af:
                 _ = FloatTryParse(Value, out var f);
-                if (af.Get() != f) { af.Set(f); }
+                if (Math.Abs(af.Get() - f) > DefaultTolerance) { af.Set(f); }
                 break;
 
             //case Accessor <enum> ae:

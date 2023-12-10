@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -29,7 +29,7 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static bool Contains(this ICollection<string> collection, string searchKeyword, bool caseSensitive) {
+    public static bool Contains(this IEnumerable<string> collection, string searchKeyword, bool caseSensitive) {
         if (caseSensitive) { Develop.DebugPrint(FehlerArt.Fehler, "CaseSensitive = True"); }
         return collection.Any(item => string.Equals(item, searchKeyword, StringComparison.OrdinalIgnoreCase));
     }
@@ -40,14 +40,18 @@ public static partial class Extensions {
     /// <param name="collection"></param>
     /// <param name="joinChar"></param>
     /// <returns></returns>
-    public static string JoinWith(this IEnumerable<string>? collection, string joinChar) => collection != null && collection.Any() ? string.Join(joinChar, collection.ToArray()) : string.Empty;
+    public static string JoinWith(this IEnumerable<string>? collection, string joinChar) {
+        if (collection == null) { return string.Empty; }
+
+        return string.Join(joinChar, collection);
+    }
 
     /// <summary>
     /// Verbindet die Collection mit \r und doppelte \r am Ende werden nicht abgeschnitten.
     /// </summary>
     /// <param name="collection"></param>
     /// <returns></returns>
-    public static string JoinWithCr(this IEnumerable<string>? collection) => collection != null && collection.Any() ? collection.JoinWith("\r") : string.Empty;
+    public static string JoinWithCr(this IEnumerable<string>? collection) => JoinWith(collection, "\r");
 
     /// <summary>
     /// Gibt einen String zurück, der alle Elemet der Collection mittels einem Zeilenumbruch zusammenfügt.
@@ -56,7 +60,7 @@ public static partial class Extensions {
     /// <param name="collection"></param>
     /// <param name="maxlenght"></param>
     /// <returns></returns>
-    public static string JoinWithCr(this ICollection<string> collection, long maxlenght) {
+    public static string JoinWithCr(this IEnumerable<string> collection, long maxlenght) {
         StringBuilder sb = new();
 
         foreach (var thisitem in collection) {

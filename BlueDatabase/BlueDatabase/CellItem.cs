@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -58,61 +58,6 @@ public class CellItem {
             if (tmpImageCode != null) { tmpText = string.Empty; }
         }
         return (tmpText, tmpImageCode);
-    }
-
-    public static QuickImage? StandardErrorImage(string gr, BildTextVerhalten bildTextverhalten, string originalText, ColumnItem? column) {
-        switch (bildTextverhalten) {
-            case BildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen:
-                return QuickImage.Get("Fragezeichen|" + gr);
-
-            case BildTextVerhalten.Fehlendes_Bild_zeige_Kreis:
-                return QuickImage.Get("Kreis2|" + gr);
-
-            case BildTextVerhalten.Fehlendes_Bild_zeige_Kreuz:
-                return QuickImage.Get("Kreuz|" + gr);
-
-            case BildTextVerhalten.Fehlendes_Bild_zeige_Häkchen:
-                return QuickImage.Get("Häkchen|" + gr);
-
-            case BildTextVerhalten.Fehlendes_Bild_zeige_Infozeichen:
-                return QuickImage.Get("Information|" + gr);
-
-            case BildTextVerhalten.Fehlendes_Bild_zeige_Warnung:
-                return QuickImage.Get("Warnung|" + gr);
-
-            case BildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen:
-                return QuickImage.Get("Kritisch|" + gr);
-
-            case BildTextVerhalten.Interpretiere_Bool:
-
-                if (originalText == "+") {
-                    return column == column?.Database?.Column.SysCorrect ?
-                        QuickImage.Get("Häkchen|" + gr + "||||||||80") :
-                        QuickImage.Get("Häkchen|" + gr);
-                }
-
-                if (originalText == "-") {
-                    return column == column?.Database?.Column.SysCorrect ?
-                        QuickImage.Get("Warnung|" + gr) :
-                        QuickImage.Get("Kreuz|" + gr);
-                }
-
-                if (originalText is "o" or "O") {
-                    return QuickImage.Get("Kreis2|" + gr);
-                }
-
-                if (originalText == "?") {
-                    return QuickImage.Get("Fragezeichen|" + gr);
-                }
-
-                return null;
-
-            case BildTextVerhalten.Bild_oder_Text:
-                return null;
-
-            default:
-                return null;
-        }
     }
 
     /// <summary>
@@ -188,11 +133,6 @@ public class CellItem {
         return txt;
     }
 
-    /// <summary>
-    /// Jede Zeile für sich richtig formatiert.
-    /// </summary>
-    /// <returns></returns>
-
     public static List<string>? ValuesReadable(ColumnItem? column, RowItem? row, ShortenStyle style) {
         if (column == null || row == null) { return null; }
 
@@ -218,6 +158,65 @@ public class CellItem {
         return ret;
     }
 
+    private static QuickImage? StandardErrorImage(string gr, BildTextVerhalten bildTextverhalten, string originalText, ColumnItem? column) {
+        switch (bildTextverhalten) {
+            case BildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen:
+                return QuickImage.Get("Fragezeichen|" + gr);
+
+            case BildTextVerhalten.Fehlendes_Bild_zeige_Kreis:
+                return QuickImage.Get("Kreis2|" + gr);
+
+            case BildTextVerhalten.Fehlendes_Bild_zeige_Kreuz:
+                return QuickImage.Get("Kreuz|" + gr);
+
+            case BildTextVerhalten.Fehlendes_Bild_zeige_Häkchen:
+                return QuickImage.Get("Häkchen|" + gr);
+
+            case BildTextVerhalten.Fehlendes_Bild_zeige_Infozeichen:
+                return QuickImage.Get("Information|" + gr);
+
+            case BildTextVerhalten.Fehlendes_Bild_zeige_Warnung:
+                return QuickImage.Get("Warnung|" + gr);
+
+            case BildTextVerhalten.Fehlendes_Bild_zeige_Kritischzeichen:
+                return QuickImage.Get("Kritisch|" + gr);
+
+            case BildTextVerhalten.Interpretiere_Bool:
+
+                if (originalText == "+") {
+                    return column == column?.Database?.Column.SysCorrect ?
+                        QuickImage.Get("Häkchen|" + gr + "||||||||80") :
+                        QuickImage.Get("Häkchen|" + gr);
+                }
+
+                if (originalText == "-") {
+                    return column == column?.Database?.Column.SysCorrect ?
+                        QuickImage.Get("Warnung|" + gr) :
+                        QuickImage.Get("Kreuz|" + gr);
+                }
+
+                if (originalText is "o" or "O") {
+                    return QuickImage.Get("Kreis2|" + gr);
+                }
+
+                if (originalText == "?") {
+                    return QuickImage.Get("Fragezeichen|" + gr);
+                }
+
+                return null;
+
+            case BildTextVerhalten.Bild_oder_Text:
+                return null;
+
+            default:
+                return null;
+        }
+    }
+
+    /// <summary>
+    /// Jede Zeile für sich richtig formatiert.
+    /// </summary>
+    /// <returns></returns>
     //internal void InvalidateSize() => Size = Size.Empty;
 
     private static QuickImage? StandardImage(ColumnItem column, string originalText, string replacedText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {

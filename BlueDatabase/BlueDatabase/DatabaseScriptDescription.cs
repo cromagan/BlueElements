@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -25,6 +25,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Interfaces;
+using BlueScript;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -122,7 +123,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
 
     public override int CompareTo(object obj) {
         if (obj is DatabaseScriptDescription v) {
-            return CompareKey.CompareTo(v.CompareKey);
+            return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
         }
 
         Develop.DebugPrint(FehlerArt.Fehler, "Falscher Objecttyp!");

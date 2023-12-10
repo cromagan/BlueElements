@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -283,16 +283,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
     }
 
     /// <summary>
-    /// Zeichnet die UsedArea. mehr für Debugging gedacht.
-    /// </summary>
-    /// <param name="gr"></param>
-    /// <param name="zoom"></param>
-    /// <param name="shiftX"></param>
-    /// <param name="shiftY"></param>
-    /// <param name="c"></param>
-    public void DrawOutline(Graphics gr, float zoom, float shiftX, float shiftY, Color c) => gr.DrawRectangle(new Pen(c), UsedArea.ZoomAndMoveRect(zoom, shiftX, shiftY, false));
-
-    /// <summary>
     /// Gibt für das aktuelle Item das "Kontext-Menü" zurück.
     /// Alle Elemente für dieses Menü müssen neu erzeugt werden
     /// und werden bei nicht gebrauchen automatisch disposed
@@ -429,7 +419,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
 
     public virtual void PointMoved(object sender, MoveEventArgs e) => OnChanged();
 
-    public virtual void PointMoving(object sender, MoveEventArgs e) { }
+    public void PointMoving(object sender, MoveEventArgs e) { }
 
     /// <summary>
     /// Teilt dem Item mit, dass das Design geändert wurde.
@@ -514,11 +504,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         try {
             if (!forPrinting) {
                 if (positionModified.Width > 1 && positionModified.Height > 1) {
-                    if (zoom > 1) {
-                        gr.DrawRectangle(new Pen(Color.Gray, zoom), positionModified);
-                    } else {
-                        gr.DrawRectangle(ZoomPad.PenGray, positionModified);
-                    }
+                    gr.DrawRectangle(zoom > 1 ? new Pen(Color.Gray, zoom) : ZoomPad.PenGray, positionModified);
                 }
                 if (positionModified.Width < 1 && positionModified.Height < 1) {
                     gr.DrawEllipse(new Pen(Color.Gray, 3), positionModified.Left - 5, positionModified.Top + 5, 10, 10);

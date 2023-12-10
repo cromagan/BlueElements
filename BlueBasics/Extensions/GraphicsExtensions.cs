@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -35,14 +35,6 @@ public static partial class Extensions {
         var dw = (int)(bmp.Width * sc);
         var dh = (int)(bmp.Height * sc);
         gR.DrawImage(bmp, x + ((width - dw) / 2), y + ((height - dh) / 2), dw, dh);
-    }
-
-    public static void DrawImageInRectAspectRatio(this Graphics gR, Bitmap? bmp, Rectangle r) => DrawImageInRectAspectRatio(gR, bmp, r.Left, r.Top, r.Width, r.Height);
-
-    public static void DrawRad(this Graphics gR, Pen pen, PointF middle, PointF startP, float wink) {
-        var radius = Math.Abs(Geometry.GetLenght(middle, startP));
-        var startw = Geometry.GetAngle(middle, startP);
-        gR.DrawArc(pen, middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -wink);
     }
 
     public static void DrawRectangle(this Graphics gR, Pen pen, RectangleF r) => gR.DrawRectangle(pen, r.X, r.Y, r.Width, r.Height);

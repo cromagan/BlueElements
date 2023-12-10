@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -22,7 +22,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
-using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -131,12 +130,6 @@ public partial class ComboBox : TextBox, ITranslateable {
     #endregion
 
     #region Methods
-
-    public void SetTextIfItemExists(string text) {
-        if (Item.Any(thisItem => thisItem.KeyName == text)) {
-            Text = text;
-        }
-    }
 
     public void ShowMenu(object? sender, MouseEventArgs? e) {
         if (_btnDropDownIsIn || IsDisposed || !Enabled) { return; }

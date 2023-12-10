@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -20,11 +20,9 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.EventArgs;
 using static BlueBasics.BitmapExt;
-using static BlueBasics.Develop;
 using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;
 
@@ -47,15 +45,6 @@ public partial class Tool_Clipping {
 
     #region Methods
 
-    public void CheckMinMax() {
-        var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
-        Links.Maximum = pic.Width - 1;
-        Recht.Minimum = -pic.Width + 1;
-        Oben.Maximum = pic.Height - 1;
-        Unten.Minimum = -pic.Height - 1;
-    }
-
     public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
         if (originalPic == null) { return; }
         Pen penBlau = new(Color.FromArgb(150, 0, 0, 255));
@@ -67,35 +56,6 @@ public partial class Tool_Clipping {
         if (e.Current.Button == MouseButtons.Left && e.MouseDown != null) {
             e.DrawLine(penBlau, e.MouseDown.X, -1, e.MouseDown.X, originalPic.Height);
             e.DrawLine(penBlau, -1, e.MouseDown.Y, originalPic.Width, e.MouseDown.Y);
-        }
-    }
-
-    public void DrawZusatz(AdditionalDrawing e, Bitmap? originalPic) {
-        SolidBrush brushBlau = new(Color.FromArgb(120, 0, 0, 255));
-        if (originalPic == null) { return; }
-
-        if (Links.Value != 0) {
-            e.FillRectangle(brushBlau, new Rectangle(0, 0, Convert.ToInt32(Links.Value), originalPic.Height));
-        }
-        if (Recht.Value != 0) {
-            e.FillRectangle(brushBlau, new Rectangle(originalPic.Width + Convert.ToInt32(Recht.Value), 0, (int)-Recht.Value, originalPic.Height));
-        }
-        if (Oben.Value != 0) {
-            e.FillRectangle(brushBlau, new Rectangle(0, 0, originalPic.Width, Convert.ToInt32(Oben.Value)));
-        }
-        if (Unten.Value != 0) {
-            e.FillRectangle(brushBlau, new Rectangle(0, originalPic.Height + Convert.ToInt32(Unten.Value), originalPic.Width, (int)-Unten.Value));
-        }
-    }
-
-    public override void ExcuteCommand(string command) {
-        var c = command.SplitAndCutBy(";");
-        if (c[0] == "AutoZuschnitt") {
-            CheckMinMax();
-            btnAutoZ_Click(null, null);
-            ZuschnittOK_Click(null, null);
-        } else {
-            DebugPrint_NichtImplementiert();
         }
     }
 
@@ -114,17 +74,6 @@ public partial class Tool_Clipping {
 
     public override void OnToolChanging() => WollenSieDenZuschnittÜbernehmen();
 
-    public void Set(int left, int top, int right, int bottom) {
-        if (left < 0 || top < 0 || right > 0 || bottom > 0) {
-            DebugPrint(FehlerArt.Warnung, "Fehler in den Angaben");
-        }
-        CheckMinMax();
-        Links.Value = left;
-        Oben.Value = top;
-        Recht.Value = right;
-        Unten.Value = bottom;
-    }
-
     internal override void ToolFirstShown() {
         CheckMinMax();
         btnAutoZ_Click(null, null);
@@ -140,6 +89,33 @@ public partial class Tool_Clipping {
         Oben.Value = pa.Top;
         Unten.Value = pa.Bottom;
         OnDoInvalidate();
+    }
+
+    private void CheckMinMax() {
+        var pic = OnNeedCurrentPic();
+        if (pic == null) { return; }
+        Links.Maximum = pic.Width - 1;
+        Recht.Minimum = -pic.Width + 1;
+        Oben.Maximum = pic.Height - 1;
+        Unten.Minimum = -pic.Height - 1;
+    }
+
+    private void DrawZusatz(AdditionalDrawing e, Image? originalPic) {
+        SolidBrush brushBlau = new(Color.FromArgb(120, 0, 0, 255));
+        if (originalPic == null) { return; }
+
+        if (Links.Value != 0) {
+            e.FillRectangle(brushBlau, new Rectangle(0, 0, Convert.ToInt32(Links.Value), originalPic.Height));
+        }
+        if (Recht.Value != 0) {
+            e.FillRectangle(brushBlau, new Rectangle(originalPic.Width + Convert.ToInt32(Recht.Value), 0, (int)-Recht.Value, originalPic.Height));
+        }
+        if (Oben.Value != 0) {
+            e.FillRectangle(brushBlau, new Rectangle(0, 0, originalPic.Width, Convert.ToInt32(Oben.Value)));
+        }
+        if (Unten.Value != 0) {
+            e.FillRectangle(brushBlau, new Rectangle(0, originalPic.Height + Convert.ToInt32(Unten.Value), originalPic.Width, (int)-Unten.Value));
+        }
     }
 
     private void ValueChangedByClicking(object sender, System.EventArgs e) => OnDoInvalidate();

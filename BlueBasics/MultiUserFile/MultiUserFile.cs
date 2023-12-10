@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -37,43 +37,29 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     #region Fields
 
-    public int ReloadDelaySecond = 10;
     private static readonly List<MultiUserFile> AllFiles = new();
-
     private readonly Timer _checker;
-
     private readonly BackgroundWorker _pureBinSaver;
-
     private string _canWriteError = string.Empty;
-
     private DateTime _canWriteNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
-
     private bool _checkedAndReloadNeed;
-
     private int _checkerTickCount = -5;
-
     private bool _doingTempFile;
-
     private string _editNormalyError = string.Empty;
-
     private DateTime _editNormalyNextCheckUtc = DateTime.UtcNow.AddSeconds(-30);
-
     private string _filename = string.Empty;
-
     private string _inhaltBlockdatei = string.Empty;
-
     private bool _initialLoadDone;
-
     private DateTime _lastMessageUtc = DateTime.UtcNow.AddMinutes(-10);
-
     private string _lastSaveCode;
-
-    //private int _loadingThreadId = -1;
 
     //private static string _lockLastastfile = string.Empty;
     private int _lockload;
 
+    //private int _loadingThreadId = -1;
     private FileSystemWatcher? _watcher;
+
+    private int ReloadDelaySecond = 10;
 
     #endregion
 
@@ -131,7 +117,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     #region Properties
 
-    public bool AutoDeleteBak { get; set; }
+    public bool AutoDeleteBak { get; }
 
     /// <summary>
     /// Load oder SaveAsAndChangeTo benutzen
@@ -411,28 +397,6 @@ public sealed class MultiUserFile : IDisposableExtended {
         return false;
     }
 
-    public void RepairOldBlockFiles() {
-        if (DateTime.UtcNow.Subtract(_lastMessageUtc).TotalMinutes < 1) { return; }
-        _lastMessageUtc = DateTime.UtcNow;
-        var sec = AgeOfBlockDatei;
-        try {
-            // Nach 15 Minuten versuchen die Datei zu reparieren
-            if (sec >= 900) {
-                if (!FileExists(Filename)) { return; }
-                _ = File.ReadAllText(Blockdateiname(), Encoding.UTF8);
-                if (!CreateBlockDatei()) { return; }
-                var autoRepairName = TempFile(Filename.FilePath(), Filename.FileNameWithoutSuffix() + "_BeforeAutoRepair", "AUT");
-                if (!CopyFile(Filename, autoRepairName, false)) {
-                    Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 1: " + Filename);
-                    return;
-                }
-                if (!DeleteBlockDatei(true, false)) {
-                    Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 2: " + Filename);
-                }
-            }
-        } catch { }
-    }
-
     /// <summary>
     /// Angehängte Formulare werden aufgefordert, ihre Bearbeitung zu beenden. Geöffnete Benutzereingaben werden geschlossen.
     /// Ist die Datei in Bearbeitung wird diese freigegeben. Zu guter letzt werden PendingChanges fest gespeichert.
@@ -501,19 +465,13 @@ public sealed class MultiUserFile : IDisposableExtended {
         CreateWatcher();
     }
 
+    // ReSharper disable once UnusedMember.Global
     public void UnlockHard() {
         try {
             _ = Load_Reload();
             if (AgeOfBlockDatei >= 0) { _ = DeleteBlockDatei(true, true); }
             _ = Save(true);
         } catch { }
-    }
-
-    public void WaitEditable() {
-        while (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.EditAcut))) {
-            if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.EditNormaly))) { return; }// Nur anzeige-Dateien sind immer Schreibgeschützt
-            Pause(0.2, true);
-        }
     }
 
     internal bool BlockDateiCheck() {
@@ -674,11 +632,11 @@ public sealed class MultiUserFile : IDisposableExtended {
             }
         }
 
-        if (bLoaded.isZipped()) {
+        if (bLoaded.IsZipped()) {
             // Gezipte Daten-Kennung gefunden
             var tmp = bLoaded.UnzipIt();
 
-            if (tmp is byte[] bok) { bLoaded = bok; }
+            if (tmp != null) { bLoaded = tmp; }
         }
         return (bLoaded, tmpLastSaveCode2);
     }
@@ -753,6 +711,28 @@ public sealed class MultiUserFile : IDisposableExtended {
             _watcher?.Dispose();
             _watcher = null;
         }
+    }
+
+    private void RepairOldBlockFiles() {
+        if (DateTime.UtcNow.Subtract(_lastMessageUtc).TotalMinutes < 1) { return; }
+        _lastMessageUtc = DateTime.UtcNow;
+        var sec = AgeOfBlockDatei;
+        try {
+            // Nach 15 Minuten versuchen die Datei zu reparieren
+            if (sec >= 900) {
+                if (!FileExists(Filename)) { return; }
+                _ = File.ReadAllText(Blockdateiname(), Encoding.UTF8);
+                if (!CreateBlockDatei()) { return; }
+                var autoRepairName = TempFile(Filename.FilePath(), Filename.FileNameWithoutSuffix() + "_BeforeAutoRepair", "AUT");
+                if (!CopyFile(Filename, autoRepairName, false)) {
+                    Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 1: " + Filename);
+                    return;
+                }
+                if (!DeleteBlockDatei(true, false)) {
+                    Develop.DebugPrint(FehlerArt.Warnung, "Autoreparatur fehlgeschlagen 2: " + Filename);
+                }
+            }
+        } catch { }
     }
 
     /// <summary>

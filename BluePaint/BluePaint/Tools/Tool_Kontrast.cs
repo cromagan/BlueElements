@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -22,7 +22,6 @@ using System.Drawing;
 using BlueBasics;
 using BlueControls.EventArgs;
 using static BlueBasics.BitmapExt;
-using static BlueBasics.Converter;
 
 namespace BluePaint;
 
@@ -52,56 +51,6 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
             var picPreview = AdjustBrightness(originalPic, sldHelligkeit.Value);
             e.DrawImage(picPreview);
         }
-    }
-
-    public override void ExcuteCommand(string command) {
-        var c = command.SplitAndCutBy(";");
-        switch (c[0]) {
-            case "Kontrast":
-                sldKontrast.Value = FloatParse(c[1]);
-                btnKontrastErhoehen_Click(null, System.EventArgs.Empty);
-                break;
-
-            case "Graustufen":
-                btnGraustufen_Click(null, System.EventArgs.Empty);
-                break;
-
-            case "AlleFarbenSchwarz":
-                btnAlleFarbenSchwarz_Click(null, System.EventArgs.Empty);
-                break;
-
-            case "PixelHinzu":
-                btnPixelHinzu_Click(null, System.EventArgs.Empty);
-                break;
-
-            case "Ausdünnen":
-                btnAusdünnen_Click(null, System.EventArgs.Empty);
-                break;
-
-            case "Gamma":
-                sldGamma.Value = FloatParse(c[1]);
-                btnGamma_Click(null, System.EventArgs.Empty);
-                break;
-
-            case "Helligkeit":
-                sldHelligkeit.Value = FloatParse(c[1]);
-                btnHelligkeit_Click(null, System.EventArgs.Empty);
-                break;
-
-            default:
-                Develop.DebugPrint_NichtImplementiert();
-                break;
-        }
-        //if (c[0] == "Replace")
-        //{
-        //    var OriginalPic = OnNeedCurrentPic();
-        //    var cc = Color.FromArgb(IntParse(c[1]));
-        //    OnOverridePic(OriginalPic.ReplaceColor(cc, Color.Transparent));
-        //}
-        //else
-        //{
-        //    Develop.DebugPrint_NichtImplementiert();
-        //}
     }
 
     private void btnAlleFarbenSchwarz_Click(object? sender, System.EventArgs e) {

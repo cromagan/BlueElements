@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -106,12 +106,6 @@ public static class Develop {
     /// </summary>
     /// <param name="warnung"></param>
     public static void DebugPrint(IHasKeyName warnung) => DebugPrint(FehlerArt.Warnung, "Unbekanntes Item:" + warnung.KeyName);
-
-    /// <summary>
-    /// Gibt die Meldung Unbekannte Item aus
-    /// </summary>
-    /// <param name="warnung"></param>
-    public static void DebugPrint(IReadableText warnung) => DebugPrint(FehlerArt.Warnung, "Unbekanntes Item:" + warnung.ReadableText());
 
     public static void DebugPrint(string warnung) => DebugPrint(FehlerArt.Warnung, warnung);
 
@@ -227,11 +221,6 @@ public static class Develop {
     public static void Debugprint_BackgroundThread() {
         if (!Thread.CurrentThread.IsBackground) { return; }
         DebugPrint(FehlerArt.Warnung, "Totes Fenster!");
-    }
-
-    public static void DebugPrint_InternalError() {
-        if (IsHostRunning()) { Debugger.Break(); }
-        DebugPrint(FehlerArt.Fehler, "Schwerer Interner Fehler.");
     }
 
     public static void DebugPrint_InvokeRequired(bool invokeRequired, bool fehler) {

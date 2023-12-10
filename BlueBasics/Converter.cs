@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -24,7 +24,6 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using BlueBasics.Enums;
-using static BlueBasics.IO;
 
 namespace BlueBasics;
 
@@ -43,8 +42,6 @@ public static class Converter {
         }
     }
 
-    public static byte Bin8ToByte(string bIn8) => Convert.ToByte(bIn8, 2);
-
     public static string BitmapToBase64(Bitmap? bMp, ImageFormat bFormat) {
         if (bMp == null) { return string.Empty; }
         if (bMp.PixelFormat != PixelFormat.Format32bppPArgb) { bMp = Bitmap_ChangePixelFormat(bMp); }
@@ -54,65 +51,6 @@ public static class Converter {
         var base64 = Convert.ToBase64String(memory.ToArray());
         memory.Close();
         return base64;
-    }
-
-    public static byte[]? BitmapToByte(Bitmap? bMp, ImageFormat format) {
-        if (bMp == null) { return null; }
-        if (bMp.PixelFormat != PixelFormat.Format32bppPArgb) { bMp = Bitmap_ChangePixelFormat(bMp); }
-        if (bMp == null) { return null; }
-        MemoryStream memSt = new();
-        bMp.Save(memSt, format);
-        return memSt.ToArray();
-    }
-
-    public static string BitmapToStringUnicode(Bitmap? bMp, ImageFormat format) => bMp == null ? string.Empty : new string(Encoding.Unicode.GetChars(BitmapToByte(bMp, format)));
-
-    //private static readonly string SerialNr2Path_LastSearch = string.Empty;
-    //private static readonly string SerialNr2Path_LastErgebnis = string.Empty;
-    public static string ByteToBin8(byte b) {
-        var x = Convert.ToString(b, 2);
-        while (true) {
-            if (x.Length == 8) { return x; }
-            x = "0" + x;
-        }
-    }
-
-    public static Bitmap? ByteToBitmap(byte[]? value) {
-        if (value == null || value.GetUpperBound(0) == 0) { return null; }
-        try {
-            using MemoryStream ms = new(value);
-            return new Bitmap(ms);
-            // return (Bitmap)Image.FromStream(fs);
-        } catch {
-            Develop.DebugPrint("Fehler bei der Umwandlung!");
-            return null;
-        }
-    }
-
-    public static void ByteToFile(string dateiname, byte[] b) {
-        if (FileExists(dateiname)) {
-            Develop.DebugPrint("Datei soll überschrieben werden: " + dateiname);
-            return;
-        }
-        // Stop
-        var l = File.Create(dateiname);
-        l.Write(b, 0, b.Length);
-        l.Flush();
-        l.Close();
-        l.Dispose();
-    }
-
-    // public static string FileToString(string Dateiname) {
-    //    try {
-    //        var b = FileToByte(Dateiname);
-    //        return b.ToStringWIN1252();
-    //    } catch {
-    //        return string.Empty;
-    //    }
-    // }
-    public static void CartesianToPolar(PointF ko, out float r, out float win) {
-        r = (float)Math.Sqrt((ko.X * ko.X) + (ko.Y * ko.Y));
-        win = Geometry.GetAngle(0, 0, ko.X, ko.Y);
     }
 
     /// <summary>
@@ -197,17 +135,6 @@ public static class Converter {
         }
 
         return value;
-    }
-
-    public static byte[] FileToByte(string dateiname) {
-        FileStream obFi = new(dateiname, FileMode.Open, FileAccess.Read);
-        BinaryReader r = new(obFi);
-        var b = r.ReadBytes((int)new FileInfo(dateiname).Length);
-        r.Close();
-        r.Dispose();
-        obFi.Close();
-        obFi.Dispose();
-        return b;
     }
 
     /// <summary>
@@ -296,25 +223,7 @@ public static class Converter {
 
     public static string StringtoUtf8(this string s) => Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
 
-    public static Bitmap? StringUnicodeToBitmap(string unicodeTxt) {
-        if (string.IsNullOrEmpty(unicodeTxt)) {
-            return null;
-        }
-        var b = unicodeTxt.Unicode_ToByte();
-        var bmp = ByteToBitmap(b);
-        return bmp;
-    }
-
-    public static Bitmap? StringWin1252ToBitmap(string tXt) {
-        if (string.IsNullOrEmpty(tXt)) {
-            return null;
-        }
-        var b = tXt.WIN1252_toByte();
-        var bmp = ByteToBitmap(b);
-        return bmp;
-    }
-
-    private static Bitmap? Bitmap_ChangePixelFormat(Bitmap? oldBmp) {
+    private static Bitmap? Bitmap_ChangePixelFormat(Image? oldBmp) {
         if (oldBmp == null) { return null; }
         Generic.CollectGarbage();
         return new Bitmap(oldBmp);

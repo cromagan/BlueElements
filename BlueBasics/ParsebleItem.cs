@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -34,7 +34,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IChangedFeedback {
 
     #region Constructors
 
-    public ParsebleItem(string keyname) {
+    protected ParsebleItem(string keyname) {
         KeyName = string.IsNullOrEmpty(keyname) ? Generic.UniqueInternal() : keyname;
         if (string.IsNullOrEmpty(KeyName)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
     }
@@ -135,10 +135,12 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IChangedFeedback {
     public override string ToString() {
         List<string> result = new();
 
-        var ci = (string)GetType().GetProperty("ClassId").GetValue(null, null);
-
-        result.ParseableAdd("ClassId", ci);
+        var ci = (string?)GetType().GetProperty("ClassId")?.GetValue(null, null);
+        if (ci != null) {
+            result.ParseableAdd("ClassId", ci);
+        }
         result.ParseableAdd("Key", KeyName);
+
         return result.Parseable();
     }
 

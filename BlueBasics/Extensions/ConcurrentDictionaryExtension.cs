@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -28,23 +27,6 @@ namespace BlueBasics;
 public static partial class Extensions {
 
     #region Methods
-
-    public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<int, T>? l) where T : ICanBeEmpty {
-        if (l == null || l.Count == 0) { return false; }
-        List<int> remo = new();
-        foreach (var pair in l) {
-            if (pair.Value == null || pair.Value.IsNullOrEmpty()) { remo.Add(pair.Key); }
-        }
-        if (remo.Count == 0) { return false; }
-
-        foreach (var thisInteger in remo) {
-            if (!l.TryRemove(thisInteger, out _)) {
-                Develop.DebugPrint(FehlerArt.Fehler, "Remove failed: " + thisInteger);
-            }
-        }
-
-        return true;
-    }
 
     public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<string, T>? l) where T : ICanBeEmpty? {
         if (l == null || l.Count == 0) { return false; }

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,10 +17,9 @@
 
 #nullable enable
 
-using BlueBasics.Interfaces;
-using BlueControls.Controls;
-using BlueDatabase;
 using System.Collections.Generic;
+using BlueBasics.Interfaces;
+using BlueDatabase;
 
 namespace BlueControls.Interfaces;
 
@@ -44,7 +43,7 @@ public static class IControlSendSomethingExtension {
 
     #region Methods
 
-    public static void DoOutputSettings(this IControlSendSomething dest, ConnectedFormulaView parent, IItemSendSomething source) {
+    public static void DoOutputSettings(this IControlSendSomething dest, IItemSendSomething source) {
         dest.Name = source.DefaultItemToControlName();
         dest.FilterOutput.Database = source.DatabaseOutput;
     }

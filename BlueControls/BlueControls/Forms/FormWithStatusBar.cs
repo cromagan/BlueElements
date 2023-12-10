@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -74,8 +75,8 @@ public partial class FormWithStatusBar : Form {
         var did = false;
         try {
             foreach (var thisf in _formsWithStatusBar) {
-                if (thisf is FormWithStatusBar fd && fd.Visible && !fd.InvokeRequired) {
-                    var x = fd.UpdateStatus(type, text, did);
+                if (thisf != null && thisf.Visible && !thisf.InvokeRequired) {
+                    var x = thisf.UpdateStatus(type, text, did);
                     if (x) { did = true; }
                 }
             }
@@ -112,7 +113,7 @@ public partial class FormWithStatusBar : Form {
             if (type == FehlerArt.Warnung) { imagecode = ImageCode.Warnung; }
             if (type == FehlerArt.Fehler) { imagecode = ImageCode.Kritisch; }
 
-            if (type == FehlerArt.Info || type == FehlerArt.DevelopInfo || !DropMessages || didAlreadyMessagebox) {
+            if (type is FehlerArt.Info or FehlerArt.DevelopInfo || !DropMessages || didAlreadyMessagebox) {
                 capStatusBar.Text = "<imagecode=" + QuickImage.Get(imagecode, 16) + "> " + message;
                 capStatusBar.Refresh();
                 return false;
@@ -135,7 +136,7 @@ public partial class FormWithStatusBar : Form {
 
     internal static void GotMessageDropMessage(object sender, MessageEventArgs e) => UpdateStatusBar(e.Type, e.Message, true);
 
-    protected override void OnFormClosed(System.Windows.Forms.FormClosedEventArgs e) {
+    protected override void OnFormClosed(FormClosedEventArgs e) {
         _formsWithStatusBar.Remove(this);
         base.OnFormClosed(e);
     }

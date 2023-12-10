@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -150,7 +150,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
             //Name = DefaultItemToControlName()
         };
         //return con;
-        con.DoOutputSettings(parent, this);
+        con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);
 
         return con;
@@ -221,7 +221,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     }
 
     public override string ReadableText() {
-        var txt = "Filter: ";
+        const string txt = "Filter: ";
 
         if (this.IsOk() && DatabaseOutput != null) {
             return txt + DatabaseOutput.Caption;

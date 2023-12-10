@@ -88,14 +88,6 @@ public class Html {
 
     public void CellAdd(string content, Color c) => Code.Add("        <th  bgcolor=\"#" + c.ToHtmlCode() + "\">" + content + "</th>");
 
-    public void ListAdd(List<string> items) {
-        Code.Add("<ul>");
-        foreach (var thisitem in items) {
-            Code.Add("  <li>" + thisitem + "</li>");
-        }
-        Code.Add("</ul>");
-    }
-
     public void RowBeginn() => Code.Add("      <tr>");
 
     public void RowEnd() => Code.Add("      </tr>");

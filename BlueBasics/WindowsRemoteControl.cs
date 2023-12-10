@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -29,11 +29,11 @@ public static class WindowsRemoteControl {
 
     #region Fields
 
-    private const int KEYEVENTF_EXTENDEDKEY = 0x1;
+    private const int KeyeventfExtendedkey = 0x1;
 
-    private const int KEYEVENTF_KEYDOWN = 0x0;
+    private const int KeyeventfKeydown = 0x0;
 
-    private const int KEYEVENTF_KEYUP = 0x2;
+    private const int KeyeventfKeyup = 0x2;
 
     #endregion
 
@@ -66,29 +66,7 @@ public static class WindowsRemoteControl {
     #region Methods
 
     // Release key
-    public static void AltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, 0);
-
-    /// <summary>
-    /// Diese Funktion Sucht alle offenen Fenster.
-    /// </summary>
-    /// <returns></returns>
-    /// <remarks></remarks>
-    public static List<strProcess> exProzesse() {
-        List<strProcess> wDescr = new();
-        var hh = GetTopWindow((IntPtr)0);
-        while (true) {
-            hh = GetWindow(hh, 2);
-            if (hh.ToInt32() != 0) {
-                strProcess l = new() {
-                    MainWindowHandle = hh
-                };
-                GetWindowInfo(ref l);
-                wDescr.Add(l);
-            } else {
-                return wDescr;
-            }
-        }
-    }
+    public static void AltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfExtendedkey | KeyeventfKeyup, 0);
 
     public static void FensterMaximieren(IntPtr handle) => ShowWindow(handle, (int)Sw.ShowMaximized);
 
@@ -119,7 +97,7 @@ public static class WindowsRemoteControl {
     /// </summary>
     /// <param name="wDescr"></param>
     /// <remarks></remarks>
-    public static void GetWindowInfo(ref strProcess wDescr) {
+    public static void GetWindowInfo(ref StrProcess wDescr) {
         // If WorkStationISLocked() Then
         //    wDescr = Nothing
         //    Exit Sub
@@ -131,12 +109,12 @@ public static class WindowsRemoteControl {
         wDescr.MainWindowTitle = WinTitle(wDescr.MainWindowHandle);
         wDescr.Klasse = WinClass(wDescr.MainWindowHandle);
         wDescr.ExeName = WinExeName(wDescr.MainWindowHandle);
-        wDescr.prid = prid;
+        wDescr.Prid = prid;
     }
 
-    public static void KeyDown(KeyCode k) => keybd_event((byte)k, 0, KEYEVENTF_KEYDOWN, 0);
+    public static void KeyDown(KeyCode k) => keybd_event((byte)k, 0, KeyeventfKeydown, 0);
 
-    public static void KeyUp(KeyCode k) => keybd_event((byte)k, 0, KEYEVENTF_KEYUP, 0);
+    public static void KeyUp(KeyCode k) => keybd_event((byte)k, 0, KeyeventfKeyup, 0);
 
     public static string LastMouseButton() {
         if (Convert.ToBoolean(GetAsyncKeyState(0x1))) { return "Links"; }
@@ -145,7 +123,7 @@ public static class WindowsRemoteControl {
         return string.Empty;
     }
 
-    public static void LeftAltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KEYEVENTF_KEYUP, 0);
+    public static void LeftAltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfKeyup, 0);
 
     /// <summary>
     /// Diese Funktion bewegt den Mauscursor an einen bestimmten Punkt.
@@ -155,19 +133,41 @@ public static class WindowsRemoteControl {
     /// <returns>Liefert 1 bei Erfolg und 0, wenn der Eingabestream schon blockiert war zurück.</returns>
     public static uint MoveMouse(int x, int y) {
         // Bildschirm Auflösung
-        float ScreenWidth = Screen.PrimaryScreen.Bounds.Width;
-        float ScreenHeight = Screen.PrimaryScreen.Bounds.Height;
-        var input_move = new INPUT {
+        float screenWidth = Screen.PrimaryScreen.Bounds.Width;
+        float screenHeight = Screen.PrimaryScreen.Bounds.Height;
+        var input_Move = new Input {
             type = InputType.INPUT_MOUSE
         };
-        input_move.mi.dx = (int)Math.Round(x * (65535 / ScreenWidth), 0);
-        input_move.mi.dy = (int)Math.Round(y * (65535 / ScreenHeight), 0);
-        input_move.mi.mouseData = 0;
-        input_move.mi.dwFlags = Mouseeventf.MOVE | Mouseeventf.ABSOLUTE;
-        input_move.mi.time = 0;
-        input_move.mi.dwExtraInfo = GetMessageExtraInfo();
-        INPUT[] input = { input_move };
-        return SendInput(1, input, Marshal.SizeOf(input_move));
+        input_Move.mi.dx = (int)Math.Round(x * (65535 / screenWidth), 0);
+        input_Move.mi.dy = (int)Math.Round(y * (65535 / screenHeight), 0);
+        input_Move.mi.mouseData = 0;
+        input_Move.mi.dwFlags = Mouseeventf.MOVE | Mouseeventf.ABSOLUTE;
+        input_Move.mi.time = 0;
+        input_Move.mi.dwExtraInfo = GetMessageExtraInfo();
+        Input[] input = { input_Move };
+        return SendInput(1, input, Marshal.SizeOf(input_Move));
+    }
+
+    /// <summary>
+    /// Diese Funktion Sucht alle offenen Fenster.
+    /// </summary>
+    /// <returns></returns>
+    /// <remarks></remarks>
+    public static List<StrProcess> Prozesse() {
+        List<StrProcess> wDescr = new();
+        var hh = GetTopWindow((IntPtr)0);
+        while (true) {
+            hh = GetWindow(hh, 2);
+            if (hh.ToInt32() != 0) {
+                StrProcess l = new() {
+                    MainWindowHandle = hh
+                };
+                GetWindowInfo(ref l);
+                wDescr.Add(l);
+            } else {
+                return wDescr;
+            }
+        }
     }
 
     public static void RebootComputer() {
@@ -183,7 +183,7 @@ public static class WindowsRemoteControl {
         Develop.AbortExe();
     }
 
-    public static void ShiftRelease() => keybd_event((byte)KeyCode.VK_SHIFT, 0, KEYEVENTF_KEYUP, 0);
+    public static void ShiftRelease() => keybd_event((byte)KeyCode.VK_SHIFT, 0, KeyeventfKeyup, 0);
 
     [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
@@ -291,7 +291,7 @@ public static class WindowsRemoteControl {
     private static extern int keybd_event(byte bVk, byte bScan, int dwFlags, int dwExtraInfo);
 
     [DllImport("user32.dll", EntryPoint = "SendInput", SetLastError = true)]
-    private static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
+    private static extern uint SendInput(uint nInputs, Input[] pInputs, int cbSize);
 
     /// <summary>
     /// Setzt ein Fenster an eine andere Position
@@ -312,7 +312,7 @@ public static class WindowsRemoteControl {
 
     #region Structs
 
-    public struct strProcess {
+    public struct StrProcess {
 
         #region Fields
 
@@ -320,19 +320,19 @@ public static class WindowsRemoteControl {
         public string Klasse;
         public IntPtr MainWindowHandle;
         public string MainWindowTitle;
-        public int prid;
+        public int Prid;
 
         #endregion
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct INPUT {
+    private struct Input {
         public InputType type;
-        public MOUSEINPUT mi;
+        public Mouseinput mi;
     }
 
     [StructLayout(LayoutKind.Sequential)]
-    private struct MOUSEINPUT {
+    private struct Mouseinput {
         public int dx;
         public int dy;
         public int mouseData;

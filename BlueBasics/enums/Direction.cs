@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -25,9 +25,5 @@ public enum Direction : byte {
     Oben = 1,
     Unten = 2,
     Links = 4,
-    Rechts = 8,
-    Oben_Links = Oben | Links,
-    Oben_Rechts = Oben | Rechts,
-    Unten_Links = Unten | Links,
-    Unten_Rechts = Unten | Rechts
+    Rechts = 8
 }

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,6 +17,7 @@
 
 using System;
 using System.Drawing;
+using static BlueBasics.Constants;
 
 namespace BlueBasics;
 
@@ -160,11 +161,11 @@ public static class Geometry {
     public static PointF PointOnLine(PointF maus, float pX, float pY, float qX, float qY) {
         //http://de.wikipedia.org/wiki/Geradengleichung
         // < 0.000001 ist 0 gleich, weil ansonsten zu große ergebnisse rauskommen
-        if (Math.Abs(pY - qY) < 0.0000001d) // genau Waagerecht
+        if (Math.Abs(pY - qY) < FineTolerance) // genau Waagerecht
         {
             return maus with { Y = pY };
         }
-        if (Math.Abs(pX - qX) < 0.0000001d) // genau Senkrecht
+        if (Math.Abs(pX - qX) < FineTolerance) // genau Senkrecht
         {
             return maus with { X = pX };
         }

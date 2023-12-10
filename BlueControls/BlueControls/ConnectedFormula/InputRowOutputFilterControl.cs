@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -23,6 +23,7 @@ using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using BlueDatabase.Enums;
 
 namespace BlueControls.Controls;
 
@@ -78,16 +79,16 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
         switch (_type) {
             case FilterTypeRowInputItem.Ist_GrossKleinEgal:
-                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_GroßKleinEgal, lastInputRow.CellGetString(_inputcolumn)));
+                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, FilterType.Istgleich_GroßKleinEgal, lastInputRow.CellGetString(_inputcolumn)));
                 return;
 
             case FilterTypeRowInputItem.Ist_genau:
-                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich, lastInputRow.CellGetString(_inputcolumn)));
+                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, FilterType.Istgleich, lastInputRow.CellGetString(_inputcolumn)));
                 return;
 
             case FilterTypeRowInputItem.Ist_eines_der_Wörter_GrossKleinEgal:
                 var list = lastInputRow.CellGetString(_inputcolumn).HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
-                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, BlueDatabase.Enums.FilterType.Istgleich_ODER_GroßKleinEgal, list));
+                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, FilterType.Istgleich_ODER_GroßKleinEgal, list));
 
                 //List<string> names = new();
                 //names.AddRange(_outputcolumn.GetUcaseNamesSortedByLenght());

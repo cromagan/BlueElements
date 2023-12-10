@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -60,7 +60,7 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
     #region Methods
 
     protected override void OnClosing(CancelEventArgs e) {
-        if (Database is DatabaseAbstract db && !db.IsDisposed) { db.DisposingEvent -= Database_DisposingEvent; }
+        if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_DisposingEvent; }
         base.OnClosing(e);
     }
 
@@ -87,8 +87,8 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
         }
         var m = "Datenbank-Fehler";
 
-        if (Database is DatabaseAbstract db && !db.IsDisposed) {
-            m = db.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked);
+        if (Database != null && !Database.IsDisposed) {
+            m = Database.Import(_originalImportText, SpalteZuordnen.Checked, ZeilenZuorden.Checked, TR, Aufa.Checked, AnfTre.Checked);
         }
 
         if (!string.IsNullOrEmpty(m)) {

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -159,8 +159,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         }
     }
 
-    public override string QuickInfoText => _lastQuickInfo;
-
     [DefaultValue(false)]
     public bool ShowInPrintMode {
         get => _showInPrintMode;
@@ -171,6 +169,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             Unselect();
         }
     }
+
+    protected override string QuickInfoText => _lastQuickInfo;
 
     #endregion
 
@@ -232,7 +232,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         if (hasbase) { base.OnKeyUp(e); }
         if (!EditAllowed || _item == null) { return; }
         if (_givesMouseCommandsTo != null) {
-            if (_givesMouseCommandsTo.KeyUp(this, e, Zoom, ShiftX, ShiftY)) { return; }
+            if (_givesMouseCommandsTo.KeyUp(e, Zoom, ShiftX, ShiftY)) { return; }
         }
         var multi = 1f;
         if (_item.SnapMode == SnapMode.SnapToGrid) {
@@ -269,7 +269,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         }
     }
 
-    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? selectedHotItem, ref bool cancel, ref bool translate) {
+    public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? selectedHotItem) {
         CheckHotItem(e, true);
         selectedHotItem = HotItem;
         if (selectedHotItem != null) {
@@ -384,7 +384,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         if (!EditAllowed) { return; }
         _lastQuickInfo = string.Empty;
         if (HotItem is IMouseAndKeyHandle ho2) {
-            if (ho2.MouseDown(this, e, Zoom, ShiftX, ShiftY)) {
+            if (ho2.MouseDown(e, Zoom, ShiftX, ShiftY)) {
                 _givesMouseCommandsTo = ho2;
                 return;
             }
@@ -418,7 +418,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
                 _givesMouseCommandsTo = null;
                 Invalidate();
             } else {
-                if (!_givesMouseCommandsTo.MouseMove(this, e, Zoom, ShiftX, ShiftY)) {
+                if (!_givesMouseCommandsTo.MouseMove(e, Zoom, ShiftX, ShiftY)) {
                     _givesMouseCommandsTo = null;
                     Invalidate();
                 } else {
@@ -427,7 +427,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             }
         } else {
             if (HotItem is IMouseAndKeyHandle ho2) {
-                if (ho2.MouseMove(this, e, Zoom, ShiftX, ShiftY)) {
+                if (ho2.MouseMove(e, Zoom, ShiftX, ShiftY)) {
                     _givesMouseCommandsTo = ho2;
                     Invalidate();
                     return;
@@ -453,7 +453,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     internal void DoMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         if (_givesMouseCommandsTo != null) {
-            if (!_givesMouseCommandsTo.MouseUp(this, e, Zoom, ShiftX, ShiftY)) {
+            if (!_givesMouseCommandsTo.MouseUp(e, Zoom, ShiftX, ShiftY)) {
                 _givesMouseCommandsTo = null;
             } else {
                 return;

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -90,6 +90,13 @@ public static class Generic {
         return false;
     }
 
+    /// <summary>
+    /// Erstellt eine URL-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
+    /// </summary>
+    /// <param name="saveTo"></param>
+    /// <param name="linkUrl"></param>
+    /// <returns></returns>
+    // ReSharper disable once UnusedMember.Global
     public static bool CreateInternetLink(string saveTo, string linkUrl) {
         var title = "unbekannt";
         // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -108,6 +115,11 @@ public static class Generic {
         return true;
     }
 
+    /// <summary>
+    /// Erstellt eine Datei-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
+    /// </summary>
+    /// <returns></returns>
+    // ReSharper disable once UnusedMember.Global
     public static bool CreateShortCut(string saveTo, string linkName) {
         try {
             // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -173,11 +185,6 @@ public static class Generic {
         return l;
     }
 
-    public static byte[] GetHash(this string inputString) {
-        using HashAlgorithm algorithm = SHA256.Create();
-        return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
-    }
-
     public static string GetHashString(this string inputString) {
         var sb = new StringBuilder();
         foreach (var b in GetHash(inputString)) {
@@ -208,11 +215,6 @@ public static class Generic {
         if (key < 0) { return (key * -1).ToString(); }
 
         return key.ToString();
-    }
-
-    public static string GetUrlFileDestination(string filename) {
-        var d = File.ReadAllText(filename, Encoding.UTF8).SplitAndCutByCrToList();
-        return d.TagGet("URL");
     }
 
     public static void LaunchBrowser(string url) {
@@ -260,10 +262,10 @@ public static class Generic {
 
     public static void LoadAllAssemblies(string assemblyDirectory) {
         // Alle Dateien mit der Erweiterung ".dll" im Verzeichnis abrufen
-        string[] assemblyFiles = Directory.GetFiles(assemblyDirectory, "*.dll");
+        var assemblyFiles = Directory.GetFiles(assemblyDirectory, "*.dll");
 
         // Alle Assemblys laden und instanziieren
-        foreach (string assemblyFile in assemblyFiles) {
+        foreach (var assemblyFile in assemblyFiles) {
             try {
                 _ = Assembly.LoadFrom(assemblyFile);
                 //Console.WriteLine(assembly.FullName);
@@ -312,25 +314,7 @@ public static class Generic {
         return new Rectangle(gp, sz);
     }
 
-    /// <summary>
-    /// Gibt einen Wert zwischen 0 und 1 zurpück
-    /// </summary>
-    /// <param name="x"></param>
-    /// <returns></returns>
-    public static double Sigmoid(double x) => 1 / (1 + Math.Exp(-x));
-
     public static void Swap<T>(ref T w1, ref T w2) => (w1, w2) = (w2, w1);
-
-    /// <summary>
-    /// Gibt einen Wert zwischen -1 und 1 zurück
-    /// </summary>
-    /// <param name="x"></param>
-    /// <returns></returns>
-    public static float TangensHyperbolicus(double x) {
-        if (x > 20) { return 1; }
-        var et = (float)Math.Pow(Math.E, x);
-        return (et / (1 + et) * 2) - 1;
-    }
 
     public static string UniqueInternal() {
         var neueZeit = DateTime.UtcNow.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture).ReduceToChars(Constants.Char_Numerals);
@@ -341,6 +325,11 @@ public static class Generic {
             _uniqueInternalLastTime = neueZeit;
         }
         return "ID_" + neueZeit + "_" + _uniqueInternalCount.ToString(Constants.Format_Integer3);
+    }
+
+    private static IEnumerable<byte> GetHash(this string inputString) {
+        using HashAlgorithm algorithm = SHA256.Create();
+        return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
     }
 
     #endregion

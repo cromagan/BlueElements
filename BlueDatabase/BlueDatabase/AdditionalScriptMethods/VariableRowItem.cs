@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -36,9 +36,9 @@ public class VariableRowItem : Variable {
 
     public VariableRowItem(string name, RowItem? value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _row = value;
 
-    public VariableRowItem(string name) : this(name, null, true, false, string.Empty) { }
-
     public VariableRowItem(RowItem? value) : this(DummyName(), value, true, false, string.Empty) { }
+
+    public VariableRowItem(string name) : this(name, null, true, false, string.Empty) { }
 
     #endregion
 
@@ -53,7 +53,7 @@ public class VariableRowItem : Variable {
 
     public RowItem? RowItem {
         get => _row;
-        set {
+        private set {
             if (ReadOnly) { return; }
             _row = value;
         }

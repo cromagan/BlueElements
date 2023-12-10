@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
+using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics.Enums;
 
@@ -25,27 +25,31 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static Point NearestCornerOf(this Rectangle r, Point p) {
-        var lo = r.PointOf(Alignment.Top_Left);
-        var rO = r.PointOf(Alignment.Top_Right);
-        var ru = r.PointOf(Alignment.Bottom_Right);
-        var lu = r.PointOf(Alignment.Bottom_Left);
-        var llo = Geometry.GetLenght(p, lo);
-        var lro = Geometry.GetLenght(p, rO);
-        var llu = Geometry.GetLenght(p, lu);
-        var lru = Geometry.GetLenght(p, ru);
-        var erg = Math.Min(Math.Min(llo, lro), Math.Min(llu, lru));
-        if (Math.Abs(erg - llo) < 0.001) {
-            return lo;
-        } else if (Math.Abs(erg - lro) < 0.001) {
-            return rO;
-        } else if (Math.Abs(erg - llu) < 0.001) {
-            return lu;
-        } else if (Math.Abs(erg - lru) < 0.001) {
-            return ru;
-        } else {
-            return Point.Empty;
+    public static PointF NearestCornerOf(this Rectangle r, Point p) {
+        var pl = new List<Point>
+        {
+            r.PointOf(Alignment.Top_Left),
+            r.PointOf(Alignment.Top_Right),
+            r.PointOf(Alignment.Bottom_Right),
+            r.PointOf(Alignment.Bottom_Left)
+        };
+        return p.NearestPoint(pl);
+    }
+
+    public static Point NearestPoint(this Point p, List<Point> pl) {
+        if (pl.Count == 0) { return Point.Empty; }
+        var minl = float.MaxValue;
+        var rp = Point.Empty;
+
+        foreach (var thisP in pl) {
+            var l = Geometry.GetLenght(p, thisP);
+            if (l > minl) { continue; }
+
+            minl = l;
+            rp = thisP;
         }
+
+        return rp;
     }
 
     public static Point PointOf(this Rectangle r, Alignment p) {

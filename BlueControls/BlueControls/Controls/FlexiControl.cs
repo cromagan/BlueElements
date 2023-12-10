@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -28,6 +28,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
+using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
@@ -57,44 +58,28 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// </summary>
     protected DateTime? LastTextChange;
 
-    private readonly bool _translateCaption = true;
-
     private AdditionalCheck _additionalCheck = AdditionalCheck.None;
-
     private string _allowedChars = string.Empty;
-
     private bool _alwaysInstantChange;
-
     private string _caption = string.Empty;
-
     private Caption? _captionObject;
-
     private ÜberschriftAnordnung _captionPosition = ÜberschriftAnordnung.ohne;
 
     // None ist -1 und muss gesetzt sein!
     private int _controlX = -1;
 
     private string _disabledReason = string.Empty;
-
     private EditTypeFormula _editType;
-
     private bool _formatierungErlaubt;
-
     private Caption? _infoCaption;
-
     private string _infoText = string.Empty;
-
     private int _maxTextLenght = 4000;
-
     private bool _multiLine;
-
     private string _regex = string.Empty;
-
     private bool _showInfoWhenDisabled;
-
     private bool _spellChecking;
-
     private string _suffix = string.Empty;
+    private bool _translateCaption = true;
 
     #endregion
 
@@ -118,7 +103,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         _caption = captionText;
         _captionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
 
-        var s = Extended_Text.ExtText.MeasureString(_caption, Design.Caption, States.Standard, width);
+        var s = ExtText.MeasureString(_caption, Design.Caption, States.Standard, width);
 
         //var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(Design.Caption, States.Standard).Font());
         Size = new Size(s.Width + 2, s.Height + 2);
@@ -132,6 +117,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     [Obsolete("Value Changed benutzen", true)]
     public new event EventHandler? TextChanged;
+
+#pragma warning restore CS0067
 
     //public event EventHandler? NeedRefresh;
     public event EventHandler? ValueChanged;
@@ -210,8 +197,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public string DisabledReason {
         get => _disabledReason;
         set {
-            //if (value == null) { value = string.Empty; }
-            if (_disabledReason == null && string.IsNullOrEmpty(value)) { return; }
             if (_disabledReason == value) { return; }
             _disabledReason = value;
             foreach (Control thisControl in Controls) {
@@ -294,8 +279,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    public string OriginalText { get; set; } = string.Empty;
-
     [Browsable(false)]
     [DefaultValue("")]
     public string Prefix { get; set; } = string.Empty;
@@ -354,11 +337,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public new string Text { get; set; } = string.Empty;
 
     [DefaultValue(true)]
-    bool ITranslateable.Translate {
+    public bool Translate {
         get => _translateCaption;
         set {
             if (_translateCaption == value) { return; }
-            if (_captionObject is Caption c) { c.Translate = _translateCaption; }
+            _translateCaption = value;
+
+            UpdateControls();
         }
     }
 
@@ -374,8 +359,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     #endregion
 
     #region Methods
-
-    public void DeleteValue() => ValueSet(string.Empty, true, true);
 
     public void ValueSet(string? newvalue, bool updateControls, bool doInstantChangedValue) {
         if (IsDisposed) { return; }
@@ -517,11 +500,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (!string.IsNullOrEmpty(_disabledReason)) {
             DoInfoTextCaption(_disabledReason);
         } else {
-            if (state.HasFlag(States.Standard_Disabled)) {
-                DoInfoTextCaption("Übergeordnetes Steuerlement ist deaktiviert.");
-            } else {
-                DoInfoTextCaption(string.Empty);
-            }
+            DoInfoTextCaption(state.HasFlag(States.Standard_Disabled) ? "Übergeordnetes Steuerlement ist deaktiviert." : string.Empty);
         }
     }
 
@@ -863,7 +842,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _captionObject.Text = _caption;
         }
 
-        _captionObject.Size = Extended_Text.ExtText.MeasureString(_captionObject.Text, Design.Caption, States.Standard, 500);//  _captionObject.TextRequiredSize();
+        _captionObject.Size = ExtText.MeasureString(_captionObject.Text, Design.Caption, States.Standard, 500);//  _captionObject.TextRequiredSize();
         _captionObject.Left = 0;
         _captionObject.Top = 0;
         _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -1065,6 +1044,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private void TextEditControl_LostFocus(object sender, System.EventArgs e) => RaiseEventIfChanged();
 
     private void UpdateControls() {
+        if (_captionObject is Caption c) { c.Translate = _translateCaption; }
+
         foreach (Control control in Controls) {
             if (control != _infoCaption) {
                 if (control is GenericControl qi) { qi.QuickInfo = QuickInfo; }

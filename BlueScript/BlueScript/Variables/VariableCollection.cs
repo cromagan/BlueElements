@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -171,15 +171,13 @@ public class VariableCollection : IEnumerable<Variable> {
         return f;
     }
 
-    public List<string> AllNames() => _internal != null ? _internal.Select(thisvar => thisvar.KeyName).ToList() : new List<string>();
-
     public List<string> AllStringableNames() {
         var l = new List<string>();
-        if (_internal != null) {
-            foreach (var thisvar in _internal) {
-                if (thisvar.ToStringPossible) { l.Add(thisvar.KeyName); }
-            }
+
+        foreach (var thisvar in _internal) {
+            if (thisvar.ToStringPossible) { l.Add(thisvar.KeyName); }
         }
+
         return l;
     }
 
@@ -189,11 +187,11 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <returns></returns>
     public List<string> AllStringValues() {
         var l = new List<string>();
-        if (_internal != null) {
-            foreach (var thisvar in _internal) {
-                if (thisvar is VariableString vs) { l.Add(vs.ValueString); }
-            }
+
+        foreach (var thisvar in _internal) {
+            if (thisvar is VariableString vs) { l.Add(vs.ValueString); }
         }
+
         return l;
     }
 
@@ -206,62 +204,13 @@ public class VariableCollection : IEnumerable<Variable> {
             !thisv.SystemVariable && string.Equals(thisv.KeyName, name, StringComparison.OrdinalIgnoreCase));
     }
 
-    /// <summary>
-    /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
-    /// </summary>
-    /// <param name="vars"></param>
-    /// <param name="name"></param>
-    /// <returns></returns>
-    public bool GetBool(string name) {
-        var v = _internal.Get(name);
-
-        if (v is not VariableBool vf) {
-            Develop.DebugPrint("Falscher Datentyp");
-            return false;
-        }
-
-        return vf.ValueBool;
-    }
-
-    /// <summary>
-    /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
-    /// </summary>
-    /// <param name="name"></param>
-    public double GetDouble(string name) {
-        var v = _internal.Get(name);
-
-        if (v is not VariableFloat vf) {
-            Develop.DebugPrint("Falscher Datentyp");
-            return 0f;
-        }
-
-        return vf.ValueNum;
-    }
-
     public IEnumerator<Variable> GetEnumerator() => _internal.GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => IEnumerable_GetEnumerator();
 
     /// <summary>
-    /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten 0
-    /// </summary>
-    /// <param name="vars"></param>
-    /// <param name="name"></param>
-    public int GetInt(string name) {
-        var v = _internal.Get(name);
-
-        if (v is not VariableFloat vf) {
-            Develop.DebugPrint("Falscher Datentyp");
-            return 0;
-        }
-
-        return (int)vf.ValueNum;
-    }
-
-    /// <summary>
     /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten eine leere Liste
     /// </summary>
-    /// <param name="vars"></param>
     /// <param name="name"></param>
     public List<string> GetList(string name) {
         var v = _internal.Get(name);
@@ -278,7 +227,6 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <summary>
     /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
     /// </summary>
-    /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <returns></returns>
     public string GetString(string name) {
@@ -354,7 +302,6 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <summary>
     /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
     /// </summary>
-    /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <param name="value"></param>
     public bool Set(string name, double value) {
@@ -380,7 +327,6 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <summary>
     /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
     /// </summary>
-    /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <param name="value"></param>
     public bool Set(string name, List<string> value) {
@@ -406,7 +352,6 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <summary>
     /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
     /// </summary>
-    /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <param name="value"></param>
     public bool Set(string name, bool value) {

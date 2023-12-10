@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -28,19 +27,10 @@ public static partial class Extensions {
     #region Methods
 
     public static List<string> SortedDistinctList(this IEnumerable<string>? arr) {
-        if (arr == null || !arr.Any()) { return new(); }
+        if (arr == null) { return new(); }
 
         var arr2 = arr.Distinct().ToList();
-        if (arr2.Contains(string.Empty)) { _ = arr2.Remove(string.Empty); }
-        arr2.Sort();
-        return arr2;
-    }
-
-    public static List<T> SortedDistinctList<T>(this IEnumerable<T> arr) where T : IComparable {
-        if (!arr.Any()) { return new List<T>(); }
-
-        var arr2 = arr.Distinct().ToList();
-        //if (arr2.Contains(null)) { _ = arr2.Remove(null); }
+        _ = arr2.Remove(string.Empty);
         arr2.Sort();
         return arr2;
     }

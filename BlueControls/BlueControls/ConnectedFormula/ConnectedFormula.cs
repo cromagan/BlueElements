@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
+using System.Globalization;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -32,28 +33,25 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using BlueScript;
+using BlueScript.Enums;
+using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
-using BlueScript.Structures;
-using BlueScript.Enums;
-using BlueScript;
 using static BlueBasics.Generic;
-using System.Globalization;
 
 namespace BlueControls.ConnectedFormula;
 
-public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyName, ICanDropMessages {
+public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyName, ICanDropMessages {
 
     #region Fields
 
+    public const float StandardHöhe = 1.75f;
     public const string Version = "0.30";
 
     public static readonly ObservableCollection<ConnectedFormula> AllFiles = new();
-
-    public static readonly float StandardHöhe = 1.75f;
-
     private readonly List<string> _databaseFiles = new();
 
     private readonly List<FormulaScriptDescription> _eventScript = new();
@@ -136,7 +134,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
     #region Properties
 
     [DefaultValue(true)]
-    public bool DropMessages { get; set; } = true;
+    public bool DropMessages => true;
 
     public ReadOnlyCollection<FormulaScriptDescription> EventScript {
         get => new(_eventScript);
@@ -448,9 +446,7 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
         return p;
 
-        RectangleF PositioOf(int no) {
-            return new RectangleF(newX[no], newY[no], newW[no], newH[no]);
-        }
+        RectangleF PositioOf(int no) => new(newX[no], newY[no], newW[no], newH[no]);
     }
 
     public static List<(IAutosizable item, RectangleF newpos)> ResizeControls(ItemCollectionPad.ItemCollectionPad padData, float newWidthPixel, float newhHeightPixel, string page) {
@@ -491,6 +487,8 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
             if (names.Contains(thissc.KeyName, false)) {
                 return "Skriptname '" + thissc.KeyName + "' mehrfach vorhanden";
             }
+
+            names.Add(thissc.KeyName);
         }
 
         var l = EventScript;
@@ -800,7 +798,27 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
 
     internal void SaveAsAndChangeTo(string fileName) => _muf?.SaveAsAndChangeTo(fileName);
 
-    protected virtual void Dispose(bool disposing) {
+    private void _muf_Saving(object sender, CancelEventArgs e) {
+        if (e.Cancel) { return; }
+
+        e.Cancel = IntParse(_loadedVersion.Replace(".", string.Empty)) > IntParse(Version.Replace(".", string.Empty));
+
+        //return IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))
+        //    ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
+        //    : string.Empty;
+    }
+
+    private void DatabaseFiles_Changed() {
+        if (_saving || (_muf?.IsLoading ?? true)) { return; }
+
+        foreach (var thisfile in _databaseFiles) {
+            _ = DatabaseAbstract.GetById(new ConnectionInfo(thisfile, null, string.Empty), false, null, true);
+        }
+
+        _saved = false;
+    }
+
+    private void Dispose(bool disposing) {
         if (!IsDisposed) {
             _ = AllFiles.Remove(this);
             if (disposing) {
@@ -816,7 +834,36 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
         }
     }
 
-    protected void ParseExternal(object sender, MultiUserParseEventArgs e) {
+    private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
+
+    //private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
+    //    if (_saving || (_muf?.IsLoading ?? true)) { return; }
+    //    _saved = false;
+    //}
+    private void OnLoaded(object sender, System.EventArgs e) {
+        Repair();
+
+        Loaded?.Invoke(this, e);
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null);
+    }
+
+    private void OnLoading(object sender, System.EventArgs e) => Loading?.Invoke(this, e);
+
+    private void OnSavedToDisk(object sender, System.EventArgs e) {
+        _saved = true;
+        _loadedVersion = Version;
+        SavedToDisk?.Invoke(this, e);
+    }
+
+    private void PadData_Changed(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        if (_saving || (_muf?.IsLoading ?? true)) { return; }
+
+        _saved = false;
+        OnChanged();
+    }
+
+    private void ParseExternal(object sender, MultiUserParseEventArgs e) {
         var toParse = e.Data.ToStringWin1252();
         if (string.IsNullOrEmpty(toParse)) { return; }
 
@@ -884,55 +931,6 @@ public class ConnectedFormula : IChangedFeedback, IDisposableExtended, IHasKeyNa
                     break;
             }
         }
-    }
-
-    private void _muf_Saving(object sender, CancelEventArgs e) {
-        if (e.Cancel) { return; }
-
-        e.Cancel = IntParse(_loadedVersion.Replace(".", string.Empty)) > IntParse(Version.Replace(".", string.Empty));
-
-        //return IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))
-        //    ? "Diese Programm kann nur Datenbanken bis Version " + DatabaseVersion + " speichern."
-        //    : string.Empty;
-    }
-
-    private void DatabaseFiles_Changed() {
-        if (_saving || (_muf?.IsLoading ?? true)) { return; }
-
-        foreach (var thisfile in _databaseFiles) {
-            _ = DatabaseAbstract.GetById(new ConnectionInfo(thisfile, null, string.Empty), false, null, true);
-        }
-
-        _saved = false;
-    }
-
-    private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
-
-    //private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
-    //    if (_saving || (_muf?.IsLoading ?? true)) { return; }
-    //    _saved = false;
-    //}
-    private void OnLoaded(object sender, System.EventArgs e) {
-        Repair();
-
-        Loaded?.Invoke(this, e);
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null);
-    }
-
-    private void OnLoading(object sender, System.EventArgs e) => Loading?.Invoke(this, e);
-
-    private void OnSavedToDisk(object sender, System.EventArgs e) {
-        _saved = true;
-        _loadedVersion = Version;
-        SavedToDisk?.Invoke(this, e);
-    }
-
-    private void PadData_Changed(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        if (_saving || (_muf?.IsLoading ?? true)) { return; }
-
-        _saved = false;
-        OnChanged();
     }
 
     private void ToListOfByte(object sender, MultiUserToListEventArgs e) {

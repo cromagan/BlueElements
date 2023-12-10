@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -98,7 +98,7 @@ public partial class PictureView : Form, IDisposableExtended {
 
     protected void LoadPic(int nr) {
         _nr = nr;
-        if (_fileList != null && nr < _fileList.Count && nr > -1) {
+        if (nr < _fileList.Count && nr > -1) {
             try {
                 Pad.Bmp = Image_FromFile(_fileList[nr]) as Bitmap;
             } catch (Exception ex) {
@@ -109,7 +109,7 @@ public partial class PictureView : Form, IDisposableExtended {
             Pad.Bmp = null;
         }
 
-        if (_fileList == null || _fileList.Count < 2) {
+        if (_fileList.Count < 2) {
             grpSeiten.Visible = false;
             grpSeiten.Enabled = false;
             btnZurueck.Enabled = false;
@@ -127,7 +127,7 @@ public partial class PictureView : Form, IDisposableExtended {
     private void btnTopMost_CheckedChanged(object sender, System.EventArgs e) => TopMost = btnTopMost.Checked;
 
     private void btnVor_Click(object sender, System.EventArgs e) {
-        if (_fileList == null || _fileList.Count < 2) { return; }
+        if (_fileList.Count < 2) { return; }
         _nr++;
         if (_nr >= _fileList.Count) { _nr = _fileList.Count - 1; }
         LoadPic(_nr);
@@ -136,7 +136,7 @@ public partial class PictureView : Form, IDisposableExtended {
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 
     private void btnZurueck_Click(object sender, System.EventArgs e) {
-        if (_fileList == null || _fileList.Count < 2) { return; }
+        if (_fileList.Count < 2) { return; }
         _nr--;
         if (_nr <= 0) { _nr = 0; }
         LoadPic(_nr);

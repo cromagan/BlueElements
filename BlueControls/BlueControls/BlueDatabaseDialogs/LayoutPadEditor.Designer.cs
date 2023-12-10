@@ -2,10 +2,10 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
+using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueDatabase.Enums;
 using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
@@ -71,7 +71,7 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // btnLastFiles
             // 
-            this.btnLastFiles.AdditionalFormatCheck = BlueBasics.Enums.AdditionalCheck.None;
+            this.btnLastFiles.AdditionalFormatCheck = AdditionalCheck.None;
             this.btnLastFiles.Location = new Point(200, 2);
             this.btnLastFiles.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
             this.btnLastFiles.Visible = false;

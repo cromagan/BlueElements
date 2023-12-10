@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -38,7 +38,7 @@ public abstract class Method_WebPage : Method {
     #region Methods
 
     public static bool AllImagesLoaded(ChromiumWebBrowser wb) {
-        JavascriptResponse response = wb.EvaluateScriptAsync("document.readyState === 'complete'").GetAwaiter().GetResult();
+        var response = wb.EvaluateScriptAsync("document.readyState === 'complete'").GetAwaiter().GetResult();
 
         if (response.Success && response.Result is bool allImagesLoaded && allImagesLoaded) {
             return true;

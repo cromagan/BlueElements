@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -198,29 +198,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         } while (true);
     }
 
-    public static List<string>? SplitAttributeToString(string attributtext) {
-        if (string.IsNullOrEmpty(attributtext)) { return null; }
-        List<string> attributes = new();
-
-        #region Liste der Attribute splitten
-
-        var posc = 0;
-        do {
-            var (pos, _) = NextText(attributtext, posc, Komma, false, false, KlammernStd);
-            if (pos < 0) {
-                attributes.Add(attributtext.Substring(posc).DeKlammere(true, false, false, true));
-                break;
-            }
-            attributes.Add(attributtext.Substring(posc, pos - posc).DeKlammere(true, false, false, true));
-            posc = pos + 1;
-        } while (true);
-
-        #endregion Liste der Attribute splitten
-
-        return attributes;
-    }
-
-    public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection varcol, string attributText, List<List<string>> types, bool endlessArgs, LogData ld, ScriptProperties scp) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection? varcol, string attributText, List<List<string>> types, bool endlessArgs, LogData? ld, ScriptProperties scp) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
                 ? new SplittedAttributesFeedback(new VariableCollection())
@@ -337,6 +315,112 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return new DoItFeedback(infos.Data, "Interner Fehler");
     }
 
+    public CanDoFeedback CanDo(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
+        if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns)) {
+            return new CanDoFeedback(pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
+        }
+        if (expectedvariablefeedback && string.IsNullOrEmpty(Returns)) {
+            return new CanDoFeedback(pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
+        }
+        var maxl = scriptText.Length;
+
+        var commandtext = Command + StartSequence;
+        var l = commandtext.Length;
+        if (pos + l < maxl) {
+            if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
+                var f = GetEnd(scriptText, pos + Command.Length, StartSequence.Length, EndSequence, ld);
+                if (!f.AllOk) {
+                    return new CanDoFeedback(f.ContinuePosition, "Fehler bei " + commandtext, true, ld);
+                }
+                var cont = f.ContinuePosition;
+                var codebltxt = string.Empty;
+                if (GetCodeBlockAfter) {
+                    var (codeblock, errorreason) = GetCodeBlockText(scriptText, cont);
+                    if (!string.IsNullOrEmpty(errorreason)) { return new CanDoFeedback(f.ContinuePosition, errorreason, true, ld); }
+                    codebltxt = codeblock;
+                    cont = cont + codebltxt.Length + 2;
+                }
+
+                if (!scp.AllowedMethods.HasFlag(MethodType)) {
+                    return new CanDoFeedback(pos, "Befehl '" + Syntax + "' kann in diesem Skript nicht benutzt werden.", true, ld);
+                }
+
+                return new CanDoFeedback(cont, f.AttributeText, codebltxt, ld);
+            }
+        }
+
+        return new CanDoFeedback(pos, "Kann nicht geparst werden", false, ld);
+    }
+
+    //        //if (s != null) { line += lb; }
+    //    }
+    //    return new SplittedAttributesFeedback(feedbackVariables);
+    //}
+    public abstract DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp);
+
+    //        feedbackVariables.Add(v);
+    public string HintText() {
+        var co = "Syntax:\r\n";
+        co += "~~~~~~\r\n";
+        co = co + Syntax + "\r\n";
+        co += "\r\n";
+        co += "Argumente:\r\n";
+        co += "~~~~~~~~~~\r\n";
+        for (var z = 0; z < Args.Count; z++) {
+            co = co + "  - Argument " + (z + 1) + ": " + Args[z].JoinWith(", ");
+            if (z == Args.Count - 1 && EndlessArgs) {
+                co += " -> Dieses Argument kann beliebig oft wiederholt werden";
+            }
+            co += "\r\n";
+        }
+        co += "\r\n";
+        co += "Rückgabe:\r\n";
+        co += "~~~~~~~~~\r\n";
+        co = co + "  - Rückgabetyp: " + Returns + "\r\n";
+        co += "\r\n";
+        co += "Beschreibung:\r\n";
+        co += "~~~~~~~~~~~~\r\n";
+        co = co + Description + "\r\n";
+        return co;
+    }
+
+    //        if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId); }
+    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+
+    //        foreach (var thisAt in exceptetType) {
+    //            if (thisAt.TrimStart("*") == v.MyClassId) { ok = true; break; }
+    //            if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
+    //        }
+    public string ReadableText() => Syntax;
+
+    //        // Den Typ der Variable checken
+    //        var ok = false;
+    public QuickImage? SymbolForReadableText() => null;
+
+    private static List<string>? SplitAttributeToString(string attributtext) {
+        if (string.IsNullOrEmpty(attributtext)) { return null; }
+        List<string> attributes = new();
+
+        #region Liste der Attribute splitten
+
+        var posc = 0;
+        do {
+            var (pos, _) = NextText(attributtext, posc, Komma, false, false, KlammernStd);
+            if (pos < 0) {
+                attributes.Add(attributtext.Substring(posc).DeKlammere(true, false, false, true));
+                break;
+            }
+            attributes.Add(attributtext.Substring(posc, pos - posc).DeKlammere(true, false, false, true));
+            posc = pos + 1;
+        } while (true);
+
+        #endregion Liste der Attribute splitten
+
+        return attributes;
+    }
+
+    #endregion
+
     //public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection varcol, ScriptProperties scp, CanDoFeedback infos, List<List<string>> types, bool endlessArgs) {
     //    if (types.Count == 0) {
     //        return string.IsNullOrEmpty(infos.AttributText)
@@ -372,93 +456,4 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     //            if (tmp2.Variable == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Berechnungsfehler bei Attribut " + (n + 1)); }
     //            v = tmp2.Variable;
     //        }
-
-    //        // Den Typ der Variable checken
-    //        var ok = false;
-
-    //        foreach (var thisAt in exceptetType) {
-    //            if (thisAt.TrimStart("*") == v.MyClassId) { ok = true; break; }
-    //            if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
-    //        }
-
-    //        if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId); }
-
-    //        feedbackVariables.Add(v);
-
-    //        //if (s != null) { line += lb; }
-    //    }
-    //    return new SplittedAttributesFeedback(feedbackVariables);
-    //}
-
-    public CanDoFeedback CanDo(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
-        if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns)) {
-            return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
-        }
-        if (expectedvariablefeedback && string.IsNullOrEmpty(Returns)) {
-            return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
-        }
-        var maxl = scriptText.Length;
-
-        var commandtext = Command + StartSequence;
-        var l = commandtext.Length;
-        if (pos + l < maxl) {
-            if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
-                var f = GetEnd(scriptText, pos + Command.Length, StartSequence.Length, EndSequence, ld);
-                if (!f.AllOk) {
-                    return new CanDoFeedback(scriptText, f.ContinuePosition, "Fehler bei " + commandtext, true, ld);
-                }
-                var cont = f.ContinuePosition;
-                var codebltxt = string.Empty;
-                if (GetCodeBlockAfter) {
-                    var (codeblock, errorreason) = GetCodeBlockText(scriptText, cont);
-                    if (!string.IsNullOrEmpty(errorreason)) { return new CanDoFeedback(scriptText, f.ContinuePosition, errorreason, true, ld); }
-                    codebltxt = codeblock;
-                    cont = cont + codebltxt.Length + 2;
-                }
-
-                if (!scp.AllowedMethods.HasFlag(MethodType)) {
-                    return new CanDoFeedback(scriptText, pos, "Befehl '" + Syntax + "' kann in diesem Skript nicht benutzt werden.", true, ld);
-                }
-
-                return new CanDoFeedback(scriptText, cont, commandtext, f.AttributeText, codebltxt, ld);
-            }
-        }
-
-        return new CanDoFeedback(scriptText, pos, "Kann nicht geparst werden", false, ld);
-    }
-
-    public abstract DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp);
-
-    public string HintText() {
-        var co = "Syntax:\r\n";
-        co += "~~~~~~\r\n";
-        co = co + Syntax + "\r\n";
-        co += "\r\n";
-        co += "Argumente:\r\n";
-        co += "~~~~~~~~~~\r\n";
-        for (var z = 0; z < Args.Count; z++) {
-            co = co + "  - Argument " + (z + 1) + ": " + Args[z].JoinWith(", ");
-            if (z == Args.Count - 1 && EndlessArgs) {
-                co += " -> Dieses Argument kann beliebig oft wiederholt werden";
-            }
-            co += "\r\n";
-        }
-        co += "\r\n";
-        co += "Rückgabe:\r\n";
-        co += "~~~~~~~~~\r\n";
-        co = co + "  - Rückgabetyp: " + Returns + "\r\n";
-        co += "\r\n";
-        co += "Beschreibung:\r\n";
-        co += "~~~~~~~~~~~~\r\n";
-        co = co + Description + "\r\n";
-        return co;
-    }
-
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
-
-    public string ReadableText() => Syntax;
-
-    public QuickImage? SymbolForReadableText() => null;
-
-    #endregion
 }

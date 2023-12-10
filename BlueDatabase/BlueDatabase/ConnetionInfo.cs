@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -66,7 +66,7 @@ public class ConnectionInfo : IReadableTextWithKey {
 
             TableName = MakeValidTableName(uniqueId.FileNameWithoutSuffix());
             Provider = null;
-            DatabaseId = preveredFileFormatId ?? DatabaseMU.DatabaseId;
+            DatabaseId = preveredFileFormatId ?? DatabaseMu.DatabaseId;
             AdditionalData = uniqueId;
             MustBeFreezed = mustbefreezed;
 
@@ -94,7 +94,7 @@ public class ConnectionInfo : IReadableTextWithKey {
         foreach (var thisDb in alf) {
             //var d = thisDB.ConnectionData;
 
-            if (thisDb.ConnectionDataOfOtherTable(x[0], true, mustbefreezed) is ConnectionInfo nci) {
+            if (thisDb.ConnectionDataOfOtherTable(x[0], true) is ConnectionInfo nci) {
                 TableName = nci.TableName;
                 Provider = nci.Provider;
                 DatabaseId = nci.DatabaseId;
@@ -106,10 +106,10 @@ public class ConnectionInfo : IReadableTextWithKey {
         #endregion
     }
 
-    public ConnectionInfo(string tablename, DatabaseAbstract? provider, string databaseID, string additionalInfo, string mustbefreezed) {
+    public ConnectionInfo(string tablename, DatabaseAbstract? provider, string databaseId, string additionalInfo, string mustbefreezed) {
         TableName = tablename.ToUpper();
         Provider = provider;
-        DatabaseId = databaseID;
+        DatabaseId = databaseId;
         AdditionalData = additionalInfo;
         MustBeFreezed = mustbefreezed;
     }
@@ -124,7 +124,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// z.B. wenn ein Dateiname oder sowas mitgegeben werden soll.
     /// Ist nur wichtig für von DatabaseAbstract abgeleiten Klassen und nur diese können damit umgehen.
     /// </summary>
-    public string AdditionalData { get; set; } = string.Empty;
+    public string AdditionalData { get; } = string.Empty;
 
     /// <summary>
     /// Eine Kennung, die von von DatabaseAbstract abgeleiten Klassen erkannt werden kann.
@@ -146,7 +146,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// </summary>
     public string TableName {
         get => _tablename;
-        set {
+        private set {
             if (!IsValidTableName(value, false)) {
                 Develop.DebugPrint(FehlerArt.Fehler, "Tabellenname ungültig: " + value);
             }

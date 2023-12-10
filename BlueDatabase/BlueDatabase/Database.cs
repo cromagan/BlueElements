@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -74,77 +74,6 @@ public class Database : DatabaseAbstract {
         return db;
     }
 
-    // Dateibasierte Systeme haben immer den Undo-Speicher
-    public static void SaveToByteList(ColumnItem c, ref List<byte> l) {
-        if (c.Database is not DatabaseAbstract db) { return; }
-
-        var name = c.KeyName;
-
-        SaveToByteList(l, DatabaseDataType.ColumnName, c.KeyName, name);
-        SaveToByteList(l, DatabaseDataType.ColumnCaption, c.Caption, name);
-        SaveToByteList(l, DatabaseDataType.ColumnFormat, ((int)c.Format).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup1, c.CaptionGroup1, name);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup2, c.CaptionGroup2, name);
-        SaveToByteList(l, DatabaseDataType.CaptionGroup3, c.CaptionGroup3, name);
-        SaveToByteList(l, DatabaseDataType.MultiLine, c.MultiLine.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.CellInitValue, c.CellInitValue, name);
-        SaveToByteList(l, DatabaseDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.RoundAfterEdit, c.RoundAfterEdit.ToString(), name);
-        SaveToByteList(l, DatabaseDataType.MaxCellLenght, c.MaxCellLenght.ToString(), name);
-        SaveToByteList(l, DatabaseDataType.FixedColumnWidth, c.FixedColumnWidth.ToString(), name);
-        SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, c.AutoRemove, name);
-        //SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)c.FilterOptions).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.AutoFilterJoker, c.AutoFilterJoker, name);
-        SaveToByteList(l, DatabaseDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.EditableWithTextInput, c.TextBearbeitungErlaubt.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.ShowMultiLineInOneLine, c.ShowMultiLineInOneLine.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.TextFormatingAllowed, c.FormatierungErlaubt.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.ForeColor, c.ForeColor.ToArgb().ToString(), name);
-        SaveToByteList(l, DatabaseDataType.BackColor, c.BackColor.ToArgb().ToString(), name);
-        SaveToByteList(l, DatabaseDataType.LineStyleLeft, ((int)c.LineLeft).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.LineStyleRight, ((int)c.LineRight).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.EditableWithDropdown, c.DropdownBearbeitungErlaubt.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.DropDownItems, c.DropDownItems.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.OpticalTextReplace, c.OpticalReplace.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.RegexCheck, c.Regex, name);
-        SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, c.DropdownAllesAbwählenErlaubt.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.Quickinfo, name);
-        SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, name);
-        //SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
-        SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
-        SaveToByteList(l, DatabaseDataType.AllowedChars, c.AllowedChars, name);
-        SaveToByteList(l, DatabaseDataType.MaxTextLenght, c.MaxTextLenght.ToString(), name);
-        SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.ColumnTags, c.Tags.JoinWithCr(), name);
-        SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
-        SaveToByteList(l, DatabaseDataType.Suffix, c.Suffix, name);
-        SaveToByteList(l, DatabaseDataType.LinkedDatabase, c.LinkedDatabaseTableName, name);
-        SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, c.ConstantHeightOfImageCode, name);
-        SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)c.BehaviorOfImageAndText).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.ScriptType, ((int)c.ScriptType).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.Prefix, c.Prefix, name);
-        //SaveToByteList(l, DatabaseDataType.KeyColumnKey, column.KeyColumnKey.ToString(false), key);
-        SaveToByteList(l, DatabaseDataType.ColumnNameOfLinkedDatabase, c.LinkedCell_ColumnNameOfLinkedDatabase, name);
-        //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, column.VorschlagsColumn.ToString(false), key);
-        SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), name);
-        SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
-        //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
-
-        foreach (var thisR in db.Row) {
-            SaveToByteList(l, c, thisR);
-        }
-    }
-
     public static bool SaveToFile(DatabaseAbstract db, int minLen, string filn) {
         var bytes = ToListOfByte(db, minLen, db.FileStateUTCDate);
 
@@ -160,7 +89,7 @@ public class Database : DatabaseAbstract {
         return true;
     }
 
-    public static List<byte>? ToListOfByte(DatabaseAbstract db, int minLen, DateTime fileStateUTCDateToSave) {
+    public static List<byte>? ToListOfByte(DatabaseAbstract db, int minLen, DateTime fileStateUtcDateToSave) {
         try {
             var x = db.LastChange;
             List<byte> l = new();
@@ -179,7 +108,7 @@ public class Database : DatabaseAbstract {
             //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
             SaveToByteList(l, DatabaseDataType.Creator, db.Creator);
             SaveToByteList(l, DatabaseDataType.CreateDateUTC, db.CreateDate);
-            SaveToByteList(l, DatabaseDataType.FileStateUTCDate, fileStateUTCDateToSave.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture));
+            SaveToByteList(l, DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture));
             SaveToByteList(l, DatabaseDataType.Caption, db.Caption);
 
             SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
@@ -203,19 +132,15 @@ public class Database : DatabaseAbstract {
             SaveToByteList(l, db.Column);
             //Row.SaveToByteList(l);
             //SaveToByteList(l, db.Cell, db);
-            if (db.SortDefinition == null) {
-                // Ganz neue Datenbank
-                SaveToByteList(l, DatabaseDataType.SortDefinition, string.Empty);
-            } else {
-                SaveToByteList(l, DatabaseDataType.SortDefinition, db.SortDefinition.ToString());
-            }
+            // Ganz neue Datenbank
+            SaveToByteList(l, DatabaseDataType.SortDefinition, db.SortDefinition == null ? string.Empty : db.SortDefinition.ToString());
             //SaveToByteList(l, enDatabaseDataType.Rules_ALT, Rules.ToString(true));
             SaveToByteList(l, DatabaseDataType.ColumnArrangement, db.ColumnArrangements.ToString(false));
             //SaveToByteList(l, DatabaseDataType.Layouts, db.Layouts.JoinWithCr());
             //SaveToByteList(l, DatabaseDataType.AutoExport, db.Export.ToString(true));
 
             SaveToByteList(l, DatabaseDataType.EventScript, db.EventScript.ToString(true));
-            SaveToByteList(l, DatabaseDataType.EventScriptVersion, db.EventScriptVersion.ToString());
+            SaveToByteList(l, DatabaseDataType.EventScriptVersion, db.EventScriptVersion);
             SaveToByteList(l, DatabaseDataType.EventScriptErrorMessage, db.EventScriptErrorMessage);
             //SaveToByteList(l, DatabaseDataType.Events, db.Events.ToString(true));
             SaveToByteList(l, DatabaseDataType.DatabaseVariables, db.Variables.ToList().ToString(true));
@@ -237,7 +162,7 @@ public class Database : DatabaseAbstract {
                 }
             }
 
-            var undoCount = 5000;
+            const int undoCount = 5000;
             //SaveToByteList(l, DatabaseDataType.UndoCount, db.UndoCount.ToString());
             if (works2.Count > undoCount) { works2.RemoveRange(0, works2.Count - undoCount); }
             SaveToByteList(l, DatabaseDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
@@ -253,7 +178,7 @@ public class Database : DatabaseAbstract {
             return l;
         } catch {
             Develop.CheckStackForOverflow();
-            return ToListOfByte(db, minLen, fileStateUTCDateToSave);
+            return ToListOfByte(db, minLen, fileStateUtcDateToSave);
         }
     }
 
@@ -272,33 +197,7 @@ public class Database : DatabaseAbstract {
         return string.Empty;
     }
 
-    public override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, string mustBeFreezed) {
-        if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
-
-        if (allreadychecked != null) {
-            foreach (var thisa in allreadychecked) {
-                if (thisa is Database db) {
-                    if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
-                }
-            }
-        }
-
-        //if (ignorePath != null) {
-        //    foreach (var thisPf in ignorePath) {
-        //        if (Filename.FilePath().StartsWith(thisPf, StringComparison.OrdinalIgnoreCase)) { return null; }
-        //    }
-        //}
-
-        var nn = Directory.GetFiles(Filename.FilePath(), "*.bdb", SearchOption.AllDirectories);
-        var gb = new List<ConnectionInfo>();
-        foreach (var thisn in nn) {
-            var t = ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false, mustBeFreezed);
-            if (t != null) { gb.Add(t); }
-        }
-        return gb;
-    }
-
-    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists, string mustBeeFreezed) {
+    public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
         if (string.IsNullOrEmpty(Filename)) { return null; }
 
         var f = Filename.FilePath() + tableName.FileNameWithoutSuffix() + ".bdb";
@@ -364,8 +263,6 @@ public class Database : DatabaseAbstract {
         }
     }
 
-    public override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(IEnumerable<DatabaseAbstract> db, DateTime fromUTC, DateTime toUTC) => (new(), null);
-
     public virtual void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(FehlerArt.Fehler, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
@@ -400,9 +297,14 @@ public class Database : DatabaseAbstract {
 
         Parse(bLoaded, needPassword);
 
-        RepairAfterParse();
+        if (FileStateUTCDate.Year < 2000) {
+            FileStateUTCDate = new DateTime(2000, 1, 1);
+        }
         IsInCache = FileStateUTCDate;
-        CheckSysUndoNow(new List<DatabaseAbstract>() { this }, true);
+
+        RepairAfterParse();
+
+        CheckSysUndoNow(new List<DatabaseAbstract> { this }, true);
         if (ronly) { SetReadOnly(); }
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         OnLoaded();
@@ -423,7 +325,7 @@ public class Database : DatabaseAbstract {
             r.Close();
         }
 
-        if (bLoaded.isZipped()) { bLoaded = bLoaded.UnzipIt(); }
+        if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt() ?? bLoaded; }
         //if (bLoaded.Length > 4 && BitConverter.ToInt32(bLoaded, 0) == 67324752) {
         //    // Gezipte Daten-Kennung gefunden
         //    bLoaded = MultiUserFile.UnzipIt(bLoaded);
@@ -449,130 +351,6 @@ public class Database : DatabaseAbstract {
         return key;
     }
 
-    public void Parse(byte[] data, NeedPassword? needPassword) {
-        var pointer = 0;
-
-        ColumnItem? column = null;
-        RowItem? row = null;
-        var columnUsed = new List<ColumnItem>();
-
-        Undo.Clear();
-
-        do {
-            if (pointer >= data.Length) { break; }
-
-            var (i, command, value, columname, rowKey) = Parse(data, pointer);
-            pointer = i;
-
-            if (!command.IsObsolete()) {
-
-                #region Zeile suchen oder erstellen
-
-                if (!string.IsNullOrEmpty(rowKey)) {
-                    row = Row.SearchByKey(rowKey);
-                    if (row == null || row.IsDisposed) {
-                        _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.InitialLoad);
-                        row = Row.SearchByKey(rowKey);
-                    }
-                    if (row == null || row.IsDisposed) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
-                        Freeze("Zeile hinzufügen Fehler");
-                        return;
-                    }
-                    row.IsInCache = DateTime.UtcNow;
-                }
-
-                #endregion
-
-                #region Spalte suchen oder erstellen
-
-                //if (colKey > -1 && string.IsNullOrEmpty(columname)) {
-                //    column = db.Column.SearchByKey(colKey);
-                //    if (Column  ==null || Column .IsDisposed) {
-                //        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
-                //        _ = db.Column.SetValueInternal(DatabaseDataType.Command_AddColumnByKey, true, string.Empty);
-                //        column = db.Column.SearchByKey(colKey);
-                //    }
-                //    if (Column  ==null || Column .IsDisposed) {
-                //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
-                //        db.SetReadOnly();
-                //        return;
-                //    }
-                //    column.IsInCache = DateTime.UtcNow;
-                //    columnUsed.Add(column);
-                //}
-
-                if (!string.IsNullOrEmpty(columname)) {
-                    column = Column.Exists(columname);
-                    if (column == null || column.IsDisposed) {
-                        if (command != DatabaseDataType.ColumnName) { Develop.DebugPrint(command + " an erster Stelle!"); }
-                        _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.InitialLoad);
-                        column = Column.Exists(columname);
-                    }
-                    if (column == null || column.IsDisposed) {
-                        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
-                        Freeze("Spalte hinzufügen Fehler");
-                        return;
-                    }
-                    column.IsInCache = DateTime.UtcNow;
-                    columnUsed.Add(column);
-                }
-
-                #endregion
-
-                #region Bei verschlüsselten Datenbanken das Passwort abfragen
-
-                if (command == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
-                    var pwd = string.Empty;
-
-                    if (needPassword != null) { pwd = needPassword(); }
-                    if (pwd != value) {
-                        Freeze("Passwort falsch");
-                        break;
-                    }
-                }
-
-                #endregion
-
-                if (command == DatabaseDataType.EOF) { break; }
-
-                var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.InitialLoad);
-                if (!string.IsNullOrEmpty(fehler.Error)) {
-                    Freeze("Datenbank-Ladefehler");
-                    Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + fehler);
-                }
-            }
-        } while (true);
-
-        #region unbenutzte (gelöschte) Spalten entfernen
-
-        var l = new List<ColumnItem>();
-        foreach (var thisColumn in Column) {
-            l.Add(thisColumn);
-        }
-
-        foreach (var thisColumn in l) {
-            if (!columnUsed.Contains(thisColumn)) {
-                _ = Column.ExecuteCommand(DatabaseDataType.Command_RemoveColumn, column.KeyName, Reason.InitialLoad);
-                //_ = SetValueInternal(DatabaseDataType.Command_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload, UserName, DateTime.UtcNow, "Parsen");
-            }
-        }
-
-        #endregion
-
-        Row.RemoveNullOrEmpty();
-        Cell.RemoveOrphans();
-        //Works?.AddRange(oldPendings);
-        //oldPendings?.Clear();
-        //ExecutePending();
-
-        //if (db != null && db.Column.Count > 0 && string.IsNullOrEmpty(db.FirstColumn)) {
-        //    db.FirstColumn = Col
-        //}
-
-        if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))) { Freeze("Datenbankversions-Konflikt"); }
-    }
-
     public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns.Count == 0) { return; }
 
@@ -588,10 +366,11 @@ public class Database : DatabaseAbstract {
         }
     }
 
-    public override (bool didreload, string errormessage) RefreshRowData(IEnumerable<RowItem> row, bool refreshAlways) {
-        if (row == null || !row.Any()) { return (false, string.Empty); }
+    public override (bool didreload, string errormessage) RefreshRowData(IEnumerable<RowItem> row) {
+        var rowItems = row.ToList();
+        if (!rowItems.Any()) { return (false, string.Empty); }
 
-        foreach (var thisrow in row) {
+        foreach (var thisrow in rowItems) {
             thisrow.IsInCache = DateTime.UtcNow;
         }
         //var x = Row.DoLinkedDatabase(row);
@@ -616,7 +395,7 @@ public class Database : DatabaseAbstract {
         if (!HasPendingChanges) { return false; }
 
         _isInSave = true;
-        var v = SaveInternal(_fileStateUTCDate);
+        var v = SaveInternal(FileStateUTCDate);
         _isInSave = false;
         OnInvalidateView();
         return v;
@@ -630,7 +409,7 @@ public class Database : DatabaseAbstract {
 
         Filename = newFileName;
 
-        var l = ToListOfByte(this, 100, _fileStateUTCDate);
+        var l = ToListOfByte(this, 100, FileStateUTCDate);
 
         if (l == null) { return; }
 
@@ -641,68 +420,48 @@ public class Database : DatabaseAbstract {
         OnInvalidateView();
     }
 
-    internal static void SaveToByteList(List<byte> list, ColumnItem column, RowItem row) {
-        if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+    protected override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, string mustBeFreezed) {
+        if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
 
-        var cellContent = db.Cell.GetStringCore(column, row);
-        if (string.IsNullOrEmpty(cellContent)) { return; }
-
-        list.Add((byte)Routinen.CellFormatUTF8_V402);
-
-        var rowKeyByte = row.KeyName.UTF8_ToByte();
-        SaveToByteList(list, rowKeyByte.Length, 1);
-        list.AddRange(rowKeyByte);
-
-        var cellContentByte = cellContent.UTF8_ToByte();
-        SaveToByteList(list, cellContentByte.Length, 2);
-        list.AddRange(cellContentByte);
-    }
-
-    //public override void WaitEditable() => _muf.WaitEditable();
-    internal static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content, string columnname) {
-        list.Add((byte)Routinen.ColumnUTF8_V401);
-        list.Add((byte)databaseDataType);
-
-        var n = columnname.UTF8_ToByte();
-        SaveToByteList(list, n.Length, 1);
-        list.AddRange(n);
-
-        var b = content.UTF8_ToByte();
-        SaveToByteList(list, b.Length, 3);
-        list.AddRange(b);
-    }
-
-    internal static void SaveToByteList(List<byte> list, ColumnCollection c) {
-        //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString(false));
-        foreach (var columnitem in c) {
-            if (columnitem != null && !string.IsNullOrEmpty(columnitem.KeyName)) {
-                SaveToByteList(columnitem, ref list);
+        if (allreadychecked != null) {
+            foreach (var thisa in allreadychecked) {
+                if (thisa is Database db) {
+                    if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
+                }
             }
         }
+
+        //if (ignorePath != null) {
+        //    foreach (var thisPf in ignorePath) {
+        //        if (Filename.FilePath().StartsWith(thisPf, StringComparison.OrdinalIgnoreCase)) { return null; }
+        //    }
+        //}
+
+        var nn = Directory.GetFiles(Filename.FilePath(), "*.bdb", SearchOption.AllDirectories);
+        var gb = new List<ConnectionInfo>();
+        foreach (var thisn in nn) {
+            var t = ConnectionDataOfOtherTable(thisn.FileNameWithoutSuffix(), false);
+            if (t != null) { gb.Add(t); }
+        }
+        return gb;
     }
 
-    internal static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content) {
-        var b = content.UTF8_ToByte();
-        list.Add((byte)Routinen.DatenAllgemeinUTF8);
-        list.Add((byte)databaseDataType);
-        SaveToByteList(list, b.Length, 3);
-        list.AddRange(b);
-    }
-
-    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, List<string> cellschanged, DateTime starttimeUTC) {
+    protected override void DoWorkAfterLastChanges(List<string>? files, List<ColumnItem> columnsAdded, List<RowItem> rowsAdded, DateTime starttimeUtc) {
         foreach (var thisro in rowsAdded) { thisro.IsInCache = DateTime.UtcNow; }
         foreach (var thisco in columnsAdded) { thisco.IsInCache = DateTime.UtcNow; }
     }
 
-    protected override IEnumerable<DatabaseAbstract> LoadedDatabasesWithSameServer() => new List<DatabaseAbstract>() { this };
+    protected override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(ICollection<DatabaseAbstract> db, DateTime fromUtc, DateTime toUtc) => (new(), null);
 
-    protected bool SaveInternal(DateTime setfileStateUTCDateTo) {
+    protected override List<DatabaseAbstract> LoadedDatabasesWithSameServer() => new() { this };
+
+    protected bool SaveInternal(DateTime setfileStateUtcDateTo) {
         var m = EditableErrorReason(EditableErrorReasonType.Save);
         if (!string.IsNullOrEmpty(m)) { return false; }
 
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
-        var tmpFileName = WriteTempFileToDisk(setfileStateUTCDateTo);
+        var tmpFileName = WriteTempFileToDisk(setfileStateUtcDateTo);
 
         if (string.IsNullOrEmpty(tmpFileName)) { return false; }
 
@@ -723,7 +482,7 @@ public class Database : DatabaseAbstract {
         _ = MoveFile(tmpFileName, Filename, true);
 
         HasPendingChanges = false;
-        _fileStateUTCDate = setfileStateUTCDateTo;
+        FileStateUTCDate = setfileStateUtcDateTo;
         return true;
     }
 
@@ -751,8 +510,8 @@ public class Database : DatabaseAbstract {
     }
 
     private static (int pointer, DatabaseDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointer) {
-        string colName = string.Empty;
-        string rowKey = string.Empty;
+        var colName = string.Empty;
+        var rowKey = string.Empty;
         string value;
         DatabaseDataType type;
 
@@ -920,6 +679,125 @@ public class Database : DatabaseAbstract {
         return (pointer, type, value, colName, rowKey);
     }
 
+    // Dateibasierte Systeme haben immer den Undo-Speicher
+    private static void SaveToByteList(ColumnItem c, ref List<byte> l) {
+        if (c.Database is not DatabaseAbstract db) { return; }
+
+        var name = c.KeyName;
+
+        SaveToByteList(l, DatabaseDataType.ColumnName, c.KeyName, name);
+        SaveToByteList(l, DatabaseDataType.ColumnCaption, c.Caption, name);
+        SaveToByteList(l, DatabaseDataType.ColumnFormat, ((int)c.Format).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.CaptionGroup1, c.CaptionGroup1, name);
+        SaveToByteList(l, DatabaseDataType.CaptionGroup2, c.CaptionGroup2, name);
+        SaveToByteList(l, DatabaseDataType.CaptionGroup3, c.CaptionGroup3, name);
+        SaveToByteList(l, DatabaseDataType.MultiLine, c.MultiLine.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.CellInitValue, c.CellInitValue, name);
+        SaveToByteList(l, DatabaseDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.RoundAfterEdit, c.RoundAfterEdit.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.MaxCellLenght, c.MaxCellLenght.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.FixedColumnWidth, c.FixedColumnWidth.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.AutoRemoveCharAfterEdit, c.AutoRemove, name);
+        //SaveToByteList(l, DatabaseDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.FilterOptions, ((int)c.FilterOptions).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.AutoFilterJoker, c.AutoFilterJoker, name);
+        SaveToByteList(l, DatabaseDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.EditableWithTextInput, c.TextBearbeitungErlaubt.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.ShowMultiLineInOneLine, c.ShowMultiLineInOneLine.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.TextFormatingAllowed, c.FormatierungErlaubt.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.ForeColor, c.ForeColor.ToArgb().ToString(), name);
+        SaveToByteList(l, DatabaseDataType.BackColor, c.BackColor.ToArgb().ToString(), name);
+        SaveToByteList(l, DatabaseDataType.LineStyleLeft, ((int)c.LineLeft).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.LineStyleRight, ((int)c.LineRight).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.EditableWithDropdown, c.DropdownBearbeitungErlaubt.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.DropDownItems, c.DropDownItems.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.OpticalTextReplace, c.OpticalReplace.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.RegexCheck, c.Regex, name);
+        SaveToByteList(l, DatabaseDataType.DropdownDeselectAllAllowed, c.DropdownAllesAbwählenErlaubt.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.ShowValuesOfOtherCellsInDropdown, c.DropdownWerteAndererZellenAnzeigen.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.ColumnQuickInfo, c.Quickinfo, name);
+        SaveToByteList(l, DatabaseDataType.ColumnAdminInfo, c.AdminInfo, name);
+        //SaveToByteList(l, DatabaseDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
+        SaveToByteList(l, DatabaseDataType.AllowedChars, c.AllowedChars, name);
+        SaveToByteList(l, DatabaseDataType.MaxTextLenght, c.MaxTextLenght.ToString(), name);
+        SaveToByteList(l, DatabaseDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.ColumnTags, c.Tags.JoinWithCr(), name);
+        SaveToByteList(l, DatabaseDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
+        SaveToByteList(l, DatabaseDataType.Suffix, c.Suffix, name);
+        SaveToByteList(l, DatabaseDataType.LinkedDatabase, c.LinkedDatabaseTableName, name);
+        SaveToByteList(l, DatabaseDataType.ConstantHeightOfImageCode, c.ConstantHeightOfImageCode, name);
+        SaveToByteList(l, DatabaseDataType.BehaviorOfImageAndText, ((int)c.BehaviorOfImageAndText).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.ScriptType, ((int)c.ScriptType).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.Prefix, c.Prefix, name);
+        //SaveToByteList(l, DatabaseDataType.KeyColumnKey, column.KeyColumnKey.ToString(false), key);
+        SaveToByteList(l, DatabaseDataType.ColumnNameOfLinkedDatabase, c.LinkedCell_ColumnNameOfLinkedDatabase, name);
+        //SaveToByteList(l, DatabaseDataType.MakeSuggestionFromSameKeyColumn, column.VorschlagsColumn.ToString(false), key);
+        SaveToByteList(l, DatabaseDataType.ColumnAlign, ((int)c.Align).ToString(), name);
+        SaveToByteList(l, DatabaseDataType.SortType, ((int)c.SortType).ToString(), name);
+        //SaveToByteList(l, DatabaseDataType.ColumnTimeCode, column.TimeCode, key);
+
+        foreach (var thisR in db.Row) {
+            SaveToByteList(l, c, thisR);
+        }
+    }
+
+    private static void SaveToByteList(List<byte> list, ColumnItem column, RowItem row) {
+        if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+
+        var cellContent = db.Cell.GetStringCore(column, row);
+        if (string.IsNullOrEmpty(cellContent)) { return; }
+
+        list.Add((byte)Routinen.CellFormatUTF8_V402);
+
+        var rowKeyByte = row.KeyName.UTF8_ToByte();
+        SaveToByteList(list, rowKeyByte.Length, 1);
+        list.AddRange(rowKeyByte);
+
+        var cellContentByte = cellContent.UTF8_ToByte();
+        SaveToByteList(list, cellContentByte.Length, 2);
+        list.AddRange(cellContentByte);
+    }
+
+    //public override void WaitEditable() => _muf.WaitEditable();
+    private static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content, string columnname) {
+        list.Add((byte)Routinen.ColumnUTF8_V401);
+        list.Add((byte)databaseDataType);
+
+        var n = columnname.UTF8_ToByte();
+        SaveToByteList(list, n.Length, 1);
+        list.AddRange(n);
+
+        var b = content.UTF8_ToByte();
+        SaveToByteList(list, b.Length, 3);
+        list.AddRange(b);
+    }
+
+    private static void SaveToByteList(List<byte> list, ColumnCollection c) {
+        //Database.SaveToByteList(List, enDatabaseDataType.LastColumnKey, _LastColumnKey.ToString(false));
+        foreach (var columnitem in c) {
+            if (columnitem != null && !string.IsNullOrEmpty(columnitem.KeyName)) {
+                SaveToByteList(columnitem, ref list);
+            }
+        }
+    }
+
+    private static void SaveToByteList(List<byte> list, DatabaseDataType databaseDataType, string content) {
+        var b = content.UTF8_ToByte();
+        list.Add((byte)Routinen.DatenAllgemeinUTF8);
+        list.Add((byte)databaseDataType);
+        SaveToByteList(list, b.Length, 3);
+        list.AddRange(b);
+    }
+
     private static void SaveToByteList(ICollection<byte> list, long numberToAdd, int byteCount) {
         do {
             byteCount--;
@@ -951,7 +829,7 @@ public class Database : DatabaseAbstract {
                     //var tmpLastSaveCode1 = GetFileInfo(Filename, true);
                     bLoaded = File.ReadAllBytes(Filename);
 
-                    if (bLoaded.isZipped()) { bLoaded = bLoaded.UnzipIt(); }
+                    if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt(); }
 
                     //tmpLastSaveCode2 = GetFileInfo(Filename, true);
                     //if (tmpLastSaveCode1 == tmpLastSaveCode2) { break; }
@@ -980,15 +858,139 @@ public class Database : DatabaseAbstract {
         return bLoaded;
     }
 
-    private string WriteTempFileToDisk(DateTime setfileStateUTCDateTo) {
+    private void Parse(byte[] data, NeedPassword? needPassword) {
+        var pointer = 0;
+
+        ColumnItem? column = null;
+        RowItem? row = null;
+        var columnUsed = new List<ColumnItem>();
+
+        Undo.Clear();
+
+        do {
+            if (pointer >= data.Length) { break; }
+
+            var (i, command, value, columname, rowKey) = Parse(data, pointer);
+            pointer = i;
+
+            if (!command.IsObsolete()) {
+
+                #region Zeile suchen oder erstellen
+
+                if (!string.IsNullOrEmpty(rowKey)) {
+                    row = Row.SearchByKey(rowKey);
+                    if (row == null || row.IsDisposed) {
+                        _ = Row.ExecuteCommand(DatabaseDataType.Command_AddRow, rowKey, Reason.InitialLoad);
+                        row = Row.SearchByKey(rowKey);
+                    }
+                    if (row == null || row.IsDisposed) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Zeile hinzufügen Fehler");
+                        Freeze("Zeile hinzufügen Fehler");
+                        return;
+                    }
+                    row.IsInCache = DateTime.UtcNow;
+                }
+
+                #endregion
+
+                #region Spalte suchen oder erstellen
+
+                //if (colKey > -1 && string.IsNullOrEmpty(columname)) {
+                //    column = db.Column.SearchByKey(colKey);
+                //    if (Column  ==null || Column .IsDisposed) {
+                //        if (art != DatabaseDataType.ColumnName) { Develop.DebugPrint(art + " an erster Stelle!"); }
+                //        _ = db.Column.SetValueInternal(DatabaseDataType.Command_AddColumnByKey, true, string.Empty);
+                //        column = db.Column.SearchByKey(colKey);
+                //    }
+                //    if (Column  ==null || Column .IsDisposed) {
+                //        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
+                //        db.SetReadOnly();
+                //        return;
+                //    }
+                //    column.IsInCache = DateTime.UtcNow;
+                //    columnUsed.Add(column);
+                //}
+
+                if (!string.IsNullOrEmpty(columname)) {
+                    column = Column.Exists(columname);
+                    if (column == null || column.IsDisposed) {
+                        if (command != DatabaseDataType.ColumnName) { Develop.DebugPrint(command + " an erster Stelle!"); }
+                        _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, columname, Reason.InitialLoad);
+                        column = Column.Exists(columname);
+                    }
+                    if (column == null || column.IsDisposed) {
+                        Develop.DebugPrint(FehlerArt.Fehler, "Spalte hinzufügen Fehler");
+                        Freeze("Spalte hinzufügen Fehler");
+                        return;
+                    }
+                    column.IsInCache = DateTime.UtcNow;
+                    columnUsed.Add(column);
+                }
+
+                #endregion
+
+                #region Bei verschlüsselten Datenbanken das Passwort abfragen
+
+                if (command == DatabaseDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
+                    var pwd = string.Empty;
+
+                    if (needPassword != null) { pwd = needPassword(); }
+                    if (pwd != value) {
+                        Freeze("Passwort falsch");
+                        break;
+                    }
+                }
+
+                #endregion
+
+                if (command == DatabaseDataType.EOF) { break; }
+
+                var fehler = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.InitialLoad);
+                if (!string.IsNullOrEmpty(fehler.Error)) {
+                    Freeze("Datenbank-Ladefehler");
+                    Develop.DebugPrint("Schwerer Datenbankfehler:<br>Version: " + DatabaseVersion + "<br>Datei: " + TableName + "<br>Meldung: " + fehler);
+                }
+            }
+        } while (true);
+
+        #region unbenutzte (gelöschte) Spalten entfernen
+
+        var l = new List<ColumnItem>();
+        foreach (var thisColumn in Column) {
+            l.Add(thisColumn);
+        }
+
+        foreach (var thisColumn in l) {
+            if (!columnUsed.Contains(thisColumn)) {
+                _ = Column.ExecuteCommand(DatabaseDataType.Command_RemoveColumn, column.KeyName, Reason.InitialLoad);
+                //_ = SetValueInternal(DatabaseDataType.Command_RemoveColumn, thisColumn.KeyName, thisColumn, null, Reason.LoadReload, UserName, DateTime.UtcNow, "Parsen");
+            }
+        }
+
+        #endregion
+
+        Row.RemoveNullOrEmpty();
+        Cell.RemoveOrphans();
+        //Works?.AddRange(oldPendings);
+        //oldPendings?.Clear();
+        //ExecutePending();
+
+        //if (db != null && db.Column.Count > 0 && string.IsNullOrEmpty(db.FirstColumn)) {
+        //    db.FirstColumn = Col
+        //}
+
+        if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(DatabaseVersion.Replace(".", string.Empty))) { Freeze("Datenbankversions-Konflikt"); }
+    }
+
+    private string WriteTempFileToDisk(DateTime setfileStateUtcDateTo) {
         var f = EditableErrorReason(EditableErrorReasonType.Save);
         if (!string.IsNullOrEmpty(f)) { return string.Empty; }
 
-        var dataUncompressed = ToListOfByte(this, 1200, setfileStateUTCDateTo)?.ToArray();
+        var dataUncompressed = ToListOfByte(this, 1200, setfileStateUtcDateTo)?.ToArray();
 
         if (dataUncompressed == null) { return string.Empty; }
 
-        var datacompressed = dataUncompressed.ZipIt();
+        var datacompressed = dataUncompressed.ZipIt() ?? dataUncompressed;
 
         var tmpFileName = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpper());
 

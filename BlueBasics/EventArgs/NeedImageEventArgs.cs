@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,17 +17,9 @@
 
 #nullable enable
 
-using System.Collections.Generic;
-
 namespace BlueBasics.EventArgs;
 
 public class NeedImageEventArgs : System.EventArgs {
-
-    #region Fields
-
-    public readonly List<string> CheckedPath = new();
-
-    #endregion
 
     #region Constructors
 

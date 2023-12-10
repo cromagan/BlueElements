@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -138,26 +138,24 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
     public string GestStandardCommand(string extension) {
         if (!SubKeyExist(extension)) { return string.Empty; }
         var mainkey = Registry.ClassesRoot.OpenSubKey(extension);
-        if (mainkey == null) { return string.Empty; }
-        var type = mainkey.GetValue(""); // GetValue("") read the standard value of a key
+        var type = mainkey?.GetValue(""); // GetValue("") read the standard value of a key
         if (type == null) { return string.Empty; }
         mainkey = Registry.ClassesRoot.OpenSubKey(type.ToString());
-        if (mainkey == null) { return string.Empty; }
 
-        var shellKey = mainkey.OpenSubKey("shell");
+        var shellKey = mainkey?.OpenSubKey("shell");
         if (shellKey == null) { return string.Empty; }
-        var shellCommand = shellKey.GetValue("");
 
+        var shellCommand = shellKey.GetValue(string.Empty);
         if (shellCommand == null) { return string.Empty; }
 
         var exekey = shellKey.OpenSubKey(shellCommand.ToString());
         if (exekey == null) { return string.Empty; }
+
         exekey = exekey.OpenSubKey("command");
         if (exekey == null) { return string.Empty; }
+
         return exekey.GetValue("").ToString();
     }
-
-    public void ParentPath() => btnZurück_Click(null, System.EventArgs.Empty);
 
     public bool ParseVariables(VariableCollection? list) {
         if (IsDisposed) { return false; }
@@ -183,31 +181,37 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
         base.OnVisibleChanged(e);
     }
 
-    private bool AddThis(FileInfo fi) {
+    private static bool AddThis(FileInfo fi) {
         if (fi.Attributes.HasFlag(FileAttributes.System)) { return false; }
         //if (fi.Attributes.HasFlag(FileAttributes.Hidden)) { return false; }
 
         if (fi.Exists) {
-            if (fi.DirectoryName.FilePath() == "C:\\") { return false; }
+            if (fi.DirectoryName == null || fi.DirectoryName.FilePath() == "C:\\") { return false; }
             return true;
         }
 
-        var tmp = (fi.DirectoryName.Trim("\\") + "\\").ToLower();
+        if (fi.DirectoryName != null) {
+            var tmp = (fi.DirectoryName.Trim("\\") + "\\").ToLower();
 
-        if (tmp.EndsWith("\\$getcurrent\\")) { return false; }
-        if (tmp.EndsWith("\\$recycle.bin\\")) { return false; }
-        if (tmp.EndsWith("\\$recycle\\")) { return false; }
-        if (tmp.EndsWith("\\system volume information\\")) { return false; }
+            if (tmp.EndsWith("\\$getcurrent\\")) { return false; }
+            if (tmp.EndsWith("\\$recycle.bin\\")) { return false; }
+            if (tmp.EndsWith("\\$recycle\\")) { return false; }
+            if (tmp.EndsWith("\\system volume information\\")) { return false; }
+        }
 
         //if (Path.EndsWith("\\Dokumente und Einstellungen\\")) { return false; }
 
         return true;
     }
 
+    private static bool SubKeyExist(string subkey) {
+        // Check if a Subkey exist
+        var myKey = Registry.ClassesRoot.OpenSubKey(subkey);
+        return myKey != null;
+    }
+
     private void btnAddScreenShot_Click(object sender, System.EventArgs e) {
         var i = ScreenShot.GrabArea(ParentForm());
-
-        if (i == null) { return; }
 
         var dateiPng = TempFile(txbPfad.Text.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString(Constants.Format_Date4, CultureInfo.InvariantCulture), "PNG");
         i.Save(dateiPng, ImageFormat.Png);
@@ -274,7 +278,6 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
     }
 
     private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (e.HotItem == null) { return; }
         if (e.HotItem is not BitmapListItem it) { return; }
         //if (it.Tag is not List<string> tags) { return; }
 
@@ -451,7 +454,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
         if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
 
         newPath = newPath.TrimEnd("\\") + "\\";
-        var dropChanged = newPath.ToLower() != txbPfad.Text.ToLower();
+        var dropChanged = !String.Equals(newPath, txbPfad.Text, StringComparison.OrdinalIgnoreCase);
         txbPfad.Text = newPath;
         lsbFiles.Item.Clear();
 
@@ -472,12 +475,6 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
             _watcher?.Dispose();
             _watcher = null;
         }
-    }
-
-    private bool SubKeyExist(string subkey) {
-        // Check if a Subkey exist
-        var myKey = Registry.ClassesRoot.OpenSubKey(subkey);
-        return myKey != null;
     }
 
     private void ThumbGenerator_DoWork(object sender, DoWorkEventArgs e) {
@@ -505,7 +502,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
                 if (emd.Length == 0) {
                     var emf = Directory.GetFiles(_todel, "*", SearchOption.TopDirectoryOnly);
                     if (emf.Length == 0) {
-                        _ = IO.DeleteDir(_todel, false);
+                        _ = DeleteDir(_todel, false);
                     }
                 }
             }

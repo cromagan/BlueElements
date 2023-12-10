@@ -1,9 +1,17 @@
-﻿namespace BlueControls.Forms {
+﻿using System.ComponentModel;
+using System.Windows.Forms;
+using BlueControls.Controls;
+using Button = BlueControls.Controls.Button;
+using ComboBox = BlueControls.Controls.ComboBox;
+using GroupBox = BlueControls.Controls.GroupBox;
+using TextBox = BlueControls.Controls.TextBox;
+
+namespace BlueControls.Forms {
     partial class FormulaView {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;
+        private IContainer components = null;
 
         /// <summary>
         /// Clean up any resources being used.
@@ -798,60 +806,60 @@
 
         #endregion
 
-        protected Controls.RibbonBar ribMain;
-        private System.Windows.Forms.TabPage tabFile;
-        private Controls.GroupBox grpOrdner;
-        private Controls.Button btnDatenbankenSpeicherort;
-        private Controls.Button btnTemporärenSpeicherortÖffnen;
-        private Controls.GroupBox grpDatei;
-        private Controls.LastFilesCombo btnLastFormulas;
-        private Controls.Button btnOeffnen;
-        protected System.Windows.Forms.TabPage tabAllgemein;
-        protected Controls.GroupBox grpAnsichtWahl;
-        private Controls.Button chkAnsichtTableFormular;
-        private Controls.Button chkAnsichtFormular;
-        private Controls.Button chkAnsichtNurTabelle;
-        protected Controls.GroupBox grpAnsicht;
-        protected Controls.Button btnUnterschiede;
-        protected Controls.Button btnAlleSchließen;
-        protected Controls.Button btnAlleErweitern;
-        private Controls.Caption capSpaltenanordnung;
-        private Controls.Caption capZeilen1;
-        private Controls.ComboBox cbxColumnArr;
-        private Controls.GroupBox grpHilfen;
-        private Controls.Button ckbZeilenclickInsClipboard;
-        private Controls.Button btnNummerierung;
-        private Controls.Button btnSuchFenster;
-        private Controls.GroupBox grpFormularSteuerung;
-        private Controls.Button btnNeu;
-        private Controls.Button btnTextSuche;
-        private Controls.Button btnLoeschen;
-        private Controls.TextBox txbTextSuche;
-        private Controls.Button btnVorwärts;
-        private Controls.Button btnZurück;
-        protected System.Windows.Forms.TabPage tabAdmin;
-        private Controls.GroupBox grpAdminZeilen;
-        private Controls.Button btnSuchenUndErsetzen;
-        private Controls.Button btnZeileLöschen;
-        private Controls.GroupBox grpAdminAllgemein;
-        private Controls.Button btnSaveLoad;
-        private Controls.Button btnPowerBearbeitung;
-        private Controls.Button btnSpaltenUebersicht;
-        private Controls.GroupBox grpAdminBearbeiten;
-        private Controls.Button btnSkripteBearbeiten;
-        private Controls.Button btnFormular;
-        private Controls.Button btnSpaltenanordnung;
-        private Controls.Button btnDatenbankKopf;
-        private Controls.Button btnLayouts;
-        protected System.Windows.Forms.TabPage tabExport;
-        private Controls.GroupBox grpExport;
-        private Controls.ComboBox btnDrucken;
-        private Controls.Button btnHTMLExport;
-        private Controls.Button btnCSVClipboard;
-        private Controls.GroupBox grpImport;
-        private Controls.Button btnClipboardImport;
-        private System.Windows.Forms.OpenFileDialog LoadTab;
-        private Controls.ConnectedFormulaView CFormula;
-        private Controls.GroupBox grpSkripte;
+        protected RibbonBar ribMain;
+        private TabPage tabFile;
+        private GroupBox grpOrdner;
+        private Button btnDatenbankenSpeicherort;
+        private Button btnTemporärenSpeicherortÖffnen;
+        private GroupBox grpDatei;
+        private LastFilesCombo btnLastFormulas;
+        private Button btnOeffnen;
+        protected TabPage tabAllgemein;
+        protected GroupBox grpAnsichtWahl;
+        private Button chkAnsichtTableFormular;
+        private Button chkAnsichtFormular;
+        private Button chkAnsichtNurTabelle;
+        protected GroupBox grpAnsicht;
+        protected Button btnUnterschiede;
+        protected Button btnAlleSchließen;
+        protected Button btnAlleErweitern;
+        private Caption capSpaltenanordnung;
+        private Caption capZeilen1;
+        private ComboBox cbxColumnArr;
+        private GroupBox grpHilfen;
+        private Button ckbZeilenclickInsClipboard;
+        private Button btnNummerierung;
+        private Button btnSuchFenster;
+        private GroupBox grpFormularSteuerung;
+        private Button btnNeu;
+        private Button btnTextSuche;
+        private Button btnLoeschen;
+        private TextBox txbTextSuche;
+        private Button btnVorwärts;
+        private Button btnZurück;
+        protected TabPage tabAdmin;
+        private GroupBox grpAdminZeilen;
+        private Button btnSuchenUndErsetzen;
+        private Button btnZeileLöschen;
+        private GroupBox grpAdminAllgemein;
+        private Button btnSaveLoad;
+        private Button btnPowerBearbeitung;
+        private Button btnSpaltenUebersicht;
+        private GroupBox grpAdminBearbeiten;
+        private Button btnSkripteBearbeiten;
+        private Button btnFormular;
+        private Button btnSpaltenanordnung;
+        private Button btnDatenbankKopf;
+        private Button btnLayouts;
+        protected TabPage tabExport;
+        private GroupBox grpExport;
+        private ComboBox btnDrucken;
+        private Button btnHTMLExport;
+        private Button btnCSVClipboard;
+        private GroupBox grpImport;
+        private Button btnClipboardImport;
+        private OpenFileDialog LoadTab;
+        private ConnectedFormulaView CFormula;
+        private GroupBox grpSkripte;
     }
 }

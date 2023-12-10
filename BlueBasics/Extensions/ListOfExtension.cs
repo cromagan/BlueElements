@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -18,6 +18,8 @@
 #nullable enable
 
 using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -29,8 +31,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
-using System.Collections;
-using System.Collections.Concurrent;
 
 namespace BlueBasics;
 
@@ -59,35 +59,6 @@ public static partial class Extensions {
         var l2 = new List<T>();
         l2.AddRange(l);
         return l2;
-    }
-
-    /// <summary>
-    /// Fügt Items der hinzu, erzeugt keine Clone!
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="list1"></param>
-    /// <param name="list2"></param>
-    public static void CloneFrom<T>(this IList<T> list1, IList<T> list2) where T : IComparable {
-        if (!list1.IsDifferentTo(list2)) { return; }
-
-        //if (list2 == null) { list1 = null; return; }
-
-        //if (list1 == null || list2 == null) {
-        //    Develop.DebugPrint("Null-Listen nicht unterstützt.");
-        //    return;
-        //}
-
-        for (var z = 0; z < list2.Count; z++) {
-            if (z >= list1.Count) { list1.Add(list2[z]); }
-
-            if (!list1[z].Equals(list2[z])) { list1[z] = list2[z]; }
-
-            //if (list1[z] != null && list2[z] == null) { list1[z] = default; }
-        }
-
-        while (list1.Count > list2.Count) {
-            list1.RemoveAt(list2.Count);
-        }
     }
 
     public static List<T> CloneWithClones<T>(this ICollection<T>? l) where T : ICloneable {
@@ -247,7 +218,7 @@ public static partial class Extensions {
     public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T? value) where T : Enum {
         if (value == null) { return; }
 
-        Type underlyingType = Enum.GetUnderlyingType(typeof(T));
+        var underlyingType = Enum.GetUnderlyingType(typeof(T));
 
         if (underlyingType == typeof(int)) {
             col.Add(tagname + "=" + ((int)(object)value));
@@ -368,17 +339,9 @@ public static partial class Extensions {
         }
     }
 
-    public static void RemoveString(this IList<string>? l, string[]? value, bool caseSensitive) {
-        if (l == null || value == null) { return; }
-
-        for (var z = 0; z <= value.GetUpperBound(0); z++) {
-            l.RemoveString(value[z], caseSensitive);
-        }
-    }
-
     public static void Shuffle<T>(this IList<T> list) {
         for (var i1 = 0; i1 < list.Count; i1++) {
-            var i2 = Constants.GlobalRND.Next(i1, list.Count);
+            var i2 = Constants.GlobalRnd.Next(i1, list.Count);
             if (i1 != i2) {
                 var v1 = list[i1];
                 var v2 = list[i2];

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,13 +17,13 @@
 
 #nullable enable
 
-using BlueBasics.Enums;
-using System.Drawing.Drawing2D;
-using System.Drawing;
 using System;
+using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
-using static BlueBasics.IO;
 using System.Reflection;
+using BlueBasics.Enums;
+using static BlueBasics.IO;
 
 namespace BlueBasics;
 
@@ -130,16 +130,23 @@ public static partial class Extensions {
         // Um abstürzte zu vermeiden, einen Faktor berechnen
         Bitmap tmp;
 
-        if (bmp.Width > 20000 && calcwidth < 4000) {
-            tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
-        } else if (bmp.Width > 15000 && calcwidth < 4000) {
-            tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
-        } else if (bmp.Width > 10000 && calcwidth < 2500) {
-            tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
-        } else if (bmp.Width > 8000 && calcwidth < 2000) {
-            tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
-        } else {
-            tmp = bmp;
+        switch (bmp.Width) {
+            case > 20000 when calcwidth < 4000:
+                tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 4.0), (int)(bmp.Height / 4.0), null, IntPtr.Zero);
+                break;
+
+            case > 15000 when calcwidth < 4000:
+            case > 10000 when calcwidth < 2500:
+                tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 3.0), (int)(bmp.Height / 3.0), null, IntPtr.Zero);
+                break;
+
+            case > 8000 when calcwidth < 2000:
+                tmp = (Bitmap)bmp.GetThumbnailImage((int)(bmp.Width / 2.5), (int)(bmp.Height / 2.5), null, IntPtr.Zero);
+                break;
+
+            default:
+                tmp = bmp;
+                break;
         }
 
         try {

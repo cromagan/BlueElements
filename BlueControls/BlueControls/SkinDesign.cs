@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -27,7 +27,7 @@ public static class SkinDesignExtensions {
 
     #region Methods
 
-    public static void Add(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, RahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
+    public static void Add(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc2, string f, string pic) {
         Dictionary<States, SkinDesign> dictState;
 
         if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
@@ -37,10 +37,16 @@ public static class SkinDesignExtensions {
             dictControl.Add(ds, dictState);
         }
 
-        dictState.Add(status, enKontur, x1, y1, x2, y2, hint, verlauf, bc1, bc2, bc3, rahm, boc1, boc2, boc3, f, pic);
+        dictState.Add(status, enKontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, f, pic);
     }
 
-    public static void Add(this Dictionary<States, SkinDesign> dictStats, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, float verlauf, string bc1, string bc2, string bc3, RahmenArt rahm, string boc1, string boc2, string boc3, string f, string pic) {
+    public static void Remove(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status) {
+        if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
+            _ = existingDictOfControl.Remove(status);
+        }
+    }
+
+    private static void Add(this IDictionary<States, SkinDesign> dictStats, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc3, string f, string pic) {
         SkinDesign des = new() {
             Need = true,
             Kontur = enKontur,
@@ -48,28 +54,19 @@ public static class SkinDesignExtensions {
             Y1 = y1,
             X2 = x2,
             Y2 = y2,
-            HintergrundArt = hint,
-            Verlauf = verlauf
+            HintergrundArt = hint
         };
         if (!string.IsNullOrEmpty(bc1)) { des.BackColor1 = bc1.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(bc2)) { des.BackColor2 = bc2.FromHtmlCode(); }
-        if (!string.IsNullOrEmpty(bc3)) { des.BackColor3 = bc3.FromHtmlCode(); }
         des.HintergrundArt = hint;
         des.RahmenArt = rahm;
         if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = boc1.FromHtmlCode(); }
-        if (!string.IsNullOrEmpty(boc2)) { des.BorderColor2 = boc2.FromHtmlCode(); }
-        if (!string.IsNullOrEmpty(boc3)) { des.BorderColor3 = boc3.FromHtmlCode(); }
+        if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = boc3.FromHtmlCode(); }
         if (!string.IsNullOrEmpty(f)) { des.BFont = BlueFont.Get(f); }
         //if (!string.IsNullOrEmpty(pic)) { des.Image = QuickImage.Get(pic); }
         des.Image = pic;
         des.Status = status;
         dictStats.Add(status, des);
-    }
-
-    public static void Remove(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status) {
-        if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
-            _ = existingDictOfControl.Remove(status);
-        }
     }
 
     #endregion
@@ -81,18 +78,15 @@ public class SkinDesign {
 
     public Color BackColor1 { get; set; }
     public Color BackColor2 { get; set; }
-    public Color BackColor3 { get; set; }
     public BlueFont? BFont { get; set; }
     public Color BorderColor1 { get; set; }
     public Color BorderColor2 { get; set; }
-    public Color BorderColor3 { get; set; }
     public HintergrundArt HintergrundArt { get; set; }
     public string Image { get; set; } = string.Empty;
     public Kontur Kontur { get; set; }
     public bool Need { get; set; }
     public RahmenArt RahmenArt { get; set; }
     public States Status { get; set; }
-    public float Verlauf { get; set; }
     public int X1 { get; set; }
     public int X2 { get; set; }
     public int Y1 { get; set; }

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -18,7 +18,6 @@
 namespace BlueControls.Enums;
 
 public enum AsciiKey {
-    Undefined = -1,
     LineFeed = 10,
 
     // VerticalTab = 11

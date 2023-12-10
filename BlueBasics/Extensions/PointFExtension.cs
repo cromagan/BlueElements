@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -28,16 +28,14 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static PointF NearestPoint(this PointF p, List<PointF>? pl) {
-        if (pl == null || pl.Count == 0) { return PointF.Empty; }
+    public static PointF NearestPoint(this PointF p, List<PointF> pl) {
+        if (pl.Count == 0) { return PointF.Empty; }
         var minl = float.MaxValue;
         var rp = PointF.Empty;
 
         foreach (var thisP in pl) {
             var l = Geometry.GetLenght(p, thisP);
-            if (!(l < minl)) {
-                continue;
-            }
+            if (l > minl) { continue; }
 
             minl = l;
             rp = thisP;

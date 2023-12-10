@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -22,6 +22,7 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
+using static BlueBasics.Constants;
 
 namespace BlueControls.Controls;
 
@@ -31,8 +32,6 @@ public partial class ZoomPad : GenericControl {
     #region Fields
 
     public static readonly Pen PenGray = new(Color.FromArgb(40, 0, 0, 0));
-
-    public static readonly Pen PenGrayLarge = new(Color.FromArgb(40, 0, 0, 0), 5);
 
     /// <summary>
     /// Die Koordinaten, an der Stelle der Mausknopf gedrückt wurde. Zoom und Slider wurden eingerechnet, dass die Koordinaten Massstabsunabhängis sind.
@@ -65,7 +64,7 @@ public partial class ZoomPad : GenericControl {
     public float ShiftX {
         get => _shiftX;
         set {
-            if (Math.Abs(value - _shiftX) < 0.001) { return; }
+            if (Math.Abs(value - _shiftX) < DefaultTolerance) { return; }
             _shiftX = value;
             Invalidate();
         }
@@ -74,7 +73,7 @@ public partial class ZoomPad : GenericControl {
     public float ShiftY {
         get => _shiftY;
         set {
-            if (Math.Abs(value - _shiftY) < 0.001) { return; }
+            if (Math.Abs(value - _shiftY) < DefaultTolerance) { return; }
             _shiftY = value;
             Invalidate();
         }

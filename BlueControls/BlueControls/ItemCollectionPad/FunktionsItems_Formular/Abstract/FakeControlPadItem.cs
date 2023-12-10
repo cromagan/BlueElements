@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -46,9 +46,9 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     #region Fields
 
-    public static BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
+    public static readonly BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
-    public List<string> VisibleFor = new();
+    public readonly List<string> VisibleFor = new();
 
     #endregion
 
@@ -221,7 +221,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         return result.Parseable(base.ToString());
     }
 
-    protected static void DrawArrow(Graphics gr, RectangleF positionModified, float zoom, int colorId, Alignment al, float valueArrow, float valueSymbol, float xmod) {
+    protected static void DrawArrow(Graphics gr, RectangleF positionModified, float zoom, int colorId, Alignment al, float valueArrow, float xmod) {
         var p = positionModified.PointOf(al);
         var width = (int)(zoom * 25);
         var height = (int)(zoom * 12);
@@ -261,7 +261,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         if (forPrinting) { return; }
 
         var arrowY = (int)(zoom * 12) * 0.35f;
-        var symbolY = (int)(zoom * 12) * 0.35f;
 
         var width = (int)(zoom * 25);
 
@@ -272,7 +271,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         var start = -((colorId.Count - 1) * width / 2);
 
         foreach (var thisColorId in colorId) {
-            DrawArrow(gr, positionModified, zoom, thisColorId, Alignment.Top_HorizontalCenter, arrowY, symbolY, start);
+            DrawArrow(gr, positionModified, zoom, thisColorId, Alignment.Top_HorizontalCenter, arrowY, start);
             start += width;
         }
     }
@@ -280,8 +279,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     protected void DrawArrowOutput(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting, int colorId) {
         if (forPrinting) { return; }
         var arrowY = (int)(zoom * 12) * 0.45f;
-        var symbolY = (int)(zoom * 12) * 0.02f;
-        DrawArrow(gr, positionModified, zoom, colorId, Alignment.Bottom_HorizontalCenter, arrowY, symbolY, 0);
+        DrawArrow(gr, positionModified, zoom, colorId, Alignment.Bottom_HorizontalCenter, arrowY, 0);
     }
 
     protected void DrawColorScheme(Graphics gr, RectangleF drawingCoordinates, float zoom, List<int>? id, bool drawSymbol, bool drawText, bool transparent) {
@@ -358,7 +356,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         }
     }
 
-    private List<string> Permission_AllUsed() {
+    private IEnumerable<string> Permission_AllUsed() {
         var l = new List<string>();
         if (Parent != null) {
             foreach (var thisIt in Parent) {

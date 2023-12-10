@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -200,10 +200,9 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
                     return;
                 }
 
-                if(fc == null) {
+                if (fc == null) {
                     Notification.Show("Keine Filterung definiert.", ImageCode.Information);
                     return;
-
                 }
 
                 l.AddRange(targetColumn.Contents(fc, null));
@@ -484,7 +483,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
     /// <param name="type"></param>
     /// <returns></returns>
     public void AddRange(Type type) {
-        Type underlyingType = Enum.GetUnderlyingType(type);
+        var underlyingType = Enum.GetUnderlyingType(type);
 
         if (underlyingType == typeof(int)) {
             foreach (int z1 in Enum.GetValues(type)) {
@@ -855,8 +854,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         for (var testSp = 10; testSp >= 1; testSp--) {
             var colc = Count / testSp;
             var rest = Count % colc;
-            var ok = true;
-            if (rest > 0 && rest < colc / 2) { ok = false; }
+            var ok = !(rest > 0 && rest < colc / 2);
             if (colc < 5) { ok = false; }
             if (colc > 20) { ok = false; }
             if (colc * dithemh > 600) { ok = false; }

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,15 +17,16 @@
 
 #nullable enable
 
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_SetIfHasValue : Method {
 
     #region Properties
@@ -75,11 +76,8 @@ internal class Method_SetIfHasValue : Method {
                     return DoItFeedback.Null();
 
                 case VariableListString vl:
-                    if (vl.ValueList != null) {
-                        if (attvar.ValueListStringSet(0, vl.ValueList, infos.Data) is DoItFeedback dif4) { return dif4; }
-                        return DoItFeedback.Null();
-                    }
-                    break;
+                    if (attvar.ValueListStringSet(0, vl.ValueList, infos.Data) is DoItFeedback dif4) { return dif4; }
+                    return DoItFeedback.Null();
             }
         }
 

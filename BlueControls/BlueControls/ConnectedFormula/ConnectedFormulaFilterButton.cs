@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using BlueControls.Interfaces;
@@ -47,7 +48,7 @@ internal class ConnectedFormulaFilterButton : Button, IControlAcceptSomething {
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     protected override void Dispose(bool disposing) {

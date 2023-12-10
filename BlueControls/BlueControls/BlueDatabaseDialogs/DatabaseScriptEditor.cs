@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -27,10 +28,12 @@ using BlueControls.Forms;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Interfaces;
+using BlueScript.EventArgs;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
+using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
@@ -133,18 +136,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     #region Methods
 
-    public void OpenAdditionalFileFolder() {
-        //Todo: Implementieren
-        if (Database is not DatabaseAbstract db || db.IsDisposed) {
-            return;
-        }
-
-        if (DirectoryExists(Database.AdditionalFilesPfadWhole())) {
-            _ = ExecuteFile(Database.AdditionalFilesPfadWhole());
-        }
-    }
-
-    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
+    protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
@@ -265,7 +257,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         return true;
     }
 
-    private void eventScriptEditor_ExecuteScript(object sender, BlueScript.EventArgs.ScriptEventArgs e) {
+    private void eventScriptEditor_ExecuteScript(object sender, ScriptEventArgs e) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) {
             e.Feedback = new ScriptEndedFeedback("Keine Datenbank geladen.", false, false, "Allgemein");
             return;
@@ -395,8 +387,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         #endregion
 
-
         #region Variablen
+
         // Identisch in DatabaseHeadEditor und DatabaseScriptEditor
         var l = variableEditor.GetVariables();
         var l2 = new List<VariableString>();
@@ -406,9 +398,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             }
         }
         Database.Variables = new VariableCollection(l2);
-        #endregion
 
-     
+        #endregion
     }
 
     #endregion

@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -28,6 +28,7 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.Geometry;
+using static BlueBasics.Constants;
 
 namespace BlueControls;
 
@@ -126,7 +127,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
     public float X {
         get => _x;
         set {
-            if (Math.Abs(_x - value) < 0.0000001) { return; }
+            if (Math.Abs(_x - value) < FineTolerance) { return; }
             SetTo(value, _y);
         }
     }
@@ -134,7 +135,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
     public float Y {
         get => _y;
         set {
-            if (Math.Abs(_y - value) < 0.0000001) { return; }
+            if (Math.Abs(_y - value) < FineTolerance) { return; }
             SetTo(_x, value);
         }
     }

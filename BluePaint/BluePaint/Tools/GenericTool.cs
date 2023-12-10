@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -20,7 +20,6 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics;
 using BlueControls.EventArgs;
 using BluePaint.EventArgs;
 
@@ -30,10 +29,10 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
 {
     #region Fields
 
-    protected static SolidBrush BrushRedTransp = new(Color.FromArgb(128, 255, 0, 0));
+    protected static readonly SolidBrush BrushRedTransp = new(Color.FromArgb(128, 255, 0, 0));
+    protected static readonly Pen PenLightWhite = new(Color.FromArgb(150, 255, 255, 255), 3);
+    protected static readonly Pen PenRedTransp = new(ColorRedTransp);
     protected static Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
-    protected static Pen PenLightWhite = new(Color.FromArgb(150, 255, 255, 255), 3);
-    protected static Pen PenRedTransp = new(ColorRedTransp);
 
     #endregion
 
@@ -69,8 +68,6 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
     /// <param name="originalPic"></param>
     public virtual void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) { }
-
-    public virtual void ExcuteCommand(string command) => Develop.DebugPrint_RoutineMussUeberschriebenWerden();
 
     /// <summary>
     ///

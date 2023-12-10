@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,11 +17,12 @@
 
 #nullable enable
 
+using System.Collections.Generic;
 using BlueBasics;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueDatabase;
-using System.Collections.Generic;
 
 namespace BlueControls.Interfaces;
 
@@ -66,18 +67,17 @@ public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
 }
 
 public static class IControlAcceptSomethingExtension {
+    //public static void ConnectChildParents(this IControlAcceptSomething child, List<IControlSendSomething> parents) {
+    //    foreach (var thisParent in parents) {
+    //        child.ConnectChildParents(thisParent);
+    //    }
+    //}
 
     #region Methods
 
-    public static void ConnectChildParents(this IControlAcceptSomething child, List<IControlSendSomething> parents) {
-        foreach (var thisParent in parents) {
-            child.ConnectChildParents(thisParent);
-        }
-    }
-
     public static void ConnectChildParents(this IControlAcceptSomething child, IControlSendSomething parent) {
         if (child.FilterManualSeted) {
-            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
+            Develop.DebugPrint(FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
         }
 
         child.Parents.AddIfNotExists(parent);
@@ -145,7 +145,7 @@ public static class IControlAcceptSomethingExtension {
 
         foreach (var thiss in item.Parents) {
             if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
-                if (fc == null) { fc = new FilterCollection(fi.Database); }
+                fc ??= new FilterCollection(fi.Database);
                 fc.AddIfNotExists(fi);
             }
         }
@@ -155,7 +155,7 @@ public static class IControlAcceptSomethingExtension {
 
     public static void SetToRow(this IControlAcceptSomething item, RowItem? row) {
         if (item.Parents.Count > 0) {
-            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Element wird von Parents gesteuert!");
+            Develop.DebugPrint(FehlerArt.Fehler, "Element wird von Parents gesteuert!");
         }
 
         item.FilterManualSeted = true;

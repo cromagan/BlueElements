@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -40,9 +40,10 @@ public class UndoItem : IParseable {
         DateTimeUtc = timeutc;
         TableName = tablename;
         Comment = comment;
+        Container = container;
     }
 
-    public UndoItem(string tablename, DatabaseDataType command, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container) : this(tablename, command, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container) { }
+    public UndoItem(string tablename, DatabaseDataType command, IHasKeyName? column, IHasKeyName? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container) : this(tablename, command, column?.KeyName ?? string.Empty, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container) { }
 
     public UndoItem(string s) => this.Parse(s);
 

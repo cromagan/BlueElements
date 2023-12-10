@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -111,8 +111,6 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
     #region Methods
 
-    public bool Textbox_hasFocus() => txbZeilenFilter.Focused;
-
     internal void FillFilters() {
         if (IsDisposed) { return; }
 
@@ -123,16 +121,14 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         if (_isFilling) { return; }
         _isFilling = true;
 
-        btnPinZurück.Enabled = _table?.Database != null && _table.PinnedRows != null && _table.PinnedRows.Count > 0;
+        btnPinZurück.Enabled = _table?.Database != null && _table.PinnedRows.Count > 0;
 
         #region ZeilenFilter befüllen
 
-        txbZeilenFilter.Text = _table != null &&
-            _table.Database != null &&
-            _table.Filter != null &&
-            _table.Filter.IsRowFilterActiv()
-            ? _table.Filter.RowFilterText
-            : string.Empty;
+        txbZeilenFilter.Text = _table?.Database != null &&
+                               _table.Filter.IsRowFilterActiv()
+                                ? _table.Filter.RowFilterText
+                                : string.Empty;
 
         #endregion
 
@@ -145,8 +141,8 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         var leftpos = beginnx;
         var constwi = (int)(txbZeilenFilter.Width * 1.5);
         var right = constwi + Skin.PaddingSmal;
-        var anchor = AnchorStyles.Top | AnchorStyles.Left;
-        var down = 0;
+        const AnchorStyles anchor = AnchorStyles.Top | AnchorStyles.Left;
+        const int down = 0;
 
         #endregion
 
@@ -166,7 +162,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         if (_table?.Database != null && _table.Filter != null) {
             List<ColumnItem> columSort = new();
-            ColumnViewCollection? orderArrangement = _table.Database.ColumnArrangements.Get(AnsichtName);
+            var orderArrangement = _table.Database.ColumnArrangements.Get(AnsichtName);
 
             #region Reihenfolge der Spalten bestimmen
 
@@ -330,7 +326,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {
         _lastLooked = string.Empty;
-        if (_table?.Database != null && _table.Filter != null) {
+        if (_table?.Database != null) {
             _table.Filter.Clear();
         }
     }
@@ -357,12 +353,12 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         var r = fc.Rows;
         if (_ähnliche != null) {
             btnÄhnliche.Visible = true;
-            btnÄhnliche.Enabled = r != null && r.Count == 1;
+            btnÄhnliche.Enabled = r.Count == 1;
         } else {
             btnÄhnliche.Visible = false;
         }
 
-        if (AutoPin && r != null && r.Count == 1) {
+        if (AutoPin && r.Count == 1) {
             if (_lastLooked != r[0].CellFirstString()) {
                 if (_table.RowsFilteredAndPinned().Get(r[0]) == null) {
                     if (MessageBox.Show("Die Zeile wird durch Filterungen <b>ausgeblendet</b>.<br>Soll sie zusätzlich <b>angepinnt</b> werden?", ImageCode.Pinnadel, "Ja", "Nein") == 0) {

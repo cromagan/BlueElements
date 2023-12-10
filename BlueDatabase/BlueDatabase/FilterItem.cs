@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -45,22 +45,6 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public FilterItem(DatabaseAbstract db, FilterType filterType, string searchValue) : this(db, filterType, new List<string> { searchValue }) { }
 
-    public FilterItem(DatabaseAbstract db, FilterType filterType, IList<string>? searchValue) {
-        Database = db;
-        KeyName = Generic.UniqueInternal();
-
-        db.DisposingEvent += Database_Disposing;
-
-        _filterType = filterType;
-        if (searchValue != null && searchValue.Count > 0) {
-            SearchValue = new ReadOnlyCollection<string>(searchValue);
-        } else {
-            SearchValue = new List<string>().AsReadOnly();
-        }
-
-        _column?.RefreshColumnsData();
-    }
-
     /// <summary>
     /// Ein AlwaysFalse Filter
     /// </summary>
@@ -89,15 +73,6 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     /// <summary>
     /// Bei diesem Construktor muss der Tag 'Database' vorkommen!
     /// </summary>
-    /// <param name="filterCode"></param>
-
-    public FilterItem(string filterCode) {
-        KeyName = Generic.UniqueInternal();
-        SearchValue = new List<string>().AsReadOnly();
-        this.Parse(filterCode);
-        _column?.RefreshColumnsData();
-    }
-
     public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) { }
 
     public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string> { searchValue }, tag) { }
@@ -120,13 +95,29 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         }
     }
 
-    public FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
-
     /// <summary>
     /// Erstellt einen Filter, der die erste Spalte als Filter hat, mit dem Wert der Zeile.
     /// </summary>
     /// <param name="row"></param>
     public FilterItem(RowItem row) : this(EnsureNotNull(row.Database?.Column.First()), row) { }
+
+    private FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
+
+    private FilterItem(DatabaseAbstract db, FilterType filterType, IList<string>? searchValue) {
+        Database = db;
+        KeyName = Generic.UniqueInternal();
+
+        db.DisposingEvent += Database_Disposing;
+
+        _filterType = filterType;
+        if (searchValue != null && searchValue.Count > 0) {
+            SearchValue = new ReadOnlyCollection<string>(searchValue);
+        } else {
+            SearchValue = new List<string>().AsReadOnly();
+        }
+
+        _column?.RefreshColumnsData();
+    }
 
     #endregion
 

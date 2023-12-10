@@ -55,7 +55,6 @@ namespace BlueControls {
             this.tableVariablen.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
                                                            | AnchorStyles.Left) 
                                                           | AnchorStyles.Right)));
-            this.tableVariablen.DropMessages = false;
             this.tableVariablen.Location = new Point(8, 64);
             this.tableVariablen.Name = "tableVariablen";
             this.tableVariablen.ShowWaitScreen = true;

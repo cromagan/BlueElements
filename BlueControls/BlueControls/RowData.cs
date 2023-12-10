@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -70,7 +70,7 @@ public static class RowDrawDataExtensions {
 /// RowData kann mehrfach in einer Tabelle angezeigt werden.
 /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
 /// </summary>
-public class RowData : IComparable, IDisposableExtended {
+public sealed class RowData : IComparable, IDisposableExtended {
 
     #region Constructors
 
@@ -143,9 +143,9 @@ public class RowData : IComparable, IDisposableExtended {
         MarkYellow = thisRowData.MarkYellow;
     }
 
-    public override string ToString() => Row == null || Row.IsDisposed ? Chapter + " -> null" : Chapter + " -> " + Row.CellFirstString();
+    public override string ToString() => Row.IsDisposed ? Chapter + " -> null" : Chapter + " -> " + Row.CellFirstString();
 
-    protected virtual void Dispose(bool disposing) {
+    private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
                 //Row = null;

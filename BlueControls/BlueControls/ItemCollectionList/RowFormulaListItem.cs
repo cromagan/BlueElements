@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -30,7 +30,7 @@ public class RowFormulaListItem : AbstractListItem {
 
     #region Fields
 
-    private string _layoutId;
+    private readonly string _layoutId;
 
     private RowItem? _row;
 
@@ -59,16 +59,16 @@ public class RowFormulaListItem : AbstractListItem {
 
     #endregion
 
-    #region Properties
+    //public string LayoutId {
+    //    get => _layoutId;
+    //    set {
+    //        if (value == _layoutId) { return; }
+    //        _layoutId = value;
+    //        RemovePic();
+    //    }
+    //}
 
-    public string LayoutId {
-        get => _layoutId;
-        set {
-            if (value == _layoutId) { return; }
-            _layoutId = value;
-            RemovePic();
-        }
-    }
+    #region Properties
 
     public override string QuickInfo {
         get {
@@ -163,7 +163,7 @@ public class RowFormulaListItem : AbstractListItem {
         var internalZoom = Math.Min(500 / mb.Width, 500 / mb.Height);
         internalZoom = Math.Min(1, internalZoom);
 
-        _tmpBmp ??= new Bitmap((int)(mb.Width * internalZoom), (int)(mb.Height * internalZoom));
+        _tmpBmp ??= new Bitmap(mb.Width * internalZoom, mb.Height * internalZoom);
         var zoomv = ItemCollectionPad.ItemCollectionPad.ZoomFitValue(mb, _tmpBmp.Size);
         var centerpos = ItemCollectionPad.ItemCollectionPad.CenterPos(mb, _tmpBmp.Size, zoomv);
         var slidervalues = ItemCollectionPad.ItemCollectionPad.SliderValues(mb, zoomv, centerpos);

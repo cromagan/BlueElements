@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -45,11 +45,12 @@ using BlueScript.Variables;
 using static BlueBasics.Converter;
 using static BlueBasics.Generic;
 using MessageBox = BlueControls.Forms.MessageBox;
+using static BlueBasics.Constants;
 
 namespace BlueControls.ItemCollectionPad;
 
 //TODO: IParseable implementieren
-public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName, IStringable {
+public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName, IStringable {
 
     #region Fields
 
@@ -57,7 +58,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
 
     public static List<AbstractPadItem>? PadItemTypes;
 
-    internal string Caption;
+    internal readonly string Caption;
 
     /// <summary>
     /// Für automatische Generierungen, die zu schnell hintereinander kommen, ein Counter für den Dateinamen
@@ -242,7 +243,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         get => _gridShow;
         set {
             if (IsDisposed) { return; }
-            if (Math.Abs(_gridShow - value) < 0.00001) { return; }
+            if (Math.Abs(_gridShow - value) < FineTolerance) { return; }
             _gridShow = value;
             OnChanged();
         }
@@ -256,7 +257,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         get => _gridsnap;
         set {
             if (IsDisposed) { return; }
-            if (Math.Abs(_gridsnap - value) < 0.00001) { return; }
+            if (Math.Abs(_gridsnap - value) < FineTolerance) { return; }
             _gridsnap = value;
             OnChanged();
         }
@@ -281,8 +282,8 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         get => _sheetSizeInMm;
         set {
             if (IsDisposed) { return; }
-            if (Math.Abs(value.Width - _sheetSizeInMm.Width) < 0.0001 &&
-                Math.Abs(value.Height - _sheetSizeInMm.Height) < 0.0001) { return; }
+            if (Math.Abs(value.Width - _sheetSizeInMm.Width) < FineTolerance &&
+                Math.Abs(value.Height - _sheetSizeInMm.Height) < FineTolerance) { return; }
             _sheetSizeInMm = new SizeF(value.Width, value.Height);
             GenPoints();
             OnChanged();
@@ -316,7 +317,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         set {
             if (IsDisposed) { return; }
             if (value < 0.1f) { value = 0.1f; }
-            if (Math.Abs(_sheetStyleScale - value) < 0.0001) { return; }
+            if (Math.Abs(_sheetStyleScale - value) < DefaultTolerance) { return; }
             _sheetStyleScale = value;
             ApplyDesignToItems();
             OnChanged();
@@ -505,16 +506,14 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     public void EineEbeneNachHinten(AbstractPadItem bpi) {
         var i2 = Previous(bpi);
         if (i2 != null) {
-            var tempVar = bpi;
-            Swap(IndexOf(tempVar), IndexOf(i2));
+            Swap(IndexOf(bpi), IndexOf(i2));
         }
     }
 
     public void EineEbeneNachVorne(AbstractPadItem bpi) {
         var i2 = Next(bpi);
         if (i2 != null) {
-            var tempVar = bpi;
-            Swap(IndexOf(tempVar), IndexOf(i2));
+            Swap(IndexOf(bpi), IndexOf(i2));
         }
     }
 
@@ -577,7 +576,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
 
         if (!string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) {
             foreach (var thisToo in this) {
-                if (item.Gruppenzugehörigkeit.ToLower() == thisToo.Gruppenzugehörigkeit.ToLower()) {
+                if (String.Equals(item.Gruppenzugehörigkeit, thisToo.Gruppenzugehörigkeit, StringComparison.OrdinalIgnoreCase)) {
                     Remove(thisToo);
                     return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
                 }
@@ -715,7 +714,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         var usedids = new List<int>();
 
         foreach (var thisIt in this) {
-            if (thisIt != null && thisIt is IItemSendSomething hci && thisIt.IsVisibleOnPage(page)) {
+            if (thisIt is IItemSendSomething hci && thisIt.IsVisibleOnPage(page)) {
                 usedids.Add(hci.OutputColorId);
             }
         }
@@ -777,20 +776,6 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
             if (this[itemCount] != null) { return this[itemCount]; }
         } while (true);
     }
-
-    protected virtual void OnItemAdded(AbstractPadItem item) {
-        if (IsDisposed) { return; }
-        ItemAdded?.Invoke(this, new ListEventArgs(item));
-        OnChanged();
-    }
-
-    protected virtual void OnItemRemoved() {
-        ItemRemoved?.Invoke(this, System.EventArgs.Empty);
-        if (IsDisposed) { return; }
-        OnChanged();
-    }
-
-    protected virtual void OnItemRemoving(AbstractPadItem item) => ItemRemoving?.Invoke(this, new ListEventArgs(item));
 
     private void ApplyDesignToItems() {
         if (IsDisposed) { return; }
@@ -924,7 +909,7 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
     }
 
     private void GenPoints() {
-        if (Math.Abs(_sheetSizeInMm.Width) < 0.001 || Math.Abs(_sheetSizeInMm.Height) < 0.001) {
+        if (Math.Abs(_sheetSizeInMm.Width) < DefaultTolerance || Math.Abs(_sheetSizeInMm.Height) < DefaultTolerance) {
             if (_prLo != null) {
                 _prLo.Parent = null;
                 _prLo = null;
@@ -983,6 +968,20 @@ public class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposa
         }
         return !done ? RectangleF.Empty : new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
+
+    private void OnItemAdded(AbstractPadItem item) {
+        if (IsDisposed) { return; }
+        ItemAdded?.Invoke(this, new ListEventArgs(item));
+        OnChanged();
+    }
+
+    private void OnItemRemoved() {
+        ItemRemoved?.Invoke(this, System.EventArgs.Empty);
+        if (IsDisposed) { return; }
+        OnChanged();
+    }
+
+    private void OnItemRemoving(AbstractPadItem item) => ItemRemoving?.Invoke(this, new ListEventArgs(item));
 
     private void ParseConnections(string toParse) {
         if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }

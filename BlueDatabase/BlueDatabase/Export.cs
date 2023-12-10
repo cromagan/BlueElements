@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -43,37 +43,6 @@ public static class Export {
     //}
 
     #region Methods
-
-    public static string CreateLayout(RowItem row, string loadFile, string saveFile) {
-        if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
-        List<RowItem> tmpList = new()
-        {
-            row
-        };
-        return InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
-    }
-
-    public static string CreateLayout(List<RowItem> rows, string loadFile, string saveFile) {
-        if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
-        return InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
-    }
-
-    //Shared Sub SaveAsBitmap(Row As RowItem)
-    //    If Row Is Nothing Then
-    //        MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK")
-    //        Exit Sub
-    //    End If
-    //    If Row.Database.Layouts.Count = 0 Then
-    //        MessageBox.Show("Kein Layouts vorhanden.", ImageCode.Information, "OK")
-    //        Exit Sub
-    //    End If
-    //    'Dim x As String = Row.Cell(Row.Database.Column.SysLastUsedLayout).String
-    //    'If x.IsLong Then
-    //    '    GenerateLayout_Internal(Row, Integer.Parse(x), False, True, String.Empty)
-    //    'Else
-    //    GenerateLayout_Internal(Row, 0, False, True, String.Empty)
-    //    '   End If
-    //End Sub
 
     public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
         List<string> l = new();
@@ -117,6 +86,47 @@ public static class Export {
         return (l, fehler);
     }
 
+    public static (List<string>? files, string error) SaveAsBitmap(List<RowItem> row, string layoutId, string path) {
+        List<string> l = new();
+        Develop.DebugPrint_NichtImplementiert();
+        //foreach (var thisRow in row) {
+        //    var fn = TempFile(path, thisRow.CellFirstString(), "PNG");
+        //    thisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(thisRow, layoutId, fn));
+        //    l.Add(fn);
+        //}
+        return (l, string.Empty);
+    }
+
+    private static string CreateLayout(RowItem row, string loadFile, string saveFile) {
+        if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
+        List<RowItem> tmpList = new()
+        {
+            row
+        };
+        return InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
+    }
+
+    private static string CreateLayout(List<RowItem> rows, string loadFile, string saveFile) {
+        if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
+        return InternalCreateLayout(rows, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
+    }
+
+    //Shared Sub SaveAsBitmap(Row As RowItem)
+    //    If Row Is Nothing Then
+    //        MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK")
+    //        Exit Sub
+    //    End If
+    //    If Row.Database.Layouts.Count = 0 Then
+    //        MessageBox.Show("Kein Layouts vorhanden.", ImageCode.Information, "OK")
+    //        Exit Sub
+    //    End If
+    //    'Dim x As String = Row.Cell(Row.Database.Column.SysLastUsedLayout).String
+    //    'If x.IsLong Then
+    //    '    GenerateLayout_Internal(Row, Integer.Parse(x), False, True, String.Empty)
+    //    'Else
+    //    GenerateLayout_Internal(Row, 0, False, True, String.Empty)
+    //    '   End If
+    //End Sub
     //public static object ParseVariable(string platzhaltertxt, string variablename, object value) {
     //    var kennungstart = 0;
     //    if (string.IsNullOrEmpty(platzhaltertxt)) { return platzhaltertxt; }
@@ -484,26 +494,6 @@ public static class Export {
     //        }
     //    } while (true);
     //}
-
-    public static (List<string>? files, string error) SaveAs(RowItem row, string layout, string destinationFile) {
-        List<RowItem> l = new()
-        {
-            row
-        };
-        return GenerateLayout_FileSystem(l, layout, destinationFile, false, string.Empty);
-    }
-
-    public static (List<string>? files, string error) SaveAsBitmap(List<RowItem> row, string layoutId, string path) {
-        List<string> l = new();
-        Develop.DebugPrint_NichtImplementiert();
-        //foreach (var thisRow in row) {
-        //    var fn = TempFile(path, thisRow.CellFirstString(), "PNG");
-        //    thisRow.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(thisRow, layoutId, fn));
-        //    l.Add(fn);
-        //}
-        return (l, string.Empty);
-    }
-
     //public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Database.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(row, layoutId, filename));
 
     private static string InternalCreateLayout(List<RowItem> rows, string fileLoaded, string saveFileName) {
@@ -522,29 +512,29 @@ public static class Export {
         var onemled = string.Empty;
 
         var tmpSave = head;
-        if (rows != null) {
-            foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
-            {
-                if (thisRow != null && !thisRow.IsDisposed) {
-                    var tmpBody = body;
 
-                    var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0);
+        foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
+        {
+            if (thisRow != null && !thisRow.IsDisposed) {
+                var tmpBody = body;
 
-                    if (!script.AllOk) {
-                        f = f + thisRow.CellFirstString() + "\r\n";
-                        onemled = script.ProtocolText;
-                    }
+                var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0);
 
-                    if (script.Variables != null) {
-                        foreach (var thisV in script.Variables) {
-                            tmpBody = thisV.ReplaceInText(tmpBody);
-                        }
-                    }
-
-                    tmpSave += tmpBody;
+                if (!script.AllOk) {
+                    f = f + thisRow.CellFirstString() + "\r\n";
+                    onemled = script.ProtocolText;
                 }
+
+                if (script.Variables != null) {
+                    foreach (var thisV in script.Variables) {
+                        tmpBody = thisV.ReplaceInText(tmpBody);
+                    }
+                }
+
+                tmpSave += tmpBody;
             }
         }
+
         tmpSave += foot;
         if (!string.IsNullOrEmpty(saveFileName)) // Dateien ohne Suffix-Angabe können nicht gespeichert werden
         {

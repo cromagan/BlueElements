@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -22,6 +22,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
+using BlueBasics.Enums;
+using BlueBasics.MultiUserFile;
+using BlueDatabase;
 
 //https://stackoverflow.com/questions/9462592/best-practices-for-multi-form-applications-to-show-and-hide-forms
 namespace BlueControls;
@@ -61,7 +64,7 @@ public class FormManager : ApplicationContext {
 
     public static void RegisterForm(Form frm) {
         if (_current == null) {
-            Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "FormManager nicht gestartert!");
+            Develop.DebugPrint(FehlerArt.Fehler, "FormManager nicht gestartert!");
             return;
         }
         _current.RegisterFormInternal(frm);
@@ -81,7 +84,7 @@ public class FormManager : ApplicationContext {
     //    return l;
     //}
     public static FormManager Starter(Type startform, Type? lastWindow) {
-        if (_current != null) { Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Doppelter Start"); }
+        if (_current != null) { Develop.DebugPrint(FehlerArt.Fehler, "Doppelter Start"); }
 
         var tmp = new FormManager(); // temporär! Weil ansonsten startet true gilt und bei initialisieren der Fenster unerwartete Effekte auftreten können
         _lastWindow = lastWindow;
@@ -89,13 +92,6 @@ public class FormManager : ApplicationContext {
         tmp._lastStartForm = CreateForm(startform, tmp);
         _current = tmp;
         return _current;
-    }
-
-    //Any form which might be the last open form in the application should be created with this
-    public T CreateForm<T>() where T : Form, new() {
-        var ret = new T();
-        RegisterForm(ret);
-        return ret;
     }
 
     private static Form? CreateForm(Type? frm, FormManager? fm) {
@@ -126,13 +122,13 @@ public class FormManager : ApplicationContext {
             Running = false;
             ExecuteAtEnd?.Invoke();
 
-            var a = BlueDatabase.Database.AllFiles.Clone();
+            var a = DatabaseAbstract.AllFiles.Clone();
             foreach (var thisDb in a) {
                 thisDb.Dispose();
             }
 
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-            BlueBasics.MultiUserFile.MultiUserFile.SaveAll(true);
+            MultiUserFile.SaveAll(false);
+            MultiUserFile.SaveAll(true);
 
             ExitThread();
             Develop.AbortExe();

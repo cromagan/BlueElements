@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -27,13 +27,13 @@ public static class DatabaseDataTypeExtension {
 
     public static bool IsCommand(this DatabaseDataType type) => (int)type is >= 220 and <= 230;
 
-    public static bool IsDatabaseTag(this DatabaseDataType type) => (int)type is < 100 or >= 249;
+    //public static bool IsDatabaseTag(this DatabaseDataType type) => (int)type is < 100 or >= 249;
 
     public static bool IsObsolete(this DatabaseDataType type) => (int)type is 0 or 2 or 3 or 22 or 33 or 34 or 35 or 52 or 53 or 54 or 56 or 58 or 59 or 60 or 61 or 62 or 65 or 67 or 70 or 109 or 123 or 151 or 178 or 185 or 191 or 249;
 
-    public static bool Nameless(this DatabaseDataType type) => type.ToString() == ((int)type).ToString();
-
     #endregion
+
+    //public static bool Nameless(this DatabaseDataType type) => type.ToString() == ((int)type).ToString();
 }
 
 public enum DatabaseDataType : byte {
@@ -256,7 +256,7 @@ public enum DatabaseDataType : byte {
     //SaveContent = 191,
     //co_AutoFilter_Dauerfilter = 192,
     //co_Intelligenter_Multifilter = 193,
-    ColumnKey = 194,   //    co_DauerFilterPos = 194,
+    //ColumnKey = 194,   //    co_DauerFilterPos = 194,
 
     AutoReplaceAfterEdit = 195,
     FilterOptions = 196,

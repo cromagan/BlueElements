@@ -1,7 +1,7 @@
 ﻿// Authors:
 // Christian Peter
 //
-// Copyright (c) 2023 Christian Peter
+// Copyright (c) 2024 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -139,11 +139,6 @@ public class LinePadItem : AbstractPadItem {
 
     public override void PointMoved(object sender, MoveEventArgs e) => CalcTempPoints();
 
-    public void SetCoordinates(float px1, float py1, float px2, float py2) {
-        _point1.SetTo(px1, py1);
-        _point2.SetTo(px2, py2);
-    }
-
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = new();
@@ -229,7 +224,7 @@ public class LinePadItem : AbstractPadItem {
         }
         if (Linien_Verhalten != ConectorStyle.Direct && _tempPoints != null) {
             if (DateTime.UtcNow.Subtract(_lastRecalc).TotalSeconds > 5) {
-                if (DateTime.UtcNow.Subtract(_lastRecalc).TotalSeconds > 5 + Constants.GlobalRND.Next(10)) {
+                if (DateTime.UtcNow.Subtract(_lastRecalc).TotalSeconds > 5 + Constants.GlobalRnd.Next(10)) {
                     _tempPoints = null;
                 }
                 // r = Nothing
@@ -296,8 +291,8 @@ public class LinePadItem : AbstractPadItem {
     private bool LöscheVerdeckte(int p1) {
         if (_tempPoints?[p1] is not PointF p) { return false; }
 
-        //if (Math.Abs(p.X - _point1.X) < 0.001 && Math.Abs(p.Y - _point1.Y) < 0.001) { return false; }
-        //if (Math.Abs(p.X - _point2.X) < 0.001 && Math.Abs(p.Y - _point2.Y) < 0.001) { return false; }
+        //if (Math.Abs(p.X - _point1.X) < DefaultTolerance && Math.Abs(p.Y - _point1.Y) < DefaultTolerance) { return false; }
+        //if (Math.Abs(p.X - _point2.X) < DefaultTolerance && Math.Abs(p.Y - _point2.Y) < DefaultTolerance) { return false; }
 
         if (IsVerdeckt(p.X, p.Y)) {
             _tempPoints.RemoveAt(p1);
