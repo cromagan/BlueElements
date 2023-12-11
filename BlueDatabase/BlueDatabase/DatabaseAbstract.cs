@@ -533,6 +533,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                     }
 
                     var start = DateTime.UtcNow;
+                    db.Shuffle();
                     foreach (var thisdb in db) {
                         thisdb.DoLastChanges(files, changes, fd, start);
                         thisdb.TryToSetMeTemporaryMaster();
@@ -1168,12 +1169,15 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         }
     }
 
-    public string Export_CSV(FirstRow firstRow, ColumnItem column, ICollection<RowItem> sortedRows) =>
+    public string Export_CSV(FirstRow firstRow, ColumnViewCollection? arrangement, IEnumerable<RowItem> sortedRows) => Export_CSV(firstRow, arrangement?.ListOfUsedColumn(), sortedRows);
+
+    public string Export_CSV(FirstRow firstRow, ColumnItem column, IEnumerable<RowItem> sortedRows) =>
                         //Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
                         Export_CSV(firstRow, new List<ColumnItem> { column }, sortedRows);
 
-    public string Export_CSV(FirstRow firstRow, List<ColumnItem>? columnList, ICollection<RowItem> sortedRows) {
-        columnList ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
+    public string Export_CSV(FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
+        var columnListtmp = columnList?.ToList();
+        columnListtmp ??= Column.Where(thisColumnItem => thisColumnItem != null).ToList();
         //sortedRows ??= Row.AllRows();
 
         StringBuilder sb = new();
@@ -1182,24 +1186,24 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
                 break;
 
             case FirstRow.ColumnCaption:
-                for (var colNr = 0; colNr < columnList.Count; colNr++) {
-                    if (columnList[colNr] != null) {
-                        var tmp = columnList[colNr].ReadableText();
+                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
+                    if (columnListtmp[colNr] != null) {
+                        var tmp = columnListtmp[colNr].ReadableText();
                         tmp = tmp.Replace(";", "|");
                         tmp = tmp.Replace(" |", "|");
                         tmp = tmp.Replace("| ", "|");
                         _ = sb.Append(tmp);
-                        if (colNr < columnList.Count - 1) { _ = sb.Append(";"); }
+                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(";"); }
                     }
                 }
                 _ = sb.Append("\r\n");
                 break;
 
             case FirstRow.ColumnInternalName:
-                for (var colNr = 0; colNr < columnList.Count; colNr++) {
-                    if (columnList[colNr] != null) {
-                        _ = sb.Append(columnList[colNr].KeyName);
-                        if (colNr < columnList.Count - 1) { _ = sb.Append(';'); }
+                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
+                    if (columnListtmp[colNr] != null) {
+                        _ = sb.Append(columnListtmp[colNr].KeyName);
+                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(';'); }
                     }
                 }
                 _ = sb.Append("\r\n");
@@ -1217,15 +1221,15 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
         foreach (var thisRow in sortedRows) {
             if (thisRow != null && !thisRow.IsDisposed) {
-                for (var colNr = 0; colNr < columnList.Count; colNr++) {
-                    if (columnList[colNr] != null) {
-                        var tmp = Cell.GetString(columnList[colNr], thisRow);
+                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
+                    if (columnListtmp[colNr] != null) {
+                        var tmp = Cell.GetString(columnListtmp[colNr], thisRow);
                         tmp = tmp.Replace("\r\n", "|");
                         tmp = tmp.Replace("\r", "|");
                         tmp = tmp.Replace("\n", "|");
                         tmp = tmp.Replace(";", "<sk>");
                         _ = sb.Append(tmp);
-                        if (colNr < columnList.Count - 1) { _ = sb.Append(';'); }
+                        if (colNr < columnListtmp.Count - 1) { _ = sb.Append(';'); }
                     }
                 }
                 _ = sb.Append("\r\n");
@@ -2088,8 +2092,8 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     }
 
     private static void CheckSysUndo(object state) {
-        if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 180) { return; }
-        if (DateTime.UtcNow.Subtract(LastLoadUtc).TotalSeconds < 5) { return; }
+        if (DateTime.UtcNow.Subtract(_timerTimeStamp).TotalSeconds < 240) { return; }
+        if (DateTime.UtcNow.Subtract(LastLoadUtc).TotalSeconds < 180) { return; }
 
         if (CriticalState()) { return; }
         CheckSysUndoNow(AllFiles, false);
@@ -2099,7 +2103,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         foreach (var thisDb in AllFiles) {
             if (!thisDb.IsDisposed) {
                 if (!thisDb.LogUndo) { return true; } // Irgend ein heikler Prozess
-                if (thisDb.IsInCache.Year < 2000) { return true; } // Irgend eine Datenbank wird aktuell geladen
+                if (thisDb.IsInCache.Year < 2000 && !string.IsNullOrEmpty(thisDb.Filename)) { return true; } // Irgend eine Datenbank wird aktuell geladen
             }
         }
 

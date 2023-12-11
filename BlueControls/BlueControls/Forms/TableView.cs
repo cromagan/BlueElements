@@ -841,7 +841,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
-        Notification.Show("20 Sekunden (fast) rechtefreies<br>bearbeiten akiviert.", ImageCode.Stift);
+        Notification.Show("20 Sekunden (fast) rechtefreies<br>Bearbeiten aktiviert.", ImageCode.Stift);
         Table.PowerEdit = DateTime.UtcNow.AddSeconds(20);
     }
 

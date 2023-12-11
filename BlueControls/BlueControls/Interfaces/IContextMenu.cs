@@ -24,7 +24,7 @@ using BlueControls.EventArgs;
 namespace BlueControls.Interfaces;
 
 /// <summary>
-/// Interface, das zur Generierung von Kontextmenüs benötit wird.
+/// Interface, das zur Generierung von Kontextmenüs benötigt wird.
 /// Die ganze Erstellung und Handling übernimmt dabei FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
 /// Dabei werden die hier angegebenen Routinen und Events abgefragt und ausgelöst.
 /// </summary>

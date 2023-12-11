@@ -29,7 +29,7 @@ using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName, IEnumerable<ColumnViewItem> {
+public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName {
 
     #region Fields
 
