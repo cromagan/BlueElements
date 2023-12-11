@@ -93,7 +93,7 @@ public partial class Tool_Eraser : GenericTool {
             if (e.Current.IsInPic) {
                 var cc = pic.GetPixel(e.Current.X, e.Current.Y);
                 if (cc.ToArgb() == 0) { return; }
-                OnOverridePic(ReplaceColor(originalPic, cc, Color.Transparent));
+                OnOverridePic(ReplaceColor(originalPic, cc, Color.Transparent), false);
                 return;
             }
         }

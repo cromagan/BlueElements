@@ -107,7 +107,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
             var y = (h - pic.Height) / 2;
             gr.DrawImage(pic, x, y, pic.Width, pic.Height);
         }
-        OnOverridePic(nBmp);
+        OnOverridePic(nBmp, true);
     }
 
     private void btnAusrichten_Click(object sender, System.EventArgs e) {
@@ -121,7 +121,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         if (pic == null) { return; }
         CollectGarbage();
         pic.RotateFlip(RotateFlipType.Rotate270FlipNone);
-        OnOverridePic(pic);
+        OnOverridePic(pic, true);
         OnZoomFit();
     }
 
@@ -131,7 +131,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         if (pic == null) { return; }
         CollectGarbage();
         pic.RotateFlip(RotateFlipType.Rotate90FlipNone);
-        OnOverridePic(pic);
+        OnOverridePic(pic, true);
         OnZoomFit();
     }
 
@@ -141,7 +141,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         if (pic == null) { return; }
         CollectGarbage();
         pic.RotateFlip(RotateFlipType.RotateNoneFlipY);
-        OnOverridePic(pic);
+        OnOverridePic(pic, true);
         OnZoomFit();
     }
 
@@ -151,7 +151,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         if (pic == null) { return; }
         CollectGarbage();
         pic.RotateFlip(RotateFlipType.RotateNoneFlipX);
-        OnOverridePic(pic);
+        OnOverridePic(pic, true);
         OnZoomFit();
     }
 

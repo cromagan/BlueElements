@@ -57,19 +57,19 @@ public class DatabaseMu : Database {
 
     #endregion
 
+    //public new static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
+    //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
+
+    //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
+    //    if (ci.AdditionalData.FileSuffix().ToUpper() is not "MBDB") { return null; }
+    //    if (!FileExists(ci.AdditionalData)) { return null; }
+
+    //    var db = new DatabaseMu(ci.TableName);
+    //    db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
+    //    return db;
+    //}
+
     #region Methods
-
-    public new static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
-        if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
-
-        if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
-        if (ci.AdditionalData.FileSuffix().ToUpper() is not "MBDB") { return null; }
-        if (!FileExists(ci.AdditionalData)) { return null; }
-
-        var db = new DatabaseMu(ci.TableName);
-        db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
-        return db;
-    }
 
     public override ConnectionInfo? ConnectionDataOfOtherTable(string tableName, bool checkExists) {
         if (string.IsNullOrEmpty(Filename)) { return null; }

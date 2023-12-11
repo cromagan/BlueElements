@@ -85,7 +85,7 @@ public partial class ZoomPad : GenericControl {
             value = Math.Max(_zoomFit / 10f, value);
             value = Math.Min(20, value);
 
-            if (Math.Abs(value - _zoom) < 0.001) { return; }
+            if (Math.Abs(value - _zoom) < Constants.DefaultTolerance) { return; }
             _zoom = value;
             Invalidate();
         }

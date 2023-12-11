@@ -66,8 +66,8 @@ public partial class MainWindow {
     /// Filename wird entfernt!
     /// </summary>
     /// <param name="bmp"></param>
-    public void SetPic(Bitmap? bmp) {
-        CurrentTool_OverridePic(this, new BitmapEventArgs(bmp));
+    public void SetPic(Bitmap? bmp, bool zoomfit) {
+        CurrentTool_OverridePic(this, new ZoomBitmapEventArgs(bmp, zoomfit));
         _filename = string.Empty;
     }
 
@@ -155,7 +155,7 @@ public partial class MainWindow {
             Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", ImageCode.Information);
             return;
         }
-        SetPic((Bitmap)Clipboard.GetImage());
+        SetPic((Bitmap)Clipboard.GetImage(), true);
         _isSaved = false;
         _filename = "*";
         P.ZoomFit();
@@ -170,7 +170,7 @@ public partial class MainWindow {
 
     private void btnNeu_Click(object sender, System.EventArgs e) {
         if (!IsSaved()) { return; }
-        SetPic(new Bitmap(100, 100));
+        SetPic(new Bitmap(100, 100), true);
         _filename = "*";
     }
 
@@ -222,9 +222,11 @@ public partial class MainWindow {
 
     private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.Bmp = P.Bmp;
 
-    private void CurrentTool_OverridePic(object sender, BitmapEventArgs e) {
+    private void CurrentTool_OverridePic(object sender, ZoomBitmapEventArgs e) {
         CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
         P.Bmp = e.Bmp;
+        if (e.DoZoomFit) { P.ZoomFit(); }
+
         //if (P.Bmp != null)
         //{
         //    P.OverlayBmp = new Bitmap(P.Bmp.Width, P.Bmp.Height);
@@ -269,7 +271,7 @@ public partial class MainWindow {
     private void LoadFromDisk(string filename) {
         if (!IsSaved()) { return; }
         if (FileExists(filename)) {
-            SetPic(Image_FromFile(filename) as Bitmap);
+            SetPic(Image_FromFile(filename) as Bitmap, true);
             _filename = filename;
             _isSaved = true;
             btnLetzteDateien.AddFileName(filename, string.Empty);

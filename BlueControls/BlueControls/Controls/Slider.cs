@@ -156,7 +156,6 @@ public partial class Slider : IBackgroundNone {
             Invalidate();
             CheckButtonEnabledState();
             lock (_lockRaiseEvent) {
-                if (Math.Abs(_value - value) < DefaultTolerance) { return; }
                 _lastFiredValue = _value;
                 OnValueChanged();
             }

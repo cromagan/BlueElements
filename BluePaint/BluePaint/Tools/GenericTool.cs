@@ -52,7 +52,7 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
 
     public event EventHandler<BitmapEventArgs>? NeedCurrentPic;
 
-    public event EventHandler<BitmapEventArgs>? OverridePic;
+    public event EventHandler<ZoomBitmapEventArgs>? OverridePic;
 
     public event EventHandler? ShowMainWindow;
 
@@ -118,7 +118,7 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     /// Wird benutzt, wenn ein neues Bild erstellt wurde und dieses in den Speicher soll.
     /// </summary>
     /// <param name="bmp"></param>
-    protected void OnOverridePic(Bitmap? bmp) => OverridePic?.Invoke(this, new BitmapEventArgs(bmp));
+    protected void OnOverridePic(Bitmap? bmp, bool zoomfit) => OverridePic?.Invoke(this, new ZoomBitmapEventArgs(bmp, zoomfit));
 
     protected void OnShowMainWindow() => ShowMainWindow?.Invoke(this, System.EventArgs.Empty);
 

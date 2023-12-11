@@ -15,38 +15,23 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
-using BlueControls;
+#nullable enable
 
-namespace BluePaint;
+using System.Drawing;
 
-public partial class Tool_Screenshot {
+namespace BluePaint.EventArgs;
+
+public class ZoomBitmapEventArgs : BitmapEventArgs {
 
     #region Constructors
 
-    public Tool_Screenshot() : base() => InitializeComponent();
+    public ZoomBitmapEventArgs(Bitmap? bmp, bool doZoomFit) : base(bmp) => DoZoomFit = doZoomFit;
 
     #endregion
 
-    #region Methods
+    #region Properties
 
-    internal override void ToolFirstShown() {
-        DoScreenShot();
-        OnZoomFit();
-    }
-
-    private void DoScreenShot() {
-        OnHideMainWindow();
-        Generic.Pause(1, true);
-        var pic = ScreenShot.GrabArea(null);
-        OnOverridePic(pic, true);
-        OnShowMainWindow();
-    }
-
-    private void NeuerScreenshot_Click(object sender, System.EventArgs e) {
-        DoScreenShot();
-        OnZoomFit();
-    }
+    public bool DoZoomFit { get; private set; }
 
     #endregion
 }

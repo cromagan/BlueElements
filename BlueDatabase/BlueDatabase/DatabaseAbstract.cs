@@ -606,21 +606,21 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
         _databaseTypes ??= GetEnumerableOfType<DatabaseAbstract>();
 
-        #region Schauen, ob sie über den Typ definiert werden kann
+        //#region Schauen, ob sie über den Typ definiert werden kann
 
-        foreach (var thist in _databaseTypes) {
-            if (thist.Name.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) {
-                var l = new object?[3];
-                l[0] = ci;
-                l[1] = readOnly;
-                l[2] = needPassword;
-                var v = thist.GetMethod("CanProvide")?.Invoke(null, l);
+        //foreach (var thist in _databaseTypes) {
+        //    if (thist.Name.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) {
+        //        var l = new object?[3];
+        //        l[0] = ci;
+        //        l[1] = readOnly;
+        //        l[2] = needPassword;
+        //        var v = thist.GetMethod("CanProvide")?.Invoke(null, l);
 
-                if (v is DatabaseAbstract db) { return db; }
-            }
-        }
+        //        if (v is DatabaseAbstract db) { return db; }
+        //    }
+        //}
 
-        #endregion
+        //#endregion
 
         #region Wenn die Connection einem Dateinamen entspricht, versuchen den zu laden
 

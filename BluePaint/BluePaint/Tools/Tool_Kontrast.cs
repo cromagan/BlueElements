@@ -78,7 +78,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
     private void btnGamma_Click(object? sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic == null) { return; }
-        OnOverridePic(AdjustGamma(pic, sldGamma.Value));
+        OnOverridePic(AdjustGamma(pic, sldGamma.Value), false);
         sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
         sldHelligkeit.Value = 1f;
@@ -87,7 +87,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
     private void btnGraustufen_Click(object? sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic == null) { return; }
-        OnOverridePic(Grayscale(pic));
+        OnOverridePic(Grayscale(pic), false);
         sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
         sldHelligkeit.Value = 1f;
@@ -96,7 +96,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
     private void btnHelligkeit_Click(object? sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic == null) { return; }
-        OnOverridePic(AdjustBrightness(pic, sldHelligkeit.Value));
+        OnOverridePic(AdjustBrightness(pic, sldHelligkeit.Value), false);
         sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
         sldHelligkeit.Value = 1f;
@@ -105,7 +105,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
     private void btnKontrastErhoehen_Click(object? sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic == null) { return; }
-        OnOverridePic(AdjustContrast(pic, sldKontrast.Value));
+        OnOverridePic(AdjustContrast(pic, sldKontrast.Value), false);
         sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
         sldHelligkeit.Value = 1f;

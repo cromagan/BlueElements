@@ -60,19 +60,19 @@ public class Database : DatabaseAbstract {
 
     #endregion
 
+    //public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
+    //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
+
+    //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
+    //    if (ci.AdditionalData.FileSuffix().ToUpper() is not "BDB" or "MDB") { return null; }
+    //    if (!FileExists(ci.AdditionalData)) { return null; }
+
+    //    var db = new Database(ci.TableName);
+    //    db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
+    //    return db;
+    //}
+
     #region Methods
-
-    public static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
-        if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
-
-        if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
-        if (ci.AdditionalData.FileSuffix().ToUpper() is not "BDB" or "MDB") { return null; }
-        if (!FileExists(ci.AdditionalData)) { return null; }
-
-        var db = new Database(ci.TableName);
-        db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
-        return db;
-    }
 
     public static bool SaveToFile(DatabaseAbstract db, int minLen, string filn) {
         var bytes = ToListOfByte(db, minLen, db.FileStateUTCDate);

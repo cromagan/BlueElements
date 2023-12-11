@@ -129,7 +129,7 @@ public partial class Tool_Clipping {
     private void ZuschnittOK_Click(object? sender, System.EventArgs? e) {
         var pic = OnNeedCurrentPic();
         var bmp2 = Crop(pic, (int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
-        OnOverridePic(bmp2);
+        OnOverridePic(bmp2, true);
         Links.Value = 0;
         Recht.Value = 0;
         Oben.Value = 0;

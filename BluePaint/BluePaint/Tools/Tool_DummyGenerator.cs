@@ -55,7 +55,7 @@ public partial class Tool_DummyGenerator {
             gr.RotateTransform(-90);
             BlueFont.DrawString(gr, TXT.Text, f, new SolidBrush(Color.Black), (float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0));
         }
-        OnOverridePic(newPic);
+        OnOverridePic(newPic, true);
     }
 
     private void Erstellen_Click(object sender, System.EventArgs e) {
