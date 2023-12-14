@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueControls.ItemCollectionPad.Abstract;
 
@@ -36,7 +34,7 @@ internal class PhysicPadItem : AbstractPhysicPadItem {
 
     public static string ClassId => "Physics-Object";
     public override string Description => string.Empty;
-    public List<Kraft> Kraft { get; } = new();
+    public List<Kraft> Kraft { get; } = [];
     protected override int SaveOrder => 999;
 
     #endregion

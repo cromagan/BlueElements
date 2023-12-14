@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
@@ -27,24 +26,21 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_ExtractFirstText : Method {
+internal class Method_SplitWords : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
-    public override string Command => "extractfirsttext";
-
-    public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt einen String mit dem ersten Fund zurück.\r\n" +
-                                              "Wird kein Text gefunden, wird der Defaultwert zurück gegeben.\r\n" +
-                                          "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";
-
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "splitwords";
+    public override string Description => "Gibt eine Liste aller Wörter zurück.\r\nDie Liste ist nach die Zeichen-Länge der Wörter absteigend sortiert.\r\nJedes Wort ist nur einmal in der Liste.";
     public override bool EndlessArgs => false;
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableString.ShortName_Plain;
+    public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "ExtractFirstText(String, SearchPattern, Default);";
+    public override string Syntax => "SplitWords(String)";
 
     #endregion
 
@@ -52,15 +48,16 @@ internal class Method_ExtractFirstText : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var tags = attvar.ValueStringGet(0).ReduceToMulti(attvar.ValueStringGet(1), StringComparison.OrdinalIgnoreCase);
+        var txt = attvar.ValueStringGet(0);
 
-        if (tags == null || tags.Count == 0) {
-            return new DoItFeedback(attvar.ValueStringGet(2));
-        }
+        var list = txt.HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
 
-        return new DoItFeedback(tags[0]);
+        list.Sort((s1, s2) => s2.Length.CompareTo(s1.Length));
+
+        return new DoItFeedback(list);
     }
 
     #endregion

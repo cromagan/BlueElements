@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueDatabase.AdditionalScriptMethods;
 using BlueScript.Enums;
@@ -32,12 +30,13 @@ internal class Method_WebPageGetAllIds : Method_WebPage {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { WebPageVal };
+    public override List<List<string>> Args => [WebPageVal];
     public override string Command => "webpagegetallids";
     public override string Description => "Gibt eine Liste aller IDS zurück, mit denen interagiert werden kann.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "WebPageGetAllIds(WebPageVariable)";

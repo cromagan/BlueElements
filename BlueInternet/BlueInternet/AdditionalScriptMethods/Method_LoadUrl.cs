@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -42,12 +40,13 @@ internal class Method_LoadUrl : Method_WebPage {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal };
+    public override List<List<string>> Args => [StringVal];
     public override string Command => "loadurl";
     public override string Description => "Lädt die angebene Internet-Adresse.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Webpage des Wertes NULL.\r\n\r\nAlle Befehle, die auf die Url zugreifen können, beginnen mit WebPage.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableWebpage.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "LoadUrl(Url)";

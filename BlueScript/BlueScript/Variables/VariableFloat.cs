@@ -15,14 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Structures;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
 using static BlueBasics.Interfaces.IParseableExtension;
+using static BlueBasics.Constants;
 
 namespace BlueScript.Variables;
 
@@ -114,7 +113,7 @@ public class VariableFloat : Variable {
     }
 
     protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
-        var (pos2, _) = NextText(txt, 0, MathFormulaParser.RechenOperatoren, false, false, KlammernStd);
+        var (pos2, _) = NextText(txt, 0, MathFormulaParser.RechenOperatoren, false, false, KlammernAlle);
         if (pos2 >= 0) {
             var erg = MathFormulaParser.Ergebnis(txt);
             if (erg == null) { return null; }

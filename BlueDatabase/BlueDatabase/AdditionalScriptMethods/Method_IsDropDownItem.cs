@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 using BlueScript.Enums;
@@ -31,12 +29,13 @@ internal class Method_IsDropDownItem : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new List<string> { Variable.Any_Variable } };
+    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
     public override string Command => "isdropdownitem";
     public override string Description => "Prüft, ob der Inhalt oder die Inhalte der Variable im Dropdownmenu der Spalte vorkommt.\r\nEs werden nur fest eingegebene Dropdown-Werte berücksichtigt - keine 'Werte anderer Zellen'.\r\nEs wird streng auf die Groß/Kleinschreibung geachtet.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "IsDropDownItem(Value, Column)";

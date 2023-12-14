@@ -74,10 +74,10 @@ public static class FileDialogs {
     /// <param name="Meldungen"></param>
     /// <returns>True, wenn mindestens eine DAtei gelöscht wurde.</returns>
     public static bool DeleteFile(string file, bool rückfrage) {
-        List<string> f = new()
-        {
+        List<string> f =
+        [
             file
-        };
+        ];
         return DeleteFile(f, rückfrage);
     }
 

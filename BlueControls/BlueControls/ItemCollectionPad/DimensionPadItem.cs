@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -169,14 +167,14 @@ public class DimensionPadItem : AbstractPadItem {
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new()
-        {
+        List<GenericControl> l =
+        [
             new FlexiControlForProperty<float>(() => Länge_In_Mm),
             new FlexiControlForProperty<string>(() => Text_Oben),
             new FlexiControlForProperty<string>(() => Suffix),
             new FlexiControlForProperty<string>(() => Text_Unten),
             new FlexiControlForProperty<string>(() => Präfix)
-        };
+        ];
         AddStyleOption(l);
         l.Add(new FlexiControlForProperty<float>(() => Skalierung));
         l.AddRange(base.GetStyleOptions(widthOfControl));
@@ -242,7 +240,7 @@ public class DimensionPadItem : AbstractPadItem {
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("Text1", Text_Oben);
         result.ParseableAdd("Text2", Text_Unten);
         result.ParseableAdd("Decimal", Nachkommastellen);

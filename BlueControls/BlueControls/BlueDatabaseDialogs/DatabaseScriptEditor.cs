@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -57,15 +55,16 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
         Database = database;
 
         if (!string.IsNullOrEmpty(Database.EventScriptErrorMessage)) {
-            var l = new List<string>();
-            l.Add("### ACHTUNG - EINMALIGE ANZEIGE ###");
-            l.Add("Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.");
-            l.Add("Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.");
-            l.Add(" ");
-            l.Add(" ");
-            l.Add("Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:");
-            l.Add(" ");
-            l.Add(Database.EventScriptErrorMessage);
+            var l = new List<string> {
+                "### ACHTUNG - EINMALIGE ANZEIGE ###",
+                "Der Fehlerspeicher wird jetzt gelöscht. Es kann u.U. länger dauern, bis der Fehler erneut auftritt.",
+                "Deswegen wäre es sinnvoll, den Fehler jetzt zu reparieren.",
+                " ",
+                " ",
+                "Letzte Fehlermeldung, die zum Deaktivieren des Skriptes führte:",
+                " ",
+                Database.EventScriptErrorMessage
+            };
             l.WriteAllText(TempFile("", "", "txt"), Constants.Win1252, true);
         }
 

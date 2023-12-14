@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -139,16 +137,16 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
+        List<GenericControl> l = [.. _itemAccepts.GetStyleOptions(this, widthOfControl)];
 
         if (DatabaseInput is not DatabaseAbstract db || db.IsDisposed) { return l; }
 
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
 
-        var sn = new ItemCollectionList.ItemCollectionList(true);
-        sn.Add("#Neue Zeile in der Datenbank anlegen");
+        var sn = new ItemCollectionList.ItemCollectionList(true) {
+            "#Neue Zeile in der Datenbank anlegen"
+        };
 
         foreach (var thisScript in db.EventScript) {
             sn.Add(thisScript.KeyName);
@@ -156,10 +154,11 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
         l.Add(new FlexiControlForProperty<string>(() => SkriptName, sn));
 
-        var za = new ItemCollectionList.ItemCollectionList(true);
-        za.Add("-1", "...egal - immer");
-        za.Add("0", "...keine Zeile gefunden wurde");
-        za.Add("1", "...genau eine Zeile gefunden wurde");
+        var za = new ItemCollectionList.ItemCollectionList(true) {
+            { "-1", "...egal - immer" },
+            { "0", "...keine Zeile gefunden wurde" },
+            { "1", "...genau eine Zeile gefunden wurde" }
+        };
 
         l.Add(new FlexiControlForProperty<int>(() => Drückbar_wenn, za));
 
@@ -205,9 +204,7 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
-
-        result.AddRange(_itemAccepts.ParsableTags());
+        List<string> result = [.. _itemAccepts.ParsableTags()];
 
         result.ParseableAdd("ShowFormat", _anzeige);
         return result.Parseable(base.ToString());

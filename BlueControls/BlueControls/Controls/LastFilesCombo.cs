@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -40,7 +38,7 @@ public sealed class LastFilesCombo : ComboBox {
 
     private int _maxCount = 20;
     private bool _mustExists = true;
-    private List<string> _settings = new();
+    private List<string> _settings = [];
     private string _settingsfilename = string.Empty;
 
     #endregion
@@ -150,12 +148,7 @@ public sealed class LastFilesCombo : ComboBox {
                         }
                         TextListItem it = new(show, x[0], null, false, true,
                             nr.ToString(Constants.Format_Integer3));
-                        List<string> t = new();
-                        if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1])) {
-                            t.Add(x[1]);
-                        } else {
-                            t.Add(string.Empty);
-                        }
+                        List<string> t = [x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) ? x[1] : string.Empty];
                         it.Tag = t;
                         Item.Add(it);
                     }
@@ -166,7 +159,7 @@ public sealed class LastFilesCombo : ComboBox {
     }
 
     private void LoadSettingsFromDisk() {
-        _settings = new List<string>();
+        _settings = [];
 
         if (FileExists(SettingsFileName())) {
             var t = File.ReadAllText(SettingsFileName(), Encoding.UTF8);

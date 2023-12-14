@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -236,9 +234,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public int CellGetInteger(ColumnItem column) => Database?.Cell.GetInteger(column, this) ?? default;
 
-    public List<string> CellGetList(string columnName) => Database?.Cell.GetList(Database?.Column[columnName], this) ?? new();
+    public List<string> CellGetList(string columnName) => Database?.Cell.GetList(Database?.Column[columnName], this) ?? [];
 
-    public List<string> CellGetList(ColumnItem column) => Database?.Cell.GetList(column, this) ?? new();
+    public List<string> CellGetList(ColumnItem column) => Database?.Cell.GetList(column, this) ?? [];
 
     public Point CellGetPoint(string columnName) => Database?.Cell.GetPoint(Database?.Column[columnName], this) ?? Point.Empty;
 
@@ -251,7 +249,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return Database.Cell.GetString(column, this);
     }
 
-    public IEnumerable<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? new();
+    public IEnumerable<string> CellGetValuesReadable(ColumnItem column, ShortenStyle style) => Database?.Cell.ValuesReadable(column, this, style) ?? [];
 
     public bool CellIsNullOrEmpty(string columnName) => Database?.Cell.IsNullOrEmpty(Database?.Column.Exists(columnName), this) ?? default;
 
@@ -306,7 +304,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         LastCheckedMessage = "<b><u>" + CellFirstString() + "</b></u><br><br>";
 
-        List<string> cols = new();
+        List<string> cols = [];
 
         var tmp = LastCheckedRowFeedback;
         if (tmp != null && tmp.Count > 0) {

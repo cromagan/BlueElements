@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -175,8 +173,8 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
     #region Methods
 
     public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems) {
-        List<string> marked = new();
-        List<string> l = new();
+        List<string> marked = [];
+        List<string> l = [];
 
         e.Clear();
         e.CheckBehavior = CheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!

@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 

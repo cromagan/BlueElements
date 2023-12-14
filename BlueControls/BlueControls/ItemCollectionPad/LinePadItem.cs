@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -59,7 +57,7 @@ public class LinePadItem : AbstractPadItem {
         MovablePoint.Add(_point2);
         PointsForSuccesfullyMove.AddRange(MovablePoint);
         Stil = format;
-        _tempPoints = new List<PointF>();
+        _tempPoints = [];
         Linien_Verhalten = ConectorStyle.Direct;
     }
 
@@ -108,7 +106,7 @@ public class LinePadItem : AbstractPadItem {
     //}
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
+        List<GenericControl> l = [];
 
         ItemCollectionList.ItemCollectionList verhalt = new(false)
         {
@@ -141,7 +139,7 @@ public class LinePadItem : AbstractPadItem {
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("Connection", Linien_Verhalten);
         return result.Parseable(base.ToString());
     }
@@ -233,11 +231,11 @@ public class LinePadItem : AbstractPadItem {
         if (_tempPoints != null && _tempPoints.Count > 1) { return; }
         _lastRecalc = DateTime.UtcNow;
         _calcTempPointsCode = newCode;
-        _tempPoints = new List<PointF>
-        {
+        _tempPoints =
+        [
             _point1,
             _point2
-        };
+        ];
         if (Linien_Verhalten == ConectorStyle.Direct) { return; }
         var count = 0;
         do {

@@ -15,9 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
+using System.Globalization;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Enums;
@@ -31,12 +30,13 @@ public class Method_CellSetRow : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableFloat.ShortName_Plain }, StringVal, RowVar };
+    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableFloat.ShortName_Plain, VariableDateTime.ShortName_Variable], StringVal, RowVar];
     public override string Command => "cellsetrow";
     public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
+    public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow;
+    public override bool MustUseReturnValue => false;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "CellSetRow(Value, Column, Row)";
@@ -67,6 +67,7 @@ public class Method_CellSetRow : Method_Database {
         if (attvar.Attributes[0] is VariableString vs) { value = vs.ValueString; }
         if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
         if (attvar.Attributes[0] is VariableFloat vf) { value = vf.ValueForReplace; }
+        if (attvar.Attributes[0] is VariableDateTime vd) { value = vd.ValueDate.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture); }
 
         value = columnToSet.AutoCorrect(value, true);
 

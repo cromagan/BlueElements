@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using BlueBasics;
@@ -142,7 +140,7 @@ public class CellItem {
             //return new List<string>();
             Develop.DebugPrint(FehlerArt.Warnung, "LinkedCell sollte hier nicht ankommen.");
         }
-        List<string> ret = new();
+        List<string> ret = [];
         if (!column.MultiLine) {
             ret.Add(ValueReadable(column, row.CellGetString(column), style, column.BehaviorOfImageAndText, true));
             return ret;

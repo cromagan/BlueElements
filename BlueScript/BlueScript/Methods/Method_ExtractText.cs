@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -33,17 +31,16 @@ internal class Method_ExtractText : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal };
-
+    public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "extracttext";
 
     public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt eine Liste mit allen Funden zurück.\r\n" +
                                               "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";
 
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "ExtractText(String, SearchPattern);";

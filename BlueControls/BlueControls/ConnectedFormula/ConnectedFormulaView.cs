@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -55,7 +53,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     #region Properties
 
-    public List<IControlAcceptSomething> Childs { get; } = new();
+    public List<IControlAcceptSomething> Childs { get; } = [];
 
     public ConnectedFormula.ConnectedFormula? ConnectedFormula {
         get; private set;
@@ -81,11 +79,11 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool FilterManualSeted { get; set; } = false;
 
-    public FilterCollection FilterOutput { get; } = new();
+    public FilterCollection FilterOutput { get; } = [];
 
     public string Page { get; }
 
-    public List<IControlSendSomething> Parents { get; } = new();
+    public List<IControlSendSomething> Parents { get; } = [];
 
     //set => SetData(ConnectedFormula, Database, value, Page);
     [Browsable(false)]

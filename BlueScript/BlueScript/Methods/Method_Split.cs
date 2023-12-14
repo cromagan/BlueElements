@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
@@ -32,13 +30,13 @@ internal class Method_Split : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal };
+    public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "split";
     public override string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.\r\nEs wird dabei immer eine Liste mit mindestens einen Eintrag erzeugt,\r\ndieser kann aber leer sein.";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Split(String, Trennzeichen)";

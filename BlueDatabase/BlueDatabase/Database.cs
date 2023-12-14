@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -92,7 +90,7 @@ public class Database : DatabaseAbstract {
     public static List<byte>? ToListOfByte(DatabaseAbstract db, int minLen, DateTime fileStateUtcDateToSave) {
         try {
             var x = db.LastChange;
-            List<byte> l = new();
+            List<byte> l = [];
             // Wichtig, Reihenfolge und Länge NIE verändern!
             SaveToByteList(l, DatabaseDataType.Formatkennung, "BlueDatabase");
             SaveToByteList(l, DatabaseDataType.Version, DatabaseVersion);
@@ -149,7 +147,7 @@ public class Database : DatabaseAbstract {
 
             // Beim Erstellen des Undo-Speichers die Undos nicht verändern, da auch bei einem nicht
             // erfolgreichen Speichervorgang der Datenbank-String erstellt wird.
-            List<string> works2 = new();
+            List<string> works2 = [];
             foreach (var thisWorkItem in db.Undo) {
                 if (thisWorkItem != null) {
                     if (thisWorkItem.Command != DatabaseDataType.Value_withoutSizeData) {
@@ -451,9 +449,9 @@ public class Database : DatabaseAbstract {
         foreach (var thisco in columnsAdded) { thisco.IsInCache = DateTime.UtcNow; }
     }
 
-    protected override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(ICollection<DatabaseAbstract> db, DateTime fromUtc, DateTime toUtc) => (new(), null);
+    protected override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(ICollection<DatabaseAbstract> db, DateTime fromUtc, DateTime toUtc) => ([], null);
 
-    protected override List<DatabaseAbstract> LoadedDatabasesWithSameServer() => new() { this };
+    protected override List<DatabaseAbstract> LoadedDatabasesWithSameServer() => [this];
 
     protected bool SaveInternal(DateTime setfileStateUtcDateTo) {
         var m = EditableErrorReason(EditableErrorReasonType.Save);

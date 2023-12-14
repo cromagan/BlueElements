@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -57,7 +55,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
         _name = string.Empty;
         Textlage = (Alignment)(-1);
         Randfarbe = Color.Transparent;
-        Eingebettete_Ansichten = new List<string>();
+        Eingebettete_Ansichten = [];
     }
 
     #endregion
@@ -103,11 +101,11 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     #region Methods
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new()
-        {
+        List<GenericControl> l =
+        [
             new FlexiControlForProperty<string>(() => Name),
             new FlexiControlForProperty<Color>(() => Randfarbe)
-        };
+        ];
         ItemCollectionList.ItemCollectionList lage = new(false)
         {
             { "ohne", "-1" },
@@ -273,7 +271,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
 
         result.ParseableAdd("Name", _name);
 

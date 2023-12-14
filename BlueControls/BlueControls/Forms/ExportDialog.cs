@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -207,7 +205,7 @@ public sealed partial class ExportDialog : IHasDatabase {
         if (h < 10) { h = 10; }
         padSchachteln.Item.SheetSizeInMm = new SizeF(b, h);
         padSchachteln.Item.RandinMm = Padding.Empty;
-        List<string> l = new();
+        List<string> l = [];
         _itemNrForPrint = 0;
         do {
             var nr = _itemNrForPrint;

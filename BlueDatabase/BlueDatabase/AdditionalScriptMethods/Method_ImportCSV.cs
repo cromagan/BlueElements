@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueScript.Enums;
@@ -30,15 +28,15 @@ internal class Method_ImportCsv : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal };
+    public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "importcsv";
     public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Datenbank.";
     public override bool EndlessArgs => false;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
-
     public override string StartSequence => "(";
     public override string Syntax => "ImportCSV(CSVText, Separator);";
 

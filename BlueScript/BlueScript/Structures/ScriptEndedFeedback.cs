@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Variables;
@@ -51,7 +49,7 @@ public class ScriptEndedFeedback {
 
         GiveItAnotherTry = giveitanothertry;
 
-        Protocol = new List<string> { "[" + scriptname + ", Start abgebrochen]@" + errormessage };
+        Protocol = ["[" + scriptname + ", Start abgebrochen]@" + errormessage];
         ProtocolText = GenNiceProtokoll(Protocol);
 
         AllOk = false;
@@ -64,7 +62,7 @@ public class ScriptEndedFeedback {
     public ScriptEndedFeedback() {
         GiveItAnotherTry = false;
 
-        Protocol = new List<string>();
+        Protocol = [];
         ProtocolText = string.Empty;
 
         AllOk = true;

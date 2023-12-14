@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
@@ -33,13 +31,14 @@ internal class Method_BackupControl : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal };
+    public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "backupcontrol";
     public override string Description => "Durchsucht das Verzeichnis nach Dateien mit dem angegebenen Filter. Löscht Dateien nach bestimmten Datumsangaben.";
     public override bool EndlessArgs => false;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "BackupControl(filepath, \"table_20*.bdb\");";

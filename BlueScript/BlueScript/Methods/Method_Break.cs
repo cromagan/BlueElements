@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -31,12 +29,13 @@ internal class Method_Break : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
+    public override List<List<string>> Args => [];
     public override string Command => "break";
     public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard | MethodType.Break;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => string.Empty;
 

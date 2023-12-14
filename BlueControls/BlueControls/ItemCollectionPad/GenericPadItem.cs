@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
@@ -62,7 +60,7 @@ public class GenericPadItem : FixedRectangleBitmapPadItem {
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("Text", _text.ToNonCritical());
         result.ParseableAdd("Size", Size);
         return result.Parseable(base.ToString());

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -32,13 +30,14 @@ internal class Method_StringHTMLToAscii : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, BoolVal };
+    public override List<List<string>> Args => [StringVal, BoolVal];
     public override string Command => "stringhtmltoascii";
     public override string Description => "Ersetzt einen HTML-String zu normalen ASCII-String. Beispiel: Aus &auml; wird ä. Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
     public override bool EndlessArgs => false;
-    
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "StringHTMLToAscii(String, IgnoreBRbool)";

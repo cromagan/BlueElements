@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueScript.Enums;
@@ -30,15 +28,15 @@ public class Method_SoftMessage : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal };
+    public override List<List<string>> Args => [StringVal];
     public override string Command => "softmessage";
     public override string Description => "Gibt in der Statusleiste einen Nachricht aus, wenn ein Steuerelement vorhanden ist, dass diese anzeigen kann.";
     public override bool EndlessArgs => true;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
-
     public override string StartSequence => "(";
 
     public override string Syntax => "SoftMessage(Text);";

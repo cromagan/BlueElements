@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 using BlueBasics;
@@ -24,6 +22,7 @@ using BlueBasics.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Interfaces.IParseableExtension;
+using static BlueBasics.Constants;
 
 namespace BlueScript.Variables;
 
@@ -39,7 +38,7 @@ public class VariableListString : Variable {
 
     public VariableListString(string name, IReadOnlyCollection<string>? value, bool ronly, bool system, string comment) : base(name,
         ronly, system, comment) {
-        _list = new List<string>();
+        _list = [];
         if (value != null) {
             _list.AddRange(value);
         }
@@ -67,12 +66,12 @@ public class VariableListString : Variable {
     public override string MyClassId => ClassId;
 
     /// <summary>
-    /// Die Liste als Text formatiert. z.B. {"A", "B", "C"}
+    /// Die Liste als Text formatiert. z.B. ["A", "B", "C"]
     /// Kritische Zeichen innerhalb eines Eintrags wurden unschädlich gemacht.
     /// </summary>
     public override string ReadableText {
         get {
-            if (_list.Count == 0) { return "{ }"; }
+            if (_list.Count == 0) { return "[ ]"; }
 
             var s = string.Empty;
 
@@ -80,7 +79,7 @@ public class VariableListString : Variable {
                 s = s + "\"" + thiss.RemoveCriticalVariableChars() + "\", ";
             }
 
-            return "{" + s.TrimEnd(", ") + "}";
+            return "[" + s.TrimEnd(", ") + "]";
         }
     }
 
@@ -136,14 +135,14 @@ public class VariableListString : Variable {
     }
 
     protected override object? TryParse(string txt, VariableCollection? vs, ScriptProperties? scp) {
-        if (txt.Length > 1 && txt.StartsWith("{") && txt.EndsWith("}")) {
-            var t = txt.DeKlammere(false, true, false, true);
+        if (txt.Length > 1 && txt.StartsWith("[") && txt.EndsWith("]")) {
+            var t = txt.Trim(KlammernEckig);
 
             if (string.IsNullOrEmpty(t)) { return new List<string>(); } // Leere Liste
 
             //var infos = new CanDoFeedback(t, 0, string.Empty, string.Empty, string.Empty, null);
 
-            var l = Method.SplitAttributeToVars(vs, t, new List<List<string>> { new() { VariableString.ShortName_Plain } }, true, null, scp);
+            var l = Method.SplitAttributeToVars(vs, t, [[VariableString.ShortName_Plain]], true, null, scp);
             if (!string.IsNullOrEmpty(l.ErrorMessage)) { return null; }
 
             return l.Attributes.AllStringValues();

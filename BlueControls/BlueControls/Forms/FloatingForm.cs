@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -33,7 +31,7 @@ public partial class FloatingForm : Form {
 
     #region Fields
 
-    internal static readonly List<FloatingForm> AllBoxes = new();
+    internal static readonly List<FloatingForm> AllBoxes = [];
     private readonly Control? _connectedControl;
 
     #endregion

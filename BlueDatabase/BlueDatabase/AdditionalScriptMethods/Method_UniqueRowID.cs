@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -29,12 +27,13 @@ public class Method_UniqueRowId : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
+    public override List<List<string>> Args => [];
     public override string Command => "uniquerowid";
     public override string Description => "Gibt eine systemweit einzigartige Zeilen-ID aller geladenen Datenbanken aus.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "UniqueRowID()";

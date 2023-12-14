@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -103,7 +101,7 @@ public class ItemConnection : IStringable, IChangedFeedback {
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
 
     internal new string ToString() {
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("Item1", Item1.KeyName);
         result.ParseableAdd("Arrow1", ArrowOnItem1);
         result.ParseableAdd("Type1", Item1Type);

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -48,7 +46,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
-    private readonly List<PointM> _points = new();
+    private readonly List<PointM> _points = [];
     private Helpers _helper = Helpers.Ohne;
     private Orientation _mittelLinie = Orientation.Ohne;
     private bool _pointAdding;
@@ -83,7 +81,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         }
     }
 
-    public List<string> Tags { get; } = new();
+    public List<string> Tags { get; } = [];
 
     #endregion
 
@@ -107,7 +105,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     public static Tuple<Bitmap?, List<string>> LoadFromDisk(string pathOfPicture) {
         Bitmap? bmp = null;
-        List<string> tags = new();
+        List<string> tags = [];
         if (FileExists(pathOfPicture)) {
             bmp = (Bitmap?)Image_FromFile(pathOfPicture);
         }

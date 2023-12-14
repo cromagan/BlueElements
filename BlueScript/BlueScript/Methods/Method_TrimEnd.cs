@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
@@ -32,13 +30,13 @@ internal class Method_TrimEnd : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal };
+    public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "trimend";
     public override string Description => "Entfernt die angegebenen Texte am Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
     public override bool EndlessArgs => true;
-
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "TrimEnd(String, TexttoTrim, ...)";

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,7 +31,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
 
     #region Fields
 
-    private readonly List<ColumnItem> _auswahlc = new();
+    private readonly List<ColumnItem> _auswahlc = [];
     private readonly string _auswahlSpalte2 = string.Empty;
     private readonly string _auswahlSpalte3 = string.Empty;
     private string _auswahlSpalte1 = string.Empty;
@@ -91,7 +89,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
 
     public bool FilterManualSeted { get; set; } = false;
 
-    public List<IControlSendSomething> Parents { get; } = new();
+    public List<IControlSendSomething> Parents { get; } = [];
 
     [Description("Dieses Feld kann für den Forms-Editor verwendet werden.")]
     [DefaultValue("")]

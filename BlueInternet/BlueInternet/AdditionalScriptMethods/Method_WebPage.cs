@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using BlueBasics;
 using BlueScript.Methods;
 using BlueScript.Variables;
@@ -31,7 +29,7 @@ public abstract class Method_WebPage : Method {
 
     #region Fields
 
-    public static readonly List<string> WebPageVal = new() { VariableWebpage.ShortName_Variable };
+    public static readonly List<string> WebPageVal = [VariableWebpage.ShortName_Variable];
 
     #endregion
 

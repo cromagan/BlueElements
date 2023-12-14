@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -36,7 +34,7 @@ public readonly struct SplittedAttributesFeedback {
     }
 
     public SplittedAttributesFeedback(ScriptIssueType type, string error) {
-        Attributes = new VariableCollection();
+        Attributes = [];
         ErrorMessage = error;
         FehlerTyp = type;
     }
@@ -112,10 +110,10 @@ public readonly struct SplittedAttributesFeedback {
     }
 
     public List<string> ValueListStringGet(int varno) {
-        if (varno < 0 || varno >= Attributes.Count) { return new(); }
+        if (varno < 0 || varno >= Attributes.Count) { return []; }
 
         if (Attributes[varno] is VariableListString vs) { return vs.ValueList; }
-        return new();
+        return [];
     }
 
     public DoItFeedback? ValueListStringSet(int varno, List<string> value, LogData ld) {

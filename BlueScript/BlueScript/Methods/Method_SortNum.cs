@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Enums;
@@ -31,13 +29,14 @@ internal class Method_SortNum : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { ListStringVar, FloatVal };
+    public override List<List<string>> Args => [ListStringVar, FloatVal];
     public override string Command => "sortnum";
     public override string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
     public override bool EndlessArgs => false;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
 

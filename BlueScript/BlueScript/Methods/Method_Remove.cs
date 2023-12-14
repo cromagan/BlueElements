@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
@@ -32,13 +30,14 @@ internal class Method_Remove : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { ListStringVar, BoolVal, new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override List<List<string>> Args => [ListStringVar, BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "remove";
     public override string Description => "Entfernt aus der Liste die angegebenen Werte.";
     public override bool EndlessArgs => true;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";

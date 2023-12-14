@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -48,7 +46,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     public static readonly BlueFont CaptionFnt = Skin.GetBlueFont(Design.Caption, States.Standard);
 
-    public readonly List<string> VisibleFor = new();
+    public readonly List<string> VisibleFor = [];
 
     #endregion
 
@@ -106,7 +104,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
+        List<GenericControl> l = [];
 
         if (Bei_Export_sichtbar) {
             l.Add(new FlexiControlForDelegate(Breite_berechnen, "Breite berechnen", ImageCode.Zeile));
@@ -212,7 +210,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
 
         if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Everybody); }
 
@@ -264,7 +262,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
         var width = (int)(zoom * 25);
 
-        colorId ??= new List<int>();
+        colorId ??= [];
 
         if (colorId.Count == 0) { colorId.Add(-1); }
 

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -842,7 +840,7 @@ public static class Skin {
     internal static Pen? PenLinieDünn;
     internal static Pen? PenLinieKräftig;
     private const string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
-    private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = new();
+    private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = [];
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
 
     #endregion

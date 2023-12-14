@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -184,11 +182,11 @@ public sealed class ItemAcceptSomething {
 
     #region Fields
 
-    private readonly List<string> _getFilterFromKeys = new();
+    private readonly List<string> _getFilterFromKeys = [];
 
     private ReadOnlyCollection<IItemSendSomething>? _getFilterFrom;
 
-    private List<int> _inputColorId = new();
+    private List<int> _inputColorId = [];
 
     #endregion
 
@@ -292,7 +290,7 @@ public sealed class ItemAcceptSomething {
     }
 
     public List<string> ParsableTags() {
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys);
         //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
 
@@ -318,9 +316,9 @@ public sealed class ItemAcceptSomething {
     }
 
     internal List<GenericControl> GetStyleOptions(IItemAcceptSomething item, int widthOfControl) {
-        var l = new List<GenericControl>();
-
-        l.Add(new FlexiControl("Eingang:", widthOfControl));
+        var l = new List<GenericControl> {
+            new FlexiControl("Eingang:", widthOfControl)
+        };
 
         if (item.WaitForDatabase && item.DatabaseInputMustBe == null) {
             l.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl));

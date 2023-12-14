@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using BlueBasics.Enums;
@@ -31,7 +29,7 @@ public class Method_CallDatabase : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
+    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
 
     public override string Command => "calldatabase";
 
@@ -45,6 +43,7 @@ public class Method_CallDatabase : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
 

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -33,13 +31,13 @@ internal class Method_GetFiles : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal };
+    public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "getfiles";
     public override string Description => "Gibt alle Dateien im angegebenen Verzeichnis zurück. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "GetFiles(Path, Suffix)";

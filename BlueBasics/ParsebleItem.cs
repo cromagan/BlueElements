@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using BlueBasics.Enums;
@@ -133,7 +131,7 @@ public abstract class ParsebleItem : IHasKeyName, IParseable, IChangedFeedback {
     public abstract bool ParseThis(string key, string value);
 
     public override string ToString() {
-        List<string> result = new();
+        List<string> result = [];
 
         var ci = (string?)GetType().GetProperty("ClassId")?.GetValue(null, null);
         if (ci != null) {

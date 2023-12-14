@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,7 +34,7 @@ internal class ConnectedFormulaFilterButton : Button, IControlAcceptSomething {
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
-    public List<IControlSendSomething> Parents { get; } = new();
+    public List<IControlSendSomething> Parents { get; } = [];
 
     #endregion
 

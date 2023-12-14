@@ -43,11 +43,11 @@ public sealed class ButtonActionList : DesignerActionList {
     #region Methods
 
     public override DesignerActionItemCollection GetSortedActionItems() {
-        DesignerActionItemCollection items = new()
-        {
+        DesignerActionItemCollection items =
+        [
             new DesignerActionHeaderItem("Allgemein"),
             new DesignerActionPropertyItem("ButtonStyle", "ButtonStyle", "Allgemein", "Das Verhalten des Buttons.")
-        };
+        ];
         if ((int)_reverenceControl.ButtonStyle % 1000 is (int)ButtonStyle.Checkbox or (int)ButtonStyle.Yes_or_No or (int)ButtonStyle.Optionbox) {
             _ = items.Add(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
         }

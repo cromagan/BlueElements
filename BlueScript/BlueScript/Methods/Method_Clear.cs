@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -31,13 +29,14 @@ internal class Method_Clear : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { ListStringVar };
+    public override List<List<string>> Args => [ListStringVar];
     public override string Command => "clear";
     public override string Description => "Entfernt alle Einträge einer Liste";
     public override bool EndlessArgs => false;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "Clear(VariableListe);";
@@ -51,7 +50,7 @@ internal class Method_Clear : Method {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }
 
-        if (attvar.ValueListStringSet(0, new List<string>(), infos.Data) is DoItFeedback dif) { return dif; }
+        if (attvar.ValueListStringSet(0, [], infos.Data) is DoItFeedback dif) { return dif; }
 
         return DoItFeedback.Null();
     }

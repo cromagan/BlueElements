@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -31,12 +29,13 @@ public class Method_RowCount : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { FilterVar };
+    public override List<List<string>> Args => [FilterVar];
     public override string Command => "rowcount";
     public override string Description => "Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.";
     public override bool EndlessArgs => true;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "RowCount(Filter, ...)";

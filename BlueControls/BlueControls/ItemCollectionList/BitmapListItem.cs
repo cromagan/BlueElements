@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -37,7 +35,7 @@ public class BitmapListItem : AbstractListItem {
     private Bitmap? _bitmap;
 
     private string _caption;
-    private List<string> _captiontmp = new();
+    private List<string> _captiontmp = [];
 
     private string _imageFilename = string.Empty;
 
@@ -100,7 +98,7 @@ public class BitmapListItem : AbstractListItem {
     //    }
     //}
 
-    public List<QuickImage> Overlays { get; } = new();
+    public List<QuickImage> Overlays { get; } = [];
 
     public int Padding { get; set; }
 

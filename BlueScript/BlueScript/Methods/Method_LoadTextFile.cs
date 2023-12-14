@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -35,13 +33,13 @@ internal class Method_LoadTextFile : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal };
+    public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "loadtextfile";
     public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
     public override bool EndlessArgs => false;
-
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "LoadTextFile(Filename, UTF8/WIN1252)";

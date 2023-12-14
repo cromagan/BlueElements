@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -250,7 +248,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, IChangedFeedbac
     public void SetTo(int x, int y) => SetTo(x, (float)y);
 
     public override string ToString() {
-        List<string> result = new();
+        List<string> result = [];
 
         if (Parent != null) {
             switch (Parent) {

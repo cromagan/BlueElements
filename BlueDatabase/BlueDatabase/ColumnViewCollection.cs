@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -33,9 +31,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Fields
 
-    private readonly List<ColumnViewItem> _internal = new();
+    private readonly List<ColumnViewItem> _internal = [];
 
-    private readonly List<string> _permissionGroups_Show = new();
+    private readonly List<string> _permissionGroups_Show = [];
 
     #endregion
 
@@ -187,7 +185,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);
 
     public List<ColumnItem> ListOfUsedColumn() {
-        List<ColumnItem> colList = new();
+        List<ColumnItem> colList = [];
         foreach (var t in _internal) {
             if (t?.Column != null) { colList.Add(t.Column); }
         }

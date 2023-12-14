@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,7 +48,7 @@ public class Script {
 
         ReducedScriptText = string.Empty;
         ChangeValues = scp.ChangeValues;
-        Variables = variablen ?? new();
+        Variables = variablen ?? [];
         AllowedMethods = scp.AllowedMethods;
 
         if (!string.IsNullOrEmpty(additionalFilesPath)) {
@@ -127,9 +125,12 @@ public class Script {
             }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
-                return expectedvariablefeedback
-                    ? new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), ld)
-                    : new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), ld);
+                if (expectedvariablefeedback) {
+                    return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), ld);
+                } else {
+
+                    return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), ld);
+                }
             }
         }
 
@@ -198,7 +199,7 @@ public class Script {
                 case "\r":
                     if (gänsef) {
                         var t = s.ToString();
-                        return (t, "Fehler mit Gänsefüschen in Zeile " + Line(t, pos));
+                        return (t, "Fehler mit Gänsefüssschen in Zeile " + Line(t, pos));
                     }
                     _ = s.Append("¶");
                     comment = false;

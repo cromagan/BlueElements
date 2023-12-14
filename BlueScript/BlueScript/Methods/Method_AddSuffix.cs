@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -31,13 +29,14 @@ internal class Method_AddSuffix : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { ListStringVar, StringVal };
+    public override List<List<string>> Args => [ListStringVar, StringVal];
     public override string Command => "addsuffix";
     public override string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
     public override bool EndlessArgs => false;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "AddSuffix(VariableListe, SuffixText)";

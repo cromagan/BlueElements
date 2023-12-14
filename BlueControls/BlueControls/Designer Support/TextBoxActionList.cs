@@ -1,6 +1,4 @@
-﻿#nullable enable
-
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.ComponentModel.Design;
 
 namespace BlueControls.Designer_Support;
@@ -44,11 +42,11 @@ public sealed class TextBoxActionList : DesignerActionList {
     #region Methods
 
     public override DesignerActionItemCollection GetSortedActionItems() {
-        DesignerActionItemCollection items = new()
-        {
+        DesignerActionItemCollection items =
+        [
             new DesignerActionHeaderItem("Allgemein"),
             new DesignerActionPropertyItem("TextFormat", "TextFormat", "Allgemein", "Wert kann nicht geändert werden. Bei Anklicken werden die entsprechenden Felder gesetzt.")
-        };
+        ];
         //if ((int)ReverenceControl.ButtonStyle % 1000 is ((int)ButtonStyle.Checkbox) or ((int)ButtonStyle.Yes_or_No) or ((int)ButtonStyle.Pic1_or_Pic2) or ((int)ButtonStyle.Optionbox)) {
         //    items.GenerateAndAdd(new DesignerActionPropertyItem("Checked", "Checked", "Allgemein", "Der Checked-Status."));
         //}

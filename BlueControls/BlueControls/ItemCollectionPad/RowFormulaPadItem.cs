@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -105,7 +103,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     #region Methods
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
+        List<GenericControl> l = [];
 
         if (Row?.Database is DatabaseAbstract dbl) {
             ItemCollectionList.ItemCollectionList layouts = new(true);
@@ -161,7 +159,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("LayoutFileName", _layoutFileName);
         result.ParseableAdd("Database", Database);
         if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }

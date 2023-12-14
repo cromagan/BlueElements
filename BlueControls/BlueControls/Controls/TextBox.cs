@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -76,7 +74,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        _eTxt = new ExtText(GetDesign(), States.Standard);
+        _eTxt = new ExtText(Design.TextBox, States.Standard); // Design auf Standard setzen wegen Virtal member call
         _eTxt.Changed += _eTxt_Changed;
 
         MouseHighlight = false;
@@ -353,6 +351,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
+        if (e == null) {
+            hotItem = null;
+            return;
+        }
+
         AbortSpellChecking();
 
         var tmp = Cursor_PosAt(e.X, e.Y);

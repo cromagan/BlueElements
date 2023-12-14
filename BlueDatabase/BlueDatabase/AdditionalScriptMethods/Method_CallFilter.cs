@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -31,7 +29,7 @@ public class Method_CallFilter : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, FilterVar };
+    public override List<List<string>> Args => [StringVal, FilterVar];
 
     public override string Command => "callfilter";
 
@@ -45,8 +43,8 @@ public class Method_CallFilter : Method {
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
-
     public override string StartSequence => "(";
 
     public override string Syntax => "CallFilter(SubName, Filter, ...);";

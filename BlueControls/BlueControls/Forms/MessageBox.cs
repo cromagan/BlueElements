@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
@@ -108,7 +106,7 @@ public partial class MessageBox : Form {
     public List<Button> Generate_Buttons(string[] names) {
         var myX = Width - Skin.Padding - BorderWidth;
         ExtText erT = new(Design.Button, States.Standard);
-        List<Button> buts = new();
+        List<Button> buts = [];
         for (var z = names.GetUpperBound(0); z > -1; z--) {
             if (!string.IsNullOrEmpty(names[z])) {
                 erT.TextDimensions = Size.Empty;

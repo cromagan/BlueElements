@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -886,7 +884,7 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         _height = 0;
         if (Count == 0) { return; }
 
-        List<string> ri = new();
+        List<string> ri = [];
         var vZbxPixel = 0f;
         var isX = 0f;
         var isY = 0f;

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -31,13 +29,13 @@ internal class Method_RemoveDoubleSpaces : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal };
+    public override List<List<string>> Args => [StringVal];
     public override string Command => "removedoublespaces";
     public override string Description => "Entfernt aus dem Text unnötige Leerzeichen, Tabs etc.\r\nKann dazu verwendet werden, um Code-Dateien (z.B. HTML) zu standardisieren.";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "RemoveDoubleSpaces(text)";

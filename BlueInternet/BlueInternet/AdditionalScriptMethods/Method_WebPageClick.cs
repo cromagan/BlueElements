@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueDatabase.AdditionalScriptMethods;
 using BlueScript.Enums;
@@ -34,12 +32,13 @@ internal class Method_WebPageClick : Method_WebPage {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { WebPageVal, StringVal };
+    public override List<List<string>> Args => [WebPageVal, StringVal];
     public override string Command => "webpageclick";
     public override string Description => "Drückt einen Button, Klasse oder Link in der Webpage und wartet, bis die Seite geladen ist.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "WebPageClick(WebPageVariable, id)";

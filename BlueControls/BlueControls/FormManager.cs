@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +36,7 @@ public class FormManager : ApplicationContext {
 
     //public static dNewModeSelectionForm? NewModeSelectionForm = null;
 
-    private static readonly List<Form> _forms = new();
+    private static readonly List<Form> _forms = [];
 
     private static FormManager? _current;
 

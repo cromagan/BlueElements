@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.NetworkInformation;
@@ -32,13 +30,13 @@ internal class Method_Ping : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal };
+    public override List<List<string>> Args => [StringVal];
     public override string Command => "ping";
     public override string Description => "Pingt einen Server an und gibt dessen Reaktionszeit in Millsekunden zurück.\r\nTritt ein Fehler auf, für 9999 zurück gegeben.";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Ping(ServerAdresse)";

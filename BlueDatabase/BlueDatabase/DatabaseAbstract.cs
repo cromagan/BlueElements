@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -51,7 +49,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     #region Fields
 
     public const string DatabaseVersion = "4.02";
-    public static readonly ObservableCollection<DatabaseAbstract> AllFiles = new();
+    public static readonly ObservableCollection<DatabaseAbstract> AllFiles = [];
 
     /// <summary>
     /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
@@ -61,7 +59,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     /// <summary>
     ///  So viele Änderungen sind seit dem letzten erstellen der Komplett-Datenbank erstellen auf Festplatte gezählt worden
     /// </summary>
-    protected readonly List<UndoItem> ChangesNotIncluded = new();
+    protected readonly List<UndoItem> ChangesNotIncluded = [];
 
     private static List<Type>? _databaseTypes;
 
@@ -79,12 +77,12 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     /// </summary>
     private static DateTime _timerTimeStamp = DateTime.UtcNow.AddSeconds(-0.5);
 
-    private readonly List<ColumnViewCollection> _columnArrangements = new();
-    private readonly List<string> _datenbankAdmin = new();
-    private readonly List<DatabaseScriptDescription> _eventScript = new();
-    private readonly List<string> _permissionGroupsNewRow = new();
-    private readonly List<string> _tags = new();
-    private readonly List<Variable> _variables = new();
+    private readonly List<ColumnViewCollection> _columnArrangements = [];
+    private readonly List<string> _datenbankAdmin = [];
+    private readonly List<DatabaseScriptDescription> _eventScript = [];
+    private readonly List<string> _permissionGroupsNewRow = [];
+    private readonly List<string> _tags = [];
+    private readonly List<Variable> _variables = [];
     private string _additionalFilesPfad;
     private string _cachePfad = string.Empty;
     private string _caption = string.Empty;
@@ -130,7 +128,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         Cell = new CellCollection(this);
         Row = new RowCollection(this);
         Column = new ColumnCollection(this);
-        Undo = new List<UndoItem>();
+        Undo = [];
 
         //_columnArrangements.Clear();
         //_permissionGroupsNewRow.Clear();
@@ -429,7 +427,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         }
     }
 
-    protected static List<ConnectionInfo> AllavailableTables { get; } = new();
+    protected static List<ConnectionInfo> AllavailableTables { get; } = [];
     protected string? AdditionalFilesPfadtmp { get; set; }
 
     /// <summary>
@@ -866,7 +864,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     }
 
     public string CheckScriptError() {
-        List<string> names = new();
+        List<string> names = [];
 
         foreach (var thissc in _eventScript) {
             if (!thissc.IsOk()) {
@@ -1023,7 +1021,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             #region Variablen für Skript erstellen
 
-            VariableCollection vars = new();
+            VariableCollection vars = [];
 
             if (row != null && !row.IsDisposed) {
                 rowstamp = row.RowStamp();
@@ -1261,7 +1259,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     }
 
     public List<string> GetAllLayouts() {
-        List<string> path = new();
+        List<string> path = [];
         var r = new List<string>();
         if (!IsDisposed) {
             path.Add(DefaultLayoutPath());
@@ -1328,7 +1326,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         #region Die Zeilen (zeil) vorbereiten
 
         var ein = importText.SplitAndCutByCr();
-        List<string[]> zeil = new();
+        List<string[]> zeil = [];
         var neuZ = 0;
         for (var z = 0; z <= ein.GetUpperBound(0); z++) {
             if (eliminateMultipleSplitter) {
@@ -1350,7 +1348,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
         #region Spaltenreihenfolge (columns) ermitteln
 
-        List<ColumnItem> columns = new();
+        List<ColumnItem> columns = [];
         var startZ = 0;
 
         if (spalteZuordnen) {
@@ -1580,7 +1578,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
     }
 
     public IEnumerable<string> Permission_AllUsed(bool cellLevel) {
-        List<string> e = new();
+        List<string> e = [];
         foreach (var thisColumnItem in Column) {
             if (thisColumnItem != null) {
                 e.AddRange(thisColumnItem.PermissionGroupsChangeCell);
@@ -1622,7 +1620,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
     public void RefreshColumnsData(ColumnItem column) {
         if (column.IsInCache != null) { return; }
-        RefreshColumnsData(new List<ColumnItem> { column });
+        RefreshColumnsData([column]);
     }
 
     public abstract void RefreshColumnsData(List<ColumnItem> columns);
@@ -1987,7 +1985,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             case DatabaseDataType.EventScript:
                 _eventScriptTmp = value;
                 EventScript_RemoveAll(true);
-                List<string> ai = new(value.SplitAndCutByCr());
+                List<string> ai = [..value.SplitAndCutByCr()];
                 foreach (var t in ai) {
                     EventScript_Add(new DatabaseScriptDescription(this, t), true);
                 }
@@ -1997,7 +1995,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             case DatabaseDataType.DatabaseVariables:
                 _variables.Clear();
-                List<string> va = new(value.SplitAndCutByCr());
+                List<string> va = [..value.SplitAndCutByCr()];
                 foreach (var t in va) {
                     var l = new VariableString("dummy");
                     l.Parse(t);
@@ -2010,7 +2008,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             case DatabaseDataType.ColumnArrangement:
                 _columnArrangements.Clear();
-                List<string> ca = new(value.SplitAndCutByCr());
+                List<string> ca = [..value.SplitAndCutByCr()];
                 foreach (var t in ca) {
                     _columnArrangements.Add(new ColumnViewCollection(this, t));
                 }
@@ -2182,10 +2180,10 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
         data = data.OrderBy(obj => obj.DateTimeUtc).ToList();
 
         try {
-            List<ColumnItem> columnsAdded = new();
-            List<RowItem> rowsAdded = new();
-            List<string> cellschanged = new();
-            List<string> myfiles = new();
+            List<ColumnItem> columnsAdded = [];
+            List<RowItem> rowsAdded = [];
+            List<string> cellschanged = [];
+            List<string> myfiles = [];
 
             if (files != null) {
                 foreach (var thisf in files) {

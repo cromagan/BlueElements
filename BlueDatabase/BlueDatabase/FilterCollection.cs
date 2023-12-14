@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,7 +34,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Fields
 
-    private readonly List<FilterItem> _internal = new();
+    private readonly List<FilterItem> _internal = [];
 
     private DatabaseAbstract? _database;
     private List<RowItem>? _rows;
@@ -247,7 +245,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public object Clone() {
         var fc = new FilterCollection(Database);
         fc._internal.AddIfNotExists(_internal.CloneWithClones());
-        fc._rows = new List<RowItem>();
+        fc._rows = [];
         fc._rows.AddRange(Rows);
         return fc;
     }
@@ -409,7 +407,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
 
         foreach (var thisFilterItem in _internal) {
             if (thisFilterItem != null && !thisFilterItem.IsDisposed && thisFilterItem.IsOk()) {
@@ -420,10 +418,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private List<RowItem> CalculateFilteredRows() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>(); }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return []; }
         db.RefreshColumnsData(_internal);
 
-        List<RowItem> tmpVisibleRows = new();
+        List<RowItem> tmpVisibleRows = [];
         var lockMe = new object();
         try {
             _ = Parallel.ForEach(Database.Row, thisRowItem => {

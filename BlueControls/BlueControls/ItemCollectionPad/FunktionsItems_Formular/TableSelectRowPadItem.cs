@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -128,12 +126,13 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
-        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
-
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        List<GenericControl> l =
+        [
+            .. _itemAccepts.GetStyleOptions(this, widthOfControl),
+            .. _itemSends.GetStyleOptions(this, widthOfControl),
+            new FlexiControl(),
+            .. base.GetStyleOptions(widthOfControl),
+        ];
         return l;
     }
 
@@ -177,9 +176,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
-        result.AddRange(_itemAccepts.ParsableTags());
-        result.AddRange(_itemSends.ParsableTags());
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
         return result.Parseable(base.ToString());
     }
 

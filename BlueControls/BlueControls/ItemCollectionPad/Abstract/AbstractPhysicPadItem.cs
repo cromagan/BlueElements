@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -53,7 +51,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
         }
     }
 
-    public List<PointM> Edges { get; } = new();
+    public List<PointM> Edges { get; } = [];
 
     #endregion
 
@@ -255,7 +253,7 @@ public abstract class AbstractPhysicPadItem : AbstractPadItem {
             }
         }
         // Create the result polygon.
-        List<PointF> union = new();
+        List<PointF> union = [];
         // Start here.
         var startPoint = curPoint;
         union.Add(startPoint);

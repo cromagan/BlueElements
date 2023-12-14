@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -49,7 +47,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     #region Fields
 
-    private readonly List<string> _childs = new();
+    private readonly List<string> _childs = [];
     private readonly ItemAcceptSomething _itemAccepts;
 
     #endregion
@@ -240,13 +238,14 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
-        l.Add(new FlexiControl("Formulare:", -1));
-        l.Add(Childs());
-
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        List<GenericControl> l =
+        [
+            .. _itemAccepts.GetStyleOptions(this, widthOfControl),
+            new FlexiControl("Formulare:", -1),
+            Childs(),
+            new FlexiControl(),
+            .. base.GetStyleOptions(widthOfControl),
+        ];
         return l;
     }
 
@@ -305,8 +304,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
-        result.AddRange(_itemAccepts.ParsableTags());
+        List<string> result = [.. _itemAccepts.ParsableTags()];
 
         result.ParseableAdd("Parent", CFormula);
         result.ParseableAdd("Childs", _childs);

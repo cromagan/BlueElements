@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -219,9 +217,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
-
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
+        List<GenericControl> l = [.. _itemAccepts.GetStyleOptions(this, widthOfControl)];
 
         if (DatabaseInput is not DatabaseAbstract db || db.IsDisposed) { return l; }
 
@@ -333,9 +329,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
-
-        result.AddRange(_itemAccepts.ParsableTags());
+        List<string> result = [.. _itemAccepts.ParsableTags()];
 
         result.ParseableAdd("ColumnName", _columnName);
         result.ParseableAdd("EditType", _bearbeitung);

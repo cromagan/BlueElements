@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -116,10 +114,9 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         var t = initialItem.Row.CellGetString(_column).ToUpper();
         if (string.IsNullOrEmpty(t)) { return; }
         // Alle möglichen Namen holen
-        List<string> names = new();
-        names.AddRange(cf.GetUcaseNamesSortedByLenght());
+        List<string> names = [.. cf.GetUcaseNamesSortedByLenght()];
         // Namen ermitteln, die relevant sind
-        List<string> bez = new();
+        List<string> bez = [];
         foreach (var thisN in names.Where(t.Contains)) {
             _ = bez.AddIfNotExists(thisN);
             t = t.Replace(thisN, string.Empty);
@@ -298,7 +295,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         FolderBrowserDialog fl = new();
         _ = fl.ShowDialog();
 
-        List<string> l = new();
+        List<string> l = [];
         foreach (var thisR in Pad.Item) {
             if (thisR is RowFormulaPadItem rfi && rfi.Row is RowItem r) {
                 //_ = r.Row.ExecuteScript(true, true, "to be sure");

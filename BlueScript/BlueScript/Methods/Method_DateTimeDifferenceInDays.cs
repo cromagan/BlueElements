@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -31,13 +29,13 @@ internal class Method_DateTimeDifferenceInDays : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { DateTimeVar, DateTimeVar };
+    public override List<List<string>> Args => [DateTimeVar, DateTimeVar];
     public override string Command => "datetimedifferenceindays";
     public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = Date1 - Date2";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "DateTimeDifferenceInDays(Date1, Date2)";

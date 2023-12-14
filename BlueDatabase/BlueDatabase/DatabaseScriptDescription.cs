@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -217,7 +215,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
     public override string ToString() {
         try {
             if (IsDisposed) { return string.Empty; }
-            List<string> result = new();
+            List<string> result = [];
             result.ParseableAdd("NeedRow", _needRow);
             result.ParseableAdd("Events", _eventTypes);
             return result.Parseable(base.ToString());

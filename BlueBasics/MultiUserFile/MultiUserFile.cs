@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -37,7 +35,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     #region Fields
 
-    private static readonly List<MultiUserFile> AllFiles = new();
+    private static readonly List<MultiUserFile> AllFiles = [];
     private readonly Timer _checker;
     private readonly BackgroundWorker _pureBinSaver;
     private string _canWriteError = string.Empty;
@@ -349,7 +347,7 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     /// <summary>
     /// Führt - falls nötig - einen Reload der Datei aus.
-    /// Der Prozess wartet solange, bis der Reload erfolgreich war.
+    /// Der Prozess wartet so lange, bis der Reload erfolgreich war.
     /// Ein bereits eventuell bestehender Ladevorgang wird abgewartet.
     /// </summary>
     /// <returns>Gibt TRUE zurück, wenn die am Ende der Routine die Datei auf dem aktuellesten Stand ist</returns>

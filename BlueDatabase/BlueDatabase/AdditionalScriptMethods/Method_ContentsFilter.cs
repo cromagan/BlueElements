@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -31,12 +29,13 @@ public class Method_ContentsFilter : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, FilterVar };
+    public override List<List<string>> Args => [StringVal, FilterVar];
     public override string Command => "contentsfilter";
     public override string Description => "Lädt eine andere Datenbank (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge (sortiert und einzigartig) als Liste zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
     public override bool EndlessArgs => true;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.MyDatabaseRow | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
 
     public override string StartSequence => "(";

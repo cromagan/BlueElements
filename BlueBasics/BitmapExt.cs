@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -574,7 +572,7 @@ public class BitmapExt : IDisposableExtended {
         Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
         sourceBitmap.UnlockBits(sourceData);
         var filterOffset = (matrixSize - 1) / 2;
-        List<int> neighbourPixels = new();
+        List<int> neighbourPixels = [];
         for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++) {
             for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++) {
                 var byteOffset = (offsetY * sourceData.Stride) + (offsetX * 4);
@@ -641,7 +639,7 @@ public class BitmapExt : IDisposableExtended {
     public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
         // Open a Stream and decode a TIFF image
         FileStream imageStreamSource = new(fileName, FileMode.Open, FileAccess.Read, FileShare.Read);
-        List<Bitmap> l = new();
+        List<Bitmap> l = [];
         var frames = 1;
         try {
             TiffBitmapDecoder decoder = new(imageStreamSource,

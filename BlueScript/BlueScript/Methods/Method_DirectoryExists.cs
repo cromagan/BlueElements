@@ -25,21 +25,19 @@ using BlueScript.Variables;
 
 namespace BlueScript.Methods;
 
-#nullable enable
-
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_DirectoryExists : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal };
+    public override List<List<string>> Args => [StringVal];
     public override string Command => "directoryexists";
     public override string Description => "Prüft, ob ein Verzeichnis existiert";
     public override bool EndlessArgs => false;
-
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "DirectoryExists(FilePath)";

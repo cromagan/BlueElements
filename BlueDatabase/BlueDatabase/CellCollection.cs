@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -522,7 +520,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 }
                 return bedingungErfüllt;
             }
-            List<string> vorhandenWerte = new(txt.SplitAndCutByCr());
+            List<string> vorhandenWerte = [..txt.SplitAndCutByCr()];
             if (vorhandenWerte.Count == 0) // Um den Filter, der nach 'Leere' Sucht, zu befriediegen
             {
                 vorhandenWerte.Add("");
@@ -666,7 +664,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    public List<string> ValuesReadable(ColumnItem column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style) ?? new List<string>();
+    public List<string> ValuesReadable(ColumnItem column, RowItem row, ShortenStyle style) => CellItem.ValuesReadable(column, row, style) ?? [];
 
     internal bool ChangeColumnName(string oldName, string newName) {
         oldName = oldName.ToUpper() + "|";
@@ -719,7 +717,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal void RemoveOrphans() {
         try {
-            List<string> removeKeys = new();
+            List<string> removeKeys = [];
 
             foreach (var pair in this) {
                 if (!string.IsNullOrEmpty(pair.Value.Value)) {
@@ -796,14 +794,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     private static List<RowItem?> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
-        List<RowItem?> allRows = new();
+        List<RowItem?> allRows = [];
         if (row?.Database?.Column.First() == null || row.Database.IsDisposed) { return allRows; }
 
         var names = row.Database.Column.First()?.GetUcaseNamesSortedByLenght();
         var relationTextLine = completeRelationText.ToUpper().SplitAndCutByCr();
         foreach (var thisTextLine in relationTextLine) {
             var tmp = thisTextLine;
-            List<RowItem?> r = new();
+            List<RowItem?> r = [];
             if (names != null)
                 for (var z = names.Count - 1; z > -1; z--) {
                     if (tmp.IndexOfWord(names[z], 0, RegexOptions.IgnoreCase) > -1) {

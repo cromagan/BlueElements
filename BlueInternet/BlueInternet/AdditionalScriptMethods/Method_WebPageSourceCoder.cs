@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using BlueBasics;
@@ -36,12 +34,13 @@ internal class Method_WebPageSourceCode : Method_WebPage {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { WebPageVal };
+    public override List<List<string>> Args => [WebPageVal];
     public override string Command => "webpagesourcecode";
     public override string Description => "Gibt den Quell-Code-Text der Webpage zurück.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "WebPageSourceCode(WebPageVariable)";

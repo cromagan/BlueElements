@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -46,7 +44,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSome
 
     #region Properties
 
-    public List<IControlAcceptSomething> Childs { get; } = new();
+    public List<IControlAcceptSomething> Childs { get; } = [];
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -55,9 +53,9 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSome
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
-    public FilterCollection FilterOutput { get; } = new();
+    public FilterCollection FilterOutput { get; } = [];
 
-    public List<IControlSendSomething> Parents { get; } = new();
+    public List<IControlSendSomething> Parents { get; } = [];
 
     #endregion
 

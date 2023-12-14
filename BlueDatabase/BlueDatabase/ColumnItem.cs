@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -51,12 +49,12 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public int? TmpIfFilterRemoved = null;
     internal List<string>? UcaseNamesSortedByLenght;
     private const string TmpNewDummy = "TMPNEWDUMMY";
-    private readonly List<string> _afterEditAutoReplace = new();
-    private readonly List<string> _dropDownItems = new();
-    private readonly List<string> _linkedCellFilter = new();
-    private readonly List<string> _opticalReplace = new();
-    private readonly List<string> _permissionGroupsChangeCell = new();
-    private readonly List<string> _tags = new();
+    private readonly List<string> _afterEditAutoReplace = [];
+    private readonly List<string> _dropDownItems = [];
+    private readonly List<string> _linkedCellFilter = [];
+    private readonly List<string> _opticalReplace = [];
+    private readonly List<string> _permissionGroupsChangeCell = [];
+    private readonly List<string> _tags = [];
     private AdditionalCheck _additionalFormatCheck;
     private string _adminInfo;
     private bool _afterEditAutoCorrect;
@@ -990,7 +988,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (_afterEditDoUCase) { value = value.ToUpper(); }
         if (!string.IsNullOrEmpty(_autoRemove)) { value = value.RemoveChars(_autoRemove); }
         if (_afterEditAutoReplace.Count > 0) {
-            List<string> l = new(value.SplitAndCutByCr());
+            List<string> l = [..value.SplitAndCutByCr()];
             foreach (var thisar in _afterEditAutoReplace) {
                 var rep = thisar.SplitAndCutBy("|");
                 for (var z = 0; z < l.Count; z++) {
@@ -1168,7 +1166,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public List<string> Contents() => Contents(Database?.Row.ToList());
 
     public List<string> Contents(FilterCollection fc, List<RowItem>? pinned) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<string>(); }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return []; }
         var r = fc.Rows;
 
         var r2 = new List<RowItem>();
@@ -1181,7 +1179,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     //public List<string> Contents(FilterItem fi, List<RowItem>? additional) => Contents(new FilterCollection(fi.Database) { fi }, additional);
     public List<string> Contents(ICollection<RowItem>? rows) {
-        if (rows == null || rows.Count == 0) { return new List<string>(); }
+        if (rows == null || rows.Count == 0) { return []; }
 
         RefreshColumnsData();
 
@@ -1366,30 +1364,22 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         return string.Empty;
     }
 
-    //public void DeleteContents(FilterCollection fc, List<RowItem?>? pinned) {
-    //    if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
     public List<string> GetUcaseNamesSortedByLenght() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<string>(); }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return []; }
 
         if (UcaseNamesSortedByLenght != null) { return UcaseNamesSortedByLenght; }
         var tmp = Contents(db.Row.ToList());
-        for (var z = 0; z < tmp.Count; z++) {
-            tmp[z] = tmp[z].Length.ToString(Constants.Format_Integer10) + tmp[z].ToUpper();
-        }
-        tmp.Sort();
-        for (var z = 0; z < tmp.Count; z++) {
-            tmp[z] = tmp[z].Substring(10);
-        }
+        tmp.Sort((s1, s2) => s2.Length.CompareTo(s1.Length));
         UcaseNamesSortedByLenght = tmp;
         return UcaseNamesSortedByLenght;
     }
 
     public void GetUniques(List<RowItem> rows, out List<string> einzigartig, out List<string> nichtEinzigartig) {
-        einzigartig = new List<string>();
-        nichtEinzigartig = new List<string>();
+        einzigartig = [];
+        nichtEinzigartig = [];
         foreach (var thisRow in rows) {
             if (thisRow != null && !thisRow.IsDisposed) {
-                var tmp = MultiLine ? thisRow.CellGetList(this) : new List<string> { thisRow.CellGetString(this) };
+                var tmp = MultiLine ? thisRow.CellGetList(this) : [thisRow.CellGetString(this)];
                 foreach (var thisString in tmp) {
                     if (einzigartig.Contains(thisString)) {
                         _ = nichtEinzigartig.AddIfNotExists(thisString);

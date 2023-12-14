@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -233,7 +231,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
     #region Properties
 
     public Color BackColor { get; set; } = Color.White;
-    public ObservableCollection<ItemConnection> Connections { get; } = new();
+    public ObservableCollection<ItemConnection> Connections { get; } = [];
 
     /// <summary>
     /// in mm
@@ -670,7 +668,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
     public new string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
         //result.ParseableAdd("ID", KeyName);
         result.ParseableAdd("Caption", Caption);
         result.ParseableAdd("Style", SheetStyle?.CellFirstString());

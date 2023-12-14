@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -31,7 +29,7 @@ internal class Method_Try : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
+    public override List<List<string>> Args => [];
     public override string Command => "try";
 
     public override string Description => "Führt den Codeblock innerhalb der geschweiften Klammern aus.\r\n" +
@@ -42,6 +40,7 @@ internal class Method_Try : Method {
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => true;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => string.Empty;
     public override string Syntax => "Try { }";

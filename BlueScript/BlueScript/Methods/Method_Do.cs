@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -31,12 +29,13 @@ internal class Method_Do : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
+    public override List<List<string>> Args => [];
     public override string Command => "do";
     public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => true;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => string.Empty;
     public override string Syntax => "Do { Break; }";

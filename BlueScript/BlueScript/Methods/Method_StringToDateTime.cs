@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -29,13 +27,13 @@ public class Method_StringToDateTime : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal };
+    public override List<List<string>> Args => [StringVal];
     public override string Command => "stringtodatetime";
     public override string Description => "Wandelt einen Time-String ein Datum um.";
     public override bool EndlessArgs => false;
-
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableDateTime.ShortName_Variable;
 
     public override string StartSequence => "(";

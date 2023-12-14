@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -353,16 +351,14 @@ public static partial class Extensions {
     }
 
     public static void SplitAndCutByCr(this List<string> list, string textToSplit) {
-        List<string> l = new();
-        l.AddRange(textToSplit.SplitAndCutByCr());
+        List<string> l = [.. textToSplit.SplitAndCutByCr()];
         if (!list.IsDifferentTo(l)) { return; }
         if (list.Count > 0) { list.Clear(); }
         list.AddRange(l);
     }
 
     public static void SplitAndCutByCr_QuickSortAndRemoveDouble(this List<string> list, string textToSplit) {
-        List<string> l = new();
-        l.AddRange(textToSplit.SplitAndCutByCr());
+        List<string> l = [.. textToSplit.SplitAndCutByCr()];
         l = l.SortedDistinctList();
 
         if (!list.IsDifferentTo(l)) { return; }
@@ -386,7 +382,7 @@ public static partial class Extensions {
     }
 
     public static List<string> TagGetAll(this ICollection<string>? list, string tagName) {
-        List<string> l = new();
+        List<string> l = [];
         if (list == null) { return l; }
         var uTagName = tagName.ToUpper();
         foreach (var thisString in list) {

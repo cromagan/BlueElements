@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 using BlueScript.Enums;
@@ -30,13 +28,14 @@ internal class Method_Min : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { FloatVal };
+    public override List<List<string>> Args => [FloatVal];
     public override string Command => "min";
     public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.";
     public override bool EndlessArgs => true;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Min(Value1, Value2, ...)";

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -50,7 +48,7 @@ public partial class TableView : FormWithStatusBar {
 
     private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
     private bool _firstOne = true;
-    private List<string> _settings = new();
+    private List<string> _settings = [];
 
     #endregion
 
@@ -239,7 +237,7 @@ public partial class TableView : FormWithStatusBar {
         switch (e.Item.KeyName) {
             case "erweitert":
                 Visible = false;
-                List<RowItem> selectedRows = new();
+                List<RowItem> selectedRows = [];
                 if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead && CFO.ShowingRow is RowItem r) {
                     selectedRows.Add(r);
                 } else {
@@ -697,7 +695,7 @@ public partial class TableView : FormWithStatusBar {
     protected virtual string ViewToString() {
         //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
 
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("Ansicht", _ansicht);
         result.ParseableAdd("MainTab", ribMain.SelectedIndex);
         result.ParseableAdd("TableView", Table.ViewToString());
@@ -1122,7 +1120,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void LoadSettingsFromDisk() {
-        _settings = new List<string>();
+        _settings = [];
 
         if (FileExists(SettingsFileName())) {
             var t = File.ReadAllText(SettingsFileName(), Encoding.UTF8);

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -646,7 +644,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Entfernt alle Controls und löst dessen die Events auf. Setzt _allinitialized auf false.
     /// </summary>
     protected virtual void RemoveAll() {
-        List<Control> l = new();
+        List<Control> l = [];
         for (var z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
 
         foreach (var thisc in l) {

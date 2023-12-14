@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -128,16 +126,17 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
-        //l.Add(new FlexiControlForProperty<string>(() => Bild_Dateiname));
-
-        l.Add(new FlexiControlForDelegate(Text_Spalte_wählen, "Text-Spalte wählen", ImageCode.Pfeil_Rechts));
-        l.Add(new FlexiControlForDelegate(Auswahl_Spalte_1_wählen, "Auswahl-Spalte 1 wählen", ImageCode.Pfeil_Rechts));
-        l.Add(new FlexiControlForDelegate(Auswahl_Spalte_2_wählen, "Auswahl-Spalte 2 wählen", ImageCode.Pfeil_Rechts));
-        l.Add(new FlexiControlForDelegate(Auswahl_Spalte_3_wählen, "Auswahl-Spalte 3 wählen", ImageCode.Pfeil_Rechts));
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        List<GenericControl> l =
+        [
+            .. _itemAccepts.GetStyleOptions(this, widthOfControl),
+            //l.Add(new FlexiControlForProperty<string>(() => Bild_Dateiname));
+            new FlexiControlForDelegate(Text_Spalte_wählen, "Text-Spalte wählen", ImageCode.Pfeil_Rechts),
+            new FlexiControlForDelegate(Auswahl_Spalte_1_wählen, "Auswahl-Spalte 1 wählen", ImageCode.Pfeil_Rechts),
+            new FlexiControlForDelegate(Auswahl_Spalte_2_wählen, "Auswahl-Spalte 2 wählen", ImageCode.Pfeil_Rechts),
+            new FlexiControlForDelegate(Auswahl_Spalte_3_wählen, "Auswahl-Spalte 3 wählen", ImageCode.Pfeil_Rechts),
+            new FlexiControl(),
+            .. base.GetStyleOptions(widthOfControl),
+        ];
         return l;
     }
 
@@ -194,9 +193,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
-
-        result.AddRange(_itemAccepts.ParsableTags());
+        List<string> result = [.. _itemAccepts.ParsableTags()];
 
         result.ParseableAdd("Column Text", _textc);
         result.ParseableAdd("Column Menu 1", _auswahl1);

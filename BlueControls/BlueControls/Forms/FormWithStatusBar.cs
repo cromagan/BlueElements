@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -34,7 +32,7 @@ public partial class FormWithStatusBar : Form {
     /// <summary>
     /// FormManager kennt manche Forms gar nicht, z.b. Splash Screen. Deswegen eigene Collection
     /// </summary>
-    private static readonly List<FormWithStatusBar> _formsWithStatusBar = new();
+    private static readonly List<FormWithStatusBar> _formsWithStatusBar = [];
 
     private DateTime _lastMessage = DateTime.UtcNow;
 

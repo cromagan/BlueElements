@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 using BlueBasics.Interfaces;
@@ -32,12 +30,13 @@ internal class Method_MatchColumnFormat : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, new List<string> { Variable.Any_Variable } };
+    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
     public override string Command => "matchcolumnformat";
     public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "MatchColumnFormat(Value, Column)";

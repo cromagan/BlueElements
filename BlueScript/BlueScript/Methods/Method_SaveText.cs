@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -33,15 +31,15 @@ internal class Method_SaveText : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
+    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "savetext";
     public override string Description => "Speichert den Text auf die Festplatte";
     public override bool EndlessArgs => true;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
-
     public override string StartSequence => "(";
     public override string Syntax => "SaveText(Filename, UTF8/WIN1252, Text);";
 

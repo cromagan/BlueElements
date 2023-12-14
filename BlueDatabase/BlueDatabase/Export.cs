@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,7 +43,7 @@ public static class Export {
     #region Methods
 
     public static (List<string>? files, string error) GenerateLayout_FileSystem(List<RowItem>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
-        List<string> l = new();
+        List<string> l = [];
         if (liste == null) { return (null, "Keine Zeilen angegeben"); }
         string sav;
         var fehler = string.Empty;
@@ -87,7 +85,7 @@ public static class Export {
     }
 
     public static (List<string>? files, string error) SaveAsBitmap(List<RowItem> row, string layoutId, string path) {
-        List<string> l = new();
+        List<string> l = [];
         Develop.DebugPrint_NichtImplementiert();
         //foreach (var thisRow in row) {
         //    var fn = TempFile(path, thisRow.CellFirstString(), "PNG");
@@ -99,10 +97,7 @@ public static class Export {
 
     private static string CreateLayout(RowItem row, string loadFile, string saveFile) {
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
-        List<RowItem> tmpList = new()
-        {
-            row
-        };
+        List<RowItem> tmpList = [row];
         return InternalCreateLayout(tmpList, File.ReadAllText(loadFile, Constants.Win1252), saveFile);
     }
 

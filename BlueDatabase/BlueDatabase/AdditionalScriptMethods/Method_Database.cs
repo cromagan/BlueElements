@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Methods;
@@ -30,9 +28,9 @@ public abstract class Method_Database : Method {
 
     #region Fields
 
-    public static readonly List<string> FilterVar = new() { VariableFilterItem.ShortName_Variable };
+    public static readonly List<string> FilterVar = [VariableFilterItem.ShortName_Variable];
 
-    public static readonly List<string> RowVar = new() { VariableRowItem.ShortName_Variable };
+    public static readonly List<string> RowVar = [VariableRowItem.ShortName_Variable];
 
     #endregion
 

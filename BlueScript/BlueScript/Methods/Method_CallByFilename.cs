@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -32,7 +30,7 @@ public class Method_CallByFilename : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, BoolVal };
+    public override List<List<string>> Args => [StringVal, BoolVal];
 
     public override string Command => "callbyfilename";
 
@@ -44,6 +42,7 @@ public class Method_CallByFilename : Method {
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "CallByFilename(Filename, KeepVariables);";

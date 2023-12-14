@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using BlueBasics;
@@ -148,7 +146,7 @@ public class UndoItem : IParseable {
     }
 
     public new string ToString() {
-        List<string> result = new();
+        List<string> result = [];
 
         result.ParseableAdd("T", TableName);
         result.ParseableAdd("CO", Command);

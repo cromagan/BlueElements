@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -82,7 +80,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public override string Description => "Dieses Element ist in jedem Formular vorhanden und kann\r\ndie Zeile aus einem übergerordneten Element empfangen uns weitergeben.\r\n\r\nUnsichtbares Element, wird nicht angezeigt.";
 
-    public List<int> InputColorId => new() { OutputColorId };
+    public List<int> InputColorId => [OutputColorId];
 
     public override bool MustBeInDrawingArea => false;
 
@@ -141,12 +139,12 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
-
-        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
-
-        l.Add(new FlexiControl());
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+        List<GenericControl> l =
+        [
+            .. _itemSends.GetStyleOptions(this, widthOfControl),
+            new FlexiControl(),
+            .. base.GetStyleOptions(widthOfControl),
+        ];
 
         return l;
     }
@@ -192,9 +190,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
-        result.AddRange(_itemAccepts.ParsableTags());
-        result.AddRange(_itemSends.ParsableTags());
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
         return result.Parseable(base.ToString());
     }
 

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
@@ -32,12 +30,13 @@ public class Method_RowIsNull : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { RowVar };
+    public override List<List<string>> Args => [RowVar];
     public override string Command => "rowisnull";
     public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "RowIsNull(Row)";

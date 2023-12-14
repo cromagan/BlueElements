@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -27,7 +25,7 @@ public class FormatHolder : IInputFormat, IReadableText {
 
     #region Fields
 
-    public static readonly List<FormatHolder> AllFormats = new();
+    public static readonly List<FormatHolder> AllFormats = [];
 
     public static readonly FormatHolder Bit = new("Bit") {
         Image = QuickImage.Get(ImageCode.Häkchen, 16),

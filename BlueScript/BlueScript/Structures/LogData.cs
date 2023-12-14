@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -27,7 +25,7 @@ public class LogData {
 
     #region Fields
 
-    public readonly List<string> Protocol = new();
+    public readonly List<string> Protocol = [];
 
     /// <summary>
     ///  In welcher Sub wir uns gerade befinden

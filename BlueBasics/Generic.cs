@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -172,7 +170,7 @@ public static class Generic {
     }
 
     public static List<Type> GetEnumerableOfType<T>() where T : class {
-        List<Type> l = new();
+        List<Type> l = [];
         foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
             try {
                 foreach (var thist in thisas.GetTypes()) {
@@ -195,7 +193,7 @@ public static class Generic {
     }
 
     public static List<T> GetInstaceOfType<T>(params object[] constructorArgs) where T : class {
-        List<T> l = new();
+        List<T> l = [];
         foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
             try {
                 foreach (var thist in thisas.GetTypes()) {

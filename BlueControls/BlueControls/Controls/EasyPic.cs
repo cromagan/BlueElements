@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -107,7 +105,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    public List<IControlSendSomething> Parents { get; } = new();
+    public List<IControlSendSomething> Parents { get; } = [];
 
     [DefaultValue(0)]
     public new int TabIndex {

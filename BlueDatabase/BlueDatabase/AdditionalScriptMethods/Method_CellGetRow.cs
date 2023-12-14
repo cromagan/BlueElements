@@ -15,9 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
+using System.Globalization;
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -29,12 +29,13 @@ public class Method_CellGetRow : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, RowVar };
+    public override List<List<string>> Args => [StringVal, RowVar];
     public override string Command => "cellgetrow";
     public override string Description => "Gibt den Wert einer Zelle zurück\r\nÄhnlicher Befehl: Lookup";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "CellGetRow(Column, Row)";
@@ -67,6 +68,9 @@ public class Method_CellGetRow : Method_Database {
         } else if (v[0] is VariableString vs) {
             var w = vs.ValueString;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
+        } else if (v[0] is VariableDateTime vdt) {
+            var w = vdt.ValueDate;
+            l.Add(w.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
         } else {
             return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");
         }

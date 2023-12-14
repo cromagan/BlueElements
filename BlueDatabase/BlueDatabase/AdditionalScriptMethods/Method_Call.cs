@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueBasics;
 using BlueScript;
@@ -32,7 +30,7 @@ internal class Method_Call : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, BoolVal };
+    public override List<List<string>> Args => [StringVal, BoolVal];
 
     public override string Command => "call";
 
@@ -44,6 +42,7 @@ internal class Method_Call : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "Call(SubName, KeepVariables);";

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using BlueBasics;
@@ -25,6 +23,7 @@ using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
+using static BlueBasics.Constants;
 
 namespace BlueScript.Methods;
 
@@ -32,11 +31,12 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     #region Fields
 
-    public static readonly List<string> BoolVal = new() { VariableBool.ShortName_Plain };
-    public static readonly List<string> DateTimeVar = new() { VariableDateTime.ShortName_Variable };
-    public static readonly List<string> FloatVal = new() { VariableFloat.ShortName_Plain };
-    public static readonly List<string> ListStringVar = new() { VariableListString.ShortName_Variable };
-    public static readonly List<string> StringVal = new() { VariableString.ShortName_Plain };
+    public static readonly List<string> BoolVal = [VariableBool.ShortName_Plain];
+    public static readonly List<string> DateTimeVar = [VariableDateTime.ShortName_Variable];
+    public static readonly List<string> FloatVal = [VariableFloat.ShortName_Plain];
+    public static readonly List<string> ListStringVar = [VariableListString.ShortName_Variable];
+    public static readonly List<string> ListStringVal = [VariableListString.ShortName_Plain];
+    public static readonly List<string> StringVal = [VariableString.ShortName_Plain];
 
     #endregion
 
@@ -76,8 +76,8 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     public string KeyName => Syntax;
 
     public abstract MethodType MethodType { get; }
+    public abstract bool MustUseReturnValue { get; }
     public abstract string Returns { get; }
-
     public abstract string StartSequence { get; }
 
     public abstract string Syntax { get; }
@@ -105,7 +105,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
             tmp++;
         } while (true);
 
-        var (posek, _) = NextText(scriptText, start, GeschKlammerZu, false, false, KlammernStd);
+        var (posek, _) = NextText(scriptText, start, KlammerGeschweiftZu, false, false, KlammernAlle);
         if (posek < start) {
             return (string.Empty, "Kein Codeblock Ende gefunden.");
         }
@@ -121,7 +121,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
             return new GetEndFeedback(startpos, string.Empty);
         }
 
-        var (pos, which) = NextText(scriptText, startpos, new List<string> { endsequwence }, false, false, KlammernStd);
+        var (pos, which) = NextText(scriptText, startpos, [endsequwence], false, false, KlammernAlle);
         if (pos < startpos) {
             return new GetEndFeedback("Endpunkt '" + endsequwence + "' nicht gefunden.", ld);
         }
@@ -133,7 +133,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, LogData ld, ScriptProperties scp) {
         if (Script.Commands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert", ld); }
 
-        List<string> toSearch = new();
+        List<string> toSearch = [];
 
         #region Mögliche Methoden
 
@@ -155,7 +155,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
         var posc = 0;
         do {
-            var (pos, _) = NextText(txt, posc, toSearch, true, false, KlammernStd);
+            var (pos, _) = NextText(txt, posc, toSearch, true, false, KlammernAlle);
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 
             var f = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
@@ -184,7 +184,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         var v = varCol.AllStringableNames();
 
         do {
-            var (pos, which) = NextText(txt, posc, v, true, true, KlammernStd);
+            var (pos, which) = NextText(txt, posc, v, true, true, KlammernAlle);
 
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 
@@ -201,7 +201,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection? varcol, string attributText, List<List<string>> types, bool endlessArgs, LogData? ld, ScriptProperties scp) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
-                ? new SplittedAttributesFeedback(new VariableCollection())
+                ? new SplittedAttributesFeedback([])
                 : new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Keine Attribute erwartet, aber erhalten.");
         }
 
@@ -211,7 +211,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
 
         //  Variablen und Routinen ersetzen
-        VariableCollection feedbackVariables = new();
+        VariableCollection feedbackVariables = [];
         for (var n = 0; n < attributes.Count; n++) {
             //var lb = attributes[n].Count(c => c == '¶'); // Zeilenzähler weitersetzen
             attributes[n] = attributes[n].RemoveChars("¶"); // Zeilenzähler entfernen
@@ -233,7 +233,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
                 if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1)); }
 
-                v = varcol.Get(varn);
+                v = varcol?.Get(varn);
                 if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1)); }
             } else {
                 var tmp2 = Variable.GetVariableByParsing(attributes[n], ld, varcol, scp);
@@ -288,7 +288,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
         var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
 
-        List<List<string>> sargs = new() { new List<string> { Variable.Any_Plain } };
+        List<List<string>> sargs = [[Variable.Any_Plain]];
 
         var attvar = SplitAttributeToVars(varCol, value, sargs, false, infos.Data, scp);
 
@@ -399,18 +399,18 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     private static List<string>? SplitAttributeToString(string attributtext) {
         if (string.IsNullOrEmpty(attributtext)) { return null; }
-        List<string> attributes = new();
+        List<string> attributes = [];
 
         #region Liste der Attribute splitten
 
         var posc = 0;
         do {
-            var (pos, _) = NextText(attributtext, posc, Komma, false, false, KlammernStd);
+            var (pos, _) = NextText(attributtext, posc, Komma, false, false, KlammernAlle);
             if (pos < 0) {
-                attributes.Add(attributtext.Substring(posc).DeKlammere(true, false, false, true));
+                attributes.Add(attributtext.Substring(posc).Trim(KlammernRund));
                 break;
             }
-            attributes.Add(attributtext.Substring(posc, pos - posc).DeKlammere(true, false, false, true));
+            attributes.Add(attributtext.Substring(posc, pos - posc).Trim(KlammernRund));
             posc = pos + 1;
         } while (true);
 

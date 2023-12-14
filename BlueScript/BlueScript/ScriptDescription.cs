@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using BlueBasics;
@@ -55,7 +53,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
         _manualexecutable = false;
         _admininfo = string.Empty;
         _quickinfo = string.Empty;
-        _usergroups = new List<string>();
+        _usergroups = [];
         _image = string.Empty;
     }
 
@@ -249,7 +247,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithChangingA
     public override string ToString() {
         try {
             if (IsDisposed) { return string.Empty; }
-            List<string> result = new();
+            List<string> result = [];
 
             result.ParseableAdd("Name", _keyName);
             result.ParseableAdd("Script", _scriptText);

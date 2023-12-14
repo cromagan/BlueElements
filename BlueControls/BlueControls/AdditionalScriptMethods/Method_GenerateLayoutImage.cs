@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueDatabase;
 using BlueDatabase.AdditionalScriptMethods;
@@ -31,12 +29,13 @@ public class Method_GenerateLayoutImage : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, FloatVal };
+    public override List<List<string>> Args => [StringVal, FloatVal];
     public override string Command => "generatelayoutimage";
     public override string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.MyDatabaseRow | MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "GenerateLayoutImage(LayoutName, Skalierung);";

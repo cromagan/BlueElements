@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -67,8 +65,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
     public static readonly int RowCaptionSizeY = 50;
-    public readonly FilterCollection Filter = new();
-    private readonly List<string> _collapsed = new();
+    public readonly FilterCollection Filter = [];
+    private readonly List<string> _collapsed = [];
     private readonly object _lockUserAction = new();
     private int _arrangementNr = 1;
     private AutoFilter? _autoFilter;
@@ -182,7 +180,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public List<IControlAcceptSomething> Childs { get; } = new();
+    public List<IControlAcceptSomething> Childs { get; } = [];
 
     public ColumnViewCollection? CurrentArrangement {
         get {
@@ -238,14 +236,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool FilterManualSeted { get; set; } = false;
 
-    public FilterCollection FilterOutput { get; } = new();
+    public FilterCollection FilterOutput { get; } = [];
 
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
 
-    public List<IControlSendSomething> Parents { get; } = new();
+    public List<IControlSendSomething> Parents { get; } = [];
 
-    public List<RowItem> PinnedRows { get; } = new();
+    public List<RowItem> PinnedRows { get; } = [];
 
     public DateTime PowerEdit {
         //private get => _database?.PowerEdit;
@@ -744,7 +742,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public List<RowData> CalculateSortedRows(ICollection<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowData>(); }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return []; }
 
         VisibleRowCount = 0;
 
@@ -770,7 +768,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         #region _Angepinnten Zeilen erstellen (_pinnedData)
 
-        List<RowData> pinnedData = new();
+        List<RowData> pinnedData = [];
         var lockMe = new object();
         if (pinnedRows != null) {
             _ = Parallel.ForEach(pinnedRows, thisRow => {
@@ -790,7 +788,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         #region Gefiltere Zeilen erstellen (_rowData)
 
-        List<RowData> rowData = new();
+        List<RowData> rowData = [];
         _ = Parallel.ForEach(filteredRows, thisRow => {
             var adk = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
 
@@ -801,7 +799,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (db.Column.SysChapter is ColumnItem sc) {
                 caps = thisRow.CellGetList(sc);
             } else {
-                caps = new();
+                caps = [];
             }
 
             if (caps.Count > 0) {
@@ -1186,7 +1184,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public string Export_CSV(FirstRow firstRow, ColumnItem onlyColumn) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
-        List<ColumnItem> l = new() { onlyColumn };
+        List<ColumnItem> l = [onlyColumn];
         return Database.Export_CSV(firstRow, l, RowsVisibleUnique());
     }
 
@@ -1300,7 +1298,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
 
-        rows ??= new List<RowItem>();
+        rows ??= [];
 
         rows = rows.Distinct().ToList();
         if (!rows.IsDifferentTo(PinnedRows)) { return; }
@@ -1362,7 +1360,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             List<RowData> sortedRowDataNew;
             if (Database is not DatabaseAbstract db || db.IsDisposed) {
-                sortedRowDataNew = new List<RowData>();
+                sortedRowDataNew = [];
             } else {
                 sortedRowDataNew = CalculateSortedRows(RowsFiltered, SortUsed(), PinnedRows, _rowsFilteredAndPinned);
             }
@@ -1445,11 +1443,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public List<RowItem> RowsVisibleUnique() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>(); }
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return []; }
 
         var f = RowsFiltered;
 
-        ConcurrentBag<RowItem> l = new();
+        ConcurrentBag<RowItem> l = [];
 
         try {
             var lockMe = new object();
@@ -1506,7 +1504,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public string ViewToString() {
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("ArrangementNr", _arrangementNr);
         result.ParseableAdd("Filters", (IStringable?)Filter);
         result.ParseableAdd("SliderX", SliderX.Value);
@@ -2612,7 +2610,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void Cell_Edit_Color(ColumnItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow) {
         ColDia.Color = cellInThisDatabaseRow.Row.CellGetColor(cellInThisDatabaseColumn);
         ColDia.Tag = new List<object?> { cellInThisDatabaseColumn, cellInThisDatabaseRow };
-        List<int> colList = new();
+        List<int> colList = [];
         foreach (var thisRowItem in Database.Row) {
             if (thisRowItem != null) {
                 if (thisRowItem.CellGetInteger(cellInThisDatabaseColumn) != 0) {

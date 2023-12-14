@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
@@ -115,8 +113,8 @@ internal sealed partial class SearchAndReplace : Form {
 
         if (_table.Database is not DatabaseAbstract db) { return; }
 
-        List<ColumnItem> sp = new();
-        List<RowItem> ro = new();
+        List<ColumnItem> sp = [];
+        List<RowItem> ro = [];
         if (NurinAktuellerSpalte.Checked) {
             if (_table.CursorPosColumn is ColumnItem c) { sp.Add(c); }
         } else {
@@ -154,7 +152,7 @@ internal sealed partial class SearchAndReplace : Form {
                     } else if (ErsetzeKomplett.Checked) {
                         geändeterText = ersetzText;
                     } else if (FügeHinzu.Checked) {
-                        List<string> tmp = new(originalText.SplitAndCutByCr()) { ersetzText };
+                        List<string> tmp = [..originalText.SplitAndCutByCr(), ersetzText];
                         geändeterText = tmp.SortedDistinctList().JoinWithCr();
                     }
                     if (geändeterText != originalText) {

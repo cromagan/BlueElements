@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -75,7 +73,7 @@ internal static class Dictionary {
 
     public static List<string>? SimilarTo(string word) {
         if (IsWordOk(word) || _dictWords == null) { return null; }
-        List<string> l = new();
+        List<string> l = [];
         foreach (var thisRowItem in _dictWords.Row) {
             if (thisRowItem != null) {
                 var w = thisRowItem.CellFirstString();
@@ -87,7 +85,7 @@ internal static class Dictionary {
         }
         if (l.Count == 0) { return null; }
         l.Sort();
-        List<string> l2 = new();
+        List<string> l2 = [];
         foreach (var thisstring in l) {
             l2.Add(thisstring.Substring(5));
             if (l2.Count == 10) { return l2; }

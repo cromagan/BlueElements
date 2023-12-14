@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -31,13 +29,13 @@ internal class Method_String : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableFloat.ShortName_Plain, VariableString.ShortName_Plain } };
+    public override List<List<string>> Args => [[VariableFloat.ShortName_Plain, VariableString.ShortName_Plain]];
     public override string Command => "string";
     public override string Description => "Wandelt die Zahl in einen Text um. Kulanterweise werden Strings einfach als String weitergegeben.";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "String(numeral)";

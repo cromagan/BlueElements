@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -32,15 +30,15 @@ internal class Method_IsType : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { Variable.Any_Variable }, StringVal };
+    public override List<List<string>> Args => [[Variable.Any_Variable], StringVal];
     public override string Command => "istype";
     public override string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
     public override bool EndlessArgs => false;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
-    public override string Returns => string.Empty;
-
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "isType(Variable, num / str / lst / bol / err / ukn)";
 

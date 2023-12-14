@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -164,7 +162,7 @@ public static class Develop {
 
                     case FehlerArt.Fehler:
                         if (IsHostRunning()) { Debugger.Break(); }
-                        if (!FileExists(tmp)) { l = new List<string>(); }
+                        if (!FileExists(tmp)) { l = []; }
                         Trace.WriteLine("<th><font color =FF0000>Fehler<font color =000000>");
                         _deleteTraceLog = false;
                         break;
@@ -190,7 +188,7 @@ public static class Develop {
                 Trace.WriteLine("</tr>");
                 if (art == FehlerArt.Fehler) {
                     TraceLogging_End();
-                    List<string> endl = new();
+                    List<string> endl = [];
                     HTML_AddHead(endl, "Beenden...");
                     endl.Add("<center>");
                     endl.Add("<font size = 10>");

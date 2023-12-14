@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueBasics;
 using BlueControls.Interfaces;
@@ -52,7 +50,7 @@ public abstract class RectanglePadItemWithVersion : RectanglePadItem, IHasVersio
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("Version", Version);
         return result.Parseable(base.ToString());
     }

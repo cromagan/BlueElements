@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
@@ -138,7 +136,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
         OnExecuteScript(ex);
 
         if (ex.Feedback == null) {
-            var scp = new ScriptProperties(MethodType.Standard, false, new List<string>());
+            var scp = new ScriptProperties(MethodType.Standard, false, []);
             var s = new Script(null, string.Empty, scp);
             ex.Feedback = s.Parse(0, "Main");
         }
@@ -209,7 +207,7 @@ public sealed partial class ScriptEditor : GroupBox, IContextMenu, IDisposableEx
                 SearchPattern = @"[\w\.:=!<>]",
                 AllowTabKey = true
             };
-            List<AutocompleteItem> items = new();
+            List<AutocompleteItem> items = [];
             if (Script.Commands != null) {
                 foreach (var thisc in Script.Commands) {
                     items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));

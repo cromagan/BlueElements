@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
@@ -32,7 +30,7 @@ internal class Method_ExtractTags : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain }, StringVal };
+    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], StringVal];
 
     public override string Command => "extracttags";
 
@@ -44,6 +42,7 @@ internal class Method_ExtractTags : Method {
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "ExtractTags(String, Delemiter);";

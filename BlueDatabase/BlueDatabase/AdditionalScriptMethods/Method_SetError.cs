@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -29,7 +27,7 @@ public class Method_SetError : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, new List<string> { VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable } };
+    public override List<List<string>> Args => [StringVal, [VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable]];
     public override string Command => "seterror";
     public override string Description => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden.";
 
@@ -39,6 +37,7 @@ public class Method_SetError : Method_Database {
 
     public override MethodType MethodType => MethodType.Database | MethodType.MyDatabaseRow;
 
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
 
@@ -59,7 +58,7 @@ public class Method_SetError : Method_Database {
         var r = MyRow(varCol);
         if (r == null || r.IsDisposed) { return new DoItFeedback(infos.Data, "Interner Fehler, Zeile nicht gefunden"); }
 
-        r.LastCheckedRowFeedback ??= new List<string>();
+        r.LastCheckedRowFeedback ??= [];
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
             var column = Column(varCol, attvar, z);

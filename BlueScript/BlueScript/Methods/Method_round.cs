@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -32,13 +30,13 @@ internal class Method_Round : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { FloatVal, FloatVal };
+    public override List<List<string>> Args => [FloatVal, FloatVal];
     public override string Command => "round";
     public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Round(Value, Nachkommastellen)";

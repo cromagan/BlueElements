@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -31,7 +29,7 @@ public partial class PictureView : Form, IDisposableExtended {
 
     #region Fields
 
-    private readonly List<string> _fileList = new();
+    private readonly List<string> _fileList = [];
     private int _nr = -1;
 
     #endregion

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics;
 using BlueBasics.Enums;
@@ -32,12 +30,13 @@ public class Method_AddRow : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal, BoolVal };
+    public override List<List<string>> Args => [StringVal, StringVal, BoolVal];
     public override string Command => "addrow";
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile.\r\nKeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableRowItem.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "AddRow(database, keyvalue, startScriptOfNewRow);";

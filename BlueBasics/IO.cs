@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -38,8 +36,8 @@ public static class IO {
     #region Fields
 
     private const int CanWriteTryintervall = 10;
-    private static readonly List<string> NoWriteAccess = new();
-    private static readonly List<string> WriteAccess = new();
+    private static readonly List<string> NoWriteAccess = [];
+    private static readonly List<string> WriteAccess = [];
     private static DateTime _canWriteLastCheck = DateTime.UtcNow.Subtract(new TimeSpan(10, 10, 10));
     private static string _canWriteLastFile = string.Empty;
     private static bool _canWriteLastResult;

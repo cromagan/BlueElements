@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -32,13 +30,13 @@ internal class Method_Join : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableListString.ShortName_Plain }, StringVal };
+    public override List<List<string>> Args => [[VariableListString.ShortName_Plain], StringVal];
     public override string Command => "join";
     public override string Description => "Wandelt eine Liste in einen Text um.\r\nEs verbindet den Text dabei mitteles dem angegebenen Verbindungszeichen.\r\nSind leere Einträge am Ende der Liste, werden die Trennzeichen am Ende nicht abgeschnitten.\r\nDas letzte Trennzeichen wird allerdings immer abgeschnitten!\r\n\r\nBeispiel: Eine Liste mit den Werten 'a' und 'b' wird beim Join mit Semikolon das zurück geben: 'a;b'\r\nAber: Wird eine Liste mit ChangeType in String umgewandelt, wäre ein zusätzliches Trennzeichen am Ende.";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "Join(VariableListe, Verbindungszeichen)";

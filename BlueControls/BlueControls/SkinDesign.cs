@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
@@ -33,7 +31,7 @@ public static class SkinDesignExtensions {
         if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
             dictState = existingDictOfControl;
         } else {
-            dictState = new Dictionary<States, SkinDesign>();
+            dictState = [];
             dictControl.Add(ds, dictState);
         }
 

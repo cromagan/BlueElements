@@ -15,14 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Extensions;
 using static BlueBasics.Interfaces.IParseableExtension;
+using static BlueBasics.Constants;
 
 namespace BlueScript.Variables;
 
@@ -109,7 +108,7 @@ public class VariableBool : Variable {
         #region Auf Restliche Boolsche Operationen testen
 
         //foreach (var check in Method_if.VergleichsOperatoren) {
-        var (i, check) = NextText(txt, 0, Method_If.VergleichsOperatoren, false, false, KlammernStd);
+        var (i, check) = NextText(txt, 0, Method_If.VergleichsOperatoren, false, false, KlammernAlle);
         if (i > -1) {
             if (i < 1 && check != "!") {
                 return null;//new DoItFeedback(infos.LogData, s, "Operator (" + check + ") am String-Start nicht erlaubt: " + txt);

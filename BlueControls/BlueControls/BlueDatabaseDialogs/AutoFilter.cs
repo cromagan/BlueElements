@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -68,7 +66,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     #region Methods
 
     public static List<string> Autofilter_ItemList(ColumnItem? column, FilterCollection? fc, List<RowItem>? pinned) {
-        if (column == null || column.IsDisposed) { return new(); }
+        if (column == null || column.IsDisposed) { return []; }
 
         if (fc == null || fc.Count < 0) { return column.Contents(); }
         var fc2 = (FilterCollection)fc.Clone();
@@ -250,13 +248,10 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         var doJoker = !string.IsNullOrEmpty(_column.AutoFilterJoker);
         if (_negativAuswahl) { doJoker = false; }
-        List<string> l = new()
-        {
-            e.Item.KeyName
-        };
+        List<string> l = [e.Item.KeyName];
         if (doJoker) { l.AddIfNotExists(_column.AutoFilterJoker); }
         if (_negativAuswahl) {
-            // Nur Ohne Multirow
+            // Nur ohne Multirow
             CloseAndDispose("Filter", new FilterItem(_column, FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal, l));
         } else {
             CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich_ODER_GroßKleinEgal, l));

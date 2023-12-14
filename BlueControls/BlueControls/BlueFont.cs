@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -41,7 +39,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
 
     internal Brush? BrushColorOutline;
 
-    private static readonly List<BlueFont> FontsAll = new();
+    private static readonly List<BlueFont> FontsAll = [];
 
     private SizeF[] _charSize = new SizeF[256];
 
@@ -164,7 +162,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     public static SizeF MeasureStringOfCaption(string text) => MeasureString(text, (Font)Skin.GetBlueFont(Design.Caption, States.Standard));
 
     public static List<string> SplitByWidth(Font font, string text, float maxWidth, int maxLines) {
-        List<string> broken = new();
+        List<string> broken = [];
         var pos = 0;
         var foundCut = 0;
         var rest = text;

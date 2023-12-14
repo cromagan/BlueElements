@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
@@ -33,19 +31,19 @@ internal class Method_DownloadImage : Method {
 
     #region Fields
 
-    private static readonly VariableCollection Last = new();
+    private static readonly VariableCollection Last = [];
 
     #endregion
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal, StringVal };
+    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "downloadimage";
     public override string Description => "Lädt das angegebene Bild aus dem Internet.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "DownloadImage(url, username, password)";

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -59,7 +57,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
     public BitmapPadItem(string internalname, Bitmap? bmp, Size size) : base(internalname) {
         Bitmap = bmp;
         SetCoordinates(new RectangleF(0, 0, size.Width, size.Height), true);
-        Overlays = new List<QuickImage>();
+        Overlays = [];
         Hintergrund_Weiß_Füllen = true;
         Padding = 0;
         Bild_Modus = SizeModes.EmptySpace;
@@ -109,14 +107,14 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new()
-        {
+        List<GenericControl> l =
+        [
             new FlexiControlForDelegate( Bildschirmbereich_wählen, "Bildschirmbereich wählen",ImageCode.Bild),
             new FlexiControlForDelegate( Datei_laden, "Bild laden", ImageCode.Ordner),
             new FlexiControl(),
             new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2),
             new FlexiControl()
-        };
+        ];
         ItemCollectionList.ItemCollectionList comms = new(false)
         {
             { "Abschneiden", ((int)SizeModes.BildAbschneiden).ToString(), QuickImage.Get("BildmodusAbschneiden|32") },
@@ -188,7 +186,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
 
         result.ParseableAdd("Modus", Bild_Modus);
         result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);

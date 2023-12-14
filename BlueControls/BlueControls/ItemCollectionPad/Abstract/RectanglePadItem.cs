@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -86,12 +84,12 @@ public abstract class RectanglePadItem : AbstractPadItem {
     #region Methods
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new()
-        {
+        List<GenericControl> l =
+        [
             new FlexiControl(),
-            new FlexiControlForProperty<int>(() => Drehwinkel)
-        };
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+            new FlexiControlForProperty<int>(() => Drehwinkel),
+            .. base.GetStyleOptions(widthOfControl),
+        ];
         return l;
     }
 
@@ -189,7 +187,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("Rotation", Drehwinkel);
         return result.Parseable(base.ToString());
     }

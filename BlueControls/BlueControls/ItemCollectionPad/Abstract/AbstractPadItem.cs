@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -96,7 +94,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
 
     public bool IsDisposed { get; private set; }
 
-    public ObservableCollection<PointM> MovablePoint { get; } = new();
+    public ObservableCollection<PointM> MovablePoint { get; } = [];
 
     [Description("Ist Page befüllt, wird das Item nur angezeigt, wenn die anzuzeigende Seite mit dem String übereinstimmt.")]
     public string Page {
@@ -127,7 +125,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         }
     }
 
-    public List<PointM> PointsForSuccesfullyMove { get; } = new();
+    public List<PointM> PointsForSuccesfullyMove { get; } = [];
 
     public virtual string QuickInfo { get; set; } = string.Empty;
 
@@ -141,7 +139,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         }
     }
 
-    public List<string> Tags { get; } = new();
+    public List<string> Tags { get; } = [];
 
     /// <summary>
     /// Gibt den Bereich zurück, den das Element benötigt, um komplett dargestellt zu werden. Unabhängig von der aktuellen Ansicht.
@@ -289,12 +287,12 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
     /// </summary>
     /// <returns></returns>
     public virtual List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new()
-        {
+        List<GenericControl> l =
+        [
             new FlexiControl(),
             new FlexiControlForProperty<string>(() => Gruppenzugehörigkeit),
             new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar)
-        };
+        ];
         //if (AdditionalStyleOptions != null) {
         //    l.Add(new FlexiControl());
         //    l.AddRange(AdditionalStyleOptions);
@@ -429,7 +427,7 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
 
         result.ParseableAdd("Style", _style);
         result.ParseableAdd("Page", _page);

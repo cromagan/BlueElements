@@ -15,36 +15,20 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
+using static BlueBasics.Constants;
 
 namespace BlueBasics;
 
 public static partial class Extensions {
-
-    #region Fields
-
-    //public static readonly List<string> GeschKlammerAuf = new() { "{" };
-    public static readonly List<string> GeschKlammerZu = new() { "}" };
-
-    public static readonly List<string> Gleich = new() { "=" };
-    public static readonly List<string> KlammerAuf = new() { "(" };
-    public static readonly List<List<string>> KlammernGeschweift = new() { new List<string> { "{", "}" } };
-    public static readonly List<List<string>> KlammernStd = new() { new List<string> { "(", ")" }, new List<string> { "{", "}" }, new List<string> { "[", "]" } };
-    public static readonly List<string> KlammerZu = new() { ")" };
-    public static readonly List<string> Komma = new() { "," };
-
-    #endregion
-
     //public static readonly List<string> Tilde = new() { "~" };
 
     #region Methods
@@ -59,7 +43,7 @@ public static partial class Extensions {
         input = " " + input + " ";
         var position = 0;
         var lastSeperator = 0;
-        List<string> l = new();
+        List<string> l = [];
         while (true) {
             position++;
             if (position >= input.Length) { return l; }
@@ -76,7 +60,7 @@ public static partial class Extensions {
     public static bool CanCut(this string txt, string start, string ende) {
         if (!txt.StartsWith(start) || !txt.EndsWith(ende)) { return false; }
 
-        var (pose, _) = NextText(txt, 0, new List<string> { ende }, false, false, KlammernStd);
+        var (pose, _) = NextText(txt, 0, [ende], false, false, KlammernAlle);
         return pose == txt.Length - 1;
     }
 
@@ -209,38 +193,10 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Entfernt ( und ), { und } und " und leerzeichen am Anfang/Ende
+    /// Entfernt Leerzeichen und angebebene Textpaare am Anfang/Ende - mit genau einem Zeichen. Z.B. perfekt im Klammern zu entfernen
     /// </summary>
     /// <param name="txt"></param>
-    /// <param name="klammern"></param>
-    /// <param name="geschklammern"></param>
-    /// <param name="gänsef"></param>
-    /// <param name="trimspace"></param>
-    /// <returns></returns>
-    public static string DeKlammere(this string txt, bool klammern, bool geschklammern, bool gänsef, bool trimspace) {
-        while (true) {
-            if (trimspace) {
-                txt = txt.Trim();
-            }
-
-            if (klammern && txt.CanCut("(", ")")) {
-                txt = txt.Substring(1, txt.Length - 2);
-                continue;
-            }
-
-            if (geschklammern && txt.CanCut("{", "}")) {
-                txt = txt.Substring(1, txt.Length - 2);
-                continue;
-            }
-
-            if (gänsef && txt.CanCut("\"", "\"")) {
-                txt = txt.Substring(1, txt.Length - 2);
-                continue;
-            }
-
-            return txt;
-        }
-    }
+    /// <param name="klammern">z.B. BlueBasics.Constants.KlammernRund</param>
 
     public static string FromNonCritical(this string txt) {
         // http://www.theasciicode.com.ar/ascii-printable-characters/braces-curly-brackets-opening-ascii-code-123.html
@@ -291,7 +247,7 @@ public static partial class Extensions {
     /// <param name="value">Ein String, der mit { beginnt. Z.B. {Wert=100, Wert2=150}</param>
     /// <returns>Gibt immer eine List zurück.</returns>
     public static List<KeyValuePair<string, string>> GetAllTags(this string value) {
-        List<KeyValuePair<string, string>> result = new();
+        List<KeyValuePair<string, string>> result = [];
         if (string.IsNullOrEmpty(value) || value.Length < 3) { return result; }
         if (value.Substring(0, 1) != "{") { return result; }
 
@@ -535,7 +491,7 @@ public static partial class Extensions {
         var e = search.Split('*');
         if (e.Length != 2) { return null; }
 
-        List<string> txt = new();
+        List<string> txt = [];
         var enx = 0;
         while (true) {
             var bgx = text.IndexOf(e[0], enx, compare);
@@ -571,18 +527,18 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string RemoveXmlTags(this string text) => Regex.Replace(text, "<.*?>", string.Empty);
 
-    public static string Replace(this string tXt, string alt, string neu, RegexOptions options) {
+    public static string Replace(this string txt, string alt, string neu, RegexOptions options) {
         if (options != RegexOptions.IgnoreCase) { Develop.DebugPrint(FehlerArt.Fehler, "Regex option nicht erlaubt."); }
         if (string.IsNullOrEmpty(alt)) { Develop.DebugPrint(FehlerArt.Fehler, "ALT is Empty"); }
         var oldPos = 0;
         while (true) {
-            if (string.IsNullOrEmpty(tXt)) { return tXt; }
-            var posx = tXt.ToUpper().IndexOf(alt.ToUpper(), oldPos, StringComparison.Ordinal);
+            if (string.IsNullOrEmpty(txt)) { return txt; }
+            var posx = txt.ToUpper().IndexOf(alt.ToUpper(), oldPos, StringComparison.Ordinal);
             if (posx >= 0) {
-                tXt = tXt.Substring(0, posx) + neu + tXt.Substring(posx + alt.Length);
+                txt = txt.Substring(0, posx) + neu + txt.Substring(posx + alt.Length);
                 oldPos = posx + neu.Length;
             } else {
-                return tXt;
+                return txt;
             }
         }
     }
@@ -648,7 +604,7 @@ public static partial class Extensions {
     /// <param name="textToSplit"></param>
     /// <returns></returns>
     public static List<string> SplitAndCutByCrToList(this string textToSplit) {
-        List<string> w = new();
+        List<string> w = [];
         if (string.IsNullOrEmpty(textToSplit)) { return w; }
         w.AddRange(textToSplit.SplitAndCutByCr());
         return w;
@@ -675,7 +631,7 @@ public static partial class Extensions {
     /// <param name="textToSplit"></param>
     /// <returns></returns>
     public static ICollection<string> SplitByCrToList(this string textToSplit) {
-        List<string> w = new();
+        List<string> w = [];
         if (string.IsNullOrEmpty(textToSplit)) { return w; }
         w.AddRange(textToSplit.SplitByCr());
         return w;
@@ -800,7 +756,7 @@ public static partial class Extensions {
     /// <param name="items"></param>
     /// <returns></returns>
     public static List<string> ToListOfString(this IEnumerable<IHasKeyName?>? items) {
-        List<string> w = new();
+        List<string> w = [];
         if (items == null || !items.Any()) { return w; }
 
         w.AddRange(from thisItem in items where thisItem != null where !string.IsNullOrEmpty(thisItem.KeyName) select thisItem.KeyName);
@@ -834,6 +790,28 @@ public static partial class Extensions {
         text = text.ToLower().Replace("_", " ");
         var info = CultureInfo.CurrentCulture.TextInfo;
         return info.ToTitleCase(text);
+    }
+
+    /// <returns></returns>
+    public static string Trim(this string txt, List<List<string>> klammern) {
+        var again = true;
+        while (again) {
+            again = false;
+            txt = txt.Trim();
+
+            foreach (var thisKlammern in klammern) {
+                if (thisKlammern.Count != 2) { return txt; }
+                if (thisKlammern[0].Length != 1) { return txt; }
+                if (thisKlammern[1].Length != 1) { return txt; }
+
+                if (txt.CanCut(thisKlammern[0], thisKlammern[1])) {
+                    txt = txt.Substring(1, txt.Length - 2);
+                    again = true;
+                }
+            }
+        }
+
+        return txt;
     }
 
     public static string Trim(this string tXt, string was) {

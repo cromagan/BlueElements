@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -118,10 +116,10 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
     #region Methods
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new()
-        {
+        List<GenericControl> l =
+        [
             new FlexiControlForProperty<string>(() => Text, 5)
-        };
+        ];
         ItemCollectionList.ItemCollectionList aursicht = new(false)
         {
             { "Linksbündig ausrichten", ((int)Alignment.Top_Left).ToString(), ImageCode.Linksbündig },
@@ -198,7 +196,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("ReadableText", _textOriginal);
         result.ParseableAdd("Alignment", _ausrichtung);
         result.ParseableAdd("AdditionalScale", Skalierung);

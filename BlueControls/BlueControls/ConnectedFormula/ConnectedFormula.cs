@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -51,13 +49,13 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     public const float StandardHöhe = 1.75f;
     public const string Version = "0.30";
 
-    public static readonly ObservableCollection<ConnectedFormula> AllFiles = new();
-    private readonly List<string> _databaseFiles = new();
+    public static readonly ObservableCollection<ConnectedFormula> AllFiles = [];
+    private readonly List<string> _databaseFiles = [];
 
-    private readonly List<FormulaScriptDescription> _eventScript = new();
-    private readonly List<string> _notAllowedChilds = new();
+    private readonly List<FormulaScriptDescription> _eventScript = [];
+    private readonly List<string> _notAllowedChilds = [];
 
-    private readonly List<Variable> _variables = new();
+    private readonly List<Variable> _variables = [];
     private string _createDate;
 
     private string _creator;
@@ -98,7 +96,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         _muf.Saving += _muf_Saving;
         _createDate = DateTime.UtcNow.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture);
         _creator = UserName;
-        PadData = new ItemCollectionPad.ItemCollectionPad();
+        PadData = [];
 
         if (FileExists(filename)) {
             _muf.Load(filename, true);
@@ -253,10 +251,10 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
         #region Alle Items an die neue gedachte Y-Position schieben (newY), neue bevorzugte Höhe berechnen (newH), und auch newX und newW
 
-        List<float> newX = new();
-        List<float> newW = new();
-        List<float> newY = new();
-        List<float> newH = new();
+        List<float> newX = [];
+        List<float> newW = [];
+        List<float> newY = [];
+        List<float> newH = [];
         foreach (var thisIt in its) {
 
             #region  newY
@@ -453,7 +451,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
         #region Items und Daten in einer sortierene Liste ermitteln, die es betrifft (its)
 
-        List<IAutosizable> its = new();
+        List<IAutosizable> its = [];
 
         foreach (var thisc in padData) {
             if (thisc.IsVisibleOnPage(page) && thisc is IAutosizable aas && aas.IsVisibleForMe()) {
@@ -477,7 +475,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     }
 
     public string CheckScriptError() {
-        List<string> names = new();
+        List<string> names = [];
 
         foreach (var thissc in _eventScript) {
             if (!thissc.IsOk()) {
@@ -613,7 +611,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     public void Repair() {
         // Reparatur-Routine
 
-        PadData ??= new ItemCollectionPad.ItemCollectionPad();
+        PadData ??= [];
 
         PadData.BackColor = Skin.Color_Back(Design.Form_Standard, States.Standard);
 
@@ -683,7 +681,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
             #region Variablen für Skript erstellen
 
-            VariableCollection vars = new();
+            VariableCollection vars = [];
 
             foreach (var thisvar in Variables.ToListVariableString()) {
                 var v = new VariableString("FRM_" + thisvar.KeyName, thisvar.ValueString, false, false, "Formular-Kopf-Variable\r\n" + thisvar.Comment);
@@ -911,7 +909,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
                 case "events":
                     _eventScriptTmp = pair.Value;
                     EventScript_RemoveAll(true);
-                    List<string> ai = new(pair.Value.FromNonCritical().SplitAndCutByCr());
+                    List<string> ai = [..pair.Value.FromNonCritical().SplitAndCutByCr()];
                     foreach (var t in ai) {
                         EventScript_Add(new FormulaScriptDescription(this, t.FromNonCritical()), true);
                     }
@@ -921,7 +919,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
                 case "variables":
                     _variableTmp = pair.Value;
                     _variables.Clear();
-                    List<string> va = new(pair.Value.FromNonCritical().SplitAndCutByCr());
+                    List<string> va = [..pair.Value.FromNonCritical().SplitAndCutByCr()];
                     foreach (var t in va) {
                         var l = new VariableString("dummy");
                         l.Parse(t.FromNonCritical());

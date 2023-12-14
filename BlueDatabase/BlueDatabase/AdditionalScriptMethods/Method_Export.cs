@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.IO;
 using BlueBasics;
@@ -33,15 +31,15 @@ internal class Method_Export : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal, StringVal, FilterVar };
+    public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
     public override string Command => "export";
     public override string Description => "Exportiert die Datenbank im angegeben Format. Achtung, bei BDB wird immer die gesamte Datenbank exportiert und die angegebenen Attribute ingnoriert.";
     public override bool EndlessArgs => true;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
-
     public override string StartSequence => "(";
     public override string Syntax => "Export(Filename, HTML/CSV/BDB, AnsichtName, Filter, ...);";
 

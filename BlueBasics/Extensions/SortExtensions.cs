@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,7 +25,7 @@ public static partial class Extensions {
     #region Methods
 
     public static List<string> SortedDistinctList(this IEnumerable<string>? arr) {
-        if (arr == null) { return new(); }
+        if (arr == null) { return []; }
 
         var arr2 = arr.Distinct().ToList();
         _ = arr2.Remove(string.Empty);

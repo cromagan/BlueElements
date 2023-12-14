@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueScript.Enums;
@@ -30,7 +28,7 @@ public class Method_WriteBackDbVariables : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
+    public override List<List<string>> Args => [];
 
     public override string Command => "writebackdbvariables";
 
@@ -41,8 +39,8 @@ public class Method_WriteBackDbVariables : Method_Database {
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
-
     public override string StartSequence => "(";
 
     public override string Syntax => "WriteBackDBVariables();";

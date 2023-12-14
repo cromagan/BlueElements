@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -32,12 +30,13 @@ internal class Method_AddDays : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { DateTimeVar, FloatVal };
+    public override List<List<string>> Args => [DateTimeVar, FloatVal];
     public override string Command => "adddays";
     public override string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu. Dabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt. Der Rückgabwert erfolgt immer im Format " + Format_Date7;
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableDateTime.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "AddDays(DateTimeString, Days)";

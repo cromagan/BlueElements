@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -266,9 +264,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
-        result.AddRange(_itemAccepts.ParsableTags());
-        result.AddRange(_itemSends.ParsableTags());
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
 
         result.ParseableAdd("InputColumn", _eingangsWertSpalte);
         result.ParseableAdd("OutputColumn", _filterSpalte);

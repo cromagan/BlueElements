@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using BlueBasics;
@@ -99,7 +97,7 @@ public sealed class ItemSendSomething {
 
     #region Fields
 
-    private readonly List<string> _childIds = new();
+    private readonly List<string> _childIds = [];
 
     private DatabaseAbstract? _databaseOutput;
     private int _outputColorId = -1;
@@ -154,8 +152,9 @@ public sealed class ItemSendSomething {
     }
 
     public List<GenericControl> GetStyleOptions(IItemSendSomething item, int widthOfControl) {
-        var l = new List<GenericControl>();
-        l.Add(new FlexiControl("Ausgang:", widthOfControl));
+        var l = new List<GenericControl> {
+            new FlexiControl("Ausgang:", widthOfControl)
+        };
 
         if (item.DatabaseOutput is not DatabaseAbstract db || db.IsDisposed) {
             l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
@@ -180,7 +179,7 @@ public sealed class ItemSendSomething {
     }
 
     public List<string> ParsableTags() {
-        List<string> result = new();
+        List<string> result = [];
 
         result.ParseableAdd("OutputDatabase", _databaseOutput);
 

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -31,13 +29,14 @@ internal class Method_Add : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { ListStringVar, new List<string> { VariableString.ShortName_Plain, VariableListString.ShortName_Plain } };
+    public override List<List<string>> Args => [ListStringVar, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "add";
     public override string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.";
     public override bool EndlessArgs => true;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "Add(List-Variable, Value1, Value2, ...);";

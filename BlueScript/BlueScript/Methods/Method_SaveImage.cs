@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Drawing.Imaging;
 using System.IO;
@@ -33,15 +31,15 @@ internal class Method_SaveImage : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { StringVal, StringVal, new List<string> { VariableBitmap.ShortName_Variable } };
+    public override List<List<string>> Args => [StringVal, StringVal, [VariableBitmap.ShortName_Variable]];
     public override string Command => "saveimage";
     public override string Description => "Speichert das Bild auf die Festplatte";
     public override bool EndlessArgs => true;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
-
     public override string StartSequence => "(";
     public override string Syntax => "SaveImage(Filename, PNG/JPG/BMP, Bild);";
 

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -96,7 +94,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
         }
     }
 
-    public List<IControlSendSomething> Parents { get; } = new();
+    public List<IControlSendSomething> Parents { get; } = [];
 
     public string Pfad {
         get => IsDisposed ? string.Empty : txbPfad.Text;
@@ -531,7 +529,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
 
         #region  Buttons und Watcher einschalten
 
-        feedBack = new List<object?> { "Buttons&Watcher", true };
+        feedBack = ["Buttons&Watcher", true];
         ThumbGenerator.ReportProgress(0, feedBack);
 
         #endregion
@@ -566,7 +564,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
                 tags.TagSet("Folder", bool.FalseString);
                 p.Tag = tags;
 
-                feedBack = new List<object?> { "Add", p };
+                feedBack = ["Add", p];
                 ThumbGenerator.ReportProgress(1, feedBack);
             }
         }
@@ -585,7 +583,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
                 p.Padding = 10;
                 p.UserDefCompareKey = Constants.FirstSortChar + thisString.ToUpper();
                 p.Tag = tags;
-                feedBack = new List<object?> { "Add", p };
+                feedBack = ["Add", p];
                 ThumbGenerator.ReportProgress(1, feedBack);
             }
         }
@@ -598,7 +596,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
             if (ThumbGenerator.CancellationPending || _lastcheck != newPath) { return; }
             var fi = new FileInfo(thisString);
             if (AddThis(fi)) {
-                feedBack = new List<object?> { "Image", thisString, WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk) };
+                feedBack = ["Image", thisString, WindowsThumbnailProvider.GetThumbnail(thisString, 64, 64, ThumbnailOptions.BiggerSizeOk)];
                 if (ThumbGenerator.CancellationPending || _lastcheck != newPath) { return; }
                 ThumbGenerator.ReportProgress(2, feedBack);
             }

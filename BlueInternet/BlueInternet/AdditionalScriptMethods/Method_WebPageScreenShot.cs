@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -39,12 +37,13 @@ internal class Method_WebPageScreenShot : Method_WebPage {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { WebPageVal };
+    public override List<List<string>> Args => [WebPageVal];
     public override string Command => "webpagescreenshot";
     public override string Description => "Gibt die aktuelle Anzeige der WebPage zurück. NULL falls irgendwas fehlschlägt";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "WebPageScreenShot(WebPageVariable)";

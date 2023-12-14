@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -30,7 +28,7 @@ public class VariableCollection : IEnumerable<Variable> {
 
     #region Fields
 
-    private readonly List<Variable> _internal = new();
+    private readonly List<Variable> _internal = [];
 
     #endregion
 
@@ -214,11 +212,11 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <param name="name"></param>
     public List<string> GetList(string name) {
         var v = _internal.Get(name);
-        if (v == null) { return new(); }
+        if (v == null) { return []; }
 
         if (v is not VariableListString vf) {
             Develop.DebugPrint("Falscher Datentyp");
-            return new();
+            return [];
         }
 
         return vf.ValueList;

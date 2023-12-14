@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -167,14 +165,16 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
-        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
-        l.Add(new FlexiControl());
-        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
-        l.Add(new FlexiControl());
-        l.Add(new FlexiControl("Einstellungen:", -1));
-        l.Add(new FlexiControlForProperty<string>(() => Überschrift));
-        l.Add(new FlexiControlForProperty<string>(() => Anzeige));
+        List<GenericControl> l =
+        [
+            .. _itemAccepts.GetStyleOptions(this, widthOfControl),
+            new FlexiControl(),
+            .. _itemSends.GetStyleOptions(this, widthOfControl),
+            new FlexiControl(),
+            new FlexiControl("Einstellungen:", -1),
+            new FlexiControlForProperty<string>(() => Überschrift),
+            new FlexiControlForProperty<string>(() => Anzeige),
+        ];
 
         var u = new ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
@@ -242,9 +242,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
-        result.AddRange(_itemAccepts.ParsableTags());
-        result.AddRange(_itemSends.ParsableTags());
+        List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
 
         result.ParseableAdd("CaptionText", _überschrift);
         result.ParseableAdd("ShowFormat", _anzeige);

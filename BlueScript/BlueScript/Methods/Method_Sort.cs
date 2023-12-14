@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
@@ -32,13 +30,14 @@ internal class Method_Sort : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { ListStringVar, BoolVal };
+    public override List<List<string>> Args => [ListStringVar, BoolVal];
     public override string Command => "sort";
     public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
     public override bool EndlessArgs => false;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
 

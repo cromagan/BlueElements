@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.ComponentModel.Design;
 
 namespace BlueControls.Designer_Support;
@@ -33,10 +31,10 @@ internal sealed class TextBoxDesigner : BasicDesigner {
 
     public override DesignerActionListCollection ActionLists {
         get {
-            _aList ??= new DesignerActionListCollection
-                {
+            _aList ??=
+                [
                     new TextBoxActionList(Component)
-                };
+                ];
             return _aList;
         }
     }

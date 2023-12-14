@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -26,6 +24,7 @@ using BlueBasics.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Extensions;
+using static BlueBasics.Constants;
 
 namespace BlueScript.Variables;
 
@@ -124,7 +123,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         if (string.IsNullOrEmpty(txt)) { return new DoItFeedback(ld, "Kein Wert zum Parsen angekommen."); }
 
         if (txt.StartsWith("(")) {
-            var (pose, _) = NextText(txt, 0, KlammerZu, false, false, KlammernStd);
+            var (pose, _) = NextText(txt, 0, KlammerRundZu, false, false, KlammernAlle);
             if (pose < txt.Length - 1) {
                 // Wir haben so einen Fall: (true) || (true)
                 var tmp = GetVariableByParsing(txt.Substring(1, pose - 1), ld, varCol, scp);
@@ -135,9 +134,9 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             }
         }
 
-        txt = txt.DeKlammere(true, false, false, true);
+        txt = txt.Trim(KlammernRund);
 
-        var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernStd);
+        var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernAlle);
         if (uu > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, uu), ld, varCol, scp);
             if (!txt1.AllOk || txt1.Variable == null) {
@@ -150,7 +149,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
             return GetVariableByParsing(txt.Substring(uu + 2), ld, varCol, scp);
         }
 
-        var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernStd);
+        var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernAlle);
         if (oo > 0) {
             var txt1 = GetVariableByParsing(txt.Substring(0, oo), ld, varCol, scp);
             if (!txt1.AllOk || txt1.Variable == null) {
@@ -173,9 +172,9 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         if (t2.Variable != null) { return new DoItFeedback(t2.Variable); }
         if (txt != t2.AttributeText) { return GetVariableByParsing(t2.AttributeText, ld, varCol, scp); }
 
-        var (posa, _) = NextText(txt, 0, KlammerAuf, false, false, KlammernStd);
+        var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
         if (posa > -1) {
-            var (pose, _) = NextText(txt, posa, KlammerZu, false, false, KlammernStd);
+            var (pose, _) = NextText(txt, posa, KlammerRundZu, false, false, KlammernAlle);
             if (pose <= posa) { return DoItFeedback.Klammerfehler(ld); }
 
             var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
@@ -263,7 +262,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     public new string ToString() {
         if (!ToStringPossible) { return string.Empty; }
 
-        List<string> result = new();
+        List<string> result = [];
         //result.ParseableAdd("Type", ShortName);
         //result.ParseableAdd("Name", Name);
         result.ParseableAdd("Value", ValueForReplace);

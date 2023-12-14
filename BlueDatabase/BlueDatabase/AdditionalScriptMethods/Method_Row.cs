@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
@@ -32,8 +30,7 @@ public class Method_Row : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { FilterVar };
-
+    public override List<List<string>> Args => [FilterVar];
     public override string Command => "row";
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
@@ -45,6 +42,7 @@ public class Method_Row : Method {
     public override bool EndlessArgs => true;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableRowItem.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "Row(Filter, ...)";

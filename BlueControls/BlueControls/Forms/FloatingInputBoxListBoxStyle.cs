@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -96,12 +94,12 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             }
             _ = thisContextMenu.AddSeparator();
             _ = thisContextMenu.Add(ContextMenuCommands.Abbruch);
-            List<object?> infos = new()
-            {
+            List<object?> infos =
+            [
                 userMenu,
                 hotItem,
                 control
-            };
+            ];
             var contextMenu = Show(thisContextMenu, infos, (Control)control, translate);
             contextMenu.ItemClicked += _ContextMenu_ItemClicked;
         } else {

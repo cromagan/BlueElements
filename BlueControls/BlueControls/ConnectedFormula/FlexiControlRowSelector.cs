@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -56,7 +54,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
 
     #region Properties
 
-    public List<IControlAcceptSomething> Childs { get; } = new();
+    public List<IControlAcceptSomething> Childs { get; } = [];
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -65,9 +63,9 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
-    public FilterCollection FilterOutput { get; } = new();
+    public FilterCollection FilterOutput { get; } = [];
 
-    public List<IControlSendSomething> Parents { get; } = new();
+    public List<IControlSendSomething> Parents { get; } = [];
 
     #endregion
 
@@ -130,8 +128,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
 
         if (cb == null) { return; }
 
-        List<AbstractListItem> ex = new();
-        ex.AddRange(cb.Item);
+        List<AbstractListItem> ex = [.. cb.Item];
 
         #region Zeilen erzeugen
 

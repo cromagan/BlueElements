@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -31,13 +29,14 @@ internal class Method_ForEach : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableUnknown.ShortName_Plain }, ListStringVar };
+    public override List<List<string>> Args => [[VariableUnknown.ShortName_Plain], ListStringVar];
     public override string Command => "foreach";
     public override string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.";
     public override bool EndlessArgs => false;
-    
+
     public override bool GetCodeBlockAfter => true;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "ForEach(Variable, List) { }";

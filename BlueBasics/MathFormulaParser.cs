@@ -18,6 +18,8 @@
 using System;
 using System.Collections.Generic;
 using static BlueBasics.Converter;
+using static BlueBasics.Extensions;
+using static BlueBasics.Constants;
 
 namespace BlueBasics;
 
@@ -25,7 +27,7 @@ public static class MathFormulaParser {
 
     #region Fields
 
-    public static readonly List<string> RechenOperatoren = new() { "*", "/", "+", "-" };
+    public static readonly List<string> RechenOperatoren = ["*", "/", "+", "-"];
 
     #endregion
 
@@ -54,7 +56,7 @@ public static class MathFormulaParser {
 
     private static double? ErgebnisCore(string formel) {
         // var TMP = 0;
-        formel = formel.DeKlammere(true, false, false, true);
+        formel = formel.Trim(KlammernRund);
         // Das alles kann nur möglich sein, WENN eine Klammer vorhanden ist
         if (formel.Contains("(")) {
             // --------------------------------------------------------------------------------------------------------------------------------

@@ -27,7 +27,7 @@ public partial class Progressbar : FloatingForm {
 
     #region Fields
 
-    private readonly Dictionary<int, DateTime> _eProgressbarTimeDic = new();
+    private readonly Dictionary<int, DateTime> _eProgressbarTimeDic = [];
     private string _baseText = string.Empty;
     private int _count;
     private int _eProgressbarLastCalulatedSeconds = int.MinValue;

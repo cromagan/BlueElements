@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -146,7 +144,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         #endregion
 
-        List<FlexiControlForFilter> flexsToDelete = new();
+        List<FlexiControlForFilter> flexsToDelete = [];
 
         #region Vorhandene Flexis ermitteln
 
@@ -161,7 +159,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         #region Neue Flexis erstellen / updaten
 
         if (_table?.Database != null && _table.Filter != null) {
-            List<ColumnItem> columSort = new();
+            List<ColumnItem> columSort = [];
             var orderArrangement = _table.Database.ColumnArrangements.Get(AnsichtName);
 
             #region Reihenfolge der Spalten bestimmen

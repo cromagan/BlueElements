@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -46,7 +44,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
 
     #region Fields
 
-    private readonly List<IMoveable> _itemsToMove = new();
+    private readonly List<IMoveable> _itemsToMove = [];
     private string _currentPage = string.Empty;
     private IMouseAndKeyHandle? _givesMouseCommandsTo;
     private ItemCollectionPad.ItemCollectionPad? _item;
@@ -68,7 +66,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
         MouseHighlight = false;
     }
 
-    public CreativePad() : this(new ItemCollectionPad.ItemCollectionPad()) { }
+    public CreativePad() : this([]) { }
 
     #endregion
 
@@ -243,7 +241,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
             case Keys.Delete:
 
             case Keys.Back:
-                List<AbstractPadItem> itemsDoDelete = new();
+                List<AbstractPadItem> itemsDoDelete = [];
                 foreach (var thisit in _itemsToMove) {
                     if (thisit is AbstractPadItem bi) { itemsDoDelete.Add(bi); }
                 }
@@ -286,7 +284,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, IChangedFeedbac
     }
 
     public List<AbstractPadItem> HotItems(MouseEventArgs? e) {
-        if (e == null || _item == null) { return new List<AbstractPadItem>(); }
+        if (e == null || _item == null) { return []; }
         Point p = new((int)((e.X + ShiftX) / Zoom), (int)((e.Y + ShiftY) / Zoom));
         return _item.Where(thisItem => thisItem != null &&
                                         thisItem.IsVisibleOnPage(CurrentPage) &&

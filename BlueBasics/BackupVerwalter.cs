@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -29,7 +27,7 @@ public class BackupVerwalter {
 
     #region Fields
 
-    private readonly Dictionary<string, string> _data = new();
+    private readonly Dictionary<string, string> _data = [];
 
     private readonly int _maxfiles;
     private readonly int _multi;
@@ -52,7 +50,7 @@ public class BackupVerwalter {
         get {
             if (_deletable == null) { CalculateDeleteable(_multi, _maxfiles); }
 
-            return new ReadOnlyCollection<string>(_deletable ?? new());
+            return new ReadOnlyCollection<string>(_deletable ?? []);
         }
     }
 
@@ -102,7 +100,7 @@ public class BackupVerwalter {
 
         var filc = 0;
 
-        _deletable = new List<string>();
+        _deletable = [];
 
         do {
             var dtx = DateTime.UtcNow.AddDays(-von);

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -39,9 +37,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Fields
 
     private readonly ConcurrentDictionary<string, RowItem> _internal = new();
-    private readonly List<string> _pendingChangedBackgroundRow = new();
-    private readonly List<string> _pendingChangedRows = new();
-    private readonly List<BackgroundWorker> _pendingworker = new();
+    private readonly List<string> _pendingChangedBackgroundRow = [];
+    private readonly List<string> _pendingChangedRows = [];
+    private readonly List<BackgroundWorker> _pendingworker = [];
     private bool _executingbackgroundworks;
     private bool _executingchangedrows;
 
@@ -545,7 +543,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal static List<RowItem> MatchesTo(FilterItem fi) {
-        List<RowItem> l = new();
+        List<RowItem> l = [];
 
         if (fi.Database is not DatabaseAbstract db || db.IsDisposed) { return l; }
 

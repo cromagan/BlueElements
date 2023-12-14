@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -32,13 +30,13 @@ internal class Method_DateTimeNowUTC : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new();
+    public override List<List<string>> Args => [];
     public override string Command => "datetimeutcnow";
     public override string Description => "Gibt die akutelle UTC-Uhrzeit zurück.";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableDateTime.ShortName_Variable;
     public override string StartSequence => "(";
     public override string Syntax => "DateTimeUTCNow()";

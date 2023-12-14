@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueDatabase.AdditionalScriptMethods;
 using BlueScript.Enums;
@@ -34,12 +32,13 @@ internal class Method_WebPageFillTextBox : Method_WebPage {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { WebPageVal, StringVal, StringVal };
+    public override List<List<string>> Args => [WebPageVal, StringVal, StringVal];
     public override string Command => "webpagefilltextbox";
     public override string Description => "Füllt ein Textfeld in der Webpage aus.";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "WebPageFillTextBox(WebPageVariable, id, value)";

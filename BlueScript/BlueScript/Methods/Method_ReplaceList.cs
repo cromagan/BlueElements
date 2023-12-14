@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -34,13 +32,14 @@ internal class Method_ReplaceList : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { ListStringVar, BoolVal, BoolVal, StringVal, StringVal };
+    public override List<List<string>> Args => [ListStringVar, BoolVal, BoolVal, StringVal, StringVal];
     public override string Command => "replacelist";
     public override string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
     public override bool EndlessArgs => false;
-  
+
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "ReplaceList(ListVariable, CaseSensitive, Partial, SearchValue, ReplaceValue);";

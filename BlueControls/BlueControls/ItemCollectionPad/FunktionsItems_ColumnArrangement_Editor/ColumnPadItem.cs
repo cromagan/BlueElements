@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -92,7 +90,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     //        if (value == Permanent) { return; }
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l = new();
+        List<GenericControl> l = [];
         if (Column == null || Column.IsDisposed) { return l; }
 
         l.Add(new FlexiControlForProperty<string>(() => Datenbank));
@@ -133,7 +131,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
 
         result.ParseableAdd("Database", Column?.Database);
         result.ParseableAdd("ColumnName", Column);

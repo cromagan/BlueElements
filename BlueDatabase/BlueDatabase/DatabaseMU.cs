@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -242,7 +240,7 @@ public class DatabaseMu : Database {
 
             #endregion
 
-            if (frgm.Count == 0) { return (new(), new()); }
+            if (frgm.Count == 0) { return ([], []); }
 
             var l = new List<UndoItem>();
 

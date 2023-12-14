@@ -38,7 +38,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     #region Methods
 
     public void DisablePad() {
-        Pad.Item = new ItemCollectionPad.ItemCollectionPad();
+        Pad.Item = [];
         Pad.Enabled = false;
     }
 

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Drawing.Imaging;
@@ -33,12 +31,13 @@ internal class Method_BitmapToBase64 : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { new List<string> { VariableBitmap.ShortName_Variable }, StringVal };
+    public override List<List<string>> Args => [[VariableBitmap.ShortName_Variable], StringVal];
+    public override string Command => "bitmaptobase64";
     public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
     public override bool EndlessArgs => false;
-    
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard | MethodType.NeedLongTime;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "BitmapToBase64(Bitmap, JPG / PNG)";
@@ -46,8 +45,6 @@ internal class Method_BitmapToBase64 : Method {
     #endregion
 
     #region Methods
-
-    public override string Command => "bitmaptobase64";
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);

@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -68,14 +66,14 @@ public class SymbolPadItem : RectanglePadItem {
             { "Pfeil", ((int)Symbol.Pfeil).ToString(), QuickImage.Get("Pfeil_Rechts|32") },
             { "Bruchlinie", ((int)Symbol.Bruchlinie).ToString() }
         };
-        List<GenericControl> l = new()
-        {
+        List<GenericControl> l =
+        [
             new FlexiControlForProperty<Symbol>(() => Symbol, comms),
             new FlexiControlForProperty<float>(() => Randdicke),
             new FlexiControlForProperty<Color>(() => Randfarbe),
-            new FlexiControlForProperty<Color>(() => Hintergrundfarbe)
-        };
-        l.AddRange(base.GetStyleOptions(widthOfControl));
+            new FlexiControlForProperty<Color>(() => Hintergrundfarbe),
+            .. base.GetStyleOptions(widthOfControl),
+        ];
         return l;
     }
 
@@ -108,7 +106,7 @@ public class SymbolPadItem : RectanglePadItem {
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
-        List<string> result = new();
+        List<string> result = [];
         result.ParseableAdd("Symbol", Symbol);
         result.ParseableAdd("Backcolor", Hintergrundfarbe.ToArgb());
         result.ParseableAdd("BorderColor", Randfarbe.ToArgb());

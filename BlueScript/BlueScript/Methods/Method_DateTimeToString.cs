@@ -15,8 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
@@ -32,13 +30,13 @@ internal class Method_DateTimeToString : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => new() { DateTimeVar, StringVal };
+    public override List<List<string>> Args => [DateTimeVar, StringVal];
     public override string Command => "datetimetostring";
     public override string Description => "Wandelt eine Zeitangabe in einen String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  " + Format_Date7 + "\rAchtung: Groß-Kleinschreibung ist wichtig!";
     public override bool EndlessArgs => false;
-
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
     public override string Syntax => "DateTimeToString(DateTime, string)";
