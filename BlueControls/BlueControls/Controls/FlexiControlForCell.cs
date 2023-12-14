@@ -133,7 +133,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
             db.Disposed += _Database_Disposed;
         }
 
-        FilterInput = this.FilterOfSender();
+        this.DoInputFilter();
         UpdateColumnData();
         SetValueFromCell();
         CheckEnabledState();

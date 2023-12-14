@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.Text;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Structures;
@@ -47,12 +48,12 @@ public class VariableUnknown : Variable {
     #region Properties
 
     public static string ClassId => "ukn";
-
     public static string ShortName_Plain => "ukn";
     public static string ShortName_Variable => "*ukn";
     public override int CheckOrder => 100;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => false;
+    public override bool MustDispose => false;
     public override string MyClassId => ClassId;
 
     /// <summary>

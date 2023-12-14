@@ -16,8 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using System.Globalization;
-using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -68,9 +66,6 @@ public class Method_CellGetRow : Method_Database {
         } else if (v[0] is VariableString vs) {
             var w = vs.ValueString;
             if (!string.IsNullOrEmpty(w)) { l.Add(w); }
-        } else if (v[0] is VariableDateTime vdt) {
-            var w = vdt.ValueDate;
-            l.Add(w.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture));
         } else {
             return new DoItFeedback(infos.Data, "Spaltentyp nicht unterstützt.");
         }

@@ -29,7 +29,7 @@ public class Method_CellSetFilter : Method_Database {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableFloat.ShortName_Plain, VariableDateTime.ShortName_Variable], StringVal, FilterVar];
+    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableFloat.ShortName_Plain], StringVal, FilterVar];
     public override string Command => "cellsetfilter";
     public override string Description => "Lädt eine andere Datenbank sucht eine Zeile mit einem Filter und setzt den Wert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
     public override bool EndlessArgs => true;
@@ -70,7 +70,6 @@ public class Method_CellSetFilter : Method_Database {
         if (attvar.Attributes[0] is VariableString vs) { value = vs.ValueString; }
         if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
         if (attvar.Attributes[0] is VariableFloat vf) { value = vf.ValueForReplace; }
-        if (attvar.Attributes[0] is VariableDateTime vd) { value = vd.ValueDate.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture); }
 
         value = columnToSet.AutoCorrect(value, true);
 

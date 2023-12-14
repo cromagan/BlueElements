@@ -55,6 +55,7 @@ public class VariableFloat : Variable {
     public override int CheckOrder => 1;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => false;
+    public override bool MustDispose => false;
     public override string MyClassId => ClassId;
 
     /// <summary>

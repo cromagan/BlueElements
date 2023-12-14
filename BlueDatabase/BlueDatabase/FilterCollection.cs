@@ -30,11 +30,14 @@ using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
-public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IChangedFeedback, ICloneable {
+public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IChangedFeedback {
 
     #region Fields
 
     private readonly List<FilterItem> _internal = [];
+
+    //TODO: Komentar wieder entfernen
+    private string _coment = string.Empty;
 
     private DatabaseAbstract? _database;
     private List<RowItem>? _rows;
@@ -43,11 +46,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Constructors
 
-    public FilterCollection() : this(null as DatabaseAbstract) { }
+    public FilterCollection(string c) : this(null as DatabaseAbstract, c) { }
 
-    public FilterCollection(DatabaseAbstract? database) => Database = database;
+    public FilterCollection(DatabaseAbstract? database, string c) {
+        Database = database;
+        _coment = c;
+    }
 
-    public FilterCollection(FilterItem fi) : this(fi.Database) => Add(fi);
+    public FilterCollection(FilterItem fi, string c) : this(fi.Database, c) => Add(fi);
 
     #endregion
 
@@ -242,8 +248,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// Klont die Filter Collection. Auch alle Filter werden ein Klon. Vorberechnete Zeilen werden weitergegeben.
     /// </summary>
     /// <returns></returns>
-    public object Clone() {
-        var fc = new FilterCollection(Database);
+    public object Clone(string c2) {
+        var fc = new FilterCollection(Database, "colne " + c2);
         fc._internal.AddIfNotExists(_internal.CloneWithClones());
         fc._rows = [];
         fc._rows.AddRange(Rows);
@@ -454,6 +460,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                     Database = null;
                 }
                 _rows = null;
+
+                foreach (var thisf in _internal) {
+                    thisf.Dispose();
+                }
             }
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben

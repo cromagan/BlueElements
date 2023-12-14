@@ -204,7 +204,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (fi.Count == 0 && column.Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return (null, "Keine gültigen Suchkriterien definiert."); }
 
-        var fc = new FilterCollection(linkedDatabase);
+        var fc = new FilterCollection(linkedDatabase, "cell get filter");
         fc.AddIfNotExists(fi);
 
         return (fc, string.Empty);
@@ -520,7 +520,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 }
                 return bedingungErfüllt;
             }
-            List<string> vorhandenWerte = [..txt.SplitAndCutByCr()];
+            List<string> vorhandenWerte = [.. txt.SplitAndCutByCr()];
             if (vorhandenWerte.Count == 0) // Um den Filter, der nach 'Leere' Sucht, zu befriediegen
             {
                 vorhandenWerte.Add("");

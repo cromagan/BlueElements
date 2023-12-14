@@ -210,6 +210,15 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
             if (_variableTmp == tmp) { return; }
 
             _variableTmp = tmp;
+
+            #region Kritische Variablen Disposen
+
+            foreach (var thisVar in _variables) {
+                if (thisVar is IDisposable id && thisVar.MustDispose) { id.Dispose(); }
+            }
+
+            #endregion
+
             _variables.Clear();
 
             foreach (var t in value) {
@@ -909,7 +918,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
                 case "events":
                     _eventScriptTmp = pair.Value;
                     EventScript_RemoveAll(true);
-                    List<string> ai = [..pair.Value.FromNonCritical().SplitAndCutByCr()];
+                    List<string> ai = [.. pair.Value.FromNonCritical().SplitAndCutByCr()];
                     foreach (var t in ai) {
                         EventScript_Add(new FormulaScriptDescription(this, t.FromNonCritical()), true);
                     }
@@ -919,7 +928,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
                 case "variables":
                     _variableTmp = pair.Value;
                     _variables.Clear();
-                    List<string> va = [..pair.Value.FromNonCritical().SplitAndCutByCr()];
+                    List<string> va = [.. pair.Value.FromNonCritical().SplitAndCutByCr()];
                     foreach (var t in va) {
                         var l = new VariableString("dummy");
                         l.Parse(t.FromNonCritical());

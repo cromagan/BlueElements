@@ -110,6 +110,33 @@ public static class IControlAcceptSomethingExtension {
         }
     }
 
+    public static void DoInputFilter(this IControlAcceptSomething item) {
+        if (item.IsDisposed) { return; }
+        if (item.FilterManualSeted) { return; }
+
+        item.FilterInput?.Dispose();
+        item.FilterInput = null;
+
+        if (item.Parents.Count == 0) { return; }
+        if (item.Parents.Count == 1) {
+            if (item.Parents[0].FilterOutput.Clone("FilterOfSender") is FilterCollection fc2) {
+                item.FilterInput = fc2;
+                return;
+            }
+        }
+
+        FilterCollection? fc = null;
+
+        foreach (var thiss in item.Parents) {
+            if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
+                fc ??= new FilterCollection(fi.Database, "filterofsedner");
+                fc.AddIfNotExists(fi);
+            }
+        }
+
+        item.FilterInput = fc;
+    }
+
     /// <summary>
     /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom IItemAcceptSomething übernommen.
     /// </summary>
@@ -132,25 +159,6 @@ public static class IControlAcceptSomethingExtension {
         }
     }
 
-    public static FilterCollection? FilterOfSender(this IControlAcceptSomething item) {
-        if (item.FilterManualSeted) { return item.FilterInput; }
-        if (item.Parents.Count == 0) { return null; }
-        if (item.Parents.Count == 1) {
-            if (item.Parents[0].FilterOutput.Clone() is FilterCollection fc2) { return fc2; }
-        }
-
-        FilterCollection? fc = null;
-
-        foreach (var thiss in item.Parents) {
-            if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
-                fc ??= new FilterCollection(fi.Database);
-                fc.AddIfNotExists(fi);
-            }
-        }
-
-        return fc;
-    }
-
     public static void SetToRow(this IControlAcceptSomething item, RowItem? row) {
         if (item.Parents.Count > 0) {
             Develop.DebugPrint(FehlerArt.Fehler, "Element wird von Parents gesteuert!");
@@ -161,7 +169,7 @@ public static class IControlAcceptSomethingExtension {
         if (row?.Database == null && item.FilterInput == null) { return; }
 
         if (row?.Database is DatabaseAbstract db && !db.IsDisposed) {
-            item.FilterInput ??= new FilterCollection(db);
+            item.FilterInput ??= new FilterCollection(db, "SetToRow");
             item.FilterInput.Database = db;
         }
 

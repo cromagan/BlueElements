@@ -55,6 +55,7 @@ public class VariableBool : Variable {
     public override int CheckOrder => 0;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => false;
+    public override bool MustDispose => false;
     public override string MyClassId => ClassId;
     public override string ReadableText => _valuebool.ToString();
     public override bool ToStringPossible => true;

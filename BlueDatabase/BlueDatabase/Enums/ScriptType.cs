@@ -24,7 +24,8 @@ public enum ScriptType {
     Numeral = 3,
     List = 4,
     String_Readonly = 5,
-    DateTime = 6,
+
+    //DateTime = 6,
     Bool_Readonly = 7,
 
     undefiniert = 999

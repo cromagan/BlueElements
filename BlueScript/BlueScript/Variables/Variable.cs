@@ -71,6 +71,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
 
     public abstract bool IsNullOrEmpty { get; }
 
+    public abstract bool MustDispose { get; }
     public abstract string MyClassId { get; }
     public virtual string ReadableText => "Objekt: " + MyClassId;
 

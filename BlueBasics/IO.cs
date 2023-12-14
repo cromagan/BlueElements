@@ -138,7 +138,9 @@ public static class IO {
         if (pfad.IndexOf("\\\\", 1, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
         if (pfad.Length > 1 && pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
 
-        if (pfad.Length > 1 && pfad.IndexOf(":", 2, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Falscher Doppelpunktk: " + pfad); }
+        if (pfad.Length > 1 && pfad.IndexOf(":", 2, StringComparison.Ordinal) > 0) {
+            pfad = pfad.Substring(0, 3) + pfad.Substring(3).RemoveChars(":");
+        }
 
         try {
             return Path.GetFullPath(pfad);
@@ -395,8 +397,10 @@ public static class IO {
     /// </summary>
     /// <param name="pfad"></param>
     public static string PathParent(this string pfad) {
-        var z = pfad.Length;
         pfad = pfad.CheckPath();
+        var z = pfad.Length;
+
+
         while (true) {
             z--;
             if (z <= 1) { return string.Empty; }

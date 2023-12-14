@@ -56,7 +56,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
-    public FilterCollection FilterOutput { get; } = [];
+    public FilterCollection FilterOutput { get; } = new("FilterIput 2");
     public List<IControlSendSomething> Parents { get; } = [];
 
     #endregion
@@ -64,7 +64,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
     #region Methods
 
     public void FilterInput_Changed(object sender, System.EventArgs e) {
-        FilterInput = this.FilterOfSender();
+        this.DoInputFilter();
         Invalidate();
 
         var lastInputRow = FilterInput?.RowSingleOrNull;

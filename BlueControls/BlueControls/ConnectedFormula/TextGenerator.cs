@@ -107,7 +107,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
     #region Methods
 
     public void FilterInput_Changed(object sender, System.EventArgs e) {
-        FilterInput = this.FilterOfSender();
+        this.DoInputFilter();
         GenerateColumns();// Wegen der Datenbank
         GenerateItemsAndText();
     }

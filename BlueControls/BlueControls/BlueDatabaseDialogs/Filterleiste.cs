@@ -291,7 +291,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
 
         var fl = new FilterItem(co, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
 
-        var fc = new FilterCollection(fl);
+        using var fc = new FilterCollection(fl, "ähnliche");
 
         var r = fc.Rows;
         if (r.Count != 1 || _ähnliche == null || _ähnliche.Count == 0) {
@@ -346,7 +346,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         if (col == null) { return; } // Neue Datenbank?
 
         var fi = new FilterItem(col, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, txbZeilenFilter.Text);
-        var fc = new FilterCollection(fi);
+        using var fc = new FilterCollection(fi, "doähnliche");
 
         var r = fc.Rows;
         if (_ähnliche != null) {

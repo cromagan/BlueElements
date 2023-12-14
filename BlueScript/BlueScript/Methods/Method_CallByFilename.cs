@@ -15,9 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -54,6 +56,7 @@ public class Method_CallByFilename : Method {
     /// <summary>
     ///
     /// </summary>
+    /// <param name="scp"></param>
     /// <param name="infos"></param>
     /// <param name="aufgerufenVon">Name der Funktion, z.B. Do-Schleife</param>
     /// <param name="reducedscripttext">Der Scripttext, der ausgeführt werden soll. Bereits standardisiert</param>
@@ -75,6 +78,18 @@ public class Method_CallByFilename : Method {
             if (addMe != null) { tmpv.Add(addMe); }
 
             scx = Script.Parse(tmpv, scp, reducedscripttext, lineadd, subname);
+
+            #region Kritische Variablen Disposen
+
+            foreach (var thisVar in tmpv) {
+                if (varCol.Get(thisVar.KeyName) == null) {
+                    if (thisVar is IDisposable id && thisVar.MustDispose) {
+                        id.Dispose();
+                    }
+                }
+            }
+
+            #endregion
 
             if (!scx.AllOk) {
                 // Beim Abbruch sollen die aktuellen Variabeln angezeigt werden

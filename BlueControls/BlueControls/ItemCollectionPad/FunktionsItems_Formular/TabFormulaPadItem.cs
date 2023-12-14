@@ -173,13 +173,10 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                         t.Controls.Add(cc);
                         cc.InitFormula(cf, null);
                         cc.Dock = DockStyle.Fill;
-                        //cc.DoOutputSettings(parentView, item);
-                        //dest.Name = source.DefaultItemToControlName();
                         cc.DoInputSettings(parentView, this);
-                        var f = cc.FilterOfSender();
-                        cc.FilterOutput.Database = f?.Database;
+                        cc.DoInputFilter();
+                        cc.FilterOutput.Database = cc.FilterInput?.Database;
                         cc.GenerateView();
-                        // cc.FilterInput_Changed(this, System.EventArgs.Empty);
 
                         #endregion
                     } else {

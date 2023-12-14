@@ -76,7 +76,6 @@
     <Compile Include="Methods\Method_ExtractText.cs" />
     <Compile Include="Methods\Method_IndexOf.cs" />
     <Compile Include="Methods\Method_RemoveXMLTags.cs" />
-    <Compile Include="Methods\Method_Xml.cs" />
     <Compile Include="Methods\Method_FreeDirectoryName.cs" />
     <Compile Include="Methods\Method_DeleteFile.cs" />
     <Compile Include="Methods\Method_LoadTextFile.cs" />
@@ -85,7 +84,6 @@
     <Compile Include="Methods\Method_FreeFileName.cs" />
     <Compile Include="Methods\Method_GetFiles.cs" />
     <Compile Include="Methods\Method_ClipboardText.cs" />
-    <Compile Include="Methods\Method_StringToDateTime.cs" />
     <Compile Include="Methods\Method_DirectoryCreate.cs" />
     <Compile Include="Methods\Method_RandomInt.cs" />
     <Compile Include="Methods\Method_DateTimeDifferenceInDays.cs" />
@@ -97,7 +95,7 @@
     <Compile Include="Methods\Method_SetIfHasValue.cs" />
     <Compile Include="Methods\Method_SetIfExists.cs" />
     <Compile Include="Methods\Method_LoadImage.cs" />
-    <Compile Include="Methods\Method_DateTimeToString.cs" />
+    <Compile Include="Methods\Method_ChangeDateTimeFormat.cs" />
     <Compile Include="Methods\Method_AddDays.cs" />
     <Compile Include="Methods\Method_Count.cs" />
     <Compile Include="Methods\Method_IsNullOrZero.cs" />
@@ -153,10 +151,8 @@
     <Compile Include="Variables\VariableCollection.cs" />
     <Compile Include="Variables\VariableBitmap.cs" />
     <Compile Include="Variables\VariableBool.cs" />
-    <Compile Include="Variables\VariableXml.cs" />
     <Compile Include="Variables\VariableListString.cs" />
     <Compile Include="Variables\VariableFloat.cs" />
-    <Compile Include="Variables\VariableDateTime.cs" />
     <Compile Include="Variables\VariableUnknown.cs" />
     <Compile Include="Variables\VariableString.cs" />
     <Compile Include="Variables\Variable.cs" />

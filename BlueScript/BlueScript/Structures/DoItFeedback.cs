@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueScript.Methods;
@@ -66,11 +65,6 @@ public struct DoItFeedback {
     public DoItFeedback(float value) {
         AllOk = true;
         Variable = new VariableFloat(value);
-    }
-
-    public DoItFeedback(DateTime value) {
-        AllOk = true;
-        Variable = new VariableDateTime(value);
     }
 
     public DoItFeedback(bool breakFired, bool endScript) : this() {

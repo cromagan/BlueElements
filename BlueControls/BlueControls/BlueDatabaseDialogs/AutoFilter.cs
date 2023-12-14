@@ -69,7 +69,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         if (column == null || column.IsDisposed) { return []; }
 
         if (fc == null || fc.Count < 0) { return column.Contents(); }
-        var fc2 = (FilterCollection)fc.Clone();
+        var fc2 = (FilterCollection)fc.Clone("autofilter");
         fc2.Remove(column);
 
         //foreach (var thisFilter in filter) {

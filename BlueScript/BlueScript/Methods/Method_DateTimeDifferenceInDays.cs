@@ -29,7 +29,7 @@ internal class Method_DateTimeDifferenceInDays : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [DateTimeVar, DateTimeVar];
+    public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "datetimedifferenceindays";
     public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = Date1 - Date2";
     public override bool EndlessArgs => false;
@@ -38,7 +38,7 @@ internal class Method_DateTimeDifferenceInDays : Method {
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "DateTimeDifferenceInDays(Date1, Date2)";
+    public override string Syntax => "DateTimeDifferenceInDays(DateString1, DateString2)";
 
     #endregion
 
@@ -49,8 +49,18 @@ internal class Method_DateTimeDifferenceInDays : Method {
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var d1 = attvar.ValueDateGet(0);
+
+        if (d1 == null) {
+            return new DoItFeedback(infos.Data, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
+        }
+
         var d2 = attvar.ValueDateGet(1);
-        return new DoItFeedback(d1.Subtract(d2).TotalDays);
+
+        if (d2 == null) {
+            return new DoItFeedback(infos.Data, "Der Wert '" + attvar.ReadableText(1) + "' wurde nicht als Zeitformat erkannt.");
+        }
+
+        return new DoItFeedback(d1.Value.Subtract(d2.Value).TotalDays);
     }
 
     #endregion

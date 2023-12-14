@@ -79,7 +79,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool FilterManualSeted { get; set; } = false;
 
-    public FilterCollection FilterOutput { get; } = [];
+    public FilterCollection FilterOutput { get; } = new("FilterOutput");
 
     public string Page { get; }
 
@@ -101,7 +101,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     #region Methods
 
     public void FilterInput_Changed(object sender, System.EventArgs e) {
-        FilterInput = this.FilterOfSender();
+        if (IsDisposed) { return; }
+
+        this.DoInputFilter();
         Invalidate();
 
         if (FilterInput == null || FilterOutput.Database != FilterInput.Database) {

@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -22,7 +23,7 @@ using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript;
 
-public class VariableRowItem : Variable {
+public class VariableRowItem : Variable, IDisposable {
 
     #region Fields
 
@@ -47,6 +48,7 @@ public class VariableRowItem : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _row == null;
+    public override bool MustDispose => true;
     public override string MyClassId => ClassId;
 
     public RowItem? RowItem {
@@ -67,6 +69,10 @@ public class VariableRowItem : Variable {
         var v = new VariableRowItem(KeyName);
         v.Parse(ToString());
         return v;
+    }
+
+    public void Dispose() {
+        _row = null;
     }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {

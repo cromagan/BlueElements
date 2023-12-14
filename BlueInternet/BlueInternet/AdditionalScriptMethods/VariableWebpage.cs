@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using BlueScript.Structures;
 
 //using CefSharp.WinForms;
@@ -23,7 +24,7 @@ using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
-public class VariableWebpage : Variable {
+public class VariableWebpage : Variable, IDisposable {
 
     #region Fields
 
@@ -52,6 +53,7 @@ public class VariableWebpage : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _browser == null;
+    public override bool MustDispose => true;
     public override string MyClassId => ClassId;
     public override bool ToStringPossible => false;
 
@@ -71,6 +73,10 @@ public class VariableWebpage : Variable {
         var v = new VariableWebpage(KeyName);
         v.Parse(ToString());
         return v;
+    }
+
+    public void Dispose() {
+        _browser?.Dispose();
     }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {

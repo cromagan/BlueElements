@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -175,14 +174,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                 vars.Add(new VariableString(column.KeyName, wert, ro, false, qi));
                 break;
 
-            case ScriptType.DateTime:
-                qi += "\r\nFalls die Zelle keinen gültiges Datum enthält, wird 01.01.0001 als Datum verwendet.";
-                if (DateTimeTryParse(wert, out var d)) {
-                    vars.Add(new VariableDateTime(column.KeyName, d, ro, false, qi));
-                } else {
-                    vars.Add(new VariableDateTime(column.KeyName, new DateTime(1, 1, 1), ro, false, qi));
-                }
-                break;
+            //case ScriptType.DateTime:
+            //    qi += "\r\nFalls die Zelle keinen gültiges Datum enthält, wird 01.01.0001 als Datum verwendet.";
+            //    if (DateTimeTryParse(wert, out var d)) {
+            //        vars.Add(new VariableDateTime(column.KeyName, d, ro, false, qi));
+            //    } else {
+            //        vars.Add(new VariableDateTime(column.KeyName, new DateTime(1, 1, 1), ro, false, qi));
+            //    }
+            //    break;
 
             case ScriptType.String_Readonly:
                 vars.Add(new VariableString(column.KeyName, wert, true, false, qi));
@@ -563,15 +562,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             CellSet(column, vs.ValueString);
             return;
         }
-        if (columnVar is VariableDateTime vd) {
-            var x = vd.ValueDate.ToString(Constants.Format_Date9, CultureInfo.InvariantCulture);
-            x = x.TrimEnd(".000");
-            x = x.TrimEnd(".0");
-            x = x.TrimEnd("00:00:00");
-            x = x.TrimEnd(" ");
-            CellSet(column, x);
-            return;
-        }
+        //if (columnVar is VariableDateTime vd) {
+        //    var x = vd.ValueDate.ToString(Constants.Format_Date9, CultureInfo.InvariantCulture);
+        //    x = x.TrimEnd(".000");
+        //    x = x.TrimEnd(".0");
+        //    x = x.TrimEnd("00:00:00");
+        //    x = x.TrimEnd(" ");
+        //    CellSet(column, x);
+        //    return;
+        //}
 
         Develop.DebugPrint("Typ nicht erkannt: " + columnVar.MyClassId);
     }

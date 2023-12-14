@@ -17,8 +17,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+using System.Globalization;
+using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -31,16 +31,16 @@ internal class Method_MaxDate : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableListString.ShortName_Plain, VariableString.ShortName_Plain]];
+    public override List<List<string>> Args => [StringVal, [VariableListString.ShortName_Plain, VariableString.ShortName_Plain]];
     public override string Command => "maxdate";
-    public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück. Zeichenfolgen werden versucht als Datum zu interpretieren.";
+    public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.\r\nLeere Eingangswerte werden ignoriert.\r\nBeispiel für Format-String: " + Constants.Format_Date7;
     public override bool EndlessArgs => true;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableDateTime.ShortName_Variable;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "MaxDate(Value1, Value2, ...)";
+    public override string Syntax => "MaxDate(FormatString, Value1, Value2, ...)";
 
     #endregion
 
@@ -54,22 +54,34 @@ internal class Method_MaxDate : Method {
 
         var l = new List<string>();
 
-        foreach (var thisv in attvar.Attributes) {
-            if (thisv is VariableString vs) { l.Add(vs.ValueString); }
-            if (thisv is VariableListString vl) { l.AddRange(vl.ValueList); }
+        for (var z =1; z < attvar.Attributes.Count; z++){
+
+
+            if (attvar.Attributes[z] is VariableString vs) { l.Add(vs.ValueString); }
+            if (attvar.Attributes[z] is VariableListString vl) { l.AddRange(vl.ValueList); }
         }
 
         foreach (var thisw in l) {
-            var ok = DateTimeTryParse(thisw, out var da);
 
-            if (!ok) {
-                return new DoItFeedback(infos.Data, "Wert kann icht als Datum interpretiert werden: " + thisw);
+            if (!string.IsNullOrEmpty(thisw)) {
+
+                var ok = DateTimeTryParse(thisw, out var da);
+
+                if (!ok) {
+                    return new DoItFeedback(infos.Data, "Wert kann nicht als Datum interpretiert werden: " + thisw);
+                }
+
+                if (da.Subtract(d).TotalDays > 0) {
+                    d = da;
+                }
             }
-
-            if (da.Subtract(d).TotalDays > 0) { d = da; }
         }
 
-        return new DoItFeedback(d);
+        try {
+            return new DoItFeedback(d.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
+        } catch {
+            return new DoItFeedback(infos.Data, "Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.");
+        }
     }
 
     #endregion

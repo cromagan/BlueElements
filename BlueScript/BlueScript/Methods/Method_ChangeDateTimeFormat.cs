@@ -15,32 +15,32 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
 using System.Collections.Generic;
-using System.Xml.Linq;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.Constants;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_Xml : Method {
+[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+internal class Method_ChangeDateTimeFormat : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
-    public override string Command => "xml";
-    public override string Description => "Erstellt ein XML-Dokument, der für andere Befehle verwendet werden kann.";
-    public override bool EndlessArgs => true;
-
+    public override List<List<string>> Args => [StringVal, StringVal];
+    public override string Command => "changedatetimeformat";
+    public override string Description => "Wandelt eine Zeitangabe-String in einen andern String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  " + Format_Date7 + "\rAchtung: Groß-Kleinschreibung ist wichtig!";
+    public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableXml.ShortName_Variable;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-
-    public override string Syntax => "XML(XMLText)";
+    public override string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";
 
     #endregion
 
@@ -50,11 +50,16 @@ public class Method_Xml : Method {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
+        var d = attvar.ValueDateGet(0);
+
+        if (d == null) {
+            return new DoItFeedback(infos.Data, "Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.");
+        }
+
         try {
-            var x = XDocument.Parse(attvar.ValueStringGet(0));
-            return new DoItFeedback(new VariableXml(x));
-        } catch (Exception e) {
-            return new DoItFeedback(infos.Data, "XML-Parsen fehlgeschlagen: " + e.Message);
+            return new DoItFeedback(d.Value.ToString(attvar.ReadableText(1), CultureInfo.InvariantCulture));
+        } catch {
+            return new DoItFeedback(infos.Data, "Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.");
         }
     }
 

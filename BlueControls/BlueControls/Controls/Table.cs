@@ -65,7 +65,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public static readonly int ColumnCaptionSizeY = 22;
     public static readonly Pen PenRed1 = new(Color.Red, 1);
     public static readonly int RowCaptionSizeY = 50;
-    public readonly FilterCollection Filter = [];
+    public readonly FilterCollection Filter = new("FilterIput 4");
     private readonly List<string> _collapsed = [];
     private readonly object _lockUserAction = new();
     private int _arrangementNr = 1;
@@ -236,7 +236,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public bool FilterManualSeted { get; set; } = false;
 
-    public FilterCollection FilterOutput { get; } = [];
+    public FilterCollection FilterOutput { get; } = new("FilterOutPt 4");
 
     [DefaultValue(1.0f)]
     public double FontScale => Database?.GlobalScale ?? 1f;
@@ -1197,7 +1197,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void FilterInput_Changed(object sender, System.EventArgs e) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
 
-        FilterInput = this.FilterOfSender();
+        this.DoInputFilter();
 
         var t = "Übergeordnetes Element";
 
@@ -1524,9 +1524,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (disposing) {
                 Filter.Changed -= Filter_Changed;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
-                FilterInput?.Dispose();
+                FilterInput.Dispose();
                 FilterOutput.Dispose();
-                FilterInput = null;
             }
         } finally {
             base.Dispose(disposing);
@@ -2476,7 +2475,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private int Autofilter_Text(ColumnItem column) {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return 0; }
         if (column.TmpIfFilterRemoved != null) { return (int)column.TmpIfFilterRemoved; }
-        var fc = (FilterCollection)Filter.Clone();
+        using var fc = (FilterCollection)Filter.Clone("Autofilter_Text");
         fc.Remove(column);
 
         var ro = fc.Rows;
@@ -2488,7 +2487,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <summary>
     /// Gibt die Anzahl der SICHTBAREN Zeilen zurück, die mehr angezeigt werden würden, wenn dieser Filter deaktiviert wäre.
     /// </summary>
-    /// <param name="column"></param>
     /// <returns></returns>
     private void BB_Enter(object sender, System.EventArgs e) {
         if (((TextBox)sender).MultiLine) { return; }

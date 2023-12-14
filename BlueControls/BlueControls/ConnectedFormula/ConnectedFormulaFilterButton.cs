@@ -41,7 +41,7 @@ internal class ConnectedFormulaFilterButton : Button, IControlAcceptSomething {
     #region Methods
 
     public void FilterInput_Changed(object sender, System.EventArgs e) {
-        FilterInput = this.FilterOfSender();
+        this.DoInputFilter();
         Invalidate();
     }
 

@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using BlueScript.Enums;
 using BlueScript.Variables;
+using static BlueBasics.Converter;
 
 namespace BlueScript.Structures;
 
@@ -53,17 +54,17 @@ public readonly struct SplittedAttributesFeedback {
 
     #region Methods
 
-    public string Name(int varno) {
-        if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
-
-        if (Attributes[varno] is Variable vs) { return vs.KeyName; }
-        return string.Empty;
-    }
-
     public string MyClassId(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
 
         if (Attributes[varno] is Variable vs) { return vs.MyClassId; }
+        return string.Empty;
+    }
+
+    public string Name(int varno) {
+        if (varno < 0 || varno >= Attributes.Count) { return string.Empty; }
+
+        if (Attributes[varno] is Variable vs) { return vs.KeyName; }
         return string.Empty;
     }
 
@@ -95,11 +96,13 @@ public readonly struct SplittedAttributesFeedback {
         return false;
     }
 
-    public DateTime ValueDateGet(int varno) {
+    public DateTime? ValueDateGet(int varno) {
         if (varno < 0 || varno >= Attributes.Count) { return default; }
 
-        if (Attributes[varno] is VariableDateTime vs) { return vs.ValueDate; }
-        return default;
+        if (Attributes[varno] is VariableString vs) {
+            if (DateTimeTryParse(vs.ValueString, out var d)) { return d; }
+        }
+        return null;
     }
 
     public int ValueIntGet(int varno) {

@@ -18,6 +18,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -30,16 +31,16 @@ internal class Method_DateTimeNowUTC : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [];
+    public override List<List<string>> Args => [StringVal];
     public override string Command => "datetimeutcnow";
-    public override string Description => "Gibt die akutelle UTC-Uhrzeit zurück.";
+    public override string Description => "Gibt die akutelle UTC-Uhrzeit im angegebenen Format (z.B. " + BlueBasics.Constants.Format_Date7 + ") zurück. ";
     public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
-    public override string Returns => VariableDateTime.ShortName_Variable;
+    public override string Returns => VariableString.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "DateTimeUTCNow()";
+    public override string Syntax => "DateTimeUTCNow(format)";
 
     #endregion
 
@@ -47,9 +48,14 @@ internal class Method_DateTimeNowUTC : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
-        return !string.IsNullOrEmpty(attvar.ErrorMessage)
-            ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
-            : new DoItFeedback(DateTime.UtcNow);
+        if (!string.IsNullOrEmpty(attvar.ErrorMessage))
+            return DoItFeedback.AttributFehler(infos.Data, this, attvar);
+
+        try {
+            return new DoItFeedback(DateTime.UtcNow.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
+        } catch {
+            return new DoItFeedback(infos.Data, "Der Umwandlungs-String '" + attvar.ReadableText(0) + "' ist fehlerhaft.");
+        }
     }
 
     #endregion

@@ -18,7 +18,6 @@
 using System;
 using System.Collections.Generic;
 using static BlueBasics.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.Constants;
 
 namespace BlueBasics;

@@ -65,7 +65,7 @@ public class Method_Filter : Method_Database {
 
         if (allFi.Count < 1) { return null; }
 
-        var f = new FilterCollection(allFi[0].Database);
+        var f = new FilterCollection(allFi[0].Database, "method_filter");
         f.AddIfNotExists(allFi);
         return f;
     }

@@ -53,7 +53,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSome
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
-    public FilterCollection FilterOutput { get; } = [];
+    public FilterCollection FilterOutput { get; } = new("FilterIput5");
 
     public List<IControlSendSomething> Parents { get; } = [];
 
@@ -62,7 +62,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSome
     #region Methods
 
     public void FilterInput_Changed(object sender, System.EventArgs e) {
-        FilterInput = this.FilterOfSender();
+        this.DoInputFilter();
         Invalidate();
     }
 

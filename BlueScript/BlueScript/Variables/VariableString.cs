@@ -52,6 +52,7 @@ public class VariableString : Variable {
     public override int CheckOrder => 2;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => string.IsNullOrEmpty(_valueString);
+    public override bool MustDispose => false;
     public override string MyClassId => ClassId;
 
     /// <summary>

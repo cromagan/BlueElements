@@ -988,7 +988,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (_afterEditDoUCase) { value = value.ToUpper(); }
         if (!string.IsNullOrEmpty(_autoRemove)) { value = value.RemoveChars(_autoRemove); }
         if (_afterEditAutoReplace.Count > 0) {
-            List<string> l = [..value.SplitAndCutByCr()];
+            List<string> l = [.. value.SplitAndCutByCr()];
             foreach (var thisar in _afterEditAutoReplace) {
                 var rep = thisar.SplitAndCutBy("|");
                 for (var z = 0; z < l.Count; z++) {
@@ -1528,6 +1528,11 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             } else {
                 ScriptType = ScriptType.Nicht_vorhanden;
             }
+        }
+
+        if (ScriptType == (ScriptType)6) {
+            // vorher Datum
+            ScriptType = ScriptType.String;
         }
 
         if (_format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {

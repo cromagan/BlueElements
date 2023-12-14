@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using BlueDatabase;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -22,7 +23,7 @@ using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript;
 
-public class VariableDatabase : Variable {
+public class VariableDatabase : Variable, IDisposable {
 
     #region Fields
 
@@ -54,6 +55,7 @@ public class VariableDatabase : Variable {
 
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _db == null || _db.IsDisposed;
+    public override bool MustDispose => true;
     public override string MyClassId => ClassId;
     public override bool ToStringPossible => false;
 
@@ -65,6 +67,10 @@ public class VariableDatabase : Variable {
         var v = new VariableDatabase(KeyName);
         v.Parse(ToString());
         return v;
+    }
+
+    public void Dispose() {
+        _db = null;
     }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {

@@ -63,6 +63,7 @@ public class VariableListString : Variable {
     public override int CheckOrder => 3;
     public override bool GetFromStringPossible => true;
     public override bool IsNullOrEmpty => _list == null || _list.Count == 0;
+    public override bool MustDispose => false;
     public override string MyClassId => ClassId;
 
     /// <summary>

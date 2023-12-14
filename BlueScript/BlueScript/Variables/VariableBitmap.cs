@@ -15,13 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Drawing;
 using BlueScript.Structures;
 using static BlueBasics.Interfaces.IParseableExtension;
 
 namespace BlueScript.Variables;
 
-public class VariableBitmap : Variable {
+public class VariableBitmap : Variable, IDisposable {
 
     #region Fields
 
@@ -50,6 +51,7 @@ public class VariableBitmap : Variable {
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => _bmp == null;
+    public override bool MustDispose => true;
     public override string MyClassId => ClassId;
     public override bool ToStringPossible => false;
 
@@ -69,6 +71,10 @@ public class VariableBitmap : Variable {
         var v = new VariableBitmap(KeyName);
         v.Parse(ToString());
         return v;
+    }
+
+    public void Dispose() {
+        _bmp?.Dispose();
     }
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {

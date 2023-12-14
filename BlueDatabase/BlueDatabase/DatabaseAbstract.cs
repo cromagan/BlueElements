@@ -415,6 +415,15 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             }
             l.Sort();
             if (_variableTmp == l.ToString(true)) { return; }
+
+            #region Kritische Variablen Disposen
+
+            foreach (var thisVar in _variables) {
+                if (thisVar is IDisposable id && thisVar.MustDispose) { id.Dispose(); }
+            }
+
+            #endregion
+
             _ = ChangeData(DatabaseDataType.DatabaseVariables, null, null, _variableTmp, l.ToString(true), UserName, DateTime.UtcNow, string.Empty);
         }
     }
@@ -1985,7 +1994,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             case DatabaseDataType.EventScript:
                 _eventScriptTmp = value;
                 EventScript_RemoveAll(true);
-                List<string> ai = [..value.SplitAndCutByCr()];
+                List<string> ai = [.. value.SplitAndCutByCr()];
                 foreach (var t in ai) {
                     EventScript_Add(new DatabaseScriptDescription(this, t), true);
                 }
@@ -1995,7 +2004,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             case DatabaseDataType.DatabaseVariables:
                 _variables.Clear();
-                List<string> va = [..value.SplitAndCutByCr()];
+                List<string> va = [.. value.SplitAndCutByCr()];
                 foreach (var t in va) {
                     var l = new VariableString("dummy");
                     l.Parse(t);
@@ -2008,7 +2017,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             case DatabaseDataType.ColumnArrangement:
                 _columnArrangements.Clear();
-                List<string> ca = [..value.SplitAndCutByCr()];
+                List<string> ca = [.. value.SplitAndCutByCr()];
                 foreach (var t in ca) {
                     _columnArrangements.Add(new ColumnViewCollection(this, t));
                 }

@@ -230,7 +230,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    return sortedRows;
     //}
 
-    public bool Clear(string comment) => Remove(new FilterCollection(Database), null, comment);
+    public bool Clear(string comment) => Remove(new FilterCollection(Database, "rowcol clear"), null, comment);
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
@@ -484,7 +484,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public bool Remove(FilterItem fi, List<RowItem>? pinned, string comment) {
-        FilterCollection fc = new(Database) { fi };
+        using FilterCollection fc = new(Database, "renome row") { fi };
         return Remove(fc, pinned, comment);
     }
 
