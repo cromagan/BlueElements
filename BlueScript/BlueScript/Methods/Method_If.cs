@@ -15,13 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-#nullable enable
-
 using System.Collections.Generic;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
+using static BlueBasics.Constants;
 
 namespace BlueScript.Methods;
 
@@ -29,26 +28,27 @@ public class Method_If : Method {
 
     #region Fields
 
-    public static readonly List<string> OderOder = new() { "||" };
-    public static readonly List<string> UndUnd = new() { "&&" };
+    public static readonly List<string> OderOder = ["||"];
+    public static readonly List<string> UndUnd = ["&&"];
 
     /// <summary>
     /// Vergleichsopeatoren in der richtigen Rang-Reihenfolge
     /// https://de.wikipedia.org/wiki/Operatorrangfolge
     /// </summary>
-    public static readonly List<string> VergleichsOperatoren = new() { "==", "!=", ">=", "<=", "<", ">", "!", "&&", "||" };
+    public static readonly List<string> VergleichsOperatoren = ["==", "!=", ">=", "<=", "<", ">", "!", "&&", "||"];
 
     #endregion
 
     #region Properties
 
-    public override List<List<string>> Args => new() { BoolVal };
+    public override List<List<string>> Args => [BoolVal];
     public override string Command => "if";
     public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
     public override bool EndlessArgs => false;
 
     public override bool GetCodeBlockAfter => true;
     public override MethodType MethodType => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
     public override string Syntax => "if (true) { Code zum Ausführen }";
@@ -58,7 +58,7 @@ public class Method_If : Method {
     #region Methods
 
     public static bool? GetBool(string txt) {
-        txt = txt.DeKlammere(true, false, false, true);
+        txt = txt.Trim(KlammernRund);
 
         //            if (txt.Value.Equals("true", StringComparison.OrdinalIgnoreCase) ||
         //                txt.Value.Equals("false", StringComparison.OrdinalIgnoreCase)) {
