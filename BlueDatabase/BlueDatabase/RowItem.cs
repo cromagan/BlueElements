@@ -708,9 +708,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisColumnItem in db.Column) {
             {
                 if (!thisColumnItem.IgnoreAtRowFilter) {
-                    var @string = CellGetString(thisColumnItem);
-                    @string = LanguageTool.ColumnReplace(@string, thisColumnItem, ShortenStyle.Both);
-                    if (!string.IsNullOrEmpty(@string) && @string.ToUpper().Contains(searchText)) { return true; }
+                    var txt = CellGetString(thisColumnItem);
+                    txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, thisColumnItem.Prefix, thisColumnItem.Suffix, thisColumnItem.DoOpticalTranslation, thisColumnItem.OpticalReplace);
+                    if (!string.IsNullOrEmpty(txt) && txt.ToUpper().Contains(searchText)) { return true; }
                 }
             }
         }

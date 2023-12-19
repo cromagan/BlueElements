@@ -333,7 +333,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
             case FilterType.Istgleich_UND_GroﬂKleinEgal:
                 if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
-                return nam + " = " + LanguageTool.ColumnReplace(SearchValue[0], Column, ShortenStyle.Replaced);
+
+                if (Column == null) { return "Unbekannter Filter"; }
+                return nam + " = " + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, Column.Prefix, Column.Suffix, Column.DoOpticalTranslation, Column.OpticalReplace);
 
             case FilterType.Ungleich_MultiRowIgnorieren:
 
@@ -341,7 +343,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
             case FilterType.Ungleich_MultiRowIgnorieren_GroﬂKleinEgal:
                 if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss bef¸llt sein"; }
-                return nam + " <> " + LanguageTool.ColumnReplace(SearchValue[0], Column, ShortenStyle.Replaced);
+                if (Column == null) { return "Unbekannter Filter"; }
+                return nam + " <> " + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, Column.Prefix, Column.Suffix, Column.DoOpticalTranslation, Column.OpticalReplace);
 
             case FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren:
 

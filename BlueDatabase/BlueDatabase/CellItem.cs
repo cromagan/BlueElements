@@ -123,7 +123,7 @@ public class CellItem {
             case DataFormat.RelationText:
             case DataFormat.Verknüpfung_zu_anderer_Datenbank: // Bei LinkedCell kommt direkt der Text der verlinkten Zelle an
 
-                txt = LanguageTool.ColumnReplace(txt, column, style);
+                txt = LanguageTool.PrepaireText(txt, style, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace);
                 if (removeLineBreaks) {
                     txt = txt.Replace("\r\n", " ");
                     txt = txt.Replace("\r", " ");
@@ -131,7 +131,7 @@ public class CellItem {
                 break;
 
             case DataFormat.Button:
-                txt = LanguageTool.ColumnReplace(txt, column, style);
+                txt = LanguageTool.PrepaireText(txt, style, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace);
                 break;
 
             //case DataFormat.FarbeInteger:

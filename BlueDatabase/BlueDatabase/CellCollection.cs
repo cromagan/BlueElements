@@ -498,7 +498,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 txt = GetStringCore(column, row);
             }
 
-            if (typ.HasFlag(FilterType.Instr)) { txt = LanguageTool.ColumnReplace(txt, fColumn, ShortenStyle.Both); }
+            if (typ.HasFlag(FilterType.Instr) && fColumn != null) { txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, fColumn.Prefix, fColumn.Suffix, fColumn.DoOpticalTranslation, fColumn.OpticalReplace); }
             // Multiline-Typ ermitteln  --------------------------------------------
             var tmpMultiLine = false;
             if (column != null && !column.IsDisposed) { tmpMultiLine = column.MultiLine; }
@@ -506,7 +506,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 tmpMultiLine = false;
                 typ ^= FilterType.MultiRowIgnorieren;
             }
-            if (tmpMultiLine && !txt.Contains("\r")) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandel werden.
+            if (tmpMultiLine && !txt.Contains("\r")) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandelt werden.
                                                                                //if (Typ == enFilterType.KeinFilter)
                                                                                //{
                                                                                //    Develop.DebugPrint(enFehlerArt.Fehler, "'Kein Filter' wurde übergeben: " + ToString());

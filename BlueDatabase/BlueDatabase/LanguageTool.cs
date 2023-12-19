@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Collections.ObjectModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -34,47 +35,7 @@ public static class LanguageTool {
 
     #endregion
 
-    /// <summary>
-    /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
-    /// </summary>
-    /// <param name="txt"></param>
-    /// <param name="column"></param>
-    /// <param name="style"></param>
-    /// <returns></returns>
-
     #region Methods
-
-    public static string ColumnReplace(string txt, ColumnItem? column, ShortenStyle style) {
-        if (column == null || column.IsDisposed) { return txt; }
-
-        if (!string.IsNullOrEmpty(txt)) {
-            if (!string.IsNullOrEmpty(column.Prefix)) { txt = DoTranslate(column.Prefix, true) + " " + txt; }
-            if (!string.IsNullOrEmpty(column.Suffix)) { txt = txt + " " + DoTranslate(column.Suffix, true); }
-        }
-        if (Translation != null) { return ColumnReplaceTranslated(txt, column); }
-        if (style == ShortenStyle.Unreplaced || column.OpticalReplace.Count == 0) { return txt; }
-        var ot = txt;
-        foreach (var thisString in column.OpticalReplace) {
-            var x = thisString.SplitBy("|");
-
-            if (x.Length == 2) {
-                //if (!string.IsNullOrEmpty(x[0]) && !string.IsNullOrEmpty(x[1]) && x[0] == txt) { txt = x[1]; }
-
-                if (string.IsNullOrEmpty(x[0])) {
-                    if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
-                } else {
-                    txt = txt.Replace(x[0], x[1]);
-                }
-            }
-            //if (x.Length == 1 && !thisString.StartsWith("|")) { txt = txt.Replace(x[0], string.Empty); }
-        }
-
-        if (style is ShortenStyle.Replaced or ShortenStyle.HTML || ot == txt) {
-            return txt;
-        }
-
-        return ot + " (" + txt + ")";
-    }
 
     public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);
 
@@ -118,7 +79,44 @@ public static class LanguageTool {
         }
     }
 
-    private static string ColumnReplaceTranslated(string newTxt, IColumnInputFormat column) => column.DoOpticalTranslation == TranslationType.Übersetzen ? DoTranslate(newTxt, false) : newTxt;
+    /// <summary>
+    /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
+    /// </summary>
+    /// <param name="txt"></param>
+    /// <param name="style"></param>
+    /// <param name="prefix"></param>
+    /// <param name="suffix"></param>
+    /// <param name="doOpticalTranslation"></param>
+    /// <param name="opticalReplace"></param>
+    /// <returns></returns>
+    public static string PrepaireText(string txt, ShortenStyle style, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string> opticalReplace) {
+        if (Translation != null) {
+            if (!string.IsNullOrEmpty(txt)) {
+                if (doOpticalTranslation == TranslationType.Übersetzen) { txt = DoTranslate(prefix, true); }
+                if (!string.IsNullOrEmpty(prefix)) { txt = DoTranslate(prefix, true) + " " + txt; }
+                if (!string.IsNullOrEmpty(suffix)) { txt = txt + " " + DoTranslate(suffix, true); }
+            }
+        }
+
+        if (style == ShortenStyle.Unreplaced || opticalReplace.Count == 0) { return txt; }
+
+        var ot = txt;
+        foreach (var thisString in opticalReplace) {
+            var x = thisString.SplitBy("|");
+
+            if (x.Length == 2) {
+                if (string.IsNullOrEmpty(x[0])) {
+                    if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
+                } else {
+                    txt = txt.Replace(x[0], x[1]);
+                }
+            }
+        }
+
+        if (style is ShortenStyle.Replaced or ShortenStyle.HTML || ot == txt) { return txt; }
+
+        return ot + " (" + txt + ")";
+    }
 
     #endregion
 }
