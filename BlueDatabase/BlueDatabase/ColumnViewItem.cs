@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using BlueBasics;
@@ -22,6 +23,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
@@ -52,17 +54,69 @@ public sealed class ColumnViewItem : IParseable {
     #region Properties
 
     public ColumnItem? Column { get; private set; }
+
     public int? OrderTmpSpalteX1 { get; set; }
+
     public Rectangle TmpAutoFilterLocation { get; set; }
+
     public int? TmpDrawWidth { get; set; }
+
     public bool TmpReduced { get; set; }
+
     public Rectangle TmpReduceLocation { get; set; }
+
     public ViewType ViewType { get; set; }
+
     private ColumnViewCollection Parent { get; }
 
     #endregion
 
     #region Methods
+
+    public static int CalculateColumnContentWidth(ColumnItem column, Font cellFont, int pix16) {
+        if (column.IsDisposed) { return 16; }
+        if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return 16; }
+        if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
+        if (column.Contentwidth is int v) { return v; }
+
+        column.RefreshColumnsData();
+
+        var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
+
+        try {
+            //  Parallel.ForEach führt ab und zu zu DeadLocks
+            foreach (var thisRowItem in db.Row) {
+                var wx = CellItem.Cell_ContentSize(column, thisRowItem, cellFont, pix16).Width;
+                newContentWidth = Math.Max(newContentWidth, wx);
+            }
+        } catch {
+            Develop.CheckStackForOverflow();
+            return CalculateColumnContentWidth(column, cellFont, pix16);
+        }
+
+        column.Contentwidth = newContentWidth;
+        return newContentWidth;
+    }
+
+    public int Column_DrawWidth(Rectangle displayRectangleWoSlider, int pix16, Font cellFont) {
+        // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
+
+        if (Column == null) { return 0; }
+        if (TmpDrawWidth is int v) { return v; }
+
+        if (TmpReduced) {
+            TmpDrawWidth = pix16;
+        } else {
+            TmpDrawWidth = ViewType == ViewType.PermanentColumn
+                ? Math.Min(CalculateColumnContentWidth(Column, cellFont, pix16), (int)(displayRectangleWoSlider.Width * 0.3))
+                : Math.Min(CalculateColumnContentWidth(Column, cellFont, pix16), (int)(displayRectangleWoSlider.Width * 0.6));
+        }
+
+        TmpDrawWidth = Math.Max((int)TmpDrawWidth, AutoFilterSize); // Mindestens so groß wie der Autofilter;
+
+        //TmpDrawWidth = Math.Max((int)TmpDrawWidth, (int)Column.ColumnCaptionText_Size(columnFont).Width);
+        return (int)TmpDrawWidth;
+    }
 
     public void Invalidate_DrawWidth() => TmpDrawWidth = null;
 

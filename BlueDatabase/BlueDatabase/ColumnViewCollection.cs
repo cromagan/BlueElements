@@ -19,11 +19,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Drawing;
 using System.Linq;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
@@ -31,9 +33,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Fields
 
+    public bool ShowHead = true;
+
     private readonly List<ColumnViewItem> _internal = [];
 
     private readonly List<string> _permissionGroups_Show = [];
+
+    private int? _headSize;
 
     #endregion
 
@@ -143,6 +149,19 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public object Clone() => new ColumnViewCollection(Database, ToString());
 
+    public ColumnItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, int pix16, Font cellFont) {
+        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+
+        foreach (var thisViewItem in this) {
+            if (thisViewItem?.Column != null) {
+                if (xpos >= thisViewItem.OrderTmpSpalteX1 && xpos <= thisViewItem.OrderTmpSpalteX1 + thisViewItem.Column_DrawWidth(displayRectangleWithoutSlider, pix16, cellFont)) {
+                    return thisViewItem.Column;
+                }
+            }
+        }
+        return null;
+    }
+
     public void Dispose() => Dispose(true);
 
     public void Dispose(bool disposing) {
@@ -160,6 +179,25 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public IEnumerator<ColumnViewItem> GetEnumerator() => ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
+
+    public int HeadSize(Font _columnFont) {
+        if (_headSize != null) { return (int)_headSize; }
+
+        if (!ShowHead || Count - 1 < 0) {
+            _headSize = 0;
+            return 0;
+        }
+        _headSize = 16;
+        foreach (var thisViewItem in this) {
+            if (thisViewItem?.Column != null) {
+                _headSize = Math.Max((int)_headSize, (int)thisViewItem.Column.ColumnHead_Size(_columnFont).Height);
+            }
+        }
+
+        _headSize += 8;
+        _headSize += AutoFilterSize;
+        return (int)_headSize;
+    }
 
     public void HideSystemColumns() {
         foreach (var thisViewItem in this) {
@@ -180,6 +218,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         foreach (var thisViewItem in _internal) {
             thisViewItem?.Invalidate_DrawWidth();
         }
+    }
+
+    public void Invalidate_HeadSize() {
+        _headSize = null;
     }
 
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);

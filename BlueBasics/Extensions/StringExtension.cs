@@ -598,6 +598,11 @@ public static partial class Extensions {
         return textToSplit.SplitAndCutBy("\r");
     }
 
+    public static string[] SplitAndCutByCrAndBr(this string textToSplit) {
+        textToSplit = textToSplit.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+        return textToSplit.SplitAndCutByCr();
+    }
+
     /// <summary>
     /// Erstellt eine Liste aus dem String, wobei als Trenner \r\n, \r oder \n benutzt werden. Leere Einträge am Ende werden gelöscht.
     /// </summary>

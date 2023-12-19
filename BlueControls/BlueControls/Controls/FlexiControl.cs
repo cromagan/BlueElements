@@ -41,6 +41,8 @@ namespace BlueControls.Controls;
 [DefaultEvent("ValueChanged")]
 public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable, IDisposableExtended {
 
+    public static SizeF MeasureStringOfCaption(string text) => Skin.GetBlueFont(Design.Caption, States.Standard).MeasureString(text);
+
     #region Fields
 
     protected bool Allinitialized;
@@ -708,9 +710,17 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
 
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
-            case EditTypeTable.Textfeld: control.AddAllowed = AddType.Text; break;
-            case EditTypeTable.Listbox: control.AddAllowed = AddType.OnlySuggests; break;
-            default: control.AddAllowed = AddType.None; break;
+            case EditTypeTable.Textfeld:
+                control.AddAllowed = AddType.Text;
+                break;
+
+            case EditTypeTable.Listbox:
+                control.AddAllowed = AddType.OnlySuggests;
+                break;
+
+            default:
+                control.AddAllowed = AddType.None;
+                break;
         }
 
         control.FilterAllowed = false;
@@ -737,9 +747,17 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);
         control.SuggestionsAdd(item);
         switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
-            case EditTypeTable.Textfeld: control.AddAllowed = AddType.Text; break;
-            case EditTypeTable.Listbox: control.AddAllowed = AddType.OnlySuggests; break;
-            default: control.AddAllowed = AddType.None; break;
+            case EditTypeTable.Textfeld:
+                control.AddAllowed = AddType.Text;
+                break;
+
+            case EditTypeTable.Listbox:
+                control.AddAllowed = AddType.OnlySuggests;
+                break;
+
+            default:
+                control.AddAllowed = AddType.None;
+                break;
         }
     }
 

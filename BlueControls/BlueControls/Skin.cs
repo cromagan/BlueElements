@@ -1192,40 +1192,6 @@ public static class Skin {
         }
     }
 
-    public static Size FormatedText_NeededSize(string text, QuickImage? qi, Font font, int minSie) {
-        try {
-            var pSize = SizeF.Empty;
-            var tSize = SizeF.Empty;
-            //if (font == null) { return new Size(3, 3); }
-
-            if (qi != null) {
-                lock (qi) {
-                    pSize = ((Bitmap)qi).Size;
-                }
-            }
-            if (!string.IsNullOrEmpty(text)) { tSize = BlueFont.MeasureString(text, font); }
-
-            if (!string.IsNullOrEmpty(text)) {
-                if (qi == null) {
-                    return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSie));
-                }
-
-                return new Size((int)(tSize.Width + 2 + pSize.Width + 1),
-                    Math.Max((int)tSize.Height, (int)pSize.Height));
-            }
-
-            if (qi != null) {
-                return new Size((int)pSize.Width, (int)pSize.Height);
-            }
-
-            return new Size(minSie, minSie);
-        } catch {
-            // tmpImageCode wird an anderer Stelle verwendet
-            Develop.CheckStackForOverflow();
-            return FormatedText_NeededSize(text, qi, font, minSie);
-        }
-    }
-
     public static BlueFont GetBlueFont(PadStyles format, RowItem? rowOfStyle) {
         if (StyleDb == null) { InitStyles(); }
         return StyleDb == null || rowOfStyle == null ? BlueFont.Get(ErrorFont) : GetBlueFont(StyleDb, "X" + ((int)format), rowOfStyle);

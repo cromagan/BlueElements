@@ -70,10 +70,10 @@ public sealed partial class Search : Form {
     }
 
     private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
-        if (_table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
-            MessageBox.Show("In dieser Ansicht nicht möglich", ImageCode.Information, "OK");
-            return;
-        }
+        //if (_table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
+        //    MessageBox.Show("In dieser Ansicht nicht möglich", ImageCode.Information, "OK");
+        //    return;
+        //}
         var searchT = SuchText();
         if (string.IsNullOrEmpty(searchT)) { return; }
         var found = _col;

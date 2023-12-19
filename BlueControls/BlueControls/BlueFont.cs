@@ -26,6 +26,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Constants;
+using static BlueBasics.Extensions;
 
 namespace BlueControls;
 
@@ -46,12 +47,12 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     /// <summary>
     /// Die Schriftart, mit allen Attributen, die nativ unterstützt werden.
     /// </summary>
-    private Font _font = new Font("Arial", 9);
+    private Font _font = new("Arial", 9);
 
     /// <summary>
     /// Die Schriftart, ohne den Stilen Strikeout und Underline
     /// </summary>
-    private Font? _fontOl;
+    private Font _fontOl = new("Arial", 9);
 
     private float _kapitälchenPlus = -1;
     private QuickImage? _nameInStyleSym;
@@ -113,8 +114,6 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         }
     }
 
-    public static explicit operator Font(BlueFont font) => font._font; // font.SizeOk(font.Size) ? font._font : new Font("Arial", font._fontOl.Size, font._font.Style, font._font.Unit);
-
     public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, false, "000000", "FFFFFF", false, false, false);
 
     public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool kapitälchen, bool onlyUpper, bool onlyLower) => Get(ToString(fontName, fontSize, bold, italic, underline, strikeout, outLine, colorMain, colorOutline, kapitälchen, onlyUpper, onlyLower));
@@ -139,27 +138,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         return f;
     }
 
-    public static SizeF MeasureString(string text, Font font) {
-        try {
-            using var g = Graphics.FromHwnd(IntPtr.Zero);
-            SetTextRenderingHint(g, font);
-            return g.MeasureString(text, font, 9999, StringFormat.GenericDefault);
-        } catch {
-            return SizeF.Empty;
-        }
-    }
-
-    public static SizeF MeasureString(string text, Font font, StringFormat stringformat) {
-        try {
-            using var g = Graphics.FromHwnd(IntPtr.Zero);
-            SetTextRenderingHint(g, font);
-            return g.MeasureString(text, font, 9999, stringformat);
-        } catch {
-            return SizeF.Empty;
-        }
-    }
-
-    public static SizeF MeasureStringOfCaption(string text) => MeasureString(text, (Font)Skin.GetBlueFont(Design.Caption, States.Standard));
+    public static implicit operator Font(BlueFont font) => font._font; // font.SizeOk(font.Size) ? font._font : new Font("Arial", font._fontOl.Size, font._font.Style, font._font.Unit);
 
     public static List<string> SplitByWidth(Font font, string text, float maxWidth, int maxLines) {
         List<string> broken = [];
@@ -171,7 +150,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         do {
             pos++;
             var toTEst = rest.Substring(0, pos);
-            var s = MeasureString(toTEst, font);
+            var s = font.MeasureString(toTEst);
             if (pos < rest.Length && Convert.ToChar(rest.Substring(pos, 1)).IsPossibleLineBreak()) { foundCut = pos; }
             if (s.Width > maxWidth || pos == rest.Length) {
                 if (pos == rest.Length) {
@@ -196,14 +175,14 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     }
 
     public static string TrimByWidth(Font font, string txt, float maxWidth) {
-        var tSize = MeasureString(txt, font);
+        var tSize = font.MeasureString(txt);
         if (tSize.Width - 1 > maxWidth && txt.Length > 1) {
             var min = 0;
             var max = txt.Length;
             int middle;
             do {
                 middle = (int)(min + ((max - min) / 2.0));
-                tSize = MeasureString(txt.Substring(0, middle) + "...", font);
+                tSize = font.MeasureString(txt.Substring(0, middle) + "...");
                 if (tSize.Width + 3 > maxWidth) {
                     max = middle;
                 } else {
@@ -292,7 +271,9 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     public Font FontWithoutLinesForCapitals(float zoom) =>
         new(_fontOl.Name, _fontOl.Size * zoom * 0.8F / Skin.Scale, _fontOl.Style, _fontOl.Unit);
 
-    public SizeF MeasureString(string text, StringFormat stringFormat) => MeasureString(text, _fontOl, stringFormat);
+    public SizeF MeasureString(string text) => _fontOl.MeasureString(text);
+
+    public SizeF MeasureString(string text, StringFormat stringFormat) => _fontOl.MeasureString(text, stringFormat);
 
     public QuickImage? NameInStyle() {
         if (_nameInStyleSym != null) { return _nameInStyleSym; }
@@ -344,7 +325,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         // Die Oberlänge immer berechnen, Symbole benötigen die exacte höhe
         var multi = 50 / _fontOl.Size; // Zu große Schriften verursachen bei manchen Fonts Fehler!!!
         Font tmpfont = new(_fontOl.Name, _fontOl.Size * multi / Skin.Scale, _fontOl.Style);
-        var f = MeasureString("Z", tmpfont);
+        var f = tmpfont.MeasureString("Z");
         Bitmap bmp = new((int)(f.Width + 1), (int)(f.Height + 1));
         var gr = Graphics.FromImage(bmp);
         for (var du = 0; du <= 1; du++) {
@@ -509,11 +490,11 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
             s = MeasureString("." + char.ToUpper(c) + ".", StringFormat.GenericTypographic);
             s = s with { Width = s.Width * 0.8f };
         } else if (OnlyUpper) {
-            s = MeasureString("." + char.ToUpper(c) + ".", _fontOl, StringFormat.GenericTypographic);
+            s = _fontOl.MeasureString("." + char.ToUpper(c) + ".", StringFormat.GenericTypographic);
         } else if (OnlyLower) {
-            s = MeasureString("." + char.ToLower(c) + ".", _fontOl, StringFormat.GenericTypographic);
+            s = _fontOl.MeasureString("." + char.ToLower(c) + ".", StringFormat.GenericTypographic);
         } else {
-            s = MeasureString("." + c + ".", _fontOl, StringFormat.GenericTypographic);
+            s = _fontOl.MeasureString("." + c + ".", StringFormat.GenericTypographic);
         }
 
         return new SizeF(s.Width - _widthOf2Points, _zeilenabstand);
@@ -524,10 +505,6 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     internal float Oberlänge(float zoom) => _oberlänge * zoom;
 
     internal BlueFont Scale(double zoom) => Math.Abs(1 - zoom) < 0.01 ? this : Get(FontName, (float)(Size * zoom), Bold, Italic, Underline, StrikeOut, Outline, ColorMain, ColorOutline, Kapitälchen, OnlyUpper, OnlyLower);
-
-    private static void SetTextRenderingHint(Graphics gr, Font font) =>
-        //http://csharphelper.com/blog/2014/09/understand-font-aliasing-issues-in-c/
-        gr.TextRenderingHint = font.Size < 11 ? TextRenderingHint.ClearTypeGridFit : TextRenderingHint.AntiAlias;
 
     private static string ToString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, bool outLine, string colorMain, string colorOutline, bool capitals, bool onlyupper, bool onlylower) {
         var result = new List<string>();
@@ -560,7 +537,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         if (sizeToCheck <= _sizeTestedAndOk) { return true; }
         if (sizeToCheck >= _sizeTestedAndFailed) { return false; }
         try {
-            _ = MeasureString("x", new Font(_font.Name, sizeToCheck / Skin.Scale, _font.Style, _font.Unit));
+            _ = new Font(_font.Name, sizeToCheck / Skin.Scale, _font.Style, _font.Unit).MeasureString("x");
             _sizeTestedAndOk = sizeToCheck;
             return true;
         } catch {
@@ -570,7 +547,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     }
 
     private BitmapExt Symbol(string text, bool transparent) {
-        var s = MeasureString(text, (Font)this);
+        var s = MeasureString(text);
         BitmapExt bmp = new((int)(s.Width + 1), (int)(s.Height + 1));
         using (var gr = Graphics.FromImage(bmp)) {
             if (transparent) {

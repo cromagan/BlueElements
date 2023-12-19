@@ -32,6 +32,7 @@ using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.IO;
 using static BlueDatabase.DatabaseAbstract;
+using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
@@ -40,49 +41,87 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     #region Fields
 
     public int? Contentwidth;
+
     public DateTime? IsInCache = null;
 
-    //public string _timecode;
-
     public QuickImage? TmpCaptionBitmapCode;
+
     public SizeF TmpCaptionTextSize = new(-1, -1);
+
     public int? TmpIfFilterRemoved = null;
+
     internal List<string>? UcaseNamesSortedByLenght;
+
     private const string TmpNewDummy = "TMPNEWDUMMY";
+
     private readonly List<string> _afterEditAutoReplace = [];
+
     private readonly List<string> _dropDownItems = [];
+
     private readonly List<string> _linkedCellFilter = [];
+
     private readonly List<string> _opticalReplace = [];
+
     private readonly List<string> _permissionGroupsChangeCell = [];
+
     private readonly List<string> _tags = [];
+
     private AdditionalCheck _additionalFormatCheck;
+
     private string _adminInfo;
+
     private bool _afterEditAutoCorrect;
+
     private bool _afterEditDoUCase;
+
     private bool _afterEditQuickSortRemoveDouble;
+
     private AlignmentHorizontal _align;
+
     private string _allowedChars;
+
     private string _autoFilterJoker;
+
     private string _autoRemove;
+
     private Color _backColor;
+
     private BildTextVerhalten _behaviorOfImageAndText;
+
     private string _caption;
+
     private string _captionBitmapCode;
+
     private string _captionGroup1;
+
     private string _captionGroup2;
+
     private string _captionGroup3;
+
     private string _cellInitValue;
+
     private string _constantHeightOfImageCode;
+
     private TranslationType _doOpticalTranslation;
+
     private bool _dropdownAllesAbwählenErlaubt;
+
     private bool _dropdownBearbeitungErlaubt;
+
     private bool _dropdownWerteAndererZellenAnzeigen;
+
     private bool _editAllowedDespiteLock;
+
     private FilterOptions _filterOptions;
+
     private int _fixedColumnWidth;
+
     private Color _foreColor;
+
     private DataFormat _format;
+
     private bool _formatierungErlaubt;
+
     private bool _ignoreAtRowFilter;
 
     //private long _key;
@@ -101,23 +140,36 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     private DatabaseAbstract? _linkedDatabase;
 
     private string _linkedDatabaseTableName;
+
     private int _maxCellLenght;
+
     private int _maxTextLenght;
+
     private bool _multiLine;
+
     private string _name;
+
     private string _prefix;
+
     private string _quickInfo;
+
     private string _regex = string.Empty;
+
     private int _roundAfterEdit;
 
     //private bool _saveContent;
     private ScriptType _scriptType;
 
     private bool _showMultiLineInOneLine;
+
     private bool _showUndo;
+
     private SortierTyp _sortType;
+
     private bool _spellCheckingEnabled;
+
     private string _suffix;
+
     private bool _textBearbeitungErlaubt;
 
     #endregion
@@ -833,16 +885,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    //public bool SaveContent {
-    //    get => _saveContent;
-    //    set {
-    //        if (_saveContent == value) { return; }
-
-    //        _ = Database?.ChangeData(DatabaseDataType.SaveContent, this, null, _saveContent.ToPlusMinus(), value.ToPlusMinus(), string.Empty);
-    //        OnChanged();
-    //    }
-    //}
-
     public ScriptType ScriptType {
         get => _scriptType;
         set {
@@ -854,6 +896,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
+    //        _ = Database?.ChangeData(DatabaseDataType.SaveContent, this, null, _saveContent.ToPlusMinus(), value.ToPlusMinus(), string.Empty);
+    //        OnChanged();
+    //    }
+    //}
     public bool ShowMultiLineInOneLine {
         get => _multiLine && _showMultiLineInOneLine;
         set {
@@ -866,6 +912,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
+    //public bool SaveContent {
+    //    get => _saveContent;
+    //    set {
+    //        if (_saveContent == value) { return; }
     public bool ShowUndo {
         get => _showUndo;
         set {
@@ -1161,6 +1211,39 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (Database?.Column.Exists(nameToTest) != null) { return false; }
 
         return true;
+    }
+
+    public SizeF ColumnCaptionText_Size(Font columnFont) {
+        if (IsDisposed) { return new SizeF(16, 16); }
+
+        if (TmpCaptionTextSize.Width > 0) { return TmpCaptionTextSize; }
+        //if (_columnFont == null) { return new SizeF(_pix16, _pix16); }
+        TmpCaptionTextSize = columnFont.MeasureString(Caption.Replace("\r", "\r\n"));
+        return TmpCaptionTextSize;
+    }
+
+    public SizeF ColumnHead_Size(Font columnFont) {
+        //Bitmap? CaptionBitmapCode = null; // TODO: Caption Bitmap neu erstellen
+        //if (CaptionBitmapCode != null && CaptionBitmapCode.Width > 10) {
+        //    wi = Math.Max(50, ColumnCaptionText_Size(column).Width + 4);
+        //    he = 50 + ColumnCaptionText_Size(column).Height + 3;
+        //} else {
+        var ccts = ColumnCaptionText_Size(columnFont);
+
+        var wi = ccts.Height + 4;
+        var he = ccts.Width + 3;
+
+        if (!IsDisposed) {
+            if (!string.IsNullOrEmpty(CaptionGroup3)) {
+                he += ColumnCaptionSizeY * 3;
+            } else if (!string.IsNullOrEmpty(CaptionGroup2)) {
+                he += ColumnCaptionSizeY * 2;
+            } else if (!string.IsNullOrEmpty(CaptionGroup1)) {
+                he += ColumnCaptionSizeY;
+            }
+        }
+
+        return new SizeF(wi, he);
     }
 
     public List<string> Contents() => Contents(Database?.Row.ToList());

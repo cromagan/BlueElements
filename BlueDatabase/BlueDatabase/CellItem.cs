@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueDatabase.Enums;
@@ -45,6 +46,50 @@ public class CellItem {
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Status des Bildes (Disabled) wird geändert. Diese Routine sollte nicht innerhalb der Table Klasse aufgerufen werden.
+    /// Sie dient nur dazu, das Aussehen eines Textes wie eine Zelle zu imitieren.
+    /// </summary>
+    public static Size Cell_ContentSize(ColumnItem? column, string originalText, Font font, ShortenStyle style, int minSize, BildTextVerhalten bildTextverhalten) {
+        var (s, qi) = CellItem.GetDrawingData(column, originalText, style, bildTextverhalten);
+        return font.FormatedText_NeededSize(s, qi, minSize);
+    }
+
+    public static Size Cell_ContentSize(ColumnItem column, RowItem row, Font cellFont, int pix16) {
+        if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return new Size(pix16, pix16); }
+
+        if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
+            var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);
+            return lcolumn != null && lrow != null ? Cell_ContentSize(lcolumn, lrow, cellFont, pix16)
+                : new Size(pix16, pix16);
+        }
+
+        var contentSizex = db.Cell.GetSizeOfCellContent(column, row);
+        if (contentSizex != null) { return (Size)contentSizex; }
+
+        var contentSize = Size.Empty;
+
+        if (column.MultiLine) {
+            var tmp = db.Cell.GetString(column, row).SplitAndCutByCrAndBr();
+            if (column.ShowMultiLineInOneLine) {
+                contentSize = Cell_ContentSize(column, tmp.JoinWith("; "), cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText);
+            } else {
+                foreach (var thisString in tmp) {
+                    var tmpSize = Cell_ContentSize(column, thisString, cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText);
+                    contentSize.Width = Math.Max((int)tmpSize.Width, contentSize.Width);
+                    contentSize.Height += Math.Max((int)tmpSize.Height, pix16);
+                }
+            }
+        } else {
+            var @string = db.Cell.GetString(column, row);
+            contentSize = Cell_ContentSize(column, @string, cellFont, ShortenStyle.Replaced, pix16, column.BehaviorOfImageAndText);
+        }
+        contentSize.Width = Math.Max(contentSize.Width, pix16);
+        contentSize.Height = Math.Max(contentSize.Height, pix16);
+        db.Cell.SetSizeOfCellContent(column, row, contentSize);
+        return contentSize;
+    }
 
     public static (string text, QuickImage? qi) GetDrawingData(ColumnItem? column, string originalText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         if (column == null || column.IsDisposed) { return (originalText, null); }
@@ -104,17 +149,6 @@ public class CellItem {
                 //return BlueFont.Get(Txt).ReadableText();
                 return txt;
 
-            //case DataFormat.Columns_für_LinkedCellDropdown:
-            //    // Hier kommt die Spalten-ID  an
-            //    if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-            //    if (!IntTryParse(txt, out var ColKey)) { return "Columkey kann nicht geparsed werden"; }
-            //    var LinkedDatabase = column.LinkedDatabase();
-            //    if (LinkedDatabase is not DatabaseAbstract db) { return "Datenbankverknüpfung fehlt"; }
-            //    var C = LinkedDatabase.Column.SearchByKey(ColKey);
-            //    if (C == null) { return "Columnkey nicht gefunden"; }
-            //    txt = LanguageTool.ColumnReplace(C.ReadableText(), column, style);
-            //    break;
-
             default:
                 Develop.DebugPrint(column.Format);
                 break;
@@ -122,8 +156,6 @@ public class CellItem {
         if (style != ShortenStyle.HTML) { return txt; }
         txt = txt.Replace("\r\n", "<br>");
         txt = txt.Replace("\r", "<br>");
-        //if (txt.Contains("\r")) { Develop.DebugPrint(enFehlerArt.Info, "\\r enthalten:" + txt); }
-        //if (txt.Contains("\n")) { Develop.DebugPrint(enFehlerArt.Info, "\\n enthalten:" + txt); }
         while (txt.StartsWith(" ") || txt.StartsWith("<br>") || txt.EndsWith(" ") || txt.EndsWith("<br>")) {
             txt = txt.Trim();
             txt = txt.Trim("<br>");
@@ -135,20 +167,20 @@ public class CellItem {
         if (column == null || row == null) { return null; }
 
         if (column.Format is DataFormat.Verknüpfung_zu_anderer_Datenbank) {
-            //var LinkedData = CellCollection.LinkedCellData(column, Row, false, false);
-            //if (LinkedData.Item1 != null && LinkedData.Item2 != null) { return ValuesReadable(LinkedData.Item1, LinkedData.Item2, Style); }
-            //return new List<string>();
             Develop.DebugPrint(FehlerArt.Warnung, "LinkedCell sollte hier nicht ankommen.");
         }
+
         List<string> ret = [];
         if (!column.MultiLine) {
             ret.Add(ValueReadable(column, row.CellGetString(column), style, column.BehaviorOfImageAndText, true));
             return ret;
         }
+
         var x = row.CellGetList(column);
         foreach (var thisstring in x) {
             ret.Add(ValueReadable(column, thisstring, style, column.BehaviorOfImageAndText, true));
         }
+
         if (x.Count == 0) {
             var tmp = ValueReadable(column, string.Empty, style, column.BehaviorOfImageAndText, true);
             if (!string.IsNullOrEmpty(tmp)) { ret.Add(tmp); }
@@ -156,7 +188,7 @@ public class CellItem {
         return ret;
     }
 
-    private static QuickImage? StandardErrorImage(string gr, BildTextVerhalten bildTextverhalten, string originalText, ColumnItem? column) {
+    private static QuickImage? StandardErrorImage(ColumnItem? column, string gr, BildTextVerhalten bildTextverhalten, string originalText) {
         switch (bildTextverhalten) {
             case BildTextVerhalten.Fehlendes_Bild_zeige_Fragezeichen:
                 return QuickImage.Get("Fragezeichen|" + gr);
@@ -211,12 +243,6 @@ public class CellItem {
         }
     }
 
-    /// <summary>
-    /// Jede Zeile für sich richtig formatiert.
-    /// </summary>
-    /// <returns></returns>
-    //internal void InvalidateSize() => Size = Size.Empty;
-
     private static QuickImage? StandardImage(ColumnItem column, string originalText, string replacedText, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
         // replacedText kann auch empty sein. z.B. wenn er nicht angezeigt wird
         if (bildTextverhalten == BildTextVerhalten.Nur_Text) { return null; }
@@ -238,7 +264,7 @@ public class CellItem {
         if (!defaultImage.IsError) { return defaultImage; }
 
         defaultImage = QuickImage.Get(ntxt);
-        return !defaultImage.IsError ? defaultImage : StandardErrorImage(gr, bildTextverhalten, replacedText, column);
+        return !defaultImage.IsError ? defaultImage : StandardErrorImage(column, gr, bildTextverhalten, replacedText);
     }
 
     #endregion

@@ -422,7 +422,6 @@
       <DependentUpon>Caption.cs</DependentUpon>
     </Compile>
     <Compile Include="Forms\FileDialogs.cs" />
-    <Compile Include="Enums\BlueTableAppearance.cs" />
     <Compile Include="Enums\ButtonStyle.cs" />
     <Compile Include="Enums\CheckBehavior.cs" />
     <Compile Include="Enums\HintergrundArt.cs" />

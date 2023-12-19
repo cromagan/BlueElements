@@ -253,9 +253,10 @@ public class DimensionPadItem : AbstractPadItem {
     protected override RectangleF CalculateUsedArea() {
         if (Stil == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
         var geszoom = Parent?.SheetStyleScale * Skalierung ?? Skalierung;
-        var f = Skin.GetBlueFont(Stil, Parent?.SheetStyle);
-        var sz1 = BlueFont.MeasureString(Angezeigter_Text_Oben(), f.Font(geszoom));
-        var sz2 = BlueFont.MeasureString(Text_Unten, f.Font(geszoom));
+        var f2 = Skin.GetBlueFont(Stil, Parent?.SheetStyle).Font(geszoom);
+
+        var sz1 = f2.MeasureString(Angezeigter_Text_Oben());
+        var sz2 = f2.MeasureString(Text_Unten);
         var maxrad = Math.Max(Math.Max(sz1.Width, sz1.Height), Math.Max(sz2.Width, sz2.Height));
         RectangleF x = new(_point1, new SizeF(0, 0));
         x = x.ExpandTo(_point1);

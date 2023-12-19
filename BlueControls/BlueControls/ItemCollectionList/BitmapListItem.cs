@@ -205,7 +205,7 @@ public class BitmapListItem : AbstractListItem {
             var ausgl = (c - _captionlines) * ConstMy / 2;
             foreach (var thisCap in _captiontmp) {
                 c--;
-                var s = Skin.FormatedText_NeededSize(thisCap, null, bFont, 16);
+                var s = bFont.FormatedText_NeededSize(thisCap, null, 16);
                 Rectangle r =
                     new((int)(drawingCoordinates.Left + ((drawingCoordinates.Width - s.Width) / 2.0)),
                         drawingCoordinates.Bottom - s.Height - 3, s.Width, s.Height);

@@ -42,7 +42,7 @@ public class FlexiControlForDelegate : FlexiControl {
 
         EditType = EditTypeFormula.Button;
         CaptionPosition = ÜberschriftAnordnung.ohne;
-        var s0 = BlueFont.MeasureStringOfCaption(text);
+        var s0 = MeasureStringOfCaption(text);
         Size = new Size((int)s0.Width + 50 + 22, 30);
         if (CreateSubControls() is Button c0) {
             c0.Text = text;

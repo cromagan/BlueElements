@@ -220,12 +220,12 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable {
         }
     }
 
-    internal static Size StandardSize(string text, QuickImage? qi) {
-        var s = Skin.FormatedText_NeededSize(text, qi, (Font)Skin.GetBlueFont(Design.Button_CheckBox, States.Standard), 16);
-        s.Width += 10;
-        s.Height += 4;
-        return s;
-    }
+    //internal static Size StandardSize(string text, QuickImage? qi) {
+    //    var s = ((Font)Skin.GetBlueFont(Design.Button_CheckBox, States.Standard)).FormatedText_NeededSize(text, qi, 16);
+    //    s.Width += 10;
+    //    s.Height += 4;
+    //    return s;
+    //}
 
     protected override void DrawControl(Graphics gr, States state) {
         try {

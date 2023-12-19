@@ -107,6 +107,7 @@
     <Compile Include="EventArgs\MultiUserToListEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserParseEventArgs.cs" />
     <Compile Include="EventArgs\MultiUserHasPendingChangesEventArgs.cs" />
+    <Compile Include="Extensions\FontExtensions.cs" />
     <Compile Include="FormatHolder.cs" />
     <Compile Include="ImageMatrix.cs" />
     <Compile Include="Enums\BlurType.cs" />

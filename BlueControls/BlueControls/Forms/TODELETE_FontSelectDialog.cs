@@ -49,7 +49,7 @@ public partial class FontSelectDialog {
                 if (f.IsStyleAvailable(FontStyle.Regular)) {
                     Font fo = new(f.Name, 100);
                     try {
-                        _ = BlueFont.MeasureString("T", fo);
+                        _ = fo.MeasureString("T");
                         _ = _fnList.Add(string.Empty, f.Name, BlueFont.Get(f, 12).NameInStyle(), true);
                     } catch (Exception) { }
                 }

@@ -237,12 +237,7 @@ public partial class TableView : FormWithStatusBar {
         switch (e.Item.KeyName) {
             case "erweitert":
                 Visible = false;
-                List<RowItem> selectedRows = [];
-                if (Table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead && CFO.ShowingRow is RowItem r) {
-                    selectedRows.Add(r);
-                } else {
-                    selectedRows = Table.RowsVisibleUnique();
-                }
+                var selectedRows = Table.RowsVisibleUnique();
 
                 using (ExportDialog l = new(db, selectedRows)) {
                     _ = l.ShowDialog();
@@ -307,23 +302,24 @@ public partial class TableView : FormWithStatusBar {
         //SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
         //Datenüberprüfung.Enabled = datenbankDa;
-        btnZeileLöschen.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+
+        btnZeileLöschen.Enabled = datenbankDa;
         lstAufgaben.Enabled = datenbankDa;
         btnSaveAs.Enabled = datenbankDa;
 
         if (btnDrucken.Item["csv"] is AbstractListItem bli1) {
-            bli1.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+            bli1.Enabled = datenbankDa;
         }
 
         if (btnDrucken.Item["html"] is AbstractListItem bli2) {
-            bli2.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+            bli2.Enabled = datenbankDa;
         }
 
         btnVorwärts.Enabled = datenbankDa;
         btnZurück.Enabled = datenbankDa;
         txbTextSuche.Enabled = datenbankDa;
-        btnSuchenUndErsetzen.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-        FilterLeiste.Enabled = datenbankDa && Table!.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
+        btnSuchenUndErsetzen.Enabled = datenbankDa;
+        FilterLeiste.Enabled = datenbankDa;
     }
 
     protected virtual void DatabaseSet(DatabaseAbstract? db, string toParse) {
@@ -888,7 +884,6 @@ public partial class TableView : FormWithStatusBar {
             db.ColumnArrangements = new(car);
         }
 
-        Table.Invalidate_HeadSize();
         Table.Invalidate_AllColumnArrangements();
     }
 
@@ -1023,7 +1018,7 @@ public partial class TableView : FormWithStatusBar {
         }
 
         const bool enTabAllgemein = true;
-        var enTabellenAnsicht = true;
+
         if (Table.Database is not DatabaseAbstract db || db.IsDisposed || !db.IsAdministrator()) {
             tabAdmin.Enabled = false;
             return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
@@ -1031,12 +1026,8 @@ public partial class TableView : FormWithStatusBar {
 
         var m = DatabaseAbstract.EditableErrorReason(db, EditableErrorReasonType.EditCurrently);
 
-        if (Table.Design != BlueTableAppearance.Standard || !Table.Enabled || !string.IsNullOrEmpty(m)) {
-            enTabellenAnsicht = false;
-        }
-
         grpAdminAllgemein.Enabled = enTabAllgemein;
-        grpImport.Enabled = enTabellenAnsicht;
+        grpImport.Enabled = true;
         tabAdmin.Enabled = true;
     }
 
@@ -1065,7 +1056,6 @@ public partial class TableView : FormWithStatusBar {
         switch (_ansicht) {
             case Ansicht.Nur_Tabelle:
                 grpFormularSteuerung.Visible = false;
-                Table.Design = BlueTableAppearance.Standard;
                 tbcSidebar.Visible = false;
                 grpHilfen.Visible = true;
                 grpAnsicht.Visible = true;
@@ -1076,7 +1066,6 @@ public partial class TableView : FormWithStatusBar {
 
             case Ansicht.Überschriften_und_Formular:
                 grpFormularSteuerung.Visible = true;
-                Table.Design = BlueTableAppearance.OnlyMainColumnWithoutHead;
                 tbcSidebar.Visible = true;
                 grpHilfen.Visible = false;
                 grpAnsicht.Visible = false;
@@ -1088,7 +1077,6 @@ public partial class TableView : FormWithStatusBar {
 
             case Ansicht.Tabelle_und_Formular_nebeneinander:
                 grpFormularSteuerung.Visible = false;
-                Table.Design = BlueTableAppearance.Standard;
                 tbcSidebar.Visible = true;
                 grpHilfen.Visible = true;
                 grpAnsicht.Visible = true;

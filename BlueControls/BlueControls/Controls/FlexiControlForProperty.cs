@@ -86,7 +86,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         switch (_accessor) {
             case Accessor<bool>: {
                     EditType = EditTypeFormula.Ja_Nein_Knopf;
-                    var s1 = BlueFont.MeasureStringOfCaption(Caption);
+                    var s1 = MeasureStringOfCaption(Caption);
                     Size = new Size((int)s1.Width + 30, 22);
                     break;
                 }
@@ -95,7 +95,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     if (list != null) {
                         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
                         list.Appearance = BlueListBoxAppearance.ComboBox_Textbox;
-                        var s2 = BlueFont.MeasureStringOfCaption(Caption);
+                        var s2 = MeasureStringOfCaption(Caption);
                         var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
                         var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
