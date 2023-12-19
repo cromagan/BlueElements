@@ -119,7 +119,6 @@
     <Compile Include="Interfaces\IHasDatabase.cs" />
     <Compile Include="CellCollection.cs" />
     <Compile Include="CellItem.cs" />
-    <Compile Include="Enums\Ansicht.cs" />
     <Compile Include="Enums\AlignmentHorizontal.cs" />
     <Compile Include="Enums\EditTypeFormula.cs" />
     <Compile Include="Enums\ScriptType.cs" />

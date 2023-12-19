@@ -46,10 +46,6 @@ namespace BlueControls.Forms {
             this.btnSaveAs = new BlueControls.Controls.Button();
             this.btnNeuDB = new BlueControls.Controls.Button();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
-            this.grpAnsichtWahl = new BlueControls.Controls.GroupBox();
-            this.chkAnsichtTableFormular = new BlueControls.Controls.Button();
-            this.chkAnsichtFormular = new BlueControls.Controls.Button();
-            this.chkAnsichtNurTabelle = new BlueControls.Controls.Button();
             this.grpAufgaben = new BlueControls.Controls.GroupBox();
             this.lstAufgaben = new BlueControls.Controls.ListBox();
             this.grpAnsicht = new BlueControls.Controls.GroupBox();
@@ -63,13 +59,6 @@ namespace BlueControls.Forms {
             this.ckbZeilenclickInsClipboard = new BlueControls.Controls.Button();
             this.btnNummerierung = new BlueControls.Controls.Button();
             this.btnSuchFenster = new BlueControls.Controls.Button();
-            this.grpFormularSteuerung = new BlueControls.Controls.GroupBox();
-            this.btnNeu = new BlueControls.Controls.Button();
-            this.btnTextSuche = new BlueControls.Controls.Button();
-            this.btnLoeschen = new BlueControls.Controls.Button();
-            this.txbTextSuche = new BlueControls.Controls.TextBox();
-            this.btnVorwärts = new BlueControls.Controls.Button();
-            this.btnZurück = new BlueControls.Controls.Button();
             this.tabAdmin = new System.Windows.Forms.TabPage();
             this.grpAdminZeilen = new BlueControls.Controls.GroupBox();
             this.btnSuchenUndErsetzen = new BlueControls.Controls.Button();
@@ -109,11 +98,9 @@ namespace BlueControls.Forms {
             this.grpOrdner.SuspendLayout();
             this.grpDatei.SuspendLayout();
             this.tabAllgemein.SuspendLayout();
-            this.grpAnsichtWahl.SuspendLayout();
             this.grpAufgaben.SuspendLayout();
             this.grpAnsicht.SuspendLayout();
             this.grpHilfen.SuspendLayout();
-            this.grpFormularSteuerung.SuspendLayout();
             this.tabAdmin.SuspendLayout();
             this.grpAdminZeilen.SuspendLayout();
             this.grpAdminAllgemein.SuspendLayout();
@@ -278,62 +265,14 @@ namespace BlueControls.Forms {
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabAllgemein.Controls.Add(this.grpAnsichtWahl);
             this.tabAllgemein.Controls.Add(this.grpAufgaben);
             this.tabAllgemein.Controls.Add(this.grpAnsicht);
             this.tabAllgemein.Controls.Add(this.grpHilfen);
-            this.tabAllgemein.Controls.Add(this.grpFormularSteuerung);
             this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
             this.tabAllgemein.Name = "tabAllgemein";
             this.tabAllgemein.Size = new System.Drawing.Size(1321, 81);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
-            // 
-            // grpAnsichtWahl
-            // 
-            this.grpAnsichtWahl.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpAnsichtWahl.CausesValidation = false;
-            this.grpAnsichtWahl.Controls.Add(this.chkAnsichtTableFormular);
-            this.grpAnsichtWahl.Controls.Add(this.chkAnsichtFormular);
-            this.grpAnsichtWahl.Controls.Add(this.chkAnsichtNurTabelle);
-            this.grpAnsichtWahl.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAnsichtWahl.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAnsichtWahl.Location = new System.Drawing.Point(1176, 0);
-            this.grpAnsichtWahl.Name = "grpAnsichtWahl";
-            this.grpAnsichtWahl.Size = new System.Drawing.Size(238, 81);
-            this.grpAnsichtWahl.TabIndex = 5;
-            this.grpAnsichtWahl.TabStop = false;
-            this.grpAnsichtWahl.Text = "Ansichten-Auswahl";
-            // 
-            // chkAnsichtTableFormular
-            // 
-            this.chkAnsichtTableFormular.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAnsichtTableFormular.Location = new System.Drawing.Point(8, 46);
-            this.chkAnsichtTableFormular.Name = "chkAnsichtTableFormular";
-            this.chkAnsichtTableFormular.Size = new System.Drawing.Size(224, 22);
-            this.chkAnsichtTableFormular.TabIndex = 14;
-            this.chkAnsichtTableFormular.Text = "Tabelle und Formular nebeneinander";
-            this.chkAnsichtTableFormular.Click += new System.EventHandler(this.Ansicht_Click);
-            // 
-            // chkAnsichtFormular
-            // 
-            this.chkAnsichtFormular.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAnsichtFormular.Location = new System.Drawing.Point(8, 24);
-            this.chkAnsichtFormular.Name = "chkAnsichtFormular";
-            this.chkAnsichtFormular.Size = new System.Drawing.Size(192, 22);
-            this.chkAnsichtFormular.TabIndex = 13;
-            this.chkAnsichtFormular.Text = "Überschriften und Formular";
-            this.chkAnsichtFormular.Click += new System.EventHandler(this.Ansicht_Click);
-            // 
-            // chkAnsichtNurTabelle
-            // 
-            this.chkAnsichtNurTabelle.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Optionbox | BlueControls.Enums.ButtonStyle.Text)));
-            this.chkAnsichtNurTabelle.Location = new System.Drawing.Point(8, 2);
-            this.chkAnsichtNurTabelle.Name = "chkAnsichtNurTabelle";
-            this.chkAnsichtNurTabelle.Size = new System.Drawing.Size(104, 22);
-            this.chkAnsichtNurTabelle.TabIndex = 12;
-            this.chkAnsichtNurTabelle.Text = "Nur Tabelle";
-            this.chkAnsichtNurTabelle.Click += new System.EventHandler(this.Ansicht_Click);
             // 
             // grpAufgaben
             // 
@@ -497,94 +436,6 @@ namespace BlueControls.Forms {
             this.btnSuchFenster.TabIndex = 11;
             this.btnSuchFenster.Text = "Suchfenster öffnen";
             this.btnSuchFenster.Click += new System.EventHandler(this.btnSuchFenster_Click);
-            // 
-            // grpFormularSteuerung
-            // 
-            this.grpFormularSteuerung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpFormularSteuerung.CausesValidation = false;
-            this.grpFormularSteuerung.Controls.Add(this.btnNeu);
-            this.grpFormularSteuerung.Controls.Add(this.btnTextSuche);
-            this.grpFormularSteuerung.Controls.Add(this.btnLoeschen);
-            this.grpFormularSteuerung.Controls.Add(this.txbTextSuche);
-            this.grpFormularSteuerung.Controls.Add(this.btnVorwärts);
-            this.grpFormularSteuerung.Controls.Add(this.btnZurück);
-            this.grpFormularSteuerung.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpFormularSteuerung.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpFormularSteuerung.Location = new System.Drawing.Point(0, 0);
-            this.grpFormularSteuerung.Name = "grpFormularSteuerung";
-            this.grpFormularSteuerung.Size = new System.Drawing.Size(370, 81);
-            this.grpFormularSteuerung.TabIndex = 4;
-            this.grpFormularSteuerung.TabStop = false;
-            this.grpFormularSteuerung.Text = "Formular-Ansicht-Steuerung";
-            // 
-            // btnNeu
-            // 
-            this.btnNeu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnNeu.ImageCode = "PlusZeichen";
-            this.btnNeu.Location = new System.Drawing.Point(8, 2);
-            this.btnNeu.Name = "btnNeu";
-            this.btnNeu.Size = new System.Drawing.Size(56, 66);
-            this.btnNeu.TabIndex = 2;
-            this.btnNeu.Text = "Neu";
-            this.btnNeu.Click += new System.EventHandler(this.btnNeu_Click);
-            // 
-            // btnTextSuche
-            // 
-            this.btnTextSuche.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnTextSuche.Enabled = false;
-            this.btnTextSuche.ImageCode = "Lupe|16";
-            this.btnTextSuche.Location = new System.Drawing.Point(240, 24);
-            this.btnTextSuche.Name = "btnTextSuche";
-            this.btnTextSuche.QuickInfo = "Nächsten Eintrag anzeigen,<br>der obigen Text enthält";
-            this.btnTextSuche.Size = new System.Drawing.Size(120, 22);
-            this.btnTextSuche.TabIndex = 7;
-            this.btnTextSuche.Text = "Textsuche";
-            this.btnTextSuche.Click += new System.EventHandler(this.btnTextSuche_Click);
-            // 
-            // btnLoeschen
-            // 
-            this.btnLoeschen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnLoeschen.ImageCode = "Papierkorb";
-            this.btnLoeschen.Location = new System.Drawing.Point(64, 2);
-            this.btnLoeschen.Name = "btnLoeschen";
-            this.btnLoeschen.Size = new System.Drawing.Size(56, 66);
-            this.btnLoeschen.TabIndex = 3;
-            this.btnLoeschen.Text = "löschen";
-            this.btnLoeschen.Click += new System.EventHandler(this.btnLoeschen_Click);
-            // 
-            // txbTextSuche
-            // 
-            this.txbTextSuche.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbTextSuche.Location = new System.Drawing.Point(240, 2);
-            this.txbTextSuche.Name = "txbTextSuche";
-            this.txbTextSuche.Size = new System.Drawing.Size(120, 22);
-            this.txbTextSuche.TabIndex = 6;
-            this.txbTextSuche.Enter += new System.EventHandler(this.txbTextSuche_Enter);
-            this.txbTextSuche.TextChanged += new System.EventHandler(this.txbTextSuche_TextChanged);
-            // 
-            // btnVorwärts
-            // 
-            this.btnVorwärts.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnVorwärts.ImageCode = "Pfeil_Rechts";
-            this.btnVorwärts.Location = new System.Drawing.Point(184, 2);
-            this.btnVorwärts.Name = "btnVorwärts";
-            this.btnVorwärts.QuickInfo = "Nächsten Eintrag anzeigen";
-            this.btnVorwärts.Size = new System.Drawing.Size(48, 66);
-            this.btnVorwärts.TabIndex = 5;
-            this.btnVorwärts.Text = "vor";
-            this.btnVorwärts.Click += new System.EventHandler(this.btnVorwärts_Click);
-            // 
-            // btnZurück
-            // 
-            this.btnZurück.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnZurück.ImageCode = "Pfeil_Links";
-            this.btnZurück.Location = new System.Drawing.Point(136, 2);
-            this.btnZurück.Name = "btnZurück";
-            this.btnZurück.QuickInfo = "Vorherigen Eintrag anzeigen";
-            this.btnZurück.Size = new System.Drawing.Size(48, 66);
-            this.btnZurück.TabIndex = 4;
-            this.btnZurück.Text = "zurück";
-            this.btnZurück.Click += new System.EventHandler(this.btnZurück_Click);
             // 
             // tabAdmin
             // 
@@ -1007,11 +858,9 @@ namespace BlueControls.Forms {
             this.grpOrdner.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
             this.tabAllgemein.ResumeLayout(false);
-            this.grpAnsichtWahl.ResumeLayout(false);
             this.grpAufgaben.ResumeLayout(false);
             this.grpAnsicht.ResumeLayout(false);
             this.grpHilfen.ResumeLayout(false);
-            this.grpFormularSteuerung.ResumeLayout(false);
             this.tabAdmin.ResumeLayout(false);
             this.grpAdminZeilen.ResumeLayout(false);
             this.grpAdminAllgemein.ResumeLayout(false);
@@ -1082,21 +931,10 @@ namespace BlueControls.Forms {
         protected TabPage tabFormula;
         private ConnectedFormulaView CFO;
         private Button btnFormular;
-        private GroupBox grpFormularSteuerung;
-        private Button btnNeu;
-        private Button btnTextSuche;
-        private Button btnLoeschen;
-        private TextBox txbTextSuche;
-        private Button btnVorwärts;
-        private Button btnZurück;
-        private Button chkAnsichtTableFormular;
-        private Button chkAnsichtFormular;
-        private Button chkAnsichtNurTabelle;
         private GroupBox grpHilfen;
         private Button ckbZeilenclickInsClipboard;
         private Button btnNummerierung;
         private Button btnSuchFenster;
-        protected GroupBox grpAnsichtWahl;
         private Button btnSaveLoad;
         private Button btnSkripteBearbeiten;
         protected GroupBox grpAufgaben;

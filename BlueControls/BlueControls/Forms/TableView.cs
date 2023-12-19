@@ -46,7 +46,6 @@ public partial class TableView : FormWithStatusBar {
 
     #region Fields
 
-    private Ansicht _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
     private bool _firstOne = true;
     private List<string> _settings = [];
 
@@ -207,14 +206,14 @@ public partial class TableView : FormWithStatusBar {
 
         var toParse = string.Empty;
 
-        //LoadSettingsFromDisk();
-        if (string.IsNullOrEmpty(toParse)) {
-            var v = _settings.TagGet("TableDefaultView_" + ci.TableName);
+        ////LoadSettingsFromDisk();
+        //if (string.IsNullOrEmpty(toParse)) {
+        //    var v = _settings.TagGet("TableDefaultView_" + ci.TableName);
 
-            if (!string.IsNullOrEmpty(v)) {
-                toParse = "{Ansicht=" + v + "}";
-            }
-        }
+        //    if (!string.IsNullOrEmpty(v)) {
+        //        toParse = "{Ansicht=" + v + "}";
+        //    }
+        //}
 
         var nTabPage = new TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
@@ -286,22 +285,13 @@ public partial class TableView : FormWithStatusBar {
         var datenbankDa = Table.Database != null && !Table.Database.IsDisposed;
         btnNeuDB.Enabled = true;
         btnOeffnen.Enabled = true;
-        btnNeu.Enabled = datenbankDa && Table!.Database!.PermissionCheck(Table.Database.PermissionGroupsNewRow, null);
-        btnLoeschen.Enabled = datenbankDa;
         btnDrucken.Enabled = datenbankDa;
-        chkAnsichtNurTabelle.Enabled = datenbankDa;
-        chkAnsichtFormular.Enabled = datenbankDa;
-        chkAnsichtTableFormular.Enabled = datenbankDa;
 
         if (Table.Database is Database bd) {
             btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(bd.Filename);
         } else {
             btnDatenbankenSpeicherort.Enabled = false;
         }
-
-        //SuchenUndErsetzen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-        //AngezeigteZeilenLöschen.Enabled = datenbankDa && Table.Design != BlueTableAppearance.OnlyMainColumnWithoutHead;
-        //Datenüberprüfung.Enabled = datenbankDa;
 
         btnZeileLöschen.Enabled = datenbankDa;
         lstAufgaben.Enabled = datenbankDa;
@@ -315,9 +305,6 @@ public partial class TableView : FormWithStatusBar {
             bli2.Enabled = datenbankDa;
         }
 
-        btnVorwärts.Enabled = datenbankDa;
-        btnZurück.Enabled = datenbankDa;
-        txbTextSuche.Enabled = datenbankDa;
         btnSuchenUndErsetzen.Enabled = datenbankDa;
         FilterLeiste.Enabled = datenbankDa;
     }
@@ -344,11 +331,6 @@ public partial class TableView : FormWithStatusBar {
 
                     case "maintab":
                         ribMain.SelectedIndex = int.Parse(pair.Value);
-                        break;
-
-                    case "ansicht":
-                        _ansicht = (Ansicht)int.Parse(pair.Value);
-                        InitView();
                         break;
 
                     default:
@@ -450,35 +432,33 @@ public partial class TableView : FormWithStatusBar {
 
         var editable = string.IsNullOrEmpty(CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false));
 
-        if (_ansicht != Ansicht.Überschriften_und_Formular) {
-            _ = e.UserMenu.Add("Info", true);
-            if (row != null && tbl.PinnedRows.Contains(row)) {
-                _ = e.UserMenu.Add("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), true);
-            } else {
-                _ = e.UserMenu.Add("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), row != null);
-            }
-
-            _ = e.UserMenu.Add("Sortierung", true);
-            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Format.CanBeCheckedByRules());
-            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Format.CanBeCheckedByRules());
-            _ = e.UserMenu.AddSeparator();
-            _ = e.UserMenu.Add("Zelle", true);
-            _ = e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column != null && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column != null && column.Format.CanBeChangedByRules());
-            _ = e.UserMenu.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
-            _ = e.UserMenu.Add(ContextMenuCommands.SuchenUndErsetzen, column != null && db.IsAdministrator());
-            _ = e.UserMenu.AddSeparator();
-            _ = e.UserMenu.Add("Spalte", true);
-            _ = e.UserMenu.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, column != null && db.IsAdministrator());
-
-            _ = e.UserMenu.Add("Gesamten Spalteninhalt kopieren", "CopyAll", ImageCode.Clipboard, column != null && db.IsAdministrator());
-            _ = e.UserMenu.Add("Gesamten Spalteninhalt kopieren + sortieren", "CopyAll2", ImageCode.Clipboard, column != null && db.IsAdministrator());
-
-            _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && db.IsAdministrator());
-            _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && db.IsAdministrator());
-            _ = e.UserMenu.AddSeparator();
+        _ = e.UserMenu.Add("Info", true);
+        if (row != null && tbl.PinnedRows.Contains(row)) {
+            _ = e.UserMenu.Add("Zeile nicht mehr pinnen", "pinlösen", QuickImage.Get(ImageCode.Pinnadel, 16), true);
+        } else {
+            _ = e.UserMenu.Add("Zeile anpinnen", "anpinnen", QuickImage.Get(ImageCode.Pinnadel, 16), row != null);
         }
+
+        _ = e.UserMenu.Add("Sortierung", true);
+        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungAZ, column != null && column.Format.CanBeCheckedByRules());
+        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenSortierungZA, column != null && column.Format.CanBeCheckedByRules());
+        _ = e.UserMenu.AddSeparator();
+        _ = e.UserMenu.Add("Zelle", true);
+        _ = e.UserMenu.Add("Inhalt Kopieren", "ContentCopy", ImageCode.Kopieren, column != null && column.Format.CanBeChangedByRules());
+        _ = e.UserMenu.Add("Inhalt Einfügen", "ContentPaste", ImageCode.Clipboard, editable && column != null && column.Format.CanBeChangedByRules());
+        _ = e.UserMenu.Add("Inhalt löschen", "ContentDelete", ImageCode.Radiergummi, editable && column != null && column.Format.CanBeChangedByRules());
+        _ = e.UserMenu.Add(ContextMenuCommands.VorherigenInhaltWiederherstellen, editable && column != null && column.Format.CanBeChangedByRules() && column.ShowUndo);
+        _ = e.UserMenu.Add(ContextMenuCommands.SuchenUndErsetzen, column != null && db.IsAdministrator());
+        _ = e.UserMenu.AddSeparator();
+        _ = e.UserMenu.Add("Spalte", true);
+        _ = e.UserMenu.Add(ContextMenuCommands.SpaltenEigenschaftenBearbeiten, column != null && db.IsAdministrator());
+
+        _ = e.UserMenu.Add("Gesamten Spalteninhalt kopieren", "CopyAll", ImageCode.Clipboard, column != null && db.IsAdministrator());
+        _ = e.UserMenu.Add("Gesamten Spalteninhalt kopieren + sortieren", "CopyAll2", ImageCode.Clipboard, column != null && db.IsAdministrator());
+
+        _ = e.UserMenu.Add("Statistik", "Statistik", QuickImage.Get(ImageCode.Balken, 16), column != null && db.IsAdministrator());
+        _ = e.UserMenu.Add("Summe", "Summe", ImageCode.Summe, column != null && db.IsAdministrator());
+        _ = e.UserMenu.AddSeparator();
 
         _ = e.UserMenu.Add("Zeile", true);
         _ = e.UserMenu.Add(ContextMenuCommands.ZeileLöschen, row != null && db.IsAdministrator());
@@ -692,7 +672,6 @@ public partial class TableView : FormWithStatusBar {
         //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
 
         List<string> result = [];
-        result.ParseableAdd("Ansicht", _ansicht);
         result.ParseableAdd("MainTab", ribMain.SelectedIndex);
         result.ParseableAdd("TableView", Table.ViewToString());
 
@@ -708,25 +687,6 @@ public partial class TableView : FormWithStatusBar {
     //    Table.Enabled = true;
     //}
     //private void _originalDB_Disposing(object sender, System.EventArgs e) => ChangeDatabase(null);
-
-    private void Ansicht_Click(object sender, System.EventArgs e) {
-        if (chkAnsichtFormular.Checked) {
-            _ansicht = Ansicht.Überschriften_und_Formular;
-        } else if (chkAnsichtNurTabelle.Checked) {
-            _ansicht = Ansicht.Nur_Tabelle;
-        } else {
-            _ansicht = Ansicht.Tabelle_und_Formular_nebeneinander;
-        }
-
-        if (Table.Database != null) {
-            LoadSettingsFromDisk();
-            _settings.TagSet("TableDefaultView_" + Table.Database.TableName, ((int)_ansicht).ToString());
-            SaveSettingsToDisk();
-        }
-
-        InitView();
-        CheckButtons();
-    }
 
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
 
@@ -774,34 +734,6 @@ public partial class TableView : FormWithStatusBar {
         DatabaseAbstract.ForceSaveAll();
 
         _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.KeyName, PreveredDatabaseID, string.Empty));
-    }
-
-    private void btnLoeschen_Click(object sender, System.EventArgs e) {
-        if (chkAnsichtFormular.Checked) {
-            if (CFO.ShowingRow is not RowItem tmpr) {
-                MessageBox.Show("Kein Eintrag gewählt.", ImageCode.Information, "OK");
-                return;
-            }
-
-            if (MessageBox.Show(
-                    "Soll der Eintrag<br><b>" + tmpr.CellFirstString() + "</b><br>wirklich <b>gelöscht</b> werden?",
-                    ImageCode.Warnung, "Ja", "Nein") != 0) {
-                return;
-            }
-
-            SuchEintragNoSave(Direction.Unten, out var column, out var row);
-            Table.CursorPos_Set(column, row, false);
-            _ = Table.Database?.Row.Remove(tmpr, "Benutzer: Eintrag löschen");
-        } else {
-            _ = Table.Database?.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeilen löschen");
-        }
-    }
-
-    private void btnNeu_Click(object sender, System.EventArgs e) {
-        var r = Table.Database?.Column.First()?.SortType == SortierTyp.Datum_Uhrzeit
-            ? Table.Database?.Row.GenerateAndAdd(NameRepair(DateTime.Now.ToString(Constants.Format_Date5, CultureInfo.InvariantCulture), null), "Benutzer: +")
-            : Table.Database?.Row.GenerateAndAdd(NameRepair("Neuer Eintrag", null), "Benutzer: +");
-        Table.CursorPos_Set(Table.Database?.Column.First(), Table.RowsFilteredAndPinned().Get(r), true);
     }
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
@@ -902,79 +834,8 @@ public partial class TableView : FormWithStatusBar {
         _ = ExecuteFile(Path.GetTempPath());
     }
 
-    private void btnTextSuche_Click(object sender, System.EventArgs e) {
-        var suchtT = txbTextSuche.Text.Trim();
-        if (string.IsNullOrEmpty(suchtT)) {
-            MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
-            return;
-        }
-
-        Table.SearchNextText(suchtT, Table, null, Table.CursorPosRow, out _, out var gefRow, true);
-        //var CheckRow = BlueFormulax.ShowingRow;
-        //RowItem GefRow = null;
-        //if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
-        //var Count = 0;
-        //do
-        //{
-        //    if (Count > TableView.Database.Row.Count() + 1) { break; }
-        //    if (GefRow != null && GefRow != BlueFormulax.ShowingRow) { break; }
-        //    Count++;
-        //    CheckRow = TableView.View_NextRow(CheckRow);
-        //    if (CheckRow == null) { CheckRow = TableView.View_RowFirst(); }
-        //    foreach (var ThisColumnItem in TableView.Database.Column)
-        //    {
-        //        if (ThisColumnItem != null)
-        //        {
-        //            if (!ThisColumnItem.IgnoreAtRowFilter)
-        //            {
-        //                var IsT = CheckRow.CellGetString(ThisColumnItem);
-        //                if (!string.IsNullOrEmpty(IsT))
-        //                {
-        //                    if (ThisColumnItem.Format == DataFormat.Text_mit_Formatierung)
-        //                    {
-        //                        var l = new ExtText(enDesign.TextBox, enStates.Standard);
-        //                        l.HtmlText = IsT;
-        //                        IsT = l.PlainText;
-        //                    }
-        //                    // Allgemeine Prüfung
-        //                    if (IsT.ToLower().Contains(SuchtT.ToLower()))
-        //                    {
-        //                        GefRow = CheckRow;
-        //                    }
-        //                    // Spezielle Format-Prüfung
-        //                    var SuchT2 = DataFormat.CleanFormat(SuchtT, ThisColumnItem.Format);
-        //                    IsT = DataFormat.CleanFormat(IsT, ThisColumnItem.Format);
-        //                    if (!string.IsNullOrEmpty(SuchT2) && !string.IsNullOrEmpty(IsT))
-        //                    {
-        //                        if (IsT.ToLower().Contains(SuchT2.ToLower()))
-        //                        {
-        //                            GefRow = CheckRow;
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //} while (true);
-        if (gefRow == null) {
-            MessageBox.Show("Kein Eintrag gefunden!", ImageCode.Information, "OK");
-        } else {
-            if (gefRow.Row == CFO.ShowingRow) {
-                MessageBox.Show("Text nur im <b>aktuellen Eintrag</b> gefunden,<br>aber sonst keine weiteren Einträge!",
-                    ImageCode.Information, "OK");
-            } else {
-                Table.CursorPos_Set(Table.View_ColumnFirst(), gefRow, true);
-            }
-        }
-    }
-
     private void btnUnterschiede_CheckedChanged(object sender, System.EventArgs e) =>
         Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow?.Row : null;
-
-    private void btnVorwärts_Click(object sender, System.EventArgs e) {
-        SuchEintragNoSave(Direction.Unten, out var column, out var row);
-        Table.CursorPos_Set(column, row, false);
-    }
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
         if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
@@ -986,11 +847,6 @@ public partial class TableView : FormWithStatusBar {
         }
 
         _ = db.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeile löschen");
-    }
-
-    private void btnZurück_Click(object sender, System.EventArgs e) {
-        SuchEintragNoSave(Direction.Oben, out var column, out var row);
-        Table.CursorPos_Set(column, row, false);
     }
 
     private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -1031,14 +887,8 @@ public partial class TableView : FormWithStatusBar {
         tabAdmin.Enabled = true;
     }
 
-    private void Check_SuchButton() => btnTextSuche.Enabled = Table.Database is DatabaseAbstract db &&
-                                                                db.Row.Count >= 1 &&
-                                                              !string.IsNullOrEmpty(txbTextSuche.Text) &&
-                                                              !string.IsNullOrEmpty(txbTextSuche.Text.RemoveChars(" "));
-
     private void InitView() {
         if (DesignMode) {
-            grpFormularSteuerung.Visible = true;
             tbcSidebar.Visible = true;
             grpHilfen.Visible = true;
             grpAnsicht.Visible = true;
@@ -1047,50 +897,15 @@ public partial class TableView : FormWithStatusBar {
             return;
         }
 
-        chkAnsichtNurTabelle.Checked = _ansicht == Ansicht.Nur_Tabelle;
-        chkAnsichtFormular.Checked = _ansicht == Ansicht.Überschriften_und_Formular;
-        chkAnsichtTableFormular.Checked = _ansicht == Ansicht.Tabelle_und_Formular_nebeneinander;
-
         Table.Filter.Clear();
 
-        switch (_ansicht) {
-            case Ansicht.Nur_Tabelle:
-                grpFormularSteuerung.Visible = false;
-                tbcSidebar.Visible = false;
-                grpHilfen.Visible = true;
-                grpAnsicht.Visible = true;
-                FilterLeiste.Visible = true;
-                SplitContainer1.IsSplitterFixed = false;
-                SplitContainer1.Panel2Collapsed = true;
-                break;
-
-            case Ansicht.Überschriften_und_Formular:
-                grpFormularSteuerung.Visible = true;
-                tbcSidebar.Visible = true;
-                grpHilfen.Visible = false;
-                grpAnsicht.Visible = false;
-                FilterLeiste.Visible = false;
-                SplitContainer1.SplitterDistance = 250;
-                SplitContainer1.IsSplitterFixed = true;
-                SplitContainer1.Panel2Collapsed = false;
-                break;
-
-            case Ansicht.Tabelle_und_Formular_nebeneinander:
-                grpFormularSteuerung.Visible = false;
-                tbcSidebar.Visible = true;
-                grpHilfen.Visible = true;
-                grpAnsicht.Visible = true;
-                FilterLeiste.Visible = true;
-                SplitContainer1.IsSplitterFixed = false;
-                SplitContainer1.Panel2Collapsed = false;
-                SplitContainer1.SplitterDistance =
-                    Math.Max(SplitContainer1.SplitterDistance, SplitContainer1.Width / 2);
-                break;
-
-            default:
-                DebugPrint(_ansicht);
-                break;
-        }
+        tbcSidebar.Visible = true;
+        grpHilfen.Visible = true;
+        grpAnsicht.Visible = true;
+        FilterLeiste.Visible = true;
+        SplitContainer1.IsSplitterFixed = false;
+        SplitContainer1.Panel2Collapsed = false;
+        SplitContainer1.SplitterDistance = Math.Max(SplitContainer1.SplitterDistance, SplitContainer1.Width / 2);
 
         if (Table.Visible) {
             if (Table.Database != null) {
@@ -1297,14 +1112,6 @@ public partial class TableView : FormWithStatusBar {
 
         DatabaseSet(db, (string)s[1]);
     }
-
-    private void txbTextSuche_Enter(object sender, System.EventArgs e) {
-        if (btnTextSuche.Enabled) {
-            btnTextSuche_Click(btnTextSuche, System.EventArgs.Empty);
-        }
-    }
-
-    private void txbTextSuche_TextChanged(object sender, System.EventArgs e) => Check_SuchButton();
 
     private void UpdateScripts(DatabaseAbstract? db) {
         lstAufgaben.Item.Clear();
