@@ -134,7 +134,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                 _ = lsbStandardFilter.Item.Add("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01");
             }
 
-            var tmp = CellItem.ValueReadable(lColumn, string.Empty, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, true);
+            var tmp = CellItem.ValueReadable(string.Empty, ShortenStyle.Replaced, lColumn.Format, BildTextVerhalten.Nur_Text, true, lColumn.Prefix, lColumn.Suffix, lColumn.DoOpticalTranslation, lColumn.OpticalReplace);
             if (string.IsNullOrEmpty(tmp)) {
                 leere = lsbStandardFilter.Item.Add("leere", "filterleere", QuickImage.Get("TasteABC|20|16|1"), true, Constants.FirstSortChar + "02");
                 nichtleere = lsbStandardFilter.Item.Add("nicht leere", "filternichtleere", QuickImage.Get("TasteABC|20|16"), true, Constants.FirstSortChar + "03");

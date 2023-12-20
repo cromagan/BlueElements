@@ -369,11 +369,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //    }
     //    //private set {
     //    //    if (value == null && _fc == null) { return; }
-    public static void Draw_FormatedText(Graphics gr, string text, ColumnItem? column, Rectangle fitInRect, Design design, States state, ShortenStyle style, BildTextVerhalten bildTextverhalten) {
+    public static void Draw_FormatedText(Graphics gr, string text, ShortenStyle style, ColumnItem? column, Rectangle fitInRect, Design design, States state, BildTextVerhalten bildTextverhalten, float scale) {
         if (string.IsNullOrEmpty(text)) { return; }
-        var d = Skin.DesignOf(design, state);
+        var d = Skin.DesignOf(design, state).BFont;
+        if (d == null) { return; }
 
-        Draw_CellTransparentDirect(gr, text, fitInRect, d.BFont, column, 16, style, bildTextverhalten, state);
+        Draw_CellTransparentDirect(gr, text, style, fitInRect, d, column, 16, bildTextverhalten, state, scale);
     }
 
     //public FilterCollection? UserFilter {
@@ -1940,26 +1941,26 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private static void Draw_CellTransparentDirect(Graphics gr, string toDraw, Rectangle drawarea, BlueFont font, ColumnItem? contentHolderCellColumn, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
+    private static void Draw_CellTransparentDirect(Graphics gr, string txt, ShortenStyle style, Rectangle drawarea, BlueFont font, ColumnItem? contentHolderCellColumn, int pix16, BildTextVerhalten bildTextverhalten, States state, double scale) {
         if (contentHolderCellColumn == null) { return; }
 
-        if (!ShowMultiLine(toDraw, contentHolderCellColumn.MultiLine)) {
-            Draw_CellTransparentDirect_OneLine(gr, toDraw, contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state);
+        if (!ShowMultiLine(txt, contentHolderCellColumn.MultiLine)) {
+            Draw_CellTransparentDirect_OneLine(gr, txt, contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state, scale);
         } else {
-            var mei = toDraw.SplitAndCutByCrAndBr();
+            var mei = txt.SplitAndCutByCrAndBr();
             if (contentHolderCellColumn.ShowMultiLineInOneLine) {
-                Draw_CellTransparentDirect_OneLine(gr, mei.JoinWith("; "), contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state);
+                Draw_CellTransparentDirect_OneLine(gr, mei.JoinWith("; "), contentHolderCellColumn, drawarea, 0, false, font, pix16, style, bildTextverhalten, state, scale);
             } else {
                 var y = 0;
                 for (var z = 0; z <= mei.GetUpperBound(0); z++) {
-                    Draw_CellTransparentDirect_OneLine(gr, mei[z], contentHolderCellColumn, drawarea, y, z != mei.GetUpperBound(0), font, pix16, style, bildTextverhalten, state);
-                    y += CellItem.Cell_ContentSize(contentHolderCellColumn, mei[z], (Font)font, style, pix16 - 1, bildTextverhalten).Height;
+                    Draw_CellTransparentDirect_OneLine(gr, mei[z], contentHolderCellColumn, drawarea, y, z != mei.GetUpperBound(0), font, pix16, style, bildTextverhalten, state, scale);
+                    y += CellItem.ContentSize(contentHolderCellColumn.KeyName, contentHolderCellColumn.Format, mei[z], (Font)font, style, pix16 - 1, bildTextverhalten, contentHolderCellColumn.Prefix, contentHolderCellColumn.Suffix, contentHolderCellColumn.DoOpticalTranslation, contentHolderCellColumn.OpticalReplace, scale, contentHolderCellColumn.ConstantHeightOfImageCode).Height;
                 }
             }
         }
     }
 
-    private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state) {
+    private static void Draw_CellTransparentDirect_OneLine(Graphics gr, string drawString, ColumnItem contentHolderColumnStyle, Rectangle drawarea, int txtYPix, bool changeToDot, BlueFont font, int pix16, ShortenStyle style, BildTextVerhalten bildTextverhalten, States state, double scale) {
         Rectangle r = new(drawarea.Left, drawarea.Top + txtYPix, drawarea.Width, pix16);
 
         if (r.Bottom + pix16 > drawarea.Bottom) {
@@ -1967,7 +1968,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (changeToDot) { drawString = "..."; }// Die letzte Zeile noch ganz hinschreiben
         }
 
-        var (text, qi) = CellItem.GetDrawingData(contentHolderColumnStyle, drawString, style, bildTextverhalten);
+        var (text, qi) = CellItem.GetDrawingData(contentHolderColumnStyle.KeyName, contentHolderColumnStyle.Format, drawString, style, bildTextverhalten, contentHolderColumnStyle.Prefix, contentHolderColumnStyle.Suffix, contentHolderColumnStyle.DoOpticalTranslation, contentHolderColumnStyle.OpticalReplace, scale, contentHolderColumnStyle.ConstantHeightOfImageCode);
         var tmpImageCode = qi;
         if (tmpImageCode != null) { tmpImageCode = QuickImage.Get(tmpImageCode, Skin.AdditionalState(state)); }
 
@@ -2760,6 +2761,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <param name="contentHolderCellColumn"></param>
     /// <param name="contentHolderCellRow"></param>
     /// <param name="font"></param>
+    /// <param name="state"></param>
     private void Draw_CellTransparentDirect(Graphics gr, ColumnViewItem? cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow, Rectangle cellrectangle, ColumnItem? contentHolderCellColumn, RowItem? contentHolderCellRow, BlueFont font, States state) {
         if (cellInThisDatabaseRow?.Row == null) { return; }
         if (cellInThisDatabaseColumn?.Column == null) { return; }
@@ -2773,7 +2775,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         var toDraw = contentHolderCellRow.CellGetString(contentHolderCellColumn);
 
-        Draw_CellTransparentDirect(gr, toDraw, cellrectangle, font, contentHolderCellColumn, _pix16, ShortenStyle.Replaced, contentHolderCellColumn.BehaviorOfImageAndText, state);
+        Draw_CellTransparentDirect(gr, toDraw, ShortenStyle.Replaced, cellrectangle, font, contentHolderCellColumn, _pix16, contentHolderCellColumn.BehaviorOfImageAndText, state, Database.GlobalScale);
     }
 
     private void Draw_Column_Body(Graphics gr, ColumnViewItem cellInThisDatabaseColumn, Rectangle displayRectangleWoSlider, ColumnViewCollection ca) {
@@ -3275,7 +3277,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         foreach (var thisViewItem in ca) {
             if (CellCollection.IsInCache(thisViewItem?.Column, row) && !row.CellIsNullOrEmpty(thisViewItem.Column)) {
-                tmp = Math.Max(tmp, CellItem.Cell_ContentSize(thisViewItem.Column, row, (Font)_cellFont, _pix16).Height);
+                tmp = Math.Max(tmp, CellItem.ContentSize(thisViewItem.Column, row, (Font)_cellFont, _pix16).Height);
             }
         }
 

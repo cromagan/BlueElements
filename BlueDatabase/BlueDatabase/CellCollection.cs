@@ -95,6 +95,32 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     //    return rows.Count == 0 ? string.Empty : rows[0].CellGetString(column);
     //}
 
+    #region Indexers
+
+    /// <summary>
+    /// Gibt die Zelle zurück.
+    /// Da leere Zellen nicht gespeichert werden, kann null zuück gebeben werden, obwohl die Zelle an sich gültig ist.
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="row"></param>
+    /// <returns></returns>
+    public CellItem? this[ColumnItem? column, RowItem? row] {
+        get {
+            if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+            if (column == null || column.IsDisposed) { return null; }
+            if (row == null || row.IsDisposed) { return null; }
+
+            if (column.Database != row.Database || column.Database != Database) { return null; }
+
+            db.RefreshCellData(column, row, Reason.SetCommand);
+
+            var cellKey = KeyOfCell(column, row);
+            return ContainsKey(cellKey) ? this[cellKey] : null;
+        }
+    }
+
+    #endregion
+
     #region Methods
 
     /// <summary>
@@ -103,8 +129,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="row"></param>
     /// <param name="column"></param>
     /// <param name="mode"></param>
-    /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei Internen Prozessen angeben.</param>
-    /// <param name="checkEditmode">Ob gewünscht wird, das die intern Programmierte Routine geprüft werden soll. Nur in Datenbankansicht empfohlen.</param>
+    /// <param name="checkUserRights">Ob vom Benutzer aktiv das Feld bearbeitet werden soll. false bei internen Prozessen angeben.</param>
+    /// <param name="checkEditmode">Ob gewünscht wird, dass die intern programmierte Routine geprüft werden soll. Nur in Datenbankansicht empfohlen.</param>
     /// <param name="repairallowed"></param>
     /// <param name="ignoreLinked"></param>
     /// <returns></returns>
@@ -691,17 +717,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal string CompareKey(ColumnItem column, RowItem row) => GetString(column, row).CompareKey(column.SortType);
 
-    internal string GetStringCore(ColumnItem? column, RowItem? row) {
-        if (column == null || column.IsDisposed) { return string.Empty; }
-        if (row == null || row.IsDisposed) { return string.Empty; }
-        if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return string.Empty; }
-
-        db.RefreshCellData(column, row, Reason.SetCommand);
-
-        var cellKey = KeyOfCell(column, row);
-
-        return ContainsKey(cellKey) ? this[cellKey].Value : string.Empty;
-    }
+    internal string GetStringCore(ColumnItem column, RowItem row) => this[column, row]?.Value ?? string.Empty;
 
     internal void InvalidateAllSizes() {
         if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }

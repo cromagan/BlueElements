@@ -40,7 +40,7 @@ public class CellLikeListItem : AbstractListItem {
     /// <summary>
     /// Nach welcher Spalte sich der Stil richten muss.
     /// Wichtig, dass es ein Spalten-Item ist, da bei neuen Datenbanken zwar die Spalte vorhanden ist,
-    /// aber wenn keine Zeile Vorhanden ist, logischgerweise auch keine Zelle da ist.
+    /// aber wenn keine Zeile vorhanden ist, logischgerweise auch keine Zelle da ist.
     /// </summary>
     private readonly ColumnItem? _styleLikeThis;
 
@@ -74,19 +74,19 @@ public class CellLikeListItem : AbstractListItem {
     public override bool FilterMatch(string filterText) {
         if (base.FilterMatch(filterText)) { return true; }
         if (_styleLikeThis == null) { return false; }
-        var txt = CellItem.ValueReadable(_styleLikeThis, Internal, ShortenStyle.Both, _styleLikeThis.BehaviorOfImageAndText, true);
+        var txt = CellItem.ValueReadable(Internal, ShortenStyle.Both, _styleLikeThis.Format, _styleLikeThis.BehaviorOfImageAndText, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
         return txt.ToUpper().Contains(filterText.ToUpper());
     }
 
     public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
-    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => CellItem.Cell_ContentSize(_styleLikeThis, Internal, Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _bildTextverhalten);
+    protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => CellItem.ContentSize(_styleLikeThis.KeyName, _styleLikeThis.Format, Internal, Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _bildTextverhalten, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.Database.GlobalScale, _styleLikeThis.ConstantHeightOfImageCode);
 
     protected override void DrawExplicit(Graphics gr, Rectangle positionModified, Design itemdesign, States state, bool drawBorderAndBack, bool translate) {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, itemdesign, state, positionModified, null, false);
         }
-        Table.Draw_FormatedText(gr, Internal, _styleLikeThis, positionModified, itemdesign, state, _style, _bildTextverhalten);
+        Table.Draw_FormatedText(gr, Internal, _style, _styleLikeThis, positionModified, itemdesign, state, _bildTextverhalten, 1f);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, itemdesign, state, positionModified);
         }
@@ -95,7 +95,7 @@ public class CellLikeListItem : AbstractListItem {
     protected override string GetCompareKey() {
         // Die hauptklasse frägt nach diesem Kompare-Key
         //var txt = CellItem.ValueReadable(_StyleLikeThis, Internal, ShortenStyle.HTML, true); // Muss Kompakt sein, um Suffixe zu vermeiden
-        var txt = CellItem.ValueReadable(_styleLikeThis, Internal, ShortenStyle.HTML, _bildTextverhalten, true);
+        var txt = CellItem.ValueReadable(Internal, ShortenStyle.HTML, _styleLikeThis.Format, _bildTextverhalten, true, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace);
 
         if (_styleLikeThis != null) { return txt.CompareKey(_styleLikeThis.SortType) + "|" + Internal; }
         return string.Empty;

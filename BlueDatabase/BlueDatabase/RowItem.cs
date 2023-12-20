@@ -483,32 +483,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         var erg = txt;
         // Variablen ersetzen
-        foreach (var thisColumnItem in db.Column) {
+        foreach (var column in db.Column) {
             if (!erg.Contains("~")) { return erg; }
 
-            if (thisColumnItem != null) {
-                if (erg.ToUpper().Contains("~" + thisColumnItem.KeyName.ToUpper())) {
-                    var replacewith = CellGetString(thisColumnItem);
-                    if (replacedvalue) { replacewith = CellItem.ValueReadable(thisColumnItem, replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks); }
+            if (column != null) {
+                if (erg.ToUpper().Contains("~" + column.KeyName.ToUpper())) {
+                    var replacewith = CellGetString(column);
+                    if (replacedvalue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, column.Format, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
                     if (removeLineBreaks && !replacedvalue) {
                         replacewith = replacewith.Replace("\r\n", " ");
                         replacewith = replacewith.Replace("\r", " ");
                     }
 
-                    erg = erg.Replace("~" + thisColumnItem.KeyName.ToUpper() + "~", replacewith, RegexOptions.IgnoreCase);
-                    //while (erg.ToUpper().Contains("~" + thisColumnItem.Name.ToUpper() + "(")) {
-                    //    var x = erg.IndexOf("~" + thisColumnItem.Name.ToUpper() + "(", StringComparison.OrdinalIgnoreCase);
-                    //    var x2 = erg.IndexOf(")", x, StringComparison.Ordinal);
-                    //    if (x2 < x) { return erg; }
-                    //    var ww = erg.Substring(x + thisColumnItem.Name.Length + 2, x2 - x - thisColumnItem.Name.Length - 2);
-                    //    ww = ww.Replace(" ", string.Empty).ToUpper();
-                    //    var vals = ww.SplitAndCutBy(",");
-                    //    if (vals.Length != 2) { return txt; }
-                    //    if (vals[0] != "L") { return txt; }
-                    //    if (!IntTryParse(vals[1], out var stellen)) { return txt; }
-                    //    var newW = replacewith.Substring(0, Math.Min(stellen, replacewith.Length));
-                    //    erg = erg.Replace(erg.Substring(x, x2 - x + 1), newW);
-                    //}
+                    erg = erg.Replace("~" + column.KeyName.ToUpper() + "~", replacewith, RegexOptions.IgnoreCase);
                 }
             }
         }

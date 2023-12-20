@@ -1776,7 +1776,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 _permissionGroupsChangeCell.Clear();
                 _textBearbeitungErlaubt = false;
                 _dropdownBearbeitungErlaubt = false;
-                _behaviorOfImageAndText = BildTextVerhalten.Interpretiere_Bool;
+                _behaviorOfImageAndText = BildTextVerhalten.Interpretiere_Bool_CorrectState;
                 _maxTextLenght = 1;
                 _maxCellLenght = 1;
                 _dropdownWerteAndererZellenAnzeigen = false;
@@ -2045,7 +2045,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 //if (_MultiLine && _DropdownBearbeitungErlaubt && EditType_To_Check == enEditTypeFormula.Listbox_3_Zeilen) { return true; }
                 if (_multiLine && _dropdownBearbeitungErlaubt && editTypeToCheck == EditTypeFormula.Listbox) { return true; }
                 if (editTypeToCheck == EditTypeFormula.nur_als_Text_anzeigen) { return true; }
-                if (!_multiLine && editTypeToCheck == EditTypeFormula.Ja_Nein_Knopf && _behaviorOfImageAndText == BildTextVerhalten.Interpretiere_Bool) { return true; }
+                if (!_multiLine && editTypeToCheck == EditTypeFormula.Ja_Nein_Knopf && _behaviorOfImageAndText is BildTextVerhalten.Interpretiere_Bool or BildTextVerhalten.Interpretiere_Bool_CorrectState) { return true; }
                 return false;
 
             case DataFormat.Verknüpfung_zu_anderer_Datenbank:

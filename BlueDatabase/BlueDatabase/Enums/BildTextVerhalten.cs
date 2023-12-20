@@ -23,6 +23,7 @@ public enum BildTextVerhalten {
     Nur_Bild = 110,
     Bild_oder_Text = 120,
     Interpretiere_Bool = 200,
+    Interpretiere_Bool_CorrectState = 201,
     Fehlendes_Bild_zeige_Fragezeichen = 2,
     Fehlendes_Bild_zeige_Häkchen = 3,
     Fehlendes_Bild_zeige_Kreis = 4,

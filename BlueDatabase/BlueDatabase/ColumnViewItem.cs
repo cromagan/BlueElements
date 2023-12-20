@@ -86,7 +86,7 @@ public sealed class ColumnViewItem : IParseable {
         try {
             //  Parallel.ForEach führt ab und zu zu DeadLocks
             foreach (var thisRowItem in db.Row) {
-                var wx = CellItem.Cell_ContentSize(column, thisRowItem, cellFont, pix16).Width;
+                var wx = CellItem.ContentSize(column, thisRowItem, cellFont, pix16).Width;
                 newContentWidth = Math.Max(newContentWidth, wx);
             }
         } catch {
