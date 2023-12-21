@@ -158,20 +158,20 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         switch (column.ScriptType) {
             case ScriptType.Bool:
-                vars.Add(new VariableBool(column.KeyName, wert == "+", ro, false, qi));
+                vars.Add(new VariableBool(column.KeyName, wert == "+", ro, qi));
                 break;
 
             case ScriptType.List:
-                vars.Add(new VariableListString(column.KeyName, wert.SplitAndCutByCrToList(), ro, false, qi));
+                vars.Add(new VariableListString(column.KeyName, wert.SplitAndCutByCrToList(), ro, qi));
                 break;
 
             case ScriptType.Numeral:
                 _ = FloatTryParse(wert, out var f);
-                vars.Add(new VariableFloat(column.KeyName, f, ro, false, qi));
+                vars.Add(new VariableFloat(column.KeyName, f, ro, qi));
                 break;
 
             case ScriptType.String:
-                vars.Add(new VariableString(column.KeyName, wert, ro, false, qi));
+                vars.Add(new VariableString(column.KeyName, wert, ro, qi));
                 break;
 
             //case ScriptType.DateTime:
@@ -184,11 +184,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
             //    break;
 
             case ScriptType.String_Readonly:
-                vars.Add(new VariableString(column.KeyName, wert, true, false, qi));
+                vars.Add(new VariableString(column.KeyName, wert, true, qi));
                 break;
 
             case ScriptType.Bool_Readonly:
-                vars.Add(new VariableBool(column.KeyName, wert == "+", true, false, qi));
+                vars.Add(new VariableBool(column.KeyName, wert == "+", true, qi));
                 break;
 
             default:

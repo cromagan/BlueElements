@@ -35,15 +35,15 @@ public class VariableBool : Variable {
 
     #region Constructors
 
-    public VariableBool(string name, bool value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _valuebool = value;
+    public VariableBool(string name, bool value, bool ronly, string comment) : base(name, ronly, comment) => _valuebool = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
     /// </summary>
     /// <param name="name"></param>
-    public VariableBool(string name) : this(name, false, true, false, string.Empty) { }
+    public VariableBool(string name) : this(name, false, true, string.Empty) { }
 
-    public VariableBool(bool value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableBool(bool value) : this(DummyName(), value, true, string.Empty) { }
 
     #endregion
 

@@ -35,15 +35,15 @@ public class VariableFloat : Variable {
 
     #region Constructors
 
-    public VariableFloat(string name, double value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _double = value;
+    public VariableFloat(string name, double value, bool ronly, string comment) : base(name, ronly, comment) => _double = value;
 
-    public VariableFloat(double value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableFloat(double value) : this(DummyName(), value, true, string.Empty) { }
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
     /// </summary>
     /// <param name="name"></param>
-    public VariableFloat(string name) : this(name, 0f, true, false, string.Empty) { }
+    public VariableFloat(string name) : this(name, 0f, true, string.Empty) { }
 
     #endregion
 

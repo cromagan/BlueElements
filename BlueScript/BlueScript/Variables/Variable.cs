@@ -35,15 +35,13 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     private static long _dummyCount;
     private string _comment = string.Empty;
     private bool _readOnly;
-    private bool _systemVariable;
 
     #endregion
 
     #region Constructors
 
-    protected Variable(string name, bool ronly, bool system, string comment) : base(system ? "*" + name.ToLower() : name.ToLower()) {
+    protected Variable(string name, bool ronly, string comment) : base(name.ToLower()) {
         ReadOnly = ronly;
-        SystemVariable = system;
         Comment = comment;
     }
 
@@ -80,15 +78,6 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         set {
             if (_readOnly == value) { return; }
             _readOnly = value;
-            OnChanged();
-        }
-    }
-
-    public bool SystemVariable {
-        get => _systemVariable;
-        private set {
-            if (_systemVariable == value) { return; }
-            _systemVariable = value;
             OnChanged();
         }
     }
@@ -247,8 +236,8 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
                 ReadOnly = value.FromPlusMinus();
                 return true;
 
-            case "system":
-                SystemVariable = value.FromPlusMinus();
+            case "system": // Todo: Entfernen 21.12.2023
+                //SystemVariable = value.FromPlusMinus();
                 return true;
         }
 
@@ -264,13 +253,9 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         if (!ToStringPossible) { return string.Empty; }
 
         List<string> result = [];
-        //result.ParseableAdd("Type", ShortName);
-        //result.ParseableAdd("Name", Name);
         result.ParseableAdd("Value", ValueForReplace);
         result.ParseableAdd("Comment", Comment);
         result.ParseableAdd("ReadOnly", ReadOnly);
-        result.ParseableAdd("System", SystemVariable);
-
         return result.Parseable(base.ToString());
     }
 

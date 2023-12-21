@@ -32,15 +32,15 @@ public class VariableBitmap : Variable, IDisposable {
 
     #region Constructors
 
-    public VariableBitmap(string name, Bitmap? value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _bmp = value;
+    public VariableBitmap(string name, Bitmap? value, bool ronly, string comment) : base(name, ronly, comment) => _bmp = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
     /// </summary>
     /// <param name="name"></param>
-    public VariableBitmap(string name) : this(name, null, true, false, string.Empty) { }
+    public VariableBitmap(string name) : this(name, null, true, string.Empty) { }
 
-    public VariableBitmap(Bitmap? value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableBitmap(Bitmap? value) : this(DummyName(), value, true, string.Empty) { }
 
     #endregion
 

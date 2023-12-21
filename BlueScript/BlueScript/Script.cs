@@ -51,7 +51,7 @@ public class Script {
         Properties = scp;
 
         if (!string.IsNullOrEmpty(additionalFilesPath)) {
-            Variables.Add(new VariableString("AdditionalFilesPfad", (additionalFilesPath.Trim("\\") + "\\").CheckPath(), true, false, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+            Variables.Add(new VariableString("AdditionalFilesPfad", (additionalFilesPath.Trim("\\") + "\\").CheckPath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
         }
     }
 

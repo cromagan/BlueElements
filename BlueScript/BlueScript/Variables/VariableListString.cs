@@ -36,20 +36,20 @@ public class VariableListString : Variable {
 
     #region Constructors
 
-    public VariableListString(string name, IReadOnlyCollection<string>? value, bool ronly, bool system, string comment) : base(name,
-        ronly, system, comment) {
+    public VariableListString(string name, IReadOnlyCollection<string>? value, bool ronly, string comment) : base(name,
+        ronly, comment) {
         _list = [];
         if (value != null) {
             _list.AddRange(value);
         }
     }
 
-    public VariableListString(string name) : this(name, null, true, false, string.Empty) { }
+    public VariableListString(string name) : this(name, null, true, string.Empty) { }
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType Variable("NAME");
     /// </summary>
-    public VariableListString(IReadOnlyCollection<string>? value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableListString(IReadOnlyCollection<string>? value) : this(DummyName(), value, true, string.Empty) { }
 
     public VariableListString(IEnumerable<string> value) : this(value.ToList()) { }
 

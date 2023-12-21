@@ -33,11 +33,11 @@ public class VariableFilterItem : Variable, IDisposable {
 
     #region Constructors
 
-    public VariableFilterItem(FilterItem value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableFilterItem(FilterItem value) : this(DummyName(), value, true, string.Empty) { }
 
-    public VariableFilterItem(string name) : this(name, null!, true, false, string.Empty) { }
+    public VariableFilterItem(string name) : this(name, null!, true, string.Empty) { }
 
-    private VariableFilterItem(string name, FilterItem value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _filter = value;
+    private VariableFilterItem(string name, FilterItem value, bool ronly, string comment) : base(name, ronly, comment) => _filter = value;
 
     #endregion
 

@@ -1242,18 +1242,18 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, false, "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
+                var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
                 vars.Add(v);
             }
 
-            vars.Add(new VariableString("User", UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-            vars.Add(new VariableString("Usergroup", UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-            vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-            vars.Add(new VariableString("Tablename", TableName, true, false, "Der aktuelle Tabellenname."));
-            vars.Add(new VariableBool("ReadOnly", ReadOnly, true, false, "Ob die aktuelle Datenbank schreibgeschützt ist."));
-            vars.Add(new VariableFloat("Rows", Row.Count, true, false, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
-            vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, false, "Der Name der ersten Spalte"));
-            vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
+            vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+            vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+            vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+            vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
+            vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
+            vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
+            vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, "Der Name der ersten Spalte"));
+            vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula), true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
 
             #endregion
 

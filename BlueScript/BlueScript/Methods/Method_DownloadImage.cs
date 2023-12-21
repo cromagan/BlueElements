@@ -72,7 +72,7 @@ internal class Method_DownloadImage : Method {
             Bitmap? bmp = null;
             if (img is Bitmap bmp2) { bmp = bmp2; }
 
-            Last.Add(new VariableBitmap(varn, bmp, true, false, string.Empty));
+            Last.Add(new VariableBitmap(varn, bmp, true, string.Empty));
             return new DoItFeedback(bmp);
         } catch {
             return new DoItFeedback(null as Bitmap);

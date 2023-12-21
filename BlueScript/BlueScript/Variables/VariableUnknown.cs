@@ -32,15 +32,15 @@ public class VariableUnknown : Variable {
 
     #region Constructors
 
-    public VariableUnknown(string name, bool ronly, bool system, string comment) : base(name, ronly, system, comment) { }
+    public VariableUnknown(string name, bool ronly, string comment) : base(name, ronly, comment) { }
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
     /// </summary>
     /// <param name="name"></param>
-    public VariableUnknown(string name) : this(name, true, false, string.Empty) { }
+    public VariableUnknown(string name) : this(name, true, string.Empty) { }
 
-    public VariableUnknown(string name, string value) : this(name, true, false, string.Empty) { }
+    public VariableUnknown(string name, string value) : this(name, true, string.Empty) { }
 
     #endregion
 

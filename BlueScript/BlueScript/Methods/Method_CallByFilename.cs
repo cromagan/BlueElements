@@ -42,7 +42,7 @@ public class Method_CallByFilename : Method {
     public override bool EndlessArgs => false;
 
     public override bool GetCodeBlockAfter => false;
-    public override MethodType MethodType => MethodType.IO;
+    public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
@@ -81,7 +81,7 @@ public class Method_CallByFilename : Method {
             #region Kritische Variablen Disposen
 
             foreach (var thisVar in tmpv) {
-                if (varCol.Get(thisVar.KeyName) == null && varCol.GetSystem(thisVar.KeyName) == null) {
+                if (varCol.Get(thisVar.KeyName) == null) {
                     if (thisVar is IDisposable id && thisVar.MustDispose) {
                         id.Dispose();
                     }

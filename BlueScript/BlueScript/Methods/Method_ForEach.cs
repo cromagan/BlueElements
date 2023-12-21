@@ -66,7 +66,7 @@ internal class Method_ForEach : Method {
         var scp2 = new ScriptProperties(scp, scp.AllowedMethods | MethodType.Break);
 
         foreach (var thisl in l) {
-            var nv = new VariableString(varnam, thisl, true, false, "Iterations-Variable");
+            var nv = new VariableString(varnam, thisl, true, "Iterations-Variable");
 
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos, "ForEach-Schleife", infos.CodeBlockAfterText, false, infos.Data.Line - 1, infos.Data.Subname, nv);
             if (!scx.AllOk) { return scx; }

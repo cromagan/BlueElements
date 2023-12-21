@@ -17,15 +17,13 @@
 
 using System.Collections.Generic;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallRow : Method {
+public class Method_CallRow : Method_Database {
 
     #region Properties
 
@@ -57,9 +55,7 @@ public class Method_CallRow : Method {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var see = varCol.GetSystem("SetErrorEnabled");
-        if (see is not VariableBool seet) { return new DoItFeedback(infos.Data, "SetErrorEnabled Variable nicht gefunden"); }
-        if (seet.ValueBool) { return new DoItFeedback(infos.Data, "'CallRow' bei FehlerCheck Routinen nicht erlaubt."); }
+        if (SetErrorAllowed(varCol)) { return new DoItFeedback(infos.Data, "'CallRow' bei FehlerCheck Routinen nicht erlaubt."); }
 
         var row = Method_Row.ObjectToRow(attvar.Attributes[1]);
 

@@ -32,15 +32,15 @@ public class VariableString : Variable {
 
     #region Constructors
 
-    public VariableString(string name, string value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _valueString = value.RestoreCriticalVariableChars();
+    public VariableString(string name, string value, bool ronly, string comment) : base(name, ronly, comment) => _valueString = value.RestoreCriticalVariableChars();
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType Variable ("NAME");
     /// </summary>
     /// <param name="name"></param>
-    public VariableString(string name) : this(name, string.Empty, true, false, string.Empty) { }
+    public VariableString(string name) : this(name, string.Empty, true, string.Empty) { }
 
-    public VariableString(string name, string value) : this(name, value, true, false, string.Empty) { }
+    public VariableString(string name, string value) : this(name, value, true, string.Empty) { }
 
     #endregion
 

@@ -33,15 +33,15 @@ public class VariableWebpage : Variable, IDisposable {
 
     #region Constructors
 
-    public VariableWebpage(string name, ChromiumWebBrowser? value, bool ronly, bool system, string comment) : base(name, ronly, system, comment) => _browser = value;
+    public VariableWebpage(string name, ChromiumWebBrowser? value, bool ronly, string comment) : base(name, ronly, comment) => _browser = value;
 
     /// <summary>
     /// Wichtig für: GetEnumerableOfType<Variable>("NAME");
     /// </summary>
     /// <param name="name"></param>
-    public VariableWebpage(string name) : this(name, null, true, false, string.Empty) { }
+    public VariableWebpage(string name) : this(name, null, true, string.Empty) { }
 
-    public VariableWebpage(ChromiumWebBrowser? value) : this(DummyName(), value, true, false, string.Empty) { }
+    public VariableWebpage(ChromiumWebBrowser? value) : this(DummyName(), value, true, string.Empty) { }
 
     #endregion
 

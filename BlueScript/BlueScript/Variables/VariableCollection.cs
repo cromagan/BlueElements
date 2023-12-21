@@ -198,8 +198,7 @@ public class VariableCollection : IEnumerable<Variable> {
     public Variable? Get(string name) {
         if (_internal.Count == 0) { return null; }
 
-        return _internal.FirstOrDefault(thisv =>
-            !thisv.SystemVariable && string.Equals(thisv.KeyName, name, StringComparison.OrdinalIgnoreCase));
+        return _internal.FirstOrDefault(thisv => string.Equals(thisv.KeyName, name, StringComparison.OrdinalIgnoreCase));
     }
 
     public IEnumerator<Variable> GetEnumerator() => _internal.GetEnumerator();
@@ -238,13 +237,6 @@ public class VariableCollection : IEnumerable<Variable> {
         return vf.ValueString;
     }
 
-    public Variable? GetSystem(string name) {
-        name = name.Trim("*").ToUpper();
-
-        return _internal.FirstOrDefault(thisv =>
-            thisv.SystemVariable && thisv.KeyName.ToUpper() == "*" + name);
-    }
-
     public bool Remove(Variable v) {
         if (ReadOnly) { return false; }
         return _internal.Remove(v);
@@ -272,7 +264,6 @@ public class VariableCollection : IEnumerable<Variable> {
     /// <summary>
     /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
     /// </summary>
-    /// <param name="vars"></param>
     /// <param name="name"></param>
     /// <param name="value"></param>
     public bool Set(string name, string value) {
@@ -280,7 +271,7 @@ public class VariableCollection : IEnumerable<Variable> {
 
         var v = _internal.Get(name);
         if (v == null) {
-            v = new VariableString(name, string.Empty, false, false, string.Empty);
+            v = new VariableString(name, string.Empty, false, string.Empty);
             _internal.Add(v);
         }
 

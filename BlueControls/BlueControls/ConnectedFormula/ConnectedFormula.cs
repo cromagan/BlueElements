@@ -693,13 +693,13 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
             VariableCollection vars = [];
 
             foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("FRM_" + thisvar.KeyName, thisvar.ValueString, false, false, "Formular-Kopf-Variable\r\n" + thisvar.Comment);
+                var v = new VariableString("FRM_" + thisvar.KeyName, thisvar.ValueString, false, "Formular-Kopf-Variable\r\n" + thisvar.Comment);
                 vars.Add(v);
             }
 
-            vars.Add(new VariableString("User", UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-            vars.Add(new VariableString("Usergroup", UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-            vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+            vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+            vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+            vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
 
             #endregion
 

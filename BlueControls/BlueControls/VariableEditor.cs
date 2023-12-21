@@ -56,7 +56,7 @@ public partial class VariableEditor : UserControl {
         if (filterVariablen?.Table?.Database is not Database db) { return list; }
 
         foreach (var thisr in db.Row) {
-            var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, false, thisr.CellGetString("Kommentar"));
+            var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, thisr.CellGetString("Kommentar"));
             list.Add(v);
         }
 
@@ -90,7 +90,7 @@ public partial class VariableEditor : UserControl {
             if (ro != null) {
                 ro.CellSet("typ", thisv.MyClassId);
                 ro.CellSet("RO", thisv.ReadOnly);
-                ro.CellSet("System", thisv.SystemVariable);
+                //ro.CellSet("System", thisv.SystemVariable);
 
                 var tmpi = thisv.ReadableText;
                 if (!Editabe && tmpi.Length > 3990) {
@@ -120,7 +120,7 @@ public partial class VariableEditor : UserControl {
         var na = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         _ = x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");
         _ = x.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder.Bit, "Readonly, Schreibgeschützt");
-        _ = x.Column.GenerateAndAdd("System", "S", ColumnFormatHolder.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
+        //_ = x.Column.GenerateAndAdd("System", "S", ColumnFormatHolder.Bit, "Systemspalte\r\nIm Script nicht verfügbar");
         var inh = x.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.Text, "Inhalt");
         var kom = x.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Komentar");
 
