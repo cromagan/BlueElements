@@ -238,8 +238,12 @@ public class VariableCollection : IEnumerable<Variable> {
         return vf.ValueString;
     }
 
-    public Variable? GetSystem(string name) => _internal.FirstOrDefault(thisv =>
-        thisv.SystemVariable && thisv.KeyName.ToUpper() == "*" + name.ToUpper());
+    public Variable? GetSystem(string name) {
+        name = name.Trim("*").ToUpper();
+
+        return _internal.FirstOrDefault(thisv =>
+            thisv.SystemVariable && thisv.KeyName.ToUpper() == "*" + name);
+    }
 
     public bool Remove(Variable v) {
         if (ReadOnly) { return false; }
