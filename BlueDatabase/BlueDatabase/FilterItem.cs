@@ -191,7 +191,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         if (type == _filterType && !svl.IsDifferentTo(_searchValue)) { return; }
         OnChanging();
         _filterType = type;
-        _searchValue = svl.SortedDistinctList().AsReadOnly();
+        _searchValue = svl.AsReadOnly();
         OnChanged();
     }
 

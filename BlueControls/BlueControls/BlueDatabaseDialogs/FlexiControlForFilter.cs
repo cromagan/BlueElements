@@ -173,6 +173,8 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
     private void Filter_Changed(object sender, System.EventArgs e) => UpdateFilterData();
 
     private void UpdateFilterData() {
+        RemoveAll();
+
         if (Filter.Column == null) {
             DisabledReason = "Bezug zum Filter verloren.";
             Caption = string.Empty;
