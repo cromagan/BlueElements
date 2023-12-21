@@ -725,7 +725,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
             #region Script ausführen
 
-            var scp = new ScriptProperties(allowedMethods, true, s.Attributes());
+            var scp = new ScriptProperties(allowedMethods, true, s.Attributes(), this);
             Script sc = new(vars, string.Empty, scp) {
                 ScriptText = s.ScriptText
             };
@@ -735,7 +735,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
             #region Variablen zurückschreiben und Special Rules ausführen
 
-            if (sc.ChangeValues && scf.AllOk) {
+            if (sc.Properties.ChangeValues && scf.AllOk) {
                 Variables = VariableCollection.Combine(Variables, vars, "FRM_");
             }
 

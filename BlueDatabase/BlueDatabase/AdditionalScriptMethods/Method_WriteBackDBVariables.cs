@@ -53,7 +53,7 @@ public class Method_WriteBackDbVariables : Method_Database {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var db = MyDatabase(varCol);
+        var db = MyDatabase(scp);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }

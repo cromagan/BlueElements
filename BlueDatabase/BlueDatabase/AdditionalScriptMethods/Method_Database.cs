@@ -36,9 +36,8 @@ public abstract class Method_Database : Method {
 
     #region Methods
 
-    protected static DatabaseAbstract? MyDatabase(VariableCollection variables) {
-        var f = variables.GetSystem("Database");
-        if (f is VariableDatabase db) { return db.Database; }
+    protected static DatabaseAbstract? MyDatabase(ScriptProperties scp) {
+        if (scp.AdditionalInfo is DatabaseAbstract db) { return db; }
         return null;
     }
 
@@ -48,17 +47,17 @@ public abstract class Method_Database : Method {
         return null;
     }
 
-    protected ColumnItem? Column(VariableCollection variables, SplittedAttributesFeedback attvar, int no) {
+    protected ColumnItem? Column(ScriptProperties scp, SplittedAttributesFeedback attvar, int no) {
         var c = attvar.Attributes[no];
         if (c == null) { return null; }
 
-        return MyDatabase(variables)?.Column.Exists(c.KeyName);
+        return MyDatabase(scp)?.Column.Exists(c.KeyName);
     }
 
-    protected DatabaseAbstract? DatabaseOf(VariableCollection variables, string tableName) {
+    protected DatabaseAbstract? DatabaseOf(ScriptProperties scp, string tableName) {
         if (!IsValidTableName(tableName, false)) { return null; }
 
-        var db = MyDatabase(variables)?.ConnectionDataOfOtherTable(tableName, false);
+        var db = MyDatabase(scp)?.ConnectionDataOfOtherTable(tableName, false);
         return GetById(db, false, null, true); // Freezed unnötog, da eh keine Scripte ausgeführt werden.
     }
 

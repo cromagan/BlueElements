@@ -49,7 +49,7 @@ public class Method_Lookup : Method_Database {
             return DoItFeedback.AttributFehler(infos.Data, this, attvar);
         }
 
-        var db = DatabaseOf(varCol, attvar.ValueStringGet(0));
+        var db = DatabaseOf(scp, attvar.ValueStringGet(0));
         if (db == null) {
             return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden");
         }

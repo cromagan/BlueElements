@@ -49,7 +49,7 @@ internal class Method_MatchColumnFormat : Method_Database {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var column = Column(varCol, attvar, 1);
+        var column = Column(scp, attvar, 1);
         if (column == null || column.IsDisposed) { return new DoItFeedback(infos.Data, "Spalte in Datenbank nicht gefunden"); }
 
         var tocheck = new List<string>();

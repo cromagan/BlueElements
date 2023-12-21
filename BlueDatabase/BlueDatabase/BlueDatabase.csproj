@@ -102,7 +102,6 @@
     <Compile Include="AdditionalScriptMethods\Method_Lookup.cs" />
     <Compile Include="AdditionalScriptMethods\Method_Filter.cs" />
     <Compile Include="AdditionalScriptMethods\Method_SetError.cs" />
-    <Compile Include="AdditionalScriptMethods\VariableDatabase.cs" />
     <Compile Include="AdditionalScriptMethods\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptMethods\VariableFilterItem.cs" />
     <Compile Include="DatabaseMU.cs" />

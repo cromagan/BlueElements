@@ -1049,14 +1049,14 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
             vars.Add(new VariableString("User", UserName, true, false, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
             vars.Add(new VariableString("Usergroup", UserGroup, true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
             vars.Add(new VariableBool("Administrator", IsAdministrator(), true, false, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-            vars.Add(new VariableDatabase("Database", this, true, true, "Die Datenbank, die zu dem Skript gehört"));
+            //vars.Add(new VariableDatabase("Database", this, true, true, "Die Datenbank, die zu dem Skript gehört"));
             vars.Add(new VariableString("Tablename", TableName, true, false, "Der aktuelle Tabellenname."));
             vars.Add(new VariableBool("ReadOnly", ReadOnly, true, false, "Ob die aktuelle Datenbank schreibgeschützt ist."));
             vars.Add(new VariableFloat("Rows", Row.Count, true, false, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
             vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, false, "Der Name der ersten Spalte"));
             vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula), true, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
 
-            vars.Add(new VariableListString("Attributes", attributes, true, true, "Enthält - falls übergeben worden - die Attribute aus dem Skript, das dieses hier aufruft."));
+            //vars.Add(new VariableListString("Attributes", attributes, true, true, "Enthält - falls übergeben worden - die Attribute aus dem Skript, das dieses hier aufruft."));
 
             #endregion
 
@@ -1083,7 +1083,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             #region Script ausführen
 
-            var scp = new ScriptProperties(allowedMethods, changevalues, s.Attributes());
+            var scp = new ScriptProperties(allowedMethods, changevalues, s.Attributes(), this);
 
             Script sc = new(vars, AdditionalFilesPfadWhole(), scp) {
                 ScriptText = s.ScriptText
@@ -1094,7 +1094,7 @@ public abstract class DatabaseAbstract : IDisposableExtendedWithEvent, IHasKeyNa
 
             #region Variablen zurückschreiben und Special Rules ausführen
 
-            if (sc.ChangeValues && changevalues && scf.AllOk) {
+            if (sc.Properties.ChangeValues && changevalues && scf.AllOk) {
                 if (row != null && !row.IsDisposed) {
                     if (Column.SysRowChangeDate is not ColumnItem) {
                         return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, s.KeyName);

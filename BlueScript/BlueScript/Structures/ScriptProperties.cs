@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Generic;
 using BlueScript.Enums;
 
@@ -24,22 +26,25 @@ public class ScriptProperties {
 
     #region Constructors
 
-    public ScriptProperties(MethodType allowedMethods, bool changeValues, List<string> scriptAttributes) {
+    public ScriptProperties(MethodType allowedMethods, bool changeValues, List<string> scriptAttributes, object? additionalInfo) {
         AllowedMethods = allowedMethods;
         ChangeValues = changeValues;
         ScriptAttributes = scriptAttributes;
+        AdditionalInfo = additionalInfo;
     }
 
     public ScriptProperties(ScriptProperties scriptProperties, MethodType allowedMethods) {
         AllowedMethods = allowedMethods;
         ChangeValues = scriptProperties.ChangeValues;
         ScriptAttributes = scriptProperties.ScriptAttributes;
+        AdditionalInfo = scriptProperties.AdditionalInfo;
     }
 
     #endregion
 
     #region Properties
 
+    public object? AdditionalInfo { get; }
     public bool ChangeValues { get; }
 
     /// <summary>

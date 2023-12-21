@@ -61,7 +61,7 @@ internal class Method_Export : Method_Database {
 
         #region  Datebank ermitteln (db)
 
-        var db = MyDatabase(varCol);
+        var db = MyDatabase(scp);
 
         if (db == null || allFi.Database != db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 

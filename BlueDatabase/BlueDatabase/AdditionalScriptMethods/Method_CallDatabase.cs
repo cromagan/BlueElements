@@ -61,7 +61,7 @@ public class Method_CallDatabase : Method_Database {
         if (see is not VariableBool seet) { return new DoItFeedback(infos.Data, "SetErrorEnabled Variable nicht gefunden"); }
         if (seet.ValueBool) { return new DoItFeedback(infos.Data, "'CallDatabase' bei FehlerCheck Routinen nicht erlaubt."); }
 
-        var db = DatabaseOf(varCol, attvar.ValueStringGet(0));
+        var db = DatabaseOf(scp, attvar.ValueStringGet(0));
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbank '" + attvar.ValueStringGet(0) + "' nicht gefunden"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);

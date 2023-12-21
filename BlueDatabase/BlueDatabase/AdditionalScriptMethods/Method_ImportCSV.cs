@@ -51,7 +51,7 @@ internal class Method_ImportCsv : Method_Database {
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
-        var db = MyDatabase(varCol);
+        var db = MyDatabase(scp);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var m = db.EditableErrorReason(EditableErrorReasonType.EditAcut);

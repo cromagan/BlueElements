@@ -47,26 +47,20 @@ public class Script {
         }
 
         ReducedScriptText = string.Empty;
-        ChangeValues = scp.ChangeValues;
+
         Variables = variablen ?? [];
-        AllowedMethods = scp.AllowedMethods;
+        Properties = scp;
 
         if (!string.IsNullOrEmpty(additionalFilesPath)) {
             Variables.Add(new VariableString("AdditionalFilesPfad", (additionalFilesPath.Trim("\\") + "\\").CheckPath(), true, false, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
         }
-
-        Attributes = scp.ScriptAttributes;
     }
 
     #endregion
 
     #region Properties
 
-    public MethodType AllowedMethods { get; }
-    public List<string> Attributes { get; }
-
-    public bool ChangeValues { get; }
-
+    public ScriptProperties Properties { get; }
     public string ReducedScriptText { get; private set; }
     public string ScriptText { get; set; } = string.Empty;
 
@@ -128,7 +122,6 @@ public class Script {
                 if (expectedvariablefeedback) {
                     return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), ld);
                 } else {
-
                     return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), ld);
                 }
             }
@@ -228,9 +221,7 @@ public class Script {
             return new ScriptEndedFeedback(error, false, true, subname);
         }
 
-        var scp = new ScriptProperties(AllowedMethods, ChangeValues, Attributes);
-
-        return Parse(Variables, scp, ReducedScriptText, lineadd, subname);
+        return Parse(Variables, Properties, ReducedScriptText, lineadd, subname);
     }
 
     #endregion

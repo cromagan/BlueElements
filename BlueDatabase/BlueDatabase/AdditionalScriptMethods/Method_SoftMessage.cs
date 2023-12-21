@@ -49,7 +49,7 @@ public class Method_SoftMessage : Method_Database {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var db = MyDatabase(varCol);
+        var db = MyDatabase(scp);
         if (db == null) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
