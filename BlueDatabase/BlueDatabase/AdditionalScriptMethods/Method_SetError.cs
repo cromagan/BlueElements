@@ -55,7 +55,7 @@ public class Method_SetError : Method_Database {
         if (see is not VariableBool seet) { return new DoItFeedback(infos.Data, "SetErrorEnabled Variable nicht gefunden"); }
         if (!seet.ValueBool) { return new DoItFeedback(infos.Data, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }
 
-        var r = MyRow(varCol);
+        var r = MyRow(scp);
         if (r == null || r.IsDisposed) { return new DoItFeedback(infos.Data, "Interner Fehler, Zeile nicht gefunden"); }
 
         r.LastCheckedRowFeedback ??= [];

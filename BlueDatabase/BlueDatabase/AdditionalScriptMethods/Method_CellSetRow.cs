@@ -58,7 +58,7 @@ public class Method_CellSetRow : Method_Database {
         if (!string.IsNullOrEmpty(m)) { return new DoItFeedback(infos.Data, "Datenbank-Meldung: " + m); }
         if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zellen setzen Testmodus deaktiviert."); }
 
-        if (row == MyRow(varCol)) {
+        if (row == MyRow(scp)) {
             return new DoItFeedback(infos.Data, "Die eigene Zelle kann nur über die Variabeln geändert werden.");
         }
 

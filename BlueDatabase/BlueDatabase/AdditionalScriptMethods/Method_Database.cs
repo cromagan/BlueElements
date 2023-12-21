@@ -38,12 +38,12 @@ public abstract class Method_Database : Method {
 
     protected static Database? MyDatabase(ScriptProperties scp) {
         if (scp.AdditionalInfo is Database db) { return db; }
+        if (scp.AdditionalInfo is RowItem r) { return r.Database; }
         return null;
     }
 
-    protected static RowItem? MyRow(VariableCollection variables) {
-        var f = variables.GetSystem("RowKey");
-        if (f is VariableRowItem db) { return db.RowItem; }
+    protected static RowItem? MyRow(ScriptProperties scp) {
+        if (scp.AdditionalInfo is RowItem r) { return r; }
         return null;
     }
 
