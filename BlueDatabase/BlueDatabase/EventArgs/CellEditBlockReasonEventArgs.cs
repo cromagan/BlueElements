@@ -17,11 +17,11 @@
 
 namespace BlueDatabase.EventArgs;
 
-public class CellEditBlockReasonEventArgs : CellEventArgs {
+public class CellEditBlockReasonEventArgs : CellNullableEventArgs {
 
     #region Constructors
 
-    public CellEditBlockReasonEventArgs(ColumnItem column, RowItem row, string blockReason) : base(column, row) => BlockReason = blockReason;
+    public CellEditBlockReasonEventArgs(ColumnItem? column, RowItem? row, string blockReason) : base(column, row) => BlockReason = blockReason;
 
     #endregion
 

@@ -20,7 +20,7 @@ using BlueBasics.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using static BlueBasics.Extensions;
-using static BlueBasics.Interfaces.IParseableExtension;
+using static BlueBasics.Interfaces.ParseableExtension;
 using static BlueBasics.Constants;
 
 namespace BlueScript.Variables;

@@ -98,7 +98,7 @@ public sealed class ColumnViewItem : IParseable {
         return newContentWidth;
     }
 
-    public int Column_DrawWidth(Rectangle displayRectangleWoSlider, int pix16, Font cellFont) {
+    public int DrawWidth(Rectangle displayRectangleWoSlider, int pix16, Font cellFont) {
         // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
 
         if (Column == null) { return 0; }

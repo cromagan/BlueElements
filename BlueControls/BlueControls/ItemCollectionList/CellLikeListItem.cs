@@ -21,7 +21,6 @@ using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollectionList;
 

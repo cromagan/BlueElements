@@ -808,7 +808,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             //SaveToByteList(l, DatabaseDataType.FileEncryptionKey, _fileEncryptionKey);
             SaveToByteList(l, DatabaseDataType.Creator, db.Creator);
             SaveToByteList(l, DatabaseDataType.CreateDateUTC, db.CreateDate);
-            SaveToByteList(l, DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString(Constants.Format_Date7, CultureInfo.InvariantCulture));
+            SaveToByteList(l, DatabaseDataType.FileStateUTCDate, fileStateUtcDateToSave.ToString(Format_Date7, CultureInfo.InvariantCulture));
             SaveToByteList(l, DatabaseDataType.Caption, db.Caption);
 
             SaveToByteList(l, DatabaseDataType.TemporaryDatabaseMasterUser, db.TemporaryDatabaseMasterUser);
@@ -819,7 +819,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             SaveToByteList(l, DatabaseDataType.Tags, db.Tags.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.PermissionGroupsNewRow, db.PermissionGroupsNewRow.JoinWithCr());
             SaveToByteList(l, DatabaseDataType.DatabaseAdminGroups, db.DatenbankAdmin.JoinWithCr());
-            SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToString(Constants.Format_Float1));
+            SaveToByteList(l, DatabaseDataType.GlobalScale, db.GlobalScale.ToString(Format_Float1));
             //SaveToByteList(l, DatabaseDataType.Ansicht, ((int)_ansicht).ToString(false));
             //SaveToByteList(l, DatabaseDataType.ReloadDelaySecond, ReloadDelaySecond.ToString(false));
             //SaveToByteList(l, DatabaseDataType.RulesScript, db.RulesScript);

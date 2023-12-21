@@ -88,7 +88,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         SheetSizeInMm = Size.Empty;
         RandinMm = Padding.Empty;
         _idCount++;
-        Caption = "#" + DateTime.UtcNow.ToString(Constants.Format_Date, CultureInfo.InvariantCulture) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
+        Caption = "#" + DateTime.UtcNow.ToString(Format_Date, CultureInfo.InvariantCulture) + _idCount; // # ist die erkennung, dass es kein Dateiname sondern ein Item ist
         if (Skin.StyleDb == null) { Skin.InitStyles(); }
         _sheetStyle = null;
         _sheetStyleScale = 1f;
@@ -97,7 +97,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
     }
 
-    public ItemCollectionPad(string layoutFileName) : this(File.ReadAllText(layoutFileName, Constants.Win1252), string.Empty) => Connections.CollectionChanged += ConnectsTo_CollectionChanged;
+    public ItemCollectionPad(string layoutFileName) : this(File.ReadAllText(layoutFileName, Win1252), string.Empty) => Connections.CollectionChanged += ConnectsTo_CollectionChanged;
 
     /// <summary>
     ///

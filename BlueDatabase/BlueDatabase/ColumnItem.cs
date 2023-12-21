@@ -1000,9 +1000,9 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public static bool IsValidColumnName(string name) {
         if (string.IsNullOrWhiteSpace(name)) { return false; }
 
-        if (!name.ContainsOnlyChars(Constants.AllowedCharsVariableName)) { return false; }
+        if (!name.ContainsOnlyChars(AllowedCharsVariableName)) { return false; }
 
-        if (!Constants.Char_AZ.Contains(name.Substring(0, 1).ToUpper())) { return false; }
+        if (!Char_AZ.Contains(name.Substring(0, 1).ToUpper())) { return false; }
         if (name.Length > 128) { return false; }
 
         if (name.ToUpper() == "USER") { return false; } // SQL System-Name
@@ -1415,7 +1415,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         foreach (var thisS in _permissionGroupsChangeCell) {
             if (thisS.Contains("|")) { return "Unerlaubtes Zeichen bei den Gruppen, die eine Zelle bearbeiten dürfen."; }
-            if (string.Equals(thisS, Constants.Administrator, StringComparison.OrdinalIgnoreCase)) { return "'#Administrator' bei den Bearbeitern entfernen."; }
+            if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return "'#Administrator' bei den Bearbeitern entfernen."; }
         }
         if (_dropdownBearbeitungErlaubt || tmpEditDialog == EditTypeTable.Dropdown_Single) {
             if (_format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
@@ -2111,7 +2111,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    internal static string MakeValidColumnName(string columnname) => columnname.ToUpper().Replace(" ", "_").ReduceToChars(Constants.AllowedCharsVariableName);
+    internal static string MakeValidColumnName(string columnname) => columnname.ToUpper().Replace(" ", "_").ReduceToChars(AllowedCharsVariableName);
 
     internal string EditableErrorReason(EditableErrorReasonType mode, bool checkEditmode) {
         if (Database is not Database db || db.IsDisposed) { return "Die Datenbank wurde verworfen."; }

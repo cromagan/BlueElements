@@ -19,7 +19,7 @@ using BlueBasics.Enums;
 
 namespace BlueBasics.Interfaces;
 
-public static class IParseableExtension {
+public static class ParseableExtension {
 
     #region Methods
 

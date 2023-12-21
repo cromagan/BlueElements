@@ -20,7 +20,6 @@ namespace BlueControls.Controls
             this.BTB = new TextBox();
             this.SliderX = new Slider();
             this.SliderY = new Slider();
-            this.ColDia = new ColorDialog();
             this.SuspendLayout();
             // 
             // BCB
@@ -87,6 +86,5 @@ namespace BlueControls.Controls
         private TextBox BTB;
         private Slider SliderX;
         private Slider SliderY;
-        private ColorDialog ColDia;
     }
 }

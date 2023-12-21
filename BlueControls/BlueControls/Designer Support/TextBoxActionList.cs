@@ -7,13 +7,12 @@ public sealed class TextBoxActionList : DesignerActionList {
 
     #region Constructors
 
-    public TextBoxActionList(IComponent component) : base(component) {
+    public TextBoxActionList(IComponent component) : base(component) =>
         // Save a reference to the control we are designing.
         // Save a reference to the DesignerActionUIService
         //  DesignerService = ctypex(GetService(GetType(DesignerActionUIService)), DesignerActionUIService)
         //Makes the Smart Tags open automatically
         AutoShow = true;
-    }
 
     #endregion
 

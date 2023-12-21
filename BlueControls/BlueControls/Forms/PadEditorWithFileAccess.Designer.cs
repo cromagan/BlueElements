@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows.Forms;
 using BlueControls.Controls;
 using Button = BlueControls.Controls.Button;

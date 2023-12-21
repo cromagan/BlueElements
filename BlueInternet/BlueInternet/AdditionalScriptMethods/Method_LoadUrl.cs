@@ -15,21 +15,22 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
 using BlueBasics;
+using BlueDatabase.AdditionalScriptMethods;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using CefSharp;
 using CefSharp.OffScreen;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using BlueDatabase.AdditionalScriptMethods;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_LoadUrl : Method_WebPage {
 
     #region Fields
@@ -94,7 +95,7 @@ internal class Method_LoadUrl : Method_WebPage {
 
         CefSharpSettings.SubprocessExitIfParentProcessClosed = true;
 
-        var settings = new CefSettings() {
+        var settings = new CefSettings {
             CachePath = Path.Combine(Environment.GetFolderPath(
                 Environment.SpecialFolder.LocalApplicationData), "CefSharp\\Cache")
         };

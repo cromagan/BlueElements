@@ -19,7 +19,6 @@ using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.ItemCollectionList;
 

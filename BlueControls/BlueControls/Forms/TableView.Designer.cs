@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows.Forms;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Controls;
@@ -8,7 +7,6 @@ using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
 using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
-using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.Forms {
     partial class TableView {

@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
-using System.Globalization;
 using BlueBasics;
 using BlueScript.Enums;
 using BlueScript.Structures;

@@ -110,6 +110,7 @@
     <Compile Include="Enums\Reason.cs" />
     <Compile Include="EventArgs\CellEditBlockReasonEventArgs.cs" />
     <Compile Include="EventArgs\CellChangedEventArgs.cs" />
+    <Compile Include="EventArgs\CellNullableEventArgs.cs" />
     <Compile Include="EventArgs\ColumnEventArgs.cs" />
     <Compile Include="ColumnFormatHolder.cs" />
     <Compile Include="DatabaseScriptDescription.cs" />

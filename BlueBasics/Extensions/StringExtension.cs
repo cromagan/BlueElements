@@ -15,14 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using static BlueBasics.Converter;
 using static BlueBasics.Constants;
 
@@ -65,33 +65,33 @@ public static partial class Extensions {
     }
 
     public static string CompareKey(this string isValue, SortierTyp format) {
-        var compareKeySOk = Constants.SecondSortChar + "X";
-        var compareKeySNok = Constants.SecondSortChar + "A";
+        var compareKeySOk = SecondSortChar + "X";
+        var compareKeySNok = SecondSortChar + "A";
 
         switch (format) {
             case SortierTyp.ZahlenwertInt:
                 if (string.IsNullOrEmpty(isValue)) { return compareKeySNok + "A0000000000"; }
                 if (IntTryParse(isValue, out var w)) {
                     return w >= 0
-                        ? compareKeySOk + "A" + w.ToString(Constants.Format_Integer10)
-                        : compareKeySOk + w.ToString(Constants.Format_Integer10);
+                        ? compareKeySOk + "A" + w.ToString(Format_Integer10)
+                        : compareKeySOk + w.ToString(Format_Integer10);
                 }
 
                 return compareKeySNok + isValue;
 
             case SortierTyp.Original_String:
-                return Constants.SecondSortChar + isValue;
+                return SecondSortChar + isValue;
 
             case SortierTyp.Sprachneutral_String:
 
                 if (string.IsNullOrEmpty(isValue)) { return string.Empty; }
 
-                return Constants.SecondSortChar + isValue.Sprachneutral();
+                return SecondSortChar + isValue.Sprachneutral();
 
             case SortierTyp.ZahlenwertFloat:
                 if (string.IsNullOrEmpty(isValue)) { return "A0000000000,000"; }
                 if (DoubleTryParse(isValue, out var dw)) {
-                    var t = dw.ToString(Constants.Format_Float10_3);
+                    var t = dw.ToString(Format_Float10_3);
                     if (!t.Contains(",")) { t += ",000"; }
 
                     if (dw >= 0) { t = "A" + t; }
@@ -102,11 +102,11 @@ public static partial class Extensions {
                 return compareKeySNok + isValue;
 
             case SortierTyp.Datum_Uhrzeit:
-                return DateTimeTryParse(isValue, out var d) ? compareKeySNok + d.ToString(Constants.Format_Date, CultureInfo.InvariantCulture) : compareKeySNok + isValue;
+                return DateTimeTryParse(isValue, out var d) ? compareKeySNok + d.ToString(Format_Date, CultureInfo.InvariantCulture) : compareKeySNok + isValue;
 
             default:
                 Develop.DebugPrint(format);
-                return Constants.SecondSortChar + isValue;
+                return SecondSortChar + isValue;
         }
     }
 
@@ -358,7 +358,7 @@ public static partial class Extensions {
 
     public static bool IsDouble(this string? txt) => txt is not null && DoubleTryParse(txt, out _);
 
-    public static bool IsHtmlColorCode(this string? txt) => txt != null && !string.IsNullOrEmpty(txt) && txt.Length is 6 or 8 && txt.ContainsOnlyChars(Constants.Char_Numerals + "abcdefABCDEF");
+    public static bool IsHtmlColorCode(this string? txt) => txt != null && !string.IsNullOrEmpty(txt) && txt.Length is 6 or 8 && txt.ContainsOnlyChars(Char_Numerals + "abcdefABCDEF");
 
     public static bool IsLong(this string? txt) => txt is not null && LongTryParse(txt, out _);
 
@@ -731,7 +731,7 @@ public static partial class Extensions {
     //    return tXT.Substring(FirstCharAfterEquals, CurrentChar - FirstCharAfterEquals + 1);
     //}
     public static string StarkeVereinfachung(this string tXt, string additinalAllowed) {
-        tXt = tXt.ToLower().ReduceToChars(Constants.Char_Numerals + Constants.Char_Buchstaben + additinalAllowed);
+        tXt = tXt.ToLower().ReduceToChars(Char_Numerals + Char_Buchstaben + additinalAllowed);
         tXt = tXt.Replace("ä", "ae");
         tXt = tXt.Replace("ö", "oe");
         tXt = tXt.Replace("ü", "ue");

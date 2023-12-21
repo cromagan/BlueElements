@@ -15,12 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+//using CefSharp.WinForms;
 using System;
 using BlueScript.Structures;
-
-//using CefSharp.WinForms;
 using CefSharp.OffScreen;
-using static BlueBasics.Interfaces.IParseableExtension;
+using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
 

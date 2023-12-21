@@ -66,7 +66,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
         }
     }
 
-    public string CompareKey => CheckOrder.ToString(Constants.Format_Integer3) + "|" + KeyName.ToUpper();
+    public string CompareKey => CheckOrder.ToString(Format_Integer3) + "|" + KeyName.ToUpper();
     public abstract bool GetFromStringPossible { get; }
 
     public abstract bool IsNullOrEmpty { get; }
@@ -206,7 +206,7 @@ public abstract class Variable : ParsebleItem, IComparable, IParseable, ICloneab
     public static bool IsValidName(string v) {
         v = v.ToLower();
         var vo = v;
-        v = v.ReduceToChars(Constants.AllowedCharsVariableName);
+        v = v.ReduceToChars(AllowedCharsVariableName);
         return v == vo && !string.IsNullOrEmpty(v);
     }
 

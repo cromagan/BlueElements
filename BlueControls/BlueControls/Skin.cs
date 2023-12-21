@@ -29,7 +29,6 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using static BlueBasics.Polygons;
-using Size = System.Drawing.Size;
 
 //  = A3 & ".Design.GenerateAndAdd(enStates."&B3&", enKontur."& C3 & ", " &D3&", "&E3&", "&F3&","&G3&", enHintergrundArt."&H3&","&I3&",'"&J3&"','"&K3&"','"&L3&"',enRahmenArt."&M3&",'"&N3&"','"&O3&"','"&P3&"','"&Q3&"','"&R3&"');"
 
@@ -836,9 +835,9 @@ public static class Skin {
     public const int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2);
     public static Database? StyleDb;
-    internal static Pen? PenLinieDick;
-    internal static Pen? PenLinieDünn;
-    internal static Pen? PenLinieKräftig;
+    internal static Pen PenLinieDick = Pens.Red;
+    internal static Pen PenLinieDünn = Pens.Red;
+    internal static Pen PenLinieKräftig = Pens.Red;
     private const string ErrorFont = "<Name=Arial, Size=8, Color=FF0000>";
     private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = [];
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
@@ -1160,7 +1159,7 @@ public static class Skin {
         }
         if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, translate); }
         if (bFont != null) {
-            if (fitInRect.Width > 0) { txt = BlueFont.TrimByWidth((Font)bFont, txt, fitInRect.Width - pSize.Width); }
+            if (fitInRect.Width > 0) { txt = BlueFont.TrimByWidth(bFont, txt, fitInRect.Width - pSize.Width); }
             tSize = gr.MeasureString(txt, (Font)bFont);
         }
         if (align.HasFlag(Alignment.Right)) { xp = fitInRect.Width - pSize.Width - tSize.Width; }

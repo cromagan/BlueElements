@@ -90,8 +90,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void btnAktuelleAnsichtLoeschen_Click(object sender, System.EventArgs e) {
         if (Database is not Database db || db.IsDisposed || _arrangement < 2 || _arrangement >= db.ColumnArrangements.Count) { return; }
 
-        var ca = CloneOfCurrentArrangement;
-        if (ca == null) { return; }
+        if (CloneOfCurrentArrangement is not ColumnViewCollection ca) { return; }
 
         if (MessageBox.Show("Anordung <b>'" + ca.KeyName + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         var car = db.ColumnArrangements.CloneWithClones();
@@ -103,8 +102,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnAlleSpaltenEinblenden_Click(object sender, System.EventArgs e) {
-        var ca = CloneOfCurrentArrangement;
-        if (ca == null) { return; }
+        if (CloneOfCurrentArrangement is not ColumnViewCollection ca) { return; }
 
         if (MessageBox.Show("Alle Spalten anzeigen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         ca.ShowAllColumns();
@@ -114,8 +112,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
-        var ca = CloneOfCurrentArrangement;
-        if (ca == null) { return; }
+        if (CloneOfCurrentArrangement is not ColumnViewCollection ca) { return; }
 
         var n = InputBox.Show("Umbenennen:", ca.KeyName, FormatHolder.Text);
         if (string.IsNullOrEmpty(n)) { return; }
@@ -127,8 +124,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
     private void btnBerechtigungsgruppen_Click(object sender, System.EventArgs e) {
         if (Database is not Database db || db.IsDisposed) { return; }
-        var ca = CloneOfCurrentArrangement;
-        if (ca == null) { return; }
+        if (CloneOfCurrentArrangement is not ColumnViewCollection ca) { return; }
 
         ItemCollectionList.ItemCollectionList aa = new(true);
         aa.AddRange(db.Permission_AllUsed(false));
@@ -237,8 +233,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     private void btnSpalteEinblenden_Click(object sender, System.EventArgs e) {
         if (Database is not Database db || db.IsDisposed) { return; }
 
-        var ca = CloneOfCurrentArrangement;
-        if (ca == null) { return; }
+        if (CloneOfCurrentArrangement is not ColumnViewCollection ca) { return; }
 
         ItemCollectionList.ItemCollectionList ic = new(true);
         foreach (var thisColumnItem in db.Column) {
@@ -257,8 +252,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     }
 
     private void btnSystemspaltenAusblenden_Click(object sender, System.EventArgs e) {
-        var ca = CloneOfCurrentArrangement;
-        if (ca == null) { return; }
+        if (CloneOfCurrentArrangement is not ColumnViewCollection ca) { return; }
 
         ca.HideSystemColumns();
         Change(_arrangement, ca);
@@ -439,8 +433,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         ColumnPadItem? anyitem = null;
 
-        var ca = CloneOfCurrentArrangement;
-        if (ca == null) { Generating = false; return; }
+        if (CloneOfCurrentArrangement is not ColumnViewCollection ca) { return; }
 
         #region Erst alle Spalten der eigenen Datenbank erzeugen, um später verweisen zu können
 

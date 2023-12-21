@@ -17,19 +17,19 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BlueBasics;
 using BlueDatabase.AdditionalScriptMethods;
 using BlueScript.Enums;
 using BlueScript.Structures;
 using BlueScript.Variables;
-
-//using CefSharp.WinForms;
 using CefSharp.OffScreen;
+//using CefSharp.WinForms;
 
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_WebPageSourceCode : Method_WebPage {
 
     #region Properties

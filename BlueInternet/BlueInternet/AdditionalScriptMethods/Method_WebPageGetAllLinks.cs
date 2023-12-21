@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using BlueDatabase.AdditionalScriptMethods;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -25,7 +26,7 @@ using CefSharp.OffScreen;
 namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
-[System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
+[SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
 internal class Method_WebPageGetAllLinks : Method_WebPage {
 
     #region Properties

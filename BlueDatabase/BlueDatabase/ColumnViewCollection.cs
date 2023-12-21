@@ -119,7 +119,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         #endregion
 
         var tmp = ca.PermissionGroups_Show.SortedDistinctList();
-        tmp.RemoveString(Constants.Administrator, false);
+        tmp.RemoveString(Administrator, false);
         //tmp.RemoveNullOrEmpty();
 
         switch (number) {
@@ -130,7 +130,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case 1:
                 if (string.IsNullOrEmpty(ca.KeyName)) { ca.KeyName = "Standard"; }
-                _ = tmp.AddIfNotExists(Constants.Everybody);
+                _ = tmp.AddIfNotExists(Everybody);
                 break;
         }
 
@@ -154,7 +154,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
-                if (xpos >= thisViewItem.OrderTmpSpalteX1 && xpos <= thisViewItem.OrderTmpSpalteX1 + thisViewItem.Column_DrawWidth(displayRectangleWithoutSlider, pix16, cellFont)) {
+                if (xpos >= thisViewItem.OrderTmpSpalteX1 && xpos <= thisViewItem.OrderTmpSpalteX1 + thisViewItem.DrawWidth(displayRectangleWithoutSlider, pix16, cellFont)) {
                     return thisViewItem.Column;
                 }
             }
@@ -375,7 +375,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         result.ParseableAdd("Columns", "Column", _internal);
 
         var tmp = PermissionGroups_Show.SortedDistinctList();
-        tmp.RemoveString(Constants.Administrator, false);
+        tmp.RemoveString(Administrator, false);
         result.ParseableAdd("Permissiongroups", tmp);
 
         return result.Parseable();

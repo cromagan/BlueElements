@@ -15,13 +15,14 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using BlueBasics;
 using BlueScript.Methods;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using CefSharp.OffScreen;
 using CefSharp;
+using CefSharp.OffScreen;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -47,7 +48,7 @@ public abstract class Method_WebPage : Method {
         return false;
     }
 
-    public static System.Threading.Tasks.Task<JavascriptResponse> DoTask(ChromiumWebBrowser wb, string script) {
+    public static Task<JavascriptResponse> DoTask(ChromiumWebBrowser wb, string script) {
         Generic.CollectGarbage();
 
         var task = wb.EvaluateScriptAsync(script);

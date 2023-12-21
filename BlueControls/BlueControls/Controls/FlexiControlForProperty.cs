@@ -325,11 +325,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case double db:
-                ValueSet(db.ToString(Constants.Format_Float2), true, false);
+                ValueSet(db.ToString(Format_Float2), true, false);
                 break;
 
             case float fl:
-                ValueSet(fl.ToString(Constants.Format_Float2), true, false);
+                ValueSet(fl.ToString(Format_Float2), true, false);
                 break;
 
             case Color co:

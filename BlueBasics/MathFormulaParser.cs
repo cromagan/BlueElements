@@ -36,7 +36,7 @@ public static class MathFormulaParser {
         formel = formel.Replace(" ", string.Empty);
         return string.IsNullOrEmpty(formel)
             ? null
-            : formel != formel.ReduceToChars(Constants.Char_Numerals + ".,()+-/*") ? null : ErgebnisCore(formel);
+            : formel != formel.ReduceToChars(Char_Numerals + ".,()+-/*") ? null : ErgebnisCore(formel);
     }
 
     public static int LastMinusIndex(string formel) {

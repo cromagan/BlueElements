@@ -19,7 +19,6 @@ using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueDatabase;
 using Form = BlueControls.Forms.Form;
@@ -77,14 +76,14 @@ public sealed partial class Search : Form {
         var searchT = SuchText();
         if (string.IsNullOrEmpty(searchT)) { return; }
         var found = _col;
-        var ca = _table.CurrentArrangement;
-        found ??= ca?.Last()?.Column;
-        var columnStarted = _col;
 
-        if (ca == null) {
+        if (_table.CurrentArrangement is not ColumnViewCollection ca) {
             MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
             return;
         }
+
+        found ??= ca.Last()?.Column;
+        var columnStarted = _col;
 
         do {
             found = ca.NextVisible(found) ?? ca.First()?.Column;

@@ -15,6 +15,23 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-namespace BlueBasics.Interfaces;
+namespace BlueDatabase.EventArgs;
 
-public interface IReadableTextWithChangingAndKey : IReadableTextWithKey, IReadableTextWithChanging, IHasKeyName;
+public class CellNullableEventArgs : System.EventArgs {
+
+    #region Constructors
+
+    public CellNullableEventArgs(ColumnItem? column, RowItem? row) {
+        Column = column;
+        Row = row;
+    }
+
+    #endregion
+
+    #region Properties
+
+    public ColumnItem? Column { get; }
+    public RowItem? Row { get; }
+
+    #endregion
+}

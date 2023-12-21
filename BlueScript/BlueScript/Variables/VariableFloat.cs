@@ -20,7 +20,7 @@ using BlueBasics.Enums;
 using BlueScript.Structures;
 using static BlueBasics.Converter;
 using static BlueBasics.Extensions;
-using static BlueBasics.Interfaces.IParseableExtension;
+using static BlueBasics.Interfaces.ParseableExtension;
 using static BlueBasics.Constants;
 
 namespace BlueScript.Variables;
@@ -61,7 +61,7 @@ public class VariableFloat : Variable {
     /// <summary>
     /// Der Zahlenwert mit maximal 5 Kommastellen (0.#####)
     /// </summary>
-    public override string ReadableText => _double.ToString(Constants.Format_Float5);
+    public override string ReadableText => _double.ToString(Format_Float5);
 
     public override bool ToStringPossible => true;
 

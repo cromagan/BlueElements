@@ -18,7 +18,7 @@
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Structures;
-using static BlueBasics.Interfaces.IParseableExtension;
+using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
 

@@ -1,5 +1,4 @@
-﻿
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using System.ComponentModel;
 
 namespace BeCreative {

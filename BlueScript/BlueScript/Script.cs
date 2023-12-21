@@ -20,7 +20,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using BlueBasics;
-using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -121,9 +120,9 @@ public class Script {
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
                 if (expectedvariablefeedback) {
                     return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), ld);
-                } else {
-                    return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), ld);
                 }
+
+                return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), ld);
             }
         }
 

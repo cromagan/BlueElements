@@ -1,6 +1,4 @@
-﻿
-
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Drawing;
 
 namespace BluePaint

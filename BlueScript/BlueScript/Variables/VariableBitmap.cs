@@ -18,7 +18,7 @@
 using System;
 using System.Drawing;
 using BlueScript.Structures;
-using static BlueBasics.Interfaces.IParseableExtension;
+using static BlueBasics.Interfaces.ParseableExtension;
 
 namespace BlueScript.Variables;
 
