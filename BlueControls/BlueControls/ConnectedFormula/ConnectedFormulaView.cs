@@ -181,7 +181,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
     }
 
-    public void GetConnectedFormulaFromDatabase(DatabaseAbstract? database) {
+    public void GetConnectedFormulaFromDatabase(Database? database) {
         if (database != null && !database.IsDisposed) {
             var f = database.FormulaFileName();
 
@@ -197,7 +197,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         ConnectedFormula = null;
     }
 
-    public void InitFormula(ConnectedFormula.ConnectedFormula? cf, DatabaseAbstract? database) {
+    public void InitFormula(ConnectedFormula.ConnectedFormula? cf, Database? database) {
         if (IsDisposed) { return; }
 
         var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
@@ -224,13 +224,13 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
 
         if (FilterOutput.Database != database) {
-            if (FilterOutput.Database is DatabaseAbstract db1) {
+            if (FilterOutput.Database is Database db1) {
                 db1.DisposingEvent -= _Database_DisposingEvent;
             }
             InvalidateView();
             FilterOutput.Database = database;
 
-            if (FilterOutput.Database is DatabaseAbstract db2) {
+            if (FilterOutput.Database is Database db2) {
                 db2.DisposingEvent += _Database_DisposingEvent;
             }
         }

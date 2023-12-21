@@ -127,7 +127,7 @@ public partial class Form : System.Windows.Forms.Form {
         if (IsClosed) { return; }
 
         if (this is not FloatingForm and not MessageBox) {
-            DatabaseAbstract.ForceSaveAll();
+            Database.ForceSaveAll();
             MultiUserFile.ForceLoadSaveAll();
         }
 

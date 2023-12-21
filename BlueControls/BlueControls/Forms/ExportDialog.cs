@@ -49,11 +49,11 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Constructors
 
-    public ExportDialog(DatabaseAbstract db, string autosaveFile) : this(db, null, autosaveFile) { }
+    public ExportDialog(Database db, string autosaveFile) : this(db, null, autosaveFile) { }
 
-    public ExportDialog(DatabaseAbstract db, List<RowItem>? rows) : this(db, rows, string.Empty) { }
+    public ExportDialog(Database db, List<RowItem>? rows) : this(db, rows, string.Empty) { }
 
-    public ExportDialog(DatabaseAbstract db, List<RowItem>? rows, string autosaveFile) {
+    public ExportDialog(Database db, List<RowItem>? rows, string autosaveFile) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -81,7 +81,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Properties
 
-    public DatabaseAbstract? Database { get; private set; }
+    public Database? Database { get; private set; }
 
     #endregion
 
@@ -89,7 +89,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Methods
 
-    public static void AddLayoutsOff(ItemCollectionList.ItemCollectionList addHere, DatabaseAbstract? db) {
+    public static void AddLayoutsOff(ItemCollectionList.ItemCollectionList addHere, Database? db) {
         if (db is null || db.IsDisposed) { return; }
         var r = db.GetAllLayouts();
 
@@ -254,7 +254,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Exported_ItemClicked(object sender, AbstractListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
 
     private string Fehler() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank verworfen"; }
+        if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
         if (_rowsForExport == null || _rowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
         if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
         //TODO: Schachteln implementieren

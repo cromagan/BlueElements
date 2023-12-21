@@ -39,16 +39,16 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     //TODO: Komentar wieder entfernen
     private string _coment = string.Empty;
 
-    private DatabaseAbstract? _database;
+    private Database? _database;
     private List<RowItem>? _rows;
 
     #endregion
 
     #region Constructors
 
-    public FilterCollection(string c) : this(null as DatabaseAbstract, c) { }
+    public FilterCollection(string c) : this(null as Database, c) { }
 
-    public FilterCollection(DatabaseAbstract? database, string c) {
+    public FilterCollection(Database? database, string c) {
         Database = database;
         _coment = c;
     }
@@ -77,7 +77,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public int Count => IsDisposed ? 0 : _internal.Count;
 
-    public DatabaseAbstract? Database {
+    public Database? Database {
         get => _database;
         set {
             if (IsDisposed) { return; }
@@ -107,7 +107,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             return f?.SearchValue[0] ?? string.Empty;
         }
         set {
-            if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+            if (Database is not Database db || db.IsDisposed) { return; }
 
             var f = this[null];
             if (f != null) {
@@ -123,7 +123,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public ReadOnlyCollection<RowItem> Rows {
         get {
-            if (Database is not DatabaseAbstract db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
+            if (Database is not Database db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
             _rows ??= CalculateFilteredRows();
             return _rows.AsReadOnly();
         }
@@ -131,7 +131,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public RowItem? RowSingleOrNull {
         get {
-            if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+            if (Database is not Database db || db.IsDisposed) { return null; }
             _rows ??= CalculateFilteredRows();
             return _rows.Count != 1 ? null : _rows[0];
         }
@@ -164,32 +164,32 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public void Add(string columnName, FilterType filterType, List<string> filterBy) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         Add(Database?.Column.Exists(columnName), filterType, filterBy);
     }
 
     //    Add(Database?.Column.Exists(columnName), filterType, filterBy);
     //}
     public void Add(ColumnItem? column, FilterType filterType, List<string> filterBy) {
-        if (column?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (column?.Database is not Database db || db.IsDisposed) { return; }
 
         AddIfNotExists(new FilterItem(column, filterType, filterBy));
     }
 
     //public void Add(string columnName, FilterType filterType, string filterBy) {
-    //    if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+    //    if (Database is not Database db || db.IsDisposed) { return; }
     public void Add(ColumnItem? column, FilterType filterType, string filterBy) {
-        if (column?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (column?.Database is not Database db || db.IsDisposed) { return; }
         AddIfNotExists(new FilterItem(column, filterType, filterBy));
     }
 
     //public void Add(FilterType filterType, List<string> filterBy) {
-    //    if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+    //    if (Database is not Database db || db.IsDisposed) { return; }
     //    AddIfNotExists(new FilterItem(Database, filterType, filterBy));
     //}
 
     //public void Add(FilterType filterType, string filterBy) {
-    //    if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+    //    if (Database is not Database db || db.IsDisposed) { return; }
     //    AddIfNotExists(new FilterItem(Database, filterType, filterBy));
     //}
     public void AddIfNotExists(FilterItem fi) {
@@ -424,7 +424,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private List<RowItem> CalculateFilteredRows() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return []; }
+        if (Database is not Database db || db.IsDisposed) { return []; }
         db.RefreshColumnsData(_internal);
 
         List<RowItem> tmpVisibleRows = [];
@@ -505,7 +505,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void RemoveOtherAndAddIfNotExists(ColumnItem column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         if (_rows == null) { return; }
         if (_rows.Contains(e.Row)) { _rows = null; }
     }

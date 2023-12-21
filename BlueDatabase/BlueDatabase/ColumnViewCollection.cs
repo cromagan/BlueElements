@@ -45,7 +45,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Constructors
 
-    public ColumnViewCollection(DatabaseAbstract? database, string toParse) {
+    public ColumnViewCollection(Database? database, string toParse) {
         Database = database;
         if (Database != null) {
             Database.DisposingEvent += Database_Disposing;
@@ -55,7 +55,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         this.Parse(toParse);
     }
 
-    public ColumnViewCollection(DatabaseAbstract database, string toParse, string newname) : this(database, toParse) => KeyName = newname;
+    public ColumnViewCollection(Database database, string toParse, string newname) : this(database, toParse) => KeyName = newname;
 
     #endregion
 
@@ -63,7 +63,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public int Count => _internal.Count;
 
-    public DatabaseAbstract? Database { get; private set; }
+    public Database? Database { get; private set; }
 
     //public event EventHandler? Changed;
     public bool IsDisposed { get; private set; }
@@ -104,7 +104,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     /// <param name="ca"></param>
     /// <param name="number"></param>
     public static void Repair(ColumnViewCollection ca, int number) {
-        if (ca.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (ca.Database is not Database db || db.IsDisposed) { return; }
 
         #region Ungültige Spalten entfernen
 
@@ -150,7 +150,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public object Clone() => new ColumnViewCollection(Database, ToString());
 
     public ColumnItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, int pix16, Font cellFont) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        if (Database is not Database db || db.IsDisposed) { return null; }
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
@@ -338,7 +338,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void RemoveAt(int z) => _internal.RemoveAt(z);
 
     public void ShowAllColumns() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisColumn in db.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed) {
@@ -348,7 +348,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public void ShowColumns(params string[] columnnames) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisColumn in columnnames) {
             var c = Database?.Column.Exists(thisColumn);

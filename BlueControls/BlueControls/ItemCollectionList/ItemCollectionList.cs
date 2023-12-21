@@ -210,7 +210,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
                 break;
         }
 
-        if (checkedItemsAtRow?.Database is DatabaseAbstract db) {
+        if (checkedItemsAtRow?.Database is Database db) {
             if (db.Row.Count > 0) {
                 if (!checkedItemsAtRow.CellIsNullOrEmpty(column)) {
                     if (column.MultiLine) {

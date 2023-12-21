@@ -51,7 +51,7 @@ public class Method_GenerateLayoutImage : Method_Database {
         #region  Meine Zeile ermitteln (r)
 
         var r = MyRow(varCol);
-        if (r?.Database is not DatabaseAbstract db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Zeilenfehler!"); }
+        if (r?.Database is not Database db || db.IsDisposed) { return new DoItFeedback(infos.Data, "Zeilenfehler!"); }
 
         #endregion
 

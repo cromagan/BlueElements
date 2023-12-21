@@ -26,7 +26,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
 
     #region Constructors
 
-    public RowEntryControl(DatabaseAbstract? database) : base() => FilterOutput.Database = database;
+    public RowEntryControl(Database? database) : base() => FilterOutput.Database = database;
 
     #endregion
 

@@ -77,7 +77,7 @@ public partial class FormulaView : FormWithStatusBar {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        DatabaseAbstract.ForceSaveAll();
+        Database.ForceSaveAll();
         _ = LoadTab.ShowDialog();
     }
 

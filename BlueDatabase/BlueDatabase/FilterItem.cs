@@ -41,7 +41,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     #region Constructors
 
-    public FilterItem(DatabaseAbstract db, FilterType filterType, string searchValue) : this(db, filterType, new List<string> { searchValue }) { }
+    public FilterItem(Database db, FilterType filterType, string searchValue) : this(db, filterType, new List<string> { searchValue }) { }
 
     /// <summary>
     /// Ein AlwaysFalse Filter
@@ -54,7 +54,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         SearchValue = new List<string>().AsReadOnly();
     }
 
-    public FilterItem(DatabaseAbstract db, string filterCode) {
+    public FilterItem(Database db, string filterCode) {
         Database = db;
 
         db.DisposingEvent += Database_Disposing;
@@ -101,7 +101,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     private FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
 
-    private FilterItem(DatabaseAbstract db, FilterType filterType, IList<string>? searchValue) {
+    private FilterItem(Database db, FilterType filterType, IList<string>? searchValue) {
         Database = db;
         KeyName = Generic.UniqueInternal();
 
@@ -143,7 +143,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     /// <summary>
     /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
     /// </summary>
-    public DatabaseAbstract? Database { get; private set; }
+    public Database? Database { get; private set; }
 
     public FilterType FilterType {
         get => _filterType;
@@ -198,7 +198,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public void Changeto(FilterType type, string searchvalue) => Changeto(type, new List<string> { searchvalue });
 
     public object? Clone() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed || IsDisposed) { return null; }
+        if (Database is not Database db || db.IsDisposed || IsDisposed) { return null; }
         var fi = new FilterItem(db, _filterType, _searchValue);
         fi.Column = _column;
         fi.Herkunft = _herkunft;
@@ -263,7 +263,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
             case "database":
                 if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
-                Database = DatabaseAbstract.GetById(new ConnectionInfo(value.FromNonCritical(), null, string.Empty), false, null, true);
+                Database = Database.GetById(new ConnectionInfo(value.FromNonCritical(), null, string.Empty), false, null, true);
 
                 if (Database != null && !Database.IsDisposed) { Database.DisposingEvent += Database_Disposing; }
 

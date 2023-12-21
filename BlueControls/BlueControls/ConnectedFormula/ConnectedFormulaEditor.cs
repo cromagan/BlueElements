@@ -222,7 +222,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void btnVorschauÖffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
 
-        DatabaseAbstract? db = null;
+        Database? db = null;
 
         if (CFormula?.PadData != null) {
             foreach (var thisItem in CFormula.PadData) {

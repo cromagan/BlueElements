@@ -835,7 +835,7 @@ public static class Skin {
     public const int Padding = 9;
     public const int PaddingSmal = 3;
     public static readonly float Scale = (float)Math.Round(SystemInformation.VirtualScreen.Width / SystemParameters.VirtualScreenWidth, 2);
-    public static DatabaseAbstract? StyleDb;
+    public static Database? StyleDb;
     internal static Pen? PenLinieDick;
     internal static Pen? PenLinieDünn;
     internal static Pen? PenLinieKräftig;
@@ -1283,7 +1283,7 @@ public static class Skin {
         }
     }
 
-    public static void InitStyles() => StyleDb = DatabaseAbstract.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
+    public static void InitStyles() => StyleDb = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Styles.BDB", "Styles", true, false);
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
     public static void LoadSkin() {
@@ -1746,9 +1746,9 @@ public static class Skin {
         return GetBlueFont(design, state);
     }
 
-    private static BlueFont GetBlueFont(DatabaseAbstract styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
+    private static BlueFont GetBlueFont(Database styleDb, string column, RowItem? row) => GetBlueFont(styleDb, styleDb.Column[column], row);
 
-    private static BlueFont GetBlueFont(DatabaseAbstract styleDb, ColumnItem? column, RowItem? row) {
+    private static BlueFont GetBlueFont(Database styleDb, ColumnItem? column, RowItem? row) {
         var @string = styleDb.Cell.GetString(column, row);
         if (string.IsNullOrEmpty(@string)) {
             Develop.DebugPrint("Schrift nicht definiert: " + styleDb.TableName + " - " + column.KeyName + " - " + row.CellFirstString());

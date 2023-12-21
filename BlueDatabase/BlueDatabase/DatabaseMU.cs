@@ -55,7 +55,7 @@ public class DatabaseMu : Database {
 
     #endregion
 
-    //public new static DatabaseAbstract? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
+    //public new static Database? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
     //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
 
     //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
@@ -101,7 +101,7 @@ public class DatabaseMu : Database {
         } catch { return false; }
     }
 
-    protected override List<ConnectionInfo>? AllAvailableTables(List<DatabaseAbstract>? allreadychecked, string mustBeFreezed) {
+    protected override List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked, string mustBeFreezed) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
 
         if (allreadychecked != null) {
@@ -197,7 +197,7 @@ public class DatabaseMu : Database {
         }
     }
 
-    protected override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(ICollection<DatabaseAbstract> db, DateTime fromUtc, DateTime toUtc) {
+    protected override (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(ICollection<Database> db, DateTime fromUtc, DateTime toUtc) {
         if (string.IsNullOrEmpty(FragmengtsPath())) { return new(); }
 
         if (!db.Any()) { return new(); }
@@ -271,8 +271,8 @@ public class DatabaseMu : Database {
         return (null, null);
     }
 
-    protected override List<DatabaseAbstract> LoadedDatabasesWithSameServer() {
-        var oo = new List<DatabaseAbstract>();
+    protected override List<Database> LoadedDatabasesWithSameServer() {
+        var oo = new List<Database>();
 
         if (string.IsNullOrEmpty(Filename)) { return oo; }
 

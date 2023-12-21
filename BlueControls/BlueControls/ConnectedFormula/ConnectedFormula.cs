@@ -819,7 +819,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         if (_saving || (_muf?.IsLoading ?? true)) { return; }
 
         foreach (var thisfile in _databaseFiles) {
-            _ = DatabaseAbstract.GetById(new ConnectionInfo(thisfile, null, string.Empty), false, null, true);
+            _ = Database.GetById(new ConnectionInfo(thisfile, null, string.Empty), false, null, true);
         }
 
         _saved = false;

@@ -546,7 +546,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         return did;
     }
 
-    public ScriptEndedFeedback ParseVariable(DatabaseAbstract database, string rowkey) => ParseVariable(database.Row.SearchByKey(rowkey));
+    public ScriptEndedFeedback ParseVariable(Database database, string rowkey) => ParseVariable(database.Row.SearchByKey(rowkey));
 
     public ScriptEndedFeedback ParseVariable(RowItem? row) {
         if (row == null || row.IsDisposed) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
@@ -574,7 +574,7 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
 
         if (!string.IsNullOrEmpty(item.Gruppenzugehörigkeit)) {
             foreach (var thisToo in this) {
-                if (String.Equals(item.Gruppenzugehörigkeit, thisToo.Gruppenzugehörigkeit, StringComparison.OrdinalIgnoreCase)) {
+                if (string.Equals(item.Gruppenzugehörigkeit, thisToo.Gruppenzugehörigkeit, StringComparison.OrdinalIgnoreCase)) {
                     Remove(thisToo);
                     return; // Wird eh eine Kettenreaktion ausgelöst -  und der Iteraor hier wird beschädigt
                 }

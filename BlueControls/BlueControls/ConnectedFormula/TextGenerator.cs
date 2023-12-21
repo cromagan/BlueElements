@@ -147,7 +147,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
     private void GenerateColumns() {
         _textc = null;
         _auswahlc.Clear();
-        if (FilterInput?.Database is not DatabaseAbstract db || !db.IsDisposed) { return; }
+        if (FilterInput?.Database is not Database db || !db.IsDisposed) { return; }
 
         _textc = db.Column.Exists(_textSpalte);
 
@@ -159,7 +159,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
     private void GenerateItemsAndText() {
         if (DesignMode) { return; }
 
-        if (FilterInput?.Database is not DatabaseAbstract db || !db.IsDisposed) { return; }
+        if (FilterInput?.Database is not Database db || !db.IsDisposed) { return; }
 
         if (_auswahlc.Count == 0) { return; }
         if (_textc == null) { return; }

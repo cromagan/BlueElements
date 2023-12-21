@@ -79,7 +79,7 @@ public static class Allgemein {
     public static void StartGlobalService() {
         if (_serviceStarted) { return; }
         _serviceStarted = true;
-        DatabaseAbstract.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
+        Database.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
         ConnectedFormula.ConnectedFormula.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
     }
 
@@ -90,7 +90,7 @@ public static class Allgemein {
                     dm.DropMessage += FormWithStatusBar.GotMessageDropMessage;
                 }
 
-                //if (thisit is DatabaseAbstract db) {
+                //if (thisit is Database db) {
                 //    db.Loaded += TableView.CheckDatabase;
                 //}
             }
@@ -98,11 +98,11 @@ public static class Allgemein {
 
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
-                if (thisit is DatabaseAbstract dm) {
+                if (thisit is Database dm) {
                     dm.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
                 }
 
-                //if (thisit is DatabaseAbstract db) {
+                //if (thisit is Database db) {
                 //    db.Loaded -= TableView.CheckDatabase;
                 //}
             }
@@ -118,7 +118,7 @@ public static class Allgemein {
     //private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
     //    if (e.Handled) { return; }
     //    e.Handled = true;
-    //    if (e?.Row?.Database is not DatabaseAbstract db) { return; }
+    //    if (e?.Row?.Database is not Database db) { return; }
 
     //    var pad = new ItemCollectionPad(e.LayoutId, e.Row.Database, e.Row.Key);
     //    pad.SaveAsBitmap(e.Filename);

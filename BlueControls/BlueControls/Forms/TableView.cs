@@ -55,7 +55,7 @@ public partial class TableView : FormWithStatusBar {
 
     public TableView() : this(null, true, true) { }
 
-    public TableView(DatabaseAbstract? database, bool loadTabVisible, bool adminTabVisible) : base() {
+    public TableView(Database? database, bool loadTabVisible, bool adminTabVisible) : base() {
         InitializeComponent();
 
         if (!adminTabVisible) {
@@ -100,8 +100,8 @@ public partial class TableView : FormWithStatusBar {
     /// <param name="database"></param>
     /// <param name="mode"></param>
     /// <returns></returns>
-    public static bool ErrorMessage(DatabaseAbstract? database, EditableErrorReasonType mode) {
-        var m = DatabaseAbstract.EditableErrorReason(database, mode);
+    public static bool ErrorMessage(Database? database, EditableErrorReasonType mode) {
+        var m = Database.EditableErrorReason(database, mode);
         if (string.IsNullOrEmpty(m)) { return false; }
 
         MessageBox.Show("Aktion nicht möglich:<br>" + m);
@@ -159,14 +159,14 @@ public partial class TableView : FormWithStatusBar {
     /// Löst das DatabaseLoadedEvengt aus, weil es fast einem Neuladen gleichkommt.
     /// </summary>
     /// <param name="db"></param>
-    public static void OpenDatabaseHeadEditor(DatabaseAbstract? db) {
+    public static void OpenDatabaseHeadEditor(Database? db) {
         if (db == null || db.IsDisposed) { return; }
 
         using DatabaseHeadEditor w = new(db);
         _ = w.ShowDialog();
     }
 
-    public static void OpenLayoutEditor(DatabaseAbstract db, string layoutToOpen) {
+    public static void OpenLayoutEditor(Database db, string layoutToOpen) {
         var x = db.EditableErrorReason(EditableErrorReasonType.EditNormaly);
         if (!string.IsNullOrEmpty(x)) {
             MessageBox.Show(x);
@@ -181,7 +181,7 @@ public partial class TableView : FormWithStatusBar {
         _ = w.ShowDialog();
     }
 
-    public static void OpenScriptEditor(DatabaseAbstract? db) {
+    public static void OpenScriptEditor(Database? db) {
         if (db == null || db.IsDisposed) { return; }
 
         var se = new DatabaseScriptEditor(db);
@@ -230,8 +230,8 @@ public partial class TableView : FormWithStatusBar {
 
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(false);
-        DatabaseAbstract.ForceSaveAll();
-        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        Database.ForceSaveAll();
+        if (Table.Database is not Database db || db.IsDisposed) { return; }
 
         switch (e.Item.KeyName) {
             case "erweitert":
@@ -309,7 +309,7 @@ public partial class TableView : FormWithStatusBar {
         FilterLeiste.Enabled = datenbankDa;
     }
 
-    protected virtual void DatabaseSet(DatabaseAbstract? db, string toParse) {
+    protected virtual void DatabaseSet(Database? db, string toParse) {
         if (db != null && !db.IsDisposed) {
             DropMessages = db.IsAdministrator();
         }
@@ -365,7 +365,7 @@ public partial class TableView : FormWithStatusBar {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         DatabaseSet(null, string.Empty);
         MultiUserFile.SaveAll(true);
-        DatabaseAbstract.ForceSaveAll();
+        Database.ForceSaveAll();
 
         base.OnFormClosing(e);
     }
@@ -414,7 +414,7 @@ public partial class TableView : FormWithStatusBar {
     /// Ist kein Reiter vorhanden, wird ein neuer erzeugt.
     /// </summary>
     /// <returns></returns>
-    protected bool SwitchTabToDatabase(DatabaseAbstract? database) {
+    protected bool SwitchTabToDatabase(Database? database) {
         if (database is null || database.IsDisposed) {
             return false;
         }
@@ -423,7 +423,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (sender is not Table tbl || tbl.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (sender is not Table tbl || tbl.Database is not Database db || db.IsDisposed) { return; }
         RowItem? row = null;
         ColumnItem? column = null;
         if (e.HotItem is RowItem r) { row = r; }
@@ -472,7 +472,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected virtual void Table_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (sender is not Table tbl || tbl.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (sender is not Table tbl || tbl.Database is not Database db || db.IsDisposed) { return; }
         RowItem? row = null;
         ColumnItem? column = null;
         if (e.HotItem is RowItem r) { row = r; }
@@ -693,7 +693,7 @@ public partial class TableView : FormWithStatusBar {
     private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
 
     private void btnClipboardImport_Click(object sender, System.EventArgs e) {
-        if (Table.Database is not DatabaseAbstract db || !db.IsAdministrator()) {
+        if (Table.Database is not Database db || !db.IsAdministrator()) {
             return;
         }
 
@@ -701,7 +701,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void btnDatenbankenSpeicherort_Click(object sender, System.EventArgs e) {
-        DatabaseAbstract.ForceSaveAll();
+        Database.ForceSaveAll();
         MultiUserFile.ForceLoadSaveAll();
 
         if (Table.Database is Database db && !db.IsDisposed) {
@@ -713,7 +713,7 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) {
+        if (Table.Database is not Database db || db.IsDisposed) {
             return;
         }
 
@@ -724,21 +724,21 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Table.Database is not Database db || db.IsDisposed) { return; }
 
         OpenLayoutEditor(db, string.Empty);
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(false);
-        DatabaseAbstract.ForceSaveAll();
+        Database.ForceSaveAll();
 
         _ = SwitchTabToDatabase(new ConnectionInfo(e.Item.KeyName, PreveredDatabaseID, string.Empty));
     }
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        DatabaseAbstract.ForceSaveAll();
+        Database.ForceSaveAll();
 
         _ = SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) {
@@ -762,7 +762,7 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        DatabaseAbstract.ForceSaveAll();
+        Database.ForceSaveAll();
         _ = LoadTab.ShowDialog();
     }
 
@@ -773,7 +773,7 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(false);
-        DatabaseAbstract.ForceSaveAll();
+        Database.ForceSaveAll();
 
         if (Table.Database is Database db) {
             if (db.ReadOnly) { return; }
@@ -793,8 +793,8 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(true);
-        DatabaseAbstract.ForceSaveAll();
-        DatabaseAbstract.CheckSysUndoNow(DatabaseAbstract.AllFiles, true);
+        Database.ForceSaveAll();
+        Database.CheckSysUndoNow(Database.AllFiles, true);
     }
 
     private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
@@ -803,7 +803,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
-        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Table.Database is not Database db || db.IsDisposed) { return; }
 
         var x = new ColumnArrangementPadEditor(db);
         _ = x.ShowDialog();
@@ -829,7 +829,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
-        DatabaseAbstract.ForceSaveAll();
+        Database.ForceSaveAll();
         MultiUserFile.ForceLoadSaveAll();
         _ = ExecuteFile(Path.GetTempPath());
     }
@@ -838,7 +838,7 @@ public partial class TableView : FormWithStatusBar {
         Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow?.Row : null;
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
-        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Table.Database is not Database db || db.IsDisposed) { return; }
         if (!db.IsAdministrator()) { return; }
 
         var m = MessageBox.Show("Angezeigte Zeilen löschen?", ImageCode.Warnung, "Ja", "Nein");
@@ -857,7 +857,7 @@ public partial class TableView : FormWithStatusBar {
         Table.Arrangement = int.Parse(e.Item.KeyName);
     }
 
-    //private void ChangeDatabase(DatabaseAbstract? database) {
+    //private void ChangeDatabase(Database? database) {
     //    if (_originalDb != null) {
     //        _originalDb.DisposingEvent -= _originalDB_Disposing;
     //    }
@@ -875,12 +875,12 @@ public partial class TableView : FormWithStatusBar {
 
         const bool enTabAllgemein = true;
 
-        if (Table.Database is not DatabaseAbstract db || db.IsDisposed || !db.IsAdministrator()) {
+        if (Table.Database is not Database db || db.IsDisposed || !db.IsAdministrator()) {
             tabAdmin.Enabled = false;
             return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
         }
 
-        var m = DatabaseAbstract.EditableErrorReason(db, EditableErrorReasonType.EditCurrently);
+        var m = Database.EditableErrorReason(db, EditableErrorReasonType.EditCurrently);
 
         grpAdminAllgemein.Enabled = enTabAllgemein;
         grpImport.Enabled = true;
@@ -939,7 +939,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void lstAufgaben_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Table.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Table.Database is not Database db || db.IsDisposed) { return; }
 
         lstAufgaben.Enabled = false;
 
@@ -1042,7 +1042,7 @@ public partial class TableView : FormWithStatusBar {
         column = Table.View_ColumnFirst();
         row = null;
 
-        if (Table.Database is not DatabaseAbstract db || db.Row.Count < 1) { return; }
+        if (Table.Database is not Database db || db.Row.Count < 1) { return; }
 
         // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
         if (richtung.HasFlag(Direction.Unten)) {
@@ -1073,7 +1073,7 @@ public partial class TableView : FormWithStatusBar {
         Table.Enabled = false;
         Table.Refresh();
 
-        DatabaseAbstract.ForceSaveAll();
+        Database.ForceSaveAll();
         MultiUserFile.ForceLoadSaveAll();
 
         if (e.TabPage == null) { return; }
@@ -1085,7 +1085,7 @@ public partial class TableView : FormWithStatusBar {
         #region Status-Meldung updaten?
 
         var maybeok = false;
-        foreach (var thisdb in DatabaseAbstract.AllFiles) {
+        foreach (var thisdb in Database.AllFiles) {
             if (thisdb.TableName.Equals(ci.TableName, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
         }
 
@@ -1095,7 +1095,7 @@ public partial class TableView : FormWithStatusBar {
 
         #endregion
 
-        var db = DatabaseAbstract.GetById(ci, false, Table.Database_NeedPassword, true);
+        var db = Database.GetById(ci, false, Table.Database_NeedPassword, true);
 
         if (db is Database bdb) {
             if (!string.IsNullOrEmpty(bdb.Filename)) {
@@ -1113,7 +1113,7 @@ public partial class TableView : FormWithStatusBar {
         DatabaseSet(db, (string)s[1]);
     }
 
-    private void UpdateScripts(DatabaseAbstract? db) {
+    private void UpdateScripts(Database? db) {
         lstAufgaben.Item.Clear();
 
         if (db == null || db.IsDisposed || !string.IsNullOrEmpty(db.FreezedReason)) {

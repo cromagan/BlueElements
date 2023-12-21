@@ -60,7 +60,7 @@ public class CellItem {
     }
 
     public static Size ContentSize(ColumnItem column, RowItem row, Font cellFont, int pix16) {
-        if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return new Size(pix16, pix16); }
+        if (column.Database is not Database db || db.IsDisposed) { return new Size(pix16, pix16); }
 
         if (column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             var (lcolumn, lrow, _, _) = CellCollection.LinkedCellData(column, row, false, false);

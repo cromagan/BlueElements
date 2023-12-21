@@ -75,7 +75,7 @@ public sealed class ColumnViewItem : IParseable {
 
     public static int CalculateColumnContentWidth(ColumnItem column, Font cellFont, int pix16) {
         if (column.IsDisposed) { return 16; }
-        if (column.Database is not DatabaseAbstract db || db.IsDisposed) { return 16; }
+        if (column.Database is not Database db || db.IsDisposed) { return 16; }
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
         if (column.Contentwidth is int v) { return v; }
 
@@ -125,7 +125,7 @@ public sealed class ColumnViewItem : IParseable {
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
-        if (Parent.Database is not DatabaseAbstract db) {
+        if (Parent.Database is not Database db) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbank unbekannt");
             return false;
         }

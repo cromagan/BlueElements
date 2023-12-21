@@ -108,8 +108,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
     }
 
-    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public DatabaseAbstract? DatabaseInputMustBe => null;
+    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInputMustBe => null;
     public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
 
     public EditTypeFormula EditType {
@@ -219,7 +219,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = [.. _itemAccepts.GetStyleOptions(this, widthOfControl)];
 
-        if (DatabaseInput is not DatabaseAbstract db || db.IsDisposed) { return l; }
+        if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 
         l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
 
@@ -295,7 +295,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public void Spalte_wählen() {
         if (IsDisposed) { return; }
 
-        if (DatabaseInput is not DatabaseAbstract db || db.IsDisposed) {
+        if (DatabaseInput is not Database db || db.IsDisposed) {
             MessageBox.Show("Quelle fehlerhaft!");
             return;
         }

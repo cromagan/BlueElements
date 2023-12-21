@@ -168,7 +168,7 @@ public static class IControlAcceptSomethingExtension {
 
         if (row?.Database == null && item.FilterInput == null) { return; }
 
-        if (row?.Database is DatabaseAbstract db && !db.IsDisposed) {
+        if (row?.Database is Database db && !db.IsDisposed) {
             item.FilterInput ??= new FilterCollection(db, "SetToRow");
             item.FilterInput.Database = db;
         }

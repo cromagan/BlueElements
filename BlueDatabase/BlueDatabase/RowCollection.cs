@@ -47,7 +47,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Constructors
 
-    public RowCollection(DatabaseAbstract database) {
+    public RowCollection(Database database) {
         Database = database;
         Database.DisposingEvent += Database_Disposing;
         //Initialize();
@@ -85,7 +85,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public int Count => _internal.Count;
 
-    public DatabaseAbstract? Database { get; private set; }
+    public Database? Database { get; private set; }
 
     public bool IsDisposed { get; private set; }
 
@@ -139,12 +139,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static RowItem? GenerateAndAdd(FilterCollection fc, string comment) {
         IReadOnlyCollection<string>? first = null;
 
-        DatabaseAbstract? db2 = null;
+        Database? db2 = null;
 
         foreach (var thisfi in fc) {
             if (thisfi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroﬂKleinEgal) { return null; }
             if (thisfi.Column == null) { return null; }
-            if (thisfi.Database is not DatabaseAbstract db1 || db1.IsDisposed) { return null; }
+            if (thisfi.Database is not Database db1 || db1.IsDisposed) { return null; }
             db2 ??= db1;
 
             if (db1.Column.First() == thisfi.Column) {
@@ -186,7 +186,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var unique = ("X" + DateTime.UtcNow.ToString("mm.fff") + x.ToString(Constants.Format_Integer5)).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             var ok = true;
 
-            foreach (var thisfile in DatabaseAbstract.AllFiles) {
+            foreach (var thisfile in Database.AllFiles) {
                 var row = thisfile.Row[unique];
                 if (row != null && !row.IsDisposed) { ok = false; break; }
             }
@@ -196,7 +196,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public void AddRowWithChangedValue(RowItem? row) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         if (row == null || row.IsDisposed) { return; }
 
         if (!db.IsRowScriptPossible(true)) { return; }
@@ -241,7 +241,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public void ExecuteExtraThread() {
         if (_pendingChangedRows.Count > 0) { return; }
         if (_pendingChangedBackgroundRow.Count == 0) { return; }
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         if (!Database.IsRowScriptPossible(true)) { return; }
 
         if (_executingbackgroundworks) { return; }
@@ -289,8 +289,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public string ExecuteScript(ScriptEventTypes? eventname, string scriptname, List<RowItem> rows) {
-        var m = DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditCurrently);
-        if (!string.IsNullOrEmpty(m) || Database is not DatabaseAbstract db || db.IsDisposed) { return m; }
+        var m = Database.EditableErrorReason(Database, EditableErrorReasonType.EditCurrently);
+        if (!string.IsNullOrEmpty(m) || Database is not Database db || db.IsDisposed) { return m; }
 
         if (rows.Count == 0) { return "Keine Zeilen angekommen."; }
 
@@ -335,7 +335,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         while (_pendingChangedRows.Count > 0) {
             if (IsDisposed) { break; }
-            if (Database is not DatabaseAbstract db || db.IsDisposed) { break; }
+            if (Database is not Database db || db.IsDisposed) { break; }
 
             if (!Database.IsRowScriptPossible(true)) { break; }
 
@@ -370,7 +370,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null && !thisRowItem.IsDisposed);
 
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        if (Database is not Database db || db.IsDisposed) { return null; }
         if (!Database.Row.IsNewRowPossible()) { return null; }
 
         var s = Database.NextRowKey();
@@ -452,10 +452,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return item;
     }
 
-    //    List<DatabaseAbstract> done = new();
+    //    List<Database> done = new();
     public IEnumerator<RowItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
-    //    if (database is not DatabaseAbstract db) { return "Verlinkung zur Datenbank fehlhlerhaft"; }
+    //    if (database is not Database db) { return "Verlinkung zur Datenbank fehlhlerhaft"; }
     //    if (db.IsDisposed) { return "Datenbank verworfen"; }
     //foreach (var ThisRowItem in _Internal.Values)//{//    if (ThisRowItem != null) { return ThisRowItem; }//}//return null;
     IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
@@ -471,7 +471,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public bool IsNewRowPossible() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
+        if (Database is not Database db || db.IsDisposed) { return false; }
 
         return Database.IsNewRowPossible();
     }
@@ -527,7 +527,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public RowItem? SearchByKey(string? key) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed || key == null || string.IsNullOrWhiteSpace(key)) { return null; }
+        if (Database is not Database db || db.IsDisposed || key == null || string.IsNullOrWhiteSpace(key)) { return null; }
         try {
             var r = _internal.ContainsKey(key) ? _internal[key] : null;
             if (r != null && r.IsDisposed) {
@@ -545,14 +545,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     internal static List<RowItem> MatchesTo(FilterItem fi) {
         List<RowItem> l = [];
 
-        if (fi.Database is not DatabaseAbstract db || db.IsDisposed) { return l; }
+        if (fi.Database is not Database db || db.IsDisposed) { return l; }
 
         l.AddRange(db.Row.Where(thisRow => thisRow.MatchesTo(fi)));
         return l;
     }
 
     internal void AddRowsForValueChangedEvent() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         if (!db.IsRowScriptPossible(true)) { return; }
 
         var x = DateTime.UtcNow;
@@ -567,7 +567,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         } catch { }
     }
 
-    internal void CloneFrom(DatabaseAbstract sourceDatabase) {
+    internal void CloneFrom(Database sourceDatabase) {
         if (IsNewRowPossible()) {
             Develop.DebugPrint(FehlerArt.Fehler, "Neue Zeilen nicht erlaubt");
         }
@@ -590,7 +590,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal string ExecuteCommand(DatabaseDataType type, string rowkey, Reason reason) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank verworfen"; }
+        if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
 
         if (type == DatabaseDataType.Command_AddRow) {
             var row = SearchByKey(rowkey);

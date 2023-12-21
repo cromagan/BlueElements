@@ -21,7 +21,7 @@ public class MultiUserFileGiveBackEventArgs : System.EventArgs {
 
     #region Properties
 
-    public DatabaseAbstract? File { get; set; }
+    public Database? File { get; set; }
 
     #endregion
 }

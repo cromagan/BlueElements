@@ -65,7 +65,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
 
     #region Methods
 
-    //public abstract DatabaseAbstract? DatabaseInput { get; }
+    //public abstract Database? DatabaseInput { get; }
     public void Breite_berechnen() {
         var li = new ItemCollectionList.ItemCollectionList(true);
         for (var br = 1; br <= 20; br++) {

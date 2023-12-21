@@ -81,8 +81,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     /// </summary>
     public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
 
-    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public DatabaseAbstract? DatabaseInputMustBe => null;
+    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInputMustBe => null;
     public override string Description => "Dieses Element erzeugt ein Tab-Control, dass weitere Unterformulare enthalten kann.\r\nEs kann eine Zeile empfangen, welche an die Unterformulare weitergegeben wird.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);

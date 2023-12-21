@@ -54,7 +54,7 @@ public class Method_ContentsFilter : Method {
 
         if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
-        if (allFi.Database is not DatabaseAbstract db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
+        if (allFi.Database is not Database db) { return new DoItFeedback(infos.Data, "Datenbankfehler!"); }
 
         var returncolumn = db.Column.Exists(attvar.ReadableText(0));
         if (returncolumn == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ReadableText(0)); }

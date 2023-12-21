@@ -73,8 +73,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAu
         }
     }
 
-    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public DatabaseAbstract? DatabaseInputMustBe => null;
+    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInputMustBe => null;
     public override string Description => "Dieses Element erzeugt eine File-Explorer-Steuerelement,\r\nwmit welchem interagiert werden kann.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);

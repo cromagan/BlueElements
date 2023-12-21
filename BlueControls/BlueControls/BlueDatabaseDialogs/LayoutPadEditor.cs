@@ -33,13 +33,13 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
 
     #region Fields
 
-    private DatabaseAbstract? _database;
+    private Database? _database;
 
     #endregion
 
     #region Constructors
 
-    public LayoutPadEditor(DatabaseAbstract? database) : base() {
+    public LayoutPadEditor(Database? database) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -54,7 +54,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
 
     #region Properties
 
-    public DatabaseAbstract? Database {
+    public Database? Database {
         get => _database;
         private set {
             if (value == _database) { return; }
@@ -80,7 +80,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     }
 
     internal void LoadLayout(string fileOrLayoutId) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         if (Pad.Item == null) { return; }
 
         SaveCurrentLayout();
@@ -130,7 +130,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     private void btnLayoutOeffnen_Click(object sender, System.EventArgs e) => ExecuteFile(cbxLayout.Text, string.Empty);
 
     private void btnLayoutVerzeichnis_Click(object sender, System.EventArgs e) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         if (!string.IsNullOrEmpty(Database.AdditionalFilesPfadWhole())) {
             _ = ExecuteFile(Database.AdditionalFilesPfadWhole());
         }
@@ -142,7 +142,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     private void cbxLayout_ItemClicked(object sender, AbstractListItemEventArgs e) => LoadLayout(e.Item.KeyName);
 
     private void CheckButtons() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) {
+        if (Database is not Database db || db.IsDisposed) {
             DisablePad();
             cbxLayout.Enabled = false;
             return;
@@ -180,7 +180,7 @@ public partial class LayoutPadEditor : PadEditorWithFileAccess, IHasDatabase {
     private void Database_DisposingEvent(object sender, System.EventArgs e) => Close();
 
     private void SaveCurrentLayout() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
 
         if (Pad.Item == null) { return; }
 

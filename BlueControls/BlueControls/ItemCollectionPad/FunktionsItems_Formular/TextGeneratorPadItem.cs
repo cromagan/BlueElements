@@ -65,8 +65,8 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
     public bool AutoSizeableHeight => true;
 
-    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public DatabaseAbstract? DatabaseInputMustBe => null;
+    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInputMustBe => null;
     public override string Description => "Dieses Element erzeugt einen Text-Generator-Baustein";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
@@ -224,7 +224,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     private void ChooseColumn(int no, ref string col) {
         if (IsDisposed) { return; }
 
-        if (DatabaseInput is not DatabaseAbstract db || db.IsDisposed) {
+        if (DatabaseInput is not Database db || db.IsDisposed) {
             MessageBox.Show("Quelle fehlerhaft!");
             return;
         }

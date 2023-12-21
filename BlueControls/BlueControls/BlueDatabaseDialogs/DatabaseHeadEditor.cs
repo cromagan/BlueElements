@@ -47,7 +47,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     #region Constructors
 
-    public DatabaseHeadEditor(DatabaseAbstract database) {
+    public DatabaseHeadEditor(Database database) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         Database = database;
@@ -58,7 +58,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
     #region Properties
 
-    public DatabaseAbstract? Database { get; private set; }
+    public Database? Database { get; private set; }
 
     #endregion
 
@@ -68,7 +68,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         if (_frmHeadEditorFormClosingIsin) { return; }
         _frmHeadEditorFormClosingIsin = true;
         base.OnFormClosing(e);
-        if (Database is not DatabaseAbstract db || db.IsDisposed) {
+        if (Database is not Database db || db.IsDisposed) {
             return;
         }
 
@@ -79,7 +79,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
 
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
 
         PermissionGroups_NewRow.Item.Clear();
         PermissionGroups_NewRow.Item.AddRange(db.PermissionGroupsNewRow);
@@ -125,7 +125,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void AddUndoToTable(UndoItem work) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
 
         var r = tblUndo?.Database?.Row.GenerateAndAdd(work.ToString(), "New Undo Item");
         if (r == null) { return; }
@@ -208,7 +208,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Database?.Column.GenerateOverView();
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
 
         db.Column.GenerateAndAddSystem();
     }
@@ -219,7 +219,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void GenerateInfoText() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) {
+        if (Database is not Database db || db.IsDisposed) {
             capInfo.Text = "Datenbank-Fehler";
             return;
         }
@@ -233,7 +233,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void GenerateUndoTabelle() {
-        Database x = new(DatabaseAbstract.UniqueKeyValue());
+        Database x = new(Database.UniqueKeyValue());
         //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder.Text);
         //_ = x.Column.GenerateAndAdd("Index", "Index", ColumnFormatHolder.IntegerPositive);
         _ = x.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
@@ -271,7 +271,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         tblUndo.DatabaseSet(x, string.Empty);
         tblUndo.Arrangement = 1;
 
-        if (Database is DatabaseAbstract db) {
+        if (Database is Database db) {
             //if (!db.UndoLoaded) {
             //    UpdateStatusBar(FehlerArt.Info, "Lade Undo-Speicher", true);
 
@@ -305,13 +305,13 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
     private void RemoveDatabase() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         Database.DisposingEvent -= Database_DisposingEvent;
         Database = null;
     }
 
     private void tblUndo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (sender is not Table tbl || tbl.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (sender is not Table tbl || tbl.Database is not Database db || db.IsDisposed) { return; }
         ColumnItem? column = null;
         if (e.HotItem is ColumnItem c) { column = c; }
         if (e.HotItem is string ck) { db.Cell.DataOfCellKey(ck, out column, out _); }
@@ -322,7 +322,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
     }
 
     private void tblUndo_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (sender is not Table tbl || tbl.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (sender is not Table tbl || tbl.Database is not Database db || db.IsDisposed) { return; }
         //RowItem? row = null;
         ColumnItem? column = null;
         //if (e.HotItem is RowItem r) { row = r; }

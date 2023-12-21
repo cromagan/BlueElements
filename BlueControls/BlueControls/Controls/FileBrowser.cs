@@ -452,7 +452,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
         if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }
 
         newPath = newPath.TrimEnd("\\") + "\\";
-        var dropChanged = !String.Equals(newPath, txbPfad.Text, StringComparison.OrdinalIgnoreCase);
+        var dropChanged = !string.Equals(newPath, txbPfad.Text, StringComparison.OrdinalIgnoreCase);
         txbPfad.Text = newPath;
         lsbFiles.Item.Clear();
 

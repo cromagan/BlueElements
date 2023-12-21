@@ -70,8 +70,8 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public bool AutoSizeableHeight => false;
 
-    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public DatabaseAbstract? DatabaseInputMustBe => DatabaseInput;
+    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInputMustBe => DatabaseInput;
     public override string Description => "Dieses Element wird als Knopf zum drücken dargstellt.<br>Das Element kann Filter empfangen.<br>Diese Filter werden an ein Skript weitergegeben.";
 
     [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert  größer 1 als 'mehr als eine' gilt.")]
@@ -139,7 +139,7 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = [.. _itemAccepts.GetStyleOptions(this, widthOfControl)];
 
-        if (DatabaseInput is not DatabaseAbstract db || db.IsDisposed) { return l; }
+        if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));

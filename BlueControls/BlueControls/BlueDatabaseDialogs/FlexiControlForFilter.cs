@@ -88,7 +88,7 @@ public partial class FlexiControlForFilter : FlexiControl, IContextMenu {
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
         hotItem = null;
-        if (Filter.Column?.Database is not DatabaseAbstract db || db.IsDisposed || !db.IsAdministrator()) { return; }
+        if (Filter.Column?.Database is not Database db || db.IsDisposed || !db.IsAdministrator()) { return; }
 
         hotItem = Filter.Column;
         _ = items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));

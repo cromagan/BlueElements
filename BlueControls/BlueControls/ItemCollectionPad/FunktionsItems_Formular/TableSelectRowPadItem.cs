@@ -47,16 +47,16 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public TableSelectRowPadItem(string keyname, string toParse) : this(keyname) => this.Parse(toParse);
 
-    public TableSelectRowPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
+    public TableSelectRowPadItem(Database? db) : this(string.Empty, db) { }
 
-    public TableSelectRowPadItem(string intern, DatabaseAbstract? db) : base(intern) {
+    public TableSelectRowPadItem(string intern, Database? db) : base(intern) {
         _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
     }
 
-    public TableSelectRowPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
+    public TableSelectRowPadItem(string intern) : this(intern, null as Database) { }
 
     #endregion
 
@@ -70,10 +70,10 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public DatabaseAbstract? DatabaseInputMustBe => DatabaseOutput;
+    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInputMustBe => DatabaseOutput;
 
-    public DatabaseAbstract? DatabaseOutput {
+    public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet();
         set => _itemSends.DatabaseOutputSet(value, this);
     }

@@ -32,25 +32,25 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
 
     public List<ColumnItem> Columns = new();
 
-    public DatabaseAbstract Database;
+    public Database Database;
 
     #endregion
 
     #region Constructors
 
-    public RowSortDefinition(DatabaseAbstract database, string toParse) {
+    public RowSortDefinition(Database database, string toParse) {
         Database = database;
         this.Parse(toParse);
     }
 
-    public RowSortDefinition(DatabaseAbstract database, string columnName, bool reverse) {
+    public RowSortDefinition(Database database, string columnName, bool reverse) {
         Database = database;
         Initialize();
         Reverse = reverse;
         SetColumn(new List<string> { columnName });
     }
 
-    public RowSortDefinition(DatabaseAbstract database, List<string> columnNames, bool reverse) {
+    public RowSortDefinition(Database database, List<string> columnNames, bool reverse) {
         Initialize();
         Database = database;
         Reverse = reverse;

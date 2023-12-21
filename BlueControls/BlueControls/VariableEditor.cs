@@ -53,7 +53,7 @@ public partial class VariableEditor : UserControl {
         }
         var list = new VariableCollection();
 
-        if (filterVariablen?.Table?.Database is not DatabaseAbstract db) { return list; }
+        if (filterVariablen?.Table?.Database is not Database db) { return list; }
 
         foreach (var thisr in db.Row) {
             var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, false, thisr.CellGetString("Kommentar"));
@@ -64,12 +64,12 @@ public partial class VariableEditor : UserControl {
     }
 
     public RowItem? RowOfVariable(string variable) {
-        if (tableVariablen?.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        if (tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
         return db.Row[variable];
     }
 
     public RowItem? RowOfVariable(Variable variable) {
-        if (tableVariablen?.Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        if (tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
         return db.Row[variable.KeyName];
     }
 
@@ -81,7 +81,7 @@ public partial class VariableEditor : UserControl {
 
         //tableVariablen.Database?.Row.Clear("Neue Variablen");
 
-        if (tableVariablen?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (tableVariablen?.Database is not Database db || db.IsDisposed) { return; }
         if (variables == null) { return; }
 
         foreach (var thisv in variables) {
@@ -115,7 +115,7 @@ public partial class VariableEditor : UserControl {
     }
 
     private void GenerateVariableTable() {
-        Database x = new(DatabaseAbstract.UniqueKeyValue());
+        Database x = new(Database.UniqueKeyValue());
         x.DropMessages = false;
         var na = x.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder.SystemName, "Variablenname");
         _ = x.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder.Text, "Variablentyp");

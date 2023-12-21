@@ -46,18 +46,18 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     #region Constructors
 
-    public RowEntryPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => this.Parse(toParse);
+    public RowEntryPadItem(string keyname, string toParse) : this(keyname, null as Database) => this.Parse(toParse);
 
-    public RowEntryPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
+    public RowEntryPadItem(Database? db) : this(string.Empty, db) { }
 
-    public RowEntryPadItem(string intern, DatabaseAbstract? db) : base(intern) {
+    public RowEntryPadItem(string intern, Database? db) : base(intern) {
         _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
     }
 
-    public RowEntryPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
+    public RowEntryPadItem(string intern) : this(intern, null as Database) { }
 
     #endregion
 
@@ -70,10 +70,10 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public DatabaseAbstract? DatabaseInputMustBe => DatabaseOutput;
+    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInputMustBe => DatabaseOutput;
 
-    public DatabaseAbstract? DatabaseOutput {
+    public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet();
         set => _itemSends.DatabaseOutputSet(value, this);
     }

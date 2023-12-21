@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using static BlueDatabase.DatabaseAbstract;
+using static BlueDatabase.Database;
 
 namespace BlueDatabase;
 
@@ -43,7 +43,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// <param name="preveredFileFormatId"></param>
     /// <param name="mustbefreezed"></param>
     public ConnectionInfo(string uniqueId, string? preveredFileFormatId, string mustbefreezed) {
-        var alf = new List<DatabaseAbstract>();// könnte sich ändern, deswegen Zwischenspeichern
+        var alf = new List<Database>();// könnte sich ändern, deswegen Zwischenspeichern
         alf.AddRange(AllFiles);
 
         #region Ist es NUR ein Dateiname? Dann im Single und Multiuser suchen und zur Not eine preveredFileFormatID zurück geben
@@ -104,7 +104,7 @@ public class ConnectionInfo : IReadableTextWithKey {
         #endregion
     }
 
-    public ConnectionInfo(string tablename, DatabaseAbstract? provider, string databaseId, string additionalInfo, string mustbefreezed) {
+    public ConnectionInfo(string tablename, Database? provider, string databaseId, string additionalInfo, string mustbefreezed) {
         TableName = tablename.ToUpper();
         Provider = provider;
         DatabaseId = databaseId;
@@ -120,12 +120,12 @@ public class ConnectionInfo : IReadableTextWithKey {
 
     /// <summary>
     /// z.B. wenn ein Dateiname oder sowas mitgegeben werden soll.
-    /// Ist nur wichtig für von DatabaseAbstract abgeleiten Klassen und nur diese können damit umgehen.
+    /// Ist nur wichtig für von Database abgeleiten Klassen und nur diese können damit umgehen.
     /// </summary>
     public string AdditionalData { get; } = string.Empty;
 
     /// <summary>
-    /// Eine Kennung, die von von DatabaseAbstract abgeleiten Klassen erkannt werden kann.
+    /// Eine Kennung, die von von Database abgeleiten Klassen erkannt werden kann.
     /// Enthält nur einen Wert wie z.B. DatabaseSQL.
     /// Um eine Datenbank wieder zu finden, muss uniqueID verwendet werden.
     /// </summary>
@@ -137,7 +137,7 @@ public class ConnectionInfo : IReadableTextWithKey {
     /// <summary>
     /// Welche bereits vorhandene Datenbank den in dieser Klasse aufgezeigten Tabellenamen erzeugen kann
     /// </summary>
-    public DatabaseAbstract? Provider { get; set; }
+    public Database? Provider { get; set; }
 
     /// <summary>
     /// Die Tabelle, um die es geht.

@@ -20,7 +20,7 @@ using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
-using static BlueDatabase.DatabaseAbstract;
+using static BlueDatabase.Database;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
@@ -36,8 +36,8 @@ public abstract class Method_Database : Method {
 
     #region Methods
 
-    protected static DatabaseAbstract? MyDatabase(ScriptProperties scp) {
-        if (scp.AdditionalInfo is DatabaseAbstract db) { return db; }
+    protected static Database? MyDatabase(ScriptProperties scp) {
+        if (scp.AdditionalInfo is Database db) { return db; }
         return null;
     }
 
@@ -54,7 +54,7 @@ public abstract class Method_Database : Method {
         return MyDatabase(scp)?.Column.Exists(c.KeyName);
     }
 
-    protected DatabaseAbstract? DatabaseOf(ScriptProperties scp, string tableName) {
+    protected Database? DatabaseOf(ScriptProperties scp, string tableName) {
         if (!IsValidTableName(tableName, false)) { return null; }
 
         var db = MyDatabase(scp)?.ConnectionDataOfOtherTable(tableName, false);

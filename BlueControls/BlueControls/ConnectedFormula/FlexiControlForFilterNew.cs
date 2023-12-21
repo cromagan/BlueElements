@@ -30,7 +30,7 @@ public partial class FlexiControlForFilterNew : FlexiControl, IControlAcceptSome
 
     #region Constructors
 
-    public FlexiControlForFilterNew(DatabaseAbstract? database) {
+    public FlexiControlForFilterNew(Database? database) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

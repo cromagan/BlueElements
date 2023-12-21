@@ -43,11 +43,11 @@ namespace BeCreative {
             DebugPrint(FehlerArt.Info, "Schließe Programm...");
 
             var p = Progressbar.Show("Programm wird beendet<br><i>Speichern aller Datenbanken");
-            DatabaseAbstract.ForceSaveAll();
+            Database.ForceSaveAll();
             MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
 
             p.Update("Programm wird beendet<br><i>Speichern aller Datenbanken");
-            DatabaseAbstract.ForceSaveAll();
+            Database.ForceSaveAll();
             MultiUserFile.SaveAll(false); // Fonts und Dictionarys werden noch benötigt
 
             DebugPrint(FehlerArt.Info, "Schließe Programm, noch ein SaveAll.");

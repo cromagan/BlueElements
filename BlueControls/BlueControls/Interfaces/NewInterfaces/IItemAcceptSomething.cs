@@ -35,13 +35,13 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
 
     #region Properties
 
-    public DatabaseAbstract? DatabaseInput { get; }
+    public Database? DatabaseInput { get; }
 
     /// <summary>
     /// Welcher Datenbank die eingehenden Filter entsprechen müssen.
     /// Wenn NULL zurück gegeben wird, ist freie Datenbankwahl
     /// </summary>
-    public DatabaseAbstract? DatabaseInputMustBe { get; }
+    public Database? DatabaseInputMustBe { get; }
 
     // ReSharper disable once UnusedMemberInSuper.Global
     List<int> InputColorId { get; }
@@ -202,8 +202,8 @@ public sealed class ItemAcceptSomething {
         }
     }
 
-    public DatabaseAbstract? DatabaseInput(IItemAcceptSomething item) {
-        if (item.DatabaseInputMustBe is DatabaseAbstract db) {
+    public Database? DatabaseInput(IItemAcceptSomething item) {
+        if (item.DatabaseInputMustBe is Database db) {
             return db;
         }
 
@@ -223,7 +223,7 @@ public sealed class ItemAcceptSomething {
     }
 
     public string ErrorReason(IItemAcceptSomething item) =>
-        //if (item.DatabaseInput is not DatabaseAbstract db || db.IsDisposed) {
+        //if (item.DatabaseInput is not Database db || db.IsDisposed) {
         //    return "Eingehende Datenbank unbekannt";
         //}
         string.Empty;

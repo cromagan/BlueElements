@@ -56,7 +56,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
 
     #region Constructors
 
-    public DatabaseScriptDescription(DatabaseAbstract? database, string name, string script) : base(name, script) {
+    public DatabaseScriptDescription(Database? database, string name, string script) : base(name, script) {
         Database = database;
 
         if (Database != null && !Database.IsDisposed) {
@@ -66,9 +66,9 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
         _needRow = false;
     }
 
-    public DatabaseScriptDescription(DatabaseAbstract? database, string toParse) : this(database) => this.Parse(toParse);
+    public DatabaseScriptDescription(Database? database, string toParse) : this(database) => this.Parse(toParse);
 
-    public DatabaseScriptDescription(DatabaseAbstract? database) : this(database, string.Empty, string.Empty) { }
+    public DatabaseScriptDescription(Database? database) : this(database, string.Empty, string.Empty) { }
 
     #endregion
 
@@ -84,7 +84,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
 
     #region Properties
 
-    public DatabaseAbstract? Database { get; private set; }
+    public Database? Database { get; private set; }
 
     public ScriptEventTypes EventTypes {
         get => _eventTypes;
@@ -183,7 +183,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
                 return true;
 
             case "database":
-                //Database = DatabaseAbstract.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
+                //Database = Database.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
                 return true;
         }
 

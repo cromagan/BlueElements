@@ -22,7 +22,7 @@ public interface IHasDatabase {
     #region Properties
 
     // ReSharper disable once UnusedMemberInSuper.Global
-    public DatabaseAbstract? Database { get; }
+    public Database? Database { get; }
 
     #endregion
 }

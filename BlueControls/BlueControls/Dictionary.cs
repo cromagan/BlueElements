@@ -34,7 +34,7 @@ internal static class Dictionary {
 
     public static bool IsSpellChecking;
     internal static readonly object LockSpellChecking = new();
-    private static DatabaseAbstract? _dictWords;
+    private static Database? _dictWords;
 
     #endregion
 
@@ -146,8 +146,8 @@ internal static class Dictionary {
     }
 
     private static void Init() {
-        var tmp = DatabaseAbstract.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.BDB", "Dictionary", false, false);
-        if (tmp is DatabaseAbstract DBD) { _dictWords = DBD; }
+        var tmp = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.BDB", "Dictionary", false, false);
+        if (tmp is Database DBD) { _dictWords = DBD; }
     }
 
     #endregion

@@ -38,13 +38,13 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     #region Constructors
 
-    public RelationDiagram(DatabaseAbstract? database) {
+    public RelationDiagram(Database? database) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Database = database;
 
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         Database.DisposingEvent += Database_Disposing;
         foreach (var thisColumnItem in db.Column) {
             if (thisColumnItem != null && thisColumnItem.Format == DataFormat.RelationText) {
@@ -58,7 +58,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     #region Properties
 
-    public DatabaseAbstract? Database { get; private set; }
+    public Database? Database { get; private set; }
 
     #endregion
 
@@ -67,7 +67,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //private bool RelationsValid;
     //   Dim ItS As New Size(60, 80)
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        if (Database is not Database db || db.IsDisposed) { return null; }
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad?.Item?[what] != null) { return null; }
         var r = db.Row[what];
@@ -99,7 +99,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
-        if (Database is DatabaseAbstract db) {
+        if (Database is Database db) {
             db.DisposingEvent -= Database_Disposing;
         }
 
@@ -107,7 +107,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     private void BezPlus(RowFormulaPadItem initialItem) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         if (_column == null || initialItem.Row == null || db.Column.First() is not ColumnItem cf) { return; }
 
         // Den Beziehungstext holen

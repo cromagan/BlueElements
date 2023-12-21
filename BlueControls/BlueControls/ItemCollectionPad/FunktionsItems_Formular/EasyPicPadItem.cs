@@ -69,8 +69,8 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
         }
     }
 
-    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public DatabaseAbstract? DatabaseInputMustBe => null;
+    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInputMustBe => null;
     public override string Description => "Dieses Element erzeugt eine Bild-Steuerelement,\r\nwelches dann auch bearbeitet werden kann.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);

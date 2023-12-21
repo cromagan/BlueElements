@@ -46,18 +46,18 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
     #region Constructors
 
-    public FilterConverterElementPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => this.Parse(toParse);
+    public FilterConverterElementPadItem(string keyname, string toParse) : this(keyname, null as Database) => this.Parse(toParse);
 
-    public FilterConverterElementPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
+    public FilterConverterElementPadItem(Database? db) : this(string.Empty, db) { }
 
-    public FilterConverterElementPadItem(string intern, DatabaseAbstract? db) : base(intern) {
+    public FilterConverterElementPadItem(string intern, Database? db) : base(intern) {
         _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
     }
 
-    public FilterConverterElementPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
+    public FilterConverterElementPadItem(string intern) : this(intern, null as Database) { }
 
     #endregion
 
@@ -70,10 +70,10 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public DatabaseAbstract? DatabaseInputMustBe => null;
+    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInputMustBe => null;
 
-    public DatabaseAbstract? DatabaseOutput {
+    public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet();
         set => _itemSends.DatabaseOutputSet(value, this);
     }
@@ -183,7 +183,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
         var inr = _itemAccepts.GetFilterFromGet(this);
-        if (inr.Count > 0 && inr[0].DatabaseOutput is DatabaseAbstract dbin) {
+        if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin) {
             var ic = new ItemCollectionList.ItemCollectionList(true);
             ic.AddRange(dbin.Column, true);
             l.Add(new FlexiControlForProperty<string>(() => Eingangs_Wert_Spalte, ic));
@@ -196,7 +196,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         l.Add(new FlexiControl());
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
-        if (_itemSends.DatabaseOutputGet() is DatabaseAbstract outdb) {
+        if (_itemSends.DatabaseOutputGet() is Database outdb) {
             var ic = new ItemCollectionList.ItemCollectionList(true);
             ic.AddRange(outdb.Column, true);
             l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));

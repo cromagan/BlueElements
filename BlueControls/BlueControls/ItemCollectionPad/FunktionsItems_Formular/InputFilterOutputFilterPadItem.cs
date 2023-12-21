@@ -50,18 +50,18 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     #region Constructors
 
-    public InputFilterOutputFilterPadItem(string keyname, string toParse) : this(keyname, null as DatabaseAbstract) => this.Parse(toParse);
+    public InputFilterOutputFilterPadItem(string keyname, string toParse) : this(keyname, null as Database) => this.Parse(toParse);
 
-    public InputFilterOutputFilterPadItem(DatabaseAbstract? db) : this(string.Empty, db) { }
+    public InputFilterOutputFilterPadItem(Database? db) : this(string.Empty, db) { }
 
-    public InputFilterOutputFilterPadItem(string intern, DatabaseAbstract? db) : base(intern) {
+    public InputFilterOutputFilterPadItem(string intern, Database? db) : base(intern) {
         _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
     }
 
-    public InputFilterOutputFilterPadItem(string intern) : this(intern, null as DatabaseAbstract) { }
+    public InputFilterOutputFilterPadItem(string intern) : this(intern, null as Database) { }
 
     #endregion
 
@@ -97,10 +97,10 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         set => _itemSends.ChildIdsSet(value, this);
     }
 
-    public DatabaseAbstract? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public DatabaseAbstract? DatabaseInputMustBe => DatabaseOutput;
+    public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+    public Database? DatabaseInputMustBe => DatabaseOutput;
 
-    public DatabaseAbstract? DatabaseOutput {
+    public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet();
         set => _itemSends.DatabaseOutputSet(value, this);
     }

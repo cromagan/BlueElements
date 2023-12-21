@@ -104,9 +104,9 @@
     <Compile Include="AdditionalScriptMethods\Method_SetError.cs" />
     <Compile Include="AdditionalScriptMethods\VariableRowItem.cs" />
     <Compile Include="AdditionalScriptMethods\VariableFilterItem.cs" />
-    <Compile Include="DatabaseMU.cs" />
+    <Compile Include="DatabaseMu.cs" />
     <Compile Include="ConnetionInfo.cs" />
-    <Compile Include="DatabaseAbstract.cs" />
+    <Compile Include="Database.cs" />
     <Compile Include="Enums\Reason.cs" />
     <Compile Include="EventArgs\CellEditBlockReasonEventArgs.cs" />
     <Compile Include="EventArgs\CellChangedEventArgs.cs" />
@@ -129,7 +129,6 @@
     <Compile Include="ColumnItem.cs" />
     <Compile Include="ColumnViewCollection.cs" />
     <Compile Include="ColumnViewItem.cs" />
-    <Compile Include="Database.cs" />
     <Compile Include="Enums\FilterOptions.cs" />
     <Compile Include="Enums\FilterType.cs" />
     <Compile Include="Enums\ShortenStyle.cs" />
@@ -158,10 +157,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="DatabaseAbstract.resx">
-      <DependentUpon>DatabaseAbstract.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Database.resx">
       <DependentUpon>Database.cs</DependentUpon>
       <SubType>Designer</SubType>

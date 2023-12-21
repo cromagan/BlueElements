@@ -23,7 +23,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueDatabase;
-using static BlueDatabase.DatabaseAbstract;
+using static BlueDatabase.Database;
 
 namespace BlueControls.Interfaces;
 
@@ -32,7 +32,7 @@ public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangin
     #region Properties
 
     public ReadOnlyCollection<string> ChildIds { get; set; }
-    public DatabaseAbstract? DatabaseOutput { get; set; }
+    public Database? DatabaseOutput { get; set; }
     int OutputColorId { get; set; }
     public string Page { get; }
 
@@ -70,7 +70,7 @@ public static class ItemSendSomethingExtension {
     }
 
     public static void Datenbankkopf(this IItemSendSomething item) {
-        if (item.DatabaseOutput is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (item.DatabaseOutput is not Database db || db.IsDisposed) { return; }
         TableView.OpenDatabaseHeadEditor(db);
     }
 
@@ -99,7 +99,7 @@ public sealed class ItemSendSomething {
 
     private readonly List<string> _childIds = [];
 
-    private DatabaseAbstract? _databaseOutput;
+    private Database? _databaseOutput;
     private int _outputColorId = -1;
 
     #endregion
@@ -128,9 +128,9 @@ public sealed class ItemSendSomething {
         item.OnChanged();
     }
 
-    public DatabaseAbstract? DatabaseOutputGet() => _databaseOutput;
+    public Database? DatabaseOutputGet() => _databaseOutput;
 
-    public void DatabaseOutputSet(DatabaseAbstract? value, IItemSendSomething item) {
+    public void DatabaseOutputSet(Database? value, IItemSendSomething item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (value == _databaseOutput) { return; }
 
@@ -156,7 +156,7 @@ public sealed class ItemSendSomething {
             new FlexiControl("Ausgang:", widthOfControl)
         };
 
-        if (item.DatabaseOutput is not DatabaseAbstract db || db.IsDisposed) {
+        if (item.DatabaseOutput is not Database db || db.IsDisposed) {
             l.Add(new FlexiControlForDelegate(item.Datenbank_wählen, "Datenbank wählen", ImageCode.Datenbank));
             return l;
         }

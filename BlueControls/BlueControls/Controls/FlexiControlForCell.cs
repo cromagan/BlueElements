@@ -124,7 +124,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     }
 
     public void FilterInput_Changed(object sender, System.EventArgs e) {
-        if (FilterInput?.Database is DatabaseAbstract db) {
+        if (FilterInput?.Database is Database db) {
             db.Cell.CellValueChanged += Database_CellValueChanged;
             db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
             db.Row.RowChecked += Database_RowChecked;
@@ -152,7 +152,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     public void FilterInput_Changing(object sender, System.EventArgs e) {
         FillCellNow();
 
-        if (FilterInput?.Database is DatabaseAbstract db) {
+        if (FilterInput?.Database is Database db) {
             db.Cell.CellValueChanged -= Database_CellValueChanged;
             db.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
             db.Row.RowChecked -= Database_RowChecked;
@@ -450,7 +450,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
             ColumnItem? tmpColumn;
             RowItem? tmpRow;
 
-            if (FilterInput?.Database is DatabaseAbstract db && !db.IsDisposed) {
+            if (FilterInput?.Database is Database db && !db.IsDisposed) {
                 tmpColumn = db.Column.Exists(_columnName);
                 tmpRow = FilterInput?.RowSingleOrNull;
             } else {
@@ -488,7 +488,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     }
 
     private void Marker_DoWork(object sender, DoWorkEventArgs e) {
-        if (FilterInput?.Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (FilterInput?.Database is not Database db || db.IsDisposed) { return; }
 
         #region  in Frage kommende Textbox ermitteln txb
 

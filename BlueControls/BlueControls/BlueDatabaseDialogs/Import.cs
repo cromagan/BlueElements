@@ -34,7 +34,7 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
 
     #region Constructors
 
-    public Import(DatabaseAbstract? database, string importtext) : base() {
+    public Import(Database? database, string importtext) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -42,7 +42,7 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
         var ein = _originalImportText.SplitAndCutByCrToList();
         Eintr.Text = ein.Count + " zum Importieren bereit.";
         Database = database;
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
 
         db.DisposingEvent += Database_DisposingEvent;
     }
@@ -51,7 +51,7 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
 
     #region Properties
 
-    public DatabaseAbstract? Database { get; }
+    public Database? Database { get; }
 
     #endregion
 

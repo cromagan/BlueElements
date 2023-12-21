@@ -40,7 +40,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Constructors
 
-    public ColumnCollection(DatabaseAbstract database) : base() {
+    public ColumnCollection(Database database) : base() {
         Database = database;
         Database.DisposingEvent += Database_Disposing;
     }
@@ -63,7 +63,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public int Count => _internal.Count;
 
-    public DatabaseAbstract? Database { get; private set; }
+    public Database? Database { get; private set; }
 
     ///// <summary>
     ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
@@ -126,7 +126,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public ColumnItem? Exists(string? columnName) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
+        if (Database is not Database db || db.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
 
         try {
             columnName = columnName.ToUpper();
@@ -144,7 +144,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? First() {
         // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        if (Database is not Database db || db.IsDisposed) { return null; }
 
         if (db.ColumnArrangements.Count < 1 || db.ColumnArrangements[0].Count != db.Column.Count()) {
             //Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
@@ -171,7 +171,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             return null;
         }
 
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return null; }
+        if (Database is not Database db || db.IsDisposed) { return null; }
 
         //var item = SearchByKey(key);
         //if (item != null) {
@@ -217,7 +217,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public void GenerateOverView() {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return; }
+        if (Database is not Database db || db.IsDisposed) { return; }
         Html da = new(Database.TableName);
         da.AddCaption("Spaltenliste von: " + Database.Caption);
         da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.TableName + "</h1><br>");
@@ -329,7 +329,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //}
     public void Repair() {
         GetSystems();
-        if (!string.IsNullOrEmpty(DatabaseAbstract.EditableErrorReason(Database, EditableErrorReasonType.EditAcut)) || Database is null) { return; }
+        if (!string.IsNullOrEmpty(Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut)) || Database is null) { return; }
 
         //for (var s1 = 0; s1 < Count; s1++) {
         //    if (this[s1] != null) {
@@ -385,7 +385,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    }
     internal bool ChangeName(string oldName, string newName) {
         if (oldName == newName) { return true; }
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return false; }
+        if (Database is not Database db || db.IsDisposed) { return false; }
 
         var ok = _internal.TryRemove(oldName.ToUpper(), out var vcol);
         if (!ok) { return false; }
@@ -406,7 +406,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     /// </summary>
     //public int IndexOf(ColumnItem? column) {
     //    if (column == null || column.IsDisposed || Database?.Column == null || Database.IsDisposed) { return -1; }
-    internal void CloneFrom(DatabaseAbstract sourceDatabase) {
+    internal void CloneFrom(Database sourceDatabase) {
         // Spalten, die zu viel sind, löschen
         var names = new List<ColumnItem>();
         foreach (var thisColumn in this) {
@@ -439,7 +439,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     internal string ExecuteCommand(DatabaseDataType type, string name, Reason reason) {
-        if (Database is not DatabaseAbstract db || db.IsDisposed) { return "Datenbank verworfen!"; }
+        if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type == DatabaseDataType.Command_AddColumnByName) {
             var c = Exists(name);
@@ -497,7 +497,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     //public ColumnItem? this[int index] {
     //    get {
-    //        if (Database is not DatabaseAbstract db || Database.IsDisposed) { return null; }
+    //        if (Database is not Database db || Database.IsDisposed) { return null; }
 
     //        //var L = new List<string>();
 

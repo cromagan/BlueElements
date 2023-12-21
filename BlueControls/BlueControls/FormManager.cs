@@ -120,7 +120,7 @@ public class FormManager : ApplicationContext {
             Running = false;
             ExecuteAtEnd?.Invoke();
 
-            var a = DatabaseAbstract.AllFiles.Clone();
+            var a = Database.AllFiles.Clone();
             foreach (var thisDb in a) {
                 thisDb.Dispose();
             }
