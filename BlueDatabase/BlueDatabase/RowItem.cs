@@ -469,7 +469,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     public bool NeedsUpdate() => Database?.Column.SysRowState is ColumnItem srs &&
                                      CellGetString(srs) != Database.EventScriptVersion &&
-                                     Database.IsRowScriptPossible(true);
+                                     Database.HasValueChangedScript();
 
     /// <summary>
     ///

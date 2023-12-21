@@ -461,7 +461,7 @@ public partial class TableView : FormWithStatusBar {
 
         _ = e.UserMenu.Add("Zeile", true);
         _ = e.UserMenu.Add(ContextMenuCommands.ZeileLöschen, row != null && db.IsAdministrator());
-        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null && db.HasErrorCheckScript());
+        _ = e.UserMenu.Add("Auf Fehler prüfen", "Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), row != null && db.HasPrepareFormulaCheckScript());
 
         foreach (var thiss in db.EventScript) {
             if (thiss != null && thiss.ManualExecutable && thiss.NeedRow) {
@@ -1160,7 +1160,7 @@ public partial class TableView : FormWithStatusBar {
             }
         }
 
-        if (db.HasErrorCheckScript()) {
+        if (db.HasPrepareFormulaCheckScript()) {
             _ = lstAufgaben.Item.Add("Zeilen auf Fehler prüfen", "#datenüberprüfung", ImageCode.HäkchenDoppelt);
         }
 

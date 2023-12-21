@@ -39,9 +39,8 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
     #region Fields
 
+    private bool _allowTemporay;
     private DatabaseScriptDescription? _item;
-
-    private bool allowTemporay;
 
     #endregion
 
@@ -231,7 +230,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
     }
 
     private void Database_CanDoScript(object sender, CancelReasonEventArgs e) {
-        if (allowTemporay) { return; }
+        if (_allowTemporay) { return; }
         e.CancelReason = "Skript-Editor geöffnet";
     }
 
@@ -296,9 +295,9 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             if (MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) { return; }
         }
 
-        allowTemporay = true;
+        _allowTemporay = true;
         e.Feedback = Database?.ExecuteScript(_item, chkChangeValuesInTest.Checked, r, null);
-        allowTemporay = false;
+        _allowTemporay = false;
         variableEditor.WriteVariablesToTable(Database?.Variables);
     }
 

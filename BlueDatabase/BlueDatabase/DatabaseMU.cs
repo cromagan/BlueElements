@@ -36,6 +36,7 @@ public class DatabaseMu : Database {
 
     #region Fields
 
+    private bool _mustMakeMaster = false;
     private string _myFragmentsFilename = string.Empty;
     private StreamWriter? _writer;
 
@@ -50,22 +51,10 @@ public class DatabaseMu : Database {
     #region Properties
 
     public new static string DatabaseId => nameof(DatabaseMu);
-
     public override ConnectionInfo ConnectionData => new(TableName, this, DatabaseId, Filename, FreezedReason);
+    protected override bool MultiUser => true;
 
     #endregion
-
-    //public new static Database? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
-    //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
-
-    //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
-    //    if (ci.AdditionalData.FileSuffix().ToUpper() is not "MBDB") { return null; }
-    //    if (!FileExists(ci.AdditionalData)) { return null; }
-
-    //    var db = new DatabaseMu(ci.TableName);
-    //    db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
-    //    return db;
-    //}
 
     #region Methods
 
@@ -79,6 +68,10 @@ public class DatabaseMu : Database {
         return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
     }
 
+    //    var db = new DatabaseMu(ci.TableName);
+    //    db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
+    //    return db;
+    //}
     public override void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool ronly) {
         if (FileExists(fileNameToLoad)) {
             Filename = fileNameToLoad;
@@ -90,6 +83,9 @@ public class DatabaseMu : Database {
         base.LoadFromFile(fileNameToLoad, createWhenNotExisting, needPassword, freeze, ronly);
     }
 
+    //    if (string.IsNullOrEmpty(ci.AdditionalData)) { return null; }
+    //    if (ci.AdditionalData.FileSuffix().ToUpper() is not "MBDB") { return null; }
+    //    if (!FileExists(ci.AdditionalData)) { return null; }
     public override bool Save() {
         if (_writer == null) { return true; }
 
@@ -101,6 +97,8 @@ public class DatabaseMu : Database {
         } catch { return false; }
     }
 
+    //public new static Database? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
+    //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
     protected override List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked, string mustBeFreezed) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Datenbank
 
@@ -140,6 +138,9 @@ public class DatabaseMu : Database {
         base.DoWorkAfterLastChanges(files, columnsAdded, rowsAdded, starttimeUtc);
         if (ReadOnly) { return; }
         if (files == null || files.Count < 1) { return; }
+
+        _mustMakeMaster = files.Count > 8 || ChangesNotIncluded.Count > 40;
+
         if (DateTime.UtcNow.Subtract(starttimeUtc).TotalSeconds > 20) { return; }
         if (!Directory.Exists(OldFragmengtsPath())) { return; }
 
@@ -269,6 +270,11 @@ public class DatabaseMu : Database {
             return (l, frgm);
         } catch { }
         return (null, null);
+    }
+
+    protected virtual bool IsThereNeedToMakeMeMaster() {
+        if (_mustMakeMaster) { return true; }
+        return base.IsThereNeedToMakeMeMaster();
     }
 
     protected override List<Database> LoadedDatabasesWithSameServer() {

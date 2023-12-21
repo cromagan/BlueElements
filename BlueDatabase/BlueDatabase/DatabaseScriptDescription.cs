@@ -153,12 +153,12 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
 
         if (_eventTypes.HasFlag(ScriptEventTypes.value_changed)) {
             if (!_needRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
-            if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen"; }
+            if (!ChangeValues) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.new_row)) {
             if (!_needRow) { return "Routinen, die neue Zeilen überwachen, müssen sich auf Zeilen beziehen."; }
-            if (!ChangeValues) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen"; }
+            if (!ChangeValues) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen."; }
         }
 
         if (_eventTypes.HasFlag(ScriptEventTypes.loaded)) {

@@ -456,6 +456,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected string LoadedVersion { get; private set; }
 
+    protected virtual bool MultiUser => false;
+
     /// <summary>
     ///  Wann die Datei zuletzt geladen wurde. Einzige funktion, zu viele Ladezyklen hintereinander verhinden.
     /// </summary>
@@ -959,9 +961,10 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     //    db.LoadFromFile(ci.AdditionalData, false, needPassword, ci.MustBeFreezed, readOnly);
     //    return db;
     //}
-
     public bool AmITemporaryMaster(bool checkUpcomingTo) {
         if (ReadOnly) { return false; }
+
+        if (!MultiUser) { return true; }
         if (DateTime.UtcNow.Subtract(IsInCache).TotalMinutes > 5) { return false; }
         if (TemporaryDatabaseMasterUser != UserName + "-" + Environment.MachineName) { return false; }
 
@@ -1509,10 +1512,17 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return GetById(x, readOnly, null, true);// new DatabaseSQL(_sql, readOnly, tablename);
     }
 
-    public bool HasErrorCheckScript() {
+    public bool HasPrepareFormulaCheckScript() {
         if (!IsRowScriptPossible(true)) { return false; }
 
         var e = EventScript.Get(ScriptEventTypes.prepare_formula);
+        return e.Count == 1;
+    }
+
+    public bool HasValueChangedScript() {
+        if (!IsRowScriptPossible(true)) { return false; }
+
+        var e = EventScript.Get(ScriptEventTypes.value_changed);
         return e.Count == 1;
     }
 
@@ -1716,7 +1726,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
-        if (_datenbankAdmin == null || _datenbankAdmin.Count == 0) { return false; }
+        if (_datenbankAdmin.Count == 0) { return false; }
         if (_datenbankAdmin.Contains(Everybody, false)) { return true; }
         if (!string.IsNullOrEmpty(UserName) && _datenbankAdmin.Contains("#User: " + UserName, false)) { return true; }
         return !string.IsNullOrEmpty(UserGroup) && _datenbankAdmin.Contains(UserGroup, false);
@@ -2177,6 +2187,14 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return true;
     }
 
+    protected virtual bool IsThereNeedToMakeMeMaster() {
+        if (!MultiUser) { return false; }
+
+        if (HasValueChangedScript()) { return false; }
+
+        return true;
+    }
+
     protected virtual List<Database> LoadedDatabasesWithSameServer() => [this];
 
     protected void OnLoaded() {
@@ -2469,10 +2487,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     /// </summary>
     protected void TryToSetMeTemporaryMaster() {
         if (ReadOnly) { return; }
+        if (!MultiUser) { return; }
         if (!IsAdministrator()) { return; }
         if (!IsRowScriptPossible(true)) { return; }
 
         if (AmITemporaryMaster(true)) { return; }
+
+        if (!IsThereNeedToMakeMeMaster()) { return; }
 
         var d = DateTimeParse(TemporaryDatabaseMasterTimeUtc);
 

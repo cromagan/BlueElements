@@ -64,6 +64,8 @@ public sealed class DatabaseSqlLite : Database {
         }
     }
 
+    protected override bool MultiUser => true;
+
     #endregion
 
     //public static Database? CanProvide(ConnectionInfo ci, bool readOnly, NeedPassword? needPassword) {
