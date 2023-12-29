@@ -313,8 +313,8 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return new DoItFeedback(infos.Data, "Interner Fehler");
     }
 
-    public CanDoFeedback CanDo(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
-        if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns)) {
+    public CanDoFeedback CanDo(ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
+        if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns) && MustUseReturnValue) {
             return new CanDoFeedback(pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
         }
         if (expectedvariablefeedback && string.IsNullOrEmpty(Returns)) {

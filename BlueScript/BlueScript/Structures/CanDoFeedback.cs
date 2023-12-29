@@ -59,6 +59,12 @@ public readonly struct CanDoFeedback {
     public int ContinueOrErrorPosition { get; }
 
     public LogData Data { get; }
+
+    /// <summary>
+    /// Gibt empty zurück, wenn der Befehl ausgeführt werden kann.
+    /// Ansonsten den Grund, warum er nicht ausgeführt werden kann.
+    /// Nur in Zusammenhang mit MustAbort zu benutzen, weil hier auch einfach die Meldung sein kann, dass der Befehl nicht erkannt wurde - was an sich kein Fehler ist.
+    /// </summary>
     public string ErrorMessage { get; }
 
     /// <summary>

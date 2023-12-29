@@ -72,10 +72,18 @@ public class Script {
     public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
         if (Commands == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
+        #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
+
+        if (scriptText.Length > pos && scriptText.Substring(pos, 1) == ";") {
+            return new DoItWithEndedPosFeedback(true, null, pos + 1, false, false);
+        }
+
+        #endregion
+
         #region Befehle prüfen
 
         foreach (var thisC in Commands) {
-            var f = thisC.CanDo(varCol, scp, scriptText, pos, expectedvariablefeedback, ld);
+            var f = thisC.CanDo(scp, scriptText, pos, expectedvariablefeedback, ld);
             if (f.MustAbort) { return new DoItWithEndedPosFeedback(f.ErrorMessage, ld); }
 
             if (string.IsNullOrEmpty(f.ErrorMessage)) {
@@ -112,7 +120,8 @@ public class Script {
 
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var f in Commands.Select(thisC => thisC.CanDo(varCol, scp, scriptText, pos, !expectedvariablefeedback, ld))) {
+        foreach (var thisC in Commands) {
+            var f = thisC.CanDo(scp, scriptText, pos, !expectedvariablefeedback, ld);
             if (f.MustAbort) {
                 return new DoItWithEndedPosFeedback(f.ErrorMessage, ld);
             }
@@ -122,7 +131,9 @@ public class Script {
                     return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), ld);
                 }
 
+                //if (thisC.MustUseReturnValue) {
                 return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), ld);
+                //}
             }
         }
 

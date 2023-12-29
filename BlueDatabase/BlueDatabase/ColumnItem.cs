@@ -1769,7 +1769,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
                 //_AutofilterTextFilterErlaubt = false;
                 _ignoreAtRowFilter = true;
                 _filterOptions = FilterOptions.Enabled;
-                _scriptType = ScriptType.Bool_Readonly;
+                _scriptType = ScriptType.Nicht_vorhanden; // Wichtig! Weil eine Routine ErrorCol !=0 den Wert setzt und evtl. eine Endlosschleife auslöst
                 _align = AlignmentHorizontal.Zentriert;
                 _dropDownItems.Clear();
                 _linkedCellFilter.Clear();
