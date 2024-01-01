@@ -104,6 +104,13 @@ public sealed class ColumnViewItem : IParseable {
         if (Column == null) { return 0; }
         if (TmpDrawWidth is int v) { return v; }
 
+        if (Parent.Count == 1) {
+            TmpDrawWidth = displayRectangleWoSlider.Width;
+            return displayRectangleWoSlider.Width;
+        }
+    
+
+
         if (TmpReduced) {
             TmpDrawWidth = pix16;
         } else {

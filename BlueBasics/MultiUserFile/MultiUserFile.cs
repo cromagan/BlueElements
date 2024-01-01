@@ -54,10 +54,10 @@ public sealed class MultiUserFile : IDisposableExtended {
     //private static string _lockLastastfile = string.Empty;
     private int _lockload;
 
+    private int _reloadDelaySecond = 10;
+
     //private int _loadingThreadId = -1;
     private FileSystemWatcher? _watcher;
-
-    private int ReloadDelaySecond = 10;
 
     #endregion
 
@@ -311,7 +311,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
     }
 
-    public void ForceLoadSave() => _checkerTickCount = Math.Max(ReloadDelaySecond, 10) + 10;
+    public void ForceLoadSave() => _checkerTickCount = Math.Max(_reloadDelaySecond, 10) + 10;
 
     public bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
@@ -452,6 +452,12 @@ public sealed class MultiUserFile : IDisposableExtended {
         Filename = newFileName;
         OnDiscardPendingChanges(); // Oben beschrieben. Sonst passiert bei Reload, dass diese wiederholt werden.
         var l = OnToListOfByte();
+
+        if (l == null) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenfehler!");
+            throw new Exception("Datenfehler!");
+        }
+
         using (FileStream x = new(newFileName, FileMode.Create, FileAccess.Write, FileShare.None)) {
             x.Write(l.ToArray(), 0, l.ToArray().Length);
             x.Flush();
@@ -512,8 +518,8 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
 
         // Zeiten berechnen
-        ReloadDelaySecond = Math.Max(ReloadDelaySecond, 10);
-        var countSave = (Math.Min((ReloadDelaySecond / 10f) + 1, 10) * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
+        _reloadDelaySecond = Math.Max(_reloadDelaySecond, 10);
+        var countSave = (Math.Min((_reloadDelaySecond / 10f) + 1, 10) * 2) + 1; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
 
         var mustReload = ReloadNeeded;
 
@@ -532,7 +538,7 @@ public sealed class MultiUserFile : IDisposableExtended {
         }
 
         // Überhaupt nix besonderes. Ab und zu mal Reloaden
-        if (mustReload && _checkerTickCount > ReloadDelaySecond) {
+        if (mustReload && _checkerTickCount > _reloadDelaySecond) {
             RepairOldBlockFiles();
             if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Load))) { return; }
             _ = Load_Reload();
@@ -699,16 +705,18 @@ public sealed class MultiUserFile : IDisposableExtended {
     }
 
     private void RemoveWatcher() {
-        if (_watcher != null) {
-            _watcher.EnableRaisingEvents = false;
-            _watcher.Changed -= Watcher_Changed;
-            _watcher.Created -= Watcher_Created;
-            _watcher.Deleted -= Watcher_Deleted;
-            _watcher.Renamed -= Watcher_Renamed;
-            _watcher.Error -= Watcher_Error;
-            _watcher?.Dispose();
-            _watcher = null;
-        }
+        try {
+            if (_watcher != null) {
+                _watcher.EnableRaisingEvents = false;
+                _watcher.Changed -= Watcher_Changed;
+                _watcher.Created -= Watcher_Created;
+                _watcher.Deleted -= Watcher_Deleted;
+                _watcher.Renamed -= Watcher_Renamed;
+                _watcher.Error -= Watcher_Error;
+                _watcher?.Dispose();
+                _watcher = null;
+            }
+        } catch { }
     }
 
     private void RepairOldBlockFiles() {
@@ -763,7 +771,11 @@ public sealed class MultiUserFile : IDisposableExtended {
             IsSaving = false;
             return Feedback("Datei wurde inzwischen verändert.");
         }
-        if (!savedDataUncompressed.SequenceEqual(OnToListOfByte())) {
+
+        var lb = OnToListOfByte();
+        if (lb == null) { return Feedback("Daten-Fehler"); }
+
+        if (!savedDataUncompressed.SequenceEqual(lb)) {
             _ = DeleteBlockDatei(false, true);
             IsSaving = false;
             return Feedback("Daten wurden inzwischen verändert.");
@@ -807,8 +819,12 @@ public sealed class MultiUserFile : IDisposableExtended {
         OnSavedToDisk();
         IsSaving = false;
         return string.Empty;
+
         string Feedback(string txt) {
-            _ = DeleteFile(tmpFileName, false);
+            if (tmpFileName != null) {
+                _ = DeleteFile(tmpFileName, false);
+            }
+
             //Develop.DebugPrint(enFehlerArt.Info, "Speichern der Datei abgebrochen.<br>Datei: " + Filename + "<br><br>Grund:<br>" + txt);
             RepairOldBlockFiles();
             return txt;

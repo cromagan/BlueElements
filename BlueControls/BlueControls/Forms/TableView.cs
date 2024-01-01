@@ -19,7 +19,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using BlueBasics;
@@ -187,14 +186,14 @@ public partial class TableView : FormWithStatusBar {
         _ = se.ShowDialog();
     }
 
-    public void ResetDatabaseSettings() {
-        foreach (var thisT in tbcDatabaseSelector.TabPages) {
-            if (thisT is TabPage tp && tp.Tag is List<object> s) {
-                s[1] = string.Empty;
-                tp.Tag = s;
-            }
-        }
-    }
+    //public void ResetDatabaseSettings() {
+    //    foreach (var thisT in tbcDatabaseSelector.TabPages) {
+    //        if (thisT is TabPage tp && tp.Tag is List<object> s) {
+    //            s[1] = string.Empty;
+    //            tp.Tag = s;
+    //        }
+    //    }
+    //}
 
     /// <summary>
     /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.
@@ -203,16 +202,7 @@ public partial class TableView : FormWithStatusBar {
     protected void AddTabPage(ConnectionInfo? ci) {
         if (ci is null) { return; }
 
-        var toParse = string.Empty;
-
-        ////LoadSettingsFromDisk();
-        //if (string.IsNullOrEmpty(toParse)) {
-        //    var v = _settings.TagGet("TableDefaultView_" + ci.TableName);
-
-        //    if (!string.IsNullOrEmpty(v)) {
-        //        toParse = "{Ansicht=" + v + "}";
-        //    }
-        //}
+        var toParse = _settings.TagGet("View_" + ci.TableName).FromNonCritical();
 
         var nTabPage = new TabPage {
             Name = tbcDatabaseSelector.TabCount.ToString(),
@@ -332,6 +322,15 @@ public partial class TableView : FormWithStatusBar {
                         ribMain.SelectedIndex = int.Parse(pair.Value);
                         break;
 
+                    case "splitterx":
+                        SplitContainer1.SplitterDistance = int.Parse(pair.Value);
+                        break;
+
+                    case "windowstate":
+                        WindowState = (FormWindowState)int.Parse(pair.Value);
+                        break;
+
+
                     default:
                         DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);
                         break;
@@ -362,6 +361,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
+        SaveSettingsToDisk();
         DatabaseSet(null, string.Empty);
         MultiUserFile.SaveAll(true);
         Database.ForceSaveAll();
@@ -380,9 +380,9 @@ public partial class TableView : FormWithStatusBar {
     }
 
     /// <summary>
-    /// Schaltet um auf die gewählte Datenbank. Ist diese nicht vorhanden, wird ein neuer Reiter erstellt.
+    /// Sucht den Tab mit der angegebenen Datenbank.
+    /// Ist kein Reiter vorhanden, wird ein Neuer erzeugt.
     /// </summary>
-    /// <param name="connectionInfo"></param>
     /// <returns></returns>
     protected bool SwitchTabToDatabase(ConnectionInfo? connectionInfo) {
         if (connectionInfo is null) { return false; }
@@ -390,7 +390,7 @@ public partial class TableView : FormWithStatusBar {
         foreach (var thisT in tbcDatabaseSelector.TabPages) {
             if (thisT is TabPage tp && tp.Tag is List<object> s && s[0] is ConnectionInfo ci) {
                 if (ci.UniqueId.Equals(connectionInfo.UniqueId, StringComparison.OrdinalIgnoreCase)) {
-                    tbcDatabaseSelector.SelectedTab = tp;
+                    tbcDatabaseSelector.SelectedTab = tp; // tbcDatabaseSelector_Selected macht die eigentliche Arbeit
 
                     if (_firstOne) {
                         _firstOne = false;
@@ -410,7 +410,7 @@ public partial class TableView : FormWithStatusBar {
 
     /// <summary>
     /// Sucht den Tab mit der angegebenen Datenbank.
-    /// Ist kein Reiter vorhanden, wird ein neuer erzeugt.
+    /// Ist kein Reiter vorhanden, wird ein Neuer erzeugt.
     /// </summary>
     /// <returns></returns>
     protected bool SwitchTabToDatabase(Database? database) {
@@ -671,6 +671,8 @@ public partial class TableView : FormWithStatusBar {
         //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
 
         List<string> result = [];
+        result.ParseableAdd("WindowState", WindowState);
+        result.ParseableAdd("SplitterX", SplitContainer1.SplitterDistance);
         result.ParseableAdd("MainTab", ribMain.SelectedIndex);
         result.ParseableAdd("TableView", Table.ViewToString());
 
@@ -872,8 +874,6 @@ public partial class TableView : FormWithStatusBar {
             return;
         }
 
-        const bool enTabAllgemein = true;
-
         if (Table.Database is not Database db || db.IsDisposed || !db.IsAdministrator()) {
             tabAdmin.Enabled = false;
             return; // Weitere funktionen benötigen sicher eine Datenbank um keine Null Exception auszulösen
@@ -881,9 +881,9 @@ public partial class TableView : FormWithStatusBar {
 
         var m = Database.EditableErrorReason(db, EditableErrorReasonType.EditCurrently);
 
-        grpAdminAllgemein.Enabled = enTabAllgemein;
-        grpImport.Enabled = true;
-        tabAdmin.Enabled = true;
+        grpAdminAllgemein.Enabled = string.IsNullOrEmpty(m);
+        grpImport.Enabled = string.IsNullOrEmpty(m);
+        tabAdmin.Enabled = string.IsNullOrEmpty(m);
     }
 
     private void InitView() {
@@ -1010,26 +1010,33 @@ public partial class TableView : FormWithStatusBar {
         lstAufgaben.Enabled = true;
     }
 
-    private string NameRepair(string istName, RowItem? vRow) {
-        var newName = istName;
-        var istZ = 0;
-        do {
-            var changed = false;
-            if (Table.Database != null && Table.Database.Row.Any(thisRow =>
-                    thisRow != null && thisRow != vRow && string.Equals(thisRow.CellFirstString(), newName,
-                        StringComparison.OrdinalIgnoreCase))) {
-                istZ++;
-                newName = istName + " (" + istZ + ")";
-                changed = true;
-            }
+    //private string NameRepair(string istName, RowItem? vRow) {
+    //    var newName = istName;
+    //    var istZ = 0;
+    //    do {
+    //        var changed = false;
+    //        if (Table.Database != null && Table.Database.Row.Any(thisRow =>
+    //                thisRow != null && thisRow != vRow && string.Equals(thisRow.CellFirstString(), newName,
+    //                    StringComparison.OrdinalIgnoreCase))) {
+    //            istZ++;
+    //            newName = istName + " (" + istZ + ")";
+    //            changed = true;
+    //        }
 
-            if (!changed) {
-                return newName;
-            }
-        } while (true);
-    }
+    //        if (!changed) {
+    //            return newName;
+    //        }
+    //    } while (true);
+    //}
 
+    /// <summary>
+    /// Speichert die aktuelle Ansicht in die Settings Datei und speichert das dann alles auf Festplatte
+    /// </summary>
     private void SaveSettingsToDisk() {
+        if (Table.Database is Database db && !db.IsDisposed) {
+            _settings.TagSet("View_" + db.TableName, ViewToString().ToNonCritical());
+        }
+
         if (CanWriteInDirectory(SettingsFileName().FilePath())) {
             _settings.WriteAllText(SettingsFileName(), Encoding.UTF8, false);
         }
@@ -1037,28 +1044,31 @@ public partial class TableView : FormWithStatusBar {
 
     private string SettingsFileName() => Application.StartupPath + "\\" + Name + "-Settings.ini";
 
-    private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
-        column = Table.View_ColumnFirst();
-        row = null;
+    //private void SuchEintragNoSave(Direction richtung, out ColumnItem? column, out RowData? row) {
+    //    column = Table.View_ColumnFirst();
+    //    row = null;
 
-        if (Table.Database is not Database db || db.Row.Count < 1) { return; }
+    //    if (Table.Database is not Database db || db.Row.Count < 1) { return; }
 
-        // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
-        if (richtung.HasFlag(Direction.Unten)) {
-            row = Table.View_NextRow(Table.CursorPosRow) ?? Table.View_RowFirst();
-        }
+    //    // Temporär berechnen, um geflacker zu vermeiden (Endabled - > Disabled bei Nothing)
+    //    if (richtung.HasFlag(Direction.Unten)) {
+    //        row = Table.View_NextRow(Table.CursorPosRow) ?? Table.View_RowFirst();
+    //    }
 
-        if (richtung.HasFlag(Direction.Oben)) {
-            row = Table.View_PreviousRow(Table.CursorPosRow) ?? Table.View_RowLast();
-        }
+    //    if (richtung.HasFlag(Direction.Oben)) {
+    //        row = Table.View_PreviousRow(Table.CursorPosRow) ?? Table.View_RowLast();
+    //    }
 
-        row ??= Table.View_RowFirst();
-    }
+    //    row ??= Table.View_RowFirst();
+    //}
 
     private void tbcDatabaseSelector_Deselecting(object sender, TabControlCancelEventArgs e) {
         var s = (List<object>)e.TabPage.Tag;
         s[1] = ViewToString();
+
         e.TabPage.Tag = s;
+
+        SaveSettingsToDisk();
     }
 
     /// <summary>
@@ -1108,7 +1118,6 @@ public partial class TableView : FormWithStatusBar {
         e.TabPage.Text = db?.TableName.ToTitleCase() ?? "FEHLER";
 
         UpdateScripts(db);
-
         DatabaseSet(db, (string)s[1]);
     }
 

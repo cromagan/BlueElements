@@ -124,7 +124,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     private bool _ignoreAtRowFilter;
 
-    //private long _key;
     private ColumnLineStyle _lineLeft;
 
     private ColumnLineStyle _lineRight;
@@ -157,7 +156,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     private int _roundAfterEdit;
 
-    //private bool _saveContent;
     private ScriptType _scriptType;
 
     private bool _showMultiLineInOneLine;
@@ -188,8 +186,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (ex != null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Key existiert bereits");
         }
-
-        //_key = database.Column.NextColumnKey();
 
         #region Standard-Werte
 
@@ -1260,30 +1256,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         return Contents(r2);
     }
 
-    //public List<string> Contents(FilterItem fi, List<RowItem>? additional) => Contents(new FilterCollection(fi.Database) { fi }, additional);
     public List<string> Contents(ICollection<RowItem>? rows) {
         if (rows == null || rows.Count == 0) { return []; }
 
         RefreshColumnsData();
-
-        //ConcurrentBag<string> list = new();
-        //q
-        //try {
-        //    _ = Parallel.ForEach(rows, thisRowItem => {
-        //        if (thisRowItem != null) {
-        //            if (_multiLine) {
-        //                list.AddIfNotExists(thisRowItem.CellGetList(this));
-        //            } else {
-        //                if (thisRowItem.CellGetString(this).Length > 0) {
-        //                    list.AddIfNotExists(thisRowItem.CellGetString(this));
-        //                }
-        //            }
-        //        }
-        //    });
-        //} catch {
-        //    Develop.CheckStackForOverflow();
-        //    return Contents(rows);
-        //}
 
         var list = new List<string>();
         foreach (var thisRowItem in rows) {
@@ -1307,15 +1283,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         GC.SuppressFinalize(this);
     }
 
-    //    foreach (var thisRowItem in Database.Row) {
-    //        if (thisRowItem != null) {
-    //            if (thisRowItem.MatchesTo(filter) ||
-    //                (pinned != null && pinned.Contains(thisRowItem))) {
-    //                thisRowItem.CellSet(this, string.Empty);
-    //            }
-    //        }
-    //    }
-    //}
     public string ErrorReason() {
         if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
         //if (_name < 0) { return "Interner Fehler: ID nicht definiert"; }
@@ -1349,7 +1316,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
             var c = db2.Column.Exists(_linkedCell_ColumnNameOfLinkedDatabase);
             if (c == null) { return "Die verknüpfte Schlüsselspalte existiert nicht."; }
             //var (filter, info) = CellCollection.GetFilterFromLinkedCellData(LinkedDatabase, column, row);
-            if (_linkedCellFilter == null || _linkedCellFilter.Count == 0) {
+            if (_linkedCellFilter.Count == 0) {
                 if (Format != DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) {
                     return "Keine Filter für verknüpfte Datenbank definiert.";
                 }
@@ -1901,7 +1868,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         l.WriteAllText(TempFile(string.Empty, string.Empty, "txt"), Encoding.UTF8, true);
     }
 
-    public double? Summe(FilterCollection? fc) {
+    public double? Summe(FilterCollection fc) {
         if (Database is not Database db || db.IsDisposed) { return null; }
 
         double summ = 0;

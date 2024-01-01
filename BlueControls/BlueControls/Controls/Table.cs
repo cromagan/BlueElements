@@ -797,6 +797,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public void Draw_Column_Head(Graphics gr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int lfdNo, ColumnViewCollection ca) {
         if (!IsOnScreen(viewItem, displayRectangleWoSlider)) { return; }
+        if (!ca.ShowHead) { return; }
 
         if (viewItem.Column != null) {
             if (viewItem.OrderTmpSpalteX1 != null) {
@@ -936,7 +937,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 var tmpSortDefinition = SortUsed();
                 if (tmpSortDefinition != null && (tmpSortDefinition.UsedForRowSort(viewItem.Column) || viewItem.Column == Database?.Column.SysChapter)) {
                     if (viewItem.OrderTmpSpalteX1 != null) {
-                        gr.DrawImage(tmpSortDefinition.Reverse ? QuickImage.Get("ZA|11|5||||50") : QuickImage.Get("AZ|11|5||||50"), (float)(viewItem.OrderTmpSpalteX1 ?? 0 + (viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) / 2.0) - 6), ca.HeadSize(_columnFont) - 6 - AutoFilterSize);
+                        gr.DrawImage(tmpSortDefinition.Reverse ? QuickImage.Get("ZA|11|5||||50") : QuickImage.Get("AZ|11|5||||50"),
+                            (float)((viewItem.OrderTmpSpalteX1 ?? 0) + (viewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) / 2.0) - 6),
+                            ca.HeadSize(_columnFont) - 6 - AutoFilterSize);
                     }
                 }
             }
@@ -1781,14 +1784,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
             if (e.Button == MouseButtons.Left) {
                 if (_mouseOverColumn != null) {
-                    if (Mouse_IsInAutofilter(viewItem, e)) {
+                    if (Mouse_IsInAutofilter(viewItem, e, ca)) {
                         var screenX = Cursor.Position.X - e.X;
                         var screenY = Cursor.Position.Y - e.Y;
                         AutoFilter_Show(ca, viewItem, screenX, screenY);
                         return;
                     }
 
-                    if (Mouse_IsInRedcueButton(viewItem, e)) {
+                    if (Mouse_IsInRedcueButton(viewItem, e, ca)) {
                         viewItem.TmpReduced = !viewItem.TmpReduced;
                         viewItem.TmpDrawWidth = null;
                         Invalidate();
@@ -1941,9 +1944,16 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private static int GetPix(int pix, Font f, double scale) => f.FormatedText_NeededSize("@|", null, (int)((pix * scale) + 0.5)).Height;
 
-    private static bool Mouse_IsInAutofilter(ColumnViewItem? viewItem, MouseEventArgs e) => viewItem?.Column != null && viewItem.TmpAutoFilterLocation.Width != 0 && viewItem.Column.AutoFilterSymbolPossible() && viewItem.TmpAutoFilterLocation.Contains(e.X, e.Y);
+    private static bool Mouse_IsInAutofilter(ColumnViewItem? viewItem, MouseEventArgs e, ColumnViewCollection ca) {
+        if (!ca.ShowHead) { return false; }
 
-    private static bool Mouse_IsInRedcueButton(ColumnViewItem? viewItem, MouseEventArgs e) => viewItem != null && viewItem.TmpReduceLocation.Width != 0 && viewItem.TmpReduceLocation.Contains(e.X, e.Y);
+        return viewItem?.Column != null && viewItem.TmpAutoFilterLocation.Width != 0 && viewItem.Column.AutoFilterSymbolPossible() && viewItem.TmpAutoFilterLocation.Contains(e.X, e.Y);
+    }
+
+    private static bool Mouse_IsInRedcueButton(ColumnViewItem? viewItem, MouseEventArgs e, ColumnViewCollection ca) {
+        if (!ca.ShowHead) { return false; }
+        return viewItem != null && viewItem.TmpReduceLocation.Width != 0 && viewItem.TmpReduceLocation.Contains(e.X, e.Y);
+    }
 
     private static void NotEditableInfo(string reason) => Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
 

@@ -166,6 +166,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public void Dispose(bool disposing) {
         IsDisposed = true;
+        if (disposing) {
+            // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
+        }
+        // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
+        // TODO: große Felder auf Null setzen.
         //PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
         //PermissionGroups_Show.Clear();
         if (Database != null) { Database.DisposingEvent += Database_Disposing; }
@@ -180,7 +185,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)_internal).GetEnumerator();
 
-    public int HeadSize(Font _columnFont) {
+    public int HeadSize(Font columnFont) {
         if (_headSize != null) { return (int)_headSize; }
 
         if (!ShowHead || Count - 1 < 0) {
@@ -190,7 +195,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         _headSize = 16;
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
-                _headSize = Math.Max((int)_headSize, (int)thisViewItem.Column.ColumnHead_Size(_columnFont).Height);
+                _headSize = Math.Max((int)_headSize, (int)thisViewItem.Column.ColumnHead_Size(columnFont).Height);
             }
         }
 
@@ -287,6 +292,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 _permissionGroups_Show.Clear();
                 _permissionGroups_Show.AddRange(value.FromNonCritical().SplitByCrToList());
                 return true;
+
+            case "showhead":
+                ShowHead = value.FromPlusMinus();
+                return true;
         }
 
         return false;
@@ -372,6 +381,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         var result = new List<string>();
         result.ParseableAdd("Name", (IHasKeyName)this);
+        result.ParseableAdd("ShowHead", ShowHead);
         result.ParseableAdd("Columns", "Column", _internal);
 
         var tmp = PermissionGroups_Show.SortedDistinctList();

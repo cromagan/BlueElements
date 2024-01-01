@@ -215,7 +215,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         using (ColumnEditor w = new(newc, null)) {
             _ = w.ShowDialog();
             newc.Invalidate_ColumAndContent();
-            w.Dispose();
+            //w.Dispose();
         }
         db.Column.Repair();
 
@@ -284,6 +284,20 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
     /// <summary>
     /// Überträgt die aktuelle Ansicht fest in den Datenbankcode hinein
     /// </summary>
+
+    private void chkShowCaptions_CheckedChanged(object sender, System.EventArgs e) {
+    }
+
+    private void chkShowCaptions_Click(object sender, System.EventArgs e) {
+        if (Database is not Database db || db.IsDisposed) { return; }
+
+        if (CloneOfCurrentArrangement is not ColumnViewCollection ca) { return; }
+
+        ca.ShowHead = chkShowCaptions.Checked;
+
+        Change(_arrangement, ca);
+        //ShowOrder();
+    }
 
     private void FixColumnArrangement() {
         if (Database is not Database db || db.IsDisposed) { return; }
@@ -523,6 +537,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
         }
 
         SortColumns();
+
+        chkShowCaptions.Checked = ca.ShowHead;
+
         //Pad.ZoomFit();
         Generating = false;
     }

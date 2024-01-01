@@ -34,6 +34,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpSpalten = new BlueControls.Controls.GroupBox();
             this.btnNeueSpalte = new BlueControls.Controls.Button();
             this.grpAktuelleAnsicht = new BlueControls.Controls.GroupBox();
+            this.chkShowCaptions = new BlueControls.Controls.Button();
             this.btnSystemspaltenAusblenden = new BlueControls.Controls.Button();
             this.btnSpalteEinblenden = new BlueControls.Controls.Button();
             this.btnAlleSpaltenEinblenden = new BlueControls.Controls.Button();
@@ -49,6 +50,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Ribbon.SuspendLayout();
             this.tabStart.SuspendLayout();
             this.grpAssistent.SuspendLayout();
+            this.pnlStatusBar.SuspendLayout();
             this.tabAnsichten.SuspendLayout();
             this.grpSpalten.SuspendLayout();
             this.grpAktuelleAnsicht.SuspendLayout();
@@ -57,10 +59,14 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // tabRightSide
             // 
+            this.tabRightSide.Location = new System.Drawing.Point(612, 136);
+            this.tabRightSide.Size = new System.Drawing.Size(372, 290);
             // 
             // Pad
             // 
             this.Pad.ContextMenuAllowed = false;
+            this.Pad.Location = new System.Drawing.Point(0, 136);
+            this.Pad.Size = new System.Drawing.Size(612, 290);
             this.Pad.ItemRemoved += new System.EventHandler<System.EventArgs>(this.Item_ItemRemoved);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);
             // 
@@ -81,6 +87,19 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tabStart.Size = new System.Drawing.Size(976, 81);
             // 
+            // tabSeiten
+            // 
+            this.tabSeiten.Size = new System.Drawing.Size(984, 26);
+            // 
+            // capStatusBar
+            // 
+            this.capStatusBar.Size = new System.Drawing.Size(984, 24);
+            // 
+            // pnlStatusBar
+            // 
+            this.pnlStatusBar.Location = new System.Drawing.Point(0, 426);
+            this.pnlStatusBar.Size = new System.Drawing.Size(984, 24);
+            // 
             // tabAnsichten
             // 
             this.tabAnsichten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
@@ -89,7 +108,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.tabAnsichten.Controls.Add(this.grpAnsichtsVerwaltung);
             this.tabAnsichten.Location = new System.Drawing.Point(4, 25);
             this.tabAnsichten.Name = "tabAnsichten";
-            this.tabAnsichten.Size = new System.Drawing.Size(876, 81);
+            this.tabAnsichten.Size = new System.Drawing.Size(976, 81);
             this.tabAnsichten.TabIndex = 4;
             this.tabAnsichten.Text = "Ansichten";
             // 
@@ -100,7 +119,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpSpalten.Controls.Add(this.btnNeueSpalte);
             this.grpSpalten.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpSpalten.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpSpalten.Location = new System.Drawing.Point(696, 0);
+            this.grpSpalten.Location = new System.Drawing.Point(864, 0);
             this.grpSpalten.Name = "grpSpalten";
             this.grpSpalten.Size = new System.Drawing.Size(168, 81);
             this.grpSpalten.TabIndex = 6;
@@ -109,10 +128,11 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnNeueSpalte
             // 
-            this.btnNeueSpalte.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnNeueSpalte.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnNeueSpalte.ImageCode = "PlusZeichen";
             this.btnNeueSpalte.Location = new System.Drawing.Point(8, 2);
             this.btnNeueSpalte.Name = "btnNeueSpalte";
+            this.btnNeueSpalte.QuickInfo = "Erstellt eine neue Spalte";
             this.btnNeueSpalte.Size = new System.Drawing.Size(64, 66);
             this.btnNeueSpalte.TabIndex = 3;
             this.btnNeueSpalte.Text = "neue Spalte";
@@ -122,6 +142,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.grpAktuelleAnsicht.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.grpAktuelleAnsicht.CausesValidation = false;
+            this.grpAktuelleAnsicht.Controls.Add(this.chkShowCaptions);
             this.grpAktuelleAnsicht.Controls.Add(this.btnSystemspaltenAusblenden);
             this.grpAktuelleAnsicht.Controls.Add(this.btnSpalteEinblenden);
             this.grpAktuelleAnsicht.Controls.Add(this.btnAlleSpaltenEinblenden);
@@ -130,14 +151,25 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.grpAktuelleAnsicht.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAktuelleAnsicht.Location = new System.Drawing.Point(432, 0);
             this.grpAktuelleAnsicht.Name = "grpAktuelleAnsicht";
-            this.grpAktuelleAnsicht.Size = new System.Drawing.Size(264, 81);
+            this.grpAktuelleAnsicht.Size = new System.Drawing.Size(432, 81);
             this.grpAktuelleAnsicht.TabIndex = 5;
             this.grpAktuelleAnsicht.TabStop = false;
             this.grpAktuelleAnsicht.Text = "Aktuelle Ansicht";
             // 
+            // chkShowCaptions
+            // 
+            this.chkShowCaptions.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkShowCaptions.Location = new System.Drawing.Point(264, 2);
+            this.chkShowCaptions.Name = "chkShowCaptions";
+            this.chkShowCaptions.Size = new System.Drawing.Size(160, 22);
+            this.chkShowCaptions.TabIndex = 34;
+            this.chkShowCaptions.Text = "Spalten-Köpfe anzeigen";
+            this.chkShowCaptions.CheckedChanged += new System.EventHandler(this.chkShowCaptions_CheckedChanged);
+            this.chkShowCaptions.Click += new System.EventHandler(this.chkShowCaptions_Click);
+            // 
             // btnSystemspaltenAusblenden
             // 
-            this.btnSystemspaltenAusblenden.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSystemspaltenAusblenden.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSystemspaltenAusblenden.ImageCode = "Lupe|16||1";
             this.btnSystemspaltenAusblenden.Location = new System.Drawing.Point(80, 24);
             this.btnSystemspaltenAusblenden.Name = "btnSystemspaltenAusblenden";
@@ -148,7 +180,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnSpalteEinblenden
             // 
-            this.btnSpalteEinblenden.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSpalteEinblenden.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSpalteEinblenden.ImageCode = "Lupe";
             this.btnSpalteEinblenden.Location = new System.Drawing.Point(8, 2);
             this.btnSpalteEinblenden.Name = "btnSpalteEinblenden";
@@ -159,7 +191,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnAlleSpaltenEinblenden
             // 
-            this.btnAlleSpaltenEinblenden.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnAlleSpaltenEinblenden.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnAlleSpaltenEinblenden.ImageCode = "Lupe|16|||FF0000";
             this.btnAlleSpaltenEinblenden.Location = new System.Drawing.Point(80, 2);
             this.btnAlleSpaltenEinblenden.Name = "btnAlleSpaltenEinblenden";
@@ -170,7 +202,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnBerechtigungsgruppen
             // 
-            this.btnBerechtigungsgruppen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnBerechtigungsgruppen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnBerechtigungsgruppen.ImageCode = "Schild|16";
             this.btnBerechtigungsgruppen.Location = new System.Drawing.Point(80, 46);
             this.btnBerechtigungsgruppen.Name = "btnBerechtigungsgruppen";
@@ -199,7 +231,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnAnsichtUmbenennen
             // 
-            this.btnAnsichtUmbenennen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnAnsichtUmbenennen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnAnsichtUmbenennen.ImageCode = "Stift";
             this.btnAnsichtUmbenennen.Location = new System.Drawing.Point(360, 2);
             this.btnAnsichtUmbenennen.Name = "btnAnsichtUmbenennen";
@@ -229,7 +261,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnNeueAnsichtErstellen
             // 
-            this.btnNeueAnsichtErstellen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnNeueAnsichtErstellen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnNeueAnsichtErstellen.ImageCode = "PlusZeichen";
             this.btnNeueAnsichtErstellen.Location = new System.Drawing.Point(232, 2);
             this.btnNeueAnsichtErstellen.Name = "btnNeueAnsichtErstellen";
@@ -240,7 +272,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             // btnAktuelleAnsichtLoeschen
             // 
-            this.btnAktuelleAnsichtLoeschen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnAktuelleAnsichtLoeschen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnAktuelleAnsichtLoeschen.ImageCode = "MinusZeichen";
             this.btnAktuelleAnsichtLoeschen.Location = new System.Drawing.Point(296, 2);
             this.btnAktuelleAnsichtLoeschen.Name = "btnAktuelleAnsichtLoeschen";
@@ -262,6 +294,7 @@ namespace BlueControls.BlueDatabaseDialogs {
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
             this.grpAssistent.ResumeLayout(false);
+            this.pnlStatusBar.ResumeLayout(false);
             this.tabAnsichten.ResumeLayout(false);
             this.grpSpalten.ResumeLayout(false);
             this.grpAktuelleAnsicht.ResumeLayout(false);
@@ -286,5 +319,6 @@ namespace BlueControls.BlueDatabaseDialogs {
         private Button btnBerechtigungsgruppen;
         internal GroupBox grpSpalten;
         private Button btnNeueSpalte;
+        private Button chkShowCaptions;
     }
 }

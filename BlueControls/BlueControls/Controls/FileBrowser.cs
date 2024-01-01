@@ -463,16 +463,18 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
     private void OnFolderChanged() => FolderChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void RemoveWatcher() {
-        if (_watcher != null) {
-            _watcher.EnableRaisingEvents = false;
-            _watcher.Changed -= Watcher_Changed;
-            _watcher.Created -= Watcher_Created;
-            _watcher.Deleted -= Watcher_Deleted;
-            _watcher.Renamed -= Watcher_Renamed;
-            _watcher.Error -= Watcher_Error;
-            _watcher?.Dispose();
-            _watcher = null;
-        }
+        try {
+            if (_watcher != null) {
+                _watcher.EnableRaisingEvents = false;
+                _watcher.Changed -= Watcher_Changed;
+                _watcher.Created -= Watcher_Created;
+                _watcher.Deleted -= Watcher_Deleted;
+                _watcher.Renamed -= Watcher_Renamed;
+                _watcher.Error -= Watcher_Error;
+                _watcher?.Dispose();
+                _watcher = null;
+            }
+        } catch { }
     }
 
     private void ThumbGenerator_DoWork(object sender, DoWorkEventArgs e) {
