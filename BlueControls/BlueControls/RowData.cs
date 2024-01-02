@@ -26,21 +26,23 @@ using BlueDatabase;
 
 namespace BlueControls;
 
+#nullable enable
+
 public static class RowDrawDataExtensions {
 
     #region Methods
 
     public static RowData? Get(this List<RowData>? l, RowItem? row) => l?.FirstOrDefault(thisr => thisr?.Row == row);
 
-    public static RowData? Get(this List<RowData>? l, RowItem? row, string? chapter) {
-        if (l == null || row == null) { return null; }
-
-        chapter ??= string.Empty;
-
-        return l.FirstOrDefault(thisr => thisr?.Row == row && thisr.Chapter == chapter);
-    }
-
     #endregion
+
+    //public static RowData? Get(this List<RowData>? l, RowItem? row, string? chapter) {
+    //    if (l == null || row == null) { return null; }
+
+    //    chapter ??= string.Empty;
+
+    //    return l.FirstOrDefault(thisr => thisr?.Row == row && thisr.Chapter == chapter);
+    //}
 
     //public static List<RowItem> ToUniqueRowList(this List<RowData> l) {
     //    if (l == null) { return null; }

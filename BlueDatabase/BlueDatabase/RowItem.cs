@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -349,21 +351,32 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
     }
 
-    public string CompareKey(List<ColumnItem>? columns) {
+    public string CompareKey(List<ColumnItem> columns) {
         StringBuilder r = new();
-        if (columns != null) {
-            foreach (var t in columns) {
-                if (t.LinkedDatabase is not Database db || db.IsDisposed) {
-                    // LinkedDatabase = null - Ansonsten wird beim Sortieren alles immer wieder geladen,
-                    _ = r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
-                }
+
+        foreach (var t in columns) {
+            if (t.LinkedDatabase is not Database db || db.IsDisposed) {
+                // LinkedDatabase = null - Ansonsten wird beim Sortieren alles immer wieder geladen,
+                _ = r.Append(CellGetCompareKey(t) + Constants.FirstSortChar);
             }
         }
+
         _ = r.Append(Constants.SecondSortChar + KeyName);
         return r.ToString();
     }
 
-    public string CompareKey() => CompareKey(Database?.SortDefinition?.Columns);
+    public string CompareKey() {
+        if (Database is not Database db || db.IsDisposed) { return string.Empty; }
+
+        var ColsToRefresh = new List<ColumnItem>();
+        if (db.SortDefinition?.Columns is List<ColumnItem> lc) { ColsToRefresh.AddRange(lc); }
+        if (db.Column.SysChapter is ColumnItem csc) { _ = ColsToRefresh.AddIfNotExists(csc); }
+        if (db.Column.First() is ColumnItem cf) { _ = ColsToRefresh.AddIfNotExists(cf); }
+
+        db.RefreshColumnsData(ColsToRefresh);
+
+        return CompareKey(ColsToRefresh);
+    }
 
     public int CompareTo(object obj) {
         if (obj is RowItem tobj) {

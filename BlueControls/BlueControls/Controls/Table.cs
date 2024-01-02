@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -571,7 +573,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public List<RowData> CalculateSortedRows(ICollection<RowItem> filteredRows, RowSortDefinition? rowSortDefinition, List<RowItem>? pinnedRows, List<RowData>? reUseMe) {
+    public List<RowData> CalculateSortedRows(ICollection<RowItem> filteredRows, List<RowItem>? pinnedRows) {
         if (Database is not Database db || db.IsDisposed) { return []; }
 
         VisibleRowCount = 0;
@@ -590,11 +592,17 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         #endregion
 
-        var l = new List<ColumnItem>();
-        if (rowSortDefinition != null) { l.AddRange(rowSortDefinition.Columns); }
-        if (db.Column.SysChapter != null) { _ = l.AddIfNotExists(db.Column.SysChapter); }
+        #region Refresh
 
-        db.RefreshColumnsData(l);
+        var ColsToRefresh = new List<ColumnItem>();
+        var reverse = false;
+        if (SortUsed() is RowSortDefinition rsd) { ColsToRefresh.AddRange(rsd.Columns); reverse = rsd.Reverse; }
+        if (db.Column.SysChapter is ColumnItem csc) { _ = ColsToRefresh.AddIfNotExists(csc); }
+        if (db.Column.First() is ColumnItem cf) { _ = ColsToRefresh.AddIfNotExists(cf); }
+
+        db.RefreshColumnsData(ColsToRefresh);
+
+        #endregion
 
         #region _Angepinnten Zeilen erstellen (_pinnedData)
 
@@ -602,10 +610,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         var lockMe = new object();
         if (pinnedRows != null) {
             _ = Parallel.ForEach(pinnedRows, thisRow => {
-                var rd = reUseMe.Get(thisRow, "Angepinnt") ?? new RowData(thisRow, "Angepinnt");
+                var rd = new RowData(thisRow, "Angepinnt");
                 rd.PinStateSortAddition = "1";
                 rd.MarkYellow = true;
-                rd.AdditionalSort = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
+                rd.AdditionalSort = thisRow.CompareKey(ColsToRefresh);
 
                 lock (lockMe) {
                     VisibleRowCount++;
@@ -620,7 +628,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         List<RowData> rowData = [];
         _ = Parallel.ForEach(filteredRows, thisRow => {
-            var adk = rowSortDefinition == null ? thisRow.CompareKey(null) : thisRow.CompareKey(rowSortDefinition.Columns);
+            var adk = thisRow.CompareKey(ColsToRefresh);
 
             var markYellow = pinnedRows != null && pinnedRows.Contains(thisRow);
             var added = markYellow;
@@ -643,7 +651,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (caps.Count == 0) { caps.Add(string.Empty); }
 
             foreach (var thisCap in caps) {
-                var rd = reUseMe.Get(thisRow, thisCap) ?? new RowData(thisRow, thisCap);
+                var rd = new RowData(thisRow, thisCap);
 
                 rd.PinStateSortAddition = "2";
                 rd.MarkYellow = markYellow;
@@ -660,7 +668,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         pinnedData.Sort();
         rowData.Sort();
 
-        if (rowSortDefinition != null && rowSortDefinition.Reverse) { rowData.Reverse(); }
+        if (reverse) { rowData.Reverse(); }
 
         rowData.InsertRange(0, pinnedData);
         return rowData;
@@ -1172,10 +1180,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (Database is not Database db || db.IsDisposed) {
                 sortedRowDataNew = [];
             } else {
-                sortedRowDataNew = CalculateSortedRows(RowsFiltered, SortUsed(), PinnedRows, _rowsFilteredAndPinned);
+                sortedRowDataNew = CalculateSortedRows(RowsFiltered, PinnedRows);
             }
 
-            if (_rowsFilteredAndPinned != null && !_rowsFilteredAndPinned.IsDifferentTo(sortedRowDataNew)) { return _rowsFilteredAndPinned; }
+            //if (_rowsFilteredAndPinned != null && !_rowsFilteredAndPinned.IsDifferentTo(sortedRowDataNew)) { return _rowsFilteredAndPinned; }
 
             var sortedRowDataTmp = new List<RowData>();
 

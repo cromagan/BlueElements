@@ -274,7 +274,7 @@ public class DatabaseMu : Database {
         return (null, null);
     }
 
-    protected virtual bool IsThereNeedToMakeMeMaster() {
+    protected override bool IsThereNeedToMakeMeMaster() {
         if (_mustMakeMaster) { return true; }
         return base.IsThereNeedToMakeMeMaster();
     }
