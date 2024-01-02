@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections;
 using System.Collections.Concurrent;
@@ -34,7 +36,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Fields
 
-    private readonly ConcurrentDictionary<string, ColumnItem> _internal = new();
+    private readonly ConcurrentDictionary<string, ColumnItem> _internal = [];
 
     #endregion
 

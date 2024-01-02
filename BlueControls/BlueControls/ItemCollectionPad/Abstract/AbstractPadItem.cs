@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -153,11 +155,6 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
         }
     }
 
-    ///// <summary>
-    ///// Falls eine Spezielle Information gespeichert und zurückgegeben werden soll
-    ///// </summary>
-    ///// <remarks></remarks>
-    //public List<string> Tags { get; } = new();
     public int ZoomPadding {
         get => _zoomPadding;
         set {
@@ -550,6 +547,4 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
     private void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
-
-    //protected abstract AbstractPadItem? TryCreate(string id, string name);
 }

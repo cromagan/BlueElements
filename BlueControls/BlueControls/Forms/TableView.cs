@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -45,6 +47,7 @@ public partial class TableView : FormWithStatusBar {
     #region Fields
 
     private bool _firstOne = true;
+
     private List<string> _settings = [];
 
     #endregion
@@ -184,6 +187,18 @@ public partial class TableView : FormWithStatusBar {
 
         var se = new DatabaseScriptEditor(db);
         _ = se.ShowDialog();
+    }
+
+    /// <summary>
+    /// Setzt von allen Reitern die Ansichts- und Filtereinstellungen zurück
+    /// </summary>
+    public void ResetDatabaseSettings() {
+        foreach (var thisT in tbcDatabaseSelector.TabPages) {
+            if (thisT is TabPage tp && tp.Tag is List<object> s) {
+                s[1] = string.Empty;
+                tp.Tag = s;
+            }
+        }
     }
 
     //public void ResetDatabaseSettings() {
@@ -329,7 +344,6 @@ public partial class TableView : FormWithStatusBar {
                     case "windowstate":
                         WindowState = (FormWindowState)int.Parse(pair.Value);
                         break;
-
 
                     default:
                         DebugPrint(FehlerArt.Warnung, "Tag unbekannt: " + pair.Key);

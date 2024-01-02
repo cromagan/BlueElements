@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -36,7 +38,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     #region Fields
 
-    private static readonly ConcurrentDictionary<string, Size> Sizes = new();
+    private static readonly ConcurrentDictionary<string, Size> Sizes = [];
 
     #endregion
 

@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +32,7 @@ public sealed class RowSortDefinition : IParseable, IChangedFeedback {
 
     #region Fields
 
-    public List<ColumnItem> Columns = new();
+    public List<ColumnItem> Columns = [];
 
     public Database Database;
 

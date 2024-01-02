@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -29,7 +31,6 @@ using static BlueBasics.Constants;
 namespace BlueBasics;
 
 public static partial class Extensions {
-    //public static readonly List<string> Tilde = new() { "~" };
 
     #region Methods
 
@@ -858,6 +859,4 @@ public static partial class Extensions {
     }
 
     #endregion
-
-    // var enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
 }

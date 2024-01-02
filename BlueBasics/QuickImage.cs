@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Concurrent;
 using System.Drawing;
@@ -35,7 +37,7 @@ public sealed class QuickImage : IReadableText, IStringable {
 
     #region Fields
 
-    private static readonly ConcurrentDictionary<string, QuickImage> Pics = new();
+    private static readonly ConcurrentDictionary<string, QuickImage> Pics = [];
 
     private readonly Bitmap _bitmap;
 

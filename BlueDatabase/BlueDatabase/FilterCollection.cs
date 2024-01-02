@@ -30,6 +30,8 @@ using BlueDatabase.Interfaces;
 
 namespace BlueDatabase;
 
+#nullable enable
+
 public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHasDatabase, IDisposableExtended, IChangedFeedback {
 
     #region Fields
@@ -48,12 +50,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public FilterCollection(string c) : this(null as Database, c) { }
 
-    public FilterCollection(Database? database, string c) {
+    public FilterCollection(Database? database, string coment) {
         Database = database;
-        _coment = c;
+        _coment = coment;
     }
 
-    public FilterCollection(FilterItem fi, string c) : this(fi.Database, c) => Add(fi);
+    public FilterCollection(FilterItem fi, string coment) : this(fi.Database, coment) => Add(fi);
 
     #endregion
 

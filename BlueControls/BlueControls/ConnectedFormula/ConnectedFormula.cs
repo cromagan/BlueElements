@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -989,6 +991,4 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     }
 
     #endregion
-
-    //private void Variables_Changed() => Variables = new VariableCollection(_variables);
 }
