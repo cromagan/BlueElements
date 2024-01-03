@@ -30,6 +30,8 @@ using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
+#nullable enable
+
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]

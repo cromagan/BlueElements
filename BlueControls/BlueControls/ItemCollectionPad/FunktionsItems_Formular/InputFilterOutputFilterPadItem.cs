@@ -19,16 +19,21 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
+
+using BlueControls.Forms;
+
+#nullable enable
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -42,8 +47,12 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     private readonly ItemAcceptSomething _itemAccepts;
     private readonly ItemSendSomething _itemSends;
-    private string _anzeige = string.Empty;
-    private string _überschrift = string.Empty;
+    private ColumnItem? _column;
+
+    private string _columnName = string.Empty;
+
+    //private string _anzeige = string.Empty;
+    //private string _überschrift = string.Empty;
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
 
     #endregion
@@ -69,16 +78,16 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     public static string ClassId => "FI-InputOutputElement";
 
-    [Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
-    public string Anzeige {
-        get => _anzeige;
-        set {
-            if (IsDisposed) { return; }
-            if (_anzeige == value) { return; }
-            _anzeige = value;
-            OnChanged();
-        }
-    }
+    //[Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
+    //public string Anzeige {
+    //    get => _anzeige;
+    //    set {
+    //        if (IsDisposed) { return; }
+    //        if (_anzeige == value) { return; }
+    //        _anzeige = value;
+    //        OnChanged();
+    //    }
+    //}
 
     public bool AutoSizeableHeight => false;
 
@@ -97,6 +106,22 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         set => _itemSends.ChildIdsSet(value, this);
     }
 
+    public ColumnItem? Column {
+        get {
+            _column ??= DatabaseInput?.Column.Exists(_columnName);
+
+            return _column;
+        }
+        set {
+            if (IsDisposed) { return; }
+            var tmpn = value?.KeyName ?? string.Empty;
+            if (_columnName == tmpn) { return; }
+            _columnName = tmpn;
+            _column = null;
+            OnChanged();
+        }
+    }
+
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
     public Database? DatabaseInputMustBe => DatabaseOutput;
 
@@ -105,10 +130,20 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public override string Description => "Dieses Element kann Filter empfangen - um eine Vorauswahl der verfügbaren Filterelemente darzustellen.\r\nAnschließend kann mit den übrig gebliebenen Werten ein neuer Filter erzeugt werden, den der Benutzer auswählen kann.";
+    public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
+
+    public string Interner_Name {
+        get {
+            if (Column == null || Column.IsDisposed) { return "?"; }
+            return Column.KeyName;
+        }
+    }
+
     public override bool MustBeInDrawingArea => true;
+
+    public bool MustBeOneRow => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -120,15 +155,15 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public string Überschrift {
-        get => _überschrift;
-        set {
-            if (IsDisposed) { return; }
-            if (_überschrift == value) { return; }
-            _überschrift = value;
-            OnChanged();
-        }
-    }
+    //public string Überschrift {
+    //    get => _überschrift;
+    //    set {
+    //        if (IsDisposed) { return; }
+    //        if (_überschrift == value) { return; }
+    //        _überschrift = value;
+    //        OnChanged();
+    //    }
+    //}
 
     public bool WaitForDatabase => true;
     protected override int SaveOrder => 1;
@@ -141,7 +176,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlForFilterNew(DatabaseOutput) {
             //EditType = _bearbeitung,
             //CaptionPosition = CaptionPosition,
@@ -164,18 +199,28 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         b = _itemSends.ErrorReason(this);
         if (!string.IsNullOrEmpty(b)) { return b; }
 
+        if (Column == null || Column.IsDisposed) {
+            return "Spalte fehlt";
+        }
+
         return string.Empty;
     }
 
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
-        List<GenericControl> l =
-        [
-            .. _itemAccepts.GetStyleOptions(this, widthOfControl),
-            .. _itemSends.GetStyleOptions(this, widthOfControl),
-            new FlexiControl(),
-            new FlexiControlForProperty<string>(() => Überschrift),
-            new FlexiControlForProperty<string>(() => Anzeige),
-        ];
+        var l = new List<GenericControl>();
+
+        l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
+
+        if (DatabaseOutput is Database db && !db.IsDisposed) {
+            l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
+
+            if (Column != null && !Column.IsDisposed) {
+                l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
+                l.Add(new FlexiControlForDelegate(Spalte_bearbeiten, "Spalte bearbeiten", ImageCode.Spalte));
+            }
+        }
+
+        l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
         var u = new ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(ÜberschriftAnordnung));
@@ -207,13 +252,17 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
                 _überschriftanordung = (ÜberschriftAnordnung)IntParse(value);
                 return true;
 
-            case "captiontext":
-                _überschrift = value.FromNonCritical();
+            case "columnname":
+                _columnName = value;
                 return true;
 
-            case "showformat":
-                _anzeige = value.FromNonCritical();
-                return true;
+                //case "captiontext":
+                //    _überschrift = value.FromNonCritical();
+                //    return true;
+
+                //case "showformat":
+                //    _anzeige = value.FromNonCritical();
+                //    return true;
         }
         return false;
     }
@@ -230,6 +279,40 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
 
+    public void Spalte_bearbeiten() {
+        if (IsDisposed) { return; }
+        if (Column == null || Column.IsDisposed) { return; }
+        TableView.OpenColumnEditor(Column, null, null);
+
+        OnChanged();
+    }
+
+    [Description("Wählt die Spalte, die angezeigt werden soll.\r\nDiese bestimmt maßgeblich die Eigenschaften")]
+    public void Spalte_wählen() {
+        if (IsDisposed) { return; }
+
+        if (DatabaseInput is not Database db || db.IsDisposed) {
+            MessageBox.Show("Quelle fehlerhaft!");
+            return;
+        }
+
+        var lst = new ItemCollectionList.ItemCollectionList(true);
+        lst.AddRange(db.Column, false);
+        //lst.Sort();
+
+        var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
+
+        if (sho == null || sho.Count != 1) { return; }
+
+        var col = db.Column.Exists(sho[0]);
+
+        if (col == Column) { return; }
+        Column = col;
+        this.RaiseVersion();
+        UpdateSideOptionMenu();
+        OnChanged();
+    }
+
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {
             return QuickImage.Get(ImageCode.Trichter, 16, Color.Transparent, Skin.IdColor(InputColorId));
@@ -242,8 +325,9 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
 
-        result.ParseableAdd("CaptionText", _überschrift);
-        result.ParseableAdd("ShowFormat", _anzeige);
+        result.ParseableAdd("ColumnName", _columnName);
+        //result.ParseableAdd("CaptionText", _überschrift);
+        //result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("Caption", _überschriftanordung);
         return result.Parseable(base.ToString());
     }

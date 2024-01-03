@@ -21,21 +21,17 @@ using BlueDatabase;
 
 namespace BlueControls.EventArgs;
 
-public class CellExtEventArgs : System.EventArgs {
+public class EditingEventArgs : System.EventArgs {
 
     #region Constructors
 
-    public CellExtEventArgs(ColumnItem? column, RowData? row) {
-        Column = column;
-        RowData = row;
-    }
+    public EditingEventArgs() : base() { }
 
     #endregion
 
     #region Properties
 
-    public ColumnItem? Column { get; }
-    public RowData? RowData { get; }
+    public bool Editing { get; set; }
 
     #endregion
 }

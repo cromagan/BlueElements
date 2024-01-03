@@ -24,6 +24,9 @@ using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Forms;
+
+#nullable enable
+
 using BlueDatabase;
 
 namespace BlueControls.Interfaces;
@@ -45,6 +48,13 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
 
     // ReSharper disable once UnusedMemberInSuper.Global
     List<int> InputColorId { get; }
+
+    /// <summary>
+    /// Wenn True, können Variabelen einer Zeile Benutzt werden.
+    /// Das heißt aber auch, dass die Filter nur eine Zeile ausspucken dürfen.
+    /// Wird aktuell nur für die Description des Skript-Editors benutzt
+    /// </summary>
+    public bool MustBeOneRow { get; }
 
     public string Page { get; }
 

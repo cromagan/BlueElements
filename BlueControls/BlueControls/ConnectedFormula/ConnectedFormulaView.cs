@@ -120,6 +120,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         if (IsDisposed) { return; }
         if (_generated) { return; }
         if (!Visible) { return; }
+        if (ConnectedFormula.IsEditing()) { return; }
+
         if (Width < 30 || Height < 10) { return; }
 
         var unused = new List<Control>();

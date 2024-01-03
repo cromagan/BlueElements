@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -103,10 +105,10 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public override string Description => "Dieses Element kann Filter empfangen, und gibt dem Nutzer die Möglichkeit, aus dem daraus resultierenden Zeilen eine per Dropdownmenu zu wählen.\r\n\r\nFalls die Vorfilterung nur eine Zeile ergibt, wird diese automatisch gewählt.";
-
+    public override string Description => "Ein Auswahlmenü, aus dem der Benutzer eine Zeile wählen kann,<br>die durch die Vor-Filter bestimmt wurden.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => true;
+    public bool MustBeOneRow => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -139,7 +141,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlRowSelector(DatabaseOutput, _überschrift, _anzeige) {
             EditType = _bearbeitung,
             CaptionPosition = CaptionPosition

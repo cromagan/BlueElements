@@ -124,16 +124,6 @@ Diese kann dann in einem Registersammlung dargestellt werden.
 Ein solches Register ist wie ein eigens Formular und muss
 eine "Zeile mit Filterung" besitzen, um Werte empfangen zu können.</value>
   </data>
-  <data name="btnTabControlAdd.QuickInfo" xml:space="preserve">
-    <value>Fügt ein Steuerelement mit Registerkarten hinzu.
-Pro Registerkarte kann ein Unterformular gewählt werden.
-Diese Unterformulare müssen eine "Zeile mit Filterung" beinhalten.
-Gleichzeitig muss dieses Element an ein "Zeile mit Filterung"
-angeschlossen sein, um zu funktionieren.</value>
-  </data>
-  <data name="btnDropdownmenu.QuickInfo" xml:space="preserve">
-    <value>Dieses Element stellt eine Wahlmöglichkeit für den Benutzer dar.&lt;br&gt;Es zeigt die aktuellen Zeilen einer Datenbank in einer Dropdown-List an, aus der der Benutzer wählen kann.&lt;br&gt;Es kann Vorfilterungen empfangen, um die Werte einzuschränken.</value>
-  </data>
   <metadata name="LoadTab.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>644, 56</value>
   </metadata>

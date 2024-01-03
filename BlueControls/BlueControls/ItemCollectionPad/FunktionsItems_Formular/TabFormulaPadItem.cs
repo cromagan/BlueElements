@@ -38,6 +38,8 @@ using BlueDatabase;
 using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
 
+#nullable enable
+
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 /// <summary>
@@ -83,10 +85,12 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
     public Database? DatabaseInputMustBe => null;
-    public override string Description => "Dieses Element erzeugt ein Tab-Control, dass weitere Unterformulare enthalten kann.\r\nEs kann eine Zeile empfangen, welche an die Unterformulare weitergegeben wird.";
+    public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => true;
+
+    public bool MustBeOneRow => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -106,7 +110,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new TabControl();
         con.Name = this.DefaultItemToControlName();
         // Die Input-Settings werden direkt auf das erzeugte

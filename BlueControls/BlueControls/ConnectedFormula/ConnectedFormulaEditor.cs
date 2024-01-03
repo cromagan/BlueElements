@@ -29,15 +29,45 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
+using System;
+using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+
+#nullable enable
 
 namespace BlueControls.Forms;
 
 public partial class ConnectedFormulaEditor : PadEditor {
 
+    #region Fields
+
+    private ConnectedFormula.ConnectedFormula? _cFormula = null;
+
+    #endregion
+
     #region Constructors
 
     public ConnectedFormulaEditor(string? filename, ReadOnlyCollection<string>? notAllowedchilds) {
         InitializeComponent();
+
+        GenQuickInfo(btnFeldHinzu, new EditFieldPadItem(string.Empty));
+
+        GenQuickInfo(btnButton, new FilterButtonPadItem(string.Empty));
+
+        GenQuickInfo(btnTextGenerator, new TextGeneratorPadItem(string.Empty));
+
+        GenQuickInfo(btnFileExplorer, new FileExplorerPadItem(string.Empty));
+
+        GenQuickInfo(btnBild, new EasyPicPadItem(string.Empty));
+
+        GenQuickInfo(btnTable, new TableSelectRowPadItem(string.Empty));
+
+        GenQuickInfo(btnDropdownmenu, new DropDownSelectRowPadItem(string.Empty));
+
+        GenQuickInfo(btnFilterConverter, new FilterConverterElementPadItem(string.Empty));
+
+        GenQuickInfo(btnTabControlAdd, new TabFormulaPadItem(string.Empty));
+
+        GenQuickInfo(btnBenutzerFilterWahl, new InputFilterOutputFilterPadItem(string.Empty));
 
         FormulaSet(filename, notAllowedchilds);
     }
@@ -48,7 +78,22 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     #region Properties
 
-    public ConnectedFormula.ConnectedFormula? CFormula { get; private set; }
+    public ConnectedFormula.ConnectedFormula? CFormula {
+        get => _cFormula;
+        private set {
+            if (_cFormula == value) { return; }
+
+            if (_cFormula != null) {
+                _cFormula.Editing -= _cFormula_Editing;
+            }
+
+            _cFormula = value;
+
+            if (_cFormula != null) {
+                _cFormula.Editing += _cFormula_Editing;
+            }
+        }
+    }
 
     #endregion
 
@@ -59,6 +104,10 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         var se = new ConnectedFormulaScriptEditor(f);
         _ = se.ShowDialog();
+    }
+
+    private void _cFormula_Editing(object sender, EditingEventArgs e) {
+        e.Editing = true;
     }
 
     private void AddCentered(AbstractPadItem x) {
@@ -270,6 +319,35 @@ public partial class ConnectedFormulaEditor : PadEditor {
         Pad.Item = CFormula?.PadData;
 
         CheckButtons();
+    }
+
+    private void GenQuickInfo(BlueControls.Controls.Button b, FakeControlPadItem from) {
+        var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
+
+        txt = txt + "<br><br><b><u>Beschreibung:</b></u>";
+        txt = txt + "<br>" + from.Description;
+
+        txt = txt + "<br><br><b><u>Eigenschaften:</b></u>";
+
+        if (from is IItemAcceptSomething ias) {
+            if (ias.MustBeOneRow) {
+                txt = txt + "<br> - Das Element kann Filter <u>empfangen</u>.<br>" +
+                    "   Diese müssen als Ergebniss <u>genau eine Zeile</u> einer Datenbank ergeben,<br>" +
+                    "   da die Werte der Zeile in dem Element benutzt werden können.";
+            } else {
+                txt = txt + "<br> - Das Element kann Filter <u>empfangen</u> und verarbeitet diese.";
+            }
+        }
+
+        if (from is IItemSendSomething) {
+            txt = txt + "<br> - Das Element kann Filter an andere Elemente <u>weitergeben</u>.";
+        }
+
+        if (!from.MustBeInDrawingArea) {
+            txt = txt + "<br> - Das Element dient nur zur Berechnung von Werten<br> und ist im Formular <u>nicht sichtbar</u>.";
+        }
+
+        b.QuickInfo = txt;
     }
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {

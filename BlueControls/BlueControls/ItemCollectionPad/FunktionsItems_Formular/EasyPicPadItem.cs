@@ -53,7 +53,6 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
     #region Properties
 
     public static string ClassId => "FI-EasyPic";
-
     public bool AutoSizeableHeight => true;
 
     [Description("Der Dateiname des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]
@@ -71,10 +70,11 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
     public Database? DatabaseInputMustBe => null;
-    public override string Description => "Dieses Element erzeugt eine Bild-Steuerelement,\r\nwelches dann auch bearbeitet werden kann.";
-
+    public override string Description => "Eine Bild-Anzeige,\r\nmit welchem der Benutzer interagieren kann.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => true;
+
+    public bool MustBeOneRow => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -94,7 +94,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new EasyPic {
             OriginalText = Bild_Dateiname
         };

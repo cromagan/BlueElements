@@ -84,6 +84,8 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public override bool MustBeInDrawingArea => false;
 
+    public bool MustBeOneRow => false;
+
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
         set => _itemSends.OutputColorIdSet(value, this);
@@ -106,7 +108,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new RowEntryControl(DatabaseOutput);
         con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);

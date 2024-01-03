@@ -28,6 +28,8 @@ using static BlueBasics.Develop;
 using static BlueBasics.IO;
 using Button = BlueControls.Controls.Button;
 
+#nullable enable
+
 namespace BlueControls.Forms;
 
 public partial class FormulaView : FormWithStatusBar {
@@ -35,6 +37,10 @@ public partial class FormulaView : FormWithStatusBar {
     #region Constructors
 
     public FormulaView() => InitializeComponent();
+
+    public FormulaView(string filename) : this() {
+        FormulaSet(filename);
+    }
 
     #endregion
 

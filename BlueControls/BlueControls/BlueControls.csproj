@@ -172,6 +172,7 @@
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </Compile>
     <Compile Include="Enums\FilterTypeRowInputItem.cs" />
+    <Compile Include="EventArgs\EditingEventArgs.cs" />
     <Compile Include="EventArgs\CellExtEventArgs.cs" />
     <Compile Include="FormManager.cs" />
     <Compile Include="Forms\FormulaView.cs">

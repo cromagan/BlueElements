@@ -29,6 +29,8 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
+#nullable enable
+
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAutosizable {
@@ -57,7 +59,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAu
     #region Properties
 
     public static string ClassId => "FI-FileExplorer";
-
     public bool AutoSizeableHeight => true;
 
     [Description("Ob das Verzeichniss bei Bedarf erzeugt werden soll.")]
@@ -75,8 +76,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAu
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
     public Database? DatabaseInputMustBe => null;
-    public override string Description => "Dieses Element erzeugt eine File-Explorer-Steuerelement,\r\nwmit welchem interagiert werden kann.";
-
+    public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
     [Description("Wenn angewählt, wird bei einer Änderung des Pfades geprüft, ob das Vereichniss leer ist.\r\nIst das der Fall, wird es gelöscht.")]
@@ -93,6 +93,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAu
     }
 
     public override bool MustBeInDrawingArea => true;
+
+    public bool MustBeOneRow => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -125,7 +127,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAu
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new FileBrowser {
             OriginalText = Pfad,
             CreateDir = _bei_Bedarf_Erzeugen,

@@ -64,15 +64,14 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     #region Properties
 
     public static string ClassId => "FI-TextGeneratorPadItem";
-
     public bool AutoSizeableHeight => true;
-
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
     public Database? DatabaseInputMustBe => null;
     public override string Description => "Dieses Element erzeugt einen Text-Generator-Baustein";
-
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => true;
+
+    public bool MustBeOneRow => true;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -101,7 +100,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new TextGenerator {
             Text_Spalte = _textc,
             AuswahlSpalte1 = _auswahl1,

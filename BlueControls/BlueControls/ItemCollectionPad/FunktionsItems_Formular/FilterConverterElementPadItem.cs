@@ -30,6 +30,8 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using static BlueBasics.Converter;
 
+#nullable enable
+
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething {
@@ -78,7 +80,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public override string Description => "Dieses Element kann Filter empfangen, und einen komplett anderen Filter ausgeben.\r\nWird verwendet, wenn z.b. Zwei Werte gefiltert werden, aber in Wirklichkeit ein komplett anderer Filter verwendet werden soll.\r\nUnsichtbares element, wird nicht angezeigt.";
+    public override string Description => "Kann aus dem empfangenen Filtern einen komplett anderen Filter erstellen und ausgeben.";
 
     [Description("Der Wert aus dieser Spalte wird zur Filterung verwendet.")]
     [DefaultValue("")]
@@ -125,6 +127,8 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => false;
 
+    public bool MustBeOneRow => false;
+
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
         set => _itemSends.OutputColorIdSet(value, this);
@@ -146,7 +150,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var i = _itemAccepts.DatabaseInput(this)?.Column.Exists(_eingangsWertSpalte);
         var o = DatabaseOutput?.Column.Exists(_filterSpalte);
         var con = new InputRowOutputFilterControl(i, o, _filtertype);

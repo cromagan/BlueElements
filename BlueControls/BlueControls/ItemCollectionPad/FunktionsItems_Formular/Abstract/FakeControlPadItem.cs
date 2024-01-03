@@ -32,6 +32,8 @@ using static BlueBasics.Converter;
 using static BlueBasics.Polygons;
 using static BlueBasics.Generic;
 
+#nullable enable
+
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 /// <summary>

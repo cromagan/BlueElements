@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -35,7 +34,8 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
-using MessageBox = BlueControls.Forms.MessageBox;
+
+using BlueControls.Forms;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -136,6 +136,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public override bool MustBeInDrawingArea => true;
 
+    public bool MustBeOneRow => true;
+
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -188,7 +190,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         //var ff = parent.SearchOrGenerate(rfw2);
 
         var con = new FlexiControlForCell();
@@ -260,7 +262,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
                 return true;
 
             case "columnname":
-
                 _columnName = value;
                 return true;
 

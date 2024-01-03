@@ -31,6 +31,8 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using Button = BlueControls.Controls.Button;
 
+#nullable enable
+
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IAutosizable {
@@ -69,12 +71,11 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
     }
 
     public bool AutoSizeableHeight => false;
-
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
     public Database? DatabaseInputMustBe => DatabaseInput;
-    public override string Description => "Dieses Element wird als Knopf zum drücken dargstellt.<br>Das Element kann Filter empfangen.<br>Diese Filter werden an ein Skript weitergegeben.";
+    public override string Description => "Ein Knopf, den der Benutzer drücken kann und ein Skript startet. Die eingehenden Filter stehen dann als Variable im Skript zur Verfügung.";
 
-    [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert  größer 1 als 'mehr als eine' gilt.")]
+    [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert größer 1 als 'mehr als eine' gilt.")]
     public int Drückbar_wenn {
         get => _enabledwhenrows;
         set {
@@ -86,8 +87,9 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
     public override bool MustBeInDrawingArea => true;
+
+    public bool MustBeOneRow => false;
 
     public ReadOnlyCollection<string> Parents {
         get => _itemAccepts.GetFilterFromKeysGet();
@@ -114,7 +116,7 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new ConnectedFormulaFilterButton();
 
         con.DoInputSettings(parent, this);

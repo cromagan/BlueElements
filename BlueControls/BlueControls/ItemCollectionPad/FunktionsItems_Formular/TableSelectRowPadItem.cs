@@ -78,11 +78,13 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
         set => _itemSends.DatabaseOutputSet(value, this);
     }
 
-    public override string Description => "Darstellung einer Datenbank.\r\nKann Vorfilter empfangen und eine Zeile weitergeben.";
+    public override string Description => "Darstellung einer Datenbank in Tabellen-Form.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
     public override bool MustBeInDrawingArea => true;
+
+    public bool MustBeOneRow => false;
 
     public int OutputColorId {
         get => _itemSends.OutputColorIdGet();
@@ -105,7 +107,7 @@ public class TableSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToC
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override Control CreateControl(ConnectedFormulaView parent) {
+    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new Table();
         con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);

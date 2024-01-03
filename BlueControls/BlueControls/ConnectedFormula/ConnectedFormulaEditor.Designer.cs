@@ -37,6 +37,7 @@ namespace BlueControls.Forms {
             this.btnVorschauÖffnen = new BlueControls.Controls.Button();
             this.btnPfeileAusblenden = new BlueControls.Controls.Button();
             this.grpFelder = new BlueControls.Controls.GroupBox();
+            this.btnTextGenerator = new BlueControls.Controls.Button();
             this.btnButton = new BlueControls.Controls.Button();
             this.btnBild = new BlueControls.Controls.Button();
             this.btnFileExplorer = new BlueControls.Controls.Button();
@@ -61,7 +62,6 @@ namespace BlueControls.Forms {
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.btnTextGenerator = new BlueControls.Controls.Button();
             this.grpDesign.SuspendLayout();
             this.tabHintergrund.SuspendLayout();
             this.Ribbon.SuspendLayout();
@@ -172,7 +172,7 @@ namespace BlueControls.Forms {
             // 
             // btnSkripteBearbeiten
             // 
-            this.btnSkripteBearbeiten.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSkripteBearbeiten.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
             this.btnSkripteBearbeiten.Location = new System.Drawing.Point(8, 2);
             this.btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
@@ -197,7 +197,7 @@ namespace BlueControls.Forms {
             // 
             // btnVorschauÖffnen
             // 
-            this.btnVorschauÖffnen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnVorschauÖffnen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnVorschauÖffnen.ImageCode = "Anwendung|16";
             this.btnVorschauÖffnen.Location = new System.Drawing.Point(80, 2);
             this.btnVorschauÖffnen.Name = "btnVorschauÖffnen";
@@ -208,8 +208,7 @@ namespace BlueControls.Forms {
             // 
             // btnPfeileAusblenden
             // 
-            this.btnPfeileAusblenden.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Button_Big) 
-            | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnPfeileAusblenden.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Big_Borderless;
             this.btnPfeileAusblenden.ImageCode = "Pfeil_Rechts|16||1||||0";
             this.btnPfeileAusblenden.Location = new System.Drawing.Point(8, 2);
             this.btnPfeileAusblenden.Name = "btnPfeileAusblenden";
@@ -235,14 +234,23 @@ namespace BlueControls.Forms {
             this.grpFelder.TabStop = false;
             this.grpFelder.Text = "Felder";
             // 
+            // btnTextGenerator
+            // 
+            this.btnTextGenerator.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnTextGenerator.ImageCode = "Brief|16";
+            this.btnTextGenerator.Location = new System.Drawing.Point(8, 46);
+            this.btnTextGenerator.Name = "btnTextGenerator";
+            this.btnTextGenerator.Size = new System.Drawing.Size(136, 22);
+            this.btnTextGenerator.TabIndex = 7;
+            this.btnTextGenerator.Text = "Text-Generator";
+            this.btnTextGenerator.Click += new System.EventHandler(this.btnTextGenerator_Click);
+            // 
             // btnButton
             // 
-            this.btnButton.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnButton.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnButton.ImageCode = "Stop";
             this.btnButton.Location = new System.Drawing.Point(8, 24);
             this.btnButton.Name = "btnButton";
-            this.btnButton.QuickInfo = "Fügt einen Knopf hinzu, der ein Skript starten kann.\r\nDer Knopf kann Filter empfa" +
-    "ngen, die dann im Skipt\r\nverfügbar sind.";
             this.btnButton.Size = new System.Drawing.Size(136, 22);
             this.btnButton.TabIndex = 6;
             this.btnButton.Text = "Knopf";
@@ -250,12 +258,10 @@ namespace BlueControls.Forms {
             // 
             // btnBild
             // 
-            this.btnBild.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnBild.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnBild.ImageCode = "Bild";
             this.btnBild.Location = new System.Drawing.Point(144, 24);
             this.btnBild.Name = "btnBild";
-            this.btnBild.QuickInfo = "Fügt ein Feld hinzu, das ein Bild darstellen kann.\r\nEs können Variablen eines Zei" +
-    "len-Skriptes benutzt werden.";
             this.btnBild.Size = new System.Drawing.Size(104, 22);
             this.btnBild.TabIndex = 5;
             this.btnBild.Text = "Bild";
@@ -263,12 +269,10 @@ namespace BlueControls.Forms {
             // 
             // btnFileExplorer
             // 
-            this.btnFileExplorer.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnFileExplorer.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnFileExplorer.ImageCode = "Ordner";
             this.btnFileExplorer.Location = new System.Drawing.Point(144, 2);
             this.btnFileExplorer.Name = "btnFileExplorer";
-            this.btnFileExplorer.QuickInfo = "Fügt ein Feld hinzu, das ein Verzeichniss darstellen kann.\r\nEs können Variablen e" +
-    "ines Zeilen-Skriptes benutzt werden.";
             this.btnFileExplorer.Size = new System.Drawing.Size(104, 22);
             this.btnFileExplorer.TabIndex = 3;
             this.btnFileExplorer.Text = "Verzeichniss";
@@ -276,13 +280,10 @@ namespace BlueControls.Forms {
             // 
             // btnFeldHinzu
             // 
-            this.btnFeldHinzu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnFeldHinzu.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnFeldHinzu.ImageCode = "Textfeld2|24";
             this.btnFeldHinzu.Location = new System.Drawing.Point(8, 2);
             this.btnFeldHinzu.Name = "btnFeldHinzu";
-            this.btnFeldHinzu.QuickInfo = "Fügt ein Feld hinzu, mit der z.B. eine Zelle einer \r\nSpalte bearbeitet werden kan" +
-    "n.\r\n\r\nDieses Feld kann entweder von einer Zeile\r\nbefüllt werden, oder frei einge" +
-    "geben werden";
             this.btnFeldHinzu.Size = new System.Drawing.Size(136, 22);
             this.btnFeldHinzu.TabIndex = 1;
             this.btnFeldHinzu.Text = "Zelle";
@@ -304,8 +305,8 @@ namespace BlueControls.Forms {
             // 
             // btnRegisterKarte
             // 
-            this.btnRegisterKarte.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnRegisterKarte.ImageCode = "Register";
+            this.btnRegisterKarte.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnRegisterKarte.ImageCode = "Register|16|||||||||PlusZeichen";
             this.btnRegisterKarte.Location = new System.Drawing.Point(72, 2);
             this.btnRegisterKarte.Name = "btnRegisterKarte";
             this.btnRegisterKarte.QuickInfo = resources.GetString("btnRegisterKarte.QuickInfo");
@@ -316,14 +317,13 @@ namespace BlueControls.Forms {
             // 
             // btnTabControlAdd
             // 
-            this.btnTabControlAdd.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnTabControlAdd.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnTabControlAdd.ImageCode = "Registersammlung";
             this.btnTabControlAdd.Location = new System.Drawing.Point(8, 2);
             this.btnTabControlAdd.Name = "btnTabControlAdd";
-            this.btnTabControlAdd.QuickInfo = resources.GetString("btnTabControlAdd.QuickInfo");
             this.btnTabControlAdd.Size = new System.Drawing.Size(64, 66);
             this.btnTabControlAdd.TabIndex = 3;
-            this.btnTabControlAdd.Text = "Register";
+            this.btnTabControlAdd.Text = "Register-sammlung";
             this.btnTabControlAdd.Click += new System.EventHandler(this.btnTabControlAdd_Click);
             // 
             // groupBox1
@@ -344,12 +344,10 @@ namespace BlueControls.Forms {
             // 
             // btnTable
             // 
-            this.btnTable.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnTable.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnTable.ImageCode = "Tabelle|16";
             this.btnTable.Location = new System.Drawing.Point(200, 2);
             this.btnTable.Name = "btnTable";
-            this.btnTable.QuickInfo = "Fügt eine Tabellenansicht hinzu.\r\nDiese kann Vorfilterungen empfangen,\r\ndie vom B" +
-    "enutzer dann nicht mehr\r\nverändert werden können.";
             this.btnTable.Size = new System.Drawing.Size(64, 66);
             this.btnTable.TabIndex = 5;
             this.btnTable.Text = "Tabelle";
@@ -357,11 +355,10 @@ namespace BlueControls.Forms {
             // 
             // btnDropdownmenu
             // 
-            this.btnDropdownmenu.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnDropdownmenu.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnDropdownmenu.ImageCode = "Textfeld2";
             this.btnDropdownmenu.Location = new System.Drawing.Point(136, 2);
             this.btnDropdownmenu.Name = "btnDropdownmenu";
-            this.btnDropdownmenu.QuickInfo = resources.GetString("btnDropdownmenu.QuickInfo");
             this.btnDropdownmenu.Size = new System.Drawing.Size(64, 66);
             this.btnDropdownmenu.TabIndex = 4;
             this.btnDropdownmenu.Text = "Auswahl-feld";
@@ -369,7 +366,7 @@ namespace BlueControls.Forms {
             // 
             // btnFilterConverter
             // 
-            this.btnFilterConverter.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnFilterConverter.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnFilterConverter.ImageCode = "Trichter|16";
             this.btnFilterConverter.Location = new System.Drawing.Point(72, 2);
             this.btnFilterConverter.Name = "btnFilterConverter";
@@ -380,7 +377,7 @@ namespace BlueControls.Forms {
             // 
             // btnBenutzerFilterWahl
             // 
-            this.btnBenutzerFilterWahl.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnBenutzerFilterWahl.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnBenutzerFilterWahl.ImageCode = "Trichter|16";
             this.btnBenutzerFilterWahl.Location = new System.Drawing.Point(8, 2);
             this.btnBenutzerFilterWahl.Name = "btnBenutzerFilterWahl";
@@ -404,8 +401,7 @@ namespace BlueControls.Forms {
             // 
             // btnArbeitsbereich
             // 
-            this.btnArbeitsbereich.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Button_Big) 
-            | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnArbeitsbereich.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Big_Borderless;
             this.btnArbeitsbereich.ImageCode = "SeiteEinrichten";
             this.btnArbeitsbereich.Location = new System.Drawing.Point(8, 2);
             this.btnArbeitsbereich.Name = "btnArbeitsbereich";
@@ -421,7 +417,7 @@ namespace BlueControls.Forms {
             this.tabFile.Location = new System.Drawing.Point(4, 25);
             this.tabFile.Margin = new System.Windows.Forms.Padding(0);
             this.tabFile.Name = "tabFile";
-            this.tabFile.Size = new System.Drawing.Size(876, 81);
+            this.tabFile.Size = new System.Drawing.Size(1267, 81);
             this.tabFile.TabIndex = 5;
             this.tabFile.Text = "Datei";
             // 
@@ -445,7 +441,7 @@ namespace BlueControls.Forms {
             // 
             // btnSpeichern
             // 
-            this.btnSpeichern.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSpeichern.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSpeichern.ImageCode = "Diskette";
             this.btnSpeichern.Location = new System.Drawing.Point(232, 2);
             this.btnSpeichern.Name = "btnSpeichern";
@@ -470,7 +466,7 @@ namespace BlueControls.Forms {
             // 
             // btnOeffnen
             // 
-            this.btnOeffnen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnOeffnen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnOeffnen.ImageCode = "Ordner";
             this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
             this.btnOeffnen.Name = "btnOeffnen";
@@ -481,7 +477,7 @@ namespace BlueControls.Forms {
             // 
             // btnSaveAs
             // 
-            this.btnSaveAs.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSaveAs.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSaveAs.ImageCode = "Diskette";
             this.btnSaveAs.Location = new System.Drawing.Point(296, 2);
             this.btnSaveAs.Name = "btnSaveAs";
@@ -492,7 +488,7 @@ namespace BlueControls.Forms {
             // 
             // btnNeuDB
             // 
-            this.btnNeuDB.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnNeuDB.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnNeuDB.ImageCode = "Datei";
             this.btnNeuDB.Location = new System.Drawing.Point(8, 2);
             this.btnNeuDB.Name = "btnNeuDB";
@@ -521,17 +517,6 @@ namespace BlueControls.Forms {
             this.tabPage1.Size = new System.Drawing.Size(1267, 0);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Visible = false;
-            // 
-            // btnTextGenerator
-            // 
-            this.btnTextGenerator.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
-            this.btnTextGenerator.ImageCode = "Brief|16";
-            this.btnTextGenerator.Location = new System.Drawing.Point(8, 46);
-            this.btnTextGenerator.Name = "btnTextGenerator";
-            this.btnTextGenerator.Size = new System.Drawing.Size(136, 22);
-            this.btnTextGenerator.TabIndex = 7;
-            this.btnTextGenerator.Text = "Text-Generator";
-            this.btnTextGenerator.Click += new System.EventHandler(this.btnTextGenerator_Click);
             // 
             // ConnectedFormulaEditor
             // 

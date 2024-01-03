@@ -41,6 +41,7 @@ using static BlueBasics.Converter;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
 using static BlueBasics.Generic;
+using BlueControls.EventArgs;
 
 namespace BlueControls.ConnectedFormula;
 
@@ -120,6 +121,8 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     public event EventHandler? Changed;
 
     public event EventHandler<MessageEventArgs>? DropMessage;
+
+    public event EventHandler<EditingEventArgs>? Editing;
 
     public event EventHandler? Loaded;
 
@@ -776,6 +779,14 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         return false;
     }
 
+    internal bool IsEditing() {
+        var e = new EditingEventArgs();
+
+        OnEditing(e);
+
+        return e.Editing;
+    }
+
     internal void OnDropMessage(FehlerArt type, string message) {
         if (IsDisposed) { return; }
         if (!DropMessages) { return; }
@@ -844,6 +855,8 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     }
 
     private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
+
+    private void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
 
     //private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
     //    if (_saving || (_muf?.IsLoading ?? true)) { return; }
