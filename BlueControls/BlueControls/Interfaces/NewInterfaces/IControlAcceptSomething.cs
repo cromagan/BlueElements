@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Generic;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -49,15 +51,15 @@ public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
     #region Methods
 
     /// <summary>
-    /// Wird ausgelöst, wenn eine relevante Änderung an den Daten erfolgt ist.
-    /// Hier können die neuen temporären Daten berechnet werden und sollten auch angezeigt werden und ein Invalidate gesetzt werden
+    /// Wird ausgelöst, wenn eine relevante Änderung der eingehenen Filter(Daten) erfolgt ist.
+    /// Hier können die neuen temporären Filter(Daten) (FilterInput) berechnet werden und sollten auch angezeigt werden und ein Invalidate gesetzt werden
     /// Events können gekoppelt werden
     /// </summary>
     public void FilterInput_Changed(object sender, System.EventArgs e);
 
     /// <summary>
-    /// Wird ausgelöst, bevor eine relevante Änderung an den Daten erfolgt.
-    /// Hier können Daten, die angezeigt werden, zurückgeschrieben werden. Events entkoppelt werden
+    /// Wird ausgelöst, bevor eine relevante Änderung der eingehenden Filter(Daten) erfolgen wird.
+    /// Hier können Daten, die angezeigt werden, zurückgeschrieben werden. Events können entkoppelt werden
     /// </summary>
     public void FilterInput_Changing(object sender, System.EventArgs e);
 
@@ -110,6 +112,10 @@ public static class IControlAcceptSomethingExtension {
         }
     }
 
+    /// <summary>
+    /// Verwirft den aktuellen InputFilter und erstellt einen neuen von allen Parents
+    /// </summary>
+    /// <param name="item"></param>
     public static void DoInputFilter(this IControlAcceptSomething item) {
         if (item.IsDisposed) { return; }
         if (item.FilterManualSeted) { return; }

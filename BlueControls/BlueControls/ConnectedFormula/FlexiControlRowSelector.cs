@@ -26,6 +26,8 @@ using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
 
+#nullable enable
+
 namespace BlueControls.ConnectedFormula;
 
 internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IControlAcceptSomething {
@@ -81,15 +83,16 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
     protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-
         if (disposing) {
+            //components?.Dispose();
             FilterInput?.Dispose();
             FilterOutput.Dispose();
             FilterInput = null;
             Tag = null;
             Childs.Clear();
         }
+
+        base.Dispose(disposing);
     }
 
     protected override void DrawControl(Graphics gr, States state) {
