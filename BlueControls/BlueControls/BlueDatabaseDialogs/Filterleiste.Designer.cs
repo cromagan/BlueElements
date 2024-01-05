@@ -106,7 +106,6 @@ namespace BlueControls.BlueDatabaseDialogs
             // 
             // Filterleiste
             // 
-            this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.Controls.Add(this.btnÄhnliche);
             this.Controls.Add(this.btnPinZurück);
             this.Controls.Add(this.btnPin);

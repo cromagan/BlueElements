@@ -66,7 +66,6 @@ namespace BlueControls {
             // 
             this.filterVariablen.Anchor = ((AnchorStyles)(((AnchorStyles.Top | AnchorStyles.Left) 
                                                            | AnchorStyles.Right)));
-            this.filterVariablen.AutoSizeMode = AutoSizeMode.GrowAndShrink;
             this.filterVariablen.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
             this.filterVariablen.Location = new Point(8, 24);
             this.filterVariablen.Name = "filterVariablen";

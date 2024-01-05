@@ -27,6 +27,8 @@ using BlueControls.Enums;
 using BlueControls.Forms;
 using Form = System.Windows.Forms.Form;
 
+#nullable enable
+
 //Inherits UserControl ' -> Gibt Focus an Child!
 //Inherits ContainerControl -> ?
 //Inherits Panel '-> Alles ist ein Container!

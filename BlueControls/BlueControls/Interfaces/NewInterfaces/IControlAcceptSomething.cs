@@ -67,11 +67,6 @@ public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
 }
 
 public static class IControlAcceptSomethingExtension {
-    //public static void ConnectChildParents(this IControlAcceptSomething child, List<IControlSendSomething> parents) {
-    //    foreach (var thisParent in parents) {
-    //        child.ConnectChildParents(thisParent);
-    //    }
-    //}
 
     #region Methods
 

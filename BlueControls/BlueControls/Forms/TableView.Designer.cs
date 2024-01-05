@@ -734,12 +734,10 @@ namespace BlueControls.Forms {
             // 
             this.FilterLeiste.ÄhnlicheAnsichtName = "Filterleiste Ähnlich";
             this.FilterLeiste.AnsichtName = "Filterleiste Waagerecht";
-            this.FilterLeiste.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.FilterLeiste.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.FilterLeiste.CausesValidation = false;
             this.FilterLeiste.Dock = System.Windows.Forms.DockStyle.Top;
             this.FilterLeiste.Filtertypes = BlueControls.Enums.FilterTypesToShow.AktuelleAnsicht_AktiveFilter;
-            this.FilterLeiste.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.Nothing;
             this.FilterLeiste.Location = new System.Drawing.Point(0, 0);
             this.FilterLeiste.Name = "FilterLeiste";
             this.FilterLeiste.Size = new System.Drawing.Size(972, 40);

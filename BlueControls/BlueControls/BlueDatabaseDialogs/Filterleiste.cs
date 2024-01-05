@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Security.Cryptography;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -31,12 +30,11 @@ using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using GroupBox = BlueControls.Controls.GroupBox;
 using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserControl //
+public partial class Filterleiste : GenericControl, IControlSendSomething, IBackgroundNone //  System.Windows.Forms.UserControl //
 {
     #region Fields
 
@@ -60,7 +58,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     #region Properties
 
     /// <summary>
-    /// Wenn "Ähnliche" als Knopd vorhanden sein soll, muss hier der Name einer Spaltenanordnung stehen
+    /// Wenn "Ähnliche" als Knopf vorhanden sein soll, muss hier der Name einer Spaltenanordnung stehen
     /// </summary>
     [DefaultValue("")]
     public string ÄhnlicheAnsichtName {
@@ -81,6 +79,10 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
     [DefaultValue(false)]
     public bool AutoPin { get; set; }
 
+    public List<IControlAcceptSomething> Childs { get; } = [];
+
+    public FilterCollection FilterOutput { get; } = new("FilterOutput");
+
     [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
     public FilterTypesToShow Filtertypes { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;
 
@@ -90,6 +92,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         set {
             if (_table == value) { return; }
             if (_table != null) {
+                _table.DisconnectChildParents(this);
                 _table.DatabaseChanged -= _table_DatabaseChanged;
                 _table.FilterChanged -= _table_PinnedOrFilterChanged;
                 _table.PinnedChanged -= _table_PinnedOrFilterChanged;
@@ -100,6 +103,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
             GetÄhnlich();
             FillFilters();
             if (_table != null) {
+                _table.ConnectChildParents(this);
                 _table.DatabaseChanged += _table_DatabaseChanged;
                 _table.FilterChanged += _table_PinnedOrFilterChanged;
                 _table.PinnedChanged += _table_PinnedOrFilterChanged;
@@ -214,7 +218,7 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
                     } else {
                         // Na gut, eben neuen Flex erstellen
                         flx = new FlexiControlForFilter(thisColumn);
-                        flx.FilterOutput.Database = thisColumn.Database;
+                        flx.DoOutputSettings(thisColumn.Database, flx.Name);
                         if (_table != null) { flx.ConnectChildParents(_table); }
                         //flx.DoOutputSettings(this);
                         //flx.DoInputSettings(parent, this);
@@ -244,8 +248,9 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         #region Unnötige Flexis löschen
 
         foreach (var thisFlexi in flexsToDelete) {
+            if (_table != null) { thisFlexi.DisconnectChildParents(_table); }
             //thisFlexi.FilterOutput.Changing += FilterOutput_Changing;
-            thisFlexi.FilterOutput.Changed -= FilterOutput_Changed;
+            //thisFlexi.FilterOutput.Changed -= FilterOutput_Changed;
             thisFlexi.Visible = false;
             Controls.Remove(thisFlexi);
             thisFlexi.Dispose();
@@ -254,6 +259,11 @@ public partial class Filterleiste : GroupBox //  System.Windows.Forms.UserContro
         #endregion Unnötige Flexis löschen
 
         _isFilling = false;
+    }
+
+    protected override void DrawControl(Graphics gr, States state) {
+        Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
+        //Intiall();
     }
 
     private void _table_DatabaseChanged(object sender, System.EventArgs e) {

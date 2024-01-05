@@ -41,6 +41,11 @@ public static class IControlSendSomethingExtension {
 
     #region Methods
 
+    public static void DoOutputSettings(this IControlSendSomething dest, Database db, string name) {
+        dest.Name = name;
+        dest.FilterOutput.Database = db;
+    }
+
     public static void DoOutputSettings(this IControlSendSomething dest, IItemSendSomething source) {
         dest.Name = source.DefaultItemToControlName();
         dest.FilterOutput.Database = source.DatabaseOutput;

@@ -23,6 +23,8 @@ using System.IO;
 using System.Text;
 using BlueBasics.Enums;
 
+#nullable enable
+
 namespace BlueBasics;
 
 public static class Converter {

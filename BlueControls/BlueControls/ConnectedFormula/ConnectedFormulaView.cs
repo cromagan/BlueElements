@@ -28,6 +28,8 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
 
+#nullable enable
+
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]

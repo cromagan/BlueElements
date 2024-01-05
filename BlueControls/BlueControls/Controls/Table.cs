@@ -731,7 +731,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         if (!sameRow) {
             OnSelectedRowChanged(new RowEventArgs(setedrow));
-            FilterOutput.Database = Database;
+            this.DoOutputSettings(Database, this.Name);
             FilterOutput.Add(new FilterItem(setedrow));
         }
     }

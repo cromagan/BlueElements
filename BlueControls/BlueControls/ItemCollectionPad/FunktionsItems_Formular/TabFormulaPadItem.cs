@@ -179,7 +179,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                         cc.Dock = DockStyle.Fill;
                         cc.DoInputSettings(parentView, this);
                         cc.DoInputFilter();
-                        cc.FilterOutput.Database = cc.FilterInput?.Database;
+                        cc.DoOutputSettings(cc.FilterInput?.Database, cc.Name);
                         cc.GenerateView();
 
                         #endregion
