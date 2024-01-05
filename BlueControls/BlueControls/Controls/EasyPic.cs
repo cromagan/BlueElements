@@ -105,6 +105,9 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendSomething> Parents { get; } = [];
 
     [DefaultValue(0)]

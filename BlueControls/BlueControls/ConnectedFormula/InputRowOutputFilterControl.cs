@@ -57,6 +57,10 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
     public bool FilterManualSeted { get; set; } = false;
     public FilterCollection FilterOutput { get; } = new("FilterIput 2");
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendSomething> Parents { get; } = [];
 
     #endregion

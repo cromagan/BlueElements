@@ -34,6 +34,10 @@ internal class ConnectedFormulaFilterButton : Button, IControlAcceptSomething {
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendSomething> Parents { get; } = [];
 
     #endregion

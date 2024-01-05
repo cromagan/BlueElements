@@ -35,8 +35,6 @@ using BlueDatabase;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 
-using BlueControls.Forms;
-
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
 /// <summary>

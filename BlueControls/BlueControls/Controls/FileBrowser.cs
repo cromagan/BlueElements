@@ -94,6 +94,9 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendSomething> Parents { get; } = [];
 
     public string Pfad {

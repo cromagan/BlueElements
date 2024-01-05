@@ -375,7 +375,7 @@
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TextGeneratorPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\FilterButtonPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RowEntryPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TableSelectRowPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TableViewPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\EasyPicPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\DropDownSelectRowPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\FilterConverterElementPadItem.cs" />

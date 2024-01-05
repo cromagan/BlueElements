@@ -85,6 +85,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     public string Page { get; }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendSomething> Parents { get; } = [];
 
     //set => SetData(ConnectedFormula, Database, value, Page);
@@ -122,7 +125,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         if (IsDisposed) { return; }
         if (_generated) { return; }
         if (!Visible) { return; }
-        if (ConnectedFormula.IsEditing()) { return; }
+        if (ConnectedFormula == null || ConnectedFormula.IsEditing()) { return; }
 
         if (Width < 30 || Height < 10) { return; }
 

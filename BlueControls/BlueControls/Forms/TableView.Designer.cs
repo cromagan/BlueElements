@@ -120,6 +120,7 @@ namespace BlueControls.Forms {
             // 
             this.capStatusBar.Location = new System.Drawing.Point(304, 0);
             this.capStatusBar.Size = new System.Drawing.Size(1025, 24);
+            this.capStatusBar.TextAnzeigeVerhalten = BlueControls.Enums.SteuerelementVerhalten.Text_Abschneiden;
             // 
             // pnlStatusBar
             // 
@@ -174,7 +175,7 @@ namespace BlueControls.Forms {
             // 
             // btnDatenbankenSpeicherort
             // 
-            this.btnDatenbankenSpeicherort.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnDatenbankenSpeicherort.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnDatenbankenSpeicherort.ImageCode = "Ordner";
             this.btnDatenbankenSpeicherort.Location = new System.Drawing.Point(8, 2);
             this.btnDatenbankenSpeicherort.Name = "btnDatenbankenSpeicherort";
@@ -186,7 +187,7 @@ namespace BlueControls.Forms {
             // 
             // btnTemporärenSpeicherortÖffnen
             // 
-            this.btnTemporärenSpeicherortÖffnen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnTemporärenSpeicherortÖffnen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnTemporärenSpeicherortÖffnen.ImageCode = "Ordner||||0000ff||126";
             this.btnTemporärenSpeicherortÖffnen.Location = new System.Drawing.Point(96, 2);
             this.btnTemporärenSpeicherortÖffnen.Name = "btnTemporärenSpeicherortÖffnen";
@@ -229,7 +230,7 @@ namespace BlueControls.Forms {
             // 
             // btnOeffnen
             // 
-            this.btnOeffnen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnOeffnen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnOeffnen.ImageCode = "Ordner";
             this.btnOeffnen.Location = new System.Drawing.Point(72, 2);
             this.btnOeffnen.Name = "btnOeffnen";
@@ -240,7 +241,7 @@ namespace BlueControls.Forms {
             // 
             // btnSaveAs
             // 
-            this.btnSaveAs.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSaveAs.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSaveAs.ImageCode = "Diskette";
             this.btnSaveAs.Location = new System.Drawing.Point(232, 2);
             this.btnSaveAs.Name = "btnSaveAs";
@@ -251,7 +252,7 @@ namespace BlueControls.Forms {
             // 
             // btnNeuDB
             // 
-            this.btnNeuDB.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnNeuDB.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnNeuDB.ImageCode = "Datei";
             this.btnNeuDB.Location = new System.Drawing.Point(8, 2);
             this.btnNeuDB.Name = "btnNeuDB";
@@ -279,7 +280,7 @@ namespace BlueControls.Forms {
             this.grpAufgaben.Controls.Add(this.lstAufgaben);
             this.grpAufgaben.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAufgaben.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAufgaben.Location = new System.Drawing.Point(954, 0);
+            this.grpAufgaben.Location = new System.Drawing.Point(584, 0);
             this.grpAufgaben.Name = "grpAufgaben";
             this.grpAufgaben.Size = new System.Drawing.Size(222, 81);
             this.grpAufgaben.TabIndex = 7;
@@ -312,7 +313,7 @@ namespace BlueControls.Forms {
             this.grpAnsicht.Controls.Add(this.cbxColumnArr);
             this.grpAnsicht.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpAnsicht.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAnsicht.Location = new System.Drawing.Point(626, 0);
+            this.grpAnsicht.Location = new System.Drawing.Point(256, 0);
             this.grpAnsicht.Margin = new System.Windows.Forms.Padding(0);
             this.grpAnsicht.Name = "grpAnsicht";
             this.grpAnsicht.Padding = new System.Windows.Forms.Padding(0);
@@ -323,8 +324,7 @@ namespace BlueControls.Forms {
             // 
             // btnUnterschiede
             // 
-            this.btnUnterschiede.ButtonStyle = ((BlueControls.Enums.ButtonStyle)(((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Button_Big) 
-            | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnUnterschiede.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Big_Borderless;
             this.btnUnterschiede.Location = new System.Drawing.Point(216, 46);
             this.btnUnterschiede.Name = "btnUnterschiede";
             this.btnUnterschiede.QuickInfo = "Zeigt Unterschiede zur gewählten Zeile an";
@@ -335,7 +335,7 @@ namespace BlueControls.Forms {
             // 
             // btnAlleSchließen
             // 
-            this.btnAlleSchließen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnAlleSchließen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnAlleSchließen.ImageCode = "Pfeil_Oben_Scrollbar|14|||||0";
             this.btnAlleSchließen.Location = new System.Drawing.Point(216, 24);
             this.btnAlleSchließen.Name = "btnAlleSchließen";
@@ -347,7 +347,7 @@ namespace BlueControls.Forms {
             // 
             // btnAlleErweitern
             // 
-            this.btnAlleErweitern.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnAlleErweitern.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnAlleErweitern.ImageCode = "Pfeil_Unten_Scrollbar|14|||ff0000||200|200";
             this.btnAlleErweitern.Location = new System.Drawing.Point(216, 2);
             this.btnAlleErweitern.Name = "btnAlleErweitern";
@@ -396,7 +396,7 @@ namespace BlueControls.Forms {
             this.grpHilfen.Controls.Add(this.btnSuchFenster);
             this.grpHilfen.Dock = System.Windows.Forms.DockStyle.Left;
             this.grpHilfen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpHilfen.Location = new System.Drawing.Point(370, 0);
+            this.grpHilfen.Location = new System.Drawing.Point(0, 0);
             this.grpHilfen.Name = "grpHilfen";
             this.grpHilfen.Size = new System.Drawing.Size(256, 81);
             this.grpHilfen.TabIndex = 6;
@@ -405,7 +405,7 @@ namespace BlueControls.Forms {
             // 
             // ckbZeilenclickInsClipboard
             // 
-            this.ckbZeilenclickInsClipboard.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.ckbZeilenclickInsClipboard.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.ckbZeilenclickInsClipboard.Location = new System.Drawing.Point(96, 24);
             this.ckbZeilenclickInsClipboard.Name = "ckbZeilenclickInsClipboard";
             this.ckbZeilenclickInsClipboard.Size = new System.Drawing.Size(152, 22);
@@ -414,7 +414,7 @@ namespace BlueControls.Forms {
             // 
             // btnNummerierung
             // 
-            this.btnNummerierung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Checkbox | BlueControls.Enums.ButtonStyle.Text)));
+            this.btnNummerierung.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.btnNummerierung.Location = new System.Drawing.Point(96, 2);
             this.btnNummerierung.Margin = new System.Windows.Forms.Padding(4);
             this.btnNummerierung.Name = "btnNummerierung";
@@ -426,7 +426,7 @@ namespace BlueControls.Forms {
             // 
             // btnSuchFenster
             // 
-            this.btnSuchFenster.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSuchFenster.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSuchFenster.ImageCode = "Lupe";
             this.btnSuchFenster.Location = new System.Drawing.Point(8, 2);
             this.btnSuchFenster.Name = "btnSuchFenster";
@@ -464,7 +464,7 @@ namespace BlueControls.Forms {
             // 
             // btnSuchenUndErsetzen
             // 
-            this.btnSuchenUndErsetzen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSuchenUndErsetzen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSuchenUndErsetzen.ImageCode = "Fernglas";
             this.btnSuchenUndErsetzen.Location = new System.Drawing.Point(8, 2);
             this.btnSuchenUndErsetzen.Name = "btnSuchenUndErsetzen";
@@ -475,7 +475,7 @@ namespace BlueControls.Forms {
             // 
             // btnZeileLöschen
             // 
-            this.btnZeileLöschen.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnZeileLöschen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnZeileLöschen.ImageCode = "Zeile||||||||||Kreuz";
             this.btnZeileLöschen.Location = new System.Drawing.Point(88, 2);
             this.btnZeileLöschen.Name = "btnZeileLöschen";
@@ -503,7 +503,7 @@ namespace BlueControls.Forms {
             // 
             // btnSaveLoad
             // 
-            this.btnSaveLoad.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSaveLoad.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSaveLoad.ImageCode = "Refresh|16";
             this.btnSaveLoad.Location = new System.Drawing.Point(80, 2);
             this.btnSaveLoad.Name = "btnSaveLoad";
@@ -515,7 +515,7 @@ namespace BlueControls.Forms {
             // 
             // btnPowerBearbeitung
             // 
-            this.btnPowerBearbeitung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnPowerBearbeitung.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnPowerBearbeitung.ImageCode = "Stift||||FF0000||||||Uhr";
             this.btnPowerBearbeitung.Location = new System.Drawing.Point(128, 2);
             this.btnPowerBearbeitung.Name = "btnPowerBearbeitung";
@@ -527,7 +527,7 @@ namespace BlueControls.Forms {
             // 
             // btnSpaltenUebersicht
             // 
-            this.btnSpaltenUebersicht.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSpaltenUebersicht.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSpaltenUebersicht.ImageCode = "Spalte||||||||||Information";
             this.btnSpaltenUebersicht.Location = new System.Drawing.Point(8, 2);
             this.btnSpaltenUebersicht.Name = "btnSpaltenUebersicht";
@@ -556,7 +556,7 @@ namespace BlueControls.Forms {
             // 
             // btnSkripteBearbeiten
             // 
-            this.btnSkripteBearbeiten.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSkripteBearbeiten.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSkripteBearbeiten.ImageCode = "Skript||||||||||Stift";
             this.btnSkripteBearbeiten.Location = new System.Drawing.Point(240, 2);
             this.btnSkripteBearbeiten.Name = "btnSkripteBearbeiten";
@@ -567,7 +567,7 @@ namespace BlueControls.Forms {
             // 
             // btnFormular
             // 
-            this.btnFormular.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnFormular.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnFormular.ImageCode = "Textfeld|16|||||||||Stift";
             this.btnFormular.Location = new System.Drawing.Point(64, 2);
             this.btnFormular.Name = "btnFormular";
@@ -578,7 +578,7 @@ namespace BlueControls.Forms {
             // 
             // btnSpaltenanordnung
             // 
-            this.btnSpaltenanordnung.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnSpaltenanordnung.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnSpaltenanordnung.ImageCode = "Spalte||||||||||Stift";
             this.btnSpaltenanordnung.Location = new System.Drawing.Point(176, 2);
             this.btnSpaltenanordnung.Name = "btnSpaltenanordnung";
@@ -589,7 +589,7 @@ namespace BlueControls.Forms {
             // 
             // btnDatenbankKopf
             // 
-            this.btnDatenbankKopf.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnDatenbankKopf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnDatenbankKopf.ImageCode = "Datenbank||||||||||Stift";
             this.btnDatenbankKopf.Location = new System.Drawing.Point(0, 2);
             this.btnDatenbankKopf.Name = "btnDatenbankKopf";
@@ -600,7 +600,7 @@ namespace BlueControls.Forms {
             // 
             // btnLayouts
             // 
-            this.btnLayouts.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnLayouts.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnLayouts.ImageCode = "Layout||||||||||Stift";
             this.btnLayouts.Location = new System.Drawing.Point(120, 2);
             this.btnLayouts.Name = "btnLayouts";
@@ -651,7 +651,7 @@ namespace BlueControls.Forms {
             // 
             // btnHTMLExport
             // 
-            this.btnHTMLExport.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnHTMLExport.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnHTMLExport.ImageCode = "Globus";
             this.btnHTMLExport.Location = new System.Drawing.Point(72, 2);
             this.btnHTMLExport.Name = "btnHTMLExport";
@@ -663,7 +663,7 @@ namespace BlueControls.Forms {
             // 
             // btnCSVClipboard
             // 
-            this.btnCSVClipboard.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnCSVClipboard.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnCSVClipboard.ImageCode = "Clipboard||||||||||Pfeil_Rechts";
             this.btnCSVClipboard.Location = new System.Drawing.Point(8, 2);
             this.btnCSVClipboard.Name = "btnCSVClipboard";
@@ -689,7 +689,7 @@ namespace BlueControls.Forms {
             // 
             // btnClipboardImport
             // 
-            this.btnClipboardImport.ButtonStyle = ((BlueControls.Enums.ButtonStyle)((BlueControls.Enums.ButtonStyle.Button_Big | BlueControls.Enums.ButtonStyle.Borderless)));
+            this.btnClipboardImport.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnClipboardImport.ImageCode = "Tabelle||||||||||Pfeil_Links";
             this.btnClipboardImport.Location = new System.Drawing.Point(8, 2);
             this.btnClipboardImport.Name = "btnClipboardImport";
@@ -747,9 +747,9 @@ namespace BlueControls.Forms {
             // Table
             // 
             this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.Table.FilterOutputType = BlueDatabase.Enums.Filterausgabe.Im_Element_Gewählte_Filter;
             this.Table.Location = new System.Drawing.Point(0, 64);
             this.Table.Name = "Table";
-            this.Table.ShowWaitScreen = true;
             this.Table.Size = new System.Drawing.Size(972, 531);
             this.Table.TabIndex = 0;
             this.Table.ContextMenuInit += new System.EventHandler<BlueControls.EventArgs.ContextMenuInitEventArgs>(this.Table_ContextMenuInit);

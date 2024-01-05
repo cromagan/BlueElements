@@ -110,9 +110,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     public static void OpenColumnEditor(ColumnItem? column, RowItem? row, Table? tableview) {
-        if (column == null || column.IsDisposed) {
-            return;
-        }
+        if (column == null || column.IsDisposed) { return; }
 
         if (row == null || row.IsDisposed) {
             OpenColumnEditor(column, tableview);
@@ -200,15 +198,6 @@ public partial class TableView : FormWithStatusBar {
             }
         }
     }
-
-    //public void ResetDatabaseSettings() {
-    //    foreach (var thisT in tbcDatabaseSelector.TabPages) {
-    //        if (thisT is TabPage tp && tp.Tag is List<object> s) {
-    //            s[1] = string.Empty;
-    //            tp.Tag = s;
-    //        }
-    //    }
-    //}
 
     /// <summary>
     /// Erstellt einen Reiter mit den nötigen Tags um eine Datenbank laden zu können - lädt die Datenbank aber selbst nicht.

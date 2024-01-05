@@ -89,6 +89,9 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
 
     public bool FilterManualSeted { get; set; } = false;
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendSomething> Parents { get; } = [];
 
     [Description("Dieses Feld kann für den Forms-Editor verwendet werden.")]

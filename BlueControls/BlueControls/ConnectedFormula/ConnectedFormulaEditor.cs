@@ -29,7 +29,6 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
-using System;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
 #nullable enable
@@ -59,7 +58,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         GenQuickInfo(btnBild, new EasyPicPadItem(string.Empty));
 
-        GenQuickInfo(btnTable, new TableSelectRowPadItem(string.Empty));
+        GenQuickInfo(btnTable, new TableViewPadItem(string.Empty));
 
         GenQuickInfo(btnDropdownmenu, new DropDownSelectRowPadItem(string.Empty));
 
@@ -257,7 +256,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnTable_Click(object sender, System.EventArgs e) {
-        var x = new TableSelectRowPadItem(string.Empty);
+        var x = new TableViewPadItem(string.Empty);
         AddCentered(x);
     }
 
