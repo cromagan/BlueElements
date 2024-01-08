@@ -156,7 +156,7 @@
     <Compile Include="Controls\FlexiControlForDelegate.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="ConnectedFormula\ConnectedFormulaFilterButton.cs">
+    <Compile Include="ConnectedFormula\ConnectedFormulaButton.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ConnectedFormula\TextGenerator.cs">
@@ -373,7 +373,7 @@
     <Compile Include="ItemCollectionPad\Abstract\RectanglePadItemWithVersion.cs" />
     <Compile Include="ItemCollectionPad\Abstract\AbstractPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TextGeneratorPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\FilterButtonPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\ButtonPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\RowEntryPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TableViewPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\EasyPicPadItem.cs" />

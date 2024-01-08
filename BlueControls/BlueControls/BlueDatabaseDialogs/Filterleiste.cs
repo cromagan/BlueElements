@@ -92,7 +92,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
         set {
             if (_table == value) { return; }
             if (_table != null) {
-                _table.DisconnectChildParents(this);
+                //_table.DisconnectChildParents(this);
                 _table.DatabaseChanged -= _table_DatabaseChanged;
                 _table.FilterChanged -= _table_PinnedOrFilterChanged;
                 _table.PinnedChanged -= _table_PinnedOrFilterChanged;
@@ -103,7 +103,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
             GetÄhnlich();
             FillFilters();
             if (_table != null) {
-                _table.ConnectChildParents(this);
+                //_table.ConnectChildParents(this);
                 _table.DatabaseChanged += _table_DatabaseChanged;
                 _table.FilterChanged += _table_PinnedOrFilterChanged;
                 _table.PinnedChanged += _table_PinnedOrFilterChanged;
@@ -126,6 +126,8 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
         }
         if (_isFilling) { return; }
         _isFilling = true;
+
+        FilterOutput.ChangeTo(_table?.Filter);
 
         btnPinZurück.Enabled = _table?.Database != null && _table.PinnedRows.Count > 0;
 
@@ -219,10 +221,10 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
                         // Na gut, eben neuen Flex erstellen
                         flx = new FlexiControlForFilter(thisColumn);
                         flx.DoOutputSettings(thisColumn.Database, flx.Name);
-                        if (_table != null) { flx.ConnectChildParents(_table); }
+                        flx.ConnectChildParents(this);
                         //flx.DoOutputSettings(this);
                         //flx.DoInputSettings(parent, this);
-                        //flx.FilterOutput.Changing += FilterOutput_Changing;
+                        flx.FilterOutput.Changing += FilterOutput_Changing;
                         flx.FilterOutput.Changed += FilterOutput_Changed;
                         Controls.Add(flx);
                     }
@@ -248,7 +250,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
         #region Unnötige Flexis löschen
 
         foreach (var thisFlexi in flexsToDelete) {
-            if (_table != null) { thisFlexi.DisconnectChildParents(_table); }
+            thisFlexi.DisconnectChildParents(this);
             //thisFlexi.FilterOutput.Changing += FilterOutput_Changing;
             //thisFlexi.FilterOutput.Changed -= FilterOutput_Changed;
             thisFlexi.Visible = false;
@@ -282,16 +284,6 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
     private void _table_PinnedOrFilterChanged(object sender, System.EventArgs e) => FillFilters();
 
     private void _table_ViewChanged(object sender, System.EventArgs e) => FillFilters();
-
-    private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
-        if (_table?.Filter == null) { return; }
-
-        _table.Filter.Remove(e.Column);
-        if (e.Command != "Filter") { return; }
-
-        if (e.Filter == null) { return; }
-        _table.Filter.Add(e.Filter);
-    }
 
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {
         if (_table?.Database is not Database db || db.IsDisposed) { return; }
@@ -412,18 +404,34 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
     private void Filterleiste_SizeChanged(object sender, System.EventArgs e) => FillFilters();
 
     private void FilterOutput_Changed(object sender, System.EventArgs e) {
-        if (sender is not FlexiControlForFilter flx) { return; }
+        if (sender is not FilterCollection fo) { return; }
+        if (fo.Count != 1) { return; }
+
         if (_table?.Database is not Database db || db.IsDisposed) { return; }
 
-        if (db != flx.FilterSingleColumn?.Database) { return; }
+        if (db != fo.Database) { return; }
 
-        var fo = flx.FilterOutput;
+        if (fo[0] is not FilterItem fi) { return; }
 
-        if (fo.Count == 0) {
-            _table.Filter.Remove(flx.FilterSingleColumn);
-        } else {
-            _table.Filter.RemoveOtherAndAddIfNotExists(fo);
-        }
+        _table.Filter.Add(fi);
+
+        //var fo = flx.FilterOutput;
+
+        //if (fo.Count == 0) {
+        //    _table.Filter.Remove(flx.FilterSingleColumn);
+        //} else {
+        //    _table.Filter.RemoveOtherAndAddIfNotExists(fo);
+        //}
+    }
+
+    private void FilterOutput_Changing(object sender, System.EventArgs e) {
+        if (sender is not FilterCollection fo) { return; }
+        if (fo.Count != 1) { return; }
+        if (_table?.Database is not Database db || db.IsDisposed) { return; }
+
+        if (fo[0] is not FilterItem fi) { return; }
+
+        _table.Filter.Remove(fi.Column);
     }
 
     //private void FilterOutput_Changing(object sender, System.EventArgs e) => throw new NotImplementedException();

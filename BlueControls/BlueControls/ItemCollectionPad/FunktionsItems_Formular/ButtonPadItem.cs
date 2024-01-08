@@ -34,7 +34,7 @@ using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IAutosizable {
+public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IAutosizable {
 
     #region Fields
 
@@ -48,9 +48,9 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     #region Constructors
 
-    public FilterButtonPadItem(string keyname, string toParse) : this(keyname) => this.Parse(toParse);
+    public ButtonPadItem(string keyname, string toParse) : this(keyname) => this.Parse(toParse);
 
-    public FilterButtonPadItem(string intern) : base(intern) => _itemAccepts = new();
+    public ButtonPadItem(string intern) : base(intern) => _itemAccepts = new();
 
     #endregion
 
@@ -116,7 +116,7 @@ public class FilterButtonPadItem : FakeControlPadItem, IReadableText, IItemToCon
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var con = new ConnectedFormulaFilterButton();
+        var con = new ConnectedFormulaButton();
 
         con.DoInputSettings(parent, this);
         //con.DoOutputSettings(this);

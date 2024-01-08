@@ -50,7 +50,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         GenQuickInfo(btnFeldHinzu, new EditFieldPadItem(string.Empty));
 
-        GenQuickInfo(btnButton, new FilterButtonPadItem(string.Empty));
+        GenQuickInfo(btnButton, new ButtonPadItem(string.Empty));
 
         GenQuickInfo(btnTextGenerator, new TextGeneratorPadItem(string.Empty));
 
@@ -168,7 +168,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnButton_Click(object sender, System.EventArgs e) {
-        var x = new FilterButtonPadItem(string.Empty);
+        var x = new ButtonPadItem(string.Empty);
         AddCentered(x);
     }
 

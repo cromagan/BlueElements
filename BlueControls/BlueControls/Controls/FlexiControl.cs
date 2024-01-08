@@ -35,13 +35,13 @@ using BlueDatabase.Interfaces;
 using static BlueBasics.Converter;
 using Orientation = BlueBasics.Enums.Orientation;
 
+#nullable enable
+
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("ValueChanged")]
 public partial class FlexiControl : GenericControl, IBackgroundNone, IInputFormat, ITranslateable, IDisposableExtended {
-
-    public static SizeF MeasureStringOfCaption(string text) => Skin.GetBlueFont(Design.Caption, States.Standard).MeasureString(text);
 
     #region Fields
 
@@ -59,26 +59,42 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected DateTime? LastTextChange;
 
     private AdditionalCheck _additionalCheck = AdditionalCheck.None;
+
     private string _allowedChars = string.Empty;
+
     private bool _alwaysInstantChange;
+
     private string _caption = string.Empty;
+
     private Caption? _captionObject;
+
     private ÜberschriftAnordnung _captionPosition = ÜberschriftAnordnung.ohne;
 
     // None ist -1 und muss gesetzt sein!
     private int _controlX = -1;
 
     private string _disabledReason = string.Empty;
+
     private EditTypeFormula _editType;
+
     private bool _formatierungErlaubt;
+
     private Caption? _infoCaption;
+
     private string _infoText = string.Empty;
+
     private int _maxTextLenght = 4000;
+
     private bool _multiLine;
+
     private string _regex = string.Empty;
+
     private bool _showInfoWhenDisabled;
+
     private bool _spellChecking;
+
     private string _suffix = string.Empty;
+
     private bool _translateCaption = true;
 
     #endregion
@@ -113,13 +129,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Events
 
-    public event EventHandler? ButtonClicked;
-
     [Obsolete("Value Changed benutzen", true)]
     public new event EventHandler? TextChanged;
 
-#pragma warning restore CS0067
-
+    //public event EventHandler? ButtonClicked;
     //public event EventHandler? NeedRefresh;
     public event EventHandler? ValueChanged;
 
@@ -360,6 +373,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Methods
 
+    public static SizeF MeasureStringOfCaption(string text) => Skin.GetBlueFont(Design.Caption, States.Standard).MeasureString(text);
+
     public void ValueSet(string? newvalue, bool updateControls, bool doInstantChangedValue) {
         if (IsDisposed) { return; }
         newvalue ??= string.Empty;
@@ -511,7 +526,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         return null;
     }
 
-    protected virtual void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
+    protected virtual void OnButtonClicked() { }// => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
@@ -852,13 +867,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
         // Text_abschneiden, wäre Cool, weil dann der Quickmode verfügbar ist
 
-        if(_editType == EditTypeFormula.nur_als_Text_anzeigen) {
+        if (_editType == EditTypeFormula.nur_als_Text_anzeigen) {
             // Kann alles sein, Beschriftung und was weiß ich.
             _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
         } else {
             _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden;
         }
-
 
         if (_captionPosition == ÜberschriftAnordnung.Ohne_mit_Abstand) {
             _captionObject.Text = " ";

@@ -131,6 +131,36 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         base.DrawControl(gr, state);
     }
 
+    protected override void OnButtonClicked() {
+        base.OnButtonClicked();
+
+        if (CaptionPosition == ÜberschriftAnordnung.ohne) {
+            FilterOutput.Clear();
+            return;
+        }
+
+        //if(FilterSingleColumn is not ColumnItem c) { return; }
+
+        //if( FilterInput?.Clone("ButtonClicked") is not FilterCollection f) {  return; }
+
+        //var f = (FlexiControlForFilter)sender;
+        //if (f.CaptionPosition == ÜberschriftAnordnung.ohne) {
+        //    // ein Großer Knopf ohne Überschrift, da wird der evl. Filter gelöscht
+        //    _table.Filter.Remove(((FlexiControlForFilter)sender).FilterSingle);
+        //    return;
+        //}
+
+        //if (f.FilterSingleColumn == null) { return; }
+
+        ////f.Enabled = false;
+        //AutoFilter autofilter = new(f.FilterSingleColumn, _table.Filter, _table.PinnedRows, f.Width);
+        //var p = f.PointToScreen(Point.Empty);
+        //autofilter.Position_LocateToPosition(p with { Y = p.Y + f.Height });
+        //autofilter.Show();
+        //autofilter.FilterCommand += AutoFilter_FilterCommand;
+        //Develop.Debugprint_BackgroundThread();
+    }
+
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
 
@@ -177,6 +207,18 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     //    }
     //}
 
+    //    //#endregion
+    //}
+    private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
+        //if (_table?.Filter == null) { return; }
+
+        //_table.Filter.Remove(e.Column);
+        //if (e.Command != "Filter") { return; }
+
+        //if (e.Filter == null) { return; }
+        //_table.Filter.Add(e.Filter);
+    }
+
     private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
         var cbx = (ComboBox)sender;
         cbx.Item.Clear();
@@ -202,6 +244,8 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         if (IsDisposed) { return; }
         this.DoInputFilter();
 
+
+
         if (!Allinitialized) { _ = CreateSubControls(); }
 
         #region Wenn keine Spalte vorhanden, Fehler machen
@@ -218,6 +262,8 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         #endregion
 
         var filterSingle = FilterInput?[FilterSingleColumn];
+
+        FilterOutput.ChangeTo(filterSingle);
 
         DisabledReason = filterSingle != null && !string.IsNullOrEmpty(filterSingle.Herkunft) ?
             "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;
@@ -354,31 +400,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     //    //if (cb?.Item?[Value] == null) {
     //    //    ValueSet(string.Empty, true, true);
     //    //}
-
-    //    //#endregion
-    //}
 }
-
-//private void Flx_ButtonClicked(object sender, System.EventArgs e) {
-//    if (_table?.Filter == null) { return; }
-
-//    var f = (FlexiControlForFilter)sender;
-//    if (f.CaptionPosition == ÜberschriftAnordnung.ohne) {
-//        // ein Großer Knopf ohne Überschrift, da wird der evl. Filter gelöscht
-//        _table.Filter.Remove(((FlexiControlForFilter)sender).FilterSingle);
-//        return;
-//    }
-
-//    if (f.FilterSingleColumn == null) { return; }
-
-//    //f.Enabled = false;
-//    AutoFilter autofilter = new(f.FilterSingleColumn, _table.Filter, _table.PinnedRows, f.Width);
-//    var p = f.PointToScreen(Point.Empty);
-//    autofilter.Position_LocateToPosition(p with { Y = p.Y + f.Height });
-//    autofilter.Show();
-//    autofilter.FilterCommand += AutoFilter_FilterCommand;
-//    Develop.Debugprint_BackgroundThread();
-//}
 
 //private void Flx_ValueChanged(object sender, System.EventArgs e) {
 //    if (_isFilling) { return; }

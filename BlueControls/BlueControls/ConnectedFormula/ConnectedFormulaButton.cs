@@ -23,7 +23,7 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class ConnectedFormulaFilterButton : Button, IControlAcceptSomething {
+internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
 
     #region Properties
 

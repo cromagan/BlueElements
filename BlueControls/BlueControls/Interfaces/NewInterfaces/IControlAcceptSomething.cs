@@ -31,7 +31,8 @@ public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
     #region Properties
 
     /// <summary>
-    /// Ein Wert, der bei ParentDataChanged berechnet werden sollte.
+    /// Ein Wert, der bei FilterInput_Changed zumindest neu berechnet oder invalidiert werden muss.
+    /// Zum Berechnen sollte die Routine DoInputFilter benutzt werden.
     /// Enthält die DatabaseInput und auch den berechnete Zeile.
     /// </summary>
     public FilterCollection? FilterInput { get; set; }

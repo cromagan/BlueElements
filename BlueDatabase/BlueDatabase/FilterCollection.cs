@@ -147,6 +147,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _internal.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.FilterType != FilterType.KeinFilter)
         .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
 
+    public FilterItem? this[int no] {
+        get {
+            if (no < 0 || no >= _internal.Count) { return null; }
+            return _internal[0];
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -214,12 +221,16 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
 
-    public void ChangeTo(FilterItem fi) {
-        if (Exists(fi) && _internal.Count == 1) { return; }
+    public void ChangeTo(FilterItem? fi) {
+        if (fi != null && Exists(fi) && _internal.Count == 1) { return; }
+        if (fi == null && _internal.Count == 0) { return; }
+
         OnChanging();
-        _database = fi.Database;
+        _database = fi?.Database;
         _internal.Clear();
-        _internal.Add(fi);
+
+        if (fi != null) { _internal.Add(fi); }
+
         Invalidate_FilteredRows();
         OnChanged();
     }
@@ -228,11 +239,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// Effizente Methode um wenige Events auszulösen
     /// </summary>
     /// <param name="fc"></param>
-    public void ChangeTo(FilterCollection fc) {
+    public void ChangeTo(FilterCollection? fc) {
         OnChanging();
-        _database = fc.Database;
+        _database = fc?.Database;
         _internal.Clear();
-        _internal.AddRange(fc.ToList());
+        if (fc != null) { _internal.AddRange(fc.ToList()); }
         Invalidate_FilteredRows();
         OnChanged();
     }
