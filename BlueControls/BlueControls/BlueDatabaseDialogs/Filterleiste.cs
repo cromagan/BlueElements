@@ -42,6 +42,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
     private string _ähnlicheAnsichtName = string.Empty;
     private bool _isFilling;
     private string _lastLooked = string.Empty;
+    private FilterCollection? _prevFilter = null;
     private Table? _table;
 
     #endregion
@@ -224,8 +225,8 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
                         flx.ConnectChildParents(this);
                         //flx.DoOutputSettings(this);
                         //flx.DoInputSettings(parent, this);
-                        flx.FilterOutput.Changing += FilterOutput_Changing;
-                        flx.FilterOutput.Changed += FilterOutput_Changed;
+                        flx.FilterOutput.Changing += FlexSingeFilter_FilterOutput_Changing;
+                        flx.FilterOutput.Changed += FlexSingeFilter_FilterOutput_Changed;
                         Controls.Add(flx);
                     }
 
@@ -251,8 +252,8 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
 
         foreach (var thisFlexi in flexsToDelete) {
             thisFlexi.DisconnectChildParents(this);
-            //thisFlexi.FilterOutput.Changing += FilterOutput_Changing;
-            //thisFlexi.FilterOutput.Changed -= FilterOutput_Changed;
+            thisFlexi.FilterOutput.Changing -= FlexSingeFilter_FilterOutput_Changing;
+            thisFlexi.FilterOutput.Changed -= FlexSingeFilter_FilterOutput_Changed;
             thisFlexi.Visible = false;
             Controls.Remove(thisFlexi);
             thisFlexi.Dispose();
@@ -323,13 +324,6 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
         btnÄhnliche.Enabled = false;
     }
 
-    //private void btnAdmin_Click(object sender, System.EventArgs e) {
-    //    BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-    //    frmTableView x = new(_TableView.Database, false, true);
-    //    x.ShowDialog();
-    //    x?.Dispose();
-    //    BlueBasics.MultiUserFile.MultiUserFile.SaveAll(false);
-    //}
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {
         _lastLooked = string.Empty;
         if (_table?.Database != null) {
@@ -403,39 +397,6 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
 
     private void Filterleiste_SizeChanged(object sender, System.EventArgs e) => FillFilters();
 
-    private void FilterOutput_Changed(object sender, System.EventArgs e) {
-        if (sender is not FilterCollection fo) { return; }
-        if (fo.Count != 1) { return; }
-
-        if (_table?.Database is not Database db || db.IsDisposed) { return; }
-
-        if (db != fo.Database) { return; }
-
-        if (fo[0] is not FilterItem fi) { return; }
-
-        _table.Filter.Add(fi);
-
-        //var fo = flx.FilterOutput;
-
-        //if (fo.Count == 0) {
-        //    _table.Filter.Remove(flx.FilterSingleColumn);
-        //} else {
-        //    _table.Filter.RemoveOtherAndAddIfNotExists(fo);
-        //}
-    }
-
-    private void FilterOutput_Changing(object sender, System.EventArgs e) {
-        if (sender is not FilterCollection fo) { return; }
-        if (fo.Count != 1) { return; }
-        if (_table?.Database is not Database db || db.IsDisposed) { return; }
-
-        if (fo[0] is not FilterItem fi) { return; }
-
-        _table.Filter.Remove(fi.Column);
-    }
-
-    //private void FilterOutput_Changing(object sender, System.EventArgs e) => throw new NotImplementedException();
-
     private FlexiControlForFilter? FlexiItemOf(ColumnItem column) {
         foreach (var thisControl in Controls) {
             if (thisControl is FlexiControlForFilter flx) {
@@ -445,6 +406,43 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
         return null;
     }
 
+    private void FlexSingeFilter_FilterOutput_Changed(object sender, System.EventArgs e) {
+        if (sender is not FilterCollection fo) { return; }
+        if (_table?.Database is not Database db || db.IsDisposed) { return; }
+
+        if (fo.Count == 0) {
+            if (_prevFilter != null && _prevFilter.Count == 1) {
+                if (_prevFilter[0] is FilterItem fi) {
+                    _table.Filter.Remove(fi.Column);
+                }
+            }
+        } else {
+            if (fo[0] is FilterItem fi) {
+                _table.Filter.RemoveOtherAndAddIfNotExists(fi);
+            }
+        }
+
+        _prevFilter?.Dispose();
+        _prevFilter = null;
+    }
+
+    private void FlexSingeFilter_FilterOutput_Changing(object sender, System.EventArgs e) {
+        _prevFilter?.Dispose();
+        _prevFilter = null;
+
+        if (sender is not FilterCollection fo) { return; }
+
+        _prevFilter = (FilterCollection?)fo.Clone("FlexSingeFilter_FilterOutput_Changing");
+
+        //if (fo.Count != 1) { return; }
+        //if (_table?.Database is not Database db || db.IsDisposed) { return; }
+
+        //if (fo[0] is not FilterItem fi) { return; }
+
+        //_table.Filter.Remove(fi.Column);
+    }
+
+    //private void FilterOutput_Changing(object sender, System.EventArgs e) => throw new NotImplementedException();
     private void GetÄhnlich() {
         _ähnliche = _table?.Database?.ColumnArrangements.Get(_ähnlicheAnsichtName);
         DoÄhnlich();

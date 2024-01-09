@@ -30,6 +30,8 @@ using BlueBasics.Interfaces;
 using static BlueBasics.IO;
 using static BlueBasics.Converter;
 
+#nullable enable
+
 namespace BlueBasics;
 
 public static partial class Extensions {

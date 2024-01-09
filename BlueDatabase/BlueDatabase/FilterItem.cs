@@ -226,11 +226,15 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                                                   thisFilter.SearchValue.JoinWithCr() == _searchValue.JoinWithCr();
 
     public string ErrorReason() {
+        if (IsDisposed) { return "Filter verworfen"; }
+
         if (_filterType == FilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
 
-        if (_column == null && Database == null) { return "Weder Spalte noch Datenbank angegeben"; }
+        if (Database == null) { return "Keine Datenbank angegeben"; }
 
-        if (Database != null && Database.IsDisposed) { return "Datenbank verworfen"; }
+        if (Database.IsDisposed) { return "Datenbank verworfen"; }
+
+        if (_column?.Database != Database) { return "Datenbanken inkonsistent"; }
 
         if (_column == null && !_filterType.HasFlag(FilterType.Instr)) { return "Fehlerhafter Zeilenfilter"; }
 

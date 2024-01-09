@@ -207,6 +207,43 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     //    }
     //}
 
+    protected override void OnValueChanged() {
+        base.OnValueChanged();
+
+        if (EditType == EditTypeFormula.Button) { return; }
+
+        if (FilterOutput.Count != 1) { return; }
+
+        if (FilterOutput[0] is FilterItem f) {
+            f.Changeto(f.FilterType, Value);
+        }
+
+        //if (_table?.Filter == null) { return; }
+        //var isFilter = flx.WasThisValueClicked(); //  flx.Value.StartsWith("|");
+        //                                          //flx.Filter.Herkunft = "Filterleiste";
+        //var v = flx.Value; //.Trim("|");
+        //if (_table.Filter.Count == 0 || !_table.Filter.Contains(flx.FilterSingle)) {
+        //    if (isFilter) { flx.FilterSingle.FilterType = FilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werden
+        //    flx.FilterSingle.Changeto(flx.FilterSingle.FilterType, v);
+        //    _table.Filter.Add(flx.FilterSingle);
+        //    return;
+        //}
+        //if (flx.FilterSingle.SearchValue.Count != 1) {
+        //    Develop.DebugPrint_NichtImplementiert();
+        //    return;
+        //}
+        //if (isFilter) {
+        //    flx.FilterSingle.Changeto(FilterType.Istgleich_ODER_GroßKleinEgal, v);
+        //} else {
+        //    if (string.IsNullOrEmpty(v)) {
+        //        _table.Filter.Remove(flx.FilterSingle);
+        //    } else {
+        //        flx.FilterSingle.Changeto(FilterType.Instr_GroßKleinEgal, v);
+        //        // flx.Filter.SearchValue[0] =v;
+        //    }
+        //}
+    }
+
     //    //#endregion
     //}
     private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
@@ -239,12 +276,10 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     }
 
     private void UpdateFilterData() {
-        RemoveAll();
+        //RemoveAll();
 
         if (IsDisposed) { return; }
         this.DoInputFilter();
-
-
 
         if (!Allinitialized) { _ = CreateSubControls(); }
 
@@ -401,34 +436,3 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     //    //    ValueSet(string.Empty, true, true);
     //    //}
 }
-
-//private void Flx_ValueChanged(object sender, System.EventArgs e) {
-//    if (_isFilling) { return; }
-//    if (sender is FlexiControlForFilter flx) {
-//        if (flx.EditType == EditTypeFormula.Button) { return; }
-//        if (_table?.Filter == null) { return; }
-//        var isFilter = flx.WasThisValueClicked(); //  flx.Value.StartsWith("|");
-//                                                  //flx.Filter.Herkunft = "Filterleiste";
-//        var v = flx.Value; //.Trim("|");
-//        if (_table.Filter.Count == 0 || !_table.Filter.Contains(flx.FilterSingle)) {
-//            if (isFilter) { flx.FilterSingle.FilterType = FilterType.Istgleich_ODER_GroßKleinEgal; } // Filter noch nicht in der Collection, kann ganz einfach geändert werden
-//            flx.FilterSingle.Changeto(flx.FilterSingle.FilterType, v);
-//            _table.Filter.Add(flx.FilterSingle);
-//            return;
-//        }
-//        if (flx.FilterSingle.SearchValue.Count != 1) {
-//            Develop.DebugPrint_NichtImplementiert();
-//            return;
-//        }
-//        if (isFilter) {
-//            flx.FilterSingle.Changeto(FilterType.Istgleich_ODER_GroßKleinEgal, v);
-//        } else {
-//            if (string.IsNullOrEmpty(v)) {
-//                _table.Filter.Remove(flx.FilterSingle);
-//            } else {
-//                flx.FilterSingle.Changeto(FilterType.Instr_GroßKleinEgal, v);
-//                // flx.Filter.SearchValue[0] =v;
-//            }
-//        }
-//    }
-//}

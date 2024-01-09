@@ -851,8 +851,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Text = string.Empty,
             ImageCode = string.Empty
         };
-        UpdateValueToControl();
         StandardBehandlung(control);
+        UpdateValueToControl();
         return control;
     }
 
@@ -896,8 +896,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private ComboBox Control_Create_ComboBox() {
         ComboBox control = new();
         StyleComboBox(control, null, ComboBoxStyle.DropDownList, false);
-        UpdateValueToControl();
         StandardBehandlung(control);
+        UpdateValueToControl();
         return control;
     }
 
@@ -922,8 +922,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Enabled = Enabled
         };
         StyleListBox(control, null);
-        UpdateValueToControl();
         StandardBehandlung(control);
+        UpdateValueToControl();
         return control;
     }
 
@@ -934,8 +934,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Enabled = Enabled
         };
         StyleSwapListBox(control, null);
-        UpdateValueToControl();
         StandardBehandlung(control);
+        UpdateValueToControl();
         return control;
     }
 
@@ -946,8 +946,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private TextBox Control_Create_TextBox() {
         TextBox control = new();
         StyleTextBox(control);
-        UpdateValueToControl();
         StandardBehandlung(control);
+        UpdateValueToControl();
         return control;
     }
 

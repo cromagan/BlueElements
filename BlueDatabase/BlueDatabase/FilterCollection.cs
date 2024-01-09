@@ -55,7 +55,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _coment = coment;
     }
 
-    public FilterCollection(FilterItem fi, string coment) : this(fi.Database, coment) => Add(fi);
+    public FilterCollection(FilterItem? fi, string coment) : this(fi?.Database, coment) {
+        if (fi != null) { Add(fi); }
+    }
 
     #endregion
 
@@ -82,6 +84,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public Database? Database {
         get => _database;
         set {
+            Develop.CheckStackForOverflow();
+
             if (IsDisposed) { return; }
             //if (value == null) { Develop.DebugPrint(FehlerArt.Fehler, "Datenbank null"); }
             if (_database == value) { return; }
@@ -165,9 +169,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         OnChanging();
 
-        fi.Changing += Filter_Changing;
-        fi.Changed += Filter_Changed;
-        _internal.Add(fi);
+        AddAndRegisterEvents(fi);
         Invalidate_FilteredRows();
         OnChanged();
     }
@@ -192,15 +194,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         AddIfNotExists(new FilterItem(column, filterType, filterBy));
     }
 
-    //public void Add(FilterType filterType, List<string> filterBy) {
-    //    if (Database is not Database db || db.IsDisposed) { return; }
-    //    AddIfNotExists(new FilterItem(Database, filterType, filterBy));
-    //}
-
-    //public void Add(FilterType filterType, string filterBy) {
-    //    if (Database is not Database db || db.IsDisposed) { return; }
-    //    AddIfNotExists(new FilterItem(Database, filterType, filterBy));
-    //}
     public void AddIfNotExists(FilterItem fi) {
         if (Exists(fi)) { return; }
         Add(fi);
@@ -213,7 +206,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (newItems.Any()) {
             OnChanging();
-            _internal.AddRange(newItems);
+            AddAndRegisterEvents(newItems);
             Invalidate_FilteredRows();
             OnChanged();
         }
@@ -225,14 +218,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (fi != null && Exists(fi) && _internal.Count == 1) { return; }
         if (fi == null && _internal.Count == 0) { return; }
 
-        OnChanging();
-        _database = fi?.Database;
-        _internal.Clear();
-
-        if (fi != null) { _internal.Add(fi); }
-
-        Invalidate_FilteredRows();
-        OnChanged();
+        var fc = new FilterCollection((FilterItem?)(fi?.Clone()), "ChangeTo1");
+        ChangeTo(fc);
+        fc.Dispose();
     }
 
     /// <summary>
@@ -240,11 +228,22 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     /// <param name="fc"></param>
     public void ChangeTo(FilterCollection? fc) {
+        if (!IsDifferentTo(fc)) { return; }
+
         OnChanging();
         _database = fc?.Database;
+
+        UnRegisterEvents(_internal);
         _internal.Clear();
-        if (fc != null) { _internal.AddRange(fc.ToList()); }
-        Invalidate_FilteredRows();
+
+        if (fc != null) {
+            AddIfNotExists(fc.ToList().CloneWithClones());
+            _rows = [];
+            _rows.AddRange(fc.Rows);
+        } else {
+            Invalidate_FilteredRows();
+        }
+
         OnChanged();
     }
 
@@ -252,6 +251,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed) { return; }
         if (_internal.Count == 0) { return; }
         OnChanging();
+
+        UnRegisterEvents(_internal);
+
         _internal.Clear();
         Invalidate_FilteredRows();
         OnChanged();
@@ -263,9 +265,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <returns></returns>
     public object Clone(string c2) {
         var fc = new FilterCollection(Database, "colne " + c2);
-        fc._internal.AddIfNotExists(_internal.CloneWithClones());
-        fc._rows = [];
-        fc._rows.AddRange(Rows);
+
+        fc.ChangeTo(this);
+
         return fc;
     }
 
@@ -286,10 +288,29 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public void Invalidate_FilteredRows() => _rows = null;
 
-    //GC.SuppressFinalize(this);
+    public bool IsDifferentTo(FilterCollection? fc) {
+        if (IsDisposed) { return false; }
+        if (fc == this) { return false; }
+
+        if (fc != null && fc.IsDisposed) { fc = null; }
+
+        if (fc == null) { return true; }
+
+        if (fc.Count != Count) { return true; }
+
+        if (_database != fc.Database) { return true; }
+
+        foreach (var thisf in this) {
+            if (!fc.Contains(thisf)) { return true; }
+        }
+
+        // Zweite Schleife obosolet, wenn alle vorhanden sind und Count gleich.
+
+        return false;
+    }
+
     public bool IsRowFilterActiv() => this[null] != null;
 
-    // TODO: Auskommentierung der folgenden Zeile aufheben, wenn der Finalizer weiter oben überschrieben wird.//GC.SuppressFinalize(this);
     public bool MayHasRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
@@ -325,6 +346,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (!_internal.Contains(fi)) { return; }
 
         OnChanging();
+        UnRegisterEvents(fi);
         _internal.Remove(fi);
         Invalidate_FilteredRows();
         OnChanged();
@@ -373,9 +395,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         OnChanging();
         foreach (var thisItem in existingColumnFilter) {
+            UnRegisterEvents(thisItem);
             _internal.Remove(thisItem);
         }
-        _internal.Add(fi);
+        AddAndRegisterEvents(fi);
         Invalidate_FilteredRows();
         OnChanged();
     }
@@ -412,6 +435,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                     OnChanging();
                     did = true;
                 }
+                UnRegisterEvents(thisItem);
                 _internal.Remove(thisItem);
             }
         }
@@ -434,6 +458,18 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             }
         }
         return result.Parseable();
+    }
+
+    private void AddAndRegisterEvents(FilterItem fi) {
+        fi.Changing += Filter_Changing;
+        fi.Changed += Filter_Changed;
+        _internal.Add(fi);
+    }
+
+    private void AddAndRegisterEvents(List<FilterItem> fi) {
+        foreach (var thisfio in fi) {
+            AddAndRegisterEvents(thisfio);
+        }
     }
 
     private List<RowItem> CalculateFilteredRows() {
@@ -521,6 +557,17 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (Database is not Database db || db.IsDisposed) { return; }
         if (_rows == null) { return; }
         if (_rows.Contains(e.Row)) { _rows = null; }
+    }
+
+    private void UnRegisterEvents(List<FilterItem> fi) {
+        foreach (var thisfi in fi) {
+            UnRegisterEvents(thisfi);
+        }
+    }
+
+    private void UnRegisterEvents(FilterItem fi) {
+        fi.Changing += Filter_Changing;
+        fi.Changed += Filter_Changed;
     }
 
     #endregion
