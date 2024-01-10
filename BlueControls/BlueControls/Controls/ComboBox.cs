@@ -33,6 +33,8 @@ using BlueDatabase.Interfaces;
 
 namespace BlueControls.Controls;
 
+#nullable enable
+
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent("TextChanged")]
 public partial class ComboBox : TextBox, ITranslateable {
@@ -153,6 +155,12 @@ public partial class ComboBox : TextBox, ITranslateable {
     internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
     protected override void DrawControl(Graphics gr, States state) {
+        if (_dropDownStyle == ComboBoxStyle.DropDownList) {
+            if (Item.Count == 0) {
+                state = States.Standard_Disabled;
+            }
+        }
+
         if (_drawStyle != ComboboxStyle.TextBox) {
             if (string.IsNullOrEmpty(_initialtext) && !string.IsNullOrEmpty(Text)) { _initialtext = Text; }
 

@@ -21,6 +21,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -159,10 +160,6 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
 
-        var filterSingle = FilterInput?[FilterSingleColumn];
-
-        if (filterSingle == null) { return; }
-
         if (e.Control is ComboBox cbx) {
             ItemCollectionList.ItemCollectionList item2 = new(true)
             {
@@ -178,6 +175,10 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         }
 
         if (e.Control is Button btn) {
+            var filterSingle = FilterInput?[FilterSingleColumn];
+
+            if (filterSingle == null) { return; }
+
             btn.Translate = false;
 
             if (CaptionPosition == ÜberschriftAnordnung.ohne) {
@@ -218,7 +219,9 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
             f.Changeto(f.FilterType, Value);
         }
 
-        FilterOutput.ChangeTo(f);
+        if (f.IsOk()) {
+            FilterOutput.ChangeTo(f);
+        }
 
         //var isFilter = WasThisValueClicked(); //  flx.Value.StartsWith("|");
         //                                          //flx.Filter.Herkunft = "Filterleiste";
@@ -286,7 +289,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         if (IsDisposed) { return; }
         this.DoInputFilter();
 
-        if (!Allinitialized) { _ = CreateSubControls(); }
+        //if (!Allinitialized) { _ = CreateSubControls(); }
 
         #region Wenn keine Spalte vorhanden, Fehler machen
 
@@ -302,7 +305,6 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         #endregion
 
         var filterSingle = FilterInput?[FilterSingleColumn];
-
         FilterOutput.ChangeTo(filterSingle);
 
         DisabledReason = filterSingle != null &&
