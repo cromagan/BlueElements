@@ -36,6 +36,8 @@ using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
+#nullable enable
+
 [Designer(typeof(TextBoxDesigner))]
 [DefaultEvent("TextChanged")]
 public partial class TextBox : GenericControl, IContextMenu, IInputFormat {

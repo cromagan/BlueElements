@@ -63,12 +63,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Events
 
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~FilterCollection()
-    // {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //     Dispose(disposing: false);
-    // }
     public event EventHandler? Changed;
 
     public event EventHandler? Changing;
@@ -84,7 +78,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public Database? Database {
         get => _database;
         set {
-            Develop.CheckStackForOverflow();
+            //Develop.CheckStackForOverflow();
 
             if (IsDisposed) { return; }
             //if (value == null) { Develop.DebugPrint(FehlerArt.Fehler, "Datenbank null"); }

@@ -106,11 +106,6 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     //    _ = items.Add("Spalte bearbeiten", "#ColumnEdit", QuickImage.Get(ImageCode.Spalte));
     //}
 
-    //internal bool WasThisValueClicked() {
-    //    var cb = GetComboBox();
-    //    return cb != null && cb.WasThisValueClicked();
-    //}
-
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
@@ -200,26 +195,32 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         }
     }
 
-    //protected override void OnMouseUp(MouseEventArgs e) {
-    //    base.OnMouseUp(e);
-    //    if (e.Button == MouseButtons.Right) {
-    //        FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
-    //    }
-    //}
-
     protected override void OnValueChanged() {
         base.OnValueChanged();
 
         if (EditType == EditTypeFormula.Button) { return; }
 
-        if (FilterOutput.Count != 1) { return; }
+        if (FilterSingleColumn == null) { return; }
 
-        if (FilterOutput[0] is FilterItem f) {
+        FilterItem? f;
+
+        if (FilterOutput.Count == 0) {
+            f = new FilterItem(FilterSingleColumn, FilterType.KeinFilter, string.Empty);
+        } else {
+            f = FilterOutput[0];
+        }
+
+        if (f == null) { return; }
+
+        if (WasThisValueClicked()) {
+            f.Changeto(FilterType.Istgleich_GroßKleinEgal, Value);
+        } else {
             f.Changeto(f.FilterType, Value);
         }
 
-        //if (_table?.Filter == null) { return; }
-        //var isFilter = flx.WasThisValueClicked(); //  flx.Value.StartsWith("|");
+        FilterOutput.ChangeTo(f);
+
+        //var isFilter = WasThisValueClicked(); //  flx.Value.StartsWith("|");
         //                                          //flx.Filter.Herkunft = "Filterleiste";
         //var v = flx.Value; //.Trim("|");
         //if (_table.Filter.Count == 0 || !_table.Filter.Contains(flx.FilterSingle)) {
@@ -244,6 +245,12 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         //}
     }
 
+    //protected override void OnMouseUp(MouseEventArgs e) {
+    //    base.OnMouseUp(e);
+    //    if (e.Button == MouseButtons.Right) {
+    //        FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
+    //    }
+    //}
     //    //#endregion
     //}
     private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
@@ -276,8 +283,6 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     }
 
     private void UpdateFilterData() {
-        //RemoveAll();
-
         if (IsDisposed) { return; }
         this.DoInputFilter();
 
@@ -300,8 +305,10 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         FilterOutput.ChangeTo(filterSingle);
 
-        DisabledReason = filterSingle != null && !string.IsNullOrEmpty(filterSingle.Herkunft) ?
-            "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;
+        DisabledReason = filterSingle != null &&
+                         !string.IsNullOrEmpty(filterSingle.Herkunft) ?
+                                                        "Dieser Filter ist automatisch<br>gesetzt worden."
+                                                        : string.Empty;
 
         #region QuickInfo erstellen
 
@@ -315,50 +322,99 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
                             "<br><br><b>Info:</b><br>" + qi;
             }
         } else {
-            if (string.IsNullOrEmpty(qi)) {
+            if (!string.IsNullOrEmpty(qi)) {
                 QuickInfo = "<b>Info:</b><br>" + qi;
             }
         }
 
         #endregion
 
+        var showDelFilterButton = true;
+        var showWählen = FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed) ||
+                         FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
+
+        var texteingabe = FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
+
+        var nvalue = string.Empty;
+
+        if (filterSingle != null) {
+            if (filterSingle.FilterType == FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1) {
+                texteingabe = true;
+                //showWählen = false;
+                showDelFilterButton = false;
+                nvalue = filterSingle.SearchValue[0];
+            }
+
+            if (filterSingle.FilterType is FilterType.Istgleich or FilterType.Istgleich_ODER_GroßKleinEgal) {
+                texteingabe = false;
+                //showWählen = false;
+                showDelFilterButton = true;
+                //nvalue = filterSingle.SearchValue[0];
+            }
+        }
+
+        #region Filter verbieten - und keine weiteren Berechnungen
+
         if (!FilterSingleColumn.AutoFilterSymbolPossible()) {
             EditType = EditTypeFormula.None;
             return;
         }
 
-        var showDelFilterButton = true;
-        var showWählen = FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed) ||
-             FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
+        #endregion
 
-        var texteingabe = FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
+        #region Wählen-Button - und keine weitere Berechnungen
 
-        if (filterSingle != null) {
-            if (filterSingle.FilterType == FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1) {
-                CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
-                Caption = FilterSingleColumn.ReadableText() + ":";
-                EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-                ValueSet(filterSingle.SearchValue[0], true, true);
-                showDelFilterButton = false;
-                showWählen = false;
-            }
-
-            if (showWählen && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal) {
-                showDelFilterButton = false;
-            }
-        }
-
-        if ((showWählen || !texteingabe) && !showDelFilterButton) {
-            showDelFilterButton = false;
+        if (showWählen) {
             CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
             Caption = FilterSingleColumn.ReadableText() + ":";
             EditType = EditTypeFormula.Button;
+            return;
         }
+
+        #endregion
+
+        #region Text-Eingabefeld - und keine weitere Berechnungen
+
+        if (texteingabe) {
+            CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+            Caption = FilterSingleColumn.ReadableText() + ":";
+            EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+
+            ValueSet(nvalue, true, true);
+            return;
+        }
+
+        #endregion
+
+        //if (filterSingle != null) {
+        //    if (filterSingle.FilterType == FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1) {
+        //        CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+        //        Caption = FilterSingleColumn.ReadableText() + ":";
+        //        EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+        //        ValueSet(filterSingle.SearchValue[0], true, true);
+        //        showDelFilterButton = false;
+        //        showWählen = false;
+        //    }
+
+        //    if (showWählen && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal) {
+        //        showDelFilterButton = false;
+        //    }
+        //}
+
+        #region Löschen-Button - und keine weiteren Berechnungen
 
         if (showDelFilterButton) {
             CaptionPosition = ÜberschriftAnordnung.ohne;
             EditType = EditTypeFormula.Button;
+            return;
         }
+
+        #endregion
+    }
+
+    private bool WasThisValueClicked() {
+        var cb = GetComboBox();
+        return cb != null && cb.WasThisValueClicked();
     }
 
     #endregion

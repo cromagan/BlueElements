@@ -80,8 +80,15 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
     [DefaultValue(false)]
     public bool AutoPin { get; set; }
 
+    /// <summary>
+    /// Enthält nur die FlexControlforFilter
+    /// </summary>
     public List<IControlAcceptSomething> Childs { get; } = [];
 
+    /// <summary>
+    /// Ist immer identisch mit den Filtern der Tableview.
+    /// Er entspricht den Input-Filtern der einzelenen FlexControlForFiler
+    /// </summary>
     public FilterCollection FilterOutput { get; } = new("FilterOutput");
 
     [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
@@ -203,7 +210,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
 
                 if (thisColumn.AutoFilterSymbolPossible()) {
                     if (viewItemOrder != null && Filtertypes.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
-                    if (viewItemCurrent != null && Filtertypes.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter)) { showMe = true; }
+                    if (viewItemCurrent != null && Filtertypes.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter) && filterItem != null) { showMe = true; }
                 }
 
                 #endregion
@@ -213,7 +220,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
                 //    filterItem = new FilterItem(thisColumn, FilterType.Instr_GroßKleinEgal, string.Empty);
                 //}
 
-                if (filterItem != null && showMe) {
+                if (showMe) {
                     var flx = FlexiItemOf(thisColumn);
                     if (flx != null) {
                         // Sehr Gut, Flex vorhanden, wird später nicht mehr gelöscht
