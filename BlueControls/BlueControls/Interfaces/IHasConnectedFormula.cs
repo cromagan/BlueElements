@@ -17,6 +17,8 @@
 
 #nullable enable
 
+#nullable enable
+
 namespace BlueControls.Interfaces;
 
 public interface IHasConnectedFormula {

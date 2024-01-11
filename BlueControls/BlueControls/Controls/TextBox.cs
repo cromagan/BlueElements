@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -798,7 +800,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var x = _cursorCharPos;
         MultiUserFileGiveBackEventArgs e = new();
         OnNeedDatabaseOfAdditinalSpecialChars(e);
-        ItemCollectionList.ItemCollectionList i = new(BlueListBoxAppearance.Listbox, false)
+        ItemCollectionList.ItemCollectionList i = new(ListBoxAppearance.Listbox, false)
         {
             //if (e.File is Database DB && DB.Bins.Count > 0) {
             //    foreach (var bmp in DB.Bins) {

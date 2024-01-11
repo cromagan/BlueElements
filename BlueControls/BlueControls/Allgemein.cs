@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Specialized;
 using System.Windows.Forms;
 using BlueBasics;
@@ -58,8 +60,8 @@ public static class Allgemein {
         var par = o.ParentControl<IContextMenu>();
         if (par == null) { return null; }
 
-        ItemCollectionList.ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu, false);
-        ItemCollectionList.ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
+        ItemCollectionList.ItemCollectionList thisContextMenu = new(ListBoxAppearance.KontextMenu, false);
+        ItemCollectionList.ItemCollectionList userMenu = new(ListBoxAppearance.KontextMenu, false);
 
         var cancel = false;
         par.GetContextMenuItems(null, thisContextMenu, out var hotItem);

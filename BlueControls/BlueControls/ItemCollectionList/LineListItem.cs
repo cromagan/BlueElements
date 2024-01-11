@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Drawing;
 using BlueControls.Enums;
 
@@ -45,7 +47,7 @@ public class LineListItem : AbstractListItem {
         return x;
     }
 
-    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) => 4;
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => 4;
 
     public override bool IsClickable() => false;
 

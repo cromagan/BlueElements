@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -43,7 +45,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private AddType _addAlloweds = AddType.Text;
 
-    private BlueListBoxAppearance _appearance;
+    private ListBoxAppearance _appearance;
 
     private bool _autosort = true;
     private bool _filterAllowed;
@@ -67,7 +69,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
         Item.CollectionChanged += Item_CollectionChanged;
         Item.Changed += Item_Changed;
-        _appearance = BlueListBoxAppearance.Listbox;
+        _appearance = ListBoxAppearance.Listbox;
     }
 
     #endregion
@@ -102,8 +104,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         }
     }
 
-    [DefaultValue(BlueListBoxAppearance.Listbox)]
-    public BlueListBoxAppearance Appearance {
+    [DefaultValue(ListBoxAppearance.Listbox)]
+    public ListBoxAppearance Appearance {
         get => _appearance;
         set {
             if (_appearance == value) { return; }
@@ -249,7 +251,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         #region  tmpDesign
 
         var tmpDesign = Design.ListBox;
-        if (_appearance is not BlueListBoxAppearance.Gallery and not BlueListBoxAppearance.FileSystem) { tmpDesign = (Design)_appearance; }
+        if (_appearance is not ListBoxAppearance.Gallery and not ListBoxAppearance.FileSystem) { tmpDesign = (Design)_appearance; }
 
         #endregion
 
@@ -345,7 +347,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         switch (e.Button) {
             case MouseButtons.Left:
                 if (nd != null) {
-                    if (Appearance is BlueListBoxAppearance.Listbox or BlueListBoxAppearance.Autofilter or BlueListBoxAppearance.Gallery or BlueListBoxAppearance.FileSystem) {
+                    if (Appearance is ListBoxAppearance.Listbox or ListBoxAppearance.Autofilter or ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem) {
                         if (nd.IsClickable()) { nd.Checked = !nd.Checked; }
                     }
                     OnItemClicked(new AbstractListItemEventArgs(nd));

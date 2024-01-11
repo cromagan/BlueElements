@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -122,7 +124,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public ItemCollectionList.ItemCollectionList Item { get; } = new(BlueListBoxAppearance.DropdownSelectbox, true);
+    public ItemCollectionList.ItemCollectionList Item { get; } = new(ListBoxAppearance.DropdownSelectbox, true);
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;

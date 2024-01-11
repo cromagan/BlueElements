@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Drawing;
 using BlueBasics;
@@ -212,7 +214,7 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
 
     public virtual bool FilterMatch(string filterText) => Internal.ToUpper().Contains(filterText.ToUpper());
 
-    public abstract int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign);
+    public abstract int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign);
 
     public virtual bool IsClickable() => !IsCaption;
 

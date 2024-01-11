@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -115,8 +117,8 @@ public class BitmapListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ToUpper().Contains(filterText.ToUpper()) || _imageFilename.ToUpper().Contains(filterText.ToUpper());
 
-    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) {
-        if (style == BlueListBoxAppearance.FileSystem) {
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+        if (style == ListBoxAppearance.FileSystem) {
             return 110 + (_captionlines * ConstMy);
         }
 

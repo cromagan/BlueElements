@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -399,7 +401,6 @@ public static class IO {
     public static string PathParent(this string pfad) {
         pfad = pfad.CheckPath();
         var z = pfad.Length;
-
 
         while (true) {
             z--;

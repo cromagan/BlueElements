@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -748,7 +750,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             case EditTypeFormula.Listbox:
                 control.RemoveAllowed = true;
-                control.Appearance = BlueListBoxAppearance.Listbox;
+                control.Appearance = ListBoxAppearance.Listbox;
                 break;
         }
     }

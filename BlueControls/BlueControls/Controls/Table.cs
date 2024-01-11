@@ -361,7 +361,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", ImageCode.Information, "OK");
             return;
         }
-        i.Appearance = BlueListBoxAppearance.Listbox;
+        i.Appearance = ListBoxAppearance.Listbox;
         var v = InputBoxListBoxStyle.Show("Vorherigen Eintrag wählen:", i, AddType.None, true);
         if (v == null || v.Count != 1) { return; }
         if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
@@ -496,7 +496,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //        delList.GenerateAndAdd(thisf);
     //    }
     public static ItemCollectionList.ItemCollectionList UndoItems(Database? db, string cellkey) {
-        ItemCollectionList.ItemCollectionList i = new(BlueListBoxAppearance.KontextMenu, false) {
+        ItemCollectionList.ItemCollectionList i = new(ListBoxAppearance.KontextMenu, false) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
         };
 
@@ -2432,7 +2432,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         ItemCollectionList.ItemCollectionList t = new(true) {
-            Appearance = BlueListBoxAppearance.DropdownSelectbox
+            Appearance = ListBoxAppearance.DropdownSelectbox
         };
 
         ItemCollectionList.ItemCollectionList.GetItemCollection(t, contentHolderCellColumn, contentHolderCellRow, ShortenStyle.Replaced, 1000);

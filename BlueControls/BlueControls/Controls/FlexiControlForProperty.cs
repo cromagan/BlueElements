@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -27,6 +29,8 @@ using BlueControls.Enums;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Constants;
+
+#nullable enable
 
 namespace BlueControls.Controls;
 
@@ -94,7 +98,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
             {
                     if (list != null) {
                         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-                        list.Appearance = BlueListBoxAppearance.ComboBox_Textbox;
+                        list.Appearance = ListBoxAppearance.ComboBox_Textbox;
                         var s2 = MeasureStringOfCaption(Caption);
                         var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
                         var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);

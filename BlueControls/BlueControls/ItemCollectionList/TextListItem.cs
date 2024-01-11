@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -55,7 +57,7 @@ public class TextListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ToUpper().Contains(filterText.ToUpper());
 
-    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => ((Font)Skin.GetBlueFont(TempDesign(itemdesign), States.Standard)).FormatedText_NeededSize(Text, Symbol, 16);
 

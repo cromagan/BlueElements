@@ -38,7 +38,7 @@ namespace BlueControls.Forms
             this.List.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
                                                  | AnchorStyles.Left) 
                                                 | AnchorStyles.Right)));
-            this.List.Appearance = BlueListBoxAppearance.Gallery;
+            this.List.Appearance = ListBoxAppearance.Gallery;
             this.List.Location = new Point(8, 8);
             this.List.Name = "List";
             this.List.Size = new Size(677, 427);

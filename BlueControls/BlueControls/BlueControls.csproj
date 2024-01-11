@@ -166,6 +166,8 @@
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </Compile>
     <Compile Include="Enums\FilterTypeRowInputItem.cs" />
+    <Compile Include="Enums\FlexiFilterDefaultFilter.cs" />
+    <Compile Include="Enums\FlexiFilterDefaultOutput.cs" />
     <Compile Include="EventArgs\EditingEventArgs.cs" />
     <Compile Include="EventArgs\CellExtEventArgs.cs" />
     <Compile Include="FormManager.cs" />
@@ -240,7 +242,7 @@
     <Compile Include="Enums\ConectorStyle.cs" />
     <Compile Include="Enums\ASCIIKey.cs" />
     <Compile Include="Enums\ComboboxStyle.cs" />
-    <Compile Include="Enums\BlueListBoxAppearance.cs" />
+    <Compile Include="Enums\ListBoxAppearance.cs" />
     <Compile Include="Enums\AddType.cs" />
     <Compile Include="Enums\ContextMenuCommands.cs" />
     <Compile Include="Enums\CS.cs" />
@@ -625,6 +627,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="BlueDatabaseDialogs\AutoFilter.resx">
+      <DependentUpon>AutoFilter.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\DatabaseHeadEditor.resx">
       <DependentUpon>DatabaseHeadEditor.cs</DependentUpon>
     </EmbeddedResource>

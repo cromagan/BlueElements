@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System;
 using System.Drawing;
 using BlueBasics;
@@ -97,7 +99,7 @@ public class RowFormulaListItem : AbstractListItem {
         return x;
     }
 
-    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) {
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (_tmpBmp == null) { GeneratePic(); }
         return _tmpBmp?.Height ?? 200;
 

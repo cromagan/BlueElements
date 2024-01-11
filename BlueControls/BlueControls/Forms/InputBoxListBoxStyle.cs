@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Collections.Generic;
 using BlueBasics;
 using BlueControls.Enums;
@@ -35,7 +37,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     private InputBoxListBoxStyle(string txt, ItemCollectionList.ItemCollectionList itemsOriginal, AddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
         InitializeComponent();
-        if (itemsOriginal.Appearance != BlueListBoxAppearance.Listbox) {
+        if (itemsOriginal.Appearance != ListBoxAppearance.Listbox) {
             Develop.DebugPrint("Design nicht Listbox");
         }
         //var itemsClone = (ItemCollectionList)itemsOriginal.Clone();
@@ -57,7 +59,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         if (items == null || items.Count == 0) {
             return InputBox.Show(txt, string.Empty, FormatHolder.Text);
         }
-        ItemCollectionList.ItemCollectionList x = new(BlueListBoxAppearance.Listbox, true) {
+        ItemCollectionList.ItemCollectionList x = new(ListBoxAppearance.Listbox, true) {
             CheckBehavior = CheckBehavior.AlwaysSingleSelection
         };
         x.AddRange(items);

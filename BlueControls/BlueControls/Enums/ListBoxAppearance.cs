@@ -15,9 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 namespace BlueControls.Enums;
 
-public enum BlueListBoxAppearance {
+public enum ListBoxAppearance {
 
     //   Undefiniert = enDesign.Undefiniert
     Listbox = Design.ListBox,

@@ -72,11 +72,11 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     #region Methods
 
     public static void ContextMenuShow(IContextMenu control, MouseEventArgs? e) {
-        Close(BlueListBoxAppearance.KontextMenu);
+        Close(ListBoxAppearance.KontextMenu);
         Close(control);
 
-        ItemCollectionList.ItemCollectionList thisContextMenu = new(BlueListBoxAppearance.KontextMenu, false);
-        ItemCollectionList.ItemCollectionList userMenu = new(BlueListBoxAppearance.KontextMenu, false);
+        ItemCollectionList.ItemCollectionList thisContextMenu = new(ListBoxAppearance.KontextMenu, false);
+        ItemCollectionList.ItemCollectionList userMenu = new(ListBoxAppearance.KontextMenu, false);
 
         var translate = true;
         control.GetContextMenuItems(e, thisContextMenu, out var hotItem);
@@ -121,7 +121,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     public void Generate_ListBox1(ItemCollectionList.ItemCollectionList items, int minWidth, AddType addNewAllowed, bool translate) {
         var (biggestItemX, _, heightAdded, _) = items.ItemData();
         if (addNewAllowed != AddType.None) { heightAdded += 24; }
-        lstbx.Appearance = (BlueListBoxAppearance)items.ControlDesign;
+        lstbx.Appearance = (ListBoxAppearance)items.ControlDesign;
         lstbx.Translate = translate;
         lstbx.AutoSort = items.AutoSort;
         //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
@@ -164,7 +164,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         var hotItem = infos[1];
         //var tags = (List<string>)infos[2];
         var ob = (IContextMenu)infos[2];
-        Close(BlueListBoxAppearance.KontextMenu);
+        Close(ListBoxAppearance.KontextMenu);
         Close(ob);
         if (e.ClickedCommand.ToLower() == "weiterebefehle") {
             var par = ob.ParentControlWithCommands();
@@ -196,7 +196,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         // Einen Klick auf Überschriften einfach ignorieren, zB. kontextmenü
         if (!e.Item.IsClickable()) { return; }
 
-        if (lstbx.Appearance is not BlueListBoxAppearance.Listbox and not BlueListBoxAppearance.Gallery and not BlueListBoxAppearance.FileSystem) {
+        if (lstbx.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Gallery and not ListBoxAppearance.FileSystem) {
             OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.KeyName, Tag)); // Das Control.Tag hier ist eigentlich das HotItem
             if (!IsDisposed) { Close(); }
         }

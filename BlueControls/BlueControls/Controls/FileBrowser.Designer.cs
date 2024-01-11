@@ -57,7 +57,7 @@ namespace BlueControls.Controls {
             // 
             this.lsbFiles.AddAllowed = AddType.None;
             this.lsbFiles.AllowDrop = true;
-            this.lsbFiles.Appearance = BlueListBoxAppearance.FileSystem;
+            this.lsbFiles.Appearance = ListBoxAppearance.FileSystem;
             this.lsbFiles.Dock = DockStyle.Fill;
             this.lsbFiles.Location = new Point(0, 32);
             this.lsbFiles.Name = "lsbFiles";

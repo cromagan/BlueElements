@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+#nullable enable
+
 using System.Drawing;
 using BlueBasics;
 using BlueControls.Controls;
@@ -77,7 +79,7 @@ public class CellLikeListItem : AbstractListItem {
         return txt.ToUpper().Contains(filterText.ToUpper());
     }
 
-    public override int HeightForListBox(BlueListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
+    public override int HeightForListBox(ListBoxAppearance style, int columnWidth, Design itemdesign) => SizeUntouchedForListBox(itemdesign).Height;
 
     protected override Size ComputeSizeUntouchedForListBox(Design itemdesign) => CellItem.ContentSize(_styleLikeThis.KeyName, _styleLikeThis.Format, Internal, Skin.GetBlueFont(itemdesign, States.Standard), _style, 16, _bildTextverhalten, _styleLikeThis.Prefix, _styleLikeThis.Suffix, _styleLikeThis.DoOpticalTranslation, _styleLikeThis.OpticalReplace, _styleLikeThis.Database.GlobalScale, _styleLikeThis.ConstantHeightOfImageCode);
 

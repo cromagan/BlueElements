@@ -87,6 +87,10 @@ namespace BlueControls.BlueDatabaseDialogs {
             // 
             this.tabStart.Size = new System.Drawing.Size(976, 81);
             // 
+            // tabExport
+            // 
+            this.tabExport.Size = new System.Drawing.Size(976, 81);
+            // 
             // tabSeiten
             // 
             this.tabSeiten.Size = new System.Drawing.Size(984, 26);

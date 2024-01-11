@@ -40,7 +40,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
     #region Fields
 
-    private BlueListBoxAppearance _appearance;
+    private ListBoxAppearance _appearance;
 
     private bool _autoSort;
 
@@ -60,13 +60,13 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
     #region Constructors
 
-    public ItemCollectionList(bool autosort) : this(BlueListBoxAppearance.Listbox, autosort) { }
+    public ItemCollectionList(bool autosort) : this(ListBoxAppearance.Listbox, autosort) { }
 
-    public ItemCollectionList(BlueListBoxAppearance design, bool autosort) : base() {
+    public ItemCollectionList(ListBoxAppearance design, bool autosort) : base() {
         BindingOperations.EnableCollectionSynchronization(this, new object());
 
         _maxNeededItemSize = Size.Empty;
-        _appearance = BlueListBoxAppearance.Listbox;
+        _appearance = ListBoxAppearance.Listbox;
         _itemDesign = Design.Undefiniert;
         _controlDesign = Design.Undefiniert;
         _checkBehavior = CheckBehavior.SingleSelection;
@@ -87,7 +87,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
     #region Properties
 
-    public BlueListBoxAppearance Appearance {
+    public ListBoxAppearance Appearance {
         get => _appearance;
         set {
             if (value == _appearance && _itemDesign != Design.Undefiniert) { return; }
@@ -655,11 +655,11 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
             int colWidth;
             switch (_appearance) {
-                case BlueListBoxAppearance.Gallery:
+                case ListBoxAppearance.Gallery:
                     colWidth = 200;
                     break;
 
-                case BlueListBoxAppearance.FileSystem:
+                case ListBoxAppearance.FileSystem:
                     colWidth = 110;
                     break;
 
@@ -880,34 +880,34 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
     private void GetDesigns() {
         _controlDesign = (Design)_appearance;
         switch (_appearance) {
-            case BlueListBoxAppearance.Autofilter:
+            case ListBoxAppearance.Autofilter:
                 _itemDesign = Design.Item_Autofilter;
                 break;
 
-            case BlueListBoxAppearance.DropdownSelectbox:
+            case ListBoxAppearance.DropdownSelectbox:
                 _itemDesign = Design.Item_DropdownMenu;
                 break;
 
-            case BlueListBoxAppearance.Gallery:
+            case ListBoxAppearance.Gallery:
                 _itemDesign = Design.Item_Listbox;
                 _controlDesign = Design.ListBox;
                 break;
 
-            case BlueListBoxAppearance.FileSystem:
+            case ListBoxAppearance.FileSystem:
                 _itemDesign = Design.Item_Listbox;
                 _controlDesign = Design.ListBox;
                 break;
 
-            case BlueListBoxAppearance.Listbox:
+            case ListBoxAppearance.Listbox:
                 _itemDesign = Design.Item_Listbox;
                 _controlDesign = Design.ListBox;
                 break;
 
-            case BlueListBoxAppearance.KontextMenu:
+            case ListBoxAppearance.KontextMenu:
                 _itemDesign = Design.Item_KontextMenu;
                 break;
 
-            case BlueListBoxAppearance.ComboBox_Textbox:
+            case ListBoxAppearance.ComboBox_Textbox:
                 _itemDesign = Design.ComboBox_Textbox;
                 break;
 
