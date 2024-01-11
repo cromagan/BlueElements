@@ -381,7 +381,7 @@
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\EasyPicPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\DropDownSelectRowPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\FilterConverterElementPadItem.cs" />
-    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\InputFilterOutputFilterPadItem.cs" />
+    <Compile Include="ItemCollectionPad\FunktionsItems_Formular\OutputFilterPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\TabFormulaPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\Abstract\FakeControlPadItem.cs" />
     <Compile Include="ItemCollectionPad\FunktionsItems_Formular\FileExplorerPadItem.cs" />

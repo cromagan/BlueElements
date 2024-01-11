@@ -40,6 +40,13 @@ namespace BlueControls.Controls;
 public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething, IControlAcceptSomething {
     //public FlexiControlForFilter() : this(null, null) { }
 
+    #region Fields
+
+    private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
+    private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+
+    #endregion
+
     #region Constructors
 
     public FlexiControlForFilter(ColumnItem? column) {
@@ -51,6 +58,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         AlwaysInstantChange = true;
         FilterSingleColumn = column;
         FilterInput = null;
+        OnValueChanged();
         //UpdateFilterData();
         //FilterSingle.Changed += FilterSingle_Changed;
     }
@@ -61,6 +69,16 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
     public List<IControlAcceptSomething> Childs { get; } = [];
 
+    public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
+        get => _filterart_bei_texteingabe;
+        set {
+            if (IsDisposed) { return; }
+            if (_filterart_bei_texteingabe == value) { return; }
+            _filterart_bei_texteingabe = value;
+            OnValueChanged();
+        }
+    }
+
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -68,14 +86,25 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
+
     public FilterCollection FilterOutput { get; } = new("FilterOutput");
 
-    public ColumnItem? FilterSingleColumn { get; private set; }
+    public ColumnItem? FilterSingleColumn { get; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendSomething> Parents { get; } = [];
+
+    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
+        get => _standard_bei_keiner_Eingabe;
+        set {
+            if (IsDisposed) { return; }
+            if (_standard_bei_keiner_Eingabe == value) { return; }
+            _standard_bei_keiner_Eingabe = value;
+            OnValueChanged();
+        }
+    }
 
     #endregion
 
@@ -96,6 +125,15 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         if (FilterManualSeted) { Develop.DebugPrint("Steuerelement unterstützt keine manuellen Filter"); }
         FilterInput?.Dispose();
         FilterInput = null;
+        this.DoInputFilter();
+
+        var filterSingle = FilterInput?[FilterSingleColumn];
+        if (filterSingle != null && filterSingle.SearchValue.Count == 1) {
+            ValueSet(filterSingle.SearchValue[0], true, true);
+        } else {
+            ValueSet(string.Empty, true, true);
+        }
+
         Invalidate();
     }
 
@@ -121,13 +159,13 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         }
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
-        if (FilterInput == null) {
-            //UpdateMyCollection();
-            UpdateFilterData();
-        }
-        base.DrawControl(gr, state);
-    }
+    //protected override void DrawControl(Graphics gr, States state) {
+    //    if (FilterInput == null) {
+    //        //UpdateMyCollection();
+    //        UpdateFilterData();
+    //    }
+    //    base.DrawControl(gr, state);
+    //}
 
     protected override void OnButtonClicked() {
         base.OnButtonClicked();
@@ -201,29 +239,40 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     protected override void OnValueChanged() {
         base.OnValueChanged();
 
-        if (EditType == EditTypeFormula.Button) { return; }
+        FilterItem? filterSingle = null;
 
-        if (FilterSingleColumn == null) { return; }
+        if (FilterSingleColumn != null) {
+            if (string.IsNullOrEmpty(Value)) {
+                if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
+                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty);
+                } else {
+                    filterSingle = null;
+                }
+            } else {
+                if (WasThisValueClicked()) {
+                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_GroßKleinEgal, Value);
+                } else {
+                    if (_filterart_bei_texteingabe == FlexiFilterDefaultFilter.Textteil) {
+                        filterSingle = new FilterItem(FilterSingleColumn, FilterType.Instr_GroßKleinEgal, Value);
+                    } else {
+                        filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, Value);
+                    }
+                }
+            }
+        }
 
-        FilterItem? f;
-
-        if (FilterOutput.Count == 0) {
-            f = new FilterItem(FilterSingleColumn, FilterType.KeinFilter, string.Empty);
+        if (FilterSingleColumn == null) {
+            FilterOutput.Clear();
         } else {
-            f = FilterOutput[0];
+            FilterOutput.ChangeTo(filterSingle);
         }
 
-        if (f == null) { return; }
+        UpdateFilterData(filterSingle);
 
-        if (WasThisValueClicked()) {
-            f.Changeto(FilterType.Istgleich_GroßKleinEgal, Value);
-        } else {
-            f.Changeto(f.FilterType, Value);
-        }
-
-        if (f.IsOk()) {
-            FilterOutput.ChangeTo(f);
-        }
+        //if (filterSingle != null && filterSingle.IsOk()) {
+        //    FilterOutput.ChangeTo(filterSingle);
+        //    return;
+        //}
 
         //var isFilter = WasThisValueClicked(); //  flx.Value.StartsWith("|");
         //                                          //flx.Filter.Herkunft = "Filterleiste";
@@ -287,9 +336,9 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         }
     }
 
-    private void UpdateFilterData() {
+    private void UpdateFilterData(FilterItem? filterSingle) {
         if (IsDisposed) { return; }
-        this.DoInputFilter();
+        //this.DoInputFilter();
 
         //if (!Allinitialized) { _ = CreateSubControls(); }
 
@@ -306,8 +355,8 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         #endregion
 
-        var filterSingle = FilterInput?[FilterSingleColumn];
-        FilterOutput.ChangeTo(filterSingle);
+        //var filterSingle = FilterInput?[FilterSingleColumn];
+        //FilterOutput.ChangeTo(filterSingle);
 
         DisabledReason = filterSingle != null &&
                          !string.IsNullOrEmpty(filterSingle.Herkunft) ?
@@ -344,16 +393,18 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         if (filterSingle != null) {
             if (filterSingle.FilterType == FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1) {
                 texteingabe = true;
-                //showWählen = false;
+                showWählen = false;
                 showDelFilterButton = false;
                 nvalue = filterSingle.SearchValue[0];
-            }
-
-            if (filterSingle.FilterType is FilterType.Istgleich or FilterType.Istgleich_ODER_GroßKleinEgal) {
+            } else if (_filterart_bei_texteingabe == FlexiFilterDefaultFilter.Ist) {
+                texteingabe = true;
+                showWählen = false;
+                showDelFilterButton = false;
+                nvalue = filterSingle.SearchValue[0];
+            } else if (filterSingle.FilterType is FilterType.Istgleich or FilterType.Istgleich_ODER_GroßKleinEgal) {
                 texteingabe = false;
-                //showWählen = false;
+                showWählen = false;
                 showDelFilterButton = true;
-                //nvalue = filterSingle.SearchValue[0];
             }
         }
 
@@ -422,6 +473,11 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     }
 
     #endregion
+
+    //private bool HasItem() {
+    //    var cb = GetComboBox();
+    //    return cb != null && cb.Item[Value] != null;
+    //}
 
     //private void UpdateMyCollection() {
     //    //if (IsDisposed) { return; }

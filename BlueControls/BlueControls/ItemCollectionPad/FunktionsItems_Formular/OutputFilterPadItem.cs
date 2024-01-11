@@ -41,7 +41,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
 /// </summary>
 
-public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething, IAutosizable {
+public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething, IAutosizable {
 
     #region Fields
 
@@ -51,6 +51,10 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     private string _columnName = string.Empty;
 
+    private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
+
+    private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+
     //private string _anzeige = string.Empty;
     //private string _überschrift = string.Empty;
     private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
@@ -59,18 +63,18 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     #region Constructors
 
-    public InputFilterOutputFilterPadItem(string keyname, string toParse) : this(keyname, null as Database) => this.Parse(toParse);
+    public OutputFilterPadItem(string keyname, string toParse) : this(keyname, null as Database) => this.Parse(toParse);
 
-    public InputFilterOutputFilterPadItem(Database? db) : this(string.Empty, db) { }
+    public OutputFilterPadItem(Database? db) : this(string.Empty, db) { }
 
-    public InputFilterOutputFilterPadItem(string intern, Database? db) : base(intern) {
+    public OutputFilterPadItem(string intern, Database? db) : base(intern) {
         _itemAccepts = new();
         _itemSends = new();
 
         DatabaseOutput = db;
     }
 
-    public InputFilterOutputFilterPadItem(string intern) : this(intern, null as Database) { }
+    public OutputFilterPadItem(string intern) : this(intern, null as Database) { }
 
     #endregion
 
@@ -123,6 +127,7 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
+
     public Database? DatabaseInputMustBe => DatabaseOutput;
 
     public Database? DatabaseOutput {
@@ -131,6 +136,16 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     }
 
     public override string Description => "Mit diesem Element wird dem Benutzer eine Filter-Möglichkeit angeboten.<br>Durch die empfangenen Filter können die auswählbaren Werte eingeschränkt werden.";
+
+    public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
+        get => _filterart_bei_texteingabe;
+        set {
+            if (IsDisposed) { return; }
+            if (_filterart_bei_texteingabe == value) { return; }
+            _filterart_bei_texteingabe = value;
+            OnChanged();
+        }
+    }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
@@ -153,6 +168,16 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
     public ReadOnlyCollection<string> Parents {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
+    }
+
+    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
+        get => _standard_bei_keiner_Eingabe;
+        set {
+            if (IsDisposed) { return; }
+            if (_standard_bei_keiner_Eingabe == value) { return; }
+            _standard_bei_keiner_Eingabe = value;
+            OnChanged();
+        }
     }
 
     //public string Überschrift {
@@ -178,6 +203,8 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new FlexiControlForFilter(Column) {
+            Standard_bei_keiner_Eingabe = _standard_bei_keiner_Eingabe,
+            Filterart_bei_Texteingabe = _filterart_bei_texteingabe,
             //EditType = _bearbeitung,
             //CaptionPosition = CaptionPosition,
             //Name = DefaultItemToControlName()
@@ -226,6 +253,14 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         u.AddRange(typeof(ÜberschriftAnordnung));
         l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
 
+        var u2 = new ItemCollectionList.ItemCollectionList(false);
+        u2.AddRange(typeof(FlexiFilterDefaultOutput));
+        l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u));
+
+        var u3 = new ItemCollectionList.ItemCollectionList(false);
+        u3.AddRange(typeof(FlexiFilterDefaultFilter));
+        l.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u));
+
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
 
@@ -254,6 +289,14 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
 
             case "columnname":
                 _columnName = value;
+                return true;
+
+            case "defaultemptyfilter":
+                _standard_bei_keiner_Eingabe = (FlexiFilterDefaultOutput)IntParse(value);
+                return true;
+
+            case "defaulttextfilter":
+                _filterart_bei_texteingabe = (FlexiFilterDefaultFilter)IntParse(value);
                 return true;
 
                 //case "captiontext":
@@ -329,6 +372,9 @@ public class InputFilterOutputFilterPadItem : FakeControlPadItem, IReadableText,
         //result.ParseableAdd("CaptionText", _überschrift);
         //result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("Caption", _überschriftanordung);
+        result.ParseableAdd("DefaultEmptyFilter", _standard_bei_keiner_Eingabe);
+        result.ParseableAdd("DefaultTextFilter", _filterart_bei_texteingabe);
+
         return result.Parseable(base.ToString());
     }
 

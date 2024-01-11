@@ -68,7 +68,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         GenQuickInfo(btnTabControlAdd, new TabFormulaPadItem(string.Empty));
 
-        GenQuickInfo(btnBenutzerFilterWahl, new InputFilterOutputFilterPadItem(string.Empty));
+        GenQuickInfo(btnBenutzerFilterWahl, new OutputFilterPadItem(string.Empty));
 
         FormulaSet(filename, notAllowedchilds);
     }
@@ -160,7 +160,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
     }
 
     private void btnBenutzerFilterWahl_Click(object sender, System.EventArgs e) {
-        var x = new InputFilterOutputFilterPadItem(string.Empty);
+        var x = new OutputFilterPadItem(string.Empty);
         AddCentered(x);
     }
 

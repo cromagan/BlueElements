@@ -202,53 +202,57 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
 
             foreach (var thisColumn in columSort) {
                 var showMe = false;
-                var viewItemOrder = orderArrangement?[thisColumn];
-                var viewItemCurrent = cu?[thisColumn];
-                var filterItem = _table?.Filter[thisColumn];
+                if (thisColumn.Database is Database db && !db.IsDisposed) {
+                    var viewItemOrder = orderArrangement?[thisColumn];
+                    var viewItemCurrent = cu?[thisColumn];
+                    var filterItem = _table?.Filter[thisColumn];
 
-                #region Sichtbarkeit des Filterelemts bestimmen
+                    #region Sichtbarkeit des Filterelemts bestimmen
 
-                if (thisColumn.AutoFilterSymbolPossible()) {
-                    if (viewItemOrder != null && Filtertypes.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
-                    if (viewItemCurrent != null && Filtertypes.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter) && filterItem != null) { showMe = true; }
-                }
-
-                #endregion
-
-                //if (filterItem == null && showMe) {
-                //    // Dummy-Filter, nicht in der Collection
-                //    filterItem = new FilterItem(thisColumn, FilterType.Instr_GroßKleinEgal, string.Empty);
-                //}
-
-                if (showMe) {
-                    var flx = FlexiItemOf(thisColumn);
-                    if (flx != null) {
-                        // Sehr Gut, Flex vorhanden, wird später nicht mehr gelöscht
-                        _ = flexsToDelete.Remove(flx);
-                    } else {
-                        // Na gut, eben neuen Flex erstellen
-                        flx = new FlexiControlForFilter(thisColumn);
-                        flx.DoOutputSettings(thisColumn.Database, flx.Name);
-                        flx.ConnectChildParents(this);
-                        //flx.DoOutputSettings(this);
-                        //flx.DoInputSettings(parent, this);
-                        flx.FilterOutput.Changing += FlexSingeFilter_FilterOutput_Changing;
-                        flx.FilterOutput.Changed += FlexSingeFilter_FilterOutput_Changed;
-                        Controls.Add(flx);
+                    if (thisColumn.AutoFilterSymbolPossible()) {
+                        if (viewItemOrder != null && Filtertypes.HasFlag(FilterTypesToShow.NachDefinierterAnsicht)) { showMe = true; }
+                        if (viewItemCurrent != null && Filtertypes.HasFlag(FilterTypesToShow.AktuelleAnsicht_AktiveFilter) && filterItem != null) { showMe = true; }
                     }
 
-                    if (leftpos + constwi > Width) {
-                        leftpos = beginnx;
-                        toppos = toppos + consthe + Skin.PaddingSmal;
-                    }
+                    #endregion
 
-                    flx.Top = toppos;
-                    flx.Left = leftpos;
-                    flx.Width = constwi;
-                    flx.Height = consthe;
-                    flx.Anchor = anchor;
-                    toppos += down;
-                    leftpos += right;
+                    //if (filterItem == null && showMe) {
+                    //    // Dummy-Filter, nicht in der Collection
+                    //    filterItem = new FilterItem(thisColumn, FilterType.Instr_GroßKleinEgal, string.Empty);
+                    //}
+
+                    if (showMe) {
+                        var flx = FlexiItemOf(thisColumn);
+                        if (flx != null) {
+                            // Sehr Gut, Flex vorhanden, wird später nicht mehr gelöscht
+                            _ = flexsToDelete.Remove(flx);
+                        } else {
+                            // Na gut, eben neuen Flex erstellen
+                            flx = new FlexiControlForFilter(thisColumn);
+                            flx.DoOutputSettings(thisColumn.Database, flx.Name);
+                            flx.ConnectChildParents(this);
+                            flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+                            flx.Filterart_bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
+                            //flx.DoOutputSettings(this);
+                            //flx.DoInputSettings(parent, this);
+                            flx.FilterOutput.Changing += FlexSingeFilter_FilterOutput_Changing;
+                            flx.FilterOutput.Changed += FlexSingeFilter_FilterOutput_Changed;
+                            Controls.Add(flx);
+                        }
+
+                        if (leftpos + constwi > Width) {
+                            leftpos = beginnx;
+                            toppos = toppos + consthe + Skin.PaddingSmal;
+                        }
+
+                        flx.Top = toppos;
+                        flx.Left = leftpos;
+                        flx.Width = constwi;
+                        flx.Height = consthe;
+                        flx.Anchor = anchor;
+                        toppos += down;
+                        leftpos += right;
+                    }
                 }
             }
         }
