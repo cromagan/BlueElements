@@ -36,10 +36,15 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
     #region Fields
 
     private readonly List<ColumnItem> _auswahlc = [];
+
     private readonly string _auswahlSpalte2 = string.Empty;
+
     private readonly string _auswahlSpalte3 = string.Empty;
+
     private string _auswahlSpalte1 = string.Empty;
+
     private ColumnItem? _textc;
+
     private string _textSpalte = string.Empty;
 
     #endregion
@@ -113,13 +118,19 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
 
     #region Methods
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
+    public void FilterInput_Changed(object? sender, System.EventArgs e) {
         this.DoInputFilter();
         GenerateColumns();// Wegen der Datenbank
         GenerateItemsAndText();
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
+    public void Parents_Added(bool hasFilter) {
+        if (IsDisposed) { return; }
+        if (!hasFilter) { return; }
+        FilterInput_Changed(null, System.EventArgs.Empty);
+    }
 
     /// <summary>
     /// Verwendete Ressourcen bereinigen.

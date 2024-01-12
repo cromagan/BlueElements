@@ -56,13 +56,19 @@ public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
     /// Hier können die neuen temporären Filter(Daten) (FilterInput) berechnet werden und sollten auch angezeigt werden und ein Invalidate gesetzt werden
     /// Events können gekoppelt werden
     /// </summary>
-    public void FilterInput_Changed(object sender, System.EventArgs e);
+    public void FilterInput_Changed(object? sender, System.EventArgs e);
 
     /// <summary>
     /// Wird ausgelöst, bevor eine relevante Änderung der eingehenden Filter(Daten) erfolgen wird.
     /// Hier können Daten, die angezeigt werden, zurückgeschrieben werden. Events können entkoppelt werden
     /// </summary>
     public void FilterInput_Changing(object sender, System.EventArgs e);
+
+    /// <summary>
+    /// Wird ausgelöst, wenn ein Parent hinzugefügt wurde.
+    /// Dadurch kann es vorkommen, dass die Filter neu berechnet werden müssen
+    /// </summary>
+    public void Parents_Added(bool hasFilter);
 
     #endregion
 }
@@ -76,7 +82,9 @@ public static class IControlAcceptSomethingExtension {
             Develop.DebugPrint(FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
         }
 
-        child.Parents.AddIfNotExists(parent);
+        bool isnew = !child.Parents.Contains(parent);
+
+        if (isnew) { child.Parents.AddIfNotExists(parent); }
 
         if (parent.Childs.AddIfNotExists(child)) {
             parent.FilterOutput.Changing += child.FilterInput_Changing;
@@ -84,6 +92,10 @@ public static class IControlAcceptSomethingExtension {
             parent.FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
             //child.DisposingEvent += Child_DisposingEvent;
             //parent.DisposingEvent += Parent_DisposingEvent;
+        }
+
+        if (isnew) {
+            child.Parents_Added(parent.FilterOutput.Count > 0);
         }
     }
 

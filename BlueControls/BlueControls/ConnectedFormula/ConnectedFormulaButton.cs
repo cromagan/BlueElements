@@ -46,13 +46,19 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
 
     #region Methods
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
+    public void FilterInput_Changed(object? sender, System.EventArgs e) {
         this.DoInputFilter();
         Invalidate();
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) {
         throw new NotImplementedException();
+    }
+
+    public void Parents_Added(bool hasFilter) {
+        if (IsDisposed) { return; }
+        if (!hasFilter) { return; }
+        FilterInput_Changed(null, System.EventArgs.Empty);
     }
 
     protected override void Dispose(bool disposing) {

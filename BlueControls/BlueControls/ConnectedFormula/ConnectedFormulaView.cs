@@ -107,7 +107,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     #region Methods
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
+    public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
 
         this.DoInputFilter();
@@ -251,6 +251,12 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     public void InvalidateView() {
         _generated = false;
         Invalidate(); // Sonst wird es nie neu gezeichnet
+    }
+
+    public void Parents_Added(bool hasFilter) {
+        if (IsDisposed) { return; }
+        if (!hasFilter) { return; }
+        FilterInput_Changed(null, System.EventArgs.Empty);
     }
 
     public Control? SearchOrGenerate(IItemToControl? thisit) {

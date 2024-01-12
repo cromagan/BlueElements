@@ -43,6 +43,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
+
     public FilterCollection FilterOutput { get; } = new("FilterIput 3");
 
     public List<IControlSendSomething> Parents { get; } = [];
@@ -51,7 +52,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
 
     #region Methods
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
+    public void FilterInput_Changed(object? sender, System.EventArgs e) {
         FilterInput?.Dispose();
         this.DoInputFilter();
         Invalidate();
@@ -65,6 +66,12 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
+    public void Parents_Added(bool hasFilter) {
+        if (IsDisposed) { return; }
+        if (!hasFilter) { return; }
+        FilterInput_Changed(null, System.EventArgs.Empty);
+    }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {

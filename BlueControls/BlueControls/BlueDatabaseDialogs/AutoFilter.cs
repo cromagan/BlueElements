@@ -242,7 +242,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     }
 
     private void CloseAndDispose(string command, FilterItem? newFilter) {
-        if (IsClosed) { return; }
+        if (IsClosed || IsDisposed) { return; }
         Close();
         OnFilterCommand(new FilterCommandEventArgs(command, _column, newFilter));
     }

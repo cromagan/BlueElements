@@ -67,6 +67,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
+
     public FilterCollection FilterOutput { get; } = new("FilterOutput");
 
     public List<IControlSendSomething> Parents { get; } = [];
@@ -75,7 +76,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
 
     #region Methods
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
+    public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (FilterManualSeted) { Develop.DebugPrint("Steuerelement unterstützt keine manuellen Filter"); }
         FilterInput?.Dispose();
         FilterInput = null;
@@ -83,6 +84,12 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
+    public void Parents_Added(bool hasFilter) {
+        if (IsDisposed) { return; }
+        if (!hasFilter) { return; }
+        FilterInput_Changed(null, System.EventArgs.Empty);
+    }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {

@@ -62,25 +62,45 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     #region Fields
 
     public readonly FilterCollection Filter = new("FilterIput 4");
+
     private readonly List<string> _collapsed = [];
+
     private readonly object _lockUserAction = new();
+
     private int _arrangementNr = 1;
+
     private AutoFilter? _autoFilter;
+
     private BlueFont _cellFont = BlueFont.DefaultFont;
+
     private BlueFont _chapterFont = BlueFont.DefaultFont;
+
     private BlueFont _columnFilterFont = BlueFont.DefaultFont;
+
     private BlueFont _columnFont = BlueFont.DefaultFont;
+
     private DateTime? _databaseDrawError;
+
     private bool _drawing;
+
     private bool _isinClick;
+
     private bool _isinDoubleClick;
+
     private bool _isinKeyDown;
+
     private bool _isinMouseDown;
+
     private bool _isinMouseEnter;
+
     private bool _isinMouseLeave;
+
     private bool _isinMouseMove;
+
     private bool _isinMouseWheel;
+
     private bool _isinSizeChanged;
+
     private bool _isinVisibleChanged;
 
     /// <summary>
@@ -89,19 +109,33 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private ColumnItem? _mouseOverColumn;
 
     private RowData? _mouseOverRow;
+
     private string _mouseOverText = string.Empty;
+
     private BlueFont _newRowFont = BlueFont.DefaultFont;
+
     private Progressbar? _pg;
+
     private int _pix16 = 16;
+
     private int _pix18 = 18;
+
     private int _rowCaptionFontY = 26;
+
     private List<RowData>? _rowsFilteredAndPinned;
+
     private SearchAndReplace? _searchAndReplace;
+
     private bool _showNumber;
+
     private RowSortDefinition? _sortDefinitionTemporary;
+
     private string _storedView = string.Empty;
+
     private Rectangle _tmpCursorRect = Rectangle.Empty;
+
     private RowItem? _unterschiede;
+
     private int _wiederHolungsSpaltenWidth;
 
     #endregion
@@ -1021,7 +1055,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Database.Export_HTML(filename, CurrentArrangement, RowsVisibleUnique(), execute);
     }
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
+    public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (Database is not Database db || db.IsDisposed) { return; }
 
         this.DoInputFilter();
@@ -1045,8 +1079,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (FilterOutputType == Filterausgabe.Alle_Filter) {
             FilterOutput.ChangeTo(Filter);
         }
-
-
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
@@ -1116,6 +1148,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _searchAndReplace = new SearchAndReplace(this);
             _searchAndReplace.Show();
         }
+    }
+
+    public void Parents_Added(bool hasFilter) {
+        if (IsDisposed) { return; }
+        if (!hasFilter) { return; }
+        FilterInput_Changed(null, System.EventArgs.Empty);
     }
 
     public void Pin(List<RowItem>? rows) {

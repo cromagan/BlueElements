@@ -167,7 +167,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         return false;
     }
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
+    public void FilterInput_Changed(object? sender, System.EventArgs e) {
         this.DoInputFilter();
         Invalidate();
 
@@ -188,6 +188,12 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+    public void Parents_Added(bool hasFilter) {
+        if (IsDisposed) { return; }
+        if (!hasFilter) { return; }
+        FilterInput_Changed(null, System.EventArgs.Empty);
+    }
 
     public bool ParseVariables(VariableCollection? list) {
         if (IsDisposed) { return false; }

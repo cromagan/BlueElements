@@ -32,7 +32,9 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
     #region Fields
 
     private readonly ColumnItem? _inputcolumn;
+
     private readonly ColumnItem? _outputcolumn;
+
     private readonly FilterTypeRowInputItem _type;
 
     #endregion
@@ -58,6 +60,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
+
     public FilterCollection FilterOutput { get; } = new("FilterIput 2");
 
     [Browsable(false)]
@@ -69,7 +72,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
     #region Methods
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
+    public void FilterInput_Changed(object? sender, System.EventArgs e) {
         this.DoInputFilter();
         Invalidate();
 
@@ -115,6 +118,12 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
+    public void Parents_Added(bool hasFilter) {
+        if (IsDisposed) { return; }
+        if (!hasFilter) { return; }
+        FilterInput_Changed(null, System.EventArgs.Empty);
+    }
 
     #endregion
 }

@@ -98,6 +98,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     public FilterCollection? FilterInput { get; set; }
 
     public bool FilterManualSeted { get; set; } = false;
+
     public List<IControlSendSomething> Parents { get; } = [];
 
     #endregion
@@ -125,7 +126,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
         return false;
     }
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
+    public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (FilterInput?.Database is Database db) {
             db.Cell.CellValueChanged += Database_CellValueChanged;
             db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
@@ -188,6 +189,12 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+    public void Parents_Added(bool hasFilter) {
+        if (IsDisposed) { return; }
+        if (!hasFilter) { return; }
+        FilterInput_Changed(null, System.EventArgs.Empty);
+    }
 
     internal void CheckEnabledState() {
         var (column, row) = GetTmpVariables();

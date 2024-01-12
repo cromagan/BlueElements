@@ -49,9 +49,13 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
     #region Fields
 
     private string _lastcheck = string.Empty;
+
     private string _originalText = string.Empty;
+
     private string _sort = "Name";
+
     private string _todel = string.Empty;
+
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -71,6 +75,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
     #region Properties
 
     public bool CreateDir { get; set; }
+
     public bool DeleteDir { get; set; }
 
     public new bool Enabled {
@@ -126,7 +131,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
 
     #region Methods
 
-    public void FilterInput_Changed(object sender, System.EventArgs e) {
+    public void FilterInput_Changed(object? sender, System.EventArgs e) {
         this.DoInputFilter();
         Invalidate();
 
@@ -158,6 +163,12 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
         if (exekey == null) { return string.Empty; }
 
         return exekey.GetValue("").ToString();
+    }
+
+    public void Parents_Added(bool hasFilter) {
+        if (IsDisposed) { return; }
+        if (!hasFilter) { return; }
+        FilterInput_Changed(null, System.EventArgs.Empty);
     }
 
     public bool ParseVariables(VariableCollection? list) {

@@ -389,6 +389,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (doInstantChangedValue || InvokeRequired || !Focused || _alwaysInstantChange) { RaiseEventIfChanged(); }
     }
 
+    protected virtual void CommandButton_Click(object sender, System.EventArgs e) {
+        if (_editType != EditTypeFormula.Button) { return; }
+        ValueSet(true.ToPlusMinus(), false, true); // Geklickt, wurde hiermit vermerkt
+        OnButtonClicked();
+    }
+
     /// <summary>
     /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
     /// Die Events werden Registriert und auch der Wert gesetzt.
@@ -519,6 +525,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         } else {
             DoInfoTextCaption(state.HasFlag(States.Standard_Disabled) ? "Übergeordnetes Steuerlement ist deaktiviert." : string.Empty);
         }
+    }
+
+    protected Button? GetButton() {
+        foreach (var thisc in Controls) {
+            if (thisc is Button bt) { return bt; }
+        }
+        return null;
     }
 
     protected ComboBox? GetComboBox() {
@@ -804,12 +817,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert();
-
-    private void CommandButton_Click(object sender, System.EventArgs e) {
-        if (_editType != EditTypeFormula.Button) { return; }
-        ValueSet(true.ToPlusMinus(), false, true); // Geklickt, wurde hiermit vermerkt
-        OnButtonClicked();
-    }
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
