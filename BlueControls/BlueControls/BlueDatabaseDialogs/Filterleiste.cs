@@ -26,7 +26,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
@@ -42,7 +41,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
     private string _ähnlicheAnsichtName = string.Empty;
     private bool _isFilling;
     private string _lastLooked = string.Empty;
-    private FilterCollection? _prevFilter = null;
+    private FilterCollection? _prevFilter;
     private Table? _table;
 
     #endregion
@@ -176,7 +175,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
 
         #region Neue Flexis erstellen / updaten
 
-        if (_table?.Database != null && _table.Filter != null) {
+        if (_table?.Database != null) {
             List<ColumnItem> columSort = [];
             var orderArrangement = _table.Database.ColumnArrangements.Get(AnsichtName);
 

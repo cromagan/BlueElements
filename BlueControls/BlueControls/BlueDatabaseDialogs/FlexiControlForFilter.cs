@@ -17,15 +17,12 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Text;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.BlueDatabaseDialogs;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
@@ -47,7 +44,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
     private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
-    private bool _wasvalueclicked = false;
+    private bool _wasvalueclicked;
 
     #endregion
 

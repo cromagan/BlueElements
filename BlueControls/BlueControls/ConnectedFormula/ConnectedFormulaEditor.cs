@@ -41,7 +41,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     #region Fields
 
-    private ConnectedFormula.ConnectedFormula? _cFormula = null;
+    private ConnectedFormula.ConnectedFormula? _cFormula;
 
     #endregion
 
@@ -107,7 +107,20 @@ public partial class ConnectedFormulaEditor : PadEditor {
         _ = se.ShowDialog();
     }
 
+    /// <summary>
+    /// Clean up any resources being used.
+    /// </summary>
+    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    protected override void Dispose(bool disposing) {
+        if (disposing && (components != null)) {
+            CFormula = null;
+            components?.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+
     private void _cFormula_Editing(object sender, EditingEventArgs e) {
+        if (IsDisposed) { return; }
         e.Editing = true;
     }
 
@@ -322,7 +335,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         CheckButtons();
     }
 
-    private void GenQuickInfo(BlueControls.Controls.Button b, FakeControlPadItem from) {
+    private void GenQuickInfo(Controls.Button b, FakeControlPadItem from) {
         var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
 
         txt = txt + "<br><br><b><u>Beschreibung:</b></u>";

@@ -38,7 +38,7 @@ public class DatabaseMu : Database {
 
     #region Fields
 
-    private bool _mustMakeMaster = false;
+    private bool _mustMakeMaster;
     private string _myFragmentsFilename = string.Empty;
     private StreamWriter? _writer;
 

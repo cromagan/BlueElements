@@ -112,7 +112,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
-    public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
+    public override Control CreateControl(ConnectedFormulaView parent) {
         var con = new TabControl();
         con.Name = this.DefaultItemToControlName();
         // Die Input-Settings werden direkt auf das erzeugte
@@ -191,7 +191,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
                         foreach (var thisControl in existTab.Controls) {
                             if (thisControl is ConnectedFormulaView cctmp) {
-                                cc = cctmp; break;
+                                cc = cctmp;
+                                break;
                             }
                         }
 
