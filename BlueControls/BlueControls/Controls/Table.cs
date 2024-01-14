@@ -2838,29 +2838,34 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     var prevCaptionGroup = prevViewItemWithOtherCaption[u]?.Column?.CaptionGroup(u) ?? string.Empty;
 
                     if (newCaptionGroup != prevCaptionGroup) {
-                        if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem != null) {
+                        if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem != null && prevViewItemWithOtherCaption[u] is ColumnViewItem tmp) {
                             var le = Math.Max(0, prevViewItemWithOtherCaption[u]?.OrderTmpSpalteX1 ?? 0);
-                            var re = (int)prevViewItem.OrderTmpSpalteX1 + prevViewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 1;
-                            if (thisViewItem?.ViewType != ViewType.PermanentColumn && prevViewItemWithOtherCaption[u].ViewType != ViewType.PermanentColumn) {
+                            var re = (prevViewItem.OrderTmpSpalteX1 ?? 0) + prevViewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 1;
+                            if (thisViewItem?.ViewType != ViewType.PermanentColumn && tmp.ViewType != ViewType.PermanentColumn) {
                                 le = Math.Max(le, permaX);
                             }
 
-                            if (thisViewItem?.ViewType != ViewType.PermanentColumn && prevViewItemWithOtherCaption[u].ViewType == ViewType.PermanentColumn) {
-                                re = Math.Max(re, (int)prevPermanentViewItemWithOtherCaption[u].OrderTmpSpalteX1 + (int)prevPermanentViewItemWithOtherCaption[u].TmpDrawWidth);
+                            if (thisViewItem?.ViewType != ViewType.PermanentColumn && tmp.ViewType == ViewType.PermanentColumn) {
+                                var tmp2 = prevPermanentViewItemWithOtherCaption[u].DrawWidth(displayRectangleWoSlider, _pix16, _cellFont);
+                                re = Math.Max(re, prevPermanentViewItemWithOtherCaption[u].OrderTmpSpalteX1 ?? 0 + tmp2);
                             }
 
-                            if (le < re) {
+                            if (le < re && tmp.Column is ColumnItem tmpc) {
                                 Rectangle r = new(le, u * ColumnCaptionSizeY, re - le, ColumnCaptionSizeY);
-                                gr.FillRectangle(new SolidBrush(prevViewItemWithOtherCaption[u].Column.BackColor), r);
+                                gr.FillRectangle(new SolidBrush(tmpc.BackColor), r);
                                 gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), r);
                                 gr.DrawRectangle(Skin.PenLinieKräftig, r);
                                 Skin.Draw_FormatedText(gr, prevCaptionGroup, null, Alignment.Horizontal_Vertical_Center, r, this, false, _columnFont, Translate);
                             }
                         }
+
                         prevViewItemWithOtherCaption[u] = thisViewItem;
-                        if (thisViewItem?.ViewType == ViewType.PermanentColumn) { prevPermanentViewItemWithOtherCaption[u] = thisViewItem; }
+                        if (thisViewItem?.ViewType == ViewType.PermanentColumn) {
+                            prevPermanentViewItemWithOtherCaption[u] = thisViewItem;
+                        }
                     }
                 }
+
                 prevViewItem = thisViewItem;
             }
         }
