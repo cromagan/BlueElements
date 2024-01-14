@@ -2819,43 +2819,49 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <param name="gr"></param>
     /// <param name="ca"></param>
     /// <param name="displayRectangleWoSlider"></param>
-    private void Draw_Column_Head_Captions(Graphics gr, ColumnViewCollection ca) {
-        var bvi = new ColumnViewItem?[3];
-        var lcbvi = new ColumnViewItem[3];
-        ColumnViewItem? lastViewItem = null;
+    private void Draw_Column_Head_Captions(Graphics gr, ColumnViewCollection ca, Rectangle displayRectangleWoSlider) {
+        var prevViewItemWithOtherCaption = new ColumnViewItem?[3];
+        var prevPermanentViewItemWithOtherCaption = new ColumnViewItem[3];
+        ColumnViewItem? prevViewItem = null;
         var permaX = 0;
 
-        for (var x = 0; x < ca.Count + 1; x++) {
-            var viewItem = x < ca.Count ? ca[x] : null;
-            if (viewItem != null && viewItem.ViewType == ViewType.PermanentColumn) {
-                permaX = Math.Max(permaX, (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth);
-            }
-            if (viewItem == null ||
-                viewItem.ViewType == ViewType.PermanentColumn ||
-                (int)viewItem.OrderTmpSpalteX1 + (int)viewItem.TmpDrawWidth > permaX) {
+        foreach (var thisViewItem in ca) {
+            var thisViewItemWidth = thisViewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont);
+            var thisViewItemLeft = thisViewItem.OrderTmpSpalteX1 ?? 0;
+            var thisViewItemRight = thisViewItemLeft + thisViewItemWidth;
+
+            if (thisViewItem.ViewType == ViewType.PermanentColumn) { permaX = Math.Max(permaX, thisViewItemRight); }
+
+            if (thisViewItem.ViewType == ViewType.PermanentColumn || thisViewItemRight > permaX) {
                 for (var u = 0; u < 3; u++) {
-                    var n = viewItem?.Column.CaptionGroup(u);
-                    var v = bvi[u]?.Column.CaptionGroup(u);
-                    if (n != v) {
-                        if (!string.IsNullOrEmpty(v) && lastViewItem != null) {
-                            var le = Math.Max(0, (int)bvi[u].OrderTmpSpalteX1);
-                            //int RE = (int)LastViewItem.OrderTMP_Spalte_X1 - 1 ;
-                            var re = (int)lastViewItem.OrderTmpSpalteX1 + (int)lastViewItem.TmpDrawWidth - 1;
-                            if (viewItem?.ViewType != ViewType.PermanentColumn && bvi[u].ViewType != ViewType.PermanentColumn) { le = Math.Max(le, permaX); }
-                            if (viewItem?.ViewType != ViewType.PermanentColumn && bvi[u].ViewType == ViewType.PermanentColumn) { re = Math.Max(re, (int)lcbvi[u].OrderTmpSpalteX1 + (int)lcbvi[u].TmpDrawWidth); }
+                    var newCaptionGroup = thisViewItem?.Column?.CaptionGroup(u) ?? string.Empty;
+                    var prevCaptionGroup = prevViewItemWithOtherCaption[u]?.Column?.CaptionGroup(u) ?? string.Empty;
+
+                    if (newCaptionGroup != prevCaptionGroup) {
+                        if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem != null) {
+                            var le = Math.Max(0, prevViewItemWithOtherCaption[u]?.OrderTmpSpalteX1 ?? 0);
+                            var re = (int)prevViewItem.OrderTmpSpalteX1 + prevViewItem.DrawWidth(displayRectangleWoSlider, _pix16, _cellFont) - 1;
+                            if (thisViewItem?.ViewType != ViewType.PermanentColumn && prevViewItemWithOtherCaption[u].ViewType != ViewType.PermanentColumn) {
+                                le = Math.Max(le, permaX);
+                            }
+
+                            if (thisViewItem?.ViewType != ViewType.PermanentColumn && prevViewItemWithOtherCaption[u].ViewType == ViewType.PermanentColumn) {
+                                re = Math.Max(re, (int)prevPermanentViewItemWithOtherCaption[u].OrderTmpSpalteX1 + (int)prevPermanentViewItemWithOtherCaption[u].TmpDrawWidth);
+                            }
+
                             if (le < re) {
                                 Rectangle r = new(le, u * ColumnCaptionSizeY, re - le, ColumnCaptionSizeY);
-                                gr.FillRectangle(new SolidBrush(bvi[u].Column.BackColor), r);
+                                gr.FillRectangle(new SolidBrush(prevViewItemWithOtherCaption[u].Column.BackColor), r);
                                 gr.FillRectangle(new SolidBrush(Color.FromArgb(80, 200, 200, 200)), r);
                                 gr.DrawRectangle(Skin.PenLinieKräftig, r);
-                                Skin.Draw_FormatedText(gr, v, null, Alignment.Horizontal_Vertical_Center, r, this, false, _columnFont, Translate);
+                                Skin.Draw_FormatedText(gr, prevCaptionGroup, null, Alignment.Horizontal_Vertical_Center, r, this, false, _columnFont, Translate);
                             }
                         }
-                        bvi[u] = viewItem;
-                        if (viewItem?.ViewType == ViewType.PermanentColumn) { lcbvi[u] = viewItem; }
+                        prevViewItemWithOtherCaption[u] = thisViewItem;
+                        if (thisViewItem?.ViewType == ViewType.PermanentColumn) { prevPermanentViewItemWithOtherCaption[u] = thisViewItem; }
                     }
                 }
-                lastViewItem = viewItem;
+                prevViewItem = thisViewItem;
             }
         }
     }
@@ -2904,7 +2910,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             Draw_Table_What(gr, sr, TableDrawColumn.Permament, TableDrawType.ColumnHead, permaX, displayRectangleWoSlider, firstVisibleRow, lastVisibleRow, state, ca);
 
             // Überschriften 1-3 Zeichnen
-            Draw_Column_Head_Captions(gr, ca);
+            Draw_Column_Head_Captions(gr, ca, displayRectangleWoSlider);
             Skin.Draw_Border(gr, Design.Table_And_Pad, state, displayRectangleWoSlider);
 
             ////gr.Clear(Color.White);
