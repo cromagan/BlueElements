@@ -208,6 +208,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
+    /// <summary>
+    /// Info wird nur angezeigt, wenn ShowInfoWhenDisabled True ist
+    /// </summary>
     [DefaultValue("")]
     public string DisabledReason {
         get => _disabledReason;

@@ -59,6 +59,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         AlwaysInstantChange = true;
         FilterSingleColumn = column;
         FilterInput = null;
+        ShowInfoWhenDisabled = true;
         OnValueChanged();
         //UpdateFilterData();
         //FilterSingle.Changed += FilterSingle_Changed;
@@ -225,7 +226,13 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
             //{
             //    Item2.GenerateAndAdd("|" + thiss, thiss));
             //}
-            StyleComboBox(cbx, item2, ComboBoxStyle.DropDown, false);
+
+            if (TextEntryAllowed()) {
+                StyleComboBox(cbx, item2, ComboBoxStyle.DropDown, false);
+            } else {
+                StyleComboBox(cbx, item2, ComboBoxStyle.DropDownList, false);
+            }
+
             cbx.DropDownShowing += Cbx_DropDownShowing;
         }
 
@@ -407,6 +414,11 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
                          FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
     }
 
+    private bool TextEntryAllowed() {
+        if (FilterSingleColumn == null) { return false; }
+        return FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
+    }
+
     private void UpdateFilterData(FilterItem? filterSingle, bool showDelFilterButton) {
         if (IsDisposed) { return; }
 
@@ -416,17 +428,14 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         if (FilterSingleColumn == null || FilterSingleColumn.IsDisposed) {
             DisabledReason = "Bezug zum Filter verloren.";
-            Caption = string.Empty;
-            EditType = EditTypeFormula.None;
+            Caption = "?";
+            EditType = EditTypeFormula.nur_als_Text_anzeigen;
             QuickInfo = string.Empty;
             ValueSet(string.Empty, true, true);
             return;
         }
 
         #endregion
-
-        //var filterSingle = FilterInput?[FilterSingleColumn];
-        //FilterOutput.ChangeTo(filterSingle);
 
         DisabledReason = filterSingle != null &&
                          !string.IsNullOrEmpty(filterSingle.Herkunft) ?
@@ -435,7 +444,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         var showWählen = MustMenu();
 
-        var texteingabe = FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
+        //var texteingabe = TextEntryAllowed();
 
         var nvalue = string.Empty;
 
@@ -451,15 +460,15 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         if (filterSingle != null) {
             if (filterSingle.FilterType == FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1) {
-                texteingabe = true;
+                //texteingabe = true;
                 showWählen = false;
                 nvalue = filterSingle.SearchValue[0];
             } else if (_filterart_bei_texteingabe == FlexiFilterDefaultFilter.Ist) {
-                texteingabe = true;
+                //texteingabe = true;
                 showWählen = false;
                 nvalue = filterSingle.SearchValue[0];
             } else if (filterSingle.FilterType is FilterType.Istgleich or FilterType.Istgleich_ODER_GroßKleinEgal) {
-                texteingabe = false;
+                //texteingabe = false;
                 showWählen = false;
             }
         }
@@ -467,7 +476,8 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         #region Filter verbieten - und keine weiteren Berechnungen
 
         if (!FilterSingleColumn.AutoFilterSymbolPossible()) {
-            EditType = EditTypeFormula.None;
+            EditType = EditTypeFormula.nur_als_Text_anzeigen;
+            DisabledReason = "Kein Filter erlaubt";
             return;
         }
 
@@ -486,16 +496,20 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         #region Text-Eingabefeld - und keine weitere Berechnungen
 
-        if (texteingabe) {
-            CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
-            Caption = FilterSingleColumn.ReadableText() + ":";
-            EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-
-            ValueSet(nvalue, true, true);
-            return;
-        }
+        //if (texteingabe) {
+        CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+        Caption = FilterSingleColumn.ReadableText() + ":";
+        EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+        ValueSet(nvalue, true, true);
+        return;
+        //}
 
         #endregion
+
+        //CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+        //Caption = FilterSingleColumn.ReadableText() + ":";
+        //EditType = EditTypeFormula.nur_als_Text_anzeigen;
+        //DisabledReason = "Hier keine Filterung möglich";
 
         //if (filterSingle != null) {
         //    if (filterSingle.FilterType == FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1) {

@@ -2865,9 +2865,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                         }
                     }
                 }
-
-                prevViewItem = thisViewItem;
             }
+            prevViewItem = thisViewItem;
         }
     }
 
