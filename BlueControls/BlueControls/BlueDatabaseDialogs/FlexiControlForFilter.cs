@@ -41,10 +41,9 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
     #region Fields
 
+    private bool _doFilterDeleteButton;
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
     private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
-
-    private bool _wasvalueclicked;
 
     #endregion
 
@@ -136,10 +135,12 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         var filterSingle = FilterInput?[FilterSingleColumn];
 
-        if (filterSingle != null && filterSingle.SearchValue.Count == 1) {
-            _wasvalueclicked = filterSingle.FilterType is FilterType.Istgleich_GroßKleinEgal or FilterType.Istgleich_ODER_GroßKleinEgal;
+        if (filterSingle != null) {
+            _doFilterDeleteButton = filterSingle.FilterType is FilterType.Istgleich_GroßKleinEgal or FilterType.Istgleich_ODER_GroßKleinEgal;
 
-            ValueSet(filterSingle.SearchValue[0], true, true);
+            if (filterSingle.SearchValue.Count > 1) { _doFilterDeleteButton = true; }
+
+            ValueSet(filterSingle.SearchValue.JoinWithCr(), true, true);
         } else {
             ValueSet(string.Empty, true, true);
         }
@@ -166,7 +167,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
     protected override void CommandButton_Click(object sender, System.EventArgs e) {
         //base.CommandButton_Click(); // Nope, keine Ereignisse und auch nicht auf + setzen
-        _wasvalueclicked = false;
+        _doFilterDeleteButton = false;
 
         if (CaptionPosition == ÜberschriftAnordnung.ohne) {
             FilterOutput.Clear();
@@ -245,7 +246,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         base.OnValueChanged();
 
         var cb = GetComboBox();
-        if (cb != null && cb.WasThisValueClicked()) { _wasvalueclicked = true; }
+        if (cb != null && cb.WasThisValueClicked()) { _doFilterDeleteButton = true; }
 
         FilterItem? filterSingle = null;
 
@@ -257,8 +258,8 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
                     filterSingle = null;
                 }
             } else {
-                if (_wasvalueclicked) {
-                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_GroßKleinEgal, Value);
+                if (_doFilterDeleteButton) {
+                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, Value.SplitByCr());
                 } else {
                     if (_filterart_bei_texteingabe == FlexiFilterDefaultFilter.Textteil) {
                         filterSingle = new FilterItem(FilterSingleColumn, FilterType.Instr_GroßKleinEgal, Value);
@@ -275,7 +276,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
             FilterOutput.ChangeTo(filterSingle);
         }
 
-        UpdateFilterData(filterSingle, _wasvalueclicked);
+        UpdateFilterData(filterSingle, _doFilterDeleteButton);
 
         //if (filterSingle != null && filterSingle.IsOk()) {
         //    FilterOutput.ChangeTo(filterSingle);

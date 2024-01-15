@@ -91,6 +91,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 _database.Row.RowRemoving -= Row_RowRemoving;
             }
             OnChanging();
+            _internal.Clear();
             _database = value;
             Invalidate_FilteredRows();
             OnChanged();
@@ -457,6 +458,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private void AddAndRegisterEvents(FilterItem fi) {
+        if (_internal.Count > 0 && _internal[0].Database != fi.Database) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken unterschiedlich");
+        }
+
         fi.Changing += Filter_Changing;
         fi.Changed += Filter_Changed;
         _internal.Add(fi);
