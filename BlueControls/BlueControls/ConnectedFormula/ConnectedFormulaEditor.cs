@@ -299,7 +299,10 @@ public partial class ConnectedFormulaEditor : PadEditor {
             r = db.Row.First();
         }
 
-        EditBoxRow.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", CFormula, r, true);
+        var c = CFormula;
+        CFormula = null;
+        EditBoxRow.Show("Achtung:\r\nVoll funktionsfähige Test-Ansicht", c, r, true);
+        CFormula = c;
     }
 
     private void CheckButtons() { }

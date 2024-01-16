@@ -255,11 +255,11 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
         var u2 = new ItemCollectionList.ItemCollectionList(false);
         u2.AddRange(typeof(FlexiFilterDefaultOutput));
-        l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u));
+        l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
 
         var u3 = new ItemCollectionList.ItemCollectionList(false);
         u3.AddRange(typeof(FlexiFilterDefaultFilter));
-        l.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u));
+        l.Add(new FlexiControlForProperty<FlexiFilterDefaultFilter>(() => Filterart_bei_Texteingabe, u3));
 
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
