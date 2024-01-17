@@ -45,6 +45,8 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     private string _filterSpalte = string.Empty;
     private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_GrossKleinEgal;
 
+    private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+
     #endregion
 
     #region Constructors
@@ -140,6 +142,16 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
+    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
+        get => _standard_bei_keiner_Eingabe;
+        set {
+            if (IsDisposed) { return; }
+            if (_standard_bei_keiner_Eingabe == value) { return; }
+            _standard_bei_keiner_Eingabe = value;
+            OnChanged();
+        }
+    }
+
     public bool WaitForDatabase => false;
     protected override int SaveOrder => 1;
 
@@ -154,7 +166,9 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var i = _itemAccepts.DatabaseInput(this)?.Column.Exists(_eingangsWertSpalte);
         var o = DatabaseOutput?.Column.Exists(_filterSpalte);
-        var con = new InputRowOutputFilterControl(i, o, _filtertype);
+        var con = new InputRowOutputFilterControl(i, o, _filtertype) {
+            Standard_bei_keiner_Eingabe = _standard_bei_keiner_Eingabe
+        };
         con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);
 
@@ -198,6 +212,10 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
             l.Add(new FlexiControlForProperty<FilterTypeRowInputItem>(() => Filter, ic2));
         }
 
+        var u2 = new ItemCollectionList.ItemCollectionList(false);
+        u2.AddRange(typeof(FlexiFilterDefaultOutput));
+        l.Add(new FlexiControlForProperty<FlexiFilterDefaultOutput>(() => Standard_bei_keiner_Eingabe, u2));
+
         l.Add(new FlexiControl());
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
@@ -239,6 +257,10 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
             case "filter":
                 _filtertype = (FilterTypeRowInputItem)IntParse(value);
                 return true;
+
+            case "defaultemptyfilter":
+                _standard_bei_keiner_Eingabe = (FlexiFilterDefaultOutput)IntParse(value);
+                return true;
         }
         return false;
 
@@ -274,6 +296,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         result.ParseableAdd("InputColumn", _eingangsWertSpalte);
         result.ParseableAdd("OutputColumn", _filterSpalte);
         result.ParseableAdd("Filter", _filtertype);
+        result.ParseableAdd("DefaultEmptyFilter", _standard_bei_keiner_Eingabe);
 
         return result.Parseable(base.ToString());
     }

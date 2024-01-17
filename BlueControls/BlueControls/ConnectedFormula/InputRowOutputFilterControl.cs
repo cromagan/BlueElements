@@ -37,6 +37,8 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
     private readonly FilterTypeRowInputItem _type;
 
+    private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
+
     #endregion
 
     #region Constructors
@@ -68,6 +70,15 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendSomething> Parents { get; } = [];
 
+    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
+        get => _standard_bei_keiner_Eingabe;
+        set {
+            if (IsDisposed) { return; }
+            if (_standard_bei_keiner_Eingabe == value) { return; }
+            _standard_bei_keiner_Eingabe = value;
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -77,10 +88,14 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
         Invalidate();
 
         var lastInputRow = FilterInput?.RowSingleOrNull;
-        lastInputRow?.CheckRowDataIfNeeded();
+        //lastInputRow?.CheckRowDataIfNeeded();
 
         if (lastInputRow == null || _outputcolumn == null || _inputcolumn == null) {
-            FilterOutput.Clear();
+            if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
+                FilterOutput.ChangeTo(new FilterItem());
+            } else {
+                FilterOutput.Clear();
+            }
             return;
         }
 
