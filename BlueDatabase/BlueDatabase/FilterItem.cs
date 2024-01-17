@@ -75,7 +75,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     /// </summary>
     public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string tag) : this(column, filterType, new List<string> { searchValue }, tag) { }
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string herkunft) : this(column, filterType, new List<string> { searchValue }, herkunft) { }
 
     public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 

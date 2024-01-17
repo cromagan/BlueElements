@@ -331,7 +331,7 @@ public partial class TableView : FormWithStatusBar {
                         break;
 
                     case "windowstate":
-                        WindowState = (FormWindowState)int.Parse(pair.Value);
+                        //WindowState = (FormWindowState)int.Parse(pair.Value);
                         break;
 
                     default:
