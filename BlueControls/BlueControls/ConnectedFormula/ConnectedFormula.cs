@@ -105,13 +105,13 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
             _muf.Load(filename, true);
         }
 
-        _saved = true;
-
         if (_padData != null) {
             //_padData.SheetSizeInMm = new SizeF(PixelToMm(500, ItemCollectionPad.Dpi), PixelToMm(850, ItemCollectionPad.Dpi));
             _padData.GridShow = PixelToMm(IAutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
             _padData.GridSnap = PixelToMm(IAutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
         }
+        Repair();
+        _saved = true;
     }
 
     #endregion

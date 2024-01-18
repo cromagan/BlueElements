@@ -230,6 +230,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
         if (_filterType == FilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
 
+        if (_filterType == FilterType.AlwaysFalse) { return string.Empty; }
+
         if (Database == null) { return "Keine Datenbank angegeben"; }
 
         if (Database.IsDisposed) { return "Datenbank verworfen"; }

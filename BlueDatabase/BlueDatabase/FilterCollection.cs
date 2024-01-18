@@ -212,7 +212,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
 
     public void ChangeTo(FilterItem? fi) {
-        if (fi != null && Exists(fi) && _internal.Count == 1) { return; }
+        if (fi != null && _internal.Count == 1 && Exists(fi)) { return; }
         if (fi == null && _internal.Count == 0) { return; }
 
         var fc = new FilterCollection((FilterItem?)(fi?.Clone()), "ChangeTo1");
@@ -234,7 +234,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         _internal.Clear();
 
         if (fc != null) {
-            AddIfNotExists(fc.ToList().CloneWithClones());
+            foreach (var thisf in fc) {
+                if (!Exists(thisf)) { AddAndRegisterEvents(thisf); }
+            }
+
             _rows = [];
             _rows.AddRange(fc.Rows);
         } else {
@@ -457,6 +460,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return result.Parseable();
     }
 
+    /// <summary>
+    /// Löst keine Ereignisse aus
+    /// </summary>
+    /// <param name="fi"></param>
     private void AddAndRegisterEvents(FilterItem fi) {
         if (_internal.Count > 0 && _internal[0].Database != fi.Database) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken unterschiedlich");

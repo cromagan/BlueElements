@@ -99,37 +99,34 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
             return;
         }
 
+        FilterItem? f;
+        var va = lastInputRow.CellGetString(_inputcolumn);
+
+        if (string.IsNullOrEmpty(va) && _standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
+            FilterOutput.ChangeTo(new FilterItem());
+            return;
+        }
+
         switch (_type) {
             case FilterTypeRowInputItem.Ist_GrossKleinEgal:
-                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, FilterType.Istgleich_GroßKleinEgal, lastInputRow.CellGetString(_inputcolumn)));
-                return;
+                f = new FilterItem(_outputcolumn, FilterType.Istgleich_GroßKleinEgal, va);
+                break;
 
             case FilterTypeRowInputItem.Ist_genau:
-                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, FilterType.Istgleich, lastInputRow.CellGetString(_inputcolumn)));
-                return;
+                f = new FilterItem(_outputcolumn, FilterType.Istgleich, va);
+                break;
 
             case FilterTypeRowInputItem.Ist_eines_der_Wörter_GrossKleinEgal:
-                var list = lastInputRow.CellGetString(_inputcolumn).HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
-                FilterOutput.ChangeTo(new FilterItem(_outputcolumn, FilterType.Istgleich_ODER_GroßKleinEgal, list));
-
-                //List<string> names = new();
-                //names.AddRange(_outputcolumn.GetUcaseNamesSortedByLenght());
-
-                //var tmpvalue = LastInputRow.CellGetString(_outputcolumn);
-
-                //foreach (var thisWord in names) {
-                //    var fo = tmpvalue.IndexOfWord(thisWord, 0, RegexOptions.IgnoreCase);
-                //    if (fo > -1) {
-                //        value.Add(thisWord);
-                //    }
-                //}
-                return;
+                var list = va.HtmlSpecialToNormalChar(false).AllWords().SortedDistinctList();
+                f = new FilterItem(_outputcolumn, FilterType.Istgleich_ODER_GroßKleinEgal, list);
+                break;
 
             default:
-                Develop.DebugPrint(_type);
-                FilterOutput.Clear();
-                return;
+                f = new FilterItem();
+                break;
         }
+
+        FilterOutput.ChangeTo(f);
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }

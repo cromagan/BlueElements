@@ -74,6 +74,7 @@ public partial class FormulaView : FormWithStatusBar {
 
         var x = new ConnectedFormulaEditor(CFormula.ConnectedFormula.Filename, null);
         x.Show();
+        CFormula.InvalidateView();
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
