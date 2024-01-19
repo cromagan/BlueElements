@@ -277,14 +277,14 @@ public static class Generic {
 
     public static void Pause(double sekunden, bool doEvents) {
         if (sekunden <= 0) { return; }
-        if (!doEvents) {
-            Thread.Sleep((int)(sekunden * 1000));
-            return;
-        }
+        //if (!doEvents) {
+        //    Thread.Sleep((int)(sekunden * 1000));
+        //    return;
+        //}
         TimeSpan akTimer;
         var firstTimer = DateTime.UtcNow;
         do {
-            Develop.DoEvents();
+            if (doEvents) { Develop.DoEvents(); }
             akTimer = DateTime.UtcNow.Subtract(firstTimer);
         } while (akTimer.TotalSeconds < sekunden);
     }

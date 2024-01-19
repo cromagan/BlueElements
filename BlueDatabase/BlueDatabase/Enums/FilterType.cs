@@ -25,8 +25,6 @@ namespace BlueDatabase.Enums;
 public enum FilterType {
 
     // Filterarten allgemein -------------------------------------------------------
-    KeinFilter = 0,
-
     Istgleich = 1,
 
     //  ZUR INFO:  Ungleich = 2

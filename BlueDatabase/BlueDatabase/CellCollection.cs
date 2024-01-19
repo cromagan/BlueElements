@@ -795,9 +795,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 //return d == -1;
                 return true;
 
-            case FilterType.KeinFilter:
-                Develop.DebugPrint("Kein Filter!");
-                return true;
+            //case FilterType.KeinFilter:
+            //    Develop.DebugPrint("Kein Filter!");
+            //    return true;
 
             case FilterType.BeginntMit:
                 return istValue.StartsWith(filterValue);

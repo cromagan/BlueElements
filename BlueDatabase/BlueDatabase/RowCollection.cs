@@ -600,7 +600,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             var c = new RowItem(db, rowkey);
             var f = Add(c, reason);
-            if (reason == Reason.SetCommand) {
+            if (reason == Reason.SetCommand && db.LogUndo) {
                 Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
             return f;

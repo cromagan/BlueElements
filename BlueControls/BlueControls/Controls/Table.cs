@@ -1062,19 +1062,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         const string t = "Übergeordnetes Element";
 
-        if (FilterInput != null) {
-            foreach (var thisFi in FilterInput) {
-                thisFi.Herkunft = t;
-            }
-        }
-
         Filter.RemoveRange(t);
 
         if (FilterOutputType == Filterausgabe.Im_Element_Gewählte_Filter) {
             FilterOutput.ChangeTo(Filter);
         }
 
-        Filter.RemoveOtherAndAddIfNotExists(FilterInput);
+        Filter.RemoveOtherAndAdd(FilterInput, t);
 
         if (FilterOutputType == Filterausgabe.Alle_Filter) {
             FilterOutput.ChangeTo(Filter);
@@ -2191,7 +2185,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 break;
 
             case "filter":
-                Filter.RemoveOtherAndAddIfNotExists(e.Filter);
+                Filter.RemoveOtherAndAdd(e.Filter);
                 //Filter.Remove(e.Column);
                 //Filter.Add(e.Filter);
                 break;
@@ -2285,7 +2279,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (columnviewitem.Column == null) { return; }
         if (!ca.ShowHead) { return; }
         if (!columnviewitem.Column.AutoFilterSymbolPossible()) { return; }
-        if (Filter.Any(thisFilter => thisFilter != null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Herkunft))) {
+        if (Filter.Any(thisFilter => thisFilter != null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Origin))) {
             MessageBox.Show("Dieser Filter wurde<br>automatisch gesetzt.", ImageCode.Information, "OK");
             return;
         }

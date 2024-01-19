@@ -314,7 +314,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
-        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, null);
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
     }
 
     #endregion

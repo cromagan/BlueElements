@@ -145,7 +145,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     #region Indexers
 
     public FilterItem? this[ColumnItem? column] =>
-        _internal.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.FilterType != FilterType.KeinFilter)
+        _internal.Where(thisFilterItem => thisFilterItem != null && thisFilterItem.IsOk())
         .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
 
     public FilterItem? this[int no] {
@@ -163,32 +163,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed) { return; }
 
         if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
+        if (!fi.IsOk()) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
 
         OnChanging();
 
         AddAndRegisterEvents(fi);
         Invalidate_FilteredRows();
         OnChanged();
-    }
-
-    public void Add(string columnName, FilterType filterType, List<string> filterBy) {
-        if (Database is not Database db || db.IsDisposed) { return; }
-        Add(Database?.Column.Exists(columnName), filterType, filterBy);
-    }
-
-    //    Add(Database?.Column.Exists(columnName), filterType, filterBy);
-    //}
-    public void Add(ColumnItem? column, FilterType filterType, List<string> filterBy) {
-        if (column?.Database is not Database db || db.IsDisposed) { return; }
-
-        AddIfNotExists(new FilterItem(column, filterType, filterBy));
-    }
-
-    //public void Add(string columnName, FilterType filterType, string filterBy) {
-    //    if (Database is not Database db || db.IsDisposed) { return; }
-    public void Add(ColumnItem? column, FilterType filterType, string filterBy) {
-        if (column?.Database is not Database db || db.IsDisposed) { return; }
-        AddIfNotExists(new FilterItem(column, filterType, filterBy));
     }
 
     public void AddIfNotExists(FilterItem fi) {
@@ -235,7 +216,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (fc != null) {
             foreach (var thisf in fc) {
-                if (!Exists(thisf)) { AddAndRegisterEvents(thisf); }
+                if (!Exists(thisf) && thisf.IsOk()) { AddAndRegisterEvents(thisf); }
             }
 
             _rows = [];
@@ -253,6 +234,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnChanging();
 
         UnRegisterEvents(_internal);
+        foreach (var thisF in _internal) {
+            thisF.Dispose();
+        }
 
         _internal.Clear();
         Invalidate_FilteredRows();
@@ -264,7 +248,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     /// <returns></returns>
     public object Clone(string c2) {
-        var fc = new FilterCollection(Database, "colne " + c2);
+        var fc = new FilterCollection(Database, "Clone " + c2);
 
         fc.ChangeTo(this);
 
@@ -277,10 +261,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void Dispose() =>
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
         Dispose(true);
-
-    void IDisposable.Dispose() =>
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(disposing: true);
 
     IEnumerator IEnumerable.GetEnumerator() => _internal.GetEnumerator();
 
@@ -320,9 +300,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public bool ParseThis(string key, string value) {
         switch (key) {
             case "filter":
-                if (Database != null && !Database.IsDisposed) {
-                    AddIfNotExists(new FilterItem(Database, value.FromNonCritical()));
-                }
+
+                var fi = new FilterItem(Database, value.FromNonCritical());
+                if (!Exists(fi)) { AddAndRegisterEvents(fi); }
 
                 return true;
         }
@@ -333,12 +313,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var toDel = _internal.Where(thisFilter => thisFilter.Column == column).ToList();
         if (toDel.Count == 0) { return; }
         RemoveRange(toDel);
-    }
-
-    public void Remove(string columnName) {
-        var tmp = Database?.Column.Exists(columnName);
-        if (tmp == null) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); }
-        Remove(tmp);
     }
 
     public void Remove(FilterItem fi) {
@@ -354,32 +328,23 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public void Remove_RowFilter() => Remove(null as ColumnItem);
 
-    /// <summary>
-    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
-    /// </summary>
-    public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, string filterBy, string herkunft) {
-        var column = Database?.Column.Exists(columnName);
-        if (column == null || column.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
-        RemoveOtherAndAddIfNotExists(column, filterType, filterBy, herkunft);
-    }
-
-    /// <summary>
-    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
-    /// </summary>
-    public void RemoveOtherAndAddIfNotExists(FilterCollection? fc) {
-        if (fc == null) { return; }
-
-        foreach (var thisFi in fc) {
-            RemoveOtherAndAddIfNotExists(thisFi);
+    public void RemoveOtherAndAdd(FilterItem fi, string newOrigin) {
+        if (fi.Clone() is FilterItem fi2) {
+            fi2.Origin = newOrigin;
+            RemoveOtherAndAdd(fi2);
         }
     }
 
     /// <summary>
     /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
     /// </summary>
-    public void RemoveOtherAndAddIfNotExists(FilterItem? fi) {
+    public void RemoveOtherAndAdd(FilterItem fi) {
         if (IsDisposed) { return; }
         if (fi == null || Exists(fi)) { return; }
+        if (!fi.IsOk()) {
+            Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!");
+            return;
+        }
 
         var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column).ToList();
 
@@ -406,17 +371,19 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// <summary>
     /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
     /// </summary>
-    public void RemoveOtherAndAddIfNotExists(string columnName, FilterType filterType, List<string>? filterBy, string herkunft) {
-        var column = Database?.Column.Exists(columnName);
-        if (column == null || column.IsDisposed) { Develop.DebugPrint(FehlerArt.Fehler, "Spalte '" + columnName + "' nicht vorhanden."); return; }
-        RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
+    public void RemoveOtherAndAdd(FilterCollection? fc, string newOrigin) {
+        if (fc == null) { return; }
+
+        foreach (var thisFi in fc) {
+            RemoveOtherAndAdd(thisFi, newOrigin);
+        }
     }
 
-    public void RemoveRange(string herkunft) {
+    public void RemoveRange(string origin) {
         var l = new List<FilterItem>();
 
         foreach (var thisItem in _internal) {
-            if (thisItem.Herkunft.Equals(herkunft, StringComparison.OrdinalIgnoreCase)) {
+            if (thisItem.Origin.Equals(origin, StringComparison.OrdinalIgnoreCase)) {
                 l.Add(thisItem);
             }
         }
@@ -521,6 +488,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 foreach (var thisf in _internal) {
                     thisf.Dispose();
                 }
+                _internal.Clear();
             }
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
@@ -551,15 +519,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void OnChanging() => Changing?.Invoke(this, System.EventArgs.Empty);
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
-
-    /// <summary>
-    /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="filterType"></param>
-    /// <param name="filterBy"></param>
-    /// <param name="herkunft"></param>
-    private void RemoveOtherAndAddIfNotExists(ColumnItem column, FilterType filterType, string filterBy, string herkunft) => RemoveOtherAndAddIfNotExists(new FilterItem(column, filterType, filterBy, herkunft));
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (Database is not Database db || db.IsDisposed) { return; }

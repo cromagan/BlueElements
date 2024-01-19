@@ -441,9 +441,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         if (fi.FilterType == FilterType.AlwaysFalse) { return false; }
 
-        fi.Column?.RefreshColumnsData();
+        if (!fi.IsOk()) { return false; }
 
-        if (fi.FilterType is FilterType.KeinFilter or FilterType.GroßKleinEgal) { return true; } // Filter ohne Funktion
+        //fi.Column?.RefreshColumnsData(); // Muss beim Ändern der Colum Property ausgeführt werden
+
         if (fi.Column == null) {
             if (!fi.FilterType.HasFlag(FilterType.GroßKleinEgal)) { fi.FilterType |= FilterType.GroßKleinEgal; }
             if (fi.FilterType is not FilterType.Instr_GroßKleinEgal and not FilterType.Instr_UND_GroßKleinEgal) { Develop.DebugPrint(FehlerArt.Fehler, "Zeilenfilter nur mit Instr möglich!"); }

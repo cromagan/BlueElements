@@ -428,7 +428,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
             }
         } else {
             if (fo[0] is FilterItem fi) {
-                _table.Filter.RemoveOtherAndAddIfNotExists(fi);
+                _table.Filter.RemoveOtherAndAdd(fi);
             }
         }
 

@@ -597,7 +597,7 @@ internal sealed partial class ColumnEditor {
             t.TagSet("Filename", linkdb.ConnectionData.UniqueId);
             db.Tags = t.AsReadOnly();
 
-            tblFilterliste?.Filter.Add(vis, FilterType.Istgleich, "+");
+            tblFilterliste?.Filter.Add(new FilterItem(vis, FilterType.Istgleich, "+"));
         }
 
         linkdb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt

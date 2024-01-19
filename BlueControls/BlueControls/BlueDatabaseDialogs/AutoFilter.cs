@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -165,7 +166,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         if (fc != null) {
             foreach (var thisfilter in fc) {
-                if (thisfilter != null && thisfilter.FilterType != FilterType.KeinFilter) {
+                if (thisfilter != null && thisfilter.IsOk()) {
                     if (thisfilter.Column == _column) {
                         if (thisfilter.FilterType.HasFlag(FilterType.Istgleich)) {
                             foreach (var thisValue in thisfilter.SearchValue) {

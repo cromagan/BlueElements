@@ -43,7 +43,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
     private bool _doFilterDeleteButton;
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
-    private string _herkunft;
+    private string _origin;
     private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     #endregion
@@ -60,7 +60,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         FilterSingleColumn = column;
         FilterInput = null;
         ShowInfoWhenDisabled = true;
-        _herkunft = string.Empty;
+        _origin = string.Empty;
         OnValueChanged();
         //UpdateFilterData();
         //FilterSingle.Changed += FilterSingle_Changed;
@@ -132,7 +132,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         var filterSingle = FilterInput?[FilterSingleColumn];
 
-        _herkunft = filterSingle?.Herkunft ?? string.Empty;
+        _origin = filterSingle?.Origin ?? string.Empty;
 
         if (filterSingle != null) {
             _doFilterDeleteButton = filterSingle.FilterType is FilterType.Istgleich_GroßKleinEgal or FilterType.Istgleich_ODER_GroßKleinEgal;
@@ -257,18 +257,18 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         if (FilterSingleColumn != null) {
             if (string.IsNullOrEmpty(Value)) {
                 if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
-                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, _herkunft);
+                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, _origin);
                 } else {
                     filterSingle = null;
                 }
             } else {
                 if (_doFilterDeleteButton) {
-                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, Value.SplitByCr(), _herkunft);
+                    filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, Value.SplitByCr(), _origin);
                 } else {
                     if (_filterart_bei_texteingabe == FlexiFilterDefaultFilter.Textteil) {
-                        filterSingle = new FilterItem(FilterSingleColumn, FilterType.Instr_GroßKleinEgal, Value, _herkunft);
+                        filterSingle = new FilterItem(FilterSingleColumn, FilterType.Instr_GroßKleinEgal, Value, _origin);
                     } else {
-                        filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, Value, _herkunft);
+                        filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, Value, _origin);
                     }
                 }
             }
@@ -442,7 +442,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         #endregion
 
-        DisabledReason = !string.IsNullOrEmpty(_herkunft) ? "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;
+        DisabledReason = !string.IsNullOrEmpty(_origin) ? "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;
 
         var showWählen = MustMenu();
 

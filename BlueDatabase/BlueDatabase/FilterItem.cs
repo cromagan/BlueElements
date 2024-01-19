@@ -26,6 +26,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
+using static BlueBasics.Interfaces.ErrorCheckableExtension;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -35,15 +36,15 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     #region Fields
 
     private ColumnItem? _column;
-    private FilterType _filterType = FilterType.KeinFilter;
-    private string _herkunft = string.Empty;
+    private FilterType _filterType = FilterType.AlwaysFalse;
+    private string _origin = string.Empty;
     private ReadOnlyCollection<string> _searchValue = new List<string>().AsReadOnly();
 
     #endregion
 
     #region Constructors
 
-    public FilterItem(Database db, FilterType filterType, string searchValue) : this(db, filterType, new List<string> { searchValue }) { }
+    public FilterItem(Database? db, FilterType filterType, string searchValue) : this(db, filterType, new List<string> { searchValue }) { }
 
     /// <summary>
     /// Ein AlwaysFalse Filter
@@ -56,10 +57,13 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         SearchValue = new List<string>().AsReadOnly();
     }
 
-    public FilterItem(Database db, string filterCode) {
+    public FilterItem(Database? db, string filterCode) {
+        // Database?, weil always False keine Datenbank braucht
         Database = db;
 
-        db.DisposingEvent += Database_Disposing;
+        if (db != null) {
+            db.DisposingEvent += Database_Disposing;
+        }
 
         KeyName = Generic.UniqueInternal();
 
@@ -75,16 +79,16 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     /// </summary>
     public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, new List<string> { searchValue }, string.Empty) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string herkunft) : this(column, filterType, new List<string> { searchValue }, herkunft) { }
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType, new List<string> { searchValue }, origin) { }
 
     public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, IList<string>? searchValue, string herkunft) {
+    public FilterItem(ColumnItem column, FilterType filterType, IList<string>? searchValue, string origin) {
         KeyName = Generic.UniqueInternal();
         Database = column.Database;
         _column = column;
         _filterType = filterType;
-        _herkunft = herkunft;
+        _origin = origin;
 
         _column?.RefreshColumnsData();
 
@@ -103,11 +107,14 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     private FilterItem(ColumnItem column, RowItem rowWithValue) : this(column, FilterType.Istgleich_GroﬂKleinEgal_MultiRowIgnorieren, rowWithValue.CellGetString(column)) { }
 
-    private FilterItem(Database db, FilterType filterType, IList<string>? searchValue) {
+    private FilterItem(Database? db, FilterType filterType, IList<string>? searchValue) {
+        //Database?, weil AlwaysFalse keine Angaben braucht
         Database = db;
         KeyName = Generic.UniqueInternal();
 
-        db.DisposingEvent += Database_Disposing;
+        if (db != null) {
+            db.DisposingEvent += Database_Disposing;
+        }
 
         _filterType = filterType;
         if (searchValue != null && searchValue.Count > 0) {
@@ -116,7 +123,10 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             SearchValue = new List<string>().AsReadOnly();
         }
 
-        _column?.RefreshColumnsData();
+        if (_column != null) {
+            _column.RefreshColumnsData();
+            //_column.DisposingEvent += Database_Disposing;
+        }
     }
 
     #endregion
@@ -138,6 +148,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             if (value == _column) { return; }
             OnChanging();
             _column = value;
+            _column?.RefreshColumnsData();
             OnChanged();
         }
     }
@@ -158,19 +169,20 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         }
     }
 
-    public string Herkunft {
-        get => _herkunft;
+    public bool IsDisposed { get; private set; }
+
+    public string KeyName { get; private set; }
+
+    public string Origin {
+        get => _origin;
         set {
             if (IsDisposed) { return; }
-            if (value == _herkunft) { return; }
+            if (value == _origin) { return; }
             OnChanging();
-            _herkunft = value;
+            _origin = value;
             OnChanged();
         }
     }
-
-    public bool IsDisposed { get; private set; }
-    public string KeyName { get; private set; }
 
     public ReadOnlyCollection<string> SearchValue {
         get => _searchValue;
@@ -200,10 +212,10 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public void Changeto(FilterType type, string searchvalue) => Changeto(type, new List<string> { searchvalue });
 
     public object? Clone() {
-        if (Database is not Database db || db.IsDisposed || IsDisposed) { return null; }
-        var fi = new FilterItem(db, _filterType, _searchValue);
+        if (!this.IsOk()) { return null; }
+        var fi = new FilterItem(Database, _filterType, _searchValue);
         fi.Column = _column;
-        fi.Herkunft = _herkunft;
+        fi.Origin = _origin;
         fi.KeyName = KeyName;
         fi.Database = Database;
         return fi;
@@ -219,18 +231,21 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         }
     }
 
-    public bool Equals(FilterItem? thisFilter) => thisFilter != null &&
+    public bool Equals(FilterItem? thisFilter) => !IsDisposed &&
+                                                  thisFilter != null &&
                                                   thisFilter.FilterType == _filterType &&
                                                   thisFilter.Column == _column &&
-                                                  thisFilter._herkunft == _herkunft &&
+                                                  thisFilter._origin == _origin &&
                                                   thisFilter.SearchValue.JoinWithCr() == _searchValue.JoinWithCr();
 
     public string ErrorReason() {
         if (IsDisposed) { return "Filter verworfen"; }
 
-        if (_filterType == FilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
+        //if (_filterType == FilterType.KeinFilter) { return "'Kein Filter' angegeben"; }
 
         if (_filterType == FilterType.AlwaysFalse) { return string.Empty; }
+
+        if (_filterType is FilterType.GroﬂKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
 
         if (Database == null) { return "Keine Datenbank angegeben"; }
 
@@ -251,11 +266,17 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         return string.Empty;
     }
 
-    public bool IsNullOrEmpty() => _filterType == FilterType.KeinFilter;
+    public bool IsNullOrEmpty() => !this.IsOk();
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnChanged() {
+        if (IsDisposed) { return; }
+        Changed?.Invoke(this, System.EventArgs.Empty);
+    }
 
-    public void OnChanging() => Changing?.Invoke(this, System.EventArgs.Empty);
+    public void OnChanging() {
+        if (IsDisposed) { return; }
+        Changing?.Invoke(this, System.EventArgs.Empty);
+    }
 
     public void ParseFinished(string parsed) {
         if (parsed.Contains(", Value=}") || parsed.Contains(", Value=,")) { _ = SearchValue.AddIfNotExists(""); }
@@ -284,6 +305,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             case "columnname":
             case "column":
                 _column = Database?.Column.Exists(value);
+                _column?.RefreshColumnsData();
                 return true;
 
             case "columnkey":
@@ -300,8 +322,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
                 return true;
 
+            case "origin":
             case "herkunft":
-                _herkunft = value.FromNonCritical();
+                _origin = value.FromNonCritical();
                 return true;
 
             case "id":
@@ -371,6 +394,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             case FilterType.Between | FilterType.UND:
                 return nam + ": von " + SearchValue[0].Replace("|", " bis ");
 
+            case FilterType.AlwaysFalse:
+                return "Immer FALSCH";
+
             default:
                 return nam + ": Spezial-Filter";
         }
@@ -389,11 +415,10 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             List<string> result = [];
             result.ParseableAdd("ID", KeyName);
             result.ParseableAdd("Type", _filterType);
-
             result.ParseableAdd("Database", Database);
             result.ParseableAdd("ColumnName", _column);
             result.ParseableAdd("Values", _searchValue);
-            result.ParseableAdd("Herkunft", _herkunft);
+            result.ParseableAdd("Origin", _origin);
             return result.Parseable();
         } catch {
             Develop.CheckStackForOverflow();
