@@ -26,7 +26,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueDatabase.Interfaces;
-using static BlueBasics.Interfaces.ErrorCheckableExtension;
 using static BlueBasics.Converter;
 
 namespace BlueDatabase;
@@ -123,10 +122,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
             SearchValue = new List<string>().AsReadOnly();
         }
 
-        if (_column != null) {
-            _column.RefreshColumnsData();
-            //_column.DisposingEvent += Database_Disposing;
-        }
+        _column?.RefreshColumnsData();
+        //_column.DisposingEvent += Database_Disposing;
     }
 
     #endregion
@@ -251,9 +248,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
         if (Database.IsDisposed) { return "Datenbank verworfen"; }
 
-        if (_column?.Database != Database) { return "Datenbanken inkonsistent"; }
-
         if (_column == null && !_filterType.HasFlag(FilterType.Instr)) { return "Fehlerhafter Zeilenfilter"; }
+
+        if (_column != null && _column?.Database != Database) { return "Datenbanken inkonsistent"; }
 
         if (SearchValue.Count == 0) { return "Kein Suchtext vorhanden"; }
 
