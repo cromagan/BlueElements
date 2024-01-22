@@ -46,6 +46,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
 
     private string _columnName = string.Empty;
 
+    private Database? _lastDB = null;
+
     #endregion
 
     #region Constructors
@@ -127,35 +129,15 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     }
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        if (FilterInput?.Database is Database db) {
-            db.Cell.CellValueChanged += Database_CellValueChanged;
-            db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
-            db.Row.RowChecked += Database_RowChecked;
-            db.Loaded += _Database_Loaded;
-            db.DisposingEvent += _Database_Disposing;
-            db.Disposed += _Database_Disposed;
-        }
-
-        this.DoInputFilter();
-        UpdateColumnData();
-        SetValueFromCell();
-        CheckEnabledState();
-
-        var (_, row) = GetTmpVariables();
-        row?.CheckRowDataIfNeeded();
-
-        if (row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
-            Database_RowChecked(this, rce);
-        }
-
+        this.Invalidate_FilterInput(true);
         Invalidate();
-        SetValueFromCell();
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) {
         FillCellNow();
 
-        if (FilterInput?.Database is Database db) {
+        if (FilterInput?.Database is Database db && db != _lastDB) {
+            _lastDB = db;
             db.Cell.CellValueChanged -= Database_CellValueChanged;
             db.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
             db.Row.RowChecked -= Database_RowChecked;
@@ -219,6 +201,38 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
         }
 
         base.Dispose(disposing);
+    }
+
+    protected override void DrawControl(Graphics gr, States state) {
+        if (FilterInput == null) {
+            if (Parent != null || FilterManualSeted) {
+                this.DoInputFilter();
+
+                if (FilterInput?.Database is Database db && _lastDB != db) {
+                    _lastDB = db;
+                    db.Cell.CellValueChanged += Database_CellValueChanged;
+                    db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
+                    db.Row.RowChecked += Database_RowChecked;
+                    db.Loaded += _Database_Loaded;
+                    db.DisposingEvent += _Database_Disposing;
+                    db.Disposed += _Database_Disposed;
+                }
+
+                UpdateColumnData();
+                SetValueFromCell();
+                CheckEnabledState();
+
+                var (_, row) = GetTmpVariables();
+                row?.CheckRowDataIfNeeded();
+
+                if (row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
+                    Database_RowChecked(this, rce);
+                }
+                SetValueFromCell();
+            }
+        }
+
+        base.DrawControl(gr, state);
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
