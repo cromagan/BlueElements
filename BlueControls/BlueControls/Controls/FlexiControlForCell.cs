@@ -53,9 +53,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     /// <summary>
     /// Für den Designer
     /// </summary>
-    public FlexiControlForCell() : this(string.Empty, ÜberschriftAnordnung.Über_dem_Feld, EditTypeFormula.None) { }
+    public FlexiControlForCell() : this(string.Empty, CaptionPosition.Über_dem_Feld, EditTypeFormula.None) { }
 
-    public FlexiControlForCell(string column, ÜberschriftAnordnung captionPosition, EditTypeFormula editType) : base() {
+    public FlexiControlForCell(string column, CaptionPosition captionPosition, EditTypeFormula editType) : base() {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.

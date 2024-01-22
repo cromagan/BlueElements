@@ -43,7 +43,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
     #region Constructors
 
     public FlexiControlRowSelector(Database? database, string caption, string showFormat) : base() {
-        CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
+        CaptionPosition = CaptionPosition.Über_dem_Feld;
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
 
         Caption = string.IsNullOrEmpty(caption) ? "Wählen:" : caption;

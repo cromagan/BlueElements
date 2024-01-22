@@ -391,7 +391,7 @@ namespace BlueControls.Forms
             // flxAbstand
             // 
             this.flxAbstand.Caption = "Abstand:";
-            this.flxAbstand.CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+            this.flxAbstand.CaptionPosition = CaptionPosition.Links_neben_Dem_Feld;
             this.flxAbstand.EditType = EditTypeFormula.Textfeld;
             this.flxAbstand.Location = new Point(296, 8);
             this.flxAbstand.Name = "flxAbstand";
@@ -404,7 +404,7 @@ namespace BlueControls.Forms
             // flxHöhe
             // 
             this.flxHöhe.Caption = "Höhe";
-            this.flxHöhe.CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+            this.flxHöhe.CaptionPosition = CaptionPosition.Links_neben_Dem_Feld;
             this.flxHöhe.EditType = EditTypeFormula.Textfeld;
             this.flxHöhe.Location = new Point(152, 8);
             this.flxHöhe.Name = "flxHöhe";
@@ -417,7 +417,7 @@ namespace BlueControls.Forms
             // flxBreite
             // 
             this.flxBreite.Caption = "Breite:";
-            this.flxBreite.CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+            this.flxBreite.CaptionPosition = CaptionPosition.Links_neben_Dem_Feld;
             this.flxBreite.EditType = EditTypeFormula.Textfeld;
             this.flxBreite.Location = new Point(8, 8);
             this.flxBreite.Name = "flxBreite";

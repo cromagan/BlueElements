@@ -53,7 +53,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     private string _columnName = string.Empty;
 
-    private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+    private CaptionPosition _überschriftanordung = CaptionPosition.Über_dem_Feld;
 
     #endregion
 
@@ -73,7 +73,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
                 return (int)UsedArea.Height > IAutosizableExtension.MinHeigthCaption;
             }
 
-            if (_überschriftanordung is ÜberschriftAnordnung.Links_neben_Dem_Feld or ÜberschriftAnordnung.ohne) {
+            if (_überschriftanordung is CaptionPosition.Links_neben_Dem_Feld or CaptionPosition.ohne) {
                 return (int)UsedArea.Height > IAutosizableExtension.MinHeigthTextBox;
             }
 
@@ -81,7 +81,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
     }
 
-    public ÜberschriftAnordnung CaptionPosition {
+    public CaptionPosition CaptionPosition {
         get => _überschriftanordung;
         set {
             if (IsDisposed) { return; }
@@ -230,8 +230,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         l.Add(new FlexiControlForDelegate(Spalte_bearbeiten, "Spalte bearbeiten", ImageCode.Spalte));
 
         var u = new ItemCollectionList.ItemCollectionList(false);
-        u.AddRange(typeof(ÜberschriftAnordnung));
-        l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
+        u.AddRange(typeof(CaptionPosition));
+        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
         var b = new ItemCollectionList.ItemCollectionList(false);
         b.AddRange(GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
@@ -268,7 +268,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
                 return true;
 
             case "caption":
-                _überschriftanordung = (ÜberschriftAnordnung)IntParse(value);
+                _überschriftanordung = (CaptionPosition)IntParse(value);
                 return true;
         }
         return false;

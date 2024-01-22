@@ -74,7 +74,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         GenFehlerText();
         _IdleTimer.Tick += Checker_Tick;
-        CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+        CaptionPosition = CaptionPosition.Links_neben_Dem_Feld;
         EditType = EditTypeFormula.Textfeld;
         Size = new Size(200, 24);
 
@@ -108,12 +108,12 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     } else {
                         EditType = EditTypeFormula.Textfeld;
                         if (rowCount >= 2) {
-                            CaptionPosition = ÜberschriftAnordnung.Über_dem_Feld;
+                            CaptionPosition = CaptionPosition.Über_dem_Feld;
                             Size = new Size(200, 16 + (24 * rowCount));
                             MultiLine = true;
                             this.GetStyleFrom(FormatHolder.Text);
                         } else {
-                            CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+                            CaptionPosition = CaptionPosition.Links_neben_Dem_Feld;
                             Size = new Size(200, 24);
                             MultiLine = false;
                             switch (_accessor) {

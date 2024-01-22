@@ -50,7 +50,7 @@ namespace BluePaint
             // flxProzent
             // 
             this.flxProzent.Caption = "Skalieren auf:";
-            this.flxProzent.CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+            this.flxProzent.CaptionPosition = CaptionPosition.Links_neben_Dem_Feld;
             this.flxProzent.EditType = EditTypeFormula.Textfeld;
             this.flxProzent.Location = new Point(8, 8);
             this.flxProzent.Name = "flxProzent";

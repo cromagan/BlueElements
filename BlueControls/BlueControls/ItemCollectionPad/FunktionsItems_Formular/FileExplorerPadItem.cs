@@ -234,7 +234,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAu
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
-        DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "C:\\", EditTypeFormula.Listbox);
+        DrawFakeControl(gr, positionModified, zoom, CaptionPosition.Über_dem_Feld, "C:\\", EditTypeFormula.Listbox);
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, true);

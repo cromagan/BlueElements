@@ -124,7 +124,7 @@
     <Compile Include="Enums\EditTypeFormula.cs" />
     <Compile Include="Enums\ScriptType.cs" />
     <Compile Include="Enums\TranslationType.cs" />
-    <Compile Include="Enums\ÜberschriftAnordnung.cs" />
+    <Compile Include="Enums\CaptionPosition.cs" />
     <Compile Include="EventArgs\MultiUserFileGiveBackEventArgs.cs" />
     <Compile Include="Interfaces\ITranslateAble.cs" />
     <Compile Include="ColumnCollection.cs" />

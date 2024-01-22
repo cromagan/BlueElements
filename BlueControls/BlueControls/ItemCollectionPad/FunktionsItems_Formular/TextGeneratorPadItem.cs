@@ -217,7 +217,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
             DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
-        DrawFakeControl(gr, positionModified, zoom, ÜberschriftAnordnung.Über_dem_Feld, "Bilddatei", EditTypeFormula.Listbox);
+        DrawFakeControl(gr, positionModified, zoom, CaptionPosition.Über_dem_Feld, "Bilddatei", EditTypeFormula.Listbox);
 
         base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);

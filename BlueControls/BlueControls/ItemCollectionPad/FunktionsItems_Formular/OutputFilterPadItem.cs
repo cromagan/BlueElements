@@ -57,7 +57,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     //private string _anzeige = string.Empty;
     //private string _überschrift = string.Empty;
-    private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+    private CaptionPosition _überschriftanordung = CaptionPosition.Über_dem_Feld;
 
     #endregion
 
@@ -95,7 +95,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public bool AutoSizeableHeight => false;
 
-    public ÜberschriftAnordnung CaptionPosition {
+    public CaptionPosition CaptionPosition {
         get => _überschriftanordung;
         set {
             if (IsDisposed) { return; }
@@ -205,6 +205,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         var con = new FlexiControlForFilter(Column) {
             Standard_bei_keiner_Eingabe = _standard_bei_keiner_Eingabe,
             Filterart_bei_Texteingabe = _filterart_bei_texteingabe,
+            DefaultCaptionPosition = _überschriftanordung
             //EditType = _bearbeitung,
             //CaptionPosition = CaptionPosition,
             //Name = DefaultItemToControlName()
@@ -250,8 +251,8 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
         var u = new ItemCollectionList.ItemCollectionList(false);
-        u.AddRange(typeof(ÜberschriftAnordnung));
-        l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
+        u.AddRange(typeof(CaptionPosition));
+        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
         var u2 = new ItemCollectionList.ItemCollectionList(false);
         u2.AddRange(typeof(FlexiFilterDefaultOutput));
@@ -284,7 +285,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
                 return true;
 
             case "caption":
-                _überschriftanordung = (ÜberschriftAnordnung)IntParse(value);
+                _überschriftanordung = (CaptionPosition)IntParse(value);
                 return true;
 
             case "columnname":

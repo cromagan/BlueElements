@@ -70,7 +70,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private Caption? _captionObject;
 
-    private ÜberschriftAnordnung _captionPosition = ÜberschriftAnordnung.ohne;
+    private CaptionPosition _captionPosition = CaptionPosition.ohne;
 
     // None ist -1 und muss gesetzt sein!
     private int _controlX = -1;
@@ -119,7 +119,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         _editType = EditTypeFormula.nur_als_Text_anzeigen;
         _caption = captionText;
-        _captionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+        _captionPosition = CaptionPosition.Links_neben_Dem_Feld;
 
         var s = ExtText.MeasureString(_caption, Design.Caption, States.Standard, width);
 
@@ -185,8 +185,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    [DefaultValue(ÜberschriftAnordnung.ohne)]
-    public ÜberschriftAnordnung CaptionPosition {
+    [DefaultValue(CaptionPosition.ohne)]
+    public CaptionPosition CaptionPosition {
         get => _captionPosition;
         set {
             if (_captionPosition == value) { return; }
@@ -440,7 +440,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             case EditTypeFormula.nur_als_Text_anzeigen:
-                _captionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+                _captionPosition = CaptionPosition.Links_neben_Dem_Feld;
                 Control_Create_Caption();
                 break;
 
@@ -869,7 +869,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private void Control_Create_Caption() {
-        if (_captionPosition == ÜberschriftAnordnung.ohne) { return; }
+        if (_captionPosition == CaptionPosition.ohne) { return; }
         if (_captionObject == null) {
             _captionObject = new Caption();
             Controls.Add(_captionObject);
@@ -886,7 +886,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden;
         }
 
-        if (_captionPosition == ÜberschriftAnordnung.Ohne_mit_Abstand) {
+        if (_captionPosition == CaptionPosition.Ohne_mit_Abstand) {
             _captionObject.Text = " ";
         } else {
             _captionObject.Text = _caption;
@@ -1038,14 +1038,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private void StandardBehandlung(Control control) {
         Control_Create_Caption();
         switch (_captionPosition) {
-            case ÜberschriftAnordnung.ohne:
+            case CaptionPosition.ohne:
                 control.Left = 0;
                 control.Top = 0;
                 control.Width = Width;
                 control.Height = Height;
                 break;
 
-            case ÜberschriftAnordnung.Links_neben_Dem_Feld:
+            case CaptionPosition.Links_neben_Dem_Feld:
                 if (_captionObject != null) {
                     control.Left = Math.Max(_controlX, _captionObject.Width);
                     control.Top = 0;

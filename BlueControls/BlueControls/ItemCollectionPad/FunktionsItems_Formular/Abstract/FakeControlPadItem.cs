@@ -322,16 +322,16 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         }
     }
 
-    protected void DrawFakeControl(Graphics gr, RectangleF positionModified, float zoom, ÜberschriftAnordnung captionPosition, string captiontxt, EditTypeFormula edittype) {
+    protected void DrawFakeControl(Graphics gr, RectangleF positionModified, float zoom, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {
         Point cap;
         var uc = positionModified.ToRect();
 
         switch (captionPosition) {
-            case ÜberschriftAnordnung.ohne:
+            case CaptionPosition.ohne:
                 cap = new Point(-1, -1);
                 break;
 
-            case ÜberschriftAnordnung.Links_neben_Dem_Feld:
+            case CaptionPosition.Links_neben_Dem_Feld:
                 cap = new Point(0, 0);
                 uc.X += (int)(100 * zoom);
                 uc.Width -= (int)(100 * zoom);

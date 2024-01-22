@@ -72,6 +72,12 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
     public List<IControlAcceptSomething> Childs { get; } = [];
 
+    /// <summary>
+    /// Da die CaptionPosition von dem Steuerelemnt bei bedarf geämndert wird,
+    /// muss ein default angegeben werden - wie es normalerweise auszusehen hat.
+    /// </summary>
+    public CaptionPosition DefaultCaptionPosition { get; set; } = CaptionPosition.Links_neben_Dem_Feld;
+
     public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
         get => _filterart_bei_texteingabe;
         set {
@@ -169,7 +175,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         //base.CommandButton_Click(); // Nope, keine Ereignisse und auch nicht auf + setzen
         _doFilterDeleteButton = false;
 
-        if (CaptionPosition == ÜberschriftAnordnung.ohne) {
+        if (CaptionPosition == CaptionPosition.ohne) {
             FilterOutput.Clear();
             return;
         }
@@ -370,7 +376,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         //if (filterSingle == null) { return; }
         btn.Translate = false;
 
-        if (CaptionPosition == ÜberschriftAnordnung.ohne && filterSingle != null) {
+        if (CaptionPosition == CaptionPosition.ohne && filterSingle != null) {
             btn.ImageCode = "Trichter|16||1";
             btn.Text = filterSingle.ReadableText();
         } else {
@@ -442,9 +448,9 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         #endregion
 
-        DisabledReason = !string.IsNullOrEmpty(_origin) ? "Dieser Filter ist automatisch<br>gesetzt worden." : string.Empty;
+        DisabledReason = !string.IsNullOrEmpty(_origin) ? "Dieser Filter wurde<br>automatisch gesetzt." : string.Empty;
 
-        var showWählen = MustMenu();
+        //var showWählen = MustMenu();
 
         //var texteingabe = TextEntryAllowed();
 
@@ -452,8 +458,8 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         #region Wählen-Button - und keine weitere Berechnungen
 
-        if (showWählen) {
-            CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+        if (MustMenu()) {
+            CaptionPosition = DefaultCaptionPosition;
             Caption = FilterSingleColumn.ReadableText() + ":";
             EditType = EditTypeFormula.Button;
             return;
@@ -464,7 +470,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         #region Löschen-Button - und keine weiteren Berechnungen
 
         if (showDelFilterButton) {
-            CaptionPosition = ÜberschriftAnordnung.ohne;
+            CaptionPosition = CaptionPosition.ohne;
             EditType = EditTypeFormula.Button;
             return;
         }
@@ -474,15 +480,15 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         if (filterSingle != null) {
             if (filterSingle.FilterType == FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1) {
                 //texteingabe = true;
-                showWählen = false;
+                //showWählen = false;
                 nvalue = filterSingle.SearchValue[0];
             } else if (_filterart_bei_texteingabe == FlexiFilterDefaultFilter.Ist) {
                 //texteingabe = true;
-                showWählen = false;
+                //showWählen = false;
                 nvalue = filterSingle.SearchValue[0];
             } else if (filterSingle.FilterType is FilterType.Istgleich or FilterType.Istgleich_ODER_GroßKleinEgal) {
                 //texteingabe = false;
-                showWählen = false;
+                //showWählen = false;
             }
         }
 
@@ -499,7 +505,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         #region Text-Eingabefeld - und keine weitere Berechnungen
 
         //if (texteingabe) {
-        CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+        CaptionPosition = DefaultCaptionPosition;
         Caption = FilterSingleColumn.ReadableText() + ":";
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
         ValueSet(nvalue, true, true);
@@ -508,14 +514,14 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         #endregion
 
-        //CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+        //CaptionPosition = DefaultCaptionPosition;
         //Caption = FilterSingleColumn.ReadableText() + ":";
         //EditType = EditTypeFormula.nur_als_Text_anzeigen;
         //DisabledReason = "Hier keine Filterung möglich";
 
         //if (filterSingle != null) {
         //    if (filterSingle.FilterType == FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1) {
-        //        CaptionPosition = ÜberschriftAnordnung.Links_neben_Dem_Feld;
+        //        CaptionPosition = DefaultCaptionPosition;
         //        Caption = FilterSingleColumn.ReadableText() + ":";
         //        EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
         //        ValueSet(filterSingle.SearchValue[0], true, true);

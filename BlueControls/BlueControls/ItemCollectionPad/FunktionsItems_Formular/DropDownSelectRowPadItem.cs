@@ -43,7 +43,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     private string _anzeige = string.Empty;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld_mit_Auswahlknopf;
     private string _überschrift = string.Empty;
-    private ÜberschriftAnordnung _überschriftanordung = ÜberschriftAnordnung.Über_dem_Feld;
+    private CaptionPosition _überschriftanordung = CaptionPosition.Über_dem_Feld;
 
     #endregion
 
@@ -81,7 +81,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
 
     public bool AutoSizeableHeight => false;
 
-    public ÜberschriftAnordnung CaptionPosition {
+    public CaptionPosition CaptionPosition {
         get => _überschriftanordung;
         set {
             if (IsDisposed) { return; }
@@ -178,8 +178,8 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         ];
 
         var u = new ItemCollectionList.ItemCollectionList(false);
-        u.AddRange(typeof(ÜberschriftAnordnung));
-        l.Add(new FlexiControlForProperty<ÜberschriftAnordnung>(() => CaptionPosition, u));
+        u.AddRange(typeof(CaptionPosition));
+        l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
 
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
@@ -207,7 +207,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
                 return true;
 
             case "caption":
-                _überschriftanordung = (ÜberschriftAnordnung)IntParse(value);
+                _überschriftanordung = (CaptionPosition)IntParse(value);
                 return true;
 
             case "captiontext":
