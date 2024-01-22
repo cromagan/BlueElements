@@ -38,8 +38,8 @@ public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
     public FilterCollection? FilterInput { get; set; }
 
     /// <summary>
+    /// Bedeutet, dass kein Parent vorhanden ist - und der Filter anderweitig gesetzt wurde. Z.B. durch SetRow
     /// Wenn TRUE, sollte der Input Filter nicht mehr von den Parents verändert werden.
-    /// Wird z.B. durch SetToRow gesetzt.
     /// </summary>
     public bool FilterManualSeted { get; set; }
 
@@ -128,8 +128,7 @@ public static class IControlAcceptSomethingExtension {
         if (item.IsDisposed) { return; }
         if (item.FilterManualSeted) { return; }
 
-        item.FilterInput?.Dispose();
-        item.FilterInput = null;
+        item.Invalidate_FilterInput(true);
 
         if (item.Parents.Count == 0) { return; }
         if (item.Parents.Count == 1) {
@@ -171,6 +170,16 @@ public static class IControlAcceptSomethingExtension {
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Verwirft den aktuellen InputFilter.
+    /// </summary>
+    public static void Invalidate_FilterInput(this IControlAcceptSomething item, bool checkmanuelseted) {
+        if (item.IsDisposed) { return; }
+        if (checkmanuelseted && item.FilterManualSeted) { return; }
+        item.FilterInput?.Dispose();
+        item.FilterInput = null;
     }
 
     public static void SetToRow(this IControlAcceptSomething item, RowItem? row) {

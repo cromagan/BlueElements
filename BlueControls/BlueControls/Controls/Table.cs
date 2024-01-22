@@ -1376,9 +1376,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             if (disposing) {
                 Filter.Changed -= Filter_Changed;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
-                FilterInput?.Dispose();
+                this.Invalidate_FilterInput(false);
                 FilterOutput.Dispose();
-                FilterInput = null;
             }
         } finally {
             base.Dispose(disposing);

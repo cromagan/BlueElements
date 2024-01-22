@@ -53,14 +53,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
     #region Methods
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        FilterInput?.Dispose();
         this.DoInputFilter();
-        Invalidate();
-
-        if (FilterInput == null || FilterOutput.Database != FilterInput.Database) {
-            FilterOutput.Clear();
-            return;
-        }
 
         FilterOutput.ChangeTo(FilterInput);
     }
@@ -75,9 +68,8 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            FilterInput?.Dispose();
+            this.Invalidate_FilterInput(false);
             FilterOutput.Dispose();
-            FilterInput = null;
         }
         base.Dispose(disposing);
     }

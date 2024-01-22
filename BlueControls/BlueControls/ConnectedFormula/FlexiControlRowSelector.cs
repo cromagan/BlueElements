@@ -78,8 +78,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (FilterManualSeted) { Develop.DebugPrint("Steuerelement unterstützt keine manuellen Filter"); }
-        FilterInput?.Dispose();
-        FilterInput = null;
+        this.Invalidate_FilterInput(true);
         Invalidate();
     }
 
@@ -93,10 +92,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            //components?.Dispose();
-            FilterInput?.Dispose();
             FilterOutput.Dispose();
-            FilterInput = null;
+            this.Invalidate_FilterInput(false);
             Tag = null;
             Childs.Clear();
         }
@@ -145,7 +142,6 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
 
         #region Zeilen erzeugen
 
-        //FilterInput = this.FilterOfSender();
         if (FilterInput == null) { return; }
 
         var f = FilterInput.Rows;

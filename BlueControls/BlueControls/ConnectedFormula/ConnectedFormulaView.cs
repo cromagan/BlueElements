@@ -109,16 +109,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-
-        this.DoInputFilter();
+        this.Invalidate_FilterInput(true);
         Invalidate();
-
-        if (FilterInput == null || FilterOutput.Database != FilterInput.Database) {
-            FilterOutput.Clear();
-            return;
-        }
-
-        FilterOutput.ChangeTo(FilterInput);
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
@@ -283,9 +275,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     protected override void Dispose(bool disposing) {
         if (disposing) {
             OnDisposingEvent();
-            FilterInput?.Dispose();
             FilterOutput.Dispose();
-            FilterInput = null;
+            this.Invalidate_FilterInput(false);
             InitFormula(null, null);
         }
 
@@ -299,6 +290,12 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     protected override void DrawControl(Graphics gr, States state) {
         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
         GenerateView();
+
+        if (FilterInput == null) {
+            this.DoInputFilter();
+        }
+
+        FilterOutput.ChangeTo(FilterInput);
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
@@ -316,11 +313,6 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         if (_generated) {
             InvalidateView();
         }
-    }
-
-    protected override void OnVisibleChanged(System.EventArgs e) {
-        base.OnVisibleChanged(e);
-        GenerateView();
     }
 
     private void _cf_Changed(object sender, System.EventArgs e) => InvalidateView();

@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 
 namespace BlueControls.Controls {
     partial class FileBrowser {
@@ -20,8 +21,7 @@ namespace BlueControls.Controls {
             RemoveWatcher();
             if (disposing && (components != null)) {
                 components?.Dispose();
-                FilterInput?.Dispose();
-                FilterInput = null;
+                this.Invalidate_FilterInput(false);
             }
             base.Dispose(disposing);
         }

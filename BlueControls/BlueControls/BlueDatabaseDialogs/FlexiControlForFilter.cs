@@ -58,12 +58,10 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         Size = new Size(204, 24);
         AlwaysInstantChange = true;
         FilterSingleColumn = column;
-        FilterInput = null;
+        this.Invalidate_FilterInput(true);
         ShowInfoWhenDisabled = true;
         _origin = string.Empty;
         OnValueChanged();
-        //UpdateFilterData();
-        //FilterSingle.Changed += FilterSingle_Changed;
     }
 
     #endregion
@@ -132,8 +130,6 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (FilterManualSeted) { Develop.DebugPrint("Steuerelement unterstützt keine manuellen Filter"); }
-        FilterInput?.Dispose();
-        FilterInput = null;
         this.DoInputFilter();
 
         var filterSingle = FilterInput?[FilterSingleColumn];
@@ -205,21 +201,13 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         base.Dispose(disposing);
 
         if (disposing) {
-            FilterInput?.Dispose();
             FilterOutput.Dispose();
-            FilterInput = null;
+            this.Invalidate_FilterInput(false);
             Tag = null;
             Childs.Clear();
         }
     }
 
-    //protected override void DrawControl(Graphics gr, States state) {
-    //    if (FilterInput == null) {
-    //        //UpdateMyCollection();
-    //        UpdateFilterData();
-    //    }
-    //    base.DrawControl(gr, state);
-    //}
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
 
@@ -513,105 +501,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
         //}
 
         #endregion
-
-        //CaptionPosition = DefaultCaptionPosition;
-        //Caption = FilterSingleColumn.ReadableText() + ":";
-        //EditType = EditTypeFormula.nur_als_Text_anzeigen;
-        //DisabledReason = "Hier keine Filterung möglich";
-
-        //if (filterSingle != null) {
-        //    if (filterSingle.FilterType == FilterType.Instr_GroßKleinEgal && filterSingle.SearchValue.Count == 1) {
-        //        CaptionPosition = DefaultCaptionPosition;
-        //        Caption = FilterSingleColumn.ReadableText() + ":";
-        //        EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-        //        ValueSet(filterSingle.SearchValue[0], true, true);
-        //        showDelFilterButton = false;
-        //        showWählen = false;
-        //    }
-
-        //    if (showWählen && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal) {
-        //        showDelFilterButton = false;
-        //    }
-        //}
     }
 
     #endregion
-
-    //private bool HasItem() {
-    //    var cb = GetComboBox();
-    //    return cb != null && cb.Item[Value] != null;
-    //}
-
-    //private void UpdateMyCollection() {
-    //    //if (IsDisposed) { return; }
-    //    //if (!Allinitialized) { _ = CreateSubControls(); }
-
-    //    //this.DoInputFilter();
-
-    //    //#region Combobox suchen
-
-    //    //ComboBox? cb = null;
-    //    //foreach (var thiscb in Controls) {
-    //    //    if (thiscb is ComboBox cbx) { cb = cbx; break; }
-    //    //}
-
-    //    //#endregion
-
-    //    //if (cb == null) { return; }
-
-    //    //List<AbstractListItem> ex = [.. cb.Item];
-
-    //    //#region Zeilen erzeugen
-
-    //    ////FilterInput = this.FilterOfSender();
-    //    //if (FilterInput == null) { return; }
-
-    //    //var f = FilterInput.Rows;
-    //    //foreach (var thisR in f) {
-    //    //    if (cb?.Item?[thisR.KeyName] == null) {
-    //    //        var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
-    //    //        _ = cb?.Item?.Add(tmpQuickInfo, thisR.KeyName);
-    //    //        //cb.Item.Add(thisR, string.Empty);
-    //    //    } else {
-    //    //        foreach (var thisIt in ex) {
-    //    //            if (thisIt.KeyName == thisR.KeyName) {
-    //    //                _ = ex.Remove(thisIt);
-    //    //                break;
-    //    //            }
-    //    //        }
-    //    //    }
-    //    //}
-
-    //    //#endregion
-
-    //    //#region Veraltete Zeilen entfernen
-
-    //    //foreach (var thisit in ex) {
-    //    //    cb?.Item?.Remove(thisit);
-    //    //}
-
-    //    //#endregion
-
-    //    //#region Nur eine Zeile? auswählen!
-
-    //    //// nicht vorher auf null setzen, um Blinki zu vermeiden
-    //    //if (cb?.Item != null && cb.Item.Count == 1) {
-    //    //    ValueSet(cb.Item[0].KeyName, true, true);
-    //    //}
-
-    //    //if (cb?.Item == null || cb.Item.Count < 2) {
-    //    //    DisabledReason = "Keine Auswahl möglich.";
-    //    //} else {
-    //    //    DisabledReason = string.Empty;
-    //    //}
-
-    //    //#endregion
-
-    //    //#region  Prüfen ob die aktuelle Auswahl passt
-
-    //    //// am Ende auf null setzen, um Blinki zu vermeiden
-
-    //    //if (cb?.Item?[Value] == null) {
-    //    //    ValueSet(string.Empty, true, true);
-    //    //}
 }

@@ -64,9 +64,7 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
         if (disposing) {
-            FilterInput?.Dispose();
-            //FilterOutput.Dispose();
-            FilterInput = null;
+            this.Invalidate_FilterInput(false);
         }
     }
 

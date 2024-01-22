@@ -214,9 +214,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     protected override void Dispose(bool disposing) {
         try {
             if (disposing && components != null) {
-                FilterInput?.Dispose();
-                //FilterOutput.Dispose();
-                FilterInput = null;
+                this.Invalidate_FilterInput(false);
                 components?.Dispose();
             }
         } finally {
