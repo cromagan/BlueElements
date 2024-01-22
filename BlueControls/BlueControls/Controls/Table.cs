@@ -707,18 +707,17 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void CheckView() {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        var db = Database;
+        if (_mouseOverColumn?.Database != db) { _mouseOverColumn = null; }
+        if (_mouseOverRow?.Row.Database != db) { _mouseOverRow = null; }
+        if (CursorPosColumn?.Database != db) { CursorPosColumn = null; }
+        if (CursorPosRow?.Row.Database != db) { CursorPosRow = null; }
 
-        if (_arrangementNr != 1) {
+        if (_arrangementNr != 1 && db != null) {
             if (_arrangementNr >= db.ColumnArrangements.Count || CurrentArrangement == null || !db.PermissionCheck(CurrentArrangement.PermissionGroups_Show, null)) {
                 _arrangementNr = 1;
             }
         }
-
-        if (_mouseOverColumn != null && _mouseOverColumn.Database != db) { _mouseOverColumn = null; }
-        if (_mouseOverRow?.Row != null && _mouseOverRow?.Row.Database != db) { _mouseOverRow = null; }
-        if (CursorPosColumn != null && CursorPosColumn.Database != db) { CursorPosColumn = null; }
-        if (CursorPosRow?.Row != null && CursorPosRow?.Row.Database != db) { CursorPosRow = null; }
     }
 
     public void CollapesAll() {
@@ -3179,9 +3178,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                     case "filters":
                         Filter.Changed -= Filter_Changed;
                         Filter.Database = Database;
+                        var code = pair.Value.FromNonCritical();
                         Filter.Clear();
-                        Filter.Parse(pair.Value.FromNonCritical());
+                        Filter.Parse(code);
+                        Filter.ParseFinished(code);
                         Filter.Changed += Filter_Changed;
+                        Filter_Changed(this, System.EventArgs.Empty);
                         break;
 
                     case "sliderx":

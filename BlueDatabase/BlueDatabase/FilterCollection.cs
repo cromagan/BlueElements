@@ -439,6 +439,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         fi.Changing += Filter_Changing;
         fi.Changed += Filter_Changed;
         _internal.Add(fi);
+        Invalidate_FilteredRows();
     }
 
     private void AddAndRegisterEvents(List<FilterItem> fi) {
