@@ -99,6 +99,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     public RowItem? ShowingRow {
         get {
             if (IsDisposed) { return null; }
+            FilterOutput.ChangeTo(FilterInput);
             return FilterOutput.RowSingleOrNull;
         }
     }
@@ -208,6 +209,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         SuspendLayout();
 
         FilterOutput.Clear();
+        this.Invalidate_FilterInput(false);
 
         if (oldf != cf) {
             if (oldf != null) {

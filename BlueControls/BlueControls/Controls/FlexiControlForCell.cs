@@ -130,6 +130,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         this.Invalidate_FilterInput(true);
+        if (FilterManualSeted) { DoInputFilterNow(); }
         Invalidate();
     }
 
@@ -207,28 +208,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
         if (FilterInput == null) {
             if (Parent != null || FilterManualSeted) {
                 this.DoInputFilter();
-
-                if (FilterInput?.Database is Database db && _lastDB != db) {
-                    _lastDB = db;
-                    db.Cell.CellValueChanged += Database_CellValueChanged;
-                    db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
-                    db.Row.RowChecked += Database_RowChecked;
-                    db.Loaded += _Database_Loaded;
-                    db.DisposingEvent += _Database_Disposing;
-                    db.Disposed += _Database_Disposed;
-                }
-
-                UpdateColumnData();
-                SetValueFromCell();
-                CheckEnabledState();
-
-                var (_, row) = GetTmpVariables();
-                row?.CheckRowDataIfNeeded();
-
-                if (row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
-                    Database_RowChecked(this, rce);
-                }
-                SetValueFromCell();
+                DoInputFilterNow();
             }
         }
 
@@ -431,6 +411,30 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
             }
         }
         InfoText = newT;
+    }
+
+    private void DoInputFilterNow() {
+        if (FilterInput?.Database is Database db && _lastDB != db) {
+            _lastDB = db;
+            db.Cell.CellValueChanged += Database_CellValueChanged;
+            db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
+            db.Row.RowChecked += Database_RowChecked;
+            db.Loaded += _Database_Loaded;
+            db.DisposingEvent += _Database_Disposing;
+            db.Disposed += _Database_Disposed;
+        }
+
+        UpdateColumnData();
+        SetValueFromCell();
+        CheckEnabledState();
+
+        var (_, row) = GetTmpVariables();
+        row?.CheckRowDataIfNeeded();
+
+        if (row?.LastCheckedEventArgs is RowCheckedEventArgs rce) {
+            Database_RowChecked(this, rce);
+        }
+        SetValueFromCell();
     }
 
     private void FillCellNow() {

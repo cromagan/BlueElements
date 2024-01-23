@@ -199,9 +199,9 @@ public static class IControlAcceptSomethingExtension {
         if (item.FilterInput != null) {
             item.FilterInput.Clear();
             if (row == null) {
-                item.FilterInput.Add(new FilterItem());
+                item.FilterInput.ChangeTo(new FilterItem());
             } else {
-                item.FilterInput.Add(new FilterItem(row));
+                item.FilterInput.ChangeTo(new FilterItem(row));
             }
         }
         item.FilterInput_Changed(item, System.EventArgs.Empty);
