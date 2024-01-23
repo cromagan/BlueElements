@@ -1520,22 +1520,22 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         var ret = _caption;
         if (Database.Column.Any(thisColumnItem => thisColumnItem != null && thisColumnItem != this && string.Equals(thisColumnItem.Caption, _caption, StringComparison.OrdinalIgnoreCase))) {
-            var done = false;
+            //var done = false;
             if (!string.IsNullOrEmpty(_captionGroup3)) {
                 ret = _captionGroup3 + "/" + ret;
-                done = true;
+                //done = true;
             }
             if (!string.IsNullOrEmpty(_captionGroup2)) {
                 ret = _captionGroup2 + "/" + ret;
-                done = true;
+                //done = true;
             }
             if (!string.IsNullOrEmpty(_captionGroup1)) {
                 ret = _captionGroup1 + "/" + ret;
-                done = true;
+                //done = true;
             }
-            if (!done) {
-                ret = _name; //_Caption + " (" + _Name + ")";
-            }
+            //if (!done) {
+            //    ret = _name; //_Caption + " (" + _Name + ")";
+            //}
         }
         ret = ret.Replace("\n", "\r").Replace("\r\r", "\r");
         var i = ret.IndexOf("-\r", StringComparison.Ordinal);

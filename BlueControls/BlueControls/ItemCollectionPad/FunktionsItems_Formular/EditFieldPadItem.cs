@@ -46,6 +46,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     #region Fields
 
     private readonly ItemAcceptSomething _itemAccepts;
+    private bool _autoX = true;
 
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
 
@@ -78,6 +79,19 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             }
 
             return (int)UsedArea.Height > IAutosizableExtension.MinHeigthCapAndBox;
+        }
+    }
+
+    [DefaultValue(true)]
+    public bool AutoX {
+        get => _autoX;
+        set {
+            if (_autoX == value) { return; }
+            if (IsDisposed) { return; }
+            if (_autoX == value) { return; }
+            this.RaiseVersion();
+            _autoX = value;
+            OnChanged();
         }
     }
 
@@ -191,10 +205,11 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         //var ff = parent.SearchOrGenerate(rfw2);
 
-        var con = new FlexiControlForCell();
-        con.ColumnName = Column?.KeyName ?? string.Empty;
-        con.EditType = EditType;
-        con.CaptionPosition = CaptionPosition;
+        var con = new FlexiControlForCell {
+            ColumnName = Column?.KeyName ?? string.Empty,
+            EditType = EditType,
+            CaptionPosition = CaptionPosition
+        };
 
         con.DoInputSettings(parent, this);
         //con.DoOutputSettings(this);
@@ -232,6 +247,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         var u = new ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(CaptionPosition));
         l.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, u));
+        l.Add(new FlexiControlForProperty<bool>(() => AutoX));
         var b = new ItemCollectionList.ItemCollectionList(false);
         b.AddRange(GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
@@ -269,6 +285,10 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
             case "caption":
                 _überschriftanordung = (CaptionPosition)IntParse(value);
+                return true;
+
+            case "autodistance":
+                _autoX = value.FromPlusMinus();
                 return true;
         }
         return false;
@@ -335,6 +355,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         result.ParseableAdd("ColumnName", _columnName);
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _überschriftanordung);
+        result.ParseableAdd("AutoDistance", _autoX);
         return result.Parseable(base.ToString());
     }
 

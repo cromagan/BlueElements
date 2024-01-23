@@ -23,5 +23,6 @@ public enum CaptionPosition {
     ohne = 0,
     Links_neben_Dem_Feld = 1,
     Über_dem_Feld = 2,
-    Ohne_mit_Abstand = 3
+    LinksUnsichtbar_mit_Abstand = 3,
+    ObenUnsichtbar_mit_Abstand = 4
 }

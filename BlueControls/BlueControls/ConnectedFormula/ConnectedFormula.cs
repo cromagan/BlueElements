@@ -468,7 +468,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         List<IAutosizable> its = [];
 
         foreach (var thisc in padData) {
-            if (thisc.IsVisibleOnPage(page) && thisc is IAutosizable aas && aas.IsVisibleForMe()) {
+            if (thisc is IAutosizable aas && aas.IsVisibleForMe() && thisc.IsVisibleOnPage(page)) {
                 its.Add(aas);
             }
         }

@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -124,6 +125,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
         if (Width < 30 || Height < 10) { return; }
 
+        #region Zuerst alle Controls als unused markieren
+
         var unused = new List<Control>();
         foreach (var thisco in base.Controls) {
             if (thisco is Control c) {
@@ -131,13 +134,14 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
             }
         }
 
+        #endregion
+
         if (ConnectedFormula?.PadData != null) {
             var l = ResizeControls(ConnectedFormula.PadData, Width, Height, Page);
-
-            //var addfactor = Size.Width / ConnectedFormula.PadData.SheetSizeInPix.Width;
+            var autoc = new List<FlexiControlForCell>();
 
             foreach (var thisit in ConnectedFormula.PadData) {
-                if (thisit.IsVisibleOnPage(Page) && thisit is IItemToControl thisitco) {
+                if (thisit is IItemToControl thisitco && thisit.IsVisibleOnPage(Page)) {
                     var o = SearchOrGenerate(thisitco);
 
                     if (o != null) {
@@ -163,9 +167,17 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
                         if (thisit is TabFormulaPadItem c3) {
                             c3.CreateTabs((TabControl)o, this);
                         }
+
+                        if (o.Visible && o is FlexiControlForCell fo &&
+                           thisit is EditFieldPadItem efpi && efpi.AutoX &&
+                           efpi.CaptionPosition is BlueDatabase.Enums.CaptionPosition.Links_neben_Dem_Feld or
+                                                   BlueDatabase.Enums.CaptionPosition.LinksUnsichtbar_mit_Abstand) { autoc.Add(fo); }
                     }
                 }
             }
+
+            DoAutoX(autoc);
+
             _generated = true;
         }
 
@@ -322,6 +334,35 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
 
     private void _Database_DisposingEvent(object sender, System.EventArgs e) => InitFormula(null, null);
+
+    private void DoAutoX(List<FlexiControlForCell> autoc) {
+        if (autoc.Count == 0) { return; }
+
+        var undone = new List<FlexiControlForCell>();
+        var dohere = new List<FlexiControlForCell>();
+
+        var left = autoc[0];
+
+        foreach (var thisIt in autoc) {
+            if (thisIt.Left < left.Left) { left = thisIt; }
+        }
+
+        var cx = -1;
+        foreach (var thisIt in autoc) {
+            if (thisIt.Left == left.Left && thisIt.Width == left.Width) {
+                cx = Math.Max(cx, FlexiControl.MeasureStringOfCaption(thisIt.Caption).ToSize().Width + 1);
+                dohere.Add(thisIt);
+            } else {
+                undone.Add(thisIt);
+            }
+        }
+
+        foreach (var thisIt in dohere) {
+            thisIt.ControlX = cx;
+        }
+
+        if (undone.Count > 0) { DoAutoX(undone); }
+    }
 
     #endregion
 }

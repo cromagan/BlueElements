@@ -886,13 +886,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden;
         }
 
-        if (_captionPosition == CaptionPosition.Ohne_mit_Abstand) {
+        if (_captionPosition is CaptionPosition.LinksUnsichtbar_mit_Abstand
+                             or CaptionPosition.ObenUnsichtbar_mit_Abstand) {
             _captionObject.Text = " ";
         } else {
             _captionObject.Text = _caption;
         }
 
-        _captionObject.Size = ExtText.MeasureString(_captionObject.Text, Design.Caption, States.Standard, Width);//  _captionObject.TextRequiredSize();
+        _captionObject.Size = MeasureStringOfCaption(_captionObject.Text).ToSize();
         _captionObject.Left = 0;
         _captionObject.Top = 0;
         _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -1045,24 +1046,19 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 control.Height = Height;
                 break;
 
+            case CaptionPosition.LinksUnsichtbar_mit_Abstand:
             case CaptionPosition.Links_neben_Dem_Feld:
-                if (_captionObject != null) {
-                    control.Left = Math.Max(_controlX, _captionObject.Width);
-                    control.Top = 0;
-                    control.Width = Width - control.Left;
-                    control.Height = Height;
-                    //if (_captionObject.Width < 4) { Develop.DebugPrint("Caption Width zu klein"); }
-                }
+                control.Left = Math.Max(_controlX, MeasureStringOfCaption(_caption).ToSize().Width + 2);
+                control.Top = 0;
+                control.Width = Width - control.Left;
+                control.Height = Height;
                 break;
 
             default:
-                if (_captionObject != null) {
-                    control.Left = 0;
-                    control.Top = _captionObject.Height;
-                    control.Width = Width;
-                    control.Height = Height - _captionObject.Height;
-                    //if ( _captionObject.Height < 4) { Develop.DebugPrint("Caption Height zu klein"); }
-                }
+                control.Left = 0;
+                control.Top = Math.Max(_controlX, MeasureStringOfCaption(_caption).ToSize().Height + 2);
+                control.Width = Width;
+                control.Height = Height - _captionObject.Height;
                 break;
         }
         control.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
