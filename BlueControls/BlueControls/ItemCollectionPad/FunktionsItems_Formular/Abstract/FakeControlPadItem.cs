@@ -331,7 +331,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
                 cap = new Point(-1, -1);
                 break;
 
-            case CaptionPosition.Links_neben_Dem_Feld:
+            case CaptionPosition.Links_neben_dem_Feld_unsichtbar:
+            case CaptionPosition.Links_neben_dem_Feld:
                 cap = new Point(0, 0);
                 uc.X += (int)(100 * zoom);
                 uc.Width -= (int)(100 * zoom);

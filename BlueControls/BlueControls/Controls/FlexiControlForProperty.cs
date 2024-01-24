@@ -74,7 +74,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         GenFehlerText();
         _IdleTimer.Tick += Checker_Tick;
-        CaptionPosition = CaptionPosition.Links_neben_Dem_Feld;
+        CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
         EditType = EditTypeFormula.Textfeld;
         Size = new Size(200, 24);
 
@@ -113,7 +113,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                             MultiLine = true;
                             this.GetStyleFrom(FormatHolder.Text);
                         } else {
-                            CaptionPosition = CaptionPosition.Links_neben_Dem_Feld;
+                            CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
                             Size = new Size(200, 24);
                             MultiLine = false;
                             switch (_accessor) {

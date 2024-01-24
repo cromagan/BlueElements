@@ -170,8 +170,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
                         if (o.Visible && o is FlexiControlForCell fo &&
                            thisit is EditFieldPadItem efpi && efpi.AutoX &&
-                           efpi.CaptionPosition is BlueDatabase.Enums.CaptionPosition.Links_neben_Dem_Feld or
-                                                   BlueDatabase.Enums.CaptionPosition.LinksUnsichtbar_mit_Abstand) { autoc.Add(fo); }
+                           efpi.CaptionPosition is BlueDatabase.Enums.CaptionPosition.Links_neben_dem_Feld or
+                                                   BlueDatabase.Enums.CaptionPosition.Links_neben_dem_Feld_unsichtbar) { autoc.Add(fo); }
                     }
                 }
             }

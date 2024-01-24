@@ -74,7 +74,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
                 return (int)UsedArea.Height > IAutosizableExtension.MinHeigthCaption;
             }
 
-            if (_überschriftanordung is CaptionPosition.Links_neben_Dem_Feld or CaptionPosition.ohne) {
+            if (_überschriftanordung is CaptionPosition.Links_neben_dem_Feld or CaptionPosition.ohne) {
                 return (int)UsedArea.Height > IAutosizableExtension.MinHeigthTextBox;
             }
 

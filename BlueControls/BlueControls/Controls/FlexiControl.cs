@@ -119,7 +119,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         _editType = EditTypeFormula.nur_als_Text_anzeigen;
         _caption = captionText;
-        _captionPosition = CaptionPosition.Links_neben_Dem_Feld;
+        _captionPosition = CaptionPosition.Links_neben_dem_Feld;
 
         var s = ExtText.MeasureString(_caption, Design.Caption, States.Standard, width);
 
@@ -440,7 +440,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             case EditTypeFormula.nur_als_Text_anzeigen:
-                _captionPosition = CaptionPosition.Links_neben_Dem_Feld;
+                _captionPosition = CaptionPosition.Links_neben_dem_Feld;
                 Control_Create_Caption();
                 break;
 
@@ -491,9 +491,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <param name="updateControls"></param>
     /// <param name="doInstantChangedValue">Löst bei einer Werteänderung ValueChanged aus. Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
     /// <summary>
-    /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
-    /// Die Events werden Registriert und auch der Wert gesetzt.
-    /// </summary>
     protected override void DrawControl(Graphics gr, States state) {
         // Enabled wurde verdeckt!
         if (!Enabled) { state = States.Standard_Disabled; }
@@ -886,8 +883,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden;
         }
 
-        if (_captionPosition is CaptionPosition.LinksUnsichtbar_mit_Abstand
-                             or CaptionPosition.ObenUnsichtbar_mit_Abstand) {
+        if (_captionPosition is CaptionPosition.Links_neben_dem_Feld_unsichtbar
+                             or CaptionPosition.Über_dem_Feld_unsichtbar) {
             _captionObject.Text = " ";
         } else {
             _captionObject.Text = _caption;
@@ -1046,8 +1043,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 control.Height = Height;
                 break;
 
-            case CaptionPosition.LinksUnsichtbar_mit_Abstand:
-            case CaptionPosition.Links_neben_Dem_Feld:
+            case CaptionPosition.Links_neben_dem_Feld_unsichtbar:
+            case CaptionPosition.Links_neben_dem_Feld:
                 control.Left = Math.Max(_controlX, MeasureStringOfCaption(_caption).ToSize().Width + 2);
                 control.Top = 0;
                 control.Width = Width - control.Left;
@@ -1055,10 +1052,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             default:
+                var s = MeasureStringOfCaption(_caption).ToSize();
                 control.Left = 0;
-                control.Top = Math.Max(_controlX, MeasureStringOfCaption(_caption).ToSize().Height + 2);
+                control.Top = Math.Max(_controlX, s.Height + 2);
                 control.Width = Width;
-                control.Height = Height - _captionObject.Height;
+                control.Height = Height - s.Height - 2;
                 break;
         }
         control.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;

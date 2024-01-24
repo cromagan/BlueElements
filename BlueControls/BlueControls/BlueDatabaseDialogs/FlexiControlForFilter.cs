@@ -74,7 +74,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     /// Da die CaptionPosition von dem Steuerelemnt bei bedarf geämndert wird,
     /// muss ein default angegeben werden - wie es normalerweise auszusehen hat.
     /// </summary>
-    public CaptionPosition DefaultCaptionPosition { get; set; } = CaptionPosition.Links_neben_Dem_Feld;
+    public CaptionPosition DefaultCaptionPosition { get; set; } = CaptionPosition.Links_neben_dem_Feld;
 
     public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
         get => _filterart_bei_texteingabe;
