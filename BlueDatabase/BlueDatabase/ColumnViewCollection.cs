@@ -31,7 +31,7 @@ using static BlueBasics.Constants;
 
 namespace BlueDatabase;
 
-public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName {
+public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasDatabase, IHasKeyName, IReadableTextWithKey {
 
     #region Fields
 
@@ -67,7 +67,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public Database? Database { get; private set; }
 
-    //public event EventHandler? Changed;
     public bool IsDisposed { get; private set; }
 
     public string KeyName { get; set; }
@@ -227,9 +226,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public void Invalidate_HeadSize() {
-        _headSize = null;
-    }
+    public void Invalidate_HeadSize() => _headSize = null;
 
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);
 
@@ -325,6 +322,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         } while (true);
     }
 
+    public string ReadableText() => KeyName;
+
     /// <summary>
     /// Klappe alle Spalten ein, die in der ColumnListe vorhanden sind.
     /// Alle anderen werden ausgeklappt.
@@ -377,6 +376,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         if (_internal[index2].ViewType != ViewType.PermanentColumn) { _internal[index1].ViewType = ViewType.Column; }
     }
+
+    public QuickImage? SymbolForReadableText() => null;
 
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }

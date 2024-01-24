@@ -67,7 +67,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private readonly object _lockUserAction = new();
 
-    private int _arrangementNr = 1;
+    private string _arrangement = string.Empty;
 
     private AutoFilter? _autoFilter;
 
@@ -194,11 +194,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     [DefaultValue(1)]
     [Description("Welche Spaltenanordnung angezeigt werden soll")]
-    public int Arrangement {
-        get => _arrangementNr;
+    public string Arrangement {
+        get => _arrangement;
         set {
-            if (value != _arrangementNr) {
-                _arrangementNr = value;
+            if (value != _arrangement) {
+                _arrangement = value;
 
                 var ca = CurrentArrangement;
                 ca?.Invalidate_HeadSize();
@@ -215,11 +215,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public ColumnViewCollection? CurrentArrangement {
         get {
-            if (Database is not Database db || db.IsDisposed || db.ColumnArrangements.Count <= _arrangementNr) {
+            if (Database is not Database db || db.IsDisposed) { return null; }
+
+            if (string.IsNullOrEmpty(_arrangement)) {
+                if (db.ColumnArrangements.Count > 0) { return db.ColumnArrangements[1]; }
                 return null;
             }
 
-            return db.ColumnArrangements[_arrangementNr];
+            return db.ColumnArrangements.Get(_arrangement);
         }
     }
 
@@ -572,37 +575,34 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return i;
     }
 
-    public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, Database? database, int showingNo) {
-        //if (InvokeRequired) {
-        //    Invoke(new Action(() => WriteColumnArrangementsInto(columnArrangementSelector)));
-        //    return;
-        //}
-        if (columnArrangementSelector != null) {
-            columnArrangementSelector.Item.Clear();
-            columnArrangementSelector.Enabled = false;
-            columnArrangementSelector.DropDownStyle = ComboBoxStyle.DropDownList;
-        }
+    public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, Database? database, string showingKey) {
+        if (columnArrangementSelector == null || columnArrangementSelector.IsDisposed) { return; }
 
-        if (database is null || columnArrangementSelector == null) {
-            if (columnArrangementSelector != null) {
-                columnArrangementSelector.Enabled = false;
-                columnArrangementSelector.Text = string.Empty;
-            }
-            return;
-        }
+        columnArrangementSelector.Item.Clear();
+        columnArrangementSelector.Item.AutoSort = false;
+        columnArrangementSelector.DropDownStyle = ComboBoxStyle.DropDownList;
 
-        foreach (var thisArrangement in database.ColumnArrangements) {
-            if (thisArrangement != null) {
-                if (columnArrangementSelector != null && database.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
-                    _ = columnArrangementSelector.Item.Add(thisArrangement.KeyName, database.ColumnArrangements.IndexOf(thisArrangement).ToString());
+        if (database is Database db) {
+            foreach (var thisArrangement in db.ColumnArrangements) {
+                if (thisArrangement != null) {
+                    if (db.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
+                        _ = columnArrangementSelector.Item.Add(thisArrangement);
+                    }
                 }
             }
         }
 
-        if (columnArrangementSelector != null) {
-            columnArrangementSelector.Enabled = columnArrangementSelector.Item.Count > 1;
-            columnArrangementSelector.Text = columnArrangementSelector.Item.Count > 0 ? showingNo.ToString() : string.Empty;
+        columnArrangementSelector.Enabled = columnArrangementSelector.Item.Count > 1;
+
+        if (columnArrangementSelector.Item[showingKey] == null) {
+            if (columnArrangementSelector.Item.Count > 1) {
+                showingKey = columnArrangementSelector.Item[1].KeyName;
+            } else {
+                showingKey = string.Empty;
+            }
         }
+
+        columnArrangementSelector.Text = showingKey;
     }
 
     public List<RowData> CalculateSortedRows(ICollection<RowItem> filteredRows, List<RowItem>? pinnedRows) {
@@ -713,10 +713,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (CursorPosColumn?.Database != db) { CursorPosColumn = null; }
         if (CursorPosRow?.Row.Database != db) { CursorPosRow = null; }
 
-        if (_arrangementNr != 1 && db != null) {
-            if (_arrangementNr >= db.ColumnArrangements.Count || CurrentArrangement == null || !db.PermissionCheck(CurrentArrangement.PermissionGroups_Show, null)) {
-                _arrangementNr = 1;
-            }
+        if (CurrentArrangement is ColumnViewCollection ca && db != null) {
+            if (!db.PermissionCheck(ca.PermissionGroups_Show, null)) { Arrangement = string.Empty; }
+        } else {
+            Arrangement = string.Empty;
         }
     }
 
@@ -1189,7 +1189,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _mouseOverRow = null;
         CursorPosColumn = null;
         CursorPosRow = null;
-        _arrangementNr = 1;
+        _arrangement = string.Empty;
         _unterschiede = null;
 
         Invalidate_AllColumnArrangements();
@@ -1357,7 +1357,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public string ViewToString() {
         List<string> result = [];
-        result.ParseableAdd("ArrangementNr", _arrangementNr);
+        result.ParseableAdd("Arrangement", _arrangement);
         result.ParseableAdd("Filters", (IStringable?)Filter);
         result.ParseableAdd("SliderX", SliderX.Value);
         result.ParseableAdd("SliderY", SliderY.Value);
@@ -3170,8 +3170,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (!string.IsNullOrEmpty(toParse)) {
             foreach (var pair in toParse.GetAllTags()) {
                 switch (pair.Key) {
+                    case "arrangement":
+                        Arrangement = pair.Value.FromNonCritical();
+                        break;
+
                     case "arrangementnr":
-                        Arrangement = IntParse(pair.Value);
                         break;
 
                     case "filters":

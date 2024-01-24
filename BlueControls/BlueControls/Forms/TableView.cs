@@ -39,6 +39,7 @@ using static BlueBasics.Develop;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
 using static BlueControls.Interfaces.IControlAcceptSomethingExtension;
+using static BlueBasics.Converter;
 
 namespace BlueControls.Forms;
 
@@ -323,15 +324,15 @@ public partial class TableView : FormWithStatusBar {
                         break;
 
                     case "maintab":
-                        ribMain.SelectedIndex = int.Parse(pair.Value);
+                        ribMain.SelectedIndex = IntParse(pair.Value);
                         break;
 
                     case "splitterx":
-                        SplitContainer1.SplitterDistance = int.Parse(pair.Value);
+                        SplitContainer1.SplitterDistance = IntParse(pair.Value);
                         break;
 
                     case "windowstate":
-                        //WindowState = (FormWindowState)int.Parse(pair.Value);
+                        //WindowState = (FormWindowState)IntParse(pair.Value);
                         break;
 
                     default:
@@ -853,23 +854,7 @@ public partial class TableView : FormWithStatusBar {
         _ = db.Row.Remove(Table.Filter, Table.PinnedRows, "Benutzer: Zeile löschen");
     }
 
-    private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (string.IsNullOrEmpty(cbxColumnArr.Text)) {
-            return;
-        }
-
-        Table.Arrangement = int.Parse(e.Item.KeyName);
-    }
-
-    //private void ChangeDatabase(Database? database) {
-    //    if (_originalDb != null) {
-    //        _originalDb.DisposingEvent -= _originalDB_Disposing;
-    //    }
-
-    //    _originalDb = null;
-    //    //CheckDatabase(database, System.EventArgs.Empty);
-    //    Check_OrderButtons();
-    //}
+    private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => Table.Arrangement = e.Item.KeyName;
 
     private void Check_OrderButtons() {
         if (InvokeRequired) {

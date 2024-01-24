@@ -243,8 +243,9 @@ public partial class ConnectedFormulaEditor : PadEditor {
         var n = InputBox.Show("Formular-Name:");
         if (string.IsNullOrEmpty(n)) { return; }
 
-        var it = new RowEntryPadItem(string.Empty);
-        it.Page = n;
+        var it = new RowEntryPadItem(string.Empty) {
+            Page = n
+        };
         Pad.Item?.Add(it);
         CFormula?.Repair();
 

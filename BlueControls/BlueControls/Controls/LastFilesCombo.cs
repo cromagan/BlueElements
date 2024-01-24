@@ -38,6 +38,7 @@ public sealed class LastFilesCombo : ComboBox {
 
     #region Fields
 
+    private bool _loaded = false;
     private int _maxCount = 20;
     private bool _mustExists = true;
     private List<string> _settings = [];
@@ -99,6 +100,7 @@ public sealed class LastFilesCombo : ComboBox {
             s = s.Replace("\r", ";");
             s = s.Replace("\n", ";");
             if (!_mustExists || FileExists(fileName)) {
+                if (!_loaded) { LoadSettingsFromDisk(); }
                 if (_settings.Count > 0) { _settings.RemoveString(fileName, false); }
                 if (_settings.Count > 0) { _settings.RemoveString(s, false); }
                 _settings.Add(s);
@@ -116,7 +118,7 @@ public sealed class LastFilesCombo : ComboBox {
 
     protected override void OnHandleCreated(System.EventArgs e) {
         base.OnHandleCreated(e);
-        LoadSettingsFromDisk();
+        if (!_loaded) { LoadSettingsFromDisk(); }
         GenerateMenu();
     }
 
@@ -167,7 +169,9 @@ public sealed class LastFilesCombo : ComboBox {
             var t = File.ReadAllText(SettingsFileName(), Encoding.UTF8);
             t = t.RemoveChars("\n");
             _settings.AddRange(t.SplitAndCutByCr());
+            _loaded = true;
         }
+
     }
 
     private void SaveSettingsToDisk() {

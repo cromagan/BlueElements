@@ -171,7 +171,7 @@ public partial class VariableEditor : UserControl {
         //if (!Editabe) { x.Freeze("Nur Ansicht"); }
 
         tableVariablen.DatabaseSet(x, string.Empty);
-        tableVariablen.Arrangement = 1;
+        //tableVariablen.Arrangement = 1;
         filterVariablen.Table = tableVariablen;
 
         tableVariablen.CellValueChanged += TableVariablen_CellValueChanged;

@@ -100,6 +100,21 @@ public static partial class Extensions {
         return default;
     }
 
+    public static int IndexOf<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
+        if (string.IsNullOrEmpty(name)) { return -1; }
+
+        if (items != null) {
+            for (var z = 0; z < items.Count(); z++) {
+                var thisp = items.ElementAt(z);
+                if (thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase)) {
+                    return z;
+                }
+            }
+        }
+
+        return -1;
+    }
+
     public static bool IsDifferentTo<T>(this IEnumerable<T>? list1, IEnumerable<T>? list2) =>
                 // https://docs.microsoft.com/en-us/dotnet/api/system.linq.enumerable.sequenceequal?redirectedfrom=MSDN&view=netcore-3.1#System_Linq_Enumerable_SequenceEqual__1_System_Collections_Generic_IEnumerable___0__System_Collections_Generic_IEnumerable___0__
                 list1 != list2 && (list1 is null || list2 is null || !list1.SequenceEqual(list2));

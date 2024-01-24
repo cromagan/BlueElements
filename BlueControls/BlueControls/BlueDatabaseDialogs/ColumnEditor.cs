@@ -591,7 +591,7 @@ internal sealed partial class ColumnEditor {
 
             db.SortDefinition = new RowSortDefinition(db, "Spalte", false);
             tblFilterliste.DatabaseSet(db, string.Empty);
-            tblFilterliste.Arrangement = 1;
+            //tblFilterliste.Arrangement = 1;
 
             var t = db.Tags.Clone();
             t.TagSet("Filename", linkdb.ConnectionData.UniqueId);

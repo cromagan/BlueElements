@@ -271,7 +271,7 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         x.SortDefinition = new RowSortDefinition(x, "Index", true);
 
         tblUndo.DatabaseSet(x, string.Empty);
-        tblUndo.Arrangement = 1;
+        tblUndo.Arrangement = string.Empty;
 
         if (Database is Database db) {
             //if (!db.UndoLoaded) {

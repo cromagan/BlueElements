@@ -373,7 +373,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         var childs = new ListBox {
             AddAllowed = AddType.OnlySuggests,
             RemoveAllowed = true,
-            MoveAllowed = true
+            MoveAllowed = true,
+            AutoSort = false
         };
         childs.Suggestions.Clear();
 

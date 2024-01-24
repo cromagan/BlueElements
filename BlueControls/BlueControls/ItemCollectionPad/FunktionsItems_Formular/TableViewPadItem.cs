@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -28,6 +29,8 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using static System.Net.Mime.MediaTypeNames;
+using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -43,6 +46,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
     private readonly ItemAcceptSomething _itemAccepts;
     private readonly ItemSendSomething _itemSends;
 
+    private string _defaultView = string.Empty;
     private Filterausgabe _filterOutputType = Filterausgabe.Gewähle_Zeile;
 
     #endregion
@@ -110,6 +114,17 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
+    [DefaultValue("")]
+    public string Standard_Ansicht {
+        get => _defaultView;
+        set {
+            if (IsDisposed) { return; }
+            if (_defaultView == value) { return; }
+            _defaultView = value;
+            OnChanged();
+        }
+    }
+
     public bool WaitForDatabase => true;
     protected override int SaveOrder => 1;
 
@@ -145,12 +160,21 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = [];
 
-        var u = new ItemCollectionList.ItemCollectionList(false);
-        u.AddRange(typeof(Filterausgabe));
-        l.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
+        if (DatabaseOutput is Database db && !db.IsDisposed) {
+            var u = new ItemCollectionList.ItemCollectionList(false);
+            u.AddRange(typeof(Filterausgabe));
+            l.Add(new FlexiControlForProperty<Filterausgabe>(() => FilterOutputType, u));
 
-        l.Add(new FlexiControl());
+            var u2 = new ItemCollectionList.ItemCollectionList(false) {
+                AutoSort = false
+            };
+            foreach (var thisC in db.ColumnArrangements) {
+                u2.Add(thisC);
+            }
+            l.Add(new FlexiControlForProperty<string>(() => Standard_Ansicht, u2));
 
+            l.Add(new FlexiControl());
+        }
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
         l.Add(new FlexiControl());
@@ -171,7 +195,10 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         if (_itemAccepts.ParseThis(tag, value)) { return true; }
         switch (tag) {
             case "id":
-                //Id = IntParse(value);
+                return true;
+
+            case "defaultview":
+                _defaultView = value.FromNonCritical();
                 return true;
         }
         return false;
@@ -200,6 +227,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
+        result.ParseableAdd("DefaultView", _defaultView);
         return result.Parseable(base.ToString());
     }
 
