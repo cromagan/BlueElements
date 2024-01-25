@@ -46,7 +46,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
     private readonly ItemAcceptSomething _itemAccepts;
     private readonly ItemSendSomething _itemSends;
 
-    private string _defaultView = string.Empty;
+    private string _defaultArrangement = string.Empty;
     private Filterausgabe _filterOutputType = Filterausgabe.Gewähle_Zeile;
 
     #endregion
@@ -116,11 +116,11 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     [DefaultValue("")]
     public string Standard_Ansicht {
-        get => _defaultView;
+        get => _defaultArrangement;
         set {
             if (IsDisposed) { return; }
-            if (_defaultView == value) { return; }
-            _defaultView = value;
+            if (_defaultArrangement == value) { return; }
+            _defaultArrangement = value;
             OnChanged();
         }
     }
@@ -141,6 +141,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         con.DatabaseSet(DatabaseOutput, string.Empty);
         con.DoOutputSettings(this);
         con.DoInputSettings(parent, this);
+        con.Arrangement = _defaultArrangement;
         return con;
     }
 
@@ -197,8 +198,8 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
             case "id":
                 return true;
 
-            case "defaultview":
-                _defaultView = value.FromNonCritical();
+            case "defaultarrangement":
+                _defaultArrangement = value.FromNonCritical();
                 return true;
         }
         return false;
@@ -227,7 +228,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public override string ToString() {
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags(), .. _itemSends.ParsableTags()];
-        result.ParseableAdd("DefaultView", _defaultView);
+        result.ParseableAdd("DefaultArrangement", _defaultArrangement);
         return result.Parseable(base.ToString());
     }
 
