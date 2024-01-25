@@ -35,7 +35,7 @@ public class Method_AddRow : Method_Database {
     public override List<List<string>> Args => [StringVal, StringVal, BoolVal];
     public override string Command => "addrow";
     public override string Description => "Lädt eine andere Datenbank (Database) und erstellt eine neue Zeile.\r\nKeyValue muss einen Wert enthalten- zur Not kann UniqueRowId() benutzt werden.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
@@ -48,7 +48,7 @@ public class Method_AddRow : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));

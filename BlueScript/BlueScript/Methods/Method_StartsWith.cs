@@ -33,9 +33,9 @@ internal class Method_StartsWith : Method {
 
     public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
     public override string Command => "startswith";
-    public override string Description => "Prüft, ob der String mit einem der angegeben Strings startet.";
-    public override bool EndlessArgs => true;
+    public override string Description => "Prüft, ob der String mit einem der angegebenen Strings startet.";
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
@@ -47,7 +47,7 @@ internal class Method_StartsWith : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (attvar.ValueBoolGet(1)) {

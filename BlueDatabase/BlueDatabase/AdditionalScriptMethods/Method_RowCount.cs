@@ -34,8 +34,8 @@ public class Method_RowCount : Method {
     public override List<List<string>> Args => [FilterVar];
     public override string Command => "rowcount";
     public override string Description => "Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.";
-    public override bool EndlessArgs => true;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
@@ -47,7 +47,7 @@ public class Method_RowCount : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);

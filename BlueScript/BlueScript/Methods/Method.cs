@@ -53,8 +53,6 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     public abstract string Command { get; }
     public abstract string Description { get; }
 
-    public abstract bool EndlessArgs { get; }
-
     public string EndSequence {
         get {
             if (StartSequence == "(") {
@@ -74,6 +72,15 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     ///  Gibt die Syntax zurück, weil der Befehl selbst anders sein könnte. Z.B. Bei Variablan
     /// </summary>
     public string KeyName => Syntax;
+
+    /// <summary>
+    /// Gint an, ob und wie oft das letzte Argument wiederholt werden kann bzw. muss.
+    ///  -1 = das letzte Argument muss genau 1x vorhanden sein.
+    ///   0 = das letzte Argument darf fehlen oder öfters vorhanden sein (nicht implementiert)
+    ///   1 = das letzte Argument darf öfters vorhanden sein
+    /// > 2 = das letzte Argumengt muss mindestes so oft vorhanden sein.
+    /// </summary>
+    public abstract int LastArgMinCount { get; }    //TODO: 0 implementieren
 
     public abstract MethodType MethodType { get; }
     public abstract bool MustUseReturnValue { get; }
@@ -198,7 +205,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         } while (true);
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection? varcol, string attributText, List<List<string>> types, bool endlessArgs, LogData? ld, ScriptProperties scp) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(VariableCollection? varcol, string attributText, List<List<string>> types, int lastArgMinCount, LogData? ld, ScriptProperties? scp) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
                 ? new SplittedAttributesFeedback([])
@@ -208,7 +215,8 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         var attributes = SplitAttributeToString(attributText);
         if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler."); }
         if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
-        if (!endlessArgs && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
+        if (lastArgMinCount <= 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
+        if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount-1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
 
         //  Variablen und Routinen ersetzen
         VariableCollection feedbackVariables = [];
@@ -290,7 +298,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
         List<List<string>> sargs = [[Variable.Any_Plain]];
 
-        var attvar = SplitAttributeToVars(varCol, value, sargs, false, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, value, sargs, 0, infos.Data, scp);
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return new DoItFeedback(infos.Data, attvar.ErrorMessage); }
 
@@ -368,7 +376,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         co += "~~~~~~~~~~\r\n";
         for (var z = 0; z < Args.Count; z++) {
             co = co + "  - Argument " + (z + 1) + ": " + Args[z].JoinWith(", ");
-            if (z == Args.Count - 1 && EndlessArgs) {
+            if (z == Args.Count - 1 && LastArgMinCount > 0) {
                 co += " -> Dieses Argument kann beliebig oft wiederholt werden";
             }
             co += "\r\n";

@@ -34,8 +34,8 @@ internal class Method_Exists : Method {
     public override List<List<string>> Args => [[Variable.Any_Variable]];
     public override string Command => "exists";
     public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
-    public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
@@ -48,7 +48,7 @@ internal class Method_Exists : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         return !string.IsNullOrEmpty(attvar.ErrorMessage) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 

@@ -34,9 +34,8 @@ internal class Method_Exception : Method {
     public override List<List<string>> Args => [StringVal];
     public override string Command => "Exception";
     public override string Description => "Unterbricht das Skript mit einer Fehlermeldung.";
-    public override bool EndlessArgs => false;
-
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -49,7 +48,7 @@ internal class Method_Exception : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen."); }
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         return attvar.Attributes == null || attvar.Attributes.Count != 1 ? new DoItFeedback(infos.Data, "Die Ausführung wurde absichtlich abgebrochen.")
             : new DoItFeedback(infos.Data, "Abbruch durch Exception-Befehl: " + attvar.ValueStringGet(0));
     }

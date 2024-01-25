@@ -31,12 +31,14 @@ public class Method_SetError : Method_Database {
 
     public override List<List<string>> Args => [StringVal, [VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableFloat.ShortName_Variable, VariableBool.ShortName_Variable]];
     public override string Command => "seterror";
-    public override string Description => "Bei Zeilenprüfungen wird ein Fehler abgesetzt. Dessen Inhalt bestimmt die Nachricht. Die Spalten, die als fehlerhaft markiert werden sollen, müssen nachträglich als Variablennamen angegeben werden.";
 
-    public override bool EndlessArgs => true;
+    public override string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
+                                          "Die hier angegebenen Variablen müssen einer Spalte der Datenbank entsprechen.\r\n" +
+                                          "Diese werden dann als 'fehlerhaft' in der Datenbank-Zeile markiert, mit der hier\r\n" +
+                                          "angegebenen Nachricht.";
 
     public override bool GetCodeBlockAfter => false;
-
+    public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Database | MethodType.MyDatabaseRow;
 
     public override bool MustUseReturnValue => false;
@@ -50,7 +52,7 @@ public class Method_SetError : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         if (!SetErrorAllowed(varCol)) { return new DoItFeedback(infos.Data, "'SetError' nur bei FehlerCheck Routinen erlaubt."); }

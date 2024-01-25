@@ -35,7 +35,7 @@ internal class Method_IndexOf : Method {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "indexof";
     public override string Description => "Sucht im ersten String nach dem zweiten Strin und gibt dessen Position zurück. Wird er nicht gefunden, wird -1 zurück gegeben. Wird er an erster Position gefunden, wird 0 zurück gegeben. Groß und Kleinschreibung wird ignoriert.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
@@ -48,7 +48,7 @@ internal class Method_IndexOf : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var val = attvar.ValueStringGet(0);

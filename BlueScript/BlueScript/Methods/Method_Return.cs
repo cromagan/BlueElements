@@ -34,7 +34,7 @@ internal class Method_Return : Method {
     public override List<List<string>> Args => [];
     public override string Command => "return";
     public override string Description => "Beendet das Skript oder Unterskript ohne Fehler.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;

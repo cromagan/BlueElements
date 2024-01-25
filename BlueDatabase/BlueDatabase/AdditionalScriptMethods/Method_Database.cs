@@ -66,7 +66,7 @@ public abstract class Method_Database : Method {
         if (!IsValidTableName(tableName, false)) { return null; }
 
         var db = MyDatabase(scp)?.ConnectionDataOfOtherTable(tableName, false);
-        return GetById(db, false, null, true); // Freezed unnötog, da eh keine Scripte ausgeführt werden.
+        return GetById(db, false, null, true); // Freezed unnötiog, da eh keine Scripte ausgeführt werden.
     }
 
     #endregion

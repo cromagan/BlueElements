@@ -33,7 +33,7 @@ internal class Method_ImportCsv : Method_Database {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "importcsv";
     public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Datenbank.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.IO | MethodType.NeedLongTime;
@@ -47,7 +47,7 @@ internal class Method_ImportCsv : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var txt = attvar.ValueStringGet(0);

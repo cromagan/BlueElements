@@ -36,9 +36,8 @@ internal class Method_Export : Method_Database {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
     public override string Command => "export";
     public override string Description => "Exportiert die Datenbank im angegeben Format. Achtung, bei BDB wird immer die gesamte Datenbank exportiert und die angegebenen Attribute ingnoriert.";
-    public override bool EndlessArgs => true;
-
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.Database | MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -50,7 +49,7 @@ internal class Method_Export : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         #region  Filter ermitteln (allfi)

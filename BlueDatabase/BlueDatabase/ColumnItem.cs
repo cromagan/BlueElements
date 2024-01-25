@@ -2518,7 +2518,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (_linkedDatabase == null && IsValidTableName(_linkedDatabaseTableName, false)) {
             var sr = string.Empty;
             if (!string.IsNullOrEmpty(Database.FreezedReason)) { sr = "Vorgänger eingefroren"; }
-            _linkedDatabase = Database.GetOtherTable(_linkedDatabaseTableName, false, sr);
+            _linkedDatabase = Database.GetOtherTable(_linkedDatabaseTableName, false);
         }
 
         if (_linkedDatabase == null) {

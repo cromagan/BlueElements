@@ -145,7 +145,7 @@ public class VariableListString : Variable {
 
             //var infos = new CanDoFeedback(t, 0, string.Empty, string.Empty, string.Empty, null);
 
-            var l = Method.SplitAttributeToVars(vs, t, [[VariableString.ShortName_Plain]], true, null, scp);
+            var l = Method.SplitAttributeToVars(vs, t, [[VariableString.ShortName_Plain]], 1, null, scp);
             if (!string.IsNullOrEmpty(l.ErrorMessage)) { return null; }
 
             return l.Attributes.AllStringValues();

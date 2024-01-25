@@ -19,6 +19,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics;
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueScript.Enums;
 using BlueScript.Structures;
@@ -41,9 +42,8 @@ public class Method_CallDatabase : Method_Database {
         "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
         "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
-    public override bool EndlessArgs => true;
-
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -56,7 +56,7 @@ public class Method_CallDatabase : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var db = DatabaseOf(scp, attvar.ValueStringGet(0));
@@ -70,7 +70,16 @@ public class Method_CallDatabase : Method_Database {
 
         if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "CallDatabase im Testmodus deaktiviert."); }
 
-        var f = db.ExecuteScript(null, attvar.ValueStringGet(1), true, null, null);
+        #region Attributliste erzeugen
+
+        var a = new List<string>();
+        for (var z = 2; z < attvar.Attributes.Count; z++) {
+            if (attvar.Attributes[z] is VariableString vs1) { a.Add(vs1.ValueString); }
+        }
+
+        #endregion
+
+        var f = db.ExecuteScript(null, attvar.ValueStringGet(1), true, null, a);
 
         if (f.AllOk) {
             return new DoItFeedback(infos.Data, f.ProtocolText);

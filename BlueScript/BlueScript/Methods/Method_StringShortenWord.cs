@@ -36,7 +36,7 @@ internal class Method_StringShortenWord : Method {
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "stringshortenword";
     public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
@@ -50,7 +50,7 @@ internal class Method_StringShortenWord : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
         var txt = attvar.ValueStringGet(0);
         if (string.IsNullOrEmpty(txt)) {

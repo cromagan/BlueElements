@@ -34,7 +34,7 @@ public class Method_GenerateLayoutImage : Method_Database {
     public override List<List<string>> Args => [StringVal, FloatVal];
     public override string Command => "generatelayoutimage";
     public override string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.MyDatabaseRow | MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
@@ -47,7 +47,7 @@ public class Method_GenerateLayoutImage : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         #region  Meine Zeile ermitteln (r)

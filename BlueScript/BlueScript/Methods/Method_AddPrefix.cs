@@ -34,7 +34,7 @@ internal class Method_AddPrefix : Method {
     public override List<List<string>> Args => [ListStringVar, StringVal];
     public override string Command => "addprefix";
     public override string Description => "Fügt am Anfang jedes Listenobjekts einen Text hinzu.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
@@ -48,7 +48,7 @@ internal class Method_AddPrefix : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(infos.Data); }

@@ -36,8 +36,8 @@ internal class Method_FreeFileName : Method {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "freefilename";
     public override string Description => "Gibt einen zufälligen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.";
-    public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.IO;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
@@ -49,7 +49,7 @@ internal class Method_FreeFileName : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
 
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 

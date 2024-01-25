@@ -36,7 +36,7 @@ internal class Method_BitmapToBase64 : Method {
     public override List<List<string>> Args => [[VariableBitmap.ShortName_Variable], StringVal];
     public override string Command => "bitmaptobase64";
     public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
@@ -49,7 +49,7 @@ internal class Method_BitmapToBase64 : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         string x;

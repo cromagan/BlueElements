@@ -33,9 +33,8 @@ public class Method_SoftMessage : Method_Database {
     public override List<List<string>> Args => [StringVal];
     public override string Command => "softmessage";
     public override string Description => "Gibt in der Statusleiste einen Nachricht aus, wenn ein Steuerelement vorhanden ist, dass diese anzeigen kann.";
-    public override bool EndlessArgs => true;
-
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Database;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -48,7 +47,7 @@ public class Method_SoftMessage : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         var db = MyDatabase(scp);

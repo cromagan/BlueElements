@@ -32,7 +32,7 @@ public class Method_CellGetRow : Method_Database {
     public override List<List<string>> Args => [StringVal, RowVar];
     public override string Command => "cellgetrow";
     public override string Description => "Gibt den Wert einer Zelle zurück\r\nÄhnlicher Befehl: Lookup";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
@@ -45,7 +45,7 @@ public class Method_CellGetRow : Method_Database {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) {
             return DoItFeedback.AttributFehler(infos.Data, this, attvar);
         }

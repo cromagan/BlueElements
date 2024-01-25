@@ -34,20 +34,20 @@ internal class Method_Count : Method {
     public override List<List<string>> Args => [ListStringVar];
     public override string Command => "count";
     public override string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
-    public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFloat.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "Count(List-Variable)";
+    public override string Syntax => "Count(ListVariable)";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         return !string.IsNullOrEmpty(attvar.ErrorMessage)
             ? DoItFeedback.AttributFehler(infos.Data, this, attvar)
             : new DoItFeedback(attvar.ValueListStringGet(0).Count);

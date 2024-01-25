@@ -34,7 +34,7 @@ internal class Method_Break : Method {
     public override List<List<string>> Args => [];
     public override string Command => "break";
     public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard | MethodType.Break;
     public override bool MustUseReturnValue => false;

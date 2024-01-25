@@ -52,7 +52,7 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
     List<int> InputColorId { get; }
 
     /// <summary>
-    /// Wenn True, können Variabelen einer Zeile Benutzt werden.
+    /// Wenn True, können Variablen einer Zeile Benutzt werden.
     /// Das heißt aber auch, dass die Filter nur eine Zeile ausspucken dürfen.
     /// Wird aktuell nur für die Description des Skript-Editors benutzt
     /// </summary>

@@ -34,7 +34,7 @@ internal class Method_Var : Method {
     public override List<List<string>> Args => [[Variable.Any_Plain]];
     public override string Command => "var";
     public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;

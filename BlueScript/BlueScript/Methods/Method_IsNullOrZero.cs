@@ -34,7 +34,7 @@ internal class Method_IsNullOrZero : Method {
     public override List<List<string>> Args => [[Variable.Any_Variable]];
     public override string Command => "isnullorzero";
     public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist, keinen Inhalt hat, oder dem Zahlenwert 0 entspricht. Falls die Variable existiert, muss diese dem Typ Numeral entsprechen.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
@@ -47,7 +47,7 @@ internal class Method_IsNullOrZero : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
 
         if (attvar.Attributes.Count == 0) {
             if (attvar.FehlerTyp != ScriptIssueType.VariableNichtGefunden) {

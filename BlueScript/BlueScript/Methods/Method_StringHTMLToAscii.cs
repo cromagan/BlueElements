@@ -35,7 +35,7 @@ internal class Method_StringHTMLToAscii : Method {
     public override List<List<string>> Args => [StringVal, BoolVal];
     public override string Command => "stringhtmltoascii";
     public override string Description => "Ersetzt einen HTML-String zu normalen ASCII-String. Beispiel: Aus &auml; wird ä. Dabei kann der Zeilenumbuch explicit ausgenommen werden.";
-    public override bool EndlessArgs => false;
+     public override int LastArgMinCount => -1;
 
     public override bool GetCodeBlockAfter => false;
     public override MethodType MethodType => MethodType.Standard;
@@ -49,7 +49,7 @@ internal class Method_StringHTMLToAscii : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         return string.IsNullOrEmpty(attvar.ErrorMessage) ? new DoItFeedback(infos.Data, attvar.ValueStringGet(0).HtmlSpecialToNormalChar(attvar.ValueBoolGet(1)))
             : DoItFeedback.AttributFehler(infos.Data, this, attvar);
     }

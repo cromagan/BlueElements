@@ -619,7 +619,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         #region Schauen, ob der Provider sie herstellen kann
 
         if (ci.Provider != null) {
-            var db = ci.Provider.GetOtherTable(ci.TableName, readOnly, ci.MustBeFreezed);
+            var db = ci.Provider.GetOtherTable(ci.TableName, readOnly);
             if (db != null) { return db; }
         }
 
@@ -1498,7 +1498,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return string.Empty;
     }
 
-    public Database? GetOtherTable(string tablename, bool readOnly, string freezedReason) {
+    public Database? GetOtherTable(string tablename, bool readOnly) {
         if (!IsValidTableName(tablename, false)) {
             Develop.DebugPrint(FehlerArt.Fehler, "Ungültiger Tabellenname: " + tablename);
             return null;

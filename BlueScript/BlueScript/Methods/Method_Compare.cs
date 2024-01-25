@@ -27,20 +27,23 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_EndsWith : Method {
+internal class Method_Compare : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
-    public override string Command => "endswith";
-    public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
+    public override List<List<string>> Args => [BoolVal, BoolVal, [VariableString.ShortName_Plain, VariableFloat.ShortName_Plain, VariableBool.ShortName_Plain]];
+    public override string Command => "compare";
+
+    public override string Description => "Diese Routine vergleicht Werte mit einander und gibt true zurück, wenn diese gleich sind. Dabei müssen die Datentypen übereinstimmen.\r\n" +
+                                           "Bei IgnoreNullOrEmpty wird bei Zahlen ebenfalls 0 ignoriert";
+
     public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 1;
+    public override int LastArgMinCount => 2;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string StartSequence => "(";
-    public override string Syntax => "EndsWith(String, CaseSensitive, Value1, Value2, ...)";
+    public override string Syntax => "Compare(IgnoreNullOrEmpty, CaseSensitive, Werte, ...);";
 
     #endregion
 
@@ -49,18 +52,44 @@ internal class Method_EndsWith : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
+
+        var ignorenull = attvar.ValueBoolGet(0);
+        var cases = attvar.ValueBoolGet(1);
+
+        string? firstval = null;
+
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.ValueBoolGet(1)) {
-                if (attvar.ValueStringGet(0).EndsWith(attvar.ValueStringGet(z))) {
-                    return DoItFeedback.Wahr();
-                }
-            } else {
-                if (attvar.ValueStringGet(0).ToLower().EndsWith(attvar.ValueStringGet(z).ToLower())) {
-                    return DoItFeedback.Wahr();
-                }
+            if (attvar.MyClassId(z) != attvar.MyClassId(2)) { return new DoItFeedback(infos.Data, "Variablentypen unterschiedlich."); }
+
+            var hasval = !ignorenull;
+            var val = string.Empty;
+
+            switch (attvar.Attributes[z]) {
+                case VariableFloat vf:
+                    if (!hasval && vf.ValueNum != 0) { hasval = true; }
+                    val = vf.ValueForReplace;
+                    break;
+
+                case VariableString vs:
+                    if (!hasval && !string.IsNullOrEmpty(vs.ValueString)) { hasval = true; }
+                    val = vs.ValueForReplace;
+                    break;
+
+                case VariableBool vb:
+                    hasval = true;
+                    val = vb.ValueForReplace;
+                    break;
+            }
+
+            if (hasval) {
+                if (!cases) { val = val.ToUpper(); }
+                firstval ??= val;
+
+                if (val != firstval) { return DoItFeedback.Falsch(); }
             }
         }
-        return DoItFeedback.Falsch();
+
+        return DoItFeedback.Wahr();
     }
 
     #endregion
