@@ -301,7 +301,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         switch (key) {
             case "filter":
 
-                var fi = new FilterItem(Database, value.FromNonCritical());
+                var fi = new FilterItem(value.FromNonCritical(), Database);
                 if (!Exists(fi)) { AddAndRegisterEvents(fi); }
 
                 return true;

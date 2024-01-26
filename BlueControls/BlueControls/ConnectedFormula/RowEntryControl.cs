@@ -53,7 +53,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
     #region Methods
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        this.DoInputFilter();
+        this.DoInputFilter(FilterOutput.Database);
 
         FilterOutput.ChangeTo(FilterInput);
     }

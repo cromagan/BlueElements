@@ -27,6 +27,7 @@ using BlueScript.Structures;
 using BlueScript.Variables;
 using CefSharp;
 using CefSharp.OffScreen;
+
 //using CefSharp.WinForms;
 
 namespace BlueScript.Methods;
@@ -40,8 +41,8 @@ internal class Method_WebPageScreenShot : Method_WebPage {
     public override List<List<string>> Args => [WebPageVal];
     public override string Command => "webpagescreenshot";
     public override string Description => "Gibt die aktuelle Anzeige der WebPage zurück. NULL falls irgendwas fehlschlägt";
-    public override bool EndlessArgs => false;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;
@@ -53,7 +54,7 @@ internal class Method_WebPageScreenShot : Method_WebPage {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
-        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, EndlessArgs, infos.Data, scp);
+        var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
         // Da es keine Möglichkeit gibt, eine Url Variable (außerhalb eines If) zu deklarieren,

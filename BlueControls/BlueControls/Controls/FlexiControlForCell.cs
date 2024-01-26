@@ -180,12 +180,28 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     }
 
     internal void CheckEnabledState() {
-        var (column, row) = GetTmpVariables();
+       var (column, row) = GetTmpVariables();
 
-        if (Parent == null || !Parent.Enabled || column == null || row == null) {
+        if (Parent == null ) {
+            DisabledReason = "Kein Bezug zu einem Formular.";
+            return;
+        }
+
+        if (!Parent.Enabled) {
+            DisabledReason = "Übergeordnetes Formular deaktiviert.";
+            return;
+        }
+
+        if (column == null) {
+            DisabledReason = "Kein Bezug zu einer Spalte.";
+            return;
+        }
+
+        if ( row == null) {
             DisabledReason = "Kein Bezug zu einer Zelle.";
             return;
         }
+
         DisabledReason = CellCollection.EditableErrorReason(column, row, EditableErrorReasonType.EditNormaly, true, false, true, false); // Rechteverwaltung einfliesen lassen.
     }
 
@@ -207,7 +223,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     protected override void DrawControl(Graphics gr, States state) {
         if (FilterInput == null) {
             if (Parent != null || FilterManualSeted) {
-                this.DoInputFilter();
+                this.DoInputFilter(null);
                 DoInputFilterNow();
             }
         }

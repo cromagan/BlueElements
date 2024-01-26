@@ -217,12 +217,17 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         get {
             if (Database is not Database db || db.IsDisposed) { return null; }
 
-            if (string.IsNullOrEmpty(_arrangement)) {
+            var l = db.ColumnArrangements.Get(_arrangement);
+            if (string.IsNullOrEmpty(_arrangement) || l == null) {
                 if (db.ColumnArrangements.Count > 0) { return db.ColumnArrangements[1]; }
                 return null;
             }
 
-            return db.ColumnArrangements.Get(_arrangement);
+
+            return l;
+
+
+
         }
     }
 
@@ -1057,7 +1062,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (Database is not Database db || db.IsDisposed) { return; }
 
-        this.DoInputFilter();
+        this.DoInputFilter(FilterOutput.Database);
 
         const string t = "Übergeordnetes Element";
 

@@ -18,11 +18,13 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueDatabase;
+using BlueDatabase.Enums;
 
 namespace BlueControls.Interfaces;
 
@@ -124,7 +126,7 @@ public static class IControlAcceptSomethingExtension {
     /// Verwirft den aktuellen InputFilter und erstellt einen neuen von allen Parents
     /// </summary>
     /// <param name="item"></param>
-    public static void DoInputFilter(this IControlAcceptSomething item) {
+    public static void DoInputFilter(this IControlAcceptSomething item, Database? mustbeDatabase) {
         if (item.IsDisposed) { return; }
         if (item.FilterManualSeted) { return; }
 
@@ -133,6 +135,11 @@ public static class IControlAcceptSomethingExtension {
         if (item.Parents.Count == 0) { return; }
         if (item.Parents.Count == 1) {
             if (item.Parents[0].FilterOutput.Clone("FilterOfSender") is FilterCollection fc2) {
+                if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {
+                    item.FilterInput = new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 1"), "Datenbanken inkonsitent");
+                    return;
+                }
+
                 item.FilterInput = fc2;
                 return;
             }
@@ -142,7 +149,12 @@ public static class IControlAcceptSomethingExtension {
 
         foreach (var thiss in item.Parents) {
             if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
-                fc ??= new FilterCollection(fi.Database, "filterofsedner");
+                if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
+                    item.FilterInput = new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 2"), "Datenbanken inkonsitent");
+                    return;
+                }
+
+                fc ??= new FilterCollection(fi.Database, "filterofsender");
                 fc.AddIfNotExists(fi);
             }
         }
@@ -199,7 +211,7 @@ public static class IControlAcceptSomethingExtension {
         if (item.FilterInput != null) {
             item.FilterInput.Clear();
             if (row == null) {
-                item.FilterInput.ChangeTo(new FilterItem());
+                item.FilterInput.ChangeTo(new FilterItem(item.FilterInput?.Database, "SetRow"));
             } else {
                 item.FilterInput.ChangeTo(new FilterItem(row));
             }

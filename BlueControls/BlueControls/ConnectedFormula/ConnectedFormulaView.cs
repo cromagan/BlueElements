@@ -306,7 +306,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         GenerateView();
 
         if (FilterInput == null) {
-            this.DoInputFilter();
+            this.DoInputFilter(FilterOutput.Database);
         }
 
         FilterOutput.ChangeTo(FilterInput);

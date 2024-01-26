@@ -130,18 +130,27 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (FilterManualSeted) { Develop.DebugPrint("Steuerelement unterstützt keine manuellen Filter"); }
-        this.DoInputFilter();
+        this.DoInputFilter(null);
 
         var filterSingle = FilterInput?[FilterSingleColumn];
 
         _origin = filterSingle?.Origin ?? string.Empty;
 
         if (filterSingle != null) {
-            _doFilterDeleteButton = filterSingle.FilterType is FilterType.Istgleich_GroßKleinEgal or FilterType.Istgleich_ODER_GroßKleinEgal;
+            _doFilterDeleteButton = filterSingle.FilterType is
+                FilterType.Istgleich_GroßKleinEgal or
+                FilterType.Istgleich_ODER_GroßKleinEgal or
+                FilterType.Istgleich_MultiRowIgnorieren or
+                FilterType.Ungleich_MultiRowIgnorieren;
 
             if (filterSingle.SearchValue.Count > 1) { _doFilterDeleteButton = true; }
 
-            ValueSet(filterSingle.SearchValue.JoinWithCr(), true, true);
+            var n = filterSingle.SearchValue.JoinWithCr();
+            if (Value == n) {
+                OnValueChanged(); // Sonst wird bei neuen Filtern wie Leere oder nichtleere nix verändert
+            } else {
+                ValueSet(n, true, true);
+            }
         } else {
             _doFilterDeleteButton = false;
             ValueSet(string.Empty, true, true);
@@ -250,7 +259,10 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         if (FilterSingleColumn != null) {
             if (string.IsNullOrEmpty(Value)) {
-                if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
+
+                if (_doFilterDeleteButton && FilterInput != null && FilterInput.Count == 1) {
+                    filterSingle = (FilterItem)FilterInput[0].Clone();
+                } else if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
                     filterSingle = new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, _origin);
                 } else {
                     filterSingle = null;

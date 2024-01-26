@@ -48,15 +48,16 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     /// <summary>
     /// Ein AlwaysFalse Filter
     /// </summary>
-    public FilterItem() {
-        Database = null;
+    public FilterItem(Database? database, string origin) {
+        Database = database;
         _filterType = FilterType.AlwaysFalse;
         _column = null;
         KeyName = string.Empty;
+        _origin = origin;
         SearchValue = new List<string>().AsReadOnly();
     }
 
-    public FilterItem(Database? db, string filterCode) {
+    public FilterItem(string filterCode, Database? db) {
         // Database?, weil always False keine Datenbank braucht
         Database = db;
 

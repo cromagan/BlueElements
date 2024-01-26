@@ -84,7 +84,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
     #region Methods
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        this.DoInputFilter();
+        this.DoInputFilter(null);
         Invalidate();
 
         var lastInputRow = FilterInput?.RowSingleOrNull;
@@ -92,7 +92,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
         if (lastInputRow == null || _outputcolumn == null || _inputcolumn == null) {
             if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
-                FilterOutput.ChangeTo(new FilterItem());
+                FilterOutput.ChangeTo(new FilterItem(FilterInput?.Database, "IO"));
             } else {
                 FilterOutput.Clear();
             }
@@ -103,7 +103,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
         var va = lastInputRow.CellGetString(_inputcolumn);
 
         if (string.IsNullOrEmpty(va) && _standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
-            FilterOutput.ChangeTo(new FilterItem());
+            FilterOutput.ChangeTo(new FilterItem(_outputcolumn?.Database, "IO2"));
             return;
         }
 
@@ -122,7 +122,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
                 break;
 
             default:
-                f = new FilterItem();
+                f = new FilterItem(_outputcolumn?.Database, "IO3");
                 break;
         }
 

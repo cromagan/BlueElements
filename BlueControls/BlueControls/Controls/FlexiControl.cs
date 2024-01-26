@@ -208,23 +208,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    /// <summary>
-    /// Info wird nur angezeigt, wenn ShowInfoWhenDisabled True ist
-    /// </summary>
-    [DefaultValue("")]
-    public string DisabledReason {
-        get => _disabledReason;
-        set {
-            if (_disabledReason == value) { return; }
-            _disabledReason = value;
-            foreach (Control thisControl in Controls) {
-                thisControl.Enabled = thisControl == _infoCaption || Enabled;
-            }
-            DoInfoTextCaption(_disabledReason);
-            Invalidate();
-        }
-    }
-
     [DefaultValue(EditTypeFormula.None)]
     public EditTypeFormula EditType {
         get => _editType;
@@ -373,6 +356,26 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Value { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Info wird nur angezeigt, wenn ShowInfoWhenDisabled True ist
+    /// </summary>
+    [DefaultValue("")]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    protected string DisabledReason {
+        get => _disabledReason;
+        set {
+            if (_disabledReason == value) { return; }
+            _disabledReason = value;
+            foreach (Control thisControl in Controls) {
+                thisControl.Enabled = thisControl == _infoCaption || Enabled;
+            }
+            DoInfoTextCaption(_disabledReason);
+            Invalidate();
+        }
+    }
 
     #endregion
 
