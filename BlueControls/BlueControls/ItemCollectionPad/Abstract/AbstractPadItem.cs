@@ -549,5 +549,4 @@ public abstract class AbstractPadItem : ParsebleItem, IParseable, ICloneable, IC
     private void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
-
 }

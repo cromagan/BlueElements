@@ -26,6 +26,8 @@ public class ScriptProperties {
 
     #region Constructors
 
+    public ScriptProperties() : this(MethodType.Standard, false, [], null) { }
+
     public ScriptProperties(MethodType allowedMethods, bool changeValues, List<string> scriptAttributes, object? additionalInfo) {
         AllowedMethods = allowedMethods;
         ChangeValues = changeValues;
@@ -33,12 +35,7 @@ public class ScriptProperties {
         AdditionalInfo = additionalInfo;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, MethodType allowedMethods) {
-        AllowedMethods = allowedMethods;
-        ChangeValues = scriptProperties.ChangeValues;
-        ScriptAttributes = scriptProperties.ScriptAttributes;
-        AdditionalInfo = scriptProperties.AdditionalInfo;
-    }
+    public ScriptProperties(ScriptProperties scriptProperties, MethodType allowedMethods) : this(allowedMethods, scriptProperties.ChangeValues, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo) { }
 
     #endregion
 

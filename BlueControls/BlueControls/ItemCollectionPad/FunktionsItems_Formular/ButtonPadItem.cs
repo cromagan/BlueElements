@@ -30,6 +30,10 @@ using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using BlueScript;
+using BlueScript.Methods;
+using BlueScript.Variables;
+using static BlueBasics.Converter;
 using Button = BlueControls.Controls.Button;
 
 #nullable enable
@@ -42,8 +46,13 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     private readonly ItemAcceptSomething _itemAccepts;
     private string _anzeige = string.Empty;
-    private int _enabledwhenrows;
+    private string _arg1 = string.Empty;
+    private string _arg2 = string.Empty;
+    private string _arg3 = string.Empty;
+    private string _arg4 = string.Empty;
+    private ButtonArgs _enabledwhenrows;
     private ExtText? _eTxt;
+    private string _image = string.Empty;
     private string _scriptname = string.Empty;
 
     #endregion
@@ -71,19 +80,76 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         }
     }
 
+    [Description("Das 1. Argument des Scriptes.")]
+    public string Arg1 {
+        get => _arg1;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg1 == value) { return; }
+            _arg1 = value;
+            OnChanged();
+        }
+    }
+
+    [Description("Das 2. Argument des Scriptes.")]
+    public string Arg2 {
+        get => _arg2;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg2 == value) { return; }
+            _arg2 = value;
+            OnChanged();
+        }
+    }
+
+    [Description("Das 3. Argument des Scriptes.")]
+    public string Arg3 {
+        get => _arg3;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg3 == value) { return; }
+            _arg3 = value;
+            OnChanged();
+        }
+    }
+
+    [Description("Das 4. Argument des Scriptes.")]
+    public string Arg4 {
+        get => _arg4;
+        set {
+            if (IsDisposed) { return; }
+            if (_arg4 == value) { return; }
+            _arg4 = value;
+            OnChanged();
+        }
+    }
+
     public bool AutoSizeableHeight => false;
+
+    [Description("Ein Bild für den Knopf. Beispiel: Pluszeichen|16")]
+    public string Bild {
+        get => _image;
+        set {
+            if (IsDisposed) { return; }
+            if (_image == value) { return; }
+            _image = value;
+            OnChanged();
+        }
+    }
+
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public Database? DatabaseInputMustBe => DatabaseInput;
+    public Database? DatabaseInputMustBe => null;
     public override string Description => "Ein Knopf, den der Benutzer drücken kann und ein Skript startet. Die eingehenden Filter stehen dann als Variable im Skript zur Verfügung.";
 
     [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert größer 1 als 'mehr als eine' gilt.")]
-    public int Drückbar_wenn {
+    public ButtonArgs Drückbar_wenn {
         get => _enabledwhenrows;
         set {
             if (IsDisposed) { return; }
             if (_enabledwhenrows == value) { return; }
             _enabledwhenrows = value;
             OnChanged();
+            UpdateSideOptionMenu();
         }
     }
 
@@ -147,23 +213,48 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
 
-        var sn = new ItemCollectionList.ItemCollectionList(true) {
-            "#Neue Zeile in der Datenbank anlegen"
-        };
+        l.Add(new FlexiControlForProperty<string>(() => Anzeige));
 
-        foreach (var thisScript in db.EventScript) {
-            sn.Add(thisScript.KeyName);
-        }
+        l.Add(new FlexiControlForProperty<string>(() => Bild));
 
-        l.Add(new FlexiControlForProperty<string>(() => SkriptName, sn));
+        //var sn = new ItemCollectionList.ItemCollectionList(true) {
+        //    "#Neue Zeile in der Datenbank anlegen"
+        //};
+
+        //foreach (var thisScript in db.EventScript) {
+        //    sn.Add(thisScript.KeyName);
+        //}
+
+        //l.Add(new FlexiControlForProperty<string>(() => SkriptName, sn));
 
         var za = new ItemCollectionList.ItemCollectionList(true) {
-            { "-1", "...egal - immer" },
-            { "0", "...keine Zeile gefunden wurde" },
-            { "1", "...genau eine Zeile gefunden wurde" }
+            {  "...egal - immer", ((int)ButtonArgs.Egal).ToString()},
+            {  "...keine Zeile gefunden wurde", ((int)ButtonArgs.Keine_Zeile).ToString()},
+            {  "...genau eine Zeile gefunden wurde", ((int)ButtonArgs.Genau_eine_Zeile).ToString()},
+             {  "...genau eine oder mehr Zeilen gefunden wurden",((int)ButtonArgs.Eine_oder_mehr_Zeilen).ToString() }
         };
 
-        l.Add(new FlexiControlForProperty<int>(() => Drückbar_wenn, za));
+        l.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za));
+
+        if (Script.Commands == null) {
+            var c = new Script(null, string.Empty, new BlueScript.Structures.ScriptProperties());
+        }
+
+        var co = new ItemCollectionList.ItemCollectionList(true);
+
+        if (Script.Commands != null) {
+            foreach (var cmd in Script.Commands) {
+                if (PossibleFor(cmd, Drückbar_wenn)) {
+                    co.Add(cmd);
+                }
+            }
+        }
+
+        l.Add(new FlexiControlForProperty<string>(() => SkriptName, co));
+        l.Add(new FlexiControlForProperty<string>(() => Arg1));
+        l.Add(new FlexiControlForProperty<string>(() => Arg2));
+        l.Add(new FlexiControlForProperty<string>(() => Arg3));
+        l.Add(new FlexiControlForProperty<string>(() => Arg4));
 
         return l;
     }
@@ -180,11 +271,107 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         if (_itemAccepts.ParseThis(tag, value)) { return true; }
 
         switch (tag) {
-            case "showformat":
+            case "caption":
                 _anzeige = value.FromNonCritical();
                 return true;
+
+            case "image":
+                _image = value.FromNonCritical();
+                return true;
+
+            case "arg1":
+                _arg1 = value.FromNonCritical();
+                return true;
+
+            case "arg2":
+                _arg2 = value.FromNonCritical();
+                return true;
+
+            case "arg3":
+                _arg3 = value.FromNonCritical();
+                return true;
+
+            case "arg4":
+                _arg4 = value.FromNonCritical();
+                return true;
+
+            case "enablewhenrows":
+                _enabledwhenrows = (ButtonArgs)IntParse(value);
+                return true;
+
+            case "scriptname":
+                _scriptname = value.FromNonCritical();
+                return true;
         }
+
+        //result.ParseableAdd("Caption", _anzeige);
+        //result.ParseableAdd("Image", _image);
+
+        //result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
+        //result.ParseableAdd("ScriptName", _scriptname);
+
         return false;
+    }
+
+    public bool PossibleFor(Method toCheck, ButtonArgs klickable_when) {
+        if (toCheck.GetCodeBlockAfter) { return false; }
+        if (toCheck.Args.Count == 0) { return false; }
+        if (toCheck.MustUseReturnValue) { return false; }
+
+        if (klickable_when is not ButtonArgs.Egal and
+                              not ButtonArgs.Genau_eine_Zeile) {
+            // Egal MUSS eine Zeile berechnen. Und da müssen am End die Filter rein
+            // Und DIESE müssen endlos erlaubt sein.
+            if (toCheck.LastArgMinCount < 1) { return false; }
+            if (toCheck.Args.Count > 4) { return false; }
+        } else {
+            if (toCheck.LastArgMinCount != -1) { return false; }
+            if (toCheck.Args.Count > 5) { return false; }
+        }
+
+        int? rowno = null;
+        int? fono = null;
+
+        for (var nr = 0; nr < toCheck.Args.Count; nr++) {
+            var thisarg = toCheck.Args[nr];
+
+            if (thisarg.Count != 1) { return false; }
+
+            if (thisarg[0] != VariableFloat.ShortName_Plain &&
+                thisarg[0] != VariableString.ShortName_Plain &&
+                thisarg[0] != VariableBool.ShortName_Plain &&
+                thisarg[0] != VariableFilterItem.ShortName_Variable &&
+                thisarg[0] != VariableRowItem.ShortName_Variable) { return false; }
+
+            if (thisarg[0] == VariableRowItem.ShortName_Variable) {
+                if (rowno != null) { return false; }
+                rowno = nr;
+            }
+
+            if (thisarg[0] == VariableFilterItem.ShortName_Variable) {
+                if (fono != null) { return false; }
+                fono = nr;
+            }
+        }
+
+        if (fono != null && rowno != null) { return false; }
+
+        if (klickable_when is ButtonArgs.Keine_Zeile or
+            ButtonArgs.Eine_oder_mehr_Zeilen) {
+            if (rowno != null) { return false; }
+            if (fono == null || fono != toCheck.Args.Count - 1) { return false; }
+        }
+
+        if (klickable_when == ButtonArgs.Genau_eine_Zeile) {
+            //Steuerung über Variablen möglich!
+            //if (rowno == null) { return false; }
+        }
+
+        if (klickable_when == ButtonArgs.Egal) {
+            if (fono != null || rowno != null) { return false; }
+        }
+
+        return true;
     }
 
     public override string ReadableText() {
@@ -209,7 +396,11 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         if (IsDisposed) { return string.Empty; }
         List<string> result = [.. _itemAccepts.ParsableTags()];
 
-        result.ParseableAdd("ShowFormat", _anzeige);
+        result.ParseableAdd("Caption", _anzeige);
+        result.ParseableAdd("Image", _image);
+
+        result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
+        result.ParseableAdd("ScriptName", _scriptname);
         return result.Parseable(base.ToString());
     }
 

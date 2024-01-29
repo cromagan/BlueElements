@@ -52,8 +52,8 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
     List<int> InputColorId { get; }
 
     /// <summary>
-    /// Wenn True, können Variablen einer Zeile Benutzt werden.
-    /// Das heißt aber auch, dass die Filter nur eine Zeile ausspucken dürfen.
+    /// Wenn True, können Variablen einer Zeile benutzt werden.
+    /// Das heißt aber auch, dass die eingehenden Filter nur eine Zeile ergeben dürfen.
     /// Wird aktuell nur für die Description des Skript-Editors benutzt
     /// </summary>
     public bool MustBeOneRow { get; }

@@ -22,11 +22,9 @@ using System;
 namespace BlueControls.Enums;
 
 [Flags]
-public enum FilterTypesToShow {
-    None = 0,
-    NachDefinierterAnsicht = 1,
-    AktuelleAnsicht_AktiveFilter = 2,
-
-    //NachDefinierterAnsichtStepByStep = 4,
-    DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter = NachDefinierterAnsicht | AktuelleAnsicht_AktiveFilter
+public enum ButtonArgs {
+    Egal = -1,
+    Keine_Zeile = 0,
+    Genau_eine_Zeile = 1,
+    Eine_oder_mehr_Zeilen = 2
 }

@@ -1944,8 +1944,8 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             var c = new List<ColumnItem>();
 
             foreach (var thisF in fi) {
-                if (thisF.Column != null && thisF.Column.IsInCache == null) {
-                    _ = c.AddIfNotExists(thisF.Column);
+                if (thisF.Column is ColumnItem ci && ci.IsInCache == null) {
+                    _ = c.AddIfNotExists(ci);
                 }
             }
             RefreshColumnsData(c);
