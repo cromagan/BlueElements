@@ -180,9 +180,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     }
 
     internal void CheckEnabledState() {
-       var (column, row) = GetTmpVariables();
+        var (column, row) = GetTmpVariables();
 
-        if (Parent == null ) {
+        if (Parent == null) {
             DisabledReason = "Kein Bezug zu einem Formular.";
             return;
         }
@@ -197,7 +197,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
             return;
         }
 
-        if ( row == null) {
+        if (row == null) {
             DisabledReason = "Kein Bezug zu einer Zelle.";
             return;
         }
@@ -223,7 +223,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     protected override void DrawControl(Graphics gr, States state) {
         if (FilterInput == null) {
             if (Parent != null || FilterManualSeted) {
-                this.DoInputFilter(null);
+                this.DoInputFilter(null, false);
                 DoInputFilterNow();
             }
         }

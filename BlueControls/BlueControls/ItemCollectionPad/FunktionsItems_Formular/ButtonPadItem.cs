@@ -30,6 +30,7 @@ using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Variables;
@@ -126,7 +127,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public bool AutoSizeableHeight => false;
 
-    [Description("Ein Bild für den Knopf. Beispiel: Pluszeichen|16")]
+    [Description("Ein Bild für den Knopf. Beispiel: PlusZeichen|16")]
     public string Bild {
         get => _image;
         set {
@@ -184,7 +185,10 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var con = new ConnectedFormulaButton();
+        var con = new ConnectedFormulaButton() {
+            Text = _anzeige,
+            ImageCode = _image,
+        };
 
         con.DoInputSettings(parent, this);
         //con.DoOutputSettings(this);
@@ -412,14 +416,39 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     }
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
-        if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
-        }
+        //if (!forPrinting) {
+        //    DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
+        //}
+
+        //if (!forPrinting) {
+        //    DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
+        //}
+
+        //if (Column  ==null || Column .IsDisposed) {
+        //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionModified.ToRect(), CaptionFnt.Scale(zoom), true);
+        //} else {
+        //DrawFakeControl(gr, positionModified, zoom, CaptionPosition, Column?.ReadableText() + ":", EditType);
+        //}
 
         _eTxt ??= new ExtText(Design.Button, States.Standard);
-        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(ImageCode.PlusZeichen), Alignment.Top_HorizontalCenter, false, _eTxt, "xxx", positionModified.ToRect(), false);
+        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt,_anzeige, positionModified.ToRect(), false);
 
-        base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+
+        if (!forPrinting) {
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false, true);
+        }
+
+        //base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
+
+        DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
+
+
+
+
+
+
+
+        //base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
 
     #endregion

@@ -69,7 +69,7 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
 
     /// <summary>
     /// Wenn DatabaseInputMustBe null zurück gibt, ob schon Filter gewählt werden dürfen.
-    /// Typischerweise false, wenn auf die Output-Database gewartet werden soll.
+    /// Typischerweise TRUE, wenn auf die Output-Database gewartet werden soll.
     /// </summary>
     public bool WaitForDatabase { get; }
 

@@ -84,7 +84,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
     #region Methods
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        this.DoInputFilter(null);
+        this.DoInputFilter(null, false);
         Invalidate();
 
         var lastInputRow = FilterInput?.RowSingleOrNull;

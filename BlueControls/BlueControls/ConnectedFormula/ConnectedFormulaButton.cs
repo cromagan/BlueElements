@@ -17,9 +17,10 @@
 
 #nullable enable
 
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueDatabase;
 
@@ -47,12 +48,13 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
     #region Methods
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        this.DoInputFilter(null);
+        this.Invalidate_FilterInput(true);
+        //if (FilterManualSeted) { DoInputFilterNow(); }
         Invalidate();
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) {
-        throw new NotImplementedException();
+        Enabled = false;
     }
 
     public void Parents_Added(bool hasFilter) {
@@ -69,4 +71,12 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
     }
 
     #endregion
+
+    //protected override void DrawControl(Graphics gr, States state) {
+    //    if (FilterInput == null) {
+    //        this.DoInputFilter
+    //    }
+
+    //    base.DrawControl(gr, state);
+    //}
 }

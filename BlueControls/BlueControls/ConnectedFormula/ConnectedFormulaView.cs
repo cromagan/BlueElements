@@ -306,7 +306,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         GenerateView();
 
         if (FilterInput == null) {
-            this.DoInputFilter(FilterOutput.Database);
+            this.DoInputFilter(FilterOutput.Database, false);
         }
 
         FilterOutput.ChangeTo(FilterInput);
@@ -350,7 +350,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         var cx = -1;
         foreach (var thisIt in autoc) {
             if (thisIt.Left == left.Left && thisIt.Width == left.Width) {
-                cx = Math.Max(cx, FlexiControl.MeasureStringOfCaption(thisIt.Caption).ToSize().Width + 1);
+                var s1 = BlueControls.Controls.Caption.RequiredTextSize(thisIt.Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, false, -1);
+                cx = Math.Max(cx, s1.Width + 1);
                 dohere.Add(thisIt);
             } else {
                 undone.Add(thisIt);

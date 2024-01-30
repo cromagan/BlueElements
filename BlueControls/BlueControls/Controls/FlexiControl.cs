@@ -121,10 +121,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         _caption = captionText;
         _captionPosition = CaptionPosition.Links_neben_dem_Feld;
 
-        var s = ExtText.MeasureString(_caption, Design.Caption, States.Standard, width);
+        //var s = ExtText.MeasureString(_caption, Design.Caption, States.Standard, width - 2);
 
         //var s = BlueFont.MeasureString(_caption, Skin.GetBlueFont(Design.Caption, States.Standard).Font());
-        Size = new Size(s.Width + 2, s.Height + 2);
+        //  Size = new Size(s.Width + 2, s.Height + 2);
+
+        Size = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Scrollen_mit_Textumbruch, Design.Caption, null, Translate, width);
     }
 
     #endregion
@@ -380,8 +382,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     #endregion
 
     #region Methods
-
-    public static SizeF MeasureStringOfCaption(string text) => Skin.GetBlueFont(Design.Caption, States.Standard).MeasureString(text);
 
     public void ValueSet(string? newvalue, bool updateControls, bool doInstantChangedValue) {
         if (IsDisposed) { return; }
@@ -876,31 +876,35 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
         _captionObject.Enabled = Enabled;
 
-        // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
-        // Text_abschneiden, wäre Cool, weil dann der Quickmode verfügbar ist
-
-        if (_editType == EditTypeFormula.nur_als_Text_anzeigen) {
-            // Kann alles sein, Beschriftung und was weiß ich.
-            _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
-        } else {
-            _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden;
-        }
-
-        if (_captionPosition is CaptionPosition.Links_neben_dem_Feld_unsichtbar
-                             or CaptionPosition.Über_dem_Feld_unsichtbar) {
-            _captionObject.Text = " ";
-        } else {
-            _captionObject.Text = _caption;
-        }
-
-        _captionObject.Size = MeasureStringOfCaption(_captionObject.Text).ToSize();
         _captionObject.Left = 0;
         _captionObject.Top = 0;
         _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
         _captionObject.Visible = true; // _captionPosition != ÜberschriftAnordnung.Ohne_mit_Abstand;
         _captionObject.Translate = _translateCaption;
+
+        // nicht SteuerelementVerhalten.Steuerelement_Anpassen! weil sonst beim einem Resize die Koordinaten geändert werden und das kann zum Ping Pong führen
+        // Text_abschneiden, wäre Cool, weil dann der Quickmode verfügbar ist
+
+        if (_captionPosition is CaptionPosition.Links_neben_dem_Feld_unsichtbar
+                     or CaptionPosition.Über_dem_Feld_unsichtbar) {
+            _captionObject.Text = " ";
+        } else {
+            _captionObject.Text = _caption;
+        }
+
+        if (_editType == EditTypeFormula.nur_als_Text_anzeigen) {
+            // Kann alles sein, Beschriftung und was weiß ich.
+            _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            _captionObject.Size = BlueControls.Controls.Caption.RequiredTextSize(_captionObject.Text, _captionObject.TextAnzeigeVerhalten, Design.Caption, null, false, Width);
+        } else {
+            _captionObject.TextAnzeigeVerhalten = SteuerelementVerhalten.Text_Abschneiden;
+            _captionObject.Size = _captionObject.RequiredTextSize();
+        }
+
         _captionObject.BringToFront();
     }
+
+    //public Size MeasureStringOfCaption(string text) => Skin.GetBlueFont(Design.Caption, States.Standard).MeasureString(text);
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
@@ -1048,18 +1052,22 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             case CaptionPosition.Links_neben_dem_Feld_unsichtbar:
             case CaptionPosition.Links_neben_dem_Feld:
-                control.Left = Math.Max(_controlX, MeasureStringOfCaption(_caption).ToSize().Width + 2);
+                var s1 = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+
+                control.Left = Math.Max(_controlX, s1.Width);
                 control.Top = 0;
                 control.Width = Width - control.Left;
                 control.Height = Height;
                 break;
 
             default:
-                var s = MeasureStringOfCaption(_caption).ToSize();
+                var s2 = BlueControls.Controls.Caption.RequiredTextSize(_caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+
+                //var s = MeasureStringOfCaption(_caption).ToSize();
                 control.Left = 0;
-                control.Top = Math.Max(_controlX, s.Height + 2);
+                control.Top = Math.Max(_controlX, s2.Height);
                 control.Width = Width;
-                control.Height = Height - s.Height - 2;
+                control.Height = Height - s2.Height;
                 break;
         }
         control.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;

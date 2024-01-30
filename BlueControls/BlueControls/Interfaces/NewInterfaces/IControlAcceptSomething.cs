@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -124,13 +125,19 @@ public static class IControlAcceptSomethingExtension {
     /// Verwirft den aktuellen InputFilter und erstellt einen neuen von allen Parents
     /// </summary>
     /// <param name="item"></param>
-    public static void DoInputFilter(this IControlAcceptSomething item, Database? mustbeDatabase) {
+    public static void DoInputFilter(this IControlAcceptSomething item, Database? mustbeDatabase, bool doEmptyFilterToo) {
         if (item.IsDisposed) { return; }
         if (item.FilterManualSeted) { return; }
 
         item.Invalidate_FilterInput(true);
 
-        if (item.Parents.Count == 0) { return; }
+        if (item.Parents.Count == 0) {
+            if (doEmptyFilterToo && mustbeDatabase != null) {
+                item.FilterInput = new FilterCollection(mustbeDatabase, "Empty Input Filter");
+            }
+            return;
+        }
+
         if (item.Parents.Count == 1) {
             if (item.Parents[0].FilterOutput.Clone("FilterOfSender") is FilterCollection fc2) {
                 if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {

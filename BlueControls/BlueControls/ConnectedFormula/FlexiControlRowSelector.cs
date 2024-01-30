@@ -125,7 +125,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
         if (IsDisposed) { return; }
         if (!Allinitialized) { _ = CreateSubControls(); }
 
-        this.DoInputFilter(null);
+        this.DoInputFilter(FilterOutput.Database, true);
 
         #region Combobox suchen
 

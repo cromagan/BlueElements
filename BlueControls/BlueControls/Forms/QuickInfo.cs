@@ -43,8 +43,8 @@ public partial class QuickInfo : FloatingForm {
     private QuickInfo(string text) : this() {
         //InitializeComponent();
         capTXT.Text = text;
-        var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-        var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+        var he = Math.Min(capTXT.RequiredTextSize().Height, (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+        var wi = Math.Min(capTXT.RequiredTextSize().Width, (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
         Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
         Visible = false;
         timQI.Enabled = true;

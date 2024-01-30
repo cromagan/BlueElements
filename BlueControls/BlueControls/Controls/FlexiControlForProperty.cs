@@ -29,6 +29,7 @@ using BlueControls.Enums;
 using BlueDatabase.Enums;
 using static BlueBasics.Converter;
 using static BlueBasics.Constants;
+using static System.Net.Mime.MediaTypeNames;
 
 #nullable enable
 
@@ -90,8 +91,9 @@ public class FlexiControlForProperty<T> : FlexiControl {
         switch (_accessor) {
             case Accessor<bool>: {
                     EditType = EditTypeFormula.Ja_Nein_Knopf;
-                    var s1 = MeasureStringOfCaption(Caption);
-                    Size = new Size((int)s1.Width + 30, 22);
+                    var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+
+                    Size = new Size(s1.Width + 30, 22);
                     break;
                 }
             default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
@@ -99,7 +101,9 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     if (list != null) {
                         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
                         list.Appearance = ListBoxAppearance.ComboBox_Textbox;
-                        var s2 = MeasureStringOfCaption(Caption);
+                        //var s2 = MeasureStringOfCaption(Caption);
+                        var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+
                         var (biggestItemX, biggestItemY, _, _) = list.ItemData(); // BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
                         var x2 = Math.Max((int)(biggestItemX + 20 + s2.Width), 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);

@@ -368,7 +368,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     protected override void DrawExplicit(Graphics gr, RectangleF positionModified, float zoom, float shiftX, float shiftY, bool forPrinting) {
         if (!forPrinting) {
-            DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false, false);
+            DrawColorScheme(gr, positionModified, zoom, InputColorId, true, true, false);
         }
 
         //if (Column  ==null || Column .IsDisposed) {

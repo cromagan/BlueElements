@@ -379,16 +379,6 @@ public sealed class ExtText : List<ExtChar>, IChangedFeedback, IDisposableExtend
         return Substring(s, e - s);
     }
 
-    internal static Size MeasureString(string text, Design design, States state, int width) {
-        var x = new ExtText(design, state) {
-            HtmlText = text,
-            Multiline = true,
-            TextDimensions = new Size(width, -1)
-        };
-
-        return x.LastSize();
-    }
-
     internal string ConvertCharToPlainText(int first, int last) {
         try {
             var T = new StringBuilder();

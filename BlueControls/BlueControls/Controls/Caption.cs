@@ -75,7 +75,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public new int Height {
         get => _textAnzeigeverhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen)
-            ? TextRequiredSize().Height
+            ? RequiredTextSize().Height
             : base.Height;
         set {
             GetDesign();
@@ -85,7 +85,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     public new Size Size {
-        get => _textAnzeigeverhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen) ? TextRequiredSize() : base.Size;
+        get => _textAnzeigeverhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen) ? RequiredTextSize() : base.Size;
         set {
             GetDesign();
             if (value.Width == base.Size.Width && value.Height == base.Size.Height) { return; }
@@ -139,7 +139,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public new int Width {
         get => _textAnzeigeverhalten.HasFlag(SteuerelementVerhalten.Steuerelement_Anpassen)
-            ? TextRequiredSize().Width
+            ? RequiredTextSize().Width
             : base.Width;
         set {
             GetDesign();
@@ -152,6 +152,22 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Methods
 
+    public static Size RequiredTextSize(string text, SteuerelementVerhalten textAnzeigeverhalten, Design design, ExtText? _eText, bool translate, int maxwidth) {
+        if (QuickModePossible(text, textAnzeigeverhalten)) {
+            var s = Skin.GetBlueFont(design, States.Standard).MeasureString(text);
+            return new Size((int)(s.Width + 1), (int)(s.Height + 1));
+        }
+
+        _eText ??= new ExtText(design, States.Standard);
+
+        _eText.Design = design;
+        _eText.HtmlText = LanguageTool.DoTranslate(text, translate);
+        _eText.Multiline = true;
+        _eText.TextDimensions = new Size(maxwidth, _eText.TextDimensions.Height);
+
+        return _eText?.LastSize() ?? new Size(1, 1);
+    }
+
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) => hotItem = null;
@@ -160,24 +176,22 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
+    public Size RequiredTextSize() {
+        if (_design == Design.Undefiniert) { GetDesign(); }
+
+        if (!QuickModePossible(_text, _textAnzeigeverhalten) && _eText == null) {
+            if (DesignMode) { Refresh(); }// Damit das Skin initialisiert wird
+            DrawControl(null, States.Standard);
+        }
+
+        return RequiredTextSize(_text, _textAnzeigeverhalten, _design, _eText, Translate, -1);
+    }
+
     public void ResetETextAndInvalidate() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
         _eText = null;
         //if (!QuickModePossible()) { SetDoubleBuffering(); }
         Invalidate();
-    }
-
-    public Size TextRequiredSize() {
-        if (QuickModePossible()) {
-            if (_design == Design.Undefiniert) { GetDesign(); }
-            var s = Skin.GetBlueFont(_design, States.Standard).MeasureString(_text);
-            return new Size((int)(s.Width + 1), (int)(s.Height + 1));
-        }
-        if (_eText == null) {
-            if (DesignMode) { Refresh(); }// Damit das Skin initialisiert wird
-            DrawControl(null, States.Standard);
-        }
-        return _eText?.LastSize() ?? new Size(1, 1);
     }
 
     protected override void DrawControl(Graphics? gr, States state) {
@@ -193,7 +207,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
             }
 
             if (!string.IsNullOrEmpty(_text)) {
-                if (QuickModePossible()) {
+                if (QuickModePossible(_text, _textAnzeigeverhalten)) {
                     if (gr == null) { return; }
                     Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
                     Skin.Draw_FormatedText(gr, _text, _design, state, null, Alignment.Top_Left, new Rectangle(), null, false, Translate);
@@ -237,57 +251,45 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, e); }
     }
 
+    private static bool QuickModePossible(string text, SteuerelementVerhalten textAnzeigeverhalten) {
+        if (textAnzeigeverhalten != SteuerelementVerhalten.Text_Abschneiden) { return false; }
+        //if (Math.Abs(_Zeilenabstand - 1) > 0.01) { return false; }
+        return !text.Contains("<");
+    }
+
     private void GetDesign() {
         _design = Design.Undefiniert;
         if (Parent == null) { return; }
         if (Parent is Form fm) { _design = fm.Design; }
         switch (_design) {
             case Design.Form_QuickInfo:
-
             case Design.Form_DesktopBenachrichtigung:
-
             case Design.Form_BitteWarten:
-
             case Design.Form_KontextMenu:
-
             case Design.Form_SelectBox_Dropdown:
-
             case Design.Form_AutoFilter:
                 return;
         }
         switch (ParentType()) {
             case PartentType.RibbonGroupBox:
-
             case PartentType.RibbonPage:
                 _design = Design.Ribbonbar_Caption;
                 break;
 
-            case PartentType.GroupBox:
-
-            case PartentType.TabPage:
-
-            case PartentType.Form:
-
-            case PartentType.FlexiControlForCell:
-
-            case PartentType.Unbekannt: // UserForms und anderes
-
-            case PartentType.Nothing: // UserForms und anderes
-
-            case PartentType.ListBox:
-                _design = Design.Caption;
-                return;
+            //case PartentType.GroupBox:
+            //case PartentType.TabPage:
+            //case PartentType.Form:
+            //case PartentType.FlexiControlForCell:
+            //case PartentType.Unbekannt: // UserForms und anderes
+            //case PartentType.Nothing: // UserForms und anderes
+            //case PartentType.ListBox:
+            //    _design = Design.Caption;
+            //    return;
 
             default:
                 _design = Design.Caption;
                 break;
         }
-    }
-
-    private bool QuickModePossible() {
-        if (_textAnzeigeverhalten != SteuerelementVerhalten.Text_Abschneiden) { return false; }
-        //if (Math.Abs(_Zeilenabstand - 1) > 0.01) { return false; }
-        return !_text.Contains("<");
     }
 
     #endregion

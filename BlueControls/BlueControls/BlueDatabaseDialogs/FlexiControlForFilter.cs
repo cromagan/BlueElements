@@ -130,7 +130,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (FilterManualSeted) { Develop.DebugPrint("Steuerelement unterstützt keine manuellen Filter"); }
-        this.DoInputFilter(null);
+        this.DoInputFilter(null, false);
 
         var filterSingle = FilterInput?[FilterSingleColumn];
 
@@ -259,7 +259,6 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
         if (FilterSingleColumn != null) {
             if (string.IsNullOrEmpty(Value)) {
-
                 if (_doFilterDeleteButton && FilterInput != null && FilterInput.Count == 1) {
                     filterSingle = (FilterItem)FilterInput[0].Clone();
                 } else if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {

@@ -168,7 +168,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     }
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        this.DoInputFilter(null);
+        this.DoInputFilter(null, false);
         Invalidate();
 
         var row = FilterInput?.RowSingleOrNull;

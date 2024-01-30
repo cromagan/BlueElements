@@ -223,11 +223,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 return null;
             }
 
-
             return l;
-
-
-
         }
     }
 
@@ -1062,7 +1058,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (Database is not Database db || db.IsDisposed) { return; }
 
-        this.DoInputFilter(FilterOutput.Database);
+        this.DoInputFilter(FilterOutput.Database, false);
 
         const string t = "Übergeordnetes Element";
 

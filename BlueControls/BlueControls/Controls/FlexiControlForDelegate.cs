@@ -21,7 +21,9 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueControls.Enums;
 using BlueDatabase.Enums;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace BlueControls.Controls;
 
@@ -44,8 +46,9 @@ public class FlexiControlForDelegate : FlexiControl {
 
         EditType = EditTypeFormula.Button;
         CaptionPosition = CaptionPosition.ohne;
-        var s0 = MeasureStringOfCaption(text);
-        Size = new Size((int)s0.Width + 50 + 22, 30);
+        var s0 = BlueControls.Controls.Caption.RequiredTextSize(text, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
+
+        Size = new Size(s0.Width + 50 + 22, 30);
         if (CreateSubControls() is Button c0) {
             c0.Text = text;
             if (image is ImageCode im) {

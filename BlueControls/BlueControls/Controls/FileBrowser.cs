@@ -132,7 +132,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
     #region Methods
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        this.DoInputFilter(null);
+        this.DoInputFilter(null, false);
         Invalidate();
 
         var row = FilterInput?.RowSingleOrNull;

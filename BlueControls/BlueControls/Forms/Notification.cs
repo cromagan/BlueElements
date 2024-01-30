@@ -54,8 +54,8 @@ public partial class Notification : FloatingForm {
 
     private Notification(string text) : this() {
         capTXT.Text = text;
-        var he = Math.Min(capTXT.TextRequiredSize().Height, (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
-        var wi = Math.Min(capTXT.TextRequiredSize().Width, (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
+        var he = Math.Min(capTXT.RequiredTextSize().Height, (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7));
+        var wi = Math.Min(capTXT.RequiredTextSize().Width, (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7));
         Size = new Size(wi + (capTXT.Left * 2), he + (capTXT.Top * 2));
         Location = new Point(-Width - 10, Height - 10);
         _screenTime = Math.Max(3200, text.Length * 100);
