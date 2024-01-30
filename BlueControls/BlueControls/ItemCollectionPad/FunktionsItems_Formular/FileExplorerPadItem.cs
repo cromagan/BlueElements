@@ -76,7 +76,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAu
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public Database? DatabaseInputMustBe => null;
+    public bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Datei-Browser,\r\nmit welchem der Benutzer interagieren kann.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
 
@@ -119,7 +119,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAu
         }
     }
 
-    public bool WaitForDatabase => false;
     protected override int SaveOrder => 4;
 
     #endregion

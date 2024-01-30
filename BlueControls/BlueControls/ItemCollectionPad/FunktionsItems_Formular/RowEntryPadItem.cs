@@ -72,7 +72,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public Database? DatabaseInputMustBe => DatabaseOutput;
+    public bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet();
@@ -96,8 +96,6 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
-
-    public bool WaitForDatabase => false;
 
     protected override int SaveOrder => 1;
 

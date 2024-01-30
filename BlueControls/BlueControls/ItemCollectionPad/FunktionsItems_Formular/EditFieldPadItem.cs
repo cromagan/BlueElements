@@ -123,7 +123,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public Database? DatabaseInputMustBe => null;
+    public bool DatabaseInputMustMatchOutputDatabase => false;
+
     public override string Description => "Standard Bearbeitungs-Steuerelement für Zellen.";
 
     public EditTypeFormula EditType {
@@ -178,8 +179,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
             if (Column != null && !Column.IsDisposed) { Column.Quickinfo = value; }
         }
     }
-
-    public bool WaitForDatabase => false;
 
     #endregion
 

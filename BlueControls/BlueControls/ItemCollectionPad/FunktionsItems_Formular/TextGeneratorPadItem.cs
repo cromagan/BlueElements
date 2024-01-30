@@ -67,7 +67,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     public static string ClassId => "FI-TextGeneratorPadItem";
     public bool AutoSizeableHeight => true;
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public Database? DatabaseInputMustBe => null;
+    public bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Dieses Element erzeugt einen Text-Generator-Baustein";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => true;
@@ -83,7 +83,6 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public bool WaitForDatabase => false;
     protected override int SaveOrder => 4;
 
     #endregion

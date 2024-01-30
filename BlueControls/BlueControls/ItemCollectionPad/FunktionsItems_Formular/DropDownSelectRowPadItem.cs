@@ -97,7 +97,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public Database? DatabaseInputMustBe => DatabaseOutput;
+    public bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet();
@@ -129,7 +129,6 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         }
     }
 
-    public bool WaitForDatabase => true;
     protected override int SaveOrder => 1;
 
     #endregion

@@ -128,7 +128,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
 
-    public Database? DatabaseInputMustBe => DatabaseOutput;
+    public bool DatabaseInputMustMatchOutputDatabase => true;
 
     public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet();
@@ -190,7 +190,6 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
     //    }
     //}
 
-    public bool WaitForDatabase => true;
     protected override int SaveOrder => 1;
 
     #endregion

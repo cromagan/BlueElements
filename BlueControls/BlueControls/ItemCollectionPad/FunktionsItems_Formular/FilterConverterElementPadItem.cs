@@ -76,7 +76,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public Database? DatabaseInputMustBe => null;
+    public bool DatabaseInputMustMatchOutputDatabase => false;
 
     public Database? DatabaseOutput {
         get => _itemSends.DatabaseOutputGet();
@@ -152,7 +152,6 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         }
     }
 
-    public bool WaitForDatabase => false;
     protected override int SaveOrder => 1;
 
     #endregion

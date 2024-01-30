@@ -86,7 +86,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     public ConnectedFormula.ConnectedFormula? CFormula { get; set; }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public Database? DatabaseInputMustBe => null;
+    public bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Tab-Control, dass weitere Unterformulare enthalten kann.";
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
@@ -103,7 +103,6 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public bool WaitForDatabase => false;
     protected override int SaveOrder => 1000;
 
     #endregion

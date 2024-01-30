@@ -70,7 +70,8 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public Database? DatabaseInputMustBe => null;
+    public bool DatabaseInputMustMatchOutputDatabase => false;
+
     public override string Description => "Eine Bild-Anzeige,\r\nmit welchem der Benutzer interagieren kann.";
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
     public override bool MustBeInDrawingArea => true;
@@ -86,7 +87,6 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSom
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    public bool WaitForDatabase => false;
     protected override int SaveOrder => 4;
 
     #endregion

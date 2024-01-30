@@ -42,11 +42,7 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
 
     public Database? DatabaseInput { get; }
 
-    /// <summary>
-    /// Welcher Datenbank die eingehenden Filter entsprechen müssen.
-    /// Wenn NULL zurück gegeben wird, ist freie Datenbankwahl
-    /// </summary>
-    public Database? DatabaseInputMustBe { get; }
+    public bool DatabaseInputMustMatchOutputDatabase { get; }
 
     // ReSharper disable once UnusedMemberInSuper.Global
     List<int> InputColorId { get; }
@@ -66,12 +62,6 @@ public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersi
     /// Enthält die Schlüssel der Items
     /// </summary>
     public ReadOnlyCollection<string> Parents { get; set; }
-
-    /// <summary>
-    /// Wenn DatabaseInputMustBe null zurück gibt, ob schon Filter gewählt werden dürfen.
-    /// Typischerweise TRUE, wenn auf die Output-Database gewartet werden soll.
-    /// </summary>
-    public bool WaitForDatabase { get; }
 
     #endregion
 
@@ -106,9 +96,12 @@ public static class ItemAcceptSomethingExtensions {
     public static void Datenquellen_bearbeiten(this IItemAcceptSomething item) {
         if (item.Parent is null) { return; }
 
-        var matchDB = item.DatabaseInputMustBe;
+        Database? outd = null;
+        if (item is IItemSendSomething iiss) {
+            outd = iiss.DatabaseOutput;
+        }
 
-        if (item.WaitForDatabase && matchDB == null) {
+        if (item.DatabaseInputMustMatchOutputDatabase && outd == null) {
             return;
         }
 
@@ -124,7 +117,7 @@ public static class ItemAcceptSomethingExtensions {
         foreach (var thisR in item.Parent) {
             if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendSomething rfp) {
                 if (!item.Parents.Contains(rfp.KeyName) && item != rfp) {
-                    if (matchDB == null || matchDB == rfp.DatabaseOutput) {
+                    if (outd == null || outd == rfp.DatabaseOutput) {
                         _ = x.Add("Hinzu: " + rfp.ReadableText(), "+|" + rfp.KeyName, rfp.SymbolForReadableText(), true, "1");
                     }
                 }
@@ -215,8 +208,9 @@ public sealed class ItemAcceptSomething {
     }
 
     public Database? DatabaseInput(IItemAcceptSomething item) {
-        if (item.DatabaseInputMustBe is Database db) {
-            return db;
+        if (item.DatabaseInputMustMatchOutputDatabase) {
+            if (item is IItemSendSomething iiss) { return iiss.DatabaseOutput; }
+            return null;
         }
 
         var g = GetFilterFromGet(item);
@@ -332,7 +326,13 @@ public sealed class ItemAcceptSomething {
             new FlexiControl("Eingang:", widthOfControl)
         };
 
-        if (item.WaitForDatabase && item.DatabaseInputMustBe == null) {
+        Database? outp = null;
+
+        if (item is IItemSendSomething iiss) {
+            outp = iiss.DatabaseOutput;
+        }
+
+        if (item.DatabaseInputMustMatchOutputDatabase && outp == null) {
             l.Add(new FlexiControl("<ImageCode=Information|16> Bevor Filter gewählt werden können muss die Ausgangsdatenbank gewählt werden.", widthOfControl));
         } else {
             l.Add(new FlexiControlForDelegate(item.Datenquellen_bearbeiten, "Eingehende Filter wählen", ImageCode.Trichter));

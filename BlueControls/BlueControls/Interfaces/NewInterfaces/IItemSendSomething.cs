@@ -19,6 +19,8 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Reflection;
+using System.Windows.Controls;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -62,12 +64,12 @@ public static class ItemSendSomethingExtension {
     public static void Datenbank_wählen(this IItemSendSomething item) {
         var db = CommonDialogs.ChooseKnownDatabase("Ausgangs-Datenbank wählen: ", string.Empty);
         if (db == null) { return; }
+        if (db == item.DatabaseOutput) { return; }
+
         item.DatabaseOutput = db;
 
-        if (item is IItemAcceptSomething ias) {
-            if (ias.DatabaseInput != ias.DatabaseInputMustBe && ias.DatabaseInputMustBe != null) {
-                ias.Parents = new List<string>().AsReadOnly();
-            }
+        if (item is IItemAcceptSomething ias && ias.DatabaseInputMustMatchOutputDatabase) {
+            ias.Parents = new List<string>().AsReadOnly();
         }
     }
 

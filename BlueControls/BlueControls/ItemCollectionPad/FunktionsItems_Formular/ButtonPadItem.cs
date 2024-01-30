@@ -139,7 +139,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     }
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
-    public Database? DatabaseInputMustBe => null;
+    public bool DatabaseInputMustMatchOutputDatabase => false;
     public override string Description => "Ein Knopf, den der Benutzer drücken kann und ein Skript startet. Die eingehenden Filter stehen dann als Variable im Skript zur Verfügung.";
 
     [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert größer 1 als 'mehr als eine' gilt.")]
@@ -175,7 +175,6 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         }
     }
 
-    public bool WaitForDatabase => false;
     protected override int SaveOrder => 1;
 
     #endregion
@@ -431,8 +430,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         //}
 
         _eTxt ??= new ExtText(Design.Button, States.Standard);
-        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt,_anzeige, positionModified.ToRect(), false);
-
+        Button.DrawButton(null, gr, Design.Button, States.Standard, QuickImage.Get(_image), Alignment.Horizontal_Vertical_Center, false, _eTxt, _anzeige, positionModified.ToRect(), false);
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionModified, zoom, InputColorId, false, false, true);
@@ -441,12 +439,6 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         //base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
 
         DrawArrorInput(gr, positionModified, zoom, shiftX, shiftY, forPrinting, InputColorId);
-
-
-
-
-
-
 
         //base.DrawExplicit(gr, positionModified, zoom, shiftX, shiftY, forPrinting);
     }
