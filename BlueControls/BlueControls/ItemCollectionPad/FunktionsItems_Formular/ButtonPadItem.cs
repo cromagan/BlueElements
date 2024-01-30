@@ -181,12 +181,79 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     #region Methods
 
+    public static bool PossibleFor(Method toCheck, ButtonArgs klickable_when) {
+        if (toCheck.GetCodeBlockAfter) { return false; }
+        if (toCheck.Args.Count == 0) { return false; }
+        if (toCheck.MustUseReturnValue) { return false; }
+
+        if (klickable_when is not ButtonArgs.Egal and
+                              not ButtonArgs.Genau_eine_Zeile) {
+            // Egal MUSS eine Zeile berechnen. Und da müssen am End die Filter rein
+            // Und DIESE müssen endlos erlaubt sein.
+            if (toCheck.LastArgMinCount < 1) { return false; }
+            if (toCheck.Args.Count > 4) { return false; }
+        } else {
+            if (toCheck.LastArgMinCount != -1) { return false; }
+            if (toCheck.Args.Count > 5) { return false; }
+        }
+
+        int? rowno = null;
+        int? fono = null;
+
+        for (var nr = 0; nr < toCheck.Args.Count; nr++) {
+            var thisarg = toCheck.Args[nr];
+
+            if (thisarg.Count != 1) { return false; }
+
+            if (thisarg[0] != VariableFloat.ShortName_Plain &&
+                thisarg[0] != VariableString.ShortName_Plain &&
+                thisarg[0] != VariableBool.ShortName_Plain &&
+                thisarg[0] != VariableFilterItem.ShortName_Variable &&
+                thisarg[0] != VariableRowItem.ShortName_Variable) { return false; }
+
+            if (thisarg[0] == VariableRowItem.ShortName_Variable) {
+                if (rowno != null) { return false; }
+                rowno = nr;
+            }
+
+            if (thisarg[0] == VariableFilterItem.ShortName_Variable) {
+                if (fono != null) { return false; }
+                fono = nr;
+            }
+        }
+
+        if (fono != null && rowno != null) { return false; }
+
+        if (klickable_when is ButtonArgs.Keine_Zeile or
+            ButtonArgs.Eine_oder_mehr_Zeilen) {
+            if (rowno != null) { return false; }
+            if (fono == null || fono != toCheck.Args.Count - 1) { return false; }
+        }
+
+        if (klickable_when == ButtonArgs.Genau_eine_Zeile) {
+            //Steuerung über Variablen möglich!
+            //if (rowno == null) { return false; }
+        }
+
+        if (klickable_when == ButtonArgs.Egal) {
+            if (fono != null || rowno != null) { return false; }
+        }
+
+        return true;
+    }
+
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
         var con = new ConnectedFormulaButton() {
             Text = _anzeige,
             ImageCode = _image,
+            Drückbar_wenn = _enabledwhenrows,
+            Arg1 = _arg1,
+            Arg2 = _arg2,
+            Arg3 = _arg3,
+            Arg4 = _arg4,
+            SkriptName = _scriptname
         };
 
         con.DoInputSettings(parent, this);
@@ -314,67 +381,6 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         //result.ParseableAdd("ScriptName", _scriptname);
 
         return false;
-    }
-
-    public bool PossibleFor(Method toCheck, ButtonArgs klickable_when) {
-        if (toCheck.GetCodeBlockAfter) { return false; }
-        if (toCheck.Args.Count == 0) { return false; }
-        if (toCheck.MustUseReturnValue) { return false; }
-
-        if (klickable_when is not ButtonArgs.Egal and
-                              not ButtonArgs.Genau_eine_Zeile) {
-            // Egal MUSS eine Zeile berechnen. Und da müssen am End die Filter rein
-            // Und DIESE müssen endlos erlaubt sein.
-            if (toCheck.LastArgMinCount < 1) { return false; }
-            if (toCheck.Args.Count > 4) { return false; }
-        } else {
-            if (toCheck.LastArgMinCount != -1) { return false; }
-            if (toCheck.Args.Count > 5) { return false; }
-        }
-
-        int? rowno = null;
-        int? fono = null;
-
-        for (var nr = 0; nr < toCheck.Args.Count; nr++) {
-            var thisarg = toCheck.Args[nr];
-
-            if (thisarg.Count != 1) { return false; }
-
-            if (thisarg[0] != VariableFloat.ShortName_Plain &&
-                thisarg[0] != VariableString.ShortName_Plain &&
-                thisarg[0] != VariableBool.ShortName_Plain &&
-                thisarg[0] != VariableFilterItem.ShortName_Variable &&
-                thisarg[0] != VariableRowItem.ShortName_Variable) { return false; }
-
-            if (thisarg[0] == VariableRowItem.ShortName_Variable) {
-                if (rowno != null) { return false; }
-                rowno = nr;
-            }
-
-            if (thisarg[0] == VariableFilterItem.ShortName_Variable) {
-                if (fono != null) { return false; }
-                fono = nr;
-            }
-        }
-
-        if (fono != null && rowno != null) { return false; }
-
-        if (klickable_when is ButtonArgs.Keine_Zeile or
-            ButtonArgs.Eine_oder_mehr_Zeilen) {
-            if (rowno != null) { return false; }
-            if (fono == null || fono != toCheck.Args.Count - 1) { return false; }
-        }
-
-        if (klickable_when == ButtonArgs.Genau_eine_Zeile) {
-            //Steuerung über Variablen möglich!
-            //if (rowno == null) { return false; }
-        }
-
-        if (klickable_when == ButtonArgs.Egal) {
-            if (fono != null || rowno != null) { return false; }
-        }
-
-        return true;
     }
 
     public override string ReadableText() {
