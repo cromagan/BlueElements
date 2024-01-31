@@ -20,13 +20,18 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
+using System.Windows.Input;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueScript;
 using BlueScript.Methods;
+using BlueScript.Structures;
+using BlueScript.Variables;
 
 namespace BlueControls.Controls;
 
@@ -186,7 +191,7 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
         if (e.Button != System.Windows.Forms.MouseButtons.Left) { return; }
 
         if (Script.Commands == null) {
-            _ = new Script(null, string.Empty, new BlueScript.Structures.ScriptProperties());
+            _ = new Script(null, string.Empty, new ScriptProperties());
         }
 
         if (Script.Commands == null) {
@@ -208,10 +213,93 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
         if (!ButtonPadItem.PossibleFor(m, Drückbar_wenn)) {
             ButtonError("Befehl '" + _scriptname + "' nicht möglich."); return;
         }
+
+        var r = FilterInput?.Rows;
+
+        var f = string.Empty;
+
+        if (r == null) {
+            f = DoMethod(m, null);
+        } else {
+            foreach (var thisr in r) {
+                f = DoMethod(m, thisr);
+                if (!string.IsNullOrEmpty(f)) { break; }
+            }
+        }
+
+        if (!string.IsNullOrEmpty(f)) {
+            Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
+        }
     }
 
     private void ButtonError(string message) {
         Forms.MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
+    }
+
+    private string DoMethod(Method m, RowItem? row) {
+        List<string> a = [_arg1, _arg2, _arg3, _arg4];
+
+        var c = new VariableCollection();
+
+        #region FilterVariablen erstellen und in fis speichern
+
+        var fis = string.Empty;
+
+        if (FilterInput is FilterCollection fi) {
+            for (var fz = 0; fz < fi.Count; fz++) {
+                if (fi[fz] is FilterItem thisf) {
+                    var nam = "Filter" + fz;
+                    c.Add(new VariableFilterItem(nam, thisf, true, "FilterInput" + fz));
+                    fis = fis + nam + ",";
+                }
+            }
+        }
+        fis = fis.TrimEnd(",");
+
+        #endregion
+
+        #region RowVariable ertellen
+
+        if (row != null) {
+            c.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
+        }
+
+        #endregion
+
+        #region Attribut-Text erstellen (args)
+
+        var args = string.Empty;
+        var argc = 0;
+
+        for (var nr = 0; nr < m.Args.Count; nr++) {
+            var thisarg = m.Args[nr];
+            if (nr > 0) { args += ","; }
+
+            if (thisarg[0] == VariableString.ShortName_Plain) {
+                args += a[argc]; argc++;
+            } else if (thisarg[0] == VariableFloat.ShortName_Plain) {
+                args += a[argc]; argc++;
+            } else if (thisarg[0] == VariableBool.ShortName_Plain) {
+                args += a[argc]; argc++;
+            } else if (thisarg[0] == VariableRowItem.ShortName_Variable) {
+                args += "thisrow";
+            } else if (thisarg[0] == VariableFilterItem.ShortName_Variable) {
+                args += fis;
+            } else {
+                Develop.DebugPrint(thisarg[0]);
+            }
+        }
+
+        #endregion
+
+        var ld = new LogData("Knopfdruck", 0);
+        var cdw = new CanDoFeedback(0, args, string.Empty, ld);
+        var scp = new ScriptProperties(BlueScript.Enums.MethodType.Standard, true, [], row);
+
+        var erg = m.DoIt(c, cdw, scp);
+
+        if (erg.AllOk) { return string.Empty; }
+        return cdw.Data.Protocol.JoinWithCr();
     }
 
     #endregion

@@ -39,7 +39,7 @@ public class VariableFilterItem : Variable, IDisposable {
 
     public VariableFilterItem(string name) : this(name, null!, true, string.Empty) { }
 
-    private VariableFilterItem(string name, FilterItem value, bool ronly, string comment) : base(name, ronly, comment) => _filter = value;
+    public VariableFilterItem(string name, FilterItem value, bool ronly, string comment) : base(name, ronly, comment) => _filter = value;
 
     #endregion
 
