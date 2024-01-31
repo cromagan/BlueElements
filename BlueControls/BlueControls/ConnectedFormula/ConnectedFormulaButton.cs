@@ -21,11 +21,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Windows.Input;
 using BlueBasics;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using BlueControls.ItemCollectionPad.Abstract;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueScript;
@@ -154,48 +152,50 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
             this.DoInputFilter(null, false);
         }
 
-        bool _enabled;
+        bool enabled;
 
         switch (_enabledwhenrows) {
             case ButtonArgs.Egal:
-                _enabled = true;
+                enabled = true;
                 break;
 
             case ButtonArgs.Keine_Zeile:
-                _enabled = FilterInput != null && FilterInput.Rows.Count == 0;
+                enabled = FilterInput != null && FilterInput.Rows.Count == 0;
                 break;
 
             case ButtonArgs.Genau_eine_Zeile:
-                _enabled = FilterInput != null && FilterInput.RowSingleOrNull != null;
+                enabled = FilterInput != null && FilterInput.RowSingleOrNull != null;
                 break;
 
             case ButtonArgs.Eine_oder_mehr_Zeilen:
-                _enabled = FilterInput != null && FilterInput.Rows.Count > 0;
+                enabled = FilterInput != null && FilterInput.Rows.Count > 0;
                 break;
 
             default:
                 Develop.DebugPrint(_enabledwhenrows);
-                _enabled = false; break;
+                enabled = false;
+                break;
         }
 
-        if (string.IsNullOrEmpty(_scriptname)) { _enabled = false; }
+        if (string.IsNullOrEmpty(_scriptname)) { enabled = false; }
 
-        Enabled = _enabled;
+        Enabled = enabled;
 
         base.DrawControl(gr, state);
     }
 
-    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+    protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
 
-        if (e.Button != System.Windows.Forms.MouseButtons.Left) { return; }
+        if (e.Button != MouseButtons.Left) { return; }
 
         if (Script.Commands == null) {
             _ = new Script(null, string.Empty, new ScriptProperties());
         }
 
         if (Script.Commands == null) {
-            ButtonError("Befehle konnten nicht initialisiert werden."); return;
+            ButtonError("Befehle konnten nicht initialisiert werden.");
+            return;
         }
 
         Method? m = null;
@@ -207,11 +207,13 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
         }
 
         if (m == null) {
-            ButtonError("Befehl '" + _scriptname + "' nicht gefunden."); return;
+            ButtonError("Befehl '" + _scriptname + "' nicht gefunden.");
+            return;
         }
 
         if (!ButtonPadItem.PossibleFor(m, Drückbar_wenn)) {
-            ButtonError("Befehl '" + _scriptname + "' nicht möglich."); return;
+            ButtonError("Befehl '" + _scriptname + "' nicht möglich.");
+            return;
         }
 
         var r = FilterInput?.Rows;
@@ -276,11 +278,14 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
             if (nr > 0) { args += ","; }
 
             if (thisarg[0] == VariableString.ShortName_Plain) {
-                args += a[argc]; argc++;
+                args += a[argc];
+                argc++;
             } else if (thisarg[0] == VariableFloat.ShortName_Plain) {
-                args += a[argc]; argc++;
+                args += a[argc];
+                argc++;
             } else if (thisarg[0] == VariableBool.ShortName_Plain) {
-                args += a[argc]; argc++;
+                args += a[argc];
+                argc++;
             } else if (thisarg[0] == VariableRowItem.ShortName_Variable) {
                 args += "thisrow";
             } else if (thisarg[0] == VariableFilterItem.ShortName_Variable) {

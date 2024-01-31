@@ -23,7 +23,6 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueDatabase.Enums;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace BlueControls.Controls;
 

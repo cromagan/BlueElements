@@ -329,6 +329,16 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
     }
 
+    protected override void OnVisibleChanged(System.EventArgs e) {
+        base.OnVisibleChanged(e);
+
+        // Ist komisch, muss aber so sein:
+        // Ist die View in einer Tab-Page, eine andere TabPage angezeigt und wird ConnectedFormula
+        // Invalidiert, wird beim herschalten die ConnectedFormulaVuew NICHT neu gezeichet.
+        // Dadurch wird der Filter bei DrawControll dann nicht neu berechnet
+        Invalidate();
+    }
+
     private void _cf_Changed(object sender, System.EventArgs e) => InvalidateView();
 
     private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
@@ -350,7 +360,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         var cx = -1;
         foreach (var thisIt in autoc) {
             if (thisIt.Left == left.Left && thisIt.Width == left.Width) {
-                var s1 = BlueControls.Controls.Caption.RequiredTextSize(thisIt.Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, false, -1);
+                var s1 = Caption.RequiredTextSize(thisIt.Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, false, -1);
                 cx = Math.Max(cx, s1.Width + 1);
                 dohere.Add(thisIt);
             } else {

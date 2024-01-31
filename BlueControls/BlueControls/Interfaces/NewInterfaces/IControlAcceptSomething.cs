@@ -18,7 +18,6 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -125,6 +124,8 @@ public static class IControlAcceptSomethingExtension {
     /// Verwirft den aktuellen InputFilter und erstellt einen neuen von allen Parents
     /// </summary>
     /// <param name="item"></param>
+    /// <param name="mustbeDatabase"></param>
+    /// <param name="doEmptyFilterToo"></param>
     public static void DoInputFilter(this IControlAcceptSomething item, Database? mustbeDatabase, bool doEmptyFilterToo) {
         if (item.IsDisposed) { return; }
         if (item.FilterManualSeted) { return; }

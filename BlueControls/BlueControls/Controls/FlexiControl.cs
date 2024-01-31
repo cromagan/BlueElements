@@ -28,7 +28,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
-using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
@@ -115,6 +114,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Einfacher Info Text. Wird nirgends mehr zurück gegeben.
     /// </summary>
     /// <param name="captionText"></param>
+    /// <param name="width"></param>
     public FlexiControl(string captionText, int width) : base(false, false) {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         _editType = EditTypeFormula.nur_als_Text_anzeigen;
@@ -383,6 +383,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Methods
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="newvalue"></param>
+    /// <param name="updateControls"></param>
+    /// <param name="doInstantChangedValue">Löst bei einer Werteänderung ValueChanged aus. Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
     public void ValueSet(string? newvalue, bool updateControls, bool doInstantChangedValue) {
         if (IsDisposed) { return; }
         newvalue ??= string.Empty;
@@ -487,13 +493,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="newvalue"></param>
-    /// <param name="updateControls"></param>
-    /// <param name="doInstantChangedValue">Löst bei einer Werteänderung ValueChanged aus. Steuerelemente, wie Button, Checkboxen, DropDownListen müssen hier TRUE setzen. Auch Texte, die in einem Stück gesetzt werden.</param>
-    /// <summary>
     protected override void DrawControl(Graphics gr, States state) {
         // Enabled wurde verdeckt!
         if (!Enabled) { state = States.Standard_Disabled; }

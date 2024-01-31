@@ -30,7 +30,6 @@ using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
-using BlueDatabase.Enums;
 using BlueScript;
 using BlueScript.Methods;
 using BlueScript.Variables;
@@ -181,12 +180,12 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     #region Methods
 
-    public static bool PossibleFor(Method toCheck, ButtonArgs klickable_when) {
+    public static bool PossibleFor(Method toCheck, ButtonArgs clickableWhen) {
         if (toCheck.GetCodeBlockAfter) { return false; }
         if (toCheck.Args.Count == 0) { return false; }
         if (toCheck.MustUseReturnValue) { return false; }
 
-        if (klickable_when is not ButtonArgs.Egal and
+        if (clickableWhen is not ButtonArgs.Egal and
                               not ButtonArgs.Genau_eine_Zeile) {
             // Egal MUSS eine Zeile berechnen. Und da müssen am End die Filter rein
             // Und DIESE müssen endlos erlaubt sein.
@@ -224,18 +223,18 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         if (fono != null && rowno != null) { return false; }
 
-        if (klickable_when is ButtonArgs.Keine_Zeile or
+        if (clickableWhen is ButtonArgs.Keine_Zeile or
             ButtonArgs.Eine_oder_mehr_Zeilen) {
             if (rowno != null) { return false; }
             if (fono == null || fono != toCheck.Args.Count - 1) { return false; }
         }
 
-        if (klickable_when == ButtonArgs.Genau_eine_Zeile) {
+        if (clickableWhen == ButtonArgs.Genau_eine_Zeile) {
             //Steuerung über Variablen möglich!
             //if (rowno == null) { return false; }
         }
 
-        if (klickable_when == ButtonArgs.Egal) {
+        if (clickableWhen == ButtonArgs.Egal) {
             if (fono != null || rowno != null) { return false; }
         }
 
