@@ -376,7 +376,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
                 _enabledwhenrows = (ButtonArgs)IntParse(value);
                 return true;
 
-            case "aktion":
+            case "action":
                 _action = value.FromNonCritical();
                 return true;
         }
