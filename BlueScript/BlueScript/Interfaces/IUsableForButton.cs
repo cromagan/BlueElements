@@ -17,12 +17,8 @@
 
 #nullable enable
 
-using System.CodeDom;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using BlueBasics;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueScript.EventArgs;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -60,9 +56,9 @@ public static class UseableForButton {
         List<string> args = [arg1, arg2, arg3, arg4];
 
         for (var nr = 0; nr < args.Count; nr++) {
-            if (nr >= ufb.ArgsForButton.Count && !string.IsNullOrEmpty(args[nr])) {
-                return "Zu viele Argumente erhalten";
-            }
+            //if (nr >= ufb.ArgsForButton.Count && !string.IsNullOrEmpty(args[nr])) {
+            //    return "Zu viele Argumente erhalten";
+            //}
 
             if (nr < ufb.ArgsForButton.Count && string.IsNullOrEmpty(args[nr])) {
                 return "Zu wenig Argumente erhalten";
@@ -73,7 +69,8 @@ public static class UseableForButton {
 
         var ld = new LogData("Knopfdruck", 0);
         var cdw = new CanDoFeedback(0, s, string.Empty, ld);
-        var scp = new ScriptProperties(Enums.MethodType.Standard, true, [], additionalInfo);
+
+        var scp = new ScriptProperties(Enums.MethodType.AllDefault, true, [], additionalInfo);
 
         var erg = ufb.DoIt(varCol, cdw, scp);
 

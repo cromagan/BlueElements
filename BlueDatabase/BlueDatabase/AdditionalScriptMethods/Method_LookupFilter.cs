@@ -71,7 +71,7 @@ public class Method_LookupFilter : Method {
             return new DoItFeedback(l);
         }
 
-        var v = RowItem.CellToVariable(returncolumn, r[0]);
+        var v = RowItem.CellToVariable(returncolumn, r[0], true);
         if (v == null || v.Count != 1) { return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(4)); }
 
         if (v[0] is VariableListString vl) {

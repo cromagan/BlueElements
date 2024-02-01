@@ -33,20 +33,15 @@ public class Script {
 
     #region Fields
 
-    public static List<Method>? Commands;
-    public static List<Variable>? VarTypes;
+    private static List<Method>? _commands;
+
+    private static List<Variable>? _varTypes;
 
     #endregion
 
     #region Constructors
 
     public Script(VariableCollection? variablen, string additionalFilesPath, ScriptProperties scp) {
-        Commands ??= GetInstaceOfType<Method>();
-        if (VarTypes == null) {
-            VarTypes = GetInstaceOfType<Variable>("NAME");
-            VarTypes.Sort();
-        }
-
         ReducedScriptText = string.Empty;
 
         Variables = variablen ?? [];
@@ -60,6 +55,23 @@ public class Script {
     #endregion
 
     #region Properties
+
+    public static List<Method> Commands {
+        get {
+            _commands ??= GetInstaceOfType<Method>();
+            return _commands;
+        }
+    }
+
+    public static List<Variable> VarTypes {
+        get {
+            if (_varTypes == null) {
+                _varTypes = GetInstaceOfType<Variable>("NAME");
+                _varTypes.Sort();
+            }
+            return _varTypes;
+        }
+    }
 
     public ScriptProperties Properties { get; }
     public string ReducedScriptText { get; private set; }

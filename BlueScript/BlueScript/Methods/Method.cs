@@ -68,10 +68,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
 
     public abstract bool GetCodeBlockAfter { get; }
 
-    /// <summary>
-    ///  Gibt die Syntax zurück, weil der Befehl selbst anders sein könnte. Z.B. Bei Variablan
-    /// </summary>
-    public string KeyName => Syntax;
+    public string KeyName => Command;
 
     /// <summary>
     /// Gint an, ob und wie oft das letzte Argument wiederholt werden kann bzw. muss.

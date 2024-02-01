@@ -60,5 +60,7 @@ public enum MethodType {
     /// </summary>
     ManipulatesUser = 64,
 
-    Break = 128
+    Break = 128,
+
+    AllDefault = Standard | IO | Database | MyDatabaseRow | ChangeAnyDatabaseOrRow | NeedLongTime | ManipulatesUser
 }

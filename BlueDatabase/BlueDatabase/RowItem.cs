@@ -110,7 +110,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Methods
 
-    public static VariableCollection? CellToVariable(ColumnItem? column, RowItem? row) {
+    public static VariableCollection? CellToVariable(ColumnItem? column, RowItem? row, bool mustbeReadOnly) {
         if (column == null || row == null) { return null; }
         if (column.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { return null; }
 
@@ -119,7 +119,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         #region ReadOnly bestimmen
 
-        var ro = !column.Format.CanBeChangedByRules();
+        var ro = mustbeReadOnly || !column.Format.CanBeChangedByRules();
         //if (column == column.Database.Column.SysCorrect) { ro = true; }
         //if (column == column.Database.Column.SysRowChanger) { ro = true; }
         //if (column == column.Database.Column.SysRowChangeDate) { ro = true; }

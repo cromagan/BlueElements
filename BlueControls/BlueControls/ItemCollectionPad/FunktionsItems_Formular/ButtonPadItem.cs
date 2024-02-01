@@ -34,7 +34,6 @@ using BlueScript;
 using BlueScript.EventArgs;
 using BlueScript.Interfaces;
 using BlueScript.Methods;
-using BlueScript.Variables;
 using static BlueBasics.Converter;
 using Button = BlueControls.Controls.Button;
 
@@ -47,6 +46,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     #region Fields
 
     private readonly ItemAcceptSomething _itemAccepts;
+    private string _action = string.Empty;
     private string _anzeige = string.Empty;
     private string _arg1 = string.Empty;
     private string _arg2 = string.Empty;
@@ -55,7 +55,6 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     private ButtonArgs _enabledwhenrows;
     private ExtText? _eTxt;
     private string _image = string.Empty;
-    private string _scriptname = string.Empty;
 
     #endregion
 
@@ -70,6 +69,18 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     #region Properties
 
     public static string ClassId => "FI-FilterButton";
+
+    [Description("Welches Skript ausgeführt werden soll")]
+    public string Aktion {
+        get => _action;
+        set {
+            if (IsDisposed) { return; }
+            if (_action == value) { return; }
+            _action = value;
+            OnChanged();
+            UpdateSideOptionMenu();
+        }
+    }
 
     [Description("Die Beschriftung des Knopfes.")]
     public string Anzeige {
@@ -141,7 +152,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;
-    public override string Description => "Ein Knopf, den der Benutzer drücken kann und ein Skript startet. Die eingehenden Filter stehen dann als Variable im Skript zur Verfügung.";
+    public override string Description => "Ein Knopf, den der Benutzer drücken kann und eine Aktion startet.";
 
     [Description("Schaltet den Knopf ein oder aus.<br>Dazu werden die Zeilen berechnet, die mit der Eingangsfilterung möglich sind.<br>Wobei ein Zahlenwert größer 1 als 'mehr als eine' gilt.")]
     public ButtonArgs Drückbar_wenn {
@@ -150,6 +161,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (IsDisposed) { return; }
             if (_enabledwhenrows == value) { return; }
             _enabledwhenrows = value;
+            if (!ButtonPadItem.PossibleFor(Script.Commands.Get(_action), _enabledwhenrows)) { Aktion = string.Empty; }
             OnChanged();
             UpdateSideOptionMenu();
         }
@@ -165,25 +177,13 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
     }
 
-    [Description("Welches Skript ausgeführt werden soll")]
-    public string SkriptName {
-        get => _scriptname;
-        set {
-            if (IsDisposed) { return; }
-            if (_scriptname == value) { return; }
-            _scriptname = value;
-            OnChanged();
-            UpdateSideOptionMenu();
-        }
-    }
-
     protected override int SaveOrder => 1;
 
     #endregion
 
     #region Methods
 
-    public static bool PossibleFor(Method toCheck, ButtonArgs clickableWhen) {
+    public static bool PossibleFor(Method? toCheck, ButtonArgs clickableWhen) {
         if (toCheck is not IUseableForButton ufb) { return false; }
 
         if (!ufb.ClickableWhen.HasFlag(clickableWhen)) { return false; }
@@ -259,7 +259,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             Arg2 = _arg2,
             Arg3 = _arg3,
             Arg4 = _arg4,
-            SkriptName = _scriptname
+            Action = _action
         };
 
         con.DoInputSettings(parent, this);
@@ -312,23 +312,19 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         l.Add(new FlexiControlForProperty<ButtonArgs>(() => Drückbar_wenn, za));
 
-        if (Script.Commands == null) {
-            var c = new Script(null, string.Empty, new BlueScript.Structures.ScriptProperties());
-        }
-
         var co = new ItemCollectionList.ItemCollectionList(true);
 
         if (Script.Commands != null) {
             foreach (var cmd in Script.Commands) {
                 if (PossibleFor(cmd, Drückbar_wenn) && cmd is IUseableForButton ufb2) {
-                    co.Add(ufb2.Command, ufb2.NiceTextForUser);
+                    co.Add(ufb2.NiceTextForUser, ufb2.Command);
                 }
             }
         }
 
-        l.Add(new FlexiControlForProperty<string>(() => SkriptName, co));
+        l.Add(new FlexiControlForProperty<string>(() => Aktion, co));
 
-        Method? m = Script.Commands.Get(_scriptname);
+        Method? m = Script.Commands.Get(_action);
 
         if (m is IUseableForButton ufb) {
             if (ufb.ArgsForButton.Count > 0) { l.Add(new FlexiControlForProperty<string>(() => Arg1)); }
@@ -380,8 +376,8 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
                 _enabledwhenrows = (ButtonArgs)IntParse(value);
                 return true;
 
-            case "scriptname":
-                _scriptname = value.FromNonCritical();
+            case "aktion":
+                _action = value.FromNonCritical();
                 return true;
         }
 
@@ -420,7 +416,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         result.ParseableAdd("Image", _image);
 
         result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
-        result.ParseableAdd("ScriptName", _scriptname);
+        result.ParseableAdd("Action", _action);
         return result.Parseable(base.ToString());
     }
 

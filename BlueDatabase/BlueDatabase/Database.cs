@@ -1124,6 +1124,38 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         return new ConnectionInfo(MakeValidTableName(tableName.FileNameWithoutSuffix()), null, DatabaseId, f, FreezedReason);
     }
 
+    public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool setErrorEnabled) {
+
+        #region Variablen für Skript erstellen
+
+        VariableCollection vars = [];
+
+        if (row != null && !row.IsDisposed) {
+            foreach (var thisCol in Column) {
+                var v = RowItem.CellToVariable(thisCol, row, allReadOnly);
+                if (v != null) { vars.AddRange(v); }
+            }
+        }
+
+        foreach (var thisvar in Variables.ToListVariableString()) {
+            var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
+            vars.Add(v);
+        }
+
+        vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
+        vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
+        vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
+        vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
+        vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
+        vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
+        vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, "Der Name der ersten Spalte"));
+        vars.Add(new VariableBool("SetErrorEnabled", setErrorEnabled, true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
+
+        #endregion
+
+        return vars;
+    }
+
     /// <summary>
     /// AdditionalFiles/Datenbankpfad mit Layouts und abschließenden \
     /// </summary>
@@ -1229,35 +1261,13 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         try {
             var rowstamp = string.Empty;
 
-            #region Variablen für Skript erstellen
-
-            VariableCollection vars = [];
             object addinfo = this;
-
             if (row != null && !row.IsDisposed) {
                 rowstamp = row.RowStamp();
-                foreach (var thisCol in Column) {
-                    var v = RowItem.CellToVariable(thisCol, row);
-                    if (v != null) { vars.AddRange(v); }
-                }
                 addinfo = row;
             }
 
-            foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, "Datenbank-Kopf-Variable\r\n" + thisvar.Comment);
-                vars.Add(v);
-            }
-
-            vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-            vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-            vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-            vars.Add(new VariableString("Tablename", TableName, true, "Der aktuelle Tabellenname."));
-            vars.Add(new VariableBool("ReadOnly", ReadOnly, true, "Ob die aktuelle Datenbank schreibgeschützt ist."));
-            vars.Add(new VariableFloat("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Datenbank")); // RowCount als Befehl belegt
-            vars.Add(new VariableString("NameOfFirstColumn", Column.First()?.KeyName ?? string.Empty, true, "Der Name der ersten Spalte"));
-            vars.Add(new VariableBool("SetErrorEnabled", s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula), true, "Marker, ob der Befehl 'SetError' benutzt werden kann."));
-
-            #endregion
+            var vars = CreateVariableCollection(row, false, s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula));
 
             #region  Erlaubte Methoden ermitteln
 

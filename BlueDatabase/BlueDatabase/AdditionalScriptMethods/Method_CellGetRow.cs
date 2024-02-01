@@ -32,8 +32,8 @@ public class Method_CellGetRow : Method_Database {
     public override List<List<string>> Args => [StringVal, RowVar];
     public override string Command => "cellgetrow";
     public override string Description => "Gibt den Wert einer Zelle zurück\r\nÄhnlicher Befehl: Lookup";
-     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Database | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
@@ -56,7 +56,7 @@ public class Method_CellGetRow : Method_Database {
         var c = db.Column.Exists(attvar.ValueStringGet(0));
         if (c == null) { return new DoItFeedback(infos.Data, "Spalte nicht gefunden: " + attvar.ValueStringGet(0)); }
 
-        var v = RowItem.CellToVariable(c, row);
+        var v = RowItem.CellToVariable(c, row, true);
         if (v == null || v.Count != 1) {
             return new DoItFeedback(infos.Data, "Wert der Variable konnte nicht gelesen werden: " + attvar.ValueStringGet(0));
         }

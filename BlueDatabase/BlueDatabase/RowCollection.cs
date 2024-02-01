@@ -144,7 +144,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         Database? db2 = null;
 
         foreach (var thisfi in fc) {
-            if (thisfi.FilterType is not FilterType.Istgleich and not FilterType.Istgleich_GroﬂKleinEgal) { return null; }
+            if (thisfi.FilterType is not FilterType.Istgleich
+                and not FilterType.Istgleich_GroﬂKleinEgal
+                 and not FilterType.Istgleich_ODER_GroﬂKleinEgal) { return null; }
             if (thisfi.Column == null) { return null; }
             if (thisfi.Database is not Database db1 || db1.IsDisposed) { return null; }
             db2 ??= db1;

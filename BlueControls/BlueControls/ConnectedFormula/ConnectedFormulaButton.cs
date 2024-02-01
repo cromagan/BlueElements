@@ -30,7 +30,6 @@ using BlueScript;
 using BlueScript.EventArgs;
 using BlueScript.Interfaces;
 using BlueScript.Methods;
-using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueControls.Controls;
@@ -39,17 +38,26 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
 
     #region Fields
 
+    private string _action = string.Empty;
     private string _arg1 = string.Empty;
     private string _arg2 = string.Empty;
     private string _arg3 = string.Empty;
     private string _arg4 = string.Empty;
     private ButtonArgs _enabledwhenrows;
 
-    private string _scriptname = string.Empty;
-
     #endregion
 
     #region Properties
+
+    public string Action {
+        get => _action;
+        set {
+            if (IsDisposed) { return; }
+            if (_action == value) { return; }
+            _action = value;
+            Invalidate();
+        }
+    }
 
     public string Arg1 {
         get => _arg1;
@@ -114,16 +122,6 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendSomething> Parents { get; } = [];
 
-    public string SkriptName {
-        get => _scriptname;
-        set {
-            if (IsDisposed) { return; }
-            if (_scriptname == value) { return; }
-            _scriptname = value;
-            Invalidate();
-        }
-    }
-
     #endregion
 
     #region Methods
@@ -179,7 +177,7 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
                 break;
         }
 
-        if (string.IsNullOrEmpty(_scriptname)) { enabled = false; }
+        if (string.IsNullOrEmpty(_action)) { enabled = false; }
 
         Enabled = enabled;
 
@@ -192,29 +190,31 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
         if (e.Button != MouseButtons.Left) { return; }
 
         if (Script.Commands == null) {
-            _ = new Script(null, string.Empty, new ScriptProperties());
-        }
-
-        if (Script.Commands == null) {
             ButtonError("Befehle konnten nicht initialisiert werden.");
             return;
         }
 
-        Method? m = Script.Commands.Get(_scriptname);
+        Method? m = Script.Commands.Get(_action);
 
         if (m is not IUseableForButton ufb) {
-            ButtonError("Befehl '" + _scriptname + "' nicht gefunden.");
+            ButtonError("Aktion '" + _action + "' nicht gefunden.");
             return;
         }
 
         if (!ButtonPadItem.PossibleFor(m, Drückbar_wenn)) {
-            ButtonError("Befehl '" + _scriptname + "' nicht möglich.");
+            ButtonError("Aktion '" + _action + "' nicht möglich.");
             return;
         }
 
-        var c = new VariableCollection();
+        VariableCollection vars;
         object? ai = null;
         var row = FilterInput?.RowSingleOrNull;
+
+        if (FilterInput?.Database is Database db) {
+            vars = db.CreateVariableCollection(row, true, false);
+        } else {
+            vars = new VariableCollection();
+        }
 
         #region FilterVariablen erstellen und in fis speichern
 
@@ -224,7 +224,7 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
             for (var fz = 0; fz < fi.Count; fz++) {
                 if (fi[fz] is FilterItem thisf) {
                     var nam = "Filter" + fz;
-                    c.Add(new VariableFilterItem(nam, thisf, true, "FilterInput" + fz));
+                    vars.Add(new VariableFilterItem(nam, thisf, true, "FilterInput" + fz));
                     fis = fis + nam + ",";
                 }
             }
@@ -239,13 +239,13 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
         var rn = "thisrow";
 
         if (row != null) {
-            c.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
+            vars.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
             ai = row;
         }
 
         #endregion
 
-        var f = ufb.DoIt(c, _arg1, _arg2, _arg3, _arg4, fis, rn, ai);
+        var f = ufb.DoIt(vars, _arg1, _arg2, _arg3, _arg4, fis, rn, ai);
 
         if (!string.IsNullOrEmpty(f)) {
             Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
