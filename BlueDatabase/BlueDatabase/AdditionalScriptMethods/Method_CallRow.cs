@@ -19,17 +19,23 @@
 
 using System.Collections.Generic;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallRow : Method_Database {
+public class Method_CallRow : Method_Database, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, RowVar];
+
+    public List<List<string>> ArgsForButton => [StringVal];
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
 
     public override string Command => "callrow";
 
@@ -39,12 +45,18 @@ public class Method_CallRow : Method_Database {
         "Um auf Datenbank-Variablen zugreifen zu können,\r\n" +
         "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
-     public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => false;
+
+    public override int LastArgMinCount => -1;
+
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
+
     public override bool MustUseReturnValue => false;
+
+    public string NiceTextForUser => "Ein Skript mit der eingehenden Zeile ausführen";
+
     public override string Returns => string.Empty;
+
     public override string StartSequence => "(";
 
     public override string Syntax => "CallRow(Scriptname, Row);";
@@ -75,6 +87,8 @@ public class Method_CallRow : Method_Database {
 
         return DoItFeedback.Null();
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + rowarg;
 
     #endregion
 }

@@ -216,7 +216,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         if (attributes == null || attributes.Count == 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen."); }
         if (attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
         if (lastArgMinCount <= 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu viele Attribute erhalten."); }
-        if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount-1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
+        if (lastArgMinCount >= 1 && attributes.Count < (types.Count + lastArgMinCount - 1)) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Zu wenige Attribute erhalten."); }
 
         //  Variablen und Routinen ersetzen
         VariableCollection feedbackVariables = [];
@@ -269,13 +269,13 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     /// <summary>
     ///
     /// </summary>
+    /// <param name="varCol"></param>
     /// <param name="infos"></param>
     /// <param name="scp"></param>
     /// <param name="newcommand">Erwartet wird: X=5;</param>
-    /// <param name="varCol"></param>
     /// <param name="generateVariable"></param>
     /// <returns></returns>
-    public static DoItFeedback VariablenBerechnung(CanDoFeedback infos, ScriptProperties scp, string newcommand, VariableCollection varCol, bool generateVariable) {
+    public static DoItFeedback VariablenBerechnung(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp, string newcommand, bool generateVariable) {
         //if (s.BerechneVariable == null) { return new DoItFeedback(infos.LogData, s, "Interner Fehler"); }
 
         var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);

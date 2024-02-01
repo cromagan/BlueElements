@@ -20,6 +20,8 @@
 using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
@@ -33,9 +35,8 @@ internal class Method_ImportCsv : Method_Database {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "importcsv";
     public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Datenbank.";
-     public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Database | MethodType.ChangeAnyDatabaseOrRow | MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;

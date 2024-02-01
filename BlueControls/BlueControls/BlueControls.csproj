@@ -165,7 +165,6 @@
     <Compile Include="ConnectedFormula\TextGenerator.Designer.cs">
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </Compile>
-    <Compile Include="Enums\ButtonArgs.cs" />
     <Compile Include="Enums\FilterTypeRowInputItem.cs" />
     <Compile Include="Enums\FlexiFilterDefaultFilter.cs" />
     <Compile Include="Enums\FlexiFilterDefaultOutput.cs" />

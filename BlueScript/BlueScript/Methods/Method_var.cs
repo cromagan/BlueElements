@@ -34,8 +34,8 @@ internal class Method_Var : Method {
     public override List<List<string>> Args => [[Variable.Any_Plain]];
     public override string Command => "var";
     public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
-     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.Standard;
     public override bool MustUseReturnValue => false;
     public override string Returns => string.Empty;
@@ -49,7 +49,7 @@ internal class Method_Var : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback(infos.Data, "Kein Text angekommen."); }
 
-        return VariablenBerechnung(infos, scp, infos.AttributText + ";", varCol, true);
+        return VariablenBerechnung(varCol, infos, scp, infos.AttributText + ";", true);
     }
 
     #endregion

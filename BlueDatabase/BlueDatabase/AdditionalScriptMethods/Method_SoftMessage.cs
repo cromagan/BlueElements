@@ -20,24 +20,40 @@
 using System.Collections.Generic;
 using BlueBasics.Enums;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_SoftMessage : Method_Database {
+public class Method_SoftMessage : Method_Database, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
+
+    public List<List<string>> ArgsForButton => Args;
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
+
     public override string Command => "softmessage";
+
     public override string Description => "Gibt in der Statusleiste einen Nachricht aus, wenn ein Steuerelement vorhanden ist, dass diese anzeigen kann.";
+
     public override bool GetCodeBlockAfter => false;
+
     public override int LastArgMinCount => -1;
+
     public override MethodType MethodType => MethodType.Database;
+
     public override bool MustUseReturnValue => false;
+
+    public string NiceTextForUser => "Text in der unteren Statusleiste ausgeben";
+
     public override string Returns => string.Empty;
+
     public override string StartSequence => "(";
 
     public override string Syntax => "SoftMessage(Text);";
@@ -58,6 +74,8 @@ public class Method_SoftMessage : Method_Database {
 
         return DoItFeedback.Null();
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1;
 
     #endregion
 }

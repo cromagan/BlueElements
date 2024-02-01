@@ -111,7 +111,7 @@ public class Script {
                             return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", ld);
                         }
                         var infos = new CanDoFeedback(f.ContinuePosition, f.AttributeText, string.Empty, ld);
-                        var fn = Method.VariablenBerechnung(infos, scp, commandtext + f.AttributeText + ";", varCol, false);
+                        var fn = Method.VariablenBerechnung(varCol, infos, scp, commandtext + f.AttributeText + ";", false);
                         return new DoItWithEndedPosFeedback(fn.AllOk, fn.Variable, f.ContinuePosition, fn.BreakFired, fn.EndScript);
                     }
                 }

@@ -21,18 +21,21 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using BlueBasics.Enums;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallDatabase : Method_Database {
+public class Method_CallDatabase : Method_Database, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
-
+    public List<List<string>> ArgsForButton => [StringVal, StringVal, StringVal];
+    public ButtonArgs ClickableWhen => ButtonArgs.Egal;
     public override string Command => "calldatabase";
 
     public override string Description => "Führt das Skript in der angegebenen Datenabank aus.\r\n" +
@@ -45,9 +48,9 @@ public class Method_CallDatabase : Method_Database {
     public override int LastArgMinCount => 1;
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => false;
+    public string NiceTextForUser => "Ein Skript einer anderen Datenbank ausführen";
     public override string Returns => string.Empty;
     public override string StartSequence => "(";
-
     public override string Syntax => "CallDatabase(DatabaseName, Scriptname, Attribut0, ...);";
 
     #endregion
@@ -86,6 +89,8 @@ public class Method_CallDatabase : Method_Database {
 
         return DoItFeedback.Null();
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + arg2 + "," + arg3;
 
     #endregion
 }

@@ -19,12 +19,13 @@
 
 using System;
 
-namespace BlueControls.Enums;
+namespace BlueScript.EventArgs;
 
 [Flags]
 public enum ButtonArgs {
-    Egal = -1,
-    Keine_Zeile = 0,
-    Genau_eine_Zeile = 1,
-    Eine_oder_mehr_Zeilen = 2
+    Nie = 0,
+    Egal = 1,
+    Keine_Zeile = 2,
+    Genau_eine_Zeile = 4,
+    Eine_oder_mehr_Zeilen = 8
 }

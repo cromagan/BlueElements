@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Extensions;
@@ -30,19 +32,34 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_DirectoryCreate : Method {
+internal class Method_DirectoryCreate : Method, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
+
+    public List<List<string>> ArgsForButton => Args;
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
+
     public override string Command => "directorycreate";
+
     public override string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
-     public override int LastArgMinCount => -1;
+
     public override bool GetCodeBlockAfter => false;
+
+    public override int LastArgMinCount => -1;
+
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+
     public override bool MustUseReturnValue => false;
+
+    public string NiceTextForUser => "Ein Verzeichnis im Dateisystem erstellen";
+
     public override string Returns => VariableBool.ShortName_Plain;
+
     public override string StartSequence => "(";
+
     public override string Syntax => "DirectoryCreate(Path)";
 
     #endregion
@@ -63,6 +80,8 @@ internal class Method_DirectoryCreate : Method {
 
         return !DirectoryExists(p) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1;
 
     #endregion
 }

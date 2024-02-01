@@ -22,6 +22,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
@@ -29,11 +31,15 @@ using static BlueBasics.IO;
 namespace BlueScript.Methods;
 
 // ReSharper disable once ClassNeverInstantiated.Global
-public class Method_CallByFilename : Method {
+public class Method_CallByFilename : Method, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, BoolVal];
+
+    public List<List<string>> ArgsForButton => [StringVal];
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Egal;
 
     public override string Command => "callbyfilename";
 
@@ -41,13 +47,20 @@ public class Method_CallByFilename : Method {
                                                 "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
                                             "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
-     public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => false;
+
+    public override int LastArgMinCount => -1;
+
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+
     public override bool MustUseReturnValue => false;
+
+    public string NiceTextForUser => "Ein Skript aus dem Dateisystem ausführen";
+
     public override string Returns => string.Empty;
+
     public override string StartSequence => "(";
+
     public override string Syntax => "CallByFilename(Filename, KeepVariables);";
 
     #endregion
@@ -138,6 +151,8 @@ public class Method_CallByFilename : Method {
         if (!scx.AllOk) { return scx; }
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1;
 
     #endregion
 }

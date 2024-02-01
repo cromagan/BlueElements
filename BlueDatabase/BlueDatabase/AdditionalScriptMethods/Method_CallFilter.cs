@@ -19,17 +19,23 @@
 
 using System.Collections.Generic;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_CallFilter : Method_Database {
+public class Method_CallFilter : Method_Database, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, FilterVar];
+
+    public List<List<string>> ArgsForButton => [StringVal];
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Eine_oder_mehr_Zeilen;
 
     public override string Command => "callfilter";
 
@@ -40,10 +46,17 @@ public class Method_CallFilter : Method_Database {
                                             "die vorher verändert wurden, muss WriteBackDBVariables zuvor ausgeführt werden.";
 
     public override bool GetCodeBlockAfter => false;
+
     public override int LastArgMinCount => 1;
+
     public override MethodType MethodType => MethodType.ChangeAnyDatabaseOrRow | MethodType.NeedLongTime;
+
     public override bool MustUseReturnValue => false;
+
+    public string NiceTextForUser => "Ein Skript für jede Zeile der Filterung ausführen";
+
     public override string Returns => string.Empty;
+
     public override string StartSequence => "(";
 
     public override string Syntax => "CallFilter(SubName, Filter, ...);";
@@ -85,6 +98,8 @@ public class Method_CallFilter : Method_Database {
 
         return DoItFeedback.Null();
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + filterarg;
 
     #endregion
 }

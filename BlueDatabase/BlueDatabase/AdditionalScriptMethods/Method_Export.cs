@@ -23,25 +23,42 @@ using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueDatabase.Enums;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_Export : Method_Database {
+internal class Method_Export : Method_Database, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
+
+    public List<List<string>> ArgsForButton => [StringVal, StringVal, StringVal];
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Eine_oder_mehr_Zeilen;
+
     public override string Command => "export";
+
     public override string Description => "Exportiert die Datenbank im angegeben Format. Achtung, bei BDB wird immer die gesamte Datenbank exportiert und die angegebenen Attribute ingnoriert.";
+
     public override bool GetCodeBlockAfter => false;
+
     public override int LastArgMinCount => 1;
+
     public override MethodType MethodType => MethodType.Database | MethodType.IO | MethodType.NeedLongTime;
+
     public override bool MustUseReturnValue => false;
+
+    public string NiceTextForUser => "Die gefilterten Zeilen ins Dateisystem exportieren";
+
     public override string Returns => string.Empty;
+
     public override string StartSequence => "(";
+
     public override string Syntax => "Export(Filename, HTML/CSV/BDB, AnsichtName, Filter, ...);";
 
     #endregion
@@ -137,6 +154,8 @@ internal class Method_Export : Method_Database {
 
         return DoItFeedback.Null();
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + arg2 + "," + arg3 + "," + filterarg;
 
     #endregion
 }

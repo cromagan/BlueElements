@@ -20,6 +20,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.Generic;
@@ -28,20 +30,34 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_SetClipboard : Method {
+internal class Method_SetClipboard : Method, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal];
+
+    public List<List<string>> ArgsForButton => [StringVal];
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
+
     public override string Command => "setclipboard";
+
     public override string Description => "Speichert den Text im Clipboard.";
-     public override int LastArgMinCount => -1;
 
     public override bool GetCodeBlockAfter => false;
+
+    public override int LastArgMinCount => -1;
+
     public override MethodType MethodType => MethodType.IO | MethodType.ManipulatesUser;
+
     public override bool MustUseReturnValue => false;
+
+    public string NiceTextForUser => "Text in die Zwischenablage kopieren";
+
     public override string Returns => string.Empty;
+
     public override string StartSequence => "(";
+
     public override string Syntax => "SetClipboard(Text);";
 
     #endregion
@@ -57,6 +73,8 @@ internal class Method_SetClipboard : Method {
 
         return DoItFeedback.Null();
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1;
 
     #endregion
 }

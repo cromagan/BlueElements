@@ -27,6 +27,8 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
 using BlueScript;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -198,15 +200,9 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
             return;
         }
 
-        Method? m = null;
-        foreach (var cmd in Script.Commands) {
-            if (cmd.Syntax.Equals(_scriptname, System.StringComparison.OrdinalIgnoreCase)) {
-                m = cmd;
-                break;
-            }
-        }
+        Method? m = Script.Commands.Get(_scriptname);
 
-        if (m == null) {
+        if (m is not IUseableForButton ufb) {
             ButtonError("Befehl '" + _scriptname + "' nicht gefunden.");
             return;
         }
@@ -216,32 +212,9 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
             return;
         }
 
-        var r = FilterInput?.Rows;
-
-        var f = string.Empty;
-
-        if (r == null) {
-            f = DoMethod(m, null);
-        } else {
-            foreach (var thisr in r) {
-                f = DoMethod(m, thisr);
-                if (!string.IsNullOrEmpty(f)) { break; }
-            }
-        }
-
-        if (!string.IsNullOrEmpty(f)) {
-            Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
-        }
-    }
-
-    private void ButtonError(string message) {
-        Forms.MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
-    }
-
-    private string DoMethod(Method m, RowItem? row) {
-        List<string> a = [_arg1, _arg2, _arg3, _arg4];
-
         var c = new VariableCollection();
+        object? ai = null;
+        var row = FilterInput?.RowSingleOrNull;
 
         #region FilterVariablen erstellen und in fis speichern
 
@@ -255,6 +228,7 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
                     fis = fis + nam + ",";
                 }
             }
+            ai = fi.Database;
         }
         fis = fis.TrimEnd(",");
 
@@ -262,49 +236,24 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
 
         #region RowVariable ertellen
 
+        var rn = "thisrow";
+
         if (row != null) {
             c.Add(new VariableRowItem("thisrow", row, true, "Eingangszeile"));
+            ai = row;
         }
 
         #endregion
 
-        #region Attribut-Text erstellen (args)
+        var f = ufb.DoIt(c, _arg1, _arg2, _arg3, _arg4, fis, rn, ai);
 
-        var args = string.Empty;
-        var argc = 0;
-
-        for (var nr = 0; nr < m.Args.Count; nr++) {
-            var thisarg = m.Args[nr];
-            if (nr > 0) { args += ","; }
-
-            if (thisarg[0] == VariableString.ShortName_Plain) {
-                args += a[argc];
-                argc++;
-            } else if (thisarg[0] == VariableFloat.ShortName_Plain) {
-                args += a[argc];
-                argc++;
-            } else if (thisarg[0] == VariableBool.ShortName_Plain) {
-                args += a[argc];
-                argc++;
-            } else if (thisarg[0] == VariableRowItem.ShortName_Variable) {
-                args += "thisrow";
-            } else if (thisarg[0] == VariableFilterItem.ShortName_Variable) {
-                args += fis;
-            } else {
-                Develop.DebugPrint(thisarg[0]);
-            }
+        if (!string.IsNullOrEmpty(f)) {
+            Forms.MessageBox.Show("Dieser Knopfdruck wurde nicht komplett ausgeführt.\r\n\r\nGrund:\r\n" + f, BlueBasics.Enums.ImageCode.Kritisch, "Ok");
         }
+    }
 
-        #endregion
-
-        var ld = new LogData("Knopfdruck", 0);
-        var cdw = new CanDoFeedback(0, args, string.Empty, ld);
-        var scp = new ScriptProperties(BlueScript.Enums.MethodType.Standard, true, [], row);
-
-        var erg = m.DoIt(c, cdw, scp);
-
-        if (erg.AllOk) { return string.Empty; }
-        return cdw.Data.Protocol.JoinWithCr();
+    private void ButtonError(string message) {
+        Forms.MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
     }
 
     #endregion

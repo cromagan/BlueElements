@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using BlueBasics;
 using BlueScript;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -28,11 +30,15 @@ using BlueScript.Variables;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-internal class Method_Call : Method_Database {
+internal class Method_Call : Method_Database, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, BoolVal];
+
+    public List<List<string>> ArgsForButton => [StringVal];
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Egal;
 
     public override string Command => "call";
 
@@ -40,13 +46,20 @@ internal class Method_Call : Method_Database {
             "Mit KeepVariables kann bestimmt werden, ob die Variablen aus der Subroutine behalten werden sollen.\r\n" +
         "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
-     public override int LastArgMinCount => -1;
-
     public override bool GetCodeBlockAfter => false;
+
+    public override int LastArgMinCount => -1;
+
     public override MethodType MethodType => MethodType.Database;
+
     public override bool MustUseReturnValue => false;
+
+    public string NiceTextForUser => "Ein Skript aus dieser Datenbank ausführen";
+
     public override string Returns => string.Empty;
+
     public override string StartSequence => "(";
+
     public override string Syntax => "Call(SubName, KeepVariables);";
 
     #endregion
@@ -82,6 +95,8 @@ internal class Method_Call : Method_Database {
         if (!scx.AllOk) { return scx; }
         return DoItFeedback.Null(); // Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1;
 
     #endregion
 }

@@ -20,6 +20,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Structures;
 using BlueScript.Variables;
 using static BlueBasics.IO;
@@ -28,19 +30,34 @@ namespace BlueScript.Methods;
 
 // ReSharper disable once UnusedMember.Global
 [SuppressMessage("Microsoft.Performance", "CA1812:AvoidUninstantiatedInternalClasses")]
-internal class Method_MoveDirectory : Method {
+internal class Method_MoveDirectory : Method, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [StringVal, StringVal];
+
+    public List<List<string>> ArgsForButton => Args;
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Genau_eine_Zeile;
+
     public override string Command => "movedirectory";
+
     public override string Description => "Verschiebt einen Ordner.";
-     public override int LastArgMinCount => -1;
+
     public override bool GetCodeBlockAfter => false;
+
+    public override int LastArgMinCount => -1;
+
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+
     public override bool MustUseReturnValue => false;
+
+    public string NiceTextForUser => "Ein Verzeichniss im Dateisystem verschieben";
+
     public override string Returns => string.Empty;
+
     public override string StartSequence => "(";
+
     public override string Syntax => "MoveDirectory(SourceCompleteName, DestinatonCompleteName)";
 
     #endregion
@@ -66,6 +83,8 @@ internal class Method_MoveDirectory : Method {
 
         return DoItFeedback.Null();
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => arg1 + "," + arg2;
 
     #endregion
 }

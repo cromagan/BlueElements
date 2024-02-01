@@ -31,6 +31,8 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueScript;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Variables;
 using static BlueBasics.Converter;
@@ -171,6 +173,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
             if (_scriptname == value) { return; }
             _scriptname = value;
             OnChanged();
+            UpdateSideOptionMenu();
         }
     }
 
@@ -181,62 +184,66 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
     #region Methods
 
     public static bool PossibleFor(Method toCheck, ButtonArgs clickableWhen) {
-        if (toCheck.GetCodeBlockAfter) { return false; }
-        if (toCheck.Args.Count == 0) { return false; }
-        if (toCheck.MustUseReturnValue) { return false; }
+        if (toCheck is not IUseableForButton ufb) { return false; }
 
-        if (clickableWhen is not ButtonArgs.Egal and
-                              not ButtonArgs.Genau_eine_Zeile) {
-            // Egal MUSS eine Zeile berechnen. Und da müssen am End die Filter rein
-            // Und DIESE müssen endlos erlaubt sein.
-            if (toCheck.LastArgMinCount < 1) { return false; }
-            if (toCheck.Args.Count > 4) { return false; }
-        } else {
-            if (toCheck.LastArgMinCount != -1) { return false; }
-            if (toCheck.Args.Count > 5) { return false; }
-        }
+        if (!ufb.ClickableWhen.HasFlag(clickableWhen)) { return false; }
 
-        int? rowno = null;
-        int? fono = null;
+        //if (toCheck.GetCodeBlockAfter) { return false; }
+        //if (toCheck.Args.Count == 0) { return false; }
+        //if (toCheck.MustUseReturnValue) { return false; }
 
-        for (var nr = 0; nr < toCheck.Args.Count; nr++) {
-            var thisarg = toCheck.Args[nr];
+        //if (clickableWhen is not ButtonArgs.Egal and
+        //                      not ButtonArgs.Genau_eine_Zeile) {
+        //    // Egal MUSS eine Zeile berechnen. Und da müssen am End die Filter rein
+        //    // Und DIESE müssen endlos erlaubt sein.
+        //    if (toCheck.LastArgMinCount < 1) { return false; }
+        //    if (toCheck.Args.Count > 4) { return false; }
+        //} else {
+        //    if (toCheck.LastArgMinCount != -1) { return false; }
+        //    if (toCheck.Args.Count > 5) { return false; }
+        //}
 
-            if (thisarg.Count != 1) { return false; }
+        //int? rowno = null;
+        //int? fono = null;
 
-            if (thisarg[0] != VariableFloat.ShortName_Plain &&
-                thisarg[0] != VariableString.ShortName_Plain &&
-                thisarg[0] != VariableBool.ShortName_Plain &&
-                thisarg[0] != VariableFilterItem.ShortName_Variable &&
-                thisarg[0] != VariableRowItem.ShortName_Variable) { return false; }
+        //for (var nr = 0; nr < toCheck.Args.Count; nr++) {
+        //    var thisarg = toCheck.Args[nr];
 
-            if (thisarg[0] == VariableRowItem.ShortName_Variable) {
-                if (rowno != null) { return false; }
-                rowno = nr;
-            }
+        //    if (thisarg.Count != 1) { return false; }
 
-            if (thisarg[0] == VariableFilterItem.ShortName_Variable) {
-                if (fono != null) { return false; }
-                fono = nr;
-            }
-        }
+        //    if (thisarg[0] != VariableFloat.ShortName_Plain &&
+        //        thisarg[0] != VariableString.ShortName_Plain &&
+        //        thisarg[0] != VariableBool.ShortName_Plain &&
+        //        thisarg[0] != VariableFilterItem.ShortName_Variable &&
+        //        thisarg[0] != VariableRowItem.ShortName_Variable) { return false; }
 
-        if (fono != null && rowno != null) { return false; }
+        //    if (thisarg[0] == VariableRowItem.ShortName_Variable) {
+        //        if (rowno != null) { return false; }
+        //        rowno = nr;
+        //    }
 
-        if (clickableWhen is ButtonArgs.Keine_Zeile or
-            ButtonArgs.Eine_oder_mehr_Zeilen) {
-            if (rowno != null) { return false; }
-            if (fono == null || fono != toCheck.Args.Count - 1) { return false; }
-        }
+        //    if (thisarg[0] == VariableFilterItem.ShortName_Variable) {
+        //        if (fono != null) { return false; }
+        //        fono = nr;
+        //    }
+        //}
 
-        if (clickableWhen == ButtonArgs.Genau_eine_Zeile) {
-            //Steuerung über Variablen möglich!
-            //if (rowno == null) { return false; }
-        }
+        //if (fono != null && rowno != null) { return false; }
 
-        if (clickableWhen == ButtonArgs.Egal) {
-            if (fono != null || rowno != null) { return false; }
-        }
+        //if (clickableWhen is ButtonArgs.Keine_Zeile or
+        //    ButtonArgs.Eine_oder_mehr_Zeilen) {
+        //    if (rowno != null) { return false; }
+        //    if (fono == null || fono != toCheck.Args.Count - 1) { return false; }
+        //}
+
+        //if (clickableWhen == ButtonArgs.Genau_eine_Zeile) {
+        //    //Steuerung über Variablen möglich!
+        //    //if (rowno == null) { return false; }
+        //}
+
+        //if (clickableWhen == ButtonArgs.Egal) {
+        //    if (fono != null || rowno != null) { return false; }
+        //}
 
         return true;
     }
@@ -313,17 +320,22 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         if (Script.Commands != null) {
             foreach (var cmd in Script.Commands) {
-                if (PossibleFor(cmd, Drückbar_wenn)) {
-                    co.Add(cmd);
+                if (PossibleFor(cmd, Drückbar_wenn) && cmd is IUseableForButton ufb2) {
+                    co.Add(ufb2.Command, ufb2.NiceTextForUser);
                 }
             }
         }
 
         l.Add(new FlexiControlForProperty<string>(() => SkriptName, co));
-        l.Add(new FlexiControlForProperty<string>(() => Arg1));
-        l.Add(new FlexiControlForProperty<string>(() => Arg2));
-        l.Add(new FlexiControlForProperty<string>(() => Arg3));
-        l.Add(new FlexiControlForProperty<string>(() => Arg4));
+
+        Method? m = Script.Commands.Get(_scriptname);
+
+        if (m is IUseableForButton ufb) {
+            if (ufb.ArgsForButton.Count > 0) { l.Add(new FlexiControlForProperty<string>(() => Arg1)); }
+            if (ufb.ArgsForButton.Count > 1) { l.Add(new FlexiControlForProperty<string>(() => Arg2)); }
+            if (ufb.ArgsForButton.Count > 2) { l.Add(new FlexiControlForProperty<string>(() => Arg3)); }
+            if (ufb.ArgsForButton.Count > 3) { l.Add(new FlexiControlForProperty<string>(() => Arg4)); }
+        }
 
         return l;
     }

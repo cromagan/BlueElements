@@ -20,6 +20,8 @@
 using System.Collections.Generic;
 using BlueScript;
 using BlueScript.Enums;
+using BlueScript.EventArgs;
+using BlueScript.Interfaces;
 using BlueScript.Methods;
 using BlueScript.Structures;
 using BlueScript.Variables;
@@ -28,11 +30,16 @@ using static BlueDatabase.AdditionalScriptMethods.Method_Database;
 namespace BlueDatabase.AdditionalScriptMethods;
 
 // ReSharper disable once UnusedMember.Global
-public class Method_RowUnique : Method {
+public class Method_RowUnique : Method, IUseableForButton {
 
     #region Properties
 
     public override List<List<string>> Args => [FilterVar];
+
+    public List<List<string>> ArgsForButton => [];
+
+    public ButtonArgs ClickableWhen => ButtonArgs.Keine_Zeile;
+
     public override string Command => "rowunique";
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
@@ -41,11 +48,19 @@ public class Method_RowUnique : Method {
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen";
 
     public override bool GetCodeBlockAfter => false;
+
     public override int LastArgMinCount => 1;
+
     public override MethodType MethodType => MethodType.IO | MethodType.NeedLongTime;
+
     public override bool MustUseReturnValue => true;
+
+    public string NiceTextForUser => "Eine neue Zeile mit den eingehenden Filterwerten anlegen";
+
     public override string Returns => VariableRowItem.ShortName_Variable;
+
     public override string StartSequence => "(";
+
     public override string Syntax => "RowUnique( Filter, ...)";
 
     #endregion
@@ -72,6 +87,8 @@ public class Method_RowUnique : Method {
 
         return Method_Row.RowToObjectFeedback(r[0]);
     }
+
+    public string TranslateButtonArgs(string arg1, string arg2, string arg3, string arg4, string filterarg, string rowarg) => filterarg;
 
     #endregion
 }
