@@ -119,13 +119,12 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
     #region Methods
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        this.DoInputFilter(null, false);
-        FilterInput_RowChanged(sender, e);
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
     public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
+        this.DoInputFilter(null, false);
         GenerateColumns();// Wegen der Datenbank
         GenerateItemsAndText();
         Invalidate();
@@ -134,7 +133,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
     public void Parents_Added(bool hasFilter) {
         if (IsDisposed) { return; }
         if (!hasFilter) { return; }
-        FilterInput_Changed(null, System.EventArgs.Empty);
+        FilterInput_RowChanged(null, System.EventArgs.Empty);
     }
 
     /// <summary>

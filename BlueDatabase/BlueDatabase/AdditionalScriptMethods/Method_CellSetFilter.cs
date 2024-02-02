@@ -49,7 +49,7 @@ public class Method_CellSetFilter : Method_Database {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 2);
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
         var db = allFi.Database;

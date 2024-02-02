@@ -98,7 +98,6 @@ public static class IControlAcceptSomethingExtension {
         if (parent.Childs.AddIfNotExists(child)) {
             parent.FilterOutput.Changing += child.FilterInput_Changing;
             parent.FilterOutput.Changed += child.FilterInput_Changed;
-            parent.FilterOutput.RowsChanged += child.FilterInput_RowChanged;
             parent.FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
             //child.DisposingEvent += Child_DisposingEvent;
             //parent.DisposingEvent += Parent_DisposingEvent;
@@ -126,7 +125,6 @@ public static class IControlAcceptSomethingExtension {
 
             parent.FilterOutput.Changing -= child.FilterInput_Changing;
             parent.FilterOutput.Changed -= child.FilterInput_Changed;
-            parent.FilterOutput.RowsChanged -= child.FilterInput_RowChanged;
             parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
         }
     }
@@ -145,7 +143,7 @@ public static class IControlAcceptSomethingExtension {
 
         if (item.Parents.Count == 0) {
             if (doEmptyFilterToo && mustbeDatabase != null) {
-                item.FilterInput = new FilterCollection(mustbeDatabase, "Empty Input Filter");
+                item.SetFilterInput(new FilterCollection(mustbeDatabase, "Empty Input Filter"));
             }
             return;
         }
@@ -153,11 +151,11 @@ public static class IControlAcceptSomethingExtension {
         if (item.Parents.Count == 1) {
             if (item.Parents[0].FilterOutput.Clone("FilterOfSender") is FilterCollection fc2) {
                 if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {
-                    item.FilterInput = new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 1"), "Datenbanken inkonsitent");
+                    item.SetFilterInput(new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 1"), "Datenbanken inkonsitent"));
                     return;
                 }
 
-                item.FilterInput = fc2;
+                item.SetFilterInput(fc2);
                 return;
             }
         }
@@ -167,7 +165,7 @@ public static class IControlAcceptSomethingExtension {
         foreach (var thiss in item.Parents) {
             if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
                 if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
-                    item.FilterInput = new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 2"), "Datenbanken inkonsitent");
+                    item.SetFilterInput(new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 2"), "Datenbanken inkonsitent"));
                     return;
                 }
 
@@ -176,7 +174,7 @@ public static class IControlAcceptSomethingExtension {
             }
         }
 
-        item.FilterInput = fc;
+        item.SetFilterInput(fc);
     }
 
     /// <summary>
@@ -208,7 +206,21 @@ public static class IControlAcceptSomethingExtension {
         if (item.IsDisposed) { return; }
         if (checkmanuelseted && item.FilterManualSeted) { return; }
         item.FilterInput?.Dispose();
-        item.FilterInput = null;
+        item.SetFilterInput(null);
+    }
+
+    public static void SetFilterInput(this IControlAcceptSomething item, FilterCollection? filterCollection) {
+        if (item.FilterInput != null) {
+            item.FilterInput.RowsChanged -= item.FilterInput_RowChanged;
+        }
+
+        if (filterCollection != null && filterCollection.IsDisposed) { filterCollection = null; }
+
+        item.FilterInput = filterCollection;
+
+        if (item.FilterInput != null) {
+            item.FilterInput.RowsChanged += item.FilterInput_RowChanged;
+        }
     }
 
     public static void SetToRow(this IControlAcceptSomething item, RowItem? row) {
@@ -221,8 +233,9 @@ public static class IControlAcceptSomethingExtension {
         if (row?.Database == null && item.FilterInput == null) { return; }
 
         if (row?.Database is Database db && !db.IsDisposed) {
-            item.FilterInput ??= new FilterCollection(db, "SetToRow");
-            item.FilterInput.Database = db;
+            var fc = new FilterCollection(db, "SetToRow");
+            fc.Database = db;
+            item.SetFilterInput(fc);
         }
 
         if (item.FilterInput != null) {

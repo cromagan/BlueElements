@@ -167,19 +167,16 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         return false;
     }
 
-    public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        this.DoInputFilter(null, false);
-        FilterInput_RowChanged(sender, e);
-    }
+    public void FilterInput_Changed(object? sender, System.EventArgs e) { }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
     public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
-        Invalidate();
-
+        this.DoInputFilter(null, false);
         var row = FilterInput?.RowSingleOrNull;
         row?.CheckRowDataIfNeeded();
         ParseVariables(row?.LastCheckedEventArgs?.Variables);
+        Invalidate();
     }
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
@@ -196,7 +193,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     public void Parents_Added(bool hasFilter) {
         if (IsDisposed) { return; }
         if (!hasFilter) { return; }
-        FilterInput_Changed(null, System.EventArgs.Empty);
+        FilterInput_RowChanged(null, System.EventArgs.Empty);
     }
 
     public bool ParseVariables(VariableCollection? list) {

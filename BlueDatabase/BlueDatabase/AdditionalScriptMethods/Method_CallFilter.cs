@@ -69,7 +69,7 @@ public class Method_CallFilter : Method_Database, IUseableForButton {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 1);
 
         if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 

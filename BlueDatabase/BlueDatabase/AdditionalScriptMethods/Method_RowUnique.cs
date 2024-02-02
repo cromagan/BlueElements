@@ -71,12 +71,16 @@ public class Method_RowUnique : Method, IUseableForButton {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
-        if (allFi is null || allFi.Count == 0) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
+        if (allFi is null || allFi.Count == 0) {
+            return new DoItFeedback(infos.Data, "Fehler im Filter");
+        }
 
         var r = allFi.Rows;
 
-        if (r.Count > 1) { return new DoItFeedback(infos.Data, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount."); }
+        if (r.Count > 1) {
+            return new DoItFeedback(infos.Data, "Datenbankfehler, zu viele Einträge gefunden. Zuvor Prüfen mit RowCount.");
+        }
 
         if (r.Count == 0) {
             if (!scp.ChangeValues) { return new DoItFeedback(infos.Data, "Zeile anlegen im Testmodus deaktiviert."); }

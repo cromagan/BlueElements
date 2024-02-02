@@ -61,7 +61,7 @@ public class Method_Row : Method {
         var attvar = SplitAttributeToVars(varCol, infos.AttributText, Args, LastArgMinCount, infos.Data, scp);
         if (!string.IsNullOrEmpty(attvar.ErrorMessage)) { return DoItFeedback.AttributFehler(infos.Data, this, attvar); }
 
-        var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
+        using var allFi = Method_Filter.ObjectToFilter(attvar.Attributes, 0);
         if (allFi is null) { return new DoItFeedback(infos.Data, "Fehler im Filter"); }
 
         var r = allFi.Rows;

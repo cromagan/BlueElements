@@ -306,6 +306,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public void OnRowsChanged() {
         if (IsDisposed) { return; }
+        //if(_rows == null) { return;}
         RowsChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -354,7 +355,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// </summary>
     public void RemoveOtherAndAdd(FilterItem fi) {
         if (IsDisposed) { return; }
-        if (fi == null || Exists(fi)) { return; }
+        if (Exists(fi)) { return; }
         if (!fi.IsOk()) {
             Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!");
             return;

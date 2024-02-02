@@ -48,8 +48,6 @@ public class Method_Filter : Method_Database {
     #region Methods
 
     public static FilterCollection? ObjectToFilter(VariableCollection attributes, int ab) {
-        if (attributes == null) { return null; }
-
         var allFi = new List<FilterItem>();
 
         for (var z = ab; z < attributes.Count; z++) {
