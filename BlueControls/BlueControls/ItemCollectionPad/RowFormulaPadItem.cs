@@ -35,6 +35,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     #region Fields
 
+    private Database? _database;
     private string _lastQuickInfo = string.Empty;
     private string _layoutFileName;
     private string _rowKey;
@@ -54,7 +55,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
     public RowFormulaPadItem(string internalname, Database? database, string rowkey, string layoutFileName) : base(internalname) {
         Database = database;
-        if (Database != null) { Database.DisposingEvent += _Database_Disposing; }
         _rowKey = rowkey;
         _layoutFileName = layoutFileName;
     }
@@ -64,7 +64,24 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     #region Properties
 
     public static string ClassId => "ROW";
-    public Database? Database { get; private set; }
+
+    public Database? Database {
+        get => _database;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= _database_Disposing;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+            }
+        }
+    }
+
     public override string Description => string.Empty;
 
     /// <summary>
@@ -107,9 +124,9 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l = [];
 
-        if (Row?.Database is Database dbl) {
+        if (Row?.Database is Database db && !db.IsDisposed) {
             ItemCollectionList.ItemCollectionList layouts = new(true);
-            foreach (var thisLayouts in dbl.GetAllLayouts()) {
+            foreach (var thisLayouts in db.GetAllLayouts()) {
                 ItemCollectionPad p = new(thisLayouts, string.Empty);
                 _ = layouts.Add(p.Caption, p.KeyName, ImageCode.Stern);
             }
@@ -129,7 +146,6 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
 
             case "database":
                 Database = Database.GetById(new ConnectionInfo(value.FromNonCritical(), null, string.Empty), false, null, true);
-                Database.DisposingEvent += _Database_Disposing;
                 return true;
 
             case "rowid": // TODO: alt
@@ -170,7 +186,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     }
 
     protected override void GeneratePic() {
-        if (string.IsNullOrEmpty(_layoutFileName) || Database is not Database db || db.IsDisposed) {
+        if (IsDisposed || string.IsNullOrEmpty(_layoutFileName) || Database is not Database db || db.IsDisposed) {
             GeneratedBitmap = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }
@@ -205,8 +221,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
     //    return null;
     //}
 
-    private void _Database_Disposing(object sender, System.EventArgs e) {
-        Database.DisposingEvent -= _Database_Disposing;
+    private void _database_Disposing(object sender, System.EventArgs e) {
         Database = null;
         RemovePic();
     }

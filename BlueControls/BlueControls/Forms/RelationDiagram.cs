@@ -36,6 +36,8 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     private readonly ColumnItem? _column;
 
+    private Database? _database;
+
     #endregion
 
     #region Constructors
@@ -46,8 +48,8 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Database = database;
 
-        if (Database is not Database db || db.IsDisposed) { return; }
-        Database.DisposingEvent += Database_Disposing;
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+
         foreach (var thisColumnItem in db.Column) {
             if (thisColumnItem != null && thisColumnItem.Format == DataFormat.RelationText) {
                 _column = thisColumnItem;
@@ -60,7 +62,22 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
     #region Properties
 
-    public Database? Database { get; private set; }
+    public Database? Database {
+        get => _database;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= _database_Disposing;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+            }
+        }
+    }
 
     #endregion
 
@@ -69,7 +86,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     //private bool RelationsValid;
     //   Dim ItS As New Size(60, 80)
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
         if (string.IsNullOrEmpty(what)) { return null; }
         if (Pad?.Item?[what] != null) { return null; }
         var r = db.Row[what];
@@ -100,16 +117,17 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
-        base.OnFormClosing(e);
-        if (Database is Database db) {
-            db.DisposingEvent -= Database_Disposing;
-        }
-
         Database = null;
+        base.OnFormClosing(e);
+    }
+
+    private void _database_Disposing(object sender, System.EventArgs e) {
+        Database = null;
+        Close();
     }
 
     private void BezPlus(RowFormulaPadItem initialItem) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (_column == null || initialItem.Row == null || db.Column.First() is not ColumnItem cf) { return; }
 
         // Den Beziehungstext holen
@@ -323,8 +341,6 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
         var newn2 = IO.TempFile(fl.SelectedPath, "+++ALLES+++", "txt");
         l.WriteAllText(newn2, Constants.Win1252, true);
     }
-
-    private void Database_Disposing(object sender, System.EventArgs e) => Close();
 
     private void Hinzu_Click(object sender, System.EventArgs e) {
         if (Database?.Column.First() is not ColumnItem c) { return; }

@@ -45,6 +45,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private readonly List<RowItem>? _rowsForExport;
     private readonly string _saveTo = string.Empty;
     private readonly string _zielPfad;
+    private Database? _database;
     private int _itemNrForPrint;
 
     #endregion
@@ -60,7 +61,6 @@ public sealed partial class ExportDialog : IHasDatabase {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Database = db;
-        Database.DisposingEvent += _Database_Disposing;
         _rowsForExport = rows;
         if (!string.IsNullOrEmpty(autosaveFile)) {
             _zielPfad = autosaveFile.FilePath();
@@ -83,11 +83,24 @@ public sealed partial class ExportDialog : IHasDatabase {
 
     #region Properties
 
-    public Database? Database { get; private set; }
+    public Database? Database {
+        get => _database;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= _database_Disposing;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+            }
+        }
+    }
 
     #endregion
-
-    // Nullable wegen Dispose
 
     #region Methods
 
@@ -153,14 +166,14 @@ public sealed partial class ExportDialog : IHasDatabase {
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
-        if (Database != null && !Database.IsDisposed) {
-            Database.DisposingEvent -= _Database_Disposing;
-            Database = null;
-        }
+        Database = null;
         base.OnFormClosing(e);
     }
 
-    private void _Database_Disposing(object sender, System.EventArgs e) => Close();
+    private void _database_Disposing(object sender, System.EventArgs e) {
+        Database = null;
+        Close();
+    }
 
     private void Attribute_Changed(object? sender, System.EventArgs? e) {
         _ = FloatTryParse(flxBreite.Value, out var b);
@@ -256,7 +269,7 @@ public sealed partial class ExportDialog : IHasDatabase {
     private void Exported_ItemClicked(object sender, AbstractListItemEventArgs e) => ExecuteFile(e.Item.KeyName);
 
     private string Fehler() {
-        if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
         if (_rowsForExport == null || _rowsForExport.Count == 0) { return "Es sind keine Einträge für den Export gewählt."; }
         if (string.IsNullOrEmpty(cbxLayoutWahl.Text)) { return "Es sind keine Layout für den Export gewählt."; }
         //TODO: Schachteln implementieren

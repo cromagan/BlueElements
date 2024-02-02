@@ -41,6 +41,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     private readonly List<string> _permissionGroups_Show = [];
 
+    private Database? _database;
     private int? _headSize;
 
     #endregion
@@ -49,10 +50,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public ColumnViewCollection(Database? database, string toParse) {
         Database = database;
-        if (Database != null) {
-            Database.DisposingEvent += Database_Disposing;
-        }
-
         KeyName = string.Empty;
         this.Parse(toParse);
     }
@@ -65,7 +62,22 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public int Count => _internal.Count;
 
-    public Database? Database { get; private set; }
+    public Database? Database {
+        get => _database;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= _database_Disposing;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+            }
+        }
+    }
 
     public bool IsDisposed { get; private set; }
 
@@ -151,7 +163,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public object Clone() => new ColumnViewCollection(Database, ToString());
 
     public ColumnItem? ColumnOnCoordinate(int xpos, Rectangle displayRectangleWithoutSlider, int pix16, Font cellFont) {
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed ||Database is not Database db || db.IsDisposed) { return null; }
 
         foreach (var thisViewItem in this) {
             if (thisViewItem?.Column != null) {
@@ -174,7 +186,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         // TODO: groﬂe Felder auf Null setzen.
         //PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
         //PermissionGroups_Show.Clear();
-        if (Database != null) { Database.DisposingEvent += Database_Disposing; }
         Database = null;
         //base.Dispose(disposing);
     }
@@ -348,7 +359,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void RemoveAt(int z) => _internal.RemoveAt(z);
 
     public void ShowAllColumns() {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisColumn in db.Column) {
             if (this[thisColumn] == null && !thisColumn.IsDisposed) {
@@ -358,7 +369,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public void ShowColumns(params string[] columnnames) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisColumn in columnnames) {
             var c = Database?.Column.Exists(thisColumn);
@@ -394,9 +405,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return result.Parseable();
     }
 
-    private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);
+    private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void Add(ColumnViewItem columnViewItem) => _internal.Add(columnViewItem);
 
     private void Remove(ColumnViewItem columnViewItem) {
         if (_internal.Remove(columnViewItem)) {

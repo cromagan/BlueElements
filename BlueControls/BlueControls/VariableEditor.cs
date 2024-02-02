@@ -49,13 +49,13 @@ public partial class VariableEditor : UserControl {
     #region Methods
 
     public VariableCollection GetVariables() {
-        if (!Editabe) {
+        if (!Editabe || IsDisposed) {
             Develop.DebugPrint_NichtImplementiert();
             // Bei Editable TRUE sind es nur string variablen
         }
         var list = new VariableCollection();
 
-        if (filterVariablen?.Table?.Database is not Database db) { return list; }
+        if (filterVariablen?.Table?.Database is not Database db || db.IsDisposed) { return list; }
 
         foreach (var thisr in db.Row) {
             var v = new VariableString(thisr.CellGetString("Name"), thisr.CellGetString("Inhalt"), false, thisr.CellGetString("Kommentar"));
@@ -71,7 +71,7 @@ public partial class VariableEditor : UserControl {
     }
 
     public RowItem? RowOfVariable(Variable variable) {
-        if (tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return null; }
         return db.Row[variable.KeyName];
     }
 
@@ -83,7 +83,7 @@ public partial class VariableEditor : UserControl {
 
         //tableVariablen.Database?.Row.Clear("Neue Variablen");
 
-        if (tableVariablen?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || tableVariablen?.Database is not Database db || db.IsDisposed) { return; }
         if (variables == null) { return; }
 
         foreach (var thisv in variables) {
@@ -174,7 +174,7 @@ public partial class VariableEditor : UserControl {
         //tableVariablen.Arrangement = 1;
         filterVariablen.Table = tableVariablen;
 
-        tableVariablen.CellValueChanged += TableVariablen_CellValueChanged;
+        x.Cell.CellValueChanged += TableVariablen_CellValueChanged;
     }
 
     private void TableVariablen_CellValueChanged(object sender, CellEventArgs e) {

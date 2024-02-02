@@ -210,7 +210,7 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
         object? ai = null;
         var row = FilterInput?.RowSingleOrNull;
 
-        if (FilterInput?.Database is Database db) {
+        if (FilterInput?.Database is Database db && !db.IsDisposed) {
             vars = db.CreateVariableCollection(row, true, false);
         } else {
             vars = new VariableCollection();

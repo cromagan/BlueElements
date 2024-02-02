@@ -58,7 +58,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
 
     public string Datenbank {
         get {
-            if (Column?.Database is not Database db || db.IsDisposed) { return "?"; }
+            if (IsDisposed || Column?.Database is not Database db || db.IsDisposed) { return "?"; }
             return db.TableName;
         }
     }

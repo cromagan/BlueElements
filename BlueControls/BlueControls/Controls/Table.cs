@@ -162,8 +162,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public event EventHandler<CellEventArgs>? ButtonCellClicked;
 
-    public event EventHandler<CellChangedEventArgs>? CellValueChanged;
-
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
@@ -177,8 +175,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public event EventHandler<ButtonCellEventArgs>? NeedButtonArgs;
 
     public event EventHandler? PinnedChanged;
-
-    public event EventHandler<RowChangedEventArgs>? RowAdded;
 
     public event EventHandler<CellExtEventArgs>? SelectedCellChanged;
 
@@ -215,7 +211,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public ColumnViewCollection? CurrentArrangement {
         get {
-            if (Database is not Database db || db.IsDisposed) { return null; }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
 
             var l = db.ColumnArrangements.Get(_arrangement);
             if (string.IsNullOrEmpty(_arrangement) || l == null) {
@@ -280,7 +276,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public DateTime PowerEdit {
         //private get => _database?.PowerEdit;
         set {
-            if (Database is not Database db || db.IsDisposed) { return; }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
             Database.PowerEdit = value;
             Invalidate_SortedRowData(); // Neue Zeilen können nun erlaubt sein
         }
@@ -291,7 +287,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ReadOnlyCollection<RowItem> RowsFiltered {
         get {
-            if (Database is not Database db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
             return Filter.Rows;
         }
     }
@@ -428,7 +424,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (rowsToExpand.Count is > 99 or 0) { return false; }
 
         if (rowsToExpand[0].IsDisposed) { return false; }
-        if (rowsToExpand[0].Database is not Database db) { return false; }
+        if (rowsToExpand[0].Database is not Database db || db.IsDisposed) { return false; }
         if (db.IsDisposed) { return false; }
 
         if (sortedRows.Count == 0) { return false; } // Komisch, dürfte nie passieren
@@ -583,7 +579,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         columnArrangementSelector.Item.AutoSort = false;
         columnArrangementSelector.DropDownStyle = ComboBoxStyle.DropDownList;
 
-        if (database is Database db) {
+        if (database is Database db && !db.IsDisposed) {
             foreach (var thisArrangement in db.ColumnArrangements) {
                 if (thisArrangement != null) {
                     if (db.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
@@ -607,7 +603,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public List<RowData> CalculateSortedRows(ICollection<RowItem> filteredRows, List<RowItem>? pinnedRows) {
-        if (Database is not Database db || db.IsDisposed) { return []; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return []; }
 
         VisibleRowCount = 0;
 
@@ -735,7 +731,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public void CursorPos_Reset() => CursorPos_Set(null, null, false);
 
     public void CursorPos_Set(ColumnItem? column, RowData? row, bool ensureVisible) {
-        if (Database is not Database db1 || row == null || column == null ||
+        if (IsDisposed || Database is not Database db1 || db1.IsDisposed || row == null || column == null ||
             db1.ColumnArrangements.Count == 0 || CurrentArrangement?[column] == null ||
             RowsFilteredAndPinned() is not List<RowData> s || !s.Contains(row)) {
             column = null;
@@ -752,7 +748,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (CursorPosRow?.Row is not RowItem setedrow) { return; }
         if (CursorPosColumn != column) { return; }
 
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         if (ensureVisible) {
             if (CurrentArrangement is ColumnViewCollection ca) {
@@ -789,14 +785,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db1.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
             db1.SortParameterChanged -= _Database_SortParameterChanged;
             db1.Row.RowRemoving -= Row_RowRemoving;
-            db1.Row.RowRemoved -= _Database_RowRemoved;
-            db1.Row.RowAdded -= _Database_Row_RowAdded;
             db1.Row.RowGotData -= _Database_Row_RowGotData;
             db1.Column.ColumnRemoving -= Column_ItemRemoving;
             db1.Column.ColumnRemoved -= _Database_ViewChanged;
             db1.Column.ColumnAdded -= _Database_ViewChanged;
             db1.ProgressbarInfo -= _Database_ProgressbarInfo;
-            db1.DisposingEvent -= _Database_Disposing;
+            db1.DisposingEvent -= _database_Disposing;
             db1.InvalidateView -= Database_InvalidateView;
             //if (Filter != null) { Filter.Changed -= Filter_Changed; }
             //db.IsTableVisibleForUser -= Database_IsTableVisibleForUser;
@@ -823,14 +817,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db2.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
             db2.SortParameterChanged += _Database_SortParameterChanged;
             db2.Row.RowRemoving += Row_RowRemoving;
-            db2.Row.RowRemoved += _Database_RowRemoved;
-            db2.Row.RowAdded += _Database_Row_RowAdded;
             db2.Row.RowGotData += _Database_Row_RowGotData;
             db2.Column.ColumnAdded += _Database_ViewChanged;
             db2.Column.ColumnRemoving += Column_ItemRemoving;
             db2.Column.ColumnRemoved += _Database_ViewChanged;
             db2.ProgressbarInfo += _Database_ProgressbarInfo;
-            db2.DisposingEvent += _Database_Disposing;
+            db2.DisposingEvent += _database_Disposing;
             db2.InvalidateView += Database_InvalidateView;
             //db2.IsTableVisibleForUser += Database_IsTableVisibleForUser;
         }
@@ -892,7 +884,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 var trichterSize = (AutoFilterSize - 4).ToString();
                 if (fi != null) {
                     trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||FF0000");
-                } else if (Filter.MayHasRowFilter(viewItem.Column)) {
+                } else if (Filter.MayHaveRowFilter(viewItem.Column)) {
                     trichterIcon = QuickImage.Get("Trichter|" + trichterSize + "|||227722");
                 } else if (viewItem.Column.AutoFilterSymbolPossible()) {
                     trichterIcon = QuickImage.Get("Trichter|" + trichterSize);
@@ -1044,19 +1036,19 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public string Export_CSV(FirstRow firstRow) => Database == null ? string.Empty : Database.Export_CSV(firstRow, CurrentArrangement, RowsVisibleUnique());
 
     public string Export_CSV(FirstRow firstRow, ColumnItem onlyColumn) {
-        if (Database is not Database db || db.IsDisposed) { return string.Empty; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
         List<ColumnItem> l = [onlyColumn];
         return Database.Export_CSV(firstRow, l, RowsVisibleUnique());
     }
 
     public void Export_HTML(string filename = "", bool execute = true) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (string.IsNullOrEmpty(filename)) { filename = TempFile(string.Empty, string.Empty, "html"); }
         Database.Export_HTML(filename, CurrentArrangement, RowsVisibleUnique(), execute);
     }
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         this.DoInputFilter(FilterOutput.Database, false);
 
@@ -1110,12 +1102,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void ImportCsv(string csvtxt) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         ImportCsv(Database, csvtxt);
     }
 
     public void Invalidate_AllColumnArrangements() {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisArrangement in db.ColumnArrangements) {
             thisArrangement.Invalidate_DrawWithOfAllItems();
@@ -1200,6 +1192,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public List<RowData>? RowsFilteredAndPinned() {
+        if (IsDisposed) { return null; }
         if (CurrentArrangement is not ColumnViewCollection ca) { return null; }
 
         if (_rowsFilteredAndPinned != null) { return _rowsFilteredAndPinned; }
@@ -1212,7 +1205,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             var lastCap = string.Empty;
 
             List<RowData> sortedRowDataNew;
-            if (Database is not Database db || db.IsDisposed) {
+            if (IsDisposed || Database is not Database db || db.IsDisposed) {
                 sortedRowDataNew = [];
             } else {
                 sortedRowDataNew = CalculateSortedRows(RowsFiltered, PinnedRows);
@@ -1296,7 +1289,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public List<RowItem> RowsVisibleUnique() {
-        if (Database is not Database db || db.IsDisposed) { return []; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return []; }
 
         var f = RowsFiltered;
 
@@ -1320,14 +1313,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public ColumnItem? View_ColumnFirst() {
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
         var s = CurrentArrangement;
 
         return s == null || s.Count == 0 ? null : s[0]?.Column;
     }
 
     public RowData? View_NextRow(RowData? row) {
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
         if (row == null || row.IsDisposed) { return null; }
 
         if (RowsFilteredAndPinned() is not List<RowData> sr) { return null; }
@@ -1337,7 +1330,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public RowData? View_PreviousRow(RowData? row) {
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
         if (row == null || row.IsDisposed) { return null; }
         if (RowsFilteredAndPinned() is not List<RowData> sr) { return null; }
         var rowNr = sr.IndexOf(row);
@@ -1345,13 +1338,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public RowData? View_RowFirst() {
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
         if (RowsFilteredAndPinned() is not List<RowData> sr) { return null; }
         return sr.Count == 0 ? null : sr[0];
     }
 
     public RowData? View_RowLast() {
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
         if (RowsFilteredAndPinned() is not List<RowData> sr) { return null; }
         return sr.Count == 0 ? null : sr[sr.Count - 1];
     }
@@ -1390,6 +1383,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _ = Invoke(new Action(() => DrawControl(gr, state)));
             return;
         }
+
+        if (IsDisposed) { return; }
 
         if (_databaseDrawError is DateTime dt) {
             if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 60) {
@@ -1508,7 +1503,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnClick(System.EventArgs e) {
         base.OnClick(e);
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (CurrentArrangement is not ColumnViewCollection ca) { return; }
 
         lock (_lockUserAction) {
@@ -1522,7 +1517,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnDoubleClick(System.EventArgs e) {
         //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereigniss ausgelöst
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         if (CurrentArrangement is not ColumnViewCollection ca) { return; }
 
@@ -1546,7 +1541,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     protected override void OnKeyDown(KeyEventArgs e) {
         base.OnKeyDown(e);
 
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (CursorPosColumn is null) { return; }
 
         if (CurrentArrangement is not ColumnViewCollection ca) { return; }
@@ -1695,7 +1690,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseDown(MouseEventArgs e) {
         base.OnMouseDown(e);
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         if (CurrentArrangement is not ColumnViewCollection ca) { return; }
 
@@ -1733,7 +1728,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseEnter(System.EventArgs e) {
         base.OnMouseEnter(e);
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinMouseEnter) { return; }
             _isinMouseEnter = true;
@@ -1744,7 +1739,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinMouseLeave) { return; }
             _isinMouseLeave = true;
@@ -1756,7 +1751,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     protected override void OnMouseMove(MouseEventArgs e) {
         base.OnMouseMove(e);
         lock (_lockUserAction) {
-            if (Database is not Database db || db.IsDisposed) { return; }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
             if (CurrentArrangement is not ColumnViewCollection ca) { return; }
 
             if (_isinMouseMove) { return; }
@@ -1808,6 +1803,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
+        if (IsDisposed) { return; }
         base.OnMouseUp(e);
 
         lock (_lockUserAction) {
@@ -1855,7 +1851,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnMouseWheel(MouseEventArgs e) {
         base.OnMouseWheel(e);
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         lock (_lockUserAction) {
             if (_isinMouseWheel) { return; }
@@ -1873,7 +1869,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnSizeChanged(System.EventArgs e) {
         base.OnSizeChanged(e);
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinSizeChanged) { return; }
             _isinSizeChanged = true;
@@ -1886,7 +1882,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         lock (_lockUserAction) {
             if (_isinVisibleChanged) { return; }
             _isinVisibleChanged = true;
@@ -2079,16 +2075,12 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void _Database_CellValueChanged(object sender, CellChangedEventArgs e) {
-        var f = Filter;
-        var rsd = SortUsed();
+        if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
 
-        if ((f[e.Column] != null) ||
-             rsd == null ||
-             rsd.UsedForRowSort(e.Column) ||
-             f.MayHasRowFilter(e.Column) ||
-            e.Column == Database?.Column.SysChapter) {
-            f.Invalidate_FilteredRows();
-            Invalidate_SortedRowData();
+        if (SortUsed() is RowSortDefinition rsd) {
+            if (rsd.UsedForRowSort(e.Column) || e.Column == Database?.Column.SysChapter) {
+                Invalidate_SortedRowData();
+            }
         }
 
         if (CurrentArrangement is ColumnViewCollection cvc) {
@@ -2101,9 +2093,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
 
         Invalidate_DrawWidth(e.Column);
-
         Invalidate();
-        OnCellValueChanged(e);
     }
 
     private void _Database_ColumnContentChanged(object sender, ColumnEventArgs e) => Invalidate_AllColumnArrangements();
@@ -2123,7 +2113,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    private void _Database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);
+    private void _database_Disposing(object sender, System.EventArgs e) => DatabaseSet(null, string.Empty);
 
     //private void _Database_ColumnKeyChanged(object sender, KeyChangedEventArgs e) {
     //    // Ist aktuell nur möglich,wenn Pending Changes eine neue Zeile machen
@@ -2142,18 +2132,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _pg?.Update(e.Current);
     }
 
-    private void _Database_Row_RowAdded(object sender, RowChangedEventArgs e) {
-        OnRowAdded(sender, e);
-        Filter.Invalidate_FilteredRows();
-        Invalidate_SortedRowData();
-    }
-
     private void _Database_Row_RowGotData(object sender, RowEventArgs e) => Invalidate_SortedRowData();
-
-    private void _Database_RowRemoved(object sender, System.EventArgs e) {
-        Filter.Invalidate_FilteredRows();
-        Invalidate_SortedRowData();
-    }
 
     private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
 
@@ -2177,7 +2156,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         switch (e.Command.ToLower()) {
             case "":
@@ -2292,7 +2271,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private int Autofilter_Text(ColumnItem column) {
-        if (Database is not Database db || db.IsDisposed) { return 0; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return 0; }
         if (column.TmpIfFilterRemoved != null) { return (int)column.TmpIfFilterRemoved; }
         using var fc = (FilterCollection)Filter.Clone("Autofilter_Text");
         fc.Remove(column);
@@ -2426,7 +2405,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Cell_Edit_Color(ColumnItem cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         ColorDialog colDia = new ColorDialog();
 
@@ -2552,7 +2531,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _ = Invoke(new Action(CloseAllComponents));
             return;
         }
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         TXTBox_Close(BTB);
         TXTBox_Close(BCB);
         FloatingForm.Close(this);
@@ -2612,7 +2591,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Cursor_Move(Direction richtung) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         Neighbour(CursorPosColumn, CursorPosRow, richtung, out var newCol, out var newRow);
         CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
     }
@@ -2718,7 +2697,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     /// <param name="font"></param>
     /// <param name="state"></param>
     private void Draw_CellTransparentDirect(Graphics gr, ColumnItem cellInThisDatabaseColumn, RowItem cellInThisDatabaseRow, Rectangle cellrectangle, ColumnItem contentHolderCellColumn, RowItem contentHolderCellRow, BlueFont font, States state) {
-        if (Database is not Database db) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         if (cellInThisDatabaseColumn.Format == DataFormat.Button) {
             Draw_CellAsButton(gr, cellInThisDatabaseColumn, cellInThisDatabaseRow, cellrectangle);
@@ -2739,7 +2718,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Draw_Column_Cells(Graphics gr, IReadOnlyList<RowData> sr, ColumnViewItem viewItem, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, States state, bool firstOnScreen, ColumnViewCollection ca) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (viewItem.Column is not ColumnItem tmpc) { return; }
 
         if (Database.Column.First() is ColumnItem columnFirst && tmpc == columnFirst && UserEdit_NewRowAllowed()) {
@@ -2880,7 +2859,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void Draw_Table_Std(Graphics gr, List<RowData> sr, States state, Rectangle displayRectangleWoSlider, int firstVisibleRow, int lastVisibleRow, ColumnViewCollection? ca) {
         try {
-            if (Database is not Database db || db.IsDisposed || ca == null) { return; }   // Kommt vor, dass spontan doch geparsed wird...
+            if (IsDisposed || Database is not Database db || db.IsDisposed || ca == null) { return; }   // Kommt vor, dass spontan doch geparsed wird...
             Skin.Draw_Back(gr, Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
 
             // Maximale Rechten Pixel der Permanenten Columns ermitteln
@@ -3060,7 +3039,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void Filter_Changed(object sender, System.EventArgs e) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisColumn in db.Column) {
             if (thisColumn != null) {
@@ -3074,7 +3053,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void Invalidate_DrawWidth(ColumnItem? column) {
         if (column == null || column.IsDisposed) { return; }
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisArr in db.ColumnArrangements) {
             thisArr[column]?.Invalidate_DrawWidth();
@@ -3135,7 +3114,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnButtonCellClicked(CellEventArgs e) => ButtonCellClicked?.Invoke(this, e);
 
-    private void OnCellValueChanged(CellChangedEventArgs e) => CellValueChanged?.Invoke(this, e);
+    //private void OnCellValueChanged(CellChangedEventArgs e) => CellValueChanged?.Invoke(this, e);
 
     private void OnDatabaseChanged() => DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
 
@@ -3145,7 +3124,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnPinnedChanged() => PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnRowAdded(object sender, RowChangedEventArgs e) => RowAdded?.Invoke(sender, e);
+    //private void OnRowAdded(object sender, RowChangedEventArgs e) => RowAdded?.Invoke(sender, e);
 
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
 
@@ -3166,7 +3145,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void ParseView(string toParse) {
         ResetView();
 
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         if (!string.IsNullOrEmpty(toParse)) {
             foreach (var pair in toParse.GetAllTags()) {
@@ -3232,7 +3211,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private int Row_DrawHeight(ColumnViewCollection ca, RowItem row, Rectangle displayRectangleWoSlider) {
-        if (Database is not Database db || db.IsDisposed) { return _pix18; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return _pix18; }
 
         var tmp = _pix18;
 
@@ -3250,7 +3229,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (e.Row == CursorPosRow?.Row) { CursorPos_Reset(); }
         if (e.Row == _mouseOverRow?.Row) { _mouseOverRow = null; }
-        if (PinnedRows.Contains(e.Row)) { _ = PinnedRows.Remove(e.Row); }
+        if (PinnedRows.Contains(e.Row)) {
+            _ = PinnedRows.Remove(e.Row);
+            Invalidate_SortedRowData();
+        }
     }
 
     private string RowCaptionOnCoordinate(int pixelX, int pixelY) {
@@ -3267,7 +3249,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private RowData? RowOnCoordinate(ColumnViewCollection ca, int pixelY) {
-        if (Database is not Database db || db.IsDisposed || pixelY <= ca.HeadSize(_columnFont)) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed || pixelY <= ca.HeadSize(_columnFont)) { return null; }
         var s = RowsFilteredAndPinned();
 
         return s?.FirstOrDefault(thisRowItem => thisRowItem != null && pixelY >= DrawY(ca, thisRowItem) && pixelY <= DrawY(ca, thisRowItem) + thisRowItem.DrawHeight && thisRowItem.Expanded);
@@ -3296,7 +3278,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         : Database?.SortDefinition?.Columns != null ? Database.SortDefinition : null;
 
     private void TXTBox_Close(TextBox? textbox) {
-        if (textbox == null || Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || textbox == null || Database is not Database db || db.IsDisposed) { return; }
         if (!textbox.Visible) { return; }
         if (textbox.Tag is not List<object?> tags || tags.Count < 2) {
             textbox.Visible = false;
@@ -3317,7 +3299,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private bool UserEdit_NewRowAllowed() {
-        if (Database is not Database db || db.IsDisposed || db.Column.Count == 0 || db.Column.First() is not ColumnItem fc) { return false; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed || db.Column.Count == 0 || db.Column.First() is not ColumnItem fc) { return false; }
         if (db.ColumnArrangements.Count == 0) { return false; }
         if (CurrentArrangement?[fc] == null) { return false; }
         if (!db.Row.IsNewRowPossible()) { return false; }

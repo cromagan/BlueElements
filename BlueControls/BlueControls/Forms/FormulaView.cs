@@ -40,9 +40,7 @@ public partial class FormulaView : FormWithStatusBar {
 
     public FormulaView() => InitializeComponent();
 
-    public FormulaView(string filename) : this() {
-        FormulaSet(filename);
-    }
+    public FormulaView(string filename) : this() => FormulaSet(filename);
 
     #endregion
 
@@ -154,14 +152,14 @@ public partial class FormulaView : FormWithStatusBar {
         //if (Database != database) {
         //    if (Database != null) {
         //        RemoveRow();
-        //        Database.DisposingEvent -= _Database_Disposing;
+        //        Database.DisposingEvent -= _database_Disposing;
         //        Database.Row.RowRemoving -= Row_RowRemoving;
         //    }
         //    InvalidateView();
         //    Database = database;
 
         //    if (Database != null) {
-        //        Database.DisposingEvent += _Database_Disposing;
+        //        Database.DisposingEvent += _database_Disposing;
         //        Database.Row.RowRemoving += Row_RowRemoving;
         //    }
         //}

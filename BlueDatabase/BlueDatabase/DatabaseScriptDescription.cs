@@ -51,6 +51,7 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
 
     #region Fields
 
+    private Database? _database;
     private ScriptEventTypes _eventTypes = 0;
     private bool _needRow;
 
@@ -60,11 +61,6 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
 
     public DatabaseScriptDescription(Database? database, string name, string script) : base(name, script) {
         Database = database;
-
-        if (Database != null && !Database.IsDisposed) {
-            Database.DisposingEvent += Database_Disposing;
-        }
-
         _needRow = false;
     }
 
@@ -86,7 +82,22 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
 
     #region Properties
 
-    public Database? Database { get; private set; }
+    public Database? Database {
+        get => _database;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= _database_Disposing;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+            }
+        }
+    }
 
     public ScriptEventTypes EventTypes {
         get => _eventTypes;
@@ -232,14 +243,13 @@ public sealed class DatabaseScriptDescription : ScriptDescription, IParseable, I
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
             Database = null;
         }
 
         base.Dispose(disposing);
     }
 
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     #endregion
 }

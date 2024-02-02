@@ -91,22 +91,14 @@ public static class Allgemein {
                 if (thisit is ICanDropMessages dm) {
                     dm.DropMessage += FormWithStatusBar.GotMessageDropMessage;
                 }
-
-                //if (thisit is Database db) {
-                //    db.Loaded += TableView.CheckDatabase;
-                //}
             }
         }
 
         if (e.OldItems != null) {
             foreach (var thisit in e.OldItems) {
-                if (thisit is Database dm) {
-                    dm.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
+                if (thisit is Database db && !db.IsDisposed) {
+                    db.DropMessage -= FormWithStatusBar.GotMessageDropMessage;
                 }
-
-                //if (thisit is Database db) {
-                //    db.Loaded -= TableView.CheckDatabase;
-                //}
             }
         }
 

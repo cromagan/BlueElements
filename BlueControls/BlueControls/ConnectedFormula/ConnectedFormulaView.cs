@@ -239,14 +239,14 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
 
         if (FilterOutput.Database != database) {
-            if (FilterOutput.Database is Database db1) {
-                db1.DisposingEvent -= _Database_DisposingEvent;
+            if (FilterOutput.Database is Database db1 && !db1.IsDisposed) {
+                db1.DisposingEvent -= _database_Disposing;
             }
             InvalidateView();
             FilterOutput.Database = database;
 
-            if (FilterOutput.Database is Database db2) {
-                db2.DisposingEvent += _Database_DisposingEvent;
+            if (FilterOutput.Database is Database db2 && !db2.IsDisposed) {
+                db2.DisposingEvent += _database_Disposing;
             }
         }
 
@@ -343,7 +343,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     private void _cf_Loaded(object sender, System.EventArgs e) => InvalidateView();
 
-    private void _Database_DisposingEvent(object sender, System.EventArgs e) => InitFormula(null, null);
+    private void _database_Disposing(object sender, System.EventArgs e) => InitFormula(null, null);
 
     private void DoAutoX(List<FlexiControlForCell> autoc) {
         if (autoc.Count == 0) { return; }

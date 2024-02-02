@@ -297,7 +297,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
     private void _table_ViewChanged(object sender, System.EventArgs e) => FillFilters();
 
     private void btnÄhnliche_Click(object sender, System.EventArgs e) {
-        if (_table?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _table?.Database is not Database db || db.IsDisposed) { return; }
 
         if (db.Column.First() is not ColumnItem co) { return; }
 
@@ -351,7 +351,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
     private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void DoÄhnlich() {
-        if (_table?.Database is not Database db || db.Column.Count == 0) { return; }
+        if (IsDisposed || _table?.Database is not Database db || db.Column.Count == 0) { return; }
 
         var col = db.Column.First();
 
@@ -381,7 +381,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
     }
 
     private void Filter_ZeilenFilterSetzen() {
-        if (_table == null || _table.Database is not Database db || db.IsDisposed) {
+        if (IsDisposed || _table == null || _table.Database is not Database db || db.IsDisposed) {
             DoÄhnlich();
             return;
         }
@@ -418,7 +418,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
 
     private void FlexSingeFilter_FilterOutput_Changed(object sender, System.EventArgs e) {
         if (sender is not FilterCollection fo) { return; }
-        if (_table?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _table?.Database is not Database db || db.IsDisposed) { return; }
 
         if (fo.Count == 0) {
             if (_prevFilter != null && _prevFilter.Count == 1) {

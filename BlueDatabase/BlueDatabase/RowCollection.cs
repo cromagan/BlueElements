@@ -42,6 +42,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private readonly List<string> _pendingChangedBackgroundRow = [];
     private readonly List<string> _pendingChangedRows = [];
     private readonly List<BackgroundWorker> _pendingworker = [];
+    private Database? _database;
     private bool _executingbackgroundworks;
     private bool _executingchangedrows;
 
@@ -49,11 +50,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Constructors
 
-    public RowCollection(Database database) {
-        Database = database;
-        Database.DisposingEvent += Database_Disposing;
-        //Initialize();
-    }
+    public RowCollection(Database database) => Database = database;
 
     #endregion
 
@@ -87,7 +84,22 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public int Count => _internal.Count;
 
-    public Database? Database { get; private set; }
+    public Database? Database {
+        get => _database;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= _database_Disposing;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+            }
+        }
+    }
 
     public bool IsDisposed { get; private set; }
 
@@ -200,7 +212,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public void AddRowWithChangedValue(RowItem? row) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (row == null || row.IsDisposed) { return; }
 
         if (!db.IsRowScriptPossible(true)) { return; }
@@ -245,7 +257,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public void ExecuteExtraThread() {
         if (_pendingChangedRows.Count > 0) { return; }
         if (_pendingChangedBackgroundRow.Count == 0) { return; }
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (!Database.IsRowScriptPossible(true)) { return; }
 
         if (_executingbackgroundworks) { return; }
@@ -339,7 +351,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         while (_pendingChangedRows.Count > 0) {
             if (IsDisposed) { break; }
-            if (Database is not Database db || db.IsDisposed) { break; }
+            if (IsDisposed ||Database is not Database db || db.IsDisposed) { break; }
 
             if (!Database.IsRowScriptPossible(true)) { break; }
 
@@ -374,7 +386,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null && !thisRowItem.IsDisposed);
 
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed ||Database is not Database db || db.IsDisposed) { return null; }
         if (!Database.Row.IsNewRowPossible()) { return null; }
 
         var s = Database.NextRowKey();
@@ -475,7 +487,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public bool IsNewRowPossible() {
-        if (Database is not Database db || db.IsDisposed) { return false; }
+        if (IsDisposed ||Database is not Database db || db.IsDisposed) { return false; }
 
         return Database.IsNewRowPossible();
     }
@@ -556,7 +568,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal void AddRowsForValueChangedEvent() {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (!db.IsRowScriptPossible(true)) { return; }
 
         var x = DateTime.UtcNow;
@@ -594,7 +606,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal string ExecuteCommand(DatabaseDataType type, string rowkey, Reason reason) {
-        if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
+        if (IsDisposed ||Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
 
         if (type == DatabaseDataType.Command_AddRow) {
             var row = SearchByKey(rowkey);
@@ -629,6 +641,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
+    private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
+
     /// <summary>
     /// Fügt eine Zeile hinzu, die im System fest verankert ist.
     /// </summary>
@@ -641,14 +655,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return string.Empty;
     }
 
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
             Database = null;
             _internal.Clear();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben

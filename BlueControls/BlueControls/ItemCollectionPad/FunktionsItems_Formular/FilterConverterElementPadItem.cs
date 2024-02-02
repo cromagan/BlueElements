@@ -201,7 +201,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
         var inr = _itemAccepts.GetFilterFromGet(this);
-        if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin) {
+        if (inr.Count > 0 && inr[0].DatabaseOutput is Database dbin && !dbin.IsDisposed) {
             var ic = new ItemCollectionList.ItemCollectionList(true);
             ic.AddRange(dbin.Column, true);
             l.Add(new FlexiControlForProperty<string>(() => Eingangs_Wert_Spalte, ic));
@@ -218,9 +218,9 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         l.Add(new FlexiControl());
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
 
-        if (_itemSends.DatabaseOutputGet() is Database outdb) {
+        if (_itemSends.DatabaseOutputGet() is Database dbout && !dbout.IsDisposed) {
             var ic = new ItemCollectionList.ItemCollectionList(true);
-            ic.AddRange(outdb.Column, true);
+            ic.AddRange(dbout.Column, true);
             l.Add(new FlexiControlForProperty<string>(() => Filter_Spalte, ic));
         }
 

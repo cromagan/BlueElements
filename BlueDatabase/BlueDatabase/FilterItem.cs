@@ -35,6 +35,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     #region Fields
 
     private ColumnItem? _column;
+
+    private Database? _database;
+
     private FilterType _filterType = FilterType.AlwaysFalse;
     private string _origin = string.Empty;
     private ReadOnlyCollection<string> _searchValue = new List<string>().AsReadOnly();
@@ -60,10 +63,6 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     public FilterItem(string filterCode, Database? db) {
         // Database?, weil always False keine Datenbank braucht
         Database = db;
-
-        if (db != null) {
-            db.DisposingEvent += Database_Disposing;
-        }
 
         KeyName = Generic.UniqueInternal();
 
@@ -112,10 +111,6 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         Database = db;
         KeyName = Generic.UniqueInternal();
 
-        if (db != null) {
-            db.DisposingEvent += Database_Disposing;
-        }
-
         _filterType = filterType;
         if (searchValue != null && searchValue.Count > 0) {
             SearchValue = new ReadOnlyCollection<string>(searchValue);
@@ -124,7 +119,6 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         }
 
         _column?.RefreshColumnsData();
-        //_column.DisposingEvent += Database_Disposing;
     }
 
     #endregion
@@ -154,7 +148,22 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     /// <summary>
     /// Der Edit-Dialog braucht die Datenbank, um mit Texten die Spalte zu suchen.
     /// </summary>
-    public Database? Database { get; private set; }
+    public Database? Database {
+        get => _database;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= _database_Disposing;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+            }
+        }
+    }
 
     public FilterType FilterType {
         get => _filterType;
@@ -221,12 +230,8 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
     public void Dispose() {
         IsDisposed = true;
-
         Column = null;
-        if (Database != null && !Database.IsDisposed) {
-            if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
-            Database = null;
-        }
+        Database = null;
     }
 
     public bool Equals(FilterItem? thisFilter) => !IsDisposed &&
@@ -289,11 +294,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
                 return true;
 
             case "database":
-                if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
                 Database = Database.GetById(new ConnectionInfo(value.FromNonCritical(), null, string.Empty), false, null, true);
-
-                if (Database != null && !Database.IsDisposed) { Database.DisposingEvent += Database_Disposing; }
-
                 return true;
 
             case "type":
@@ -424,7 +425,7 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
         }
     }
 
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
     #endregion
 }

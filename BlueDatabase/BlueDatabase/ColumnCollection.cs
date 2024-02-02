@@ -38,14 +38,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     private readonly ConcurrentDictionary<string, ColumnItem> _internal = [];
 
+    private Database? _database;
+
     #endregion
 
     #region Constructors
 
-    public ColumnCollection(Database database) : base() {
-        Database = database;
-        Database.DisposingEvent += Database_Disposing;
-    }
+    public ColumnCollection(Database database) : base() => Database = database;
 
     #endregion
 
@@ -65,7 +64,22 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public int Count => _internal.Count;
 
-    public Database? Database { get; private set; }
+    public Database? Database {
+        get => _database;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= _database_Disposing;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+            }
+        }
+    }
 
     ///// <summary>
     ///// Diese Routine sollte nur bei einem Reload benutzt werden. AddPending wir nicht mehr ausgelöst.
@@ -121,14 +135,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Methods
 
-    public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(true);
-        //GC.SuppressFinalize(this);
-    }
+    public void Dispose() => Dispose(true);
 
     public ColumnItem? Exists(string? columnName) {
-        if (Database is not Database db || db.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed || columnName == null || string.IsNullOrEmpty(columnName)) { return null; }
 
         try {
             columnName = columnName.ToUpper();
@@ -146,7 +156,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? First() {
         // Nicht als Property, weil ansonsten nicht die Function des ENumerators verdeckt wird
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
 
         if (db.ColumnArrangements.Count < 1 || db.ColumnArrangements[0].Count != db.Column.Count()) {
             //Develop.DebugPrint(FehlerArt.Fehler, "Ansicht 0 fehlerhaft!");
@@ -173,7 +183,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             return null;
         }
 
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
 
         //var item = SearchByKey(key);
         //if (item != null) {
@@ -219,7 +229,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     public void GenerateOverView() {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         Html da = new(Database.TableName);
         da.AddCaption("Spaltenliste von: " + Database.Caption);
         da.Add("  <Font face=\"Arial\" Size=\"4\">" + Database.TableName + "</h1><br>");
@@ -387,7 +397,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    }
     internal bool ChangeName(string oldName, string newName) {
         if (oldName == newName) { return true; }
-        if (Database is not Database db || db.IsDisposed) { return false; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
 
         var ok = _internal.TryRemove(oldName.ToUpper(), out var vcol);
         if (!ok) { return false; }
@@ -441,7 +451,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     internal string ExecuteCommand(DatabaseDataType type, string name, Reason reason) {
-        if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen!"; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen!"; }
 
         if (type == DatabaseDataType.Command_AddColumnByName) {
             var c = Exists(name);
@@ -486,6 +496,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return "Befehl unbekannt";
     }
 
+    private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
+
     private string Add(ColumnItem column) {
         if (Exists(column.KeyName) != null) { return "Hinzufügen fehlgeschlagen."; }
 
@@ -511,15 +523,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //        if (index >= 0 && index < _internal.Count) {
     //            return _internal.ElementAt(index).Value;
     //        }
-
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
             Database = null;
             _internal.Clear();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben

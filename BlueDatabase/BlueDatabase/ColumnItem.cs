@@ -104,6 +104,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     private string _constantHeightOfImageCode;
 
+    private Database? _database;
     private TranslationType _doOpticalTranslation;
 
     private bool _dropdownAllesAbwählenErlaubt;
@@ -182,7 +183,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
 
         Database = database;
-        Database.DisposingEvent += Database_Disposing;
 
         var ex = database.Column.Exists(name);
         if (ex != null) {
@@ -506,7 +506,22 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    public Database? Database { get; private set; }
+    public Database? Database {
+        get => _database;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= _database_Disposing;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+            }
+        }
+    }
 
     public TranslationType DoOpticalTranslation {
         get => _doOpticalTranslation;
@@ -734,8 +749,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public List<string> LinkedCellFilter {
         get => _linkedCellFilter;
         set {
-            if (IsDisposed) { return; }
-            if (Database is not Database db || db.IsDisposed) { return; }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
             value = value.SortedDistinctList();
 
@@ -752,7 +766,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public Database? LinkedDatabase {
         get {
-            if (Database is not Database db || db.IsDisposed) { return null; }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
 
             if (string.IsNullOrEmpty(_linkedDatabaseTableName)) { return null; }
 
@@ -867,11 +881,6 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    //    Database = database;
-    //    Database.DisposingEvent += Database_Disposing;
-    //    if (columnkey < 0) {
-    //        Develop.DebugPrint(FehlerArt.Fehler, "ColumnKey < 0");
-    //    }
     public int RoundAfterEdit {
         get => _roundAfterEdit;
         set {
@@ -1024,7 +1033,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public string AutoCorrect(string value, bool exitifLinkedFormat) {
-        if (Database is not Database db || db.IsDisposed) { return value; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return value; }
 
         if (IsSystemColumn()) { return value; }
 
@@ -1072,7 +1081,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public bool AutoFilterSymbolPossible() => FilterOptions.HasFlag(FilterOptions.Enabled) && Format.Autofilter_möglich();
 
     public int CalculatePreveredMaxCellLenght(double prozentZuschlag) {
-        if (Database is not Database db || db.IsDisposed) { return 0; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return 0; }
 
         //if (Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) { return 35; }
         //if (Format == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return 15; }
@@ -1092,7 +1101,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public int CalculatePreveredMaxTextLenght(double prozentZuschlag) {
-        if (Database is not Database db || db.IsDisposed) { return 0; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return 0; }
 
         ////if (Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) { return 35; }
         ////if (Format == DataFormat.Werte_aus_anderer_Datenbank_als_DropDownItems) { return 15; }
@@ -1247,7 +1256,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public List<string> Contents() => Contents(Database?.Row.ToList());
 
     public List<string> Contents(FilterCollection fc, List<RowItem>? pinned) {
-        if (Database is not Database db || db.IsDisposed) { return []; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return []; }
         var r = fc.Rows;
 
         var r2 = new List<RowItem>();
@@ -1286,7 +1295,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public string ErrorReason() {
-        if (Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
         //if (_name < 0) { return "Interner Fehler: ID nicht definiert"; }
         if (string.IsNullOrEmpty(_name)) { return "Der Spaltenname ist nicht definiert."; }
 
@@ -1417,7 +1426,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public List<string> GetUcaseNamesSortedByLenght() {
-        if (Database is not Database db || db.IsDisposed) { return []; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return []; }
 
         if (UcaseNamesSortedByLenght != null) { return UcaseNamesSortedByLenght; }
         var tmp = Contents(db.Row.ToList());
@@ -1445,7 +1454,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public void Invalidate_ColumAndContent() {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         Invalidate_Head();
         Invalidate_ContentWidth();
         Invalidate_LinkedDatabase();
@@ -1501,7 +1510,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public void OnChanged() => Changed?.Invoke(this, new ColumnEventArgs(this));
 
     public string QuickInfoText(string additionalText) {
-        if (Database is not Database db || db.IsDisposed) { return string.Empty; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
         var T = string.Empty;
         if (!string.IsNullOrEmpty(_quickInfo)) { T += _quickInfo; }
         if (Database.IsAdministrator() && !string.IsNullOrEmpty(_adminInfo)) { T = T + "<br><br><b><u>Administrator-Info:</b></u><br>" + _adminInfo; }
@@ -1516,7 +1525,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public string ReadableText() {
-        if (Database is not Database db || db.IsDisposed) { return string.Empty; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
 
         var ret = _caption;
         if (Database.Column.Any(thisColumnItem => thisColumnItem != null && thisColumnItem != this && string.Equals(thisColumnItem.Caption, _caption, StringComparison.OrdinalIgnoreCase))) {
@@ -1550,7 +1559,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     public void RefreshColumnsData() {
         if (IsInCache != null) { return; }
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (_name == TmpNewDummy) { Develop.DebugPrint("TMPNEWDUMMY kann nicht geladen werden"); return; }
 
         var x = new List<ColumnItem> { this };
@@ -1560,7 +1569,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     public void Repair() {
         if (!string.IsNullOrEmpty(Database.EditableErrorReason(Database, EditableErrorReasonType.EditAcut))) { return; }
 
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (IsDisposed) { return; }
 
         if (_format == DataFormat.Button) { ScriptType = ScriptType.Nicht_vorhanden; }
@@ -1813,7 +1822,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public void Statisik(List<RowItem> rows, bool ignoreMultiLine) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         if (rows.Count < 1) { return; }
 
@@ -1871,7 +1880,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public double? Summe(FilterCollection fc) {
-        if (Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
 
         double summ = 0;
         foreach (var thisrow in db.Row) {
@@ -1920,7 +1929,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     //            break;
     public QuickImage? SymbolForReadableText() {
         if (IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
-        if (Database is not Database db || db.IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return QuickImage.Get(ImageCode.Warnung); }
 
         if (this == db.Column.SysRowChanger) { return QuickImage.Get(ImageCode.Person); }
 
@@ -1966,7 +1975,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     }
 
     public string Useage() {
-        if (Database is not Database db || db.IsDisposed) { return string.Empty; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return string.Empty; }
 
         var t = "<b><u>Verwendung von " + ReadableText() + "</b></u><br>";
         if (IsSystemColumn()) {
@@ -2083,7 +2092,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     internal static string MakeValidColumnName(string columnname) => columnname.ToUpper().Replace(" ", "_").ReduceToChars(AllowedCharsVariableName);
 
     internal string EditableErrorReason(EditableErrorReasonType mode, bool checkEditmode) {
-        if (Database is not Database db || db.IsDisposed) { return "Die Datenbank wurde verworfen."; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Die Datenbank wurde verworfen."; }
         if (IsDisposed) { return "Die Spalte wurde verworfen."; }
 
         var f = Database.EditableErrorReason(mode);
@@ -2443,8 +2452,14 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
+    private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
+
+    private void _TMP_Linked_database_Disposing(object sender, System.EventArgs e) {
+        Invalidate_LinkedDatabase();
+    }
+
     private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellChangedEventArgs e) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         if (e.Column.KeyName != LinkedCell_ColumnNameOfLinkedDatabase) { return; }
 
@@ -2459,15 +2474,10 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         }
     }
 
-    private void _TMP_LinkedDatabase_Disposing(object sender, System.EventArgs e) {
-        Invalidate_LinkedDatabase();
-        Database?.Dispose();
-    }
-
     private void CheckIfIAmAKeyColumn() {
         Am_A_Key_For_Other_Column = string.Empty;
 
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var c in db.Column) {
             //if (thisColumn.KeyColumnKey == _name) { Am_A_Key_For_Other_Column = "Spalte " + thisColumn.ReadableText() + " verweist auf diese Spalte"; } // Werte Gleichhalten
@@ -2486,14 +2496,12 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         //if (_format == DataFormat.Columns_für_LinkedCellDropdown) { Am_A_Key_For_Other_Column = "Die Spalte selbst durch das Format"; }
     }
 
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
-            if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_Disposing; }
+
             Invalidate_LinkedDatabase();
             Database = null;
 
@@ -2506,7 +2514,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     private void GetLinkedDatabase() {
         Invalidate_LinkedDatabase(); // Um evtl. Events zu löschen
 
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         foreach (var thisFile in AllFiles) {
             if (thisFile.TableName.Equals(_linkedDatabaseTableName, StringComparison.OrdinalIgnoreCase)) {
@@ -2528,7 +2536,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
         if (_linkedDatabase != null) {
             _linkedDatabase.Cell.CellValueChanged += _TMP_LinkedDatabase_Cell_CellValueChanged;
-            _linkedDatabase.DisposingEvent += _TMP_LinkedDatabase_Disposing;
+            _linkedDatabase.DisposingEvent += _TMP_Linked_database_Disposing;
         }
     }
 
@@ -2540,7 +2548,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     private void Invalidate_LinkedDatabase() {
         if (_linkedDatabase != null) {
             _linkedDatabase.Cell.CellValueChanged -= _TMP_LinkedDatabase_Cell_CellValueChanged;
-            _linkedDatabase.DisposingEvent -= _TMP_LinkedDatabase_Disposing;
+            _linkedDatabase.DisposingEvent -= _TMP_Linked_database_Disposing;
             _linkedDatabase = null;
         }
     }
@@ -2625,7 +2633,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
     /// </summary>
     /// <returns></returns>
     private bool UsedInScript() {
-        if (Database is not Database db || db.IsDisposed) { return false; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
 
         foreach (var thiss in Database.EventScript) {
             if (thiss.ScriptText.ContainsWord(_name, RegexOptions.IgnoreCase)) { return true; }

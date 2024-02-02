@@ -64,7 +64,7 @@ internal sealed partial class SearchAndReplace : Form {
 
     private void Checkbuttons() {
         var canDo = true;
-        if (_table.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || _table.Database is not Database db || db.IsDisposed) { return; }
         if (!db.IsAdministrator()) { canDo = false; }
         if (SucheNach.Checked) {
             if (string.IsNullOrEmpty(Alt.Text)) { canDo = false; }
@@ -113,7 +113,7 @@ internal sealed partial class SearchAndReplace : Form {
         var ersetzText = Neu.Text.Replace(";cr;", "\r").Replace(";tab;", "\t");
         //db.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
-        if (_table.Database is not Database db) { return; }
+        if (IsDisposed || _table.Database is not Database db || db.IsDisposed) { return; }
 
         List<ColumnItem> sp = [];
         List<RowItem> ro = [];
@@ -154,7 +154,7 @@ internal sealed partial class SearchAndReplace : Form {
                     } else if (ErsetzeKomplett.Checked) {
                         geändeterText = ersetzText;
                     } else if (FügeHinzu.Checked) {
-                        List<string> tmp = [..originalText.SplitAndCutByCr(), ersetzText];
+                        List<string> tmp = [.. originalText.SplitAndCutByCr(), ersetzText];
                         geändeterText = tmp.SortedDistinctList().JoinWithCr();
                     }
                     if (geändeterText != originalText) {

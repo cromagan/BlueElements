@@ -225,7 +225,7 @@ public partial class TableView : FormWithStatusBar {
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
         MultiUserFile.SaveAll(false);
         Database.ForceSaveAll();
-        if (Table.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Table.Database is not Database db || db.IsDisposed) { return; }
 
         switch (e.Item.KeyName) {
             case "erweitert":
@@ -276,13 +276,14 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected void CheckButtons() {
+        if (IsDisposed) { return; }
         var datenbankDa = Table.Database != null && !Table.Database.IsDisposed;
         btnNeuDB.Enabled = true;
         btnOeffnen.Enabled = true;
         btnDrucken.Enabled = datenbankDa;
 
-        if (Table.Database is Database bd) {
-            btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(bd.Filename);
+        if (Table.Database is Database db && !db.IsDisposed) {
+            btnDatenbankenSpeicherort.Enabled = !string.IsNullOrEmpty(db.Filename);
         } else {
             btnDatenbankenSpeicherort.Enabled = false;
         }
@@ -426,7 +427,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (sender is not Table tbl || tbl.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || sender is not Table tbl || tbl.Database is not Database db || db.IsDisposed) { return; }
         RowItem? row = null;
         ColumnItem? column = null;
         if (e.HotItem is RowItem r) { row = r; }
@@ -475,7 +476,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     protected virtual void Table_ContextMenuItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        if (sender is not Table tbl || tbl.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || sender is not Table tbl || tbl.Database is not Database db || db.IsDisposed) { return; }
         RowItem? row = null;
         ColumnItem? column = null;
         if (e.HotItem is RowItem r) { row = r; }
@@ -698,7 +699,7 @@ public partial class TableView : FormWithStatusBar {
     private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
 
     private void btnClipboardImport_Click(object sender, System.EventArgs e) {
-        if (Table.Database is not Database db || !db.IsAdministrator()) {
+        if (IsDisposed || Table.Database is not Database db || db.IsDisposed || !db.IsAdministrator()) {
             return;
         }
 
@@ -718,7 +719,7 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (Table.Database is not Database db || db.IsDisposed) {
+        if (IsDisposed || Table.Database is not Database db || db.IsDisposed) {
             return;
         }
 
@@ -729,7 +730,7 @@ public partial class TableView : FormWithStatusBar {
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (Table.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Table.Database is not Database db || db.IsDisposed) { return; }
 
         OpenLayoutEditor(db, string.Empty);
     }
@@ -780,7 +781,7 @@ public partial class TableView : FormWithStatusBar {
         MultiUserFile.SaveAll(false);
         Database.ForceSaveAll();
 
-        if (Table.Database is Database db) {
+        if (Table.Database is Database db && !db.IsDisposed) {
             if (db.ReadOnly) { return; }
             _ = SaveTab.ShowDialog();
             if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
@@ -808,7 +809,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
-        if (Table.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Table.Database is not Database db || db.IsDisposed) { return; }
 
         var x = new ColumnArrangementPadEditor(db);
         _ = x.ShowDialog();
@@ -843,7 +844,7 @@ public partial class TableView : FormWithStatusBar {
         Table.Unterschiede = btnUnterschiede.Checked ? Table.CursorPosRow?.Row : null;
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e) {
-        if (Table.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Table.Database is not Database db || db.IsDisposed) { return; }
         if (!db.IsAdministrator()) { return; }
 
         var m = MessageBox.Show("Angezeigte Zeilen löschen?", ImageCode.Warnung, "Ja", "Nein");
@@ -857,6 +858,7 @@ public partial class TableView : FormWithStatusBar {
     private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => Table.Arrangement = e.Item.KeyName;
 
     private void Check_OrderButtons() {
+        if (IsDisposed) { return; }
         if (InvokeRequired) {
             _ = Invoke(new Action(Check_OrderButtons));
             return;
@@ -926,7 +928,7 @@ public partial class TableView : FormWithStatusBar {
     }
 
     private void lstAufgaben_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Table.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Table.Database is not Database db || db.IsDisposed) { return; }
 
         lstAufgaben.Enabled = false;
 
@@ -1092,21 +1094,21 @@ public partial class TableView : FormWithStatusBar {
 
         #endregion
 
-        var db = Database.GetById(ci, false, Table.Database_NeedPassword, true);
-
-        if (db is Database bdb) {
-            if (!string.IsNullOrEmpty(bdb.Filename)) {
-                btnLetzteDateien.AddFileName(bdb.Filename, db.TableName);
-                LoadTab.FileName = bdb.Filename;
+        if (Database.GetById(ci, false, Table.Database_NeedPassword, true) is Database db && !db.IsDisposed) {
+            if (!string.IsNullOrEmpty(db.Filename)) {
+                btnLetzteDateien.AddFileName(db.Filename, db.TableName);
+                LoadTab.FileName = db.Filename;
             } else {
                 btnLetzteDateien.AddFileName(db.ConnectionData.UniqueId, db.TableName);
             }
+            e.TabPage.Text = db.TableName.ToTitleCase();
+            UpdateScripts(db);
+            DatabaseSet(db, (string)s[1]);
+        } else {
+            e.TabPage.Text = "FEHLER";
+            UpdateScripts(null);
+            DatabaseSet(null, string.Empty);
         }
-
-        e.TabPage.Text = db?.TableName.ToTitleCase() ?? "FEHLER";
-
-        UpdateScripts(db);
-        DatabaseSet(db, (string)s[1]);
     }
 
     private void UpdateScripts(Database? db) {

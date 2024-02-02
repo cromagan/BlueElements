@@ -80,25 +80,30 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public Database? Database {
         get => _database;
         set {
-            //Develop.CheckStackForOverflow();
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
 
-            if (IsDisposed) { return; }
-            //if (value == null) { Develop.DebugPrint(FehlerArt.Fehler, "Datenbank null"); }
             if (_database == value) { return; }
 
             if (_database != null) {
-                _database.DisposingEvent -= Database_Disposing;
+                _database.DisposingEvent -= _database_Disposing;
                 _database.Row.RowRemoving -= Row_RowRemoving;
+                _database.Cell.CellValueChanged -= _Database_CellValueChanged;
+                _database = null;
             }
+
             OnChanging();
             _internal.Clear();
             _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+                _database.Row.RowRemoving += Row_RowRemoving;
+                _database.Cell.CellValueChanged += _Database_CellValueChanged;
+            }
+
             Invalidate_FilteredRows();
             OnChanged();
-            if (_database != null) {
-                _database.DisposingEvent += Database_Disposing;
-                _database.Row.RowRemoving += Row_RowRemoving;
-            }
         }
     }
 
@@ -110,7 +115,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             return f?.SearchValue[0] ?? string.Empty;
         }
         set {
-            if (Database is not Database db || db.IsDisposed) { return; }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
             var f = this[null];
             if (f != null) {
@@ -126,7 +131,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public ReadOnlyCollection<RowItem> Rows {
         get {
-            if (Database is not Database db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { return new List<RowItem>().AsReadOnly(); }
             _rows ??= CalculateFilteredRows();
             return _rows.AsReadOnly();
         }
@@ -134,7 +139,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public RowItem? RowSingleOrNull {
         get {
-            if (Database is not Database db || db.IsDisposed) { return null; }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
             _rows ??= CalculateFilteredRows();
             return _rows.Count != 1 ? null : _rows[0];
         }
@@ -266,8 +271,6 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public IEnumerator<FilterItem> GetEnumerator() => _internal.GetEnumerator();
 
-    public void Invalidate_FilteredRows() => _rows = null;
-
     public bool IsDifferentTo(FilterCollection? fc) {
         if (IsDisposed) { return false; }
         if (fc == this) { return false; }
@@ -291,9 +294,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public bool IsRowFilterActiv() => this[null] != null;
 
-    public bool MayHasRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
+    public bool MayHaveRowFilter(ColumnItem? column) => column != null && !column.IgnoreAtRowFilter && IsRowFilterActiv();
 
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
+    public void OnChanged() {
+        if (IsDisposed) { return; }
+        Changed?.Invoke(this, System.EventArgs.Empty);
+    }
 
     public void ParseFinished(string parsed) { }
 
@@ -427,6 +433,23 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return result.Parseable();
     }
 
+    private void _Database_CellValueChanged(object sender, CellChangedEventArgs e) {
+        if (_rows == null) { return; }
+        if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
+
+        if (e.Row.MatchesTo(_internal) != _rows.Contains(e.Row)) {
+            Invalidate_FilteredRows();
+        }
+
+        //if ((this[e.Column] != null) ||
+        //     MayHasRowFilter(e.Column)
+        // ) {
+        //    Invalidate_FilteredRows();
+        //}
+    }
+
+    private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
+
     /// <summary>
     /// Löst keine Ereignisse aus
     /// </summary>
@@ -449,7 +472,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private List<RowItem> CalculateFilteredRows() {
-        if (Database is not Database db || db.IsDisposed) { return []; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return []; }
         db.RefreshColumnsData(_internal);
 
         List<RowItem> tmpVisibleRows = [];
@@ -472,18 +495,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return tmpVisibleRows;
     }
 
-    private void Database_Disposing(object sender, System.EventArgs e) => Dispose();
-
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
                 OnDisposingEvent();
                 //base.Dispose(disposing);
-                if (Database != null) {
-                    Database.DisposingEvent -= Database_Disposing;
-                    Database.Row.RowRemoving -= Row_RowRemoving;
-                    Database = null;
-                }
+
+                Database = null;
+
                 _rows = null;
 
                 foreach (var thisf in _internal) {
@@ -517,14 +536,19 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnChanging();
     }
 
-    private void OnChanging() => Changing?.Invoke(this, System.EventArgs.Empty);
+    private void Invalidate_FilteredRows() => _rows = null;
+
+    private void OnChanging() {
+        if (IsDisposed) { return; }
+        Changing?.Invoke(this, System.EventArgs.Empty);
+    }
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
-        if (Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (_rows == null) { return; }
-        if (_rows.Contains(e.Row)) { _rows = null; }
+        if (_rows.Contains(e.Row)) { Invalidate_FilteredRows(); }
     }
 
     private void UnRegisterEvents(List<FilterItem> fi) {

@@ -106,7 +106,7 @@ public class DatabaseMu : Database {
 
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
-                if (thisa is Database db) {
+                if (thisa is Database db && !db.IsDisposed) {
                     if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
                 }
             }

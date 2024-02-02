@@ -137,13 +137,13 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     public void FilterInput_Changing(object sender, System.EventArgs e) {
         FillCellNow();
 
-        if (FilterInput?.Database is Database db && db != _lastDB) {
+        if (FilterInput?.Database is Database db && db != _lastDB && !db.IsDisposed) {
             _lastDB = db;
             db.Cell.CellValueChanged -= Database_CellValueChanged;
             db.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
             db.Row.RowChecked -= Database_RowChecked;
             db.Loaded -= _Database_Loaded;
-            db.DisposingEvent -= _Database_Disposing;
+            db.DisposingEvent -= _database_Disposing;
             db.Disposed -= _Database_Disposed;
         }
     }
@@ -355,7 +355,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
 
     private void _Database_Disposed(object sender, System.EventArgs e) => FilterInput_Changed(sender, e);
 
-    private void _Database_Disposing(object sender, System.EventArgs e) => FilterInput_Changing(sender, e);
+    private void _database_Disposing(object sender, System.EventArgs e) => FilterInput_Changing(sender, e);
 
     private void _Database_Loaded(object sender, System.EventArgs e) {
         if (Disposing || IsDisposed) { return; }
@@ -430,13 +430,13 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     }
 
     private void DoInputFilterNow() {
-        if (FilterInput?.Database is Database db && _lastDB != db) {
+        if (FilterInput?.Database is Database db && _lastDB != db && !db.IsDisposed) {
             _lastDB = db;
             db.Cell.CellValueChanged += Database_CellValueChanged;
             db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
             db.Row.RowChecked += Database_RowChecked;
             db.Loaded += _Database_Loaded;
-            db.DisposingEvent += _Database_Disposing;
+            db.DisposingEvent += _database_Disposing;
             db.Disposed += _Database_Disposed;
         }
 
@@ -529,7 +529,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     }
 
     private void Marker_DoWork(object sender, DoWorkEventArgs e) {
-        if (FilterInput?.Database is not Database db || db.IsDisposed) { return; }
+        if (IsDisposed || FilterInput?.Database is not Database db || db.IsDisposed) { return; }
 
         #region  in Frage kommende Textbox ermitteln txb
 

@@ -637,7 +637,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         //        l[2] = needPassword;
         //        var v = thist.GetMethod("CanProvide")?.Invoke(null, l);
 
-        //        if (v is Database db) { return db; }
+        //        if (v is Database db && !db.IsDisposed) { return db; }
         //    }
         //}
 
@@ -1941,9 +1941,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             if (thiscol != null) {
                 thiscol.IsInCache = DateTime.UtcNow;
 
-                if (thiscol.LinkedDatabase is Database dbl &&
-                    dbl.Column.Exists(thiscol.LinkedCell_ColumnNameOfLinkedDatabase) is ColumnItem col) {
-                    dbl.RefreshColumnsData(col);
+                if (thiscol.LinkedDatabase is Database db && !db.IsDisposed &&
+                    db.Column.Exists(thiscol.LinkedCell_ColumnNameOfLinkedDatabase) is ColumnItem col) {
+                    db.RefreshColumnsData(col);
                 }
             }
         }
@@ -2118,7 +2118,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
-                if (thisa is Database db) {
+                if (thisa is Database db && !db.IsDisposed) {
                     if (string.Equals(db.Filename.FilePath(), Filename.FilePath())) { return null; }
                 }
             }
@@ -2185,7 +2185,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
-            if (thisFile is Database db) {
+            if (thisFile is Database db && !db.IsDisposed) {
                 if (string.Equals(db.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                     _ = thisFile.Save();
                     Develop.DebugPrint(FehlerArt.Warnung, "Doppletes Laden von " + fileName);
@@ -2271,7 +2271,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
         LastChange = DateTime.UtcNow;
 
         if (type.IsCellValue()) {
-            if (column?.Database is not Database db) {
+            if (column?.Database is not Database db || db.IsDisposed) {
                 Develop.DebugPrint(FehlerArt.Warnung, "Spalte ist null! " + type);
                 return ("Wert nicht gesetzt!", null, null);
             }
@@ -2729,7 +2729,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     }
 
     private static void SaveToByteList(ColumnItem c, ref List<byte> l) {
-        if (c.Database is not Database db) { return; }
+        if (c.Database is not Database db || db.IsDisposed) { return; }
 
         var name = c.KeyName;
 

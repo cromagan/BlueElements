@@ -32,6 +32,8 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
 
     private readonly string _originalImportText;
 
+    private Database? _database;
+
     #endregion
 
     #region Constructors
@@ -44,29 +46,44 @@ public sealed partial class Import : FormWithStatusBar, IHasDatabase {
         var ein = _originalImportText.SplitAndCutByCrToList();
         Eintr.Text = ein.Count + " zum Importieren bereit.";
         Database = database;
-        if (Database is not Database db || db.IsDisposed) { return; }
-
-        db.DisposingEvent += Database_DisposingEvent;
     }
 
     #endregion
 
     #region Properties
 
-    public Database? Database { get; }
+    public Database? Database {
+        get => _database;
+        private set {
+            if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
+            if (value == _database) { return; }
+
+            if (_database != null) {
+                _database.DisposingEvent -= _database_Disposing;
+            }
+            _database = value;
+
+            if (_database != null) {
+                _database.DisposingEvent += _database_Disposing;
+            }
+        }
+    }
 
     #endregion
 
     #region Methods
 
     protected override void OnClosing(CancelEventArgs e) {
-        if (Database != null && !Database.IsDisposed) { Database.DisposingEvent -= Database_DisposingEvent; }
+        Database = null;
         base.OnClosing(e);
     }
 
-    private void Cancel_Click(object sender, System.EventArgs e) => Close();
+    private void _database_Disposing(object sender, System.EventArgs e) {
+        Database = null;
+        Close();
+    }
 
-    private void Database_DisposingEvent(object sender, System.EventArgs e) => Close();
+    private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
     private void Fertig_Click(object sender, System.EventArgs e) {
         var TR = string.Empty;

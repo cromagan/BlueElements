@@ -71,7 +71,7 @@ internal static class Dictionary {
         return _dictWords.Row[word] != null;
     }
 
-    public static bool IsWriteable() => _dictWords is Database db && !string.IsNullOrEmpty(db.Filename);
+    public static bool IsWriteable() => _dictWords is Database db && !db.IsDisposed && !string.IsNullOrEmpty(db.Filename);
 
     public static List<string>? SimilarTo(string word) {
         if (IsWordOk(word) || _dictWords == null) { return null; }
@@ -149,7 +149,7 @@ internal static class Dictionary {
 
     private static void Init() {
         var tmp = Database.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.BDB", "Dictionary", false, false);
-        if (tmp is Database DBD) { _dictWords = DBD; }
+        if (tmp is Database db && !db.IsDisposed) { _dictWords = db; }
     }
 
     #endregion
