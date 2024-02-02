@@ -133,15 +133,21 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         this.DoInputFilter(null, false);
-        Invalidate();
+        FilterInput_RowChanged(sender, e);
+        ;
+    }
+
+    public void FilterInput_Changing(object sender, System.EventArgs e) => RemoveWatcher();
+
+    public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
+        RemoveWatcher();
 
         var row = FilterInput?.RowSingleOrNull;
         row?.CheckRowDataIfNeeded();
         ParseVariables(row?.LastCheckedEventArgs?.Variables);
         CreateWatcher();
+        Invalidate();
     }
-
-    public void FilterInput_Changing(object sender, System.EventArgs e) { RemoveWatcher(); }
 
     public string GestStandardCommand(string extension) {
         if (!SubKeyExist(extension)) { return string.Empty; }

@@ -134,6 +134,8 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
 
     public void FilterInput_Changing(object sender, System.EventArgs e) => Enabled = false;
 
+    public void FilterInput_RowChanged(object? sender, System.EventArgs e) => Invalidate();
+
     public void Parents_Added(bool hasFilter) {
         if (IsDisposed) { return; }
         if (!hasFilter) { return; }

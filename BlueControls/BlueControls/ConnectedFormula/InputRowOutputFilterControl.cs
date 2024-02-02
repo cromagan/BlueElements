@@ -131,6 +131,8 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
+    public void FilterInput_RowChanged(object? sender, System.EventArgs e) { }
+
     public void Parents_Added(bool hasFilter) {
         if (IsDisposed) { return; }
         if (!hasFilter) { return; }

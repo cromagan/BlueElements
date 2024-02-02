@@ -71,6 +71,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public event EventHandler? DisposingEvent;
 
+    public event EventHandler? RowsChanged;
+
     #endregion
 
     #region Properties
@@ -81,13 +83,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         get => _database;
         set {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
-            if (value == _database) { return; }
-
             if (_database == value) { return; }
 
             if (_database != null) {
                 _database.DisposingEvent -= _database_Disposing;
                 _database.Row.RowRemoving -= Row_RowRemoving;
+                _database.Row.RowAdded -= Row_Added;
                 _database.Cell.CellValueChanged -= _Database_CellValueChanged;
                 _database = null;
             }
@@ -99,6 +100,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             if (_database != null) {
                 _database.DisposingEvent += _database_Disposing;
                 _database.Row.RowRemoving += Row_RowRemoving;
+                _database.Row.RowAdded += Row_Added;
                 _database.Cell.CellValueChanged += _Database_CellValueChanged;
             }
 
@@ -226,6 +228,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
             _rows = [];
             _rows.AddRange(fc.Rows);
+            OnRowsChanged();
         } else {
             Invalidate_FilteredRows();
         }
@@ -299,6 +302,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void OnChanged() {
         if (IsDisposed) { return; }
         Changed?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    public void OnRowsChanged() {
+        if (IsDisposed) { return; }
+        RowsChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void ParseFinished(string parsed) { }
@@ -503,7 +511,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
                 Database = null;
 
-                _rows = null;
+                Invalidate_FilteredRows();
 
                 foreach (var thisf in _internal) {
                     thisf.Dispose();
@@ -536,7 +544,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnChanging();
     }
 
-    private void Invalidate_FilteredRows() => _rows = null;
+    private void Invalidate_FilteredRows() {
+        if (_rows == null) { return; }
+        _rows = null;
+        OnRowsChanged();
+    }
 
     private void OnChanging() {
         if (IsDisposed) { return; }
@@ -544,6 +556,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
+
+    private void Row_Added(object sender, RowChangedEventArgs e) {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (_rows == null) { return; }
+        if (e.Row.MatchesTo(_internal)) { Invalidate_FilteredRows(); }
+    }
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }

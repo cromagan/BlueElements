@@ -55,6 +55,7 @@ public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
     /// Wird ausgelöst, wenn eine relevante Änderung der eingehenen Filter(Daten) erfolgt ist.
     /// Hier können die neuen temporären Filter(Daten) (FilterInput) berechnet werden und sollten auch angezeigt werden und ein Invalidate gesetzt werden
     /// Events können gekoppelt werden
+    /// Achtung: FilterInput_RowChanged beachten!
     /// </summary>
     public void FilterInput_Changed(object? sender, System.EventArgs e);
 
@@ -63,6 +64,14 @@ public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
     /// Hier können Daten, die angezeigt werden, zurückgeschrieben werden. Events können entkoppelt werden
     /// </summary>
     public void FilterInput_Changing(object sender, System.EventArgs e);
+
+    /// <summary>
+    /// Wird ausgelöst, wenn sich an den Zeilen etwas ändert.
+    /// Meist, wenn diese Invalidiert werden.
+    /// </summary>
+    /// <param name="sender"></param>
+    /// <param name="e"></param>
+    public void FilterInput_RowChanged(object? sender, System.EventArgs e);
 
     /// <summary>
     /// Wird ausgelöst, wenn ein Parent hinzugefügt wurde.
@@ -89,6 +98,7 @@ public static class IControlAcceptSomethingExtension {
         if (parent.Childs.AddIfNotExists(child)) {
             parent.FilterOutput.Changing += child.FilterInput_Changing;
             parent.FilterOutput.Changed += child.FilterInput_Changed;
+            parent.FilterOutput.RowsChanged += child.FilterInput_RowChanged;
             parent.FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
             //child.DisposingEvent += Child_DisposingEvent;
             //parent.DisposingEvent += Parent_DisposingEvent;
@@ -116,6 +126,7 @@ public static class IControlAcceptSomethingExtension {
 
             parent.FilterOutput.Changing -= child.FilterInput_Changing;
             parent.FilterOutput.Changed -= child.FilterInput_Changed;
+            parent.FilterOutput.RowsChanged -= child.FilterInput_RowChanged;
             parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
         }
     }

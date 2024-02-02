@@ -150,6 +150,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         InitializeSkin();
         MouseHighlight = false;
         Filter.Changed += Filter_Changed;
+        Filter.RowsChanged += Filter_Changed;
     }
 
     #endregion
@@ -780,8 +781,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db1.Loaded -= _Database_DatabaseLoaded;
             db1.Loading -= _Database_StoreView;
             db1.ViewChanged -= _Database_ViewChanged;
-            //db.RowKeyChanged -= _Database_RowKeyChanged;
-            //db.ColumnKeyChanged -= _Database_ColumnKeyChanged;
             db1.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
             db1.SortParameterChanged -= _Database_SortParameterChanged;
             db1.Row.RowRemoving -= Row_RowRemoving;
@@ -792,11 +791,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db1.ProgressbarInfo -= _Database_ProgressbarInfo;
             db1.DisposingEvent -= _database_Disposing;
             db1.InvalidateView -= Database_InvalidateView;
-            //if (Filter != null) { Filter.Changed -= Filter_Changed; }
-            //db.IsTableVisibleForUser -= Database_IsTableVisibleForUser;
             Database.ForceSaveAll();
             MultiUserFile.ForceLoadSaveAll();
-            //db.Save(false);         // Datenbank nicht reseten, weil sie ja anderweitig noch benutzt werden kann
         }
         ShowWaitScreen = true;
         Refresh(); // um die Uhr anzuzeigen
@@ -812,8 +808,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db2.Loaded += _Database_DatabaseLoaded;
             db2.Loading += _Database_StoreView;
             db2.ViewChanged += _Database_ViewChanged;
-            //db2.RowKeyChanged += _Database_RowKeyChanged;
-            //db2.ColumnKeyChanged += _Database_ColumnKeyChanged;
             db2.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
             db2.SortParameterChanged += _Database_SortParameterChanged;
             db2.Row.RowRemoving += Row_RowRemoving;
@@ -824,12 +818,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db2.ProgressbarInfo += _Database_ProgressbarInfo;
             db2.DisposingEvent += _database_Disposing;
             db2.InvalidateView += Database_InvalidateView;
-            //db2.IsTableVisibleForUser += Database_IsTableVisibleForUser;
         }
 
         ParseView(viewCode);
-        //ResetView();
-        //CheckView();
 
         ShowWaitScreen = false;
         OnDatabaseChanged();
@@ -1068,6 +1059,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
+    public void FilterInput_RowChanged(object? sender, System.EventArgs e) { }
 
     /// <summary>
     /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
@@ -1369,6 +1362,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         try {
             if (disposing) {
                 Filter.Changed -= Filter_Changed;
+                Filter.RowsChanged -= Filter_Changed;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
                 this.Invalidate_FilterInput(false);
                 FilterOutput.Dispose();
@@ -3159,12 +3153,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
                     case "filters":
                         Filter.Changed -= Filter_Changed;
+                        Filter.RowsChanged -= Filter_Changed;
                         Filter.Database = Database;
                         var code = pair.Value.FromNonCritical();
                         Filter.Clear();
                         Filter.Parse(code);
                         Filter.ParseFinished(code);
                         Filter.Changed += Filter_Changed;
+                        Filter.RowsChanged += Filter_Changed;
                         Filter_Changed(this, System.EventArgs.Empty);
                         break;
 

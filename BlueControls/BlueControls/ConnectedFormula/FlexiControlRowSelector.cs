@@ -78,11 +78,15 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         if (FilterManualSeted) { Develop.DebugPrint("Steuerelement unterstützt keine manuellen Filter"); }
-        this.Invalidate_FilterInput(true);
-        Invalidate();
+        FilterInput_RowChanged(sender, e);
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
+    public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
+        this.Invalidate_FilterInput(true);
+        Invalidate();
+    }
 
     public void Parents_Added(bool hasFilter) {
         if (IsDisposed) { return; }

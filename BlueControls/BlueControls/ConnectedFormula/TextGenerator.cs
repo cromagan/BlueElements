@@ -120,11 +120,16 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
         this.DoInputFilter(null, false);
-        GenerateColumns();// Wegen der Datenbank
-        GenerateItemsAndText();
+        FilterInput_RowChanged(sender, e);
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
+
+    public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
+        GenerateColumns();// Wegen der Datenbank
+        GenerateItemsAndText();
+        Invalidate();
+    }
 
     public void Parents_Added(bool hasFilter) {
         if (IsDisposed) { return; }

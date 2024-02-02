@@ -117,6 +117,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     public void FilterInput_Changing(object sender, System.EventArgs e) { }
 
+    public void FilterInput_RowChanged(object? sender, System.EventArgs e) { }
+
     public void GenerateView() {
         if (IsDisposed) { return; }
         if (_generated) { return; }

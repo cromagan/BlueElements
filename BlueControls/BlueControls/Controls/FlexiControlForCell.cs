@@ -129,9 +129,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
     }
 
     public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        this.Invalidate_FilterInput(true);
-        if (FilterManualSeted) { DoInputFilterNow(); }
-        Invalidate();
+        FilterInput_RowChanged(sender, e);
     }
 
     public void FilterInput_Changing(object sender, System.EventArgs e) {
@@ -146,6 +144,12 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
             db.DisposingEvent -= _database_Disposing;
             db.Disposed -= _Database_Disposed;
         }
+    }
+
+    public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
+        this.Invalidate_FilterInput(true);
+        if (FilterManualSeted) { DoInputFilterNow(); }
+        Invalidate();
     }
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
