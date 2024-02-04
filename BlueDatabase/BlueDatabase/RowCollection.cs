@@ -330,7 +330,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 Database.OnDropMessage(FehlerArt.Warnung, "Skript fehlerhaft bei " + w);
                 return "Skript fehlerhaft bei " + w + "\r\n" + scx.Protocol[0];
             }
-            if (scx.AllOk) { rows.RemoveAt(0); }
+
+            rows.RemoveAt(0);
 
             if (DateTime.UtcNow.Subtract(start).TotalMinutes > 1) {
                 db.Save();
@@ -351,7 +352,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         while (_pendingChangedRows.Count > 0) {
             if (IsDisposed) { break; }
-            if (IsDisposed ||Database is not Database db || db.IsDisposed) { break; }
+            if (IsDisposed || Database is not Database db || db.IsDisposed) { break; }
 
             if (!Database.IsRowScriptPossible(true)) { break; }
 
@@ -386,7 +387,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public RowItem? First() => _internal.Values.FirstOrDefault(thisRowItem => thisRowItem != null && !thisRowItem.IsDisposed);
 
     public RowItem? GenerateAndAdd(string valueOfCellInFirstColumn, string comment) {
-        if (IsDisposed ||Database is not Database db || db.IsDisposed) { return null; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return null; }
         if (!Database.Row.IsNewRowPossible()) { return null; }
 
         var s = Database.NextRowKey();
@@ -487,7 +488,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public bool IsNewRowPossible() {
-        if (IsDisposed ||Database is not Database db || db.IsDisposed) { return false; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return false; }
 
         return Database.IsNewRowPossible();
     }
@@ -606,7 +607,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal string ExecuteCommand(DatabaseDataType type, string rowkey, Reason reason) {
-        if (IsDisposed ||Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return "Datenbank verworfen"; }
 
         if (type == DatabaseDataType.Command_AddRow) {
             var row = SearchByKey(rowkey);

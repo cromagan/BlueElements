@@ -83,7 +83,7 @@ public class Method_CallDatabase : Method_Database, IUseableForButton {
 
         var f = db.ExecuteScript(null, attvar.ValueStringGet(1), true, null, a);
 
-        if (f.AllOk) {
+        if (!f.AllOk) {
             return new DoItFeedback(infos.Data, f.ProtocolText);
         }
 
