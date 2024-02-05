@@ -37,7 +37,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSomething, IAutosizable {
+public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 

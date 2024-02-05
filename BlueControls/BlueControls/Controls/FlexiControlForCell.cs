@@ -40,7 +40,7 @@ using static BlueBasics.IO;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlAcceptSomething {
+public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlAcceptFilter {
 
     #region Fields
 
@@ -101,7 +101,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlA
 
     public bool FilterManualSeted { get; set; } = false;
 
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     #endregion
 

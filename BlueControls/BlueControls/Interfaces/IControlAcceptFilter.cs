@@ -26,7 +26,7 @@ using BlueDatabase;
 
 namespace BlueControls.Interfaces;
 
-public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
+public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
 
     #region Properties
 
@@ -45,7 +45,7 @@ public interface IControlAcceptSomething : IDisposableExtendedWithEvent {
 
     public string Name { get; set; }
 
-    public List<IControlSendSomething> Parents { get; }
+    public List<IControlSendFilter> Parents { get; }
 
     #endregion
 
@@ -86,7 +86,7 @@ public static class IControlAcceptSomethingExtension {
 
     #region Methods
 
-    public static void ConnectChildParents(this IControlAcceptSomething child, IControlSendSomething parent) {
+    public static void ConnectChildParents(this IControlAcceptFilter child, IControlSendFilter parent) {
         if (child.FilterManualSeted) {
             Develop.DebugPrint(FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
         }
@@ -108,8 +108,8 @@ public static class IControlAcceptSomethingExtension {
         }
     }
 
-    public static void DisconnectChildParents(this IControlAcceptSomething child, List<IControlSendSomething> parents) {
-        var p = new List<IControlSendSomething>();
+    public static void DisconnectChildParents(this IControlAcceptFilter child, List<IControlSendFilter> parents) {
+        var p = new List<IControlSendFilter>();
         p.AddRange(parents);
 
         foreach (var parent in p) {
@@ -117,7 +117,7 @@ public static class IControlAcceptSomethingExtension {
         }
     }
 
-    public static void DisconnectChildParents(this IControlAcceptSomething child, IControlSendSomething parent) {
+    public static void DisconnectChildParents(this IControlAcceptFilter child, IControlSendFilter parent) {
         child.Parents.Remove(parent);
 
         if (parent.Childs.Contains(child)) {
@@ -135,7 +135,7 @@ public static class IControlAcceptSomethingExtension {
     /// <param name="item"></param>
     /// <param name="mustbeDatabase"></param>
     /// <param name="doEmptyFilterToo"></param>
-    public static void DoInputFilter(this IControlAcceptSomething item, Database? mustbeDatabase, bool doEmptyFilterToo) {
+    public static void DoInputFilter(this IControlAcceptFilter item, Database? mustbeDatabase, bool doEmptyFilterToo) {
         if (item.IsDisposed) { return; }
         if (item.FilterManualSeted) { return; }
 
@@ -183,7 +183,7 @@ public static class IControlAcceptSomethingExtension {
     /// <param name="dest"></param>
     /// <param name="parent"></param>
     /// <param name="source"></param>
-    public static void DoInputSettings(this IControlAcceptSomething dest, ConnectedFormulaView parent, IItemAcceptSomething source) {
+    public static void DoInputSettings(this IControlAcceptFilter dest, ConnectedFormulaView parent, IItemAcceptFilter source) {
         dest.Name = source.DefaultItemToControlName();
 
         foreach (var thisKey in source.Parents) {
@@ -192,7 +192,7 @@ public static class IControlAcceptSomethingExtension {
             if (it is IItemToControl itc) {
                 var ff = parent.SearchOrGenerate(itc);
 
-                if (ff is IControlSendSomething ffx) {
+                if (ff is IControlSendFilter ffx) {
                     dest.ConnectChildParents(ffx);
                 }
             }
@@ -202,14 +202,14 @@ public static class IControlAcceptSomethingExtension {
     /// <summary>
     /// Verwirft den aktuellen InputFilter.
     /// </summary>
-    public static void Invalidate_FilterInput(this IControlAcceptSomething item, bool checkmanuelseted) {
+    public static void Invalidate_FilterInput(this IControlAcceptFilter item, bool checkmanuelseted) {
         if (item.IsDisposed) { return; }
         if (checkmanuelseted && item.FilterManualSeted) { return; }
         item.FilterInput?.Dispose();
         item.SetFilterInput(null);
     }
 
-    public static void SetFilterInput(this IControlAcceptSomething item, FilterCollection? filterCollection) {
+    public static void SetFilterInput(this IControlAcceptFilter item, FilterCollection? filterCollection) {
         if (item.FilterInput != null) {
             item.FilterInput.RowsChanged -= item.FilterInput_RowChanged;
         }
@@ -223,7 +223,7 @@ public static class IControlAcceptSomethingExtension {
         }
     }
 
-    public static void SetToRow(this IControlAcceptSomething item, RowItem? row) {
+    public static void SetToRow(this IControlAcceptFilter item, RowItem? row) {
         if (item.Parents.Count > 0) {
             Develop.DebugPrint(FehlerArt.Fehler, "Element wird von Parents gesteuert!");
         }
@@ -250,7 +250,7 @@ public static class IControlAcceptSomethingExtension {
     }
 
     private static void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {
-        if (sender is IControlSendSomething parent) {
+        if (sender is IControlSendFilter parent) {
             foreach (var child in parent.Childs) {
                 child.FilterInput_Changing(parent, System.EventArgs.Empty);
                 child.DisconnectChildParents(parent);

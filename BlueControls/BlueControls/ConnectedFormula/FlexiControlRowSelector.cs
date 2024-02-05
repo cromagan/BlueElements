@@ -32,7 +32,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IControlAcceptSomething {
+internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, IControlAcceptFilter {
 
     #region Fields
 
@@ -58,7 +58,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
 
     #region Properties
 
-    public List<IControlAcceptSomething> Childs { get; } = [];
+    public List<IControlAcceptFilter> Childs { get; } = [];
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -70,7 +70,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendSomething, IC
 
     public FilterCollection FilterOutput { get; } = new("FilterOutput");
 
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     #endregion
 

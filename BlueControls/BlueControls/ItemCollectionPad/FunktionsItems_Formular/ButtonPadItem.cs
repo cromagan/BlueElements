@@ -41,7 +41,7 @@ using Button = BlueControls.Controls.Button;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IAutosizable {
+public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 

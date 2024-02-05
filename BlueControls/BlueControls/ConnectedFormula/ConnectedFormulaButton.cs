@@ -34,7 +34,7 @@ using BlueScript.Variables;
 
 namespace BlueControls.Controls;
 
-internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
+internal class ConnectedFormulaButton : Button, IControlAcceptFilter {
 
     #region Fields
 
@@ -120,7 +120,7 @@ internal class ConnectedFormulaButton : Button, IControlAcceptSomething {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     #endregion
 

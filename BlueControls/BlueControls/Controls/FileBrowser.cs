@@ -44,7 +44,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
-public partial class FileBrowser : GenericControl, IControlAcceptSomething   //UserControl //
+public partial class FileBrowser : GenericControl, IControlAcceptFilter   //UserControl //
 {
     #region Fields
 
@@ -104,7 +104,7 @@ public partial class FileBrowser : GenericControl, IControlAcceptSomething   //U
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     public string Pfad {
         get => IsDisposed ? string.Empty : txbPfad.Text;

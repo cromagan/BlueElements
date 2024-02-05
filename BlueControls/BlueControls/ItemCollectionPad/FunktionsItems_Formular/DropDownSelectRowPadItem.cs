@@ -34,7 +34,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething, IAutosizable {
+public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendSomething, IAutosizable {
 
     #region Fields
 
@@ -230,7 +230,7 @@ public class DropDownSelectRowPadItem : FakeControlPadItem, IReadableText, IItem
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {

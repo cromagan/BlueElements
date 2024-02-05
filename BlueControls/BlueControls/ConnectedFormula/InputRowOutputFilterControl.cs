@@ -27,7 +27,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.Controls;
 
-internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, IControlSendSomething {
+internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, IControlSendFilter {
 
     #region Fields
 
@@ -53,7 +53,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
 
     #region Properties
 
-    public List<IControlAcceptSomething> Childs { get; } = [];
+    public List<IControlAcceptFilter> Childs { get; } = [];
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -68,7 +68,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptSomething, I
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
         get => _standard_bei_keiner_Eingabe;

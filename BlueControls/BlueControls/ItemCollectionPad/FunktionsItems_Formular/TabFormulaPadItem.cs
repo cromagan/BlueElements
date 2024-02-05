@@ -47,7 +47,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// <summary>
 /// Erzeut ein Tab-Formula, das weitere Formulare enthalten kann
 /// </summary>
-public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptSomething, IAutosizable {
+public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 

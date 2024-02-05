@@ -36,7 +36,7 @@ using BlueDatabase.Enums;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething, IControlAcceptSomething {
+public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, IControlAcceptFilter {
 
     #region Fields
 
@@ -69,7 +69,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
 
     #region Properties
 
-    public List<IControlAcceptSomething> Childs { get; } = [];
+    public List<IControlAcceptFilter> Childs { get; } = [];
 
     /// <summary>
     /// Da die CaptionPosition von dem Steuerelemnt bei bedarf geämndert wird,
@@ -102,7 +102,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendSomething
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe {
         get => _standard_bei_keiner_Eingabe;

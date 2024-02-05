@@ -35,7 +35,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething {
+public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendSomething {
 
     #region Fields
 
@@ -278,7 +278,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {

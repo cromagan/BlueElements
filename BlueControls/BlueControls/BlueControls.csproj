@@ -165,6 +165,7 @@
     <Compile Include="ConnectedFormula\TextGenerator.Designer.cs">
       <DependentUpon>TextGenerator.cs</DependentUpon>
     </Compile>
+    <Compile Include="Enums\AllowedInputFilter.cs" />
     <Compile Include="Enums\FilterTypeRowInputItem.cs" />
     <Compile Include="Enums\FlexiFilterDefaultFilter.cs" />
     <Compile Include="Enums\FlexiFilterDefaultOutput.cs" />
@@ -183,12 +184,12 @@
     <Compile Include="Forms\FormWithStatusBar.designer.cs">
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\NewInterfaces\IAutosizable.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IControlAcceptSomething.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IHasVersion.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IItemAcceptSomething.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IControlSendSomething.cs" />
-    <Compile Include="Interfaces\NewInterfaces\IItemSendSomething.cs" />
+    <Compile Include="Interfaces\IAutosizable.cs" />
+    <Compile Include="Interfaces\IControlAcceptFilter.cs" />
+    <Compile Include="Interfaces\IHasVersion.cs" />
+    <Compile Include="Interfaces\IItemAcceptFilter.cs" />
+    <Compile Include="Interfaces\IControlSendFilter.cs" />
+    <Compile Include="Interfaces\IItemSendFilter.cs" />
     <Compile Include="Interfaces\IHasConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormula.cs" />
     <Compile Include="ConnectedFormula\ConnectedFormulaView.cs">

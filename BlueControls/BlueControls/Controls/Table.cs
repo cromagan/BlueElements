@@ -57,7 +57,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptSomething, IControlSendSomething {
+public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptFilter, IControlSendFilter {
 
     #region Fields
 
@@ -208,7 +208,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public List<IControlAcceptSomething> Childs { get; } = [];
+    public List<IControlAcceptFilter> Childs { get; } = [];
 
     public ColumnViewCollection? CurrentArrangement {
         get {
@@ -267,7 +267,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]

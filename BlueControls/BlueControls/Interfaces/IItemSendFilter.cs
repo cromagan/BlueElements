@@ -46,7 +46,7 @@ public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangin
 
     public void AddChild(IHasKeyName add);
 
-    public void RemoveChild(IItemAcceptSomething remove);
+    public void RemoveChild(IItemAcceptFilter remove);
 
     public void UpdateSideOptionMenu();
 
@@ -66,7 +66,7 @@ public static class ItemSendSomethingExtension {
 
         item.DatabaseOutput = db;
 
-        if (item is IItemAcceptSomething ias && ias.DatabaseInputMustMatchOutputDatabase) {
+        if (item is IItemAcceptFilter ias && ias.DatabaseInputMustMatchOutputDatabase) {
             ias.Parents = new List<string>().AsReadOnly();
         }
     }
@@ -85,7 +85,7 @@ public static class ItemSendSomethingExtension {
             foreach (var thisChild in item.ChildIds) {
                 var item2 = item.Parent[thisChild];
 
-                if (item2 is IItemAcceptSomething ias) {
+                if (item2 is IItemAcceptFilter ias) {
                     ias.CalculateInputColorIds();
                 }
             }
@@ -218,7 +218,7 @@ public sealed class ItemSendSomething {
         return false;
     }
 
-    public void RemoveChild(IItemAcceptSomething remove, IItemSendSomething item) {
+    public void RemoveChild(IItemAcceptFilter remove, IItemSendSomething item) {
         var l = new List<string>();
         l.AddRange(_childIds);
         _ = l.Remove(remove.KeyName);

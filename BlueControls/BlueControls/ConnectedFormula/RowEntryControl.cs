@@ -24,7 +24,7 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-internal class RowEntryControl : GenericControl, IControlAcceptSomething, IControlSendSomething {
+internal class RowEntryControl : GenericControl, IControlAcceptFilter, IControlSendFilter {
 
     #region Constructors
 
@@ -34,7 +34,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
 
     #region Properties
 
-    public List<IControlAcceptSomething> Childs { get; } = [];
+    public List<IControlAcceptFilter> Childs { get; } = [];
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -46,7 +46,7 @@ internal class RowEntryControl : GenericControl, IControlAcceptSomething, IContr
 
     public FilterCollection FilterOutput { get; } = new("FilterIput 3");
 
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     #endregion
 

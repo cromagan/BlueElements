@@ -31,7 +31,7 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-public partial class TextGenerator : GenericControl, IControlAcceptSomething {
+public partial class TextGenerator : GenericControl, IControlAcceptFilter {
 
     #region Fields
 
@@ -101,7 +101,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptSomething {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     [Description("Dieses Feld kann für den Forms-Editor verwendet werden.")]
     [DefaultValue("")]

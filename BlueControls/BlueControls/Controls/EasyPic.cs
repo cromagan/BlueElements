@@ -39,7 +39,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone, IControlAcceptSomething {
+public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundNone, IControlAcceptFilter {
 
     #region Fields
 
@@ -110,7 +110,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     [DefaultValue(0)]
     public new int TabIndex {

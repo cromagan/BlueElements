@@ -23,11 +23,11 @@ using BlueDatabase;
 
 namespace BlueControls.Interfaces;
 
-public interface IControlSendSomething : IDisposableExtendedWithEvent {
+public interface IControlSendFilter : IDisposableExtendedWithEvent {
 
     #region Properties
 
-    public List<IControlAcceptSomething> Childs { get; }
+    public List<IControlAcceptFilter> Childs { get; }
 
     /// <summary>
     /// Sollte von DoOuputSettings befüllt werden.
@@ -43,12 +43,12 @@ public static class IControlSendSomethingExtension {
 
     #region Methods
 
-    public static void DoOutputSettings(this IControlSendSomething dest, Database? db, string name) {
+    public static void DoOutputSettings(this IControlSendFilter dest, Database? db, string name) {
         dest.Name = name;
         dest.FilterOutput.Database = db;
     }
 
-    public static void DoOutputSettings(this IControlSendSomething dest, IItemSendSomething source) {
+    public static void DoOutputSettings(this IControlSendFilter dest, IItemSendSomething source) {
         dest.Name = source.DefaultItemToControlName();
         dest.FilterOutput.Database = source.DatabaseOutput;
     }

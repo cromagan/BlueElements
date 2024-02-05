@@ -37,7 +37,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Per Tabellenansicht
 /// </summary>
 
-public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething, IAutosizable {
+public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendSomething, IAutosizable {
 
     #region Fields
 
@@ -212,7 +212,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {

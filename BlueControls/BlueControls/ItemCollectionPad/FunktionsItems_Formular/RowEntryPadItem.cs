@@ -35,7 +35,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Hat NICHT IAcceptRowItem, da es nur von einer einzigen internen Routine befüllt werden darf.
 /// Unsichtbares Element, wird nicht angezeigt.
 /// </summary>
-public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething {
+public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendSomething {
 
     #region Fields
 
@@ -179,7 +179,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {

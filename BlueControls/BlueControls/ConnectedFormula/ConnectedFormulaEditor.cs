@@ -133,7 +133,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         //    iar.GetRowFrom = isr;
         //}
 
-        if (l is IItemSendSomething && x is IItemAcceptSomething iaf) {
+        if (l is IItemSendSomething && x is IItemAcceptFilter iaf) {
             iaf.Parents = new List<string> { l.KeyName }.AsReadOnly();
         }
 
@@ -145,7 +145,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
         //    isf2.Datenbank_wählen();
         //}
 
-        if (x is IItemAcceptSomething iaf2 && iaf2.Parents.Count == 0) {
+        if (x is IItemAcceptFilter iaf2 && iaf2.Parents.Count == 0) {
             iaf2.Datenquellen_bearbeiten();
         }
     }
@@ -347,7 +347,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         txt = txt + "<br><br><b><u>Eigenschaften:</b></u>";
 
-        if (from is IItemAcceptSomething ias) {
+        if (from is IItemAcceptFilter ias) {
             if (ias.MustBeOneRow) {
                 txt = txt + "<br> - Das Element kann Filter <u>empfangen</u>.<br>" +
                     "   Diese müssen als Ergebniss <u>genau eine Zeile</u> einer Datenbank ergeben,<br>" +

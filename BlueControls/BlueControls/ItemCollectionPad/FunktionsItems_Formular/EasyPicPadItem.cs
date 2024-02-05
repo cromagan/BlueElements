@@ -32,7 +32,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptSomething, IAutosizable {
+public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 

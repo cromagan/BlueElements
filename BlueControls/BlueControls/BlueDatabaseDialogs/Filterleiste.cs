@@ -33,7 +33,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.BlueDatabaseDialogs;
 
-public partial class Filterleiste : GenericControl, IControlSendSomething, IBackgroundNone //  System.Windows.Forms.UserControl //
+public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgroundNone //  System.Windows.Forms.UserControl //
 {
     #region Fields
 
@@ -82,7 +82,7 @@ public partial class Filterleiste : GenericControl, IControlSendSomething, IBack
     /// <summary>
     /// Enthält nur die FlexControlforFilter
     /// </summary>
-    public List<IControlAcceptSomething> Childs { get; } = [];
+    public List<IControlAcceptFilter> Childs { get; } = [];
 
     /// <summary>
     /// Ist immer identisch mit den Filtern der Tableview.

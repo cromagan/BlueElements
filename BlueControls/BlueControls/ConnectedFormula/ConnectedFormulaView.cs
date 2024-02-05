@@ -36,7 +36,7 @@ using static BlueControls.ConnectedFormula.ConnectedFormula;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IControlAcceptSomething, IControlSendSomething {
+public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IControlAcceptFilter, IControlSendFilter {
 
     #region Fields
 
@@ -58,7 +58,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     #region Properties
 
-    public List<IControlAcceptSomething> Childs { get; } = [];
+    public List<IControlAcceptFilter> Childs { get; } = [];
 
     public ConnectedFormula.ConnectedFormula? ConnectedFormula {
         get; private set;
@@ -91,7 +91,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public List<IControlSendSomething> Parents { get; } = [];
+    public List<IControlSendFilter> Parents { get; } = [];
 
     //set => SetData(ConnectedFormula, Database, value, Page);
     [Browsable(false)]
@@ -184,7 +184,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
 
         foreach (var thisc in unused) {
-            if (thisc is IControlAcceptSomething child) {
+            if (thisc is IControlAcceptFilter child) {
                 child.DisconnectChildParents(child.Parents);
             }
 

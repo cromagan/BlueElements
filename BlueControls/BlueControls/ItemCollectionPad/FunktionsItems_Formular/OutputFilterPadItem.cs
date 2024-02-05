@@ -41,7 +41,7 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Dieses Element kann einen Vorfilter empfangen und stellt dem Benutzer die Wahl, einen neuen Filter auszuwählen und gibt diesen weiter.
 /// </summary>
 
-public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptSomething, IItemSendSomething, IAutosizable {
+public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendSomething, IAutosizable {
 
     #region Fields
 
@@ -320,7 +320,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         return txt + ErrorReason();
     }
 
-    public void RemoveChild(IItemAcceptSomething remove) => _itemSends.RemoveChild(remove, this);
+    public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
 
     public void Spalte_bearbeiten() {
         if (IsDisposed) { return; }

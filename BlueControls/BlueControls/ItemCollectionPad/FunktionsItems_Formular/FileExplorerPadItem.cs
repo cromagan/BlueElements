@@ -34,7 +34,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptSomething, IAutosizable {
+public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutosizable {
 
     #region Fields
 

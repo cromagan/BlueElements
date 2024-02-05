@@ -36,9 +36,15 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das Steuerelement etwas empfangen kann
 /// </summary>
-public interface IItemAcceptSomething : IHasKeyName, IChangedFeedback, IHasVersion, IItemToControl {
+public interface IItemAcceptFilter : IHasKeyName, IChangedFeedback, IHasVersion, IItemToControl {
 
     #region Properties
+
+    /// <summary>
+    /// Bestimmt die Filterberechung und bestimmt, ob der Filterder Parents weiterverwendet werde kann.
+    /// 'One' spart immens Rechenleistung
+    /// </summary>
+    public AllowedInputFilter AllowedInputFilter { get; }
 
     public Database? DatabaseInput { get; }
 
@@ -78,7 +84,7 @@ public static class ItemAcceptSomethingExtensions {
 
     #region Methods
 
-    public static List<int> CalculateColorIds(this IItemAcceptSomething item) {
+    public static List<int> CalculateColorIds(this IItemAcceptFilter item) {
         var l = new List<int>();
 
         foreach (var thisId in item.Parents) {
@@ -93,7 +99,7 @@ public static class ItemAcceptSomethingExtensions {
     }
 
     [Description("Wählt ein Filter-Objekt, aus der die Werte kommen.")]
-    public static void Datenquellen_bearbeiten(this IItemAcceptSomething item) {
+    public static void Datenquellen_bearbeiten(this IItemAcceptFilter item) {
         if (item.Parent is null) { return; }
 
         Database? outd = null;
@@ -197,7 +203,7 @@ public sealed class ItemAcceptSomething {
 
     #region Methods
 
-    public void CalculateInputColorIds(IItemAcceptSomething item) {
+    public void CalculateInputColorIds(IItemAcceptFilter item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         var nl = item.CalculateColorIds();
 
@@ -207,7 +213,7 @@ public sealed class ItemAcceptSomething {
         }
     }
 
-    public Database? DatabaseInput(IItemAcceptSomething item) {
+    public Database? DatabaseInput(IItemAcceptFilter item) {
         if (item.DatabaseInputMustMatchOutputDatabase) {
             if (item is IItemSendSomething iiss) { return iiss.DatabaseOutput; }
             return null;
@@ -219,7 +225,7 @@ public sealed class ItemAcceptSomething {
         return g[0].DatabaseOutput;
     }
 
-    public void DoCreativePadAddedToCollection(IItemAcceptSomething item) {
+    public void DoCreativePadAddedToCollection(IItemAcceptFilter item) {
         var l = GetFilterFromGet(item);
 
         foreach (var thiss in l) {
@@ -228,13 +234,13 @@ public sealed class ItemAcceptSomething {
         item.OnChanged();
     }
 
-    public string ErrorReason(IItemAcceptSomething item) =>
+    public string ErrorReason(IItemAcceptFilter item) =>
         //if (item.DatabaseInput is not Database db || db.IsDisposed) {
         //    return "Eingehende Datenbank unbekannt";
         //}
         string.Empty;
 
-    public ReadOnlyCollection<IItemSendSomething> GetFilterFromGet(IItemAcceptSomething item) {
+    public ReadOnlyCollection<IItemSendSomething> GetFilterFromGet(IItemAcceptFilter item) {
         if (item.Parent == null) {
             Develop.DebugPrint(FehlerArt.Warnung, "Parent nicht initialisiert!");
             return new ReadOnlyCollection<IItemSendSomething>(new List<IItemSendSomething>());
@@ -257,7 +263,7 @@ public sealed class ItemAcceptSomething {
 
     public ReadOnlyCollection<string> GetFilterFromKeysGet() => new(_getFilterFromKeys);
 
-    public void GetFilterFromKeysSet(ICollection<string>? value, IItemAcceptSomething item) {
+    public void GetFilterFromKeysSet(ICollection<string>? value, IItemAcceptFilter item) {
         if (!_getFilterFromKeys.IsDifferentTo(value)) { return; }
 
         var g = GetFilterFromGet(item);
@@ -288,7 +294,7 @@ public sealed class ItemAcceptSomething {
         item.UpdateSideOptionMenu();
     }
 
-    public List<int> InputColorIdGet(IItemAcceptSomething item) {
+    public List<int> InputColorIdGet(IItemAcceptFilter item) {
         if (_inputColorId.Count == 0) {
             CalculateInputColorIds(item);
         }
@@ -303,7 +309,7 @@ public sealed class ItemAcceptSomething {
         return result;
     }
 
-    public void ParseFinished(IItemAcceptSomething item) { }
+    public void ParseFinished(IItemAcceptFilter item) { }
 
     public bool ParseThis(string tag, string value) {
         switch (tag) {
@@ -321,7 +327,7 @@ public sealed class ItemAcceptSomething {
         return false;
     }
 
-    internal List<GenericControl> GetStyleOptions(IItemAcceptSomething item, int widthOfControl) {
+    internal List<GenericControl> GetStyleOptions(IItemAcceptFilter item, int widthOfControl) {
         var l = new List<GenericControl> {
             new FlexiControl("Eingang:", widthOfControl)
         };
