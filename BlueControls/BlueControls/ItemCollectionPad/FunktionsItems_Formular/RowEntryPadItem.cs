@@ -24,6 +24,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -40,7 +41,6 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     #region Fields
 
     private readonly ItemAcceptSomething _itemAccepts;
-
     private readonly ItemSendSomething _itemSends;
 
     #endregion
@@ -65,6 +65,7 @@ public class RowEntryPadItem : FakeControlPadItem, IReadableText, IItemToControl
     #region Properties
 
     public static string ClassId => "FI-RowEntryElement";
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One | AllowedInputFilter.None;
 
     public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();

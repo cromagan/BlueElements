@@ -25,6 +25,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -37,7 +38,6 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
     #region Fields
 
     private readonly ItemAcceptSomething _itemAccepts;
-
     private string _bild_Dateiname = string.Empty;
 
     #endregion
@@ -54,6 +54,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
     #region Properties
 
     public static string ClassId => "FI-EasyPic";
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
     [Description("Der Dateiname des Bildes, das angezeigt werden sollen.\r\nEs können Variablen aus dem Skript benutzt werden.\r\nDiese müssen im Format ~variable~ angegeben werden.")]

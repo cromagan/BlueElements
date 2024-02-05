@@ -21,7 +21,7 @@ namespace BlueControls.BlueDatabaseDialogs
         {
             try
             {
-                if (disposing && components != null)
+                if (disposing)
                 {
                     components?.Dispose();
                 }

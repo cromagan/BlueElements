@@ -65,6 +65,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
     #region Properties
 
     public static string ClassId => "FI-TextGeneratorPadItem";
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => true;
     public Database? DatabaseInput => _itemAccepts.DatabaseInput(this);
     public bool DatabaseInputMustMatchOutputDatabase => false;

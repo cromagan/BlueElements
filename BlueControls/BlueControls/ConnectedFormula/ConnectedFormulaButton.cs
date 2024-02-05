@@ -26,6 +26,7 @@ using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueDatabase;
+using BlueDatabase.EventArgs;
 using BlueScript;
 using BlueScript.EventArgs;
 using BlueScript.Interfaces;
@@ -34,15 +35,20 @@ using BlueScript.Variables;
 
 namespace BlueControls.Controls;
 
-internal class ConnectedFormulaButton : Button, IControlAcceptFilter {
+internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
     #region Fields
 
     private string _action = string.Empty;
+
     private string _arg1 = string.Empty;
+
     private string _arg2 = string.Empty;
+
     private string _arg3 = string.Empty;
+
     private string _arg4 = string.Empty;
+
     private ButtonArgs _enabledwhenrows;
 
     #endregion
@@ -109,53 +115,35 @@ internal class ConnectedFormulaButton : Button, IControlAcceptFilter {
         }
     }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; }
-
-    public bool FilterManualSeted { get; set; } = false;
-
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
+    public bool RowManualSeted { get; set; } = false;
+    public List<RowItem>? RowsInput { get; set; }
+
     #endregion
 
     #region Methods
 
-    public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        this.Invalidate_FilterInput(true);
-        //if (FilterManualSeted) { DoInputFilterNow(); }
-        Invalidate();
-    }
+    public void Rows_Changed() => this.Invalidate_Rows();
 
-    public void FilterInput_Changing(object sender, System.EventArgs e) => Enabled = false;
+    public void Rows_Changing() { }
 
-    public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
-        Enabled = false;
-        Invalidate();
-    }
+    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
 
-    public void Parents_Added(bool hasFilter) {
-        if (IsDisposed) { return; }
-        if (!hasFilter) { return; }
-        FilterInput_Changed(null, System.EventArgs.Empty);
-    }
+    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
 
     protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
         if (disposing) {
-            this.Invalidate_FilterInput(false);
+            this.DoDispose();
         }
+        base.Dispose(disposing);
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        if (FilterInput == null) {
-            this.DoInputFilter(null, false);
-        }
+        if (RowsInput == null) { this.DoRows(null, false); }
 
         bool enabled;
 
@@ -165,19 +153,18 @@ internal class ConnectedFormulaButton : Button, IControlAcceptFilter {
                 break;
 
             case ButtonArgs.Keine_Zeile:
-                enabled = FilterInput != null && FilterInput.Rows.Count == 0;
+                enabled = RowsInput == null || RowsInput.Count == 0;
                 break;
 
             case ButtonArgs.Genau_eine_Zeile:
-                enabled = FilterInput != null && FilterInput.RowSingleOrNull != null;
+                enabled = RowsInput != null && RowsInput.Count == 1;
                 break;
 
             case ButtonArgs.Eine_oder_mehr_Zeilen:
-                enabled = FilterInput != null && FilterInput.Rows.Count > 0;
+                enabled = RowsInput != null && RowsInput.Count > 0;
                 break;
 
             default:
-                Develop.DebugPrint(_enabledwhenrows);
                 enabled = false;
                 break;
         }
@@ -213,9 +200,11 @@ internal class ConnectedFormulaButton : Button, IControlAcceptFilter {
 
         VariableCollection vars;
         object? ai = null;
-        var row = FilterInput?.RowSingleOrNull;
+        RowItem? row = null;
 
-        if (FilterInput?.Database is Database db && !db.IsDisposed) {
+        if (RowsInput != null && RowsInput.Count == 1) { row = RowsInput[0]; }
+
+        if (row?.Database is Database db && !db.IsDisposed) {
             vars = db.CreateVariableCollection(row, true, false);
         } else {
             vars = new VariableCollection();
@@ -224,8 +213,9 @@ internal class ConnectedFormulaButton : Button, IControlAcceptFilter {
         #region FilterVariablen erstellen und in fis speichern
 
         var fis = string.Empty;
+        var filterInput = this.GetInputFilter(null, false);
 
-        if (FilterInput is FilterCollection fi) {
+        if (filterInput is FilterCollection fi) {
             for (var fz = 0; fz < fi.Count; fz++) {
                 if (fi[fz] is FilterItem thisf) {
                     var nam = "Filter" + fz;

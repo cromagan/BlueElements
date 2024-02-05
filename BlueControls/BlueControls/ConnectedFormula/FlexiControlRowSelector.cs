@@ -20,19 +20,20 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using BlueBasics;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
 using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
+using static BlueBasics.Extensions;
 
 #nullable enable
 
 namespace BlueControls.ConnectedFormula;
 
-internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, IControlAcceptFilter {
+internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, IControlUsesRow {
 
     #region Fields
 
@@ -60,53 +61,48 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     public List<IControlAcceptFilter> Childs { get; } = [];
 
+    public FilterCollection FilterOutput { get; } = new("FilterOutput");
+
+    public List<IControlSendFilter> Parents { get; } = [];
+
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; }
+    public bool RowManualSeted { get; set; } = false;
 
-    public bool FilterManualSeted { get; set; } = false;
-
-    public FilterCollection FilterOutput { get; } = new("FilterOutput");
-
-    public List<IControlSendFilter> Parents { get; } = [];
+    public List<RowItem>? RowsInput { get; set; }
 
     #endregion
 
     #region Methods
 
-    public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        if (FilterManualSeted) { Develop.DebugPrint("Steuerelement unterstützt keine manuellen Filter"); }
-        FilterInput_RowChanged(sender, e);
-    }
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
 
-    public void FilterInput_Changing(object sender, System.EventArgs e) { }
+    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
 
-    public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
-        this.Invalidate_FilterInput(true);
-        Invalidate();
-    }
+    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void Parents_Added(bool hasFilter) {
-        if (IsDisposed) { return; }
-        if (!hasFilter) { return; }
-        FilterInput_Changed(null, System.EventArgs.Empty);
-    }
+    public void Rows_Changed() => this.Invalidate_Rows();
+
+    public void Rows_Changing() { }
+
+    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
+
+    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            FilterOutput.Dispose();
-            this.Invalidate_FilterInput(false);
+            ((IControlSendFilter)this).DoDispose();
+            ((IControlUsesRow)this).DoDispose();
             Tag = null;
-            Childs.Clear();
         }
 
         base.Dispose(disposing);
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        if (FilterInput == null) {
+        if (RowsInput == null) {
             UpdateMyCollection();
         }
         base.DrawControl(gr, state);
@@ -115,7 +111,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
     protected override void OnValueChanged() {
         base.OnValueChanged();
 
-        var row = FilterInput?.Database?.Row.SearchByKey(Value);
+        var row = RowsInput?.Get(Value);
 
         if (row == null) {
             FilterOutput.Clear();
@@ -129,7 +125,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         if (IsDisposed) { return; }
         if (!Allinitialized) { _ = CreateSubControls(); }
 
-        this.DoInputFilter(FilterOutput.Database, true);
+        this.DoRows(FilterOutput.Database, true);
 
         #region Combobox suchen
 
@@ -146,10 +142,9 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         #region Zeilen erzeugen
 
-        if (FilterInput == null) { return; }
+        if (RowsInput == null) { return; }
 
-        var f = FilterInput.Rows;
-        foreach (var thisR in f) {
+        foreach (var thisR in RowsInput) {
             if (cb?.Item?[thisR.KeyName] == null) {
                 var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, true);
                 _ = cb?.Item?.Add(tmpQuickInfo, thisR.KeyName);

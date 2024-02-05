@@ -77,7 +77,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     #region Properties
 
     public static string ClassId => "FI-ChildFormula";
-
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
     /// <summary>
@@ -179,8 +179,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                         cc.InitFormula(cf, null);
                         cc.Dock = DockStyle.Fill;
                         cc.DoInputSettings(parentView, this);
-                        cc.DoInputFilter(cc.FilterInput?.Database, false);
-                        cc.DoOutputSettings(cc.FilterInput?.Database, cc.Name);
+                        cc.DoRows(cc.Database(), true);
+                        cc.DoOutputSettings(cc.Database(), cc.Name);
                         cc.GenerateView();
 
                         #endregion

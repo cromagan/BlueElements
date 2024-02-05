@@ -30,19 +30,6 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
 
     #region Properties
 
-    /// <summary>
-    /// Ein Wert, der bei FilterInput_Changed zumindest neu berechnet oder invalidiert werden muss.
-    /// Zum Berechnen sollte die Routine DoInputFilter benutzt werden.
-    /// Enthält die DatabaseInput und auch den berechnete Zeile.
-    /// </summary>
-    public FilterCollection? FilterInput { get; set; }
-
-    /// <summary>
-    /// Bedeutet, dass kein Parent vorhanden ist - und der Filter anderweitig gesetzt wurde. Z.B. durch SetRow
-    /// Wenn TRUE, sollte der Input Filter nicht mehr von den Parents verändert werden.
-    /// </summary>
-    public bool FilterManualSeted { get; set; }
-
     public string Name { get; set; }
 
     public List<IControlSendFilter> Parents { get; }
@@ -51,33 +38,7 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
 
     #region Methods
 
-    /// <summary>
-    /// Wird ausgelöst, wenn eine relevante Änderung der eingehenen Filter(Daten) erfolgt ist.
-    /// Hier können die neuen temporären Filter(Daten) (FilterInput) berechnet werden und sollten auch angezeigt werden und ein Invalidate gesetzt werden
-    /// Events können gekoppelt werden
-    /// Achtung: FilterInput_RowChanged beachten!
-    /// </summary>
-    public void FilterInput_Changed(object? sender, System.EventArgs e);
-
-    /// <summary>
-    /// Wird ausgelöst, bevor eine relevante Änderung der eingehenden Filter(Daten) erfolgen wird.
-    /// Hier können Daten, die angezeigt werden, zurückgeschrieben werden. Events können entkoppelt werden
-    /// </summary>
-    public void FilterInput_Changing(object sender, System.EventArgs e);
-
-    /// <summary>
-    /// Wird ausgelöst, wenn sich an den Zeilen etwas ändert.
-    /// Meist, wenn diese Invalidiert werden.
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    public void FilterInput_RowChanged(object? sender, System.EventArgs e);
-
-    /// <summary>
-    /// Wird ausgelöst, wenn ein Parent hinzugefügt wurde.
-    /// Dadurch kann es vorkommen, dass die Filter neu berechnet werden müssen
-    /// </summary>
-    public void Parents_Added(bool hasFilter);
+    public void Invalidate();
 
     #endregion
 }
@@ -87,24 +48,46 @@ public static class IControlAcceptSomethingExtension {
     #region Methods
 
     public static void ConnectChildParents(this IControlAcceptFilter child, IControlSendFilter parent) {
-        if (child.FilterManualSeted) {
+        if (child is IControlUsesRow icur && icur.RowManualSeted) {
             Develop.DebugPrint(FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
         }
 
+        if (parent.IsDisposed) { return; }
+        if (child.IsDisposed) { return; }
+
         bool isnew = !child.Parents.Contains(parent);
+        var newFilters = parent.FilterOutput.Count > 0;
+
+        if (newFilters && isnew) {
+            if (child is IControlUsesRow icur2) {
+                icur2.Rows_Changing();
+            }
+
+            if (child is IControlUsesFilter icuf2) {
+                icuf2.ParentFilterOutput_Changing();
+            }
+        }
 
         if (isnew) { child.Parents.AddIfNotExists(parent); }
 
-        if (parent.Childs.AddIfNotExists(child)) {
-            parent.FilterOutput.Changing += child.FilterInput_Changing;
-            parent.FilterOutput.Changed += child.FilterInput_Changed;
-            parent.FilterOutput.DisposingEvent += FilterOutput_DispodingEvent;
-            //child.DisposingEvent += Child_DisposingEvent;
-            //parent.DisposingEvent += Parent_DisposingEvent;
-        }
+        parent.Childs.AddIfNotExists(child);
 
-        if (isnew) {
-            child.Parents_Added(parent.FilterOutput.Count > 0);
+        //if (parent.Childs.AddIfNotExists(child)) {
+        //    parent.FilterOutput.Changing += child.ParentFilterOutput_Changing;
+        //    parent.FilterOutput.Changed += ParentFilterOutput_Changed;
+        //    parent.FilterOutput.DisposingEvent += ParentFilterOutput_DispodingEvent;
+        //    //child.DisposingEvent += Child_DisposingEvent;
+        //    //parent.DisposingEvent += Parent_DisposingEvent;
+        //}
+
+        if (newFilters && isnew) {
+            if (child is IControlUsesRow icur3) {
+                icur3.Rows_Changed();
+            }
+
+            if (child is IControlUsesFilter icuf3) {
+                icuf3.ParentFilterOutput_Changed();
+            };
         }
     }
 
@@ -123,58 +106,10 @@ public static class IControlAcceptSomethingExtension {
         if (parent.Childs.Contains(child)) {
             parent.Childs.Remove(child);
 
-            parent.FilterOutput.Changing -= child.FilterInput_Changing;
-            parent.FilterOutput.Changed -= child.FilterInput_Changed;
-            parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
+            //parent.FilterOutput.Changing -= child.ParentFilterOutput_Changing;
+            //parent.FilterOutput.Changed -= ParentFilterOutput_Changed;
+            //parent.FilterOutput.DisposingEvent -= ParentFilterOutput_DispodingEvent;
         }
-    }
-
-    /// <summary>
-    /// Verwirft den aktuellen InputFilter und erstellt einen neuen von allen Parents
-    /// </summary>
-    /// <param name="item"></param>
-    /// <param name="mustbeDatabase"></param>
-    /// <param name="doEmptyFilterToo"></param>
-    public static void DoInputFilter(this IControlAcceptFilter item, Database? mustbeDatabase, bool doEmptyFilterToo) {
-        if (item.IsDisposed) { return; }
-        if (item.FilterManualSeted) { return; }
-
-        item.Invalidate_FilterInput(true);
-
-        if (item.Parents.Count == 0) {
-            if (doEmptyFilterToo && mustbeDatabase != null) {
-                item.SetFilterInput(new FilterCollection(mustbeDatabase, "Empty Input Filter"));
-            }
-            return;
-        }
-
-        if (item.Parents.Count == 1) {
-            if (item.Parents[0].FilterOutput.Clone("FilterOfSender") is FilterCollection fc2) {
-                if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {
-                    item.SetFilterInput(new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 1"), "Datenbanken inkonsitent"));
-                    return;
-                }
-
-                item.SetFilterInput(fc2);
-                return;
-            }
-        }
-
-        FilterCollection? fc = null;
-
-        foreach (var thiss in item.Parents) {
-            if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
-                if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
-                    item.SetFilterInput(new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 2"), "Datenbanken inkonsitent"));
-                    return;
-                }
-
-                fc ??= new FilterCollection(fi.Database, "filterofsender");
-                fc.AddIfNotExists(fi);
-            }
-        }
-
-        item.SetFilterInput(fc);
     }
 
     /// <summary>
@@ -199,68 +134,38 @@ public static class IControlAcceptSomethingExtension {
         }
     }
 
-    /// <summary>
-    /// Verwirft den aktuellen InputFilter.
-    /// </summary>
-    public static void Invalidate_FilterInput(this IControlAcceptFilter item, bool checkmanuelseted) {
-        if (item.IsDisposed) { return; }
-        if (checkmanuelseted && item.FilterManualSeted) { return; }
-        item.FilterInput?.Dispose();
-        item.SetFilterInput(null);
-    }
-
-    public static void SetFilterInput(this IControlAcceptFilter item, FilterCollection? filterCollection) {
-        if (item.FilterInput != null) {
-            item.FilterInput.RowsChanged -= item.FilterInput_RowChanged;
+    public static FilterCollection? GetInputFilter(this IControlAcceptFilter item, Database? mustbeDatabase, bool doEmptyFilterToo) {
+        if (item.Parents.Count == 0) {
+            if (doEmptyFilterToo && mustbeDatabase != null) {
+                return new FilterCollection(mustbeDatabase, "Empty Input Filter");
+            }
+            return null;
         }
 
-        if (filterCollection != null && filterCollection.IsDisposed) { filterCollection = null; }
+        if (item.Parents.Count == 1) {
+            var fc2 = item.Parents[0].FilterOutput;
 
-        item.FilterInput = filterCollection;
+            if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {
+                return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 1"), "Datenbanken inkonsitent");
+            }
 
-        if (item.FilterInput != null) {
-            item.FilterInput.RowsChanged += item.FilterInput_RowChanged;
-        }
-    }
-
-    public static void SetToRow(this IControlAcceptFilter item, RowItem? row) {
-        if (item.Parents.Count > 0) {
-            Develop.DebugPrint(FehlerArt.Fehler, "Element wird von Parents gesteuert!");
+            return fc2;
         }
 
-        item.FilterManualSeted = true;
+        FilterCollection? fc = null;
 
-        if (row?.Database == null && item.FilterInput == null) { return; }
+        foreach (var thiss in item.Parents) {
+            if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
+                if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
+                    return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 2"), "Datenbanken inkonsitent");
+                }
 
-        if (row?.Database is Database db && !db.IsDisposed) {
-            var fc = new FilterCollection(db, "SetToRow");
-            fc.Database = db;
-            item.SetFilterInput(fc);
-        }
-
-        if (item.FilterInput != null) {
-            item.FilterInput.Clear();
-            if (row == null) {
-                item.FilterInput.ChangeTo(new FilterItem(item.FilterInput?.Database, "SetRow"));
-            } else {
-                item.FilterInput.ChangeTo(new FilterItem(row));
+                fc ??= new FilterCollection(fi.Database, "filterofsender");
+                fc.AddIfNotExists(fi);
             }
         }
-        item.FilterInput_Changed(item, System.EventArgs.Empty);
-    }
 
-    private static void FilterOutput_DispodingEvent(object sender, System.EventArgs e) {
-        if (sender is IControlSendFilter parent) {
-            foreach (var child in parent.Childs) {
-                child.FilterInput_Changing(parent, System.EventArgs.Empty);
-                child.DisconnectChildParents(parent);
-                //parent.FilterOutput.Changing -= child.FilterInput_Changing;
-                //parent.FilterOutput.Changed -= child.FilterInput_Changed;
-                //parent.FilterOutput.DisposingEvent -= FilterOutput_DispodingEvent;
-                //child.DisposingEvent += Child_DisposingEvent;
-                //item.DisposingEvent += Parent_DisposingEvent;
-            }
-        }
+        return fc;
     }
 
     #endregion

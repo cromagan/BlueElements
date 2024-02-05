@@ -21,10 +21,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using BlueControls.Interfaces;
 using BlueDatabase;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 
 namespace BlueControls.Controls;
 
-internal class RowEntryControl : GenericControl, IControlAcceptFilter, IControlSendFilter {
+internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFilter {
 
     #region Constructors
 
@@ -42,36 +44,39 @@ internal class RowEntryControl : GenericControl, IControlAcceptFilter, IControlS
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
-    public bool FilterManualSeted { get; set; } = false;
-
     public FilterCollection FilterOutput { get; } = new("FilterIput 3");
-
     public List<IControlSendFilter> Parents { get; } = [];
+    public bool RowManualSeted { get; set; } = false;
+    public List<RowItem>? RowsInput { get; set; }
 
     #endregion
 
     #region Methods
 
-    public void FilterInput_Changed(object? sender, System.EventArgs e) {
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+
+    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
+
+    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
+
+    public void Rows_Changed() {
+        if (this.RowSingleOrNull() is RowItem r) {
+            FilterOutput.ChangeTo(new FilterItem(r));
+        } else {
+            FilterOutput.ChangeTo(new FilterItem(null as Database, FilterType.AlwaysFalse, string.Empty));
+        }
     }
 
-    public void FilterInput_Changing(object sender, System.EventArgs e) { }
+    public void Rows_Changing() { }
 
-    public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
-        this.DoInputFilter(FilterOutput.Database, false);
-        FilterOutput.ChangeTo(FilterInput);
-    }
+    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
 
-    public void Parents_Added(bool hasFilter) {
-        if (IsDisposed) { return; }
-        if (!hasFilter) { return; }
-        FilterInput_RowChanged(null, System.EventArgs.Empty);
-    }
+    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            this.Invalidate_FilterInput(false);
-            FilterOutput.Dispose();
+            ((IControlSendFilter)this).DoDispose();
+            ((IControlUsesRow)this).DoDispose();
         }
         base.Dispose(disposing);
     }

@@ -38,10 +38,15 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
     #region Fields
 
     private ColumnViewCollection? _ähnliche;
+
     private string _ähnlicheAnsichtName = string.Empty;
+
     private bool _isFilling;
+
     private string _lastLooked = string.Empty;
+
     private FilterCollection? _prevFilter;
+
     private Table? _table;
 
     #endregion
@@ -123,6 +128,12 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
     #endregion
 
     #region Methods
+
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+
+    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
+
+    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
     internal void FillFilters() {
         if (IsDisposed) { return; }
@@ -272,6 +283,14 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
         #endregion Unnötige Flexis löschen
 
         _isFilling = false;
+    }
+
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            this.DoDispose();
+            components?.Dispose();
+        }
+        base.Dispose(disposing);
     }
 
     protected override void DrawControl(Graphics gr, States state) {

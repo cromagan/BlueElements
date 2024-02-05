@@ -242,7 +242,9 @@ public static class Develop {
         DebugPrint(FehlerArt.Warnung, "Diese Funktion muss noch überschrieben werden.");
     }
 
-    public static void DoEvents() => Application.DoEvents();
+    public static void DoEvents() {
+        //Application.DoEvents();
+    }
 
     public static void HTML_AddFoot(List<string> l) {
         l.Add("  </body>");

@@ -36,14 +36,18 @@ using BlueDatabase.Enums;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, IControlAcceptFilter {
+public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, IControlUsesFilter {
 
     #region Fields
 
     private bool _doFilterDeleteButton;
+
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
+
     private bool _fromInputFilter = false;
+
     private string _origin;
+
     private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     #endregion
@@ -58,7 +62,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         Size = new Size(204, 24);
         AlwaysInstantChange = true;
         FilterSingleColumn = column;
-        this.Invalidate_FilterInput(true);
+        this.Invalidate_FilterInput();
         ShowInfoWhenDisabled = true;
         _origin = string.Empty;
         _fromInputFilter = false;
@@ -93,8 +97,6 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
-    public bool FilterManualSeted { get; set; } = false;
-
     public FilterCollection FilterOutput { get; } = new("FilterOutput");
 
     public ColumnItem? FilterSingleColumn { get; }
@@ -116,6 +118,14 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     #endregion
 
+    #region Methods
+
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+
+    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
+
+    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
+
     //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
     //    switch (e.ClickedCommand.ToLower()) {
     //        case "#columnedit":
@@ -127,10 +137,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     //    return false;
     //}
 
-    #region Methods
-
-    public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        if (FilterManualSeted) { Develop.DebugPrint("Steuerelement unterstützt keine manuellen Filter"); }
+    public void ParentFilterOutput_Changed() {
         this.DoInputFilter(null, false);
 
         var filterSingle = FilterInput?[FilterSingleColumn];
@@ -150,16 +157,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         UpdateFilterData(filterSingle, _doFilterDeleteButton);
     }
 
-    public void FilterInput_Changing(object sender, System.EventArgs e) { }
-
-    public void FilterInput_RowChanged(object? sender, System.EventArgs e) { }
-
-    public void Parents_Added(bool hasFilter) {
-        if (IsDisposed) { return; }
-        if (!hasFilter) { return; }
-
-        FilterInput_Changed(null, System.EventArgs.Empty);
-    }
+    public void ParentFilterOutput_Changing() { }
 
     //public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
     //    hotItem = null;
@@ -189,14 +187,14 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     }
 
     protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-
         if (disposing) {
-            FilterOutput.Dispose();
-            this.Invalidate_FilterInput(false);
+            ((IControlSendFilter)this).DoDispose();
+            ((IControlUsesFilter)this).DoDispose();
             Tag = null;
             Childs.Clear();
         }
+
+        base.Dispose(disposing);
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {

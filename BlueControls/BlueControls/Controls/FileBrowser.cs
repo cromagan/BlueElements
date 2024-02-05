@@ -36,6 +36,7 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
+using BlueDatabase.EventArgs;
 using BlueScript.Variables;
 using Microsoft.Win32;
 using static BlueBasics.Generic;
@@ -44,7 +45,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.Controls;
 
-public partial class FileBrowser : GenericControl, IControlAcceptFilter   //UserControl //
+public partial class FileBrowser : GenericControl, IControlUsesRow   //UserControl //
 {
     #region Fields
 
@@ -85,14 +86,6 @@ public partial class FileBrowser : GenericControl, IControlAcceptFilter   //User
         }
     }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; }
-
-    public bool FilterManualSeted { get; set; } = false;
-
     public string OriginalText {
         get => _originalText;
         set {
@@ -118,6 +111,14 @@ public partial class FileBrowser : GenericControl, IControlAcceptFilter   //User
         }
     }
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool RowManualSeted { get; set; } = false;
+
+    public List<RowItem>? RowsInput { get; set; }
+
     public string Sort {
         get => _sort;
         set {
@@ -130,20 +131,6 @@ public partial class FileBrowser : GenericControl, IControlAcceptFilter   //User
     #endregion
 
     #region Methods
-
-    public void FilterInput_Changed(object? sender, System.EventArgs e) => FilterInput_RowChanged(sender, e);
-
-    public void FilterInput_Changing(object sender, System.EventArgs e) => RemoveWatcher();
-
-    public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
-        RemoveWatcher();
-        this.DoInputFilter(null, false);
-        var row = FilterInput?.RowSingleOrNull;
-        row?.CheckRowDataIfNeeded();
-        ParseVariables(row?.LastCheckedEventArgs?.Variables);
-        CreateWatcher();
-        Invalidate();
-    }
 
     public string GestStandardCommand(string extension) {
         if (!SubKeyExist(extension)) { return string.Empty; }
@@ -167,12 +154,6 @@ public partial class FileBrowser : GenericControl, IControlAcceptFilter   //User
         return exekey.GetValue("").ToString();
     }
 
-    public void Parents_Added(bool hasFilter) {
-        if (IsDisposed) { return; }
-        if (!hasFilter) { return; }
-        FilterInput_RowChanged(null, System.EventArgs.Empty);
-    }
-
     public bool ParseVariables(VariableCollection? list) {
         if (IsDisposed) { return false; }
 
@@ -188,7 +169,40 @@ public partial class FileBrowser : GenericControl, IControlAcceptFilter   //User
 
     public void Reload() => ÖffnePfad(txbPfad.Text);
 
-    protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
+    public void Rows_Changed() => this.Invalidate_Rows();
+
+    public void Rows_Changing() { }
+
+    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
+
+    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
+
+    /// <summary>
+    /// Verwendete Ressourcen bereinigen.
+    /// </summary>
+    /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
+    protected override void Dispose(bool disposing) {
+        RemoveWatcher();
+        if (disposing) {
+            this.DoDispose();
+            components?.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+
+    protected override void DrawControl(Graphics gr, States state) {
+        if (RowsInput == null) {
+            RemoveWatcher();
+            this.DoRows(null, false);
+        }
+
+        if (this.RowSingleOrNull() is RowItem r) {
+            ParseVariables(r.LastCheckedEventArgs?.Variables);
+        }
+        CreateWatcher();
+
+        Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
+    }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         if (ThumbGenerator.IsBusy && !ThumbGenerator.CancellationPending) { ThumbGenerator.CancelAsync(); }

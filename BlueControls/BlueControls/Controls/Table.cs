@@ -57,7 +57,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptFilter, IControlSendFilter {
+public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlUsesFilter, IControlSendFilter {
 
     #region Fields
 
@@ -247,12 +247,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
-
-    [DefaultValue(false)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool FilterManualSeted { get; set; } = false;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -1038,29 +1032,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Database.Export_HTML(filename, CurrentArrangement, RowsVisibleUnique(), execute);
     }
 
-    public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
 
-        this.DoInputFilter(FilterOutput.Database, false);
+    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
 
-        const string t = "Übergeordnetes Element";
-
-        Filter.RemoveRange(t);
-
-        if (FilterOutputType == Filterausgabe.Im_Element_Gewählte_Filter) {
-            FilterOutput.ChangeTo(Filter);
-        }
-
-        Filter.RemoveOtherAndAdd(FilterInput, t);
-
-        if (FilterOutputType == Filterausgabe.Alle_Filter) {
-            FilterOutput.ChangeTo(Filter);
-        }
-    }
-
-    public void FilterInput_Changing(object sender, System.EventArgs e) { }
-
-    public void FilterInput_RowChanged(object? sender, System.EventArgs e) { }
+    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
     /// <summary>
     /// Alle gefilteren Zeilen. Jede Zeile ist maximal einmal in dieser Liste vorhanden. Angepinnte Zeilen addiert worden
@@ -1129,11 +1105,27 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public void Parents_Added(bool hasFilter) {
-        if (IsDisposed) { return; }
-        if (!hasFilter) { return; }
-        FilterInput_Changed(null, System.EventArgs.Empty);
+    public void ParentFilterOutput_Changed() {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+
+        this.DoInputFilter(FilterOutput.Database, false);
+
+        const string t = "Übergeordnetes Element";
+
+        Filter.RemoveRange(t);
+
+        if (FilterOutputType == Filterausgabe.Im_Element_Gewählte_Filter) {
+            FilterOutput.ChangeTo(Filter);
+        }
+
+        Filter.RemoveOtherAndAdd(FilterInput, t);
+
+        if (FilterOutputType == Filterausgabe.Alle_Filter) {
+            FilterOutput.ChangeTo(Filter);
+        }
     }
+
+    public void ParentFilterOutput_Changing() { }
 
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
@@ -1364,8 +1356,9 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Filter.Changed -= Filter_Changed;
                 Filter.RowsChanged -= Filter_Changed;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
-                this.Invalidate_FilterInput(false);
-                FilterOutput.Dispose();
+                ((IControlSendFilter)this).DoDispose();
+                ((IControlUsesFilter)this).DoDispose();
+                //components?.Dispose();
             }
         } finally {
             base.Dispose(disposing);

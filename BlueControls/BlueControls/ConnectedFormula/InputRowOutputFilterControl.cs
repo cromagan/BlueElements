@@ -27,7 +27,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.Controls;
 
-internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, IControlSendFilter {
+internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IControlSendFilter {
 
     #region Fields
 
@@ -61,8 +61,6 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
-    public bool FilterManualSeted { get; set; } = false;
-
     public FilterCollection FilterOutput { get; } = new("FilterIput 2");
 
     [Browsable(false)]
@@ -83,7 +81,13 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
 
     #region Methods
 
-    public void FilterInput_Changed(object? sender, System.EventArgs e) {
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+
+    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
+
+    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
+
+    public void ParentFilterOutput_Changed() {
         this.DoInputFilter(null, false);
         Invalidate();
 
@@ -129,14 +133,14 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
         FilterOutput.ChangeTo(f);
     }
 
-    public void FilterInput_Changing(object sender, System.EventArgs e) { }
+    public void ParentFilterOutput_Changing() { }
 
-    public void FilterInput_RowChanged(object? sender, System.EventArgs e) { }
-
-    public void Parents_Added(bool hasFilter) {
-        if (IsDisposed) { return; }
-        if (!hasFilter) { return; }
-        FilterInput_Changed(null, System.EventArgs.Empty);
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            ((IControlSendFilter)this).DoDispose();
+            ((IControlUsesFilter)this).DoDispose();
+        }
+        base.Dispose(disposing);
     }
 
     #endregion

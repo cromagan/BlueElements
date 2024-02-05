@@ -29,6 +29,8 @@ using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
+using BlueDatabase.Enums;
+using BlueDatabase.EventArgs;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
 
 #nullable enable
@@ -36,7 +38,7 @@ using static BlueControls.ConnectedFormula.ConnectedFormula;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IControlAcceptFilter, IControlSendFilter {
+public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, IControlUsesRow, IControlSendFilter {
 
     #region Fields
 
@@ -72,20 +74,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
     }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; }
-
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool FilterManualSeted { get; set; } = false;
-
     public FilterCollection FilterOutput { get; } = new("FilterOutput");
-
     public string Page { get; }
 
     [Browsable(false)]
@@ -93,31 +82,23 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
-    //set => SetData(ConnectedFormula, Database, value, Page);
+    public bool RowManualSeted { get; set; }
+    public List<RowItem>? RowsInput { get; set; }
+
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public RowItem? ShowingRow {
-        get {
-            if (IsDisposed) { return null; }
-            FilterOutput.ChangeTo(FilterInput);
-            return FilterOutput.RowSingleOrNull;
-        }
-    }
+    public RowItem? ShowingRow => this.RowSingleOrNull();
 
     #endregion
 
     #region Methods
 
-    public void FilterInput_Changed(object? sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        this.Invalidate_FilterInput(true);
-        Invalidate();
-    }
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
 
-    public void FilterInput_Changing(object sender, System.EventArgs e) { }
+    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
 
-    public void FilterInput_RowChanged(object? sender, System.EventArgs e) { }
+    public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
     public void GenerateView() {
         if (IsDisposed) { return; }
@@ -193,7 +174,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
 
         if (_generated) {
-            FilterInput_Changed(this, System.EventArgs.Empty);
+            Rows_Changed();
         }
     }
 
@@ -223,7 +204,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         SuspendLayout();
 
         FilterOutput.Clear();
-        this.Invalidate_FilterInput(false);
+        this.Invalidate_Rows();
 
         if (oldf != cf) {
             if (oldf != null) {
@@ -261,11 +242,13 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
-    public void Parents_Added(bool hasFilter) {
-        if (IsDisposed) { return; }
-        if (!hasFilter) { return; }
-        FilterInput_Changed(null, System.EventArgs.Empty);
-    }
+    public void Rows_Changed() => this.Invalidate_Rows();
+
+    public void Rows_Changing() { }
+
+    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
+
+    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
 
     public Control? SearchOrGenerate(IItemToControl? thisit) {
         if (thisit == null) { return null; }
@@ -291,27 +274,27 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     protected override void Dispose(bool disposing) {
         if (disposing) {
             OnDisposingEvent();
-            FilterOutput.Dispose();
-            this.Invalidate_FilterInput(false);
-            InitFormula(null, null);
-        }
 
-        if (disposing && (components != null)) {
             InitFormula(null, null);
+
+            ((IControlSendFilter)this).DoDispose();
+            ((IControlUsesRow)this).DoDispose();
+
             components?.Dispose();
         }
+
         base.Dispose(disposing);
     }
 
     protected override void DrawControl(Graphics gr, States state) {
         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-        GenerateView();
+        if (RowsInput == null) { this.DoRows(null, false); }
 
-        if (FilterInput == null) {
-            this.DoInputFilter(FilterOutput.Database, false);
+        if (this.RowSingleOrNull() is RowItem r) {
+            FilterOutput.ChangeTo(new FilterItem(r));
+        } else {
+            FilterOutput.ChangeTo(new FilterItem(null as Database, FilterType.AlwaysFalse, string.Empty));
         }
-
-        FilterOutput.ChangeTo(FilterInput);
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {

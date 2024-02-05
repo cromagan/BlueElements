@@ -47,13 +47,9 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     private readonly ItemAcceptSomething _itemAccepts;
     private bool _autoX = true;
-
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-
     private ColumnItem? _column;
-
     private string _columnName = string.Empty;
-
     private CaptionPosition _überschriftanordung = CaptionPosition.Über_dem_Feld;
 
     #endregion
@@ -67,6 +63,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     #region Properties
 
     public static string ClassId => "FI-EditField";
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
 
     public bool AutoSizeableHeight {
         get {

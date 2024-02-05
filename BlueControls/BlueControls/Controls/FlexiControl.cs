@@ -475,8 +475,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     protected override void Dispose(bool disposing) {
         try {
-            if (disposing && components != null) {
-                _IdleTimer.Tick -= _IdleTimer_Tick;
+            if (disposing) {
+
+                if(_IdleTimer != null) {
+                    _IdleTimer.Tick -= _IdleTimer_Tick;
+                    _IdleTimer.Dispose();
+                }
+
                 _infoText = string.Empty;
                 //if (_BitmapOfControl != null) { _BitmapOfControl?.Dispose(); }
                 //DoInfoTextButton(); // Events entfernen!

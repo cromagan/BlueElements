@@ -25,6 +25,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -43,7 +44,6 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     private readonly ItemAcceptSomething _itemAccepts;
     private readonly ItemSendSomething _itemSends;
-
     private string _defaultArrangement = string.Empty;
     private Filterausgabe _filterOutputType = Filterausgabe.Gewähle_Zeile;
 
@@ -69,6 +69,7 @@ public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToContro
     #region Properties
 
     public static string ClassId => "FI-TableView";
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     public bool AutoSizeableHeight => true;
 
     public ReadOnlyCollection<string> ChildIds {

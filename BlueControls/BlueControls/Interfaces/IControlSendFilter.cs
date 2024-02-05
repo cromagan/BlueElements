@@ -30,11 +30,21 @@ public interface IControlSendFilter : IDisposableExtendedWithEvent {
     public List<IControlAcceptFilter> Childs { get; }
 
     /// <summary>
-    /// Sollte von DoOuputSettings befüllt werden.
+    /// Sollte von DoOutputSettings befüllt werden.
     /// </summary>
     public FilterCollection FilterOutput { get; }
 
     public string Name { get; set; }
+
+    #endregion
+
+    #region Methods
+
+    void FilterOutput_Changed(object sender, System.EventArgs e);
+
+    void FilterOutput_Changing(object sender, System.EventArgs e);
+
+    void FilterOutput_DispodingEvent(object sender, System.EventArgs e);
 
     #endregion
 }
@@ -42,6 +52,23 @@ public interface IControlSendFilter : IDisposableExtendedWithEvent {
 public static class IControlSendSomethingExtension {
 
     #region Methods
+
+    public static void DisconnectChildParents(this IControlSendFilter parent, List<IControlAcceptFilter> childs) {
+        var c = new List<IControlAcceptFilter>();
+        c.AddRange(childs);
+
+        foreach (var thisChild in c) {
+            thisChild.DisconnectChildParents(parent);
+        }
+    }
+
+    public static void DoDispose(this IControlSendFilter parent) {
+        parent.DisconnectChildParents(parent.Childs);
+
+        parent.FilterOutput.Dispose();
+
+        parent.Childs.Clear();
+    }
 
     public static void DoOutputSettings(this IControlSendFilter dest, Database? db, string name) {
         dest.Name = name;
@@ -51,6 +78,49 @@ public static class IControlSendSomethingExtension {
     public static void DoOutputSettings(this IControlSendFilter dest, IItemSendSomething source) {
         dest.Name = source.DefaultItemToControlName();
         dest.FilterOutput.Database = source.DatabaseOutput;
+
+        dest.FilterOutput.Changing += dest.FilterOutput_Changing;
+        dest.FilterOutput.Changed += dest.FilterOutput_Changed;
+        dest.FilterOutput.DisposingEvent += dest.FilterOutput_DispodingEvent;
+    }
+
+    public static void FilterOutput_Changed(this IControlSendFilter icsf) {
+        foreach (var thisChild in icsf.Childs) {
+            if (thisChild is IControlUsesRow icur) {
+                icur.Invalidate_Rows();
+                icur.Rows_Changed();
+            }
+
+            if (thisChild is IControlUsesFilter icuf) {
+                icuf.Invalidate_FilterInput();
+                icuf.ParentFilterOutput_Changed();
+            }
+
+            thisChild.Invalidate();
+        }
+    }
+
+    public static void FilterOutput_Changing(this IControlSendFilter icsf) {
+        foreach (var thisChild in icsf.Childs) {
+            if (thisChild is IControlUsesRow icur) {
+                icur.Rows_Changing();
+            }
+
+            if (thisChild is IControlUsesFilter icuf) {
+                icuf.ParentFilterOutput_Changing();
+            }
+        }
+    }
+
+    public static void FilterOutput_DispodingEvent(this IControlSendFilter icsf) {
+        icsf.FilterOutput.Changing -= icsf.FilterOutput_Changing;
+        icsf.FilterOutput.Changed -= icsf.FilterOutput_Changed;
+        icsf.FilterOutput.DisposingEvent -= icsf.FilterOutput_DispodingEvent;
+
+        if (!icsf.FilterOutput.IsDisposed) {
+            icsf.FilterOutput.Database = null;
+            icsf.FilterOutput.Dispose();
+        }
     }
 
     #endregion

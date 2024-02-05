@@ -31,7 +31,7 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-public partial class TextGenerator : GenericControl, IControlAcceptFilter {
+public partial class TextGenerator : GenericControl, IControlUsesFilter {
 
     #region Fields
 
@@ -96,8 +96,6 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
-    public bool FilterManualSeted { get; set; } = false;
-
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -118,33 +116,18 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
 
     #region Methods
 
-    public void FilterInput_Changed(object? sender, System.EventArgs e) {
-    }
+    public void ParentFilterOutput_Changed() { }
 
-    public void FilterInput_Changing(object sender, System.EventArgs e) { }
-
-    public void FilterInput_RowChanged(object? sender, System.EventArgs e) {
-        this.DoInputFilter(null, false);
-        GenerateColumns();// Wegen der Datenbank
-        GenerateItemsAndText();
-        Invalidate();
-    }
-
-    public void Parents_Added(bool hasFilter) {
-        if (IsDisposed) { return; }
-        if (!hasFilter) { return; }
-        FilterInput_RowChanged(null, System.EventArgs.Empty);
-    }
+    public void ParentFilterOutput_Changing() { }
 
     /// <summary>
     /// Verwendete Ressourcen bereinigen.
     /// </summary>
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
-        if (disposing) { FilterInput_Changing(this, System.EventArgs.Empty); }
+        if (disposing) {
+            this.DoDispose();
 
-        if (disposing && (components != null)) {
-            this.Invalidate_FilterInput(false);
             components?.Dispose();
         }
 
@@ -152,6 +135,11 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
     }
 
     protected override void DrawControl(Graphics gr, States vState) {
+        if (FilterInput == null) {
+            this.DoInputFilter(null, false);
+            GenerateColumns();// Wegen der Datenbank
+            GenerateItemsAndText();
+        }
         //if (vState.HasFlag(States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
         //if (vState.HasFlag(States.Standard_MousePressed)) { vState ^= States.Standard_MousePressed; }
 

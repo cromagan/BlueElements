@@ -82,6 +82,8 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
         }
     }
 
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
+
     [Description("Die Beschriftung des Knopfes.")]
     public string Anzeige {
         get => _anzeige;

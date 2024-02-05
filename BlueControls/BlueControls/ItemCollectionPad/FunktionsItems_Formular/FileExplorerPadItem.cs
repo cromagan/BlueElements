@@ -25,6 +25,7 @@ using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -39,11 +40,8 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
     #region Fields
 
     private readonly ItemAcceptSomething _itemAccepts;
-
     private bool _bei_Bedarf_Erzeugen;
-
     private bool _leere_Ordner_Löschen;
-
     private string _pfad = string.Empty;
 
     #endregion
@@ -60,6 +58,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
     #region Properties
 
     public static string ClassId => "FI-FileExplorer";
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.One;
     public bool AutoSizeableHeight => true;
 
     [Description("Ob das Verzeichniss bei Bedarf erzeugt werden soll.")]

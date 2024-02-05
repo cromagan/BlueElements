@@ -38,8 +38,8 @@ using BlueDatabase.EventArgs;
 using static BlueBasics.Develop;
 using static BlueBasics.Generic;
 using static BlueBasics.IO;
-using static BlueControls.Interfaces.IControlAcceptSomethingExtension;
 using static BlueBasics.Converter;
+using BlueControls.Interfaces;
 
 namespace BlueControls.Forms;
 

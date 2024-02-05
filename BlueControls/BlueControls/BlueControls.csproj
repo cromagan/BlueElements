@@ -185,6 +185,8 @@
       <DependentUpon>FormWithStatusBar.cs</DependentUpon>
     </Compile>
     <Compile Include="Interfaces\IAutosizable.cs" />
+    <Compile Include="Interfaces\IControlUsesFilter.cs" />
+    <Compile Include="Interfaces\IControlUsesRow.cs" />
     <Compile Include="Interfaces\IControlAcceptFilter.cs" />
     <Compile Include="Interfaces\IHasVersion.cs" />
     <Compile Include="Interfaces\IItemAcceptFilter.cs" />

@@ -48,11 +48,8 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
     private readonly ItemAcceptSomething _itemAccepts;
     private readonly ItemSendSomething _itemSends;
     private ColumnItem? _column;
-
     private string _columnName = string.Empty;
-
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
-
     private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     //private string _anzeige = string.Empty;
@@ -81,7 +78,7 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
     #region Properties
 
     public static string ClassId => "FI-InputOutputElement";
-
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
     //[Description("Nach welchem Format die Zeilen angezeigt werden sollen. Es können Variablen im Format ~Variable~ benutzt werden. Achtung, KEINE Skript-Variaben, nur Spaltennamen.")]
     //public string Anzeige {
     //    get => _anzeige;

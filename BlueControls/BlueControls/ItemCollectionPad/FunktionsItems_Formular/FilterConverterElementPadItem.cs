@@ -44,7 +44,6 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     private string _eingangsWertSpalte = string.Empty;
     private string _filterSpalte = string.Empty;
     private FilterTypeRowInputItem _filtertype = FilterTypeRowInputItem.Ist_GrossKleinEgal;
-
     private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     #endregion
@@ -69,6 +68,7 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
     #region Properties
 
     public static string ClassId => "FI-FilterConverterElement";
+    public AllowedInputFilter AllowedInputFilter => AllowedInputFilter.More;
 
     public ReadOnlyCollection<string> ChildIds {
         get => _itemSends.ChildIdsGet();

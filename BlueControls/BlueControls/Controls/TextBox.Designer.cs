@@ -13,7 +13,7 @@ namespace BlueControls.Controls
         {
             try
             {
-                if (disposing && components != null)
+                if (disposing)
                 {
                     //if (_BitmapOfControl != null) { _BitmapOfControl?.Dispose(); }
                     components?.Dispose();
