@@ -74,9 +74,7 @@ public class VariableWebpage : Variable, IDisposable {
         return v;
     }
 
-    public void Dispose() {
-        _browser?.Dispose();
-    }
+    public void Dispose() => _browser?.Dispose();
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableWebpage v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

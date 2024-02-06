@@ -61,7 +61,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     #region Fields
 
-    public readonly FilterCollection Filter = new("FilterIput 4");
+    public readonly FilterCollection Filter = new("FilterInput 50");
 
     private readonly List<string> _collapsed = [];
 
@@ -247,12 +247,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; }
+    public FilterCollection FilterInput { get; } = new("FilterInput 07");
+
+    public bool FilterInputChangedHandled { get; set; } = false;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutPt 07");
+    public FilterCollection FilterOutput { get; } = new("FilterOutput 07");
 
     public Filterausgabe FilterOutputType { get; set; } = Filterausgabe.Gewähle_Zeile;
 
@@ -1033,9 +1035,11 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         Database.Export_HTML(filename, CurrentArrangement, RowsVisibleUnique(), execute);
     }
 
-    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
 
-    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
+
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
@@ -1058,6 +1062,29 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         CellOnCoordinate(ca, e.X, e.Y, out _mouseOverColumn, out _mouseOverRow);
         hotItem = CellCollection.KeyOfCell(_mouseOverColumn, _mouseOverRow?.Row);
+    }
+
+    public void HandleFilterInputNow() {
+        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
+        if (FilterInputChangedHandled) { return; }
+        FilterInputChangedHandled = true;
+        if (IsDisposed) { return; }
+
+        this.DoInputFilter(FilterOutput.Database, false);
+
+        const string t = "Übergeordnetes Element";
+
+        Filter.RemoveRange(t);
+
+        if (FilterOutputType == Filterausgabe.Im_Element_Gewählte_Filter) {
+            FilterOutput.ChangeTo(Filter);
+        }
+
+        Filter.RemoveOtherAndAdd(FilterInput, t);
+
+        if (FilterOutputType == Filterausgabe.Alle_Filter) {
+            FilterOutput.ChangeTo(Filter);
+        }
     }
 
     public void ImportClipboard() {
@@ -1106,27 +1133,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public void ParentFilterOutput_Changed() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-
-        this.DoInputFilter(FilterOutput.Database, false);
-
-        const string t = "Übergeordnetes Element";
-
-        Filter.RemoveRange(t);
-
-        if (FilterOutputType == Filterausgabe.Im_Element_Gewählte_Filter) {
-            FilterOutput.ChangeTo(Filter);
-        }
-
-        Filter.RemoveOtherAndAdd(FilterInput, t);
-
-        if (FilterOutputType == Filterausgabe.Alle_Filter) {
-            FilterOutput.ChangeTo(Filter);
-        }
-    }
-
-    public void ParentFilterOutput_Changing() { }
+    public void ParentFilterOutput_Changed() => HandleFilterInputNow();
 
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist

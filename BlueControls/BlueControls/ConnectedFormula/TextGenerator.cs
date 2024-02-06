@@ -51,7 +51,10 @@ public partial class TextGenerator : GenericControl, IControlUsesFilter {
 
     #region Constructors
 
-    public TextGenerator() : base() => InitializeComponent();
+    public TextGenerator() : base() {
+        InitializeComponent();
+        ((IControlUsesFilter)this).RegisterEvents();
+    }
 
     #endregion
 
@@ -94,7 +97,9 @@ public partial class TextGenerator : GenericControl, IControlUsesFilter {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; }
+    public FilterCollection FilterInput { get; } = new FilterCollection("InputFilter 99");
+
+    public bool FilterInputChangedHandled { get; set; } = false;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -116,9 +121,21 @@ public partial class TextGenerator : GenericControl, IControlUsesFilter {
 
     #region Methods
 
-    public void ParentFilterOutput_Changed() { }
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
 
-    public void ParentFilterOutput_Changing() { }
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
+
+    public void HandleFilterInputNow() {
+        if (FilterInputChangedHandled) { return; }
+        FilterInputChangedHandled = true;
+        if (IsDisposed) { return; }
+
+        this.DoInputFilter(null, false);
+        GenerateColumns();// Wegen der Datenbank
+        GenerateItemsAndText();
+    }
+
+    public void ParentFilterOutput_Changed() => HandleFilterInputNow();
 
     /// <summary>
     /// Verwendete Ressourcen bereinigen.
@@ -135,11 +152,7 @@ public partial class TextGenerator : GenericControl, IControlUsesFilter {
     }
 
     protected override void DrawControl(Graphics gr, States vState) {
-        if (FilterInput == null) {
-            this.DoInputFilter(null, false);
-            GenerateColumns();// Wegen der Datenbank
-            GenerateItemsAndText();
-        }
+        HandleFilterInputNow();
         //if (vState.HasFlag(States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
         //if (vState.HasFlag(States.Standard_MousePressed)) { vState ^= States.Standard_MousePressed; }
 
@@ -150,6 +163,7 @@ public partial class TextGenerator : GenericControl, IControlUsesFilter {
         ////}
 
         //Skin.Draw_Border(gr, Design.EasyPic, vState, DisplayRectangle);
+        base.DrawControl(gr, vState);
     }
 
     private void GenerateColumns() {

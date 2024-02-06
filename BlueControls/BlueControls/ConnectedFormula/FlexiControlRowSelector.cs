@@ -54,6 +54,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
             _showformat = "~" + fc.KeyName + "~";
         }
         ((IControlSendFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -62,33 +63,42 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     public List<IControlAcceptFilter> Childs { get; } = [];
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection FilterInput { get; } = new("FilterInput 04");
+
+    public bool FilterInputChangedHandled { get; set; } = false;
     public FilterCollection FilterOutput { get; } = new("FilterOutput 04");
 
     public List<IControlSendFilter> Parents { get; } = [];
 
-    public bool RowChangedHandled { get; set; } = false;
+    public List<RowItem>? RowsInput { get; set; }
+
+    public bool RowsInputChangedHandled { get; set; } = false;
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowManualSeted { get; set; } = false;
-
-    public List<RowItem>? RowsInput { get; set; }
+    public bool RowsInputManualSeted { get; set; } = false;
 
     #endregion
 
     #region Methods
 
-    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
 
-    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
+
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void HandleRowsNow() {
-        if (RowChangedHandled) { return; }
-        RowChangedHandled = true;
+    public void HandleRowsInputNow() {
+        if (RowsInputChangedHandled) { return; }
+        RowsInputChangedHandled = true;
         if (IsDisposed) { return; }
 
         if (!Allinitialized) { _ = CreateSubControls(); }
@@ -110,7 +120,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         #region Zeilen erzeugen
 
-        if (RowsInput == null || !RowChangedHandled) { return; }
+        if (RowsInput == null || !RowsInputChangedHandled) { return; }
 
         foreach (var thisR in RowsInput) {
             if (cb?.Item?[thisR.KeyName] == null) {
@@ -163,13 +173,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         #endregion
     }
 
-    public void Rows_Changed() { }
-
-    public void Rows_Changing() { }
-
-    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
-
-    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
+    public void RowsInput_Changed() { }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
@@ -182,7 +186,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        HandleRowsNow();
+        HandleRowsInputNow();
         base.DrawControl(gr, state);
     }
 

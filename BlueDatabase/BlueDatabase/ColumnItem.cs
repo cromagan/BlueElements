@@ -2454,9 +2454,7 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
 
-    private void _TMP_Linked_database_Disposing(object sender, System.EventArgs e) {
-        Invalidate_LinkedDatabase();
-    }
+    private void _TMP_Linked_database_Disposing(object sender, System.EventArgs e) => Invalidate_LinkedDatabase();
 
     private void _TMP_LinkedDatabase_Cell_CellValueChanged(object sender, CellChangedEventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }

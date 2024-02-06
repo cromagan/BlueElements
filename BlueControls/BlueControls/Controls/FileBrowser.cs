@@ -50,20 +50,20 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     #region Fields
 
     private string _lastcheck = string.Empty;
-
     private string _originalText = string.Empty;
-
     private string _sort = "Name";
-
     private string _todel = string.Empty;
-
     private FileSystemWatcher? _watcher;
 
     #endregion
 
     #region Constructors
 
-    public FileBrowser() => InitializeComponent();
+    public FileBrowser() {
+        InitializeComponent();
+        //((IControlSendFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
+    }
 
     #endregion
 
@@ -76,7 +76,6 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     #region Properties
 
     public bool CreateDir { get; set; }
-
     public bool DeleteDir { get; set; }
 
     public new bool Enabled {
@@ -85,6 +84,14 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
             CheckButtons(DirectoryExists(txbPfad.Text));
         }
     }
+
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection FilterInput { get; } = new FilterCollection("InputFilter 96");
+
+    public bool FilterInputChangedHandled { get; set; } = false;
 
     public string OriginalText {
         get => _originalText;
@@ -111,15 +118,15 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         }
     }
 
-    public bool RowChangedHandled { get; set; } = false;
+    public List<RowItem>? RowsInput { get; set; }
+
+    public bool RowsInputChangedHandled { get; set; } = false;
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowManualSeted { get; set; } = false;
-
-    public List<RowItem>? RowsInput { get; set; }
+    public bool RowsInputManualSeted { get; set; } = false;
 
     public string Sort {
         get => _sort;
@@ -133,6 +140,10 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     #endregion
 
     #region Methods
+
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
+
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
     public string GestStandardCommand(string extension) {
         if (!SubKeyExist(extension)) { return string.Empty; }
@@ -156,9 +167,9 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         return exekey.GetValue("").ToString();
     }
 
-    public void HandleRowsNow() {
-        if (RowChangedHandled) { return; }
-        RowChangedHandled = true;
+    public void HandleRowsInputNow() {
+        if (RowsInputChangedHandled) { return; }
+        RowsInputChangedHandled = true;
         if (IsDisposed) { return; }
 
         RemoveWatcher();
@@ -177,13 +188,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
     public void Reload() => ÖffnePfad(txbPfad.Text);
 
-    public void Rows_Changed() { }
-
-    public void Rows_Changing() { }
-
-    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
-
-    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
+    public void RowsInput_Changed() { }
 
     /// <summary>
     /// Verwendete Ressourcen bereinigen.
@@ -199,7 +204,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        HandleRowsNow();
+        HandleRowsInputNow();
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
     }
 

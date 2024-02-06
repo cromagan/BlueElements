@@ -67,6 +67,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         _origin = string.Empty;
         _fromInputFilter = false;
         ((IControlSendFilter)this).RegisterEvents();
+        ((IControlUsesFilter)this).RegisterEvents();
         OnValueChanged();
     }
 
@@ -96,8 +97,14 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; }
+    public FilterCollection FilterInput { get; } = new("FilterInput 02");
 
+    public bool FilterInputChangedHandled { get; set; } = false;
+
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection FilterOutput { get; } = new("FilterOutput 02");
 
     public ColumnItem? FilterSingleColumn { get; }
@@ -121,24 +128,19 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     #region Methods
 
-    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
 
-    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
+
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
-    //    switch (e.ClickedCommand.ToLower()) {
-    //        case "#columnedit":
-    //            if (e.HotItem is ColumnItem col) {
-    //                Forms.TableView.OpenColumnEditor(col, null);
-    //            }
-    //            return true;
-    //    }
-    //    return false;
-    //}
+    public void HandleFilterInputNow() {
+        if (FilterInputChangedHandled) { return; }
+        FilterInputChangedHandled = true;
+        if (IsDisposed) { return; }
 
-    public void ParentFilterOutput_Changed() {
         this.DoInputFilter(null, false);
 
         var filterSingle = FilterInput?[FilterSingleColumn];
@@ -158,7 +160,18 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         UpdateFilterData(filterSingle, _doFilterDeleteButton);
     }
 
-    public void ParentFilterOutput_Changing() { }
+    //public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) {
+    //    switch (e.ClickedCommand.ToLower()) {
+    //        case "#columnedit":
+    //            if (e.HotItem is ColumnItem col) {
+    //                Forms.TableView.OpenColumnEditor(col, null);
+    //            }
+    //            return true;
+    //    }
+    //    return false;
+    //}
+
+    public void ParentFilterOutput_Changed() => HandleFilterInputNow();
 
     //public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
     //    hotItem = null;
@@ -455,7 +468,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         Caption = FilterSingleColumn.ReadableText() + ":";
         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
         ValueSet(nvalue, true, true);
-        return;
+        //return;
         //}
 
         #endregion

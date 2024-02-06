@@ -41,7 +41,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private readonly List<FilterItem> _internal = [];
 
     //TODO: Komentar wieder entfernen
-    private string _coment = string.Empty;
+    private string _coment;
 
     private Database? _database;
     private List<RowItem>? _rows;

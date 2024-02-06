@@ -40,16 +40,20 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
     #region Fields
 
     private string _action = string.Empty;
-
     private string _arg1 = string.Empty;
-
     private string _arg2 = string.Empty;
-
     private string _arg3 = string.Empty;
-
     private string _arg4 = string.Empty;
-
     private ButtonArgs _enabledwhenrows;
+
+    #endregion
+
+    #region Constructors
+
+    public ConnectedFormulaButton() : base() {
+        //((IControlSendFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
+    }
 
     #endregion
 
@@ -115,22 +119,36 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         }
     }
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection FilterInput { get; } = new FilterCollection("InputFilter 95");
+
+    public bool FilterInputChangedHandled { get; set; } = false;
+
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
-    public bool RowChangedHandled { get; set; } = false;
-    public bool RowManualSeted { get; set; } = false;
     public List<RowItem>? RowsInput { get; set; }
+
+    public bool RowsInputChangedHandled { get; set; } = false;
+
+    public bool RowsInputManualSeted { get; set; } = false;
 
     #endregion
 
     #region Methods
 
-    public void HandleRowsNow() {
-        if (RowChangedHandled) { return; }
-        RowChangedHandled = true;
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
+
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
+
+    public void HandleRowsInputNow() {
+        if (RowsInputChangedHandled) { return; }
+        RowsInputChangedHandled = true;
         if (IsDisposed) { return; }
 
         this.DoRows(null, false);
@@ -164,13 +182,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         Enabled = enabled;
     }
 
-    public void Rows_Changed() { }
-
-    public void Rows_Changing() { }
-
-    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
-
-    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
+    public void RowsInput_Changed() { }
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
@@ -180,7 +192,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        HandleRowsNow();
+        HandleRowsInputNow();
         base.DrawControl(gr, state);
     }
 
@@ -253,9 +265,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         }
     }
 
-    private void ButtonError(string message) {
-        Forms.MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
-    }
+    private void ButtonError(string message) => Forms.MessageBox.Show("Dieser Knopfdruck konnte nicht ausgeführt werden.\r\n\r\nGrund:\r\n" + message, BlueBasics.Enums.ImageCode.Warnung, "Ok");
 
     #endregion
 }

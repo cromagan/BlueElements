@@ -65,6 +65,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         CaptionPosition = captionPosition;
         EditType = editType;
         ColumnName = column;
+        //((IControlSendFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
         CheckEnabledState();
     }
 
@@ -92,17 +94,37 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         }
     }
 
-    public List<IControlSendFilter> Parents { get; } = [];
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection FilterInput { get; } = new FilterCollection("InputFilter 98");
 
-    public bool RowChangedHandled { get; set; } = false;
+    public bool FilterInputChangedHandled { get; set; } = false;
+
+    [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public List<IControlSendFilter> Parents { get; } = [];
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowManualSeted { get; set; } = false;
-
     public List<RowItem>? RowsInput { get; set; }
+
+    [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool RowsInputChangedHandled { get; set; } = false;
+
+    [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool RowsInputManualSeted { get; set; } = false;
 
     #endregion
 
@@ -129,6 +151,10 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         return false;
     }
 
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
+
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
+
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
         var (column, row) = GetTmpVariables();
         if (column?.Database != null && column.Database.IsAdministrator()) {
@@ -150,21 +176,28 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         hotItem = column;
     }
 
-    public void HandleRowsNow() {
-        if (RowChangedHandled) { return; }
-        RowChangedHandled = true;
+    public void HandleRowsInputNow() {
+        if (RowsInputChangedHandled) { return; }
+        RowsInputChangedHandled = true;
         if (IsDisposed) { return; }
+
+        if (this.Database() is Database db && db != _lastDB && !db.IsDisposed) {
+            db.Cell.CellValueChanged -= Database_CellValueChanged;
+            db.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
+            db.Row.RowChecked -= Database_RowChecked;
+            db.Loaded -= _Database_Loaded;
+            db.Disposed -= _Database_Disposed;
+        }
 
         this.DoRows(null, false);
 
-        if (this.Database() is Database db && _lastDB != db && !db.IsDisposed) {
-            _lastDB = db;
-            db.Cell.CellValueChanged += Database_CellValueChanged;
-            db.Column.ColumnInternalChanged += Column_ItemInternalChanged;
-            db.Row.RowChecked += Database_RowChecked;
-            db.Loaded += _Database_Loaded;
-            db.DisposingEvent += _Database_Disposing;
-            db.Disposed += _Database_Disposed;
+        if (this.Database() is Database db2 && _lastDB != db2 && !db2.IsDisposed) {
+            _lastDB = db2;
+            db2.Cell.CellValueChanged += Database_CellValueChanged;
+            db2.Column.ColumnInternalChanged += Column_ItemInternalChanged;
+            db2.Row.RowChecked += Database_RowChecked;
+            db2.Loaded += _Database_Loaded;
+            db2.Disposed += _Database_Disposed;
         }
 
         UpdateColumnData();
@@ -184,25 +217,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void Rows_Changed() { }
-
-    public void Rows_Changing() {
-        FillCellNow();
-
-        if (this.Database() is Database db && db != _lastDB && !db.IsDisposed) {
-            //_lastDB = db;
-            db.Cell.CellValueChanged -= Database_CellValueChanged;
-            db.Column.ColumnInternalChanged -= Column_ItemInternalChanged;
-            db.Row.RowChecked -= Database_RowChecked;
-            db.Loaded -= _Database_Loaded;
-            db.DisposingEvent -= _Database_Disposing;
-            db.Disposed -= _Database_Disposed;
-        }
-    }
-
-    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
-
-    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
+    public void RowsInput_Changed() { }
 
     internal void CheckEnabledState() {
         var (column, row) = GetTmpVariables();
@@ -244,7 +259,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        HandleRowsNow();
+        HandleRowsInputNow();
 
         base.DrawControl(gr, state);
     }
@@ -371,9 +386,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         }
     }
 
-    private void _Database_Disposed(object sender, System.EventArgs e) => Rows_Changed();
-
-    private void _Database_Disposing(object sender, System.EventArgs e) => Rows_Changing();
+    private void _Database_Disposed(object sender, System.EventArgs e) => RowsInput_Changed();
 
     private void _Database_Loaded(object sender, System.EventArgs e) {
         if (Disposing || IsDisposed) { return; }

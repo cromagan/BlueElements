@@ -30,25 +30,36 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
 
     #region Properties
 
-    public string Name { get; set; }
+    /// <summary>
+    /// Ein Wert, der bei ParentFilterOutput_Changed zumindest neu berechnet oder invalidiert werden muss.
+    /// Zum Berechnen sollte die Routine DoInputFilter benutzt werden.
+    /// Enthält die DatabaseInput und auch den berechnete Zeile.
+    /// </summary>
+    public FilterCollection FilterInput { get; }
 
+    public bool FilterInputChangedHandled { get; set; }
+    public string Name { get; set; }
     public List<IControlSendFilter> Parents { get; }
 
     #endregion
 
     #region Methods
 
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e);
+
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e);
+
     public void Invalidate();
 
     #endregion
 }
 
-public static class IControlAcceptSomethingExtension {
+public static class ControlAcceptFilterExtension {
 
     #region Methods
 
     public static void ConnectChildParents(this IControlAcceptFilter child, IControlSendFilter parent) {
-        if (child is IControlUsesRow icur && icur.RowManualSeted) {
+        if (child is IControlUsesRow icur && icur.RowsInputManualSeted) {
             Develop.DebugPrint(FehlerArt.Fehler, "Manuelle Filterung kann keine Parents empfangen.");
         }
 
@@ -64,16 +75,6 @@ public static class IControlAcceptSomethingExtension {
         }
 
         if (isnew) {
-            if (newFilters) {
-                if (child is IControlUsesRow icur2) {
-                    icur2.Rows_Changing();
-                }
-
-                if (child is IControlUsesFilter icuf2) {
-                    icuf2.ParentFilterOutput_Changing();
-                }
-            }
-
             child.Parents.AddIfNotExists(parent);
         }
 
@@ -81,7 +82,7 @@ public static class IControlAcceptSomethingExtension {
 
         if (newFilters && isnew) {
             if (child is IControlUsesRow icur3) {
-                icur3.Rows_Changed();
+                icur3.RowsInput_Changed();
             }
 
             if (child is IControlUsesFilter icuf3) {
@@ -110,11 +111,12 @@ public static class IControlAcceptSomethingExtension {
 
         if (parent.Childs.Contains(child)) {
             parent.Childs.Remove(child);
-
-            //parent.FilterOutput.Changing -= child.ParentFilterOutput_Changing;
-            //parent.FilterOutput.Changed -= ParentFilterOutput_Changed;
-            //parent.FilterOutput.DisposingEvent -= ParentFilterOutput_DispodingEvent;
         }
+    }
+
+    public static void DoDispose(this IControlAcceptFilter child) {
+        child.Invalidate_FilterInput();
+        child.DisconnectChildParents(child.Parents);
     }
 
     /// <summary>
@@ -136,6 +138,16 @@ public static class IControlAcceptSomethingExtension {
                     dest.ConnectChildParents(ffx);
                 }
             }
+        }
+    }
+
+    public static void FilterInput_DispodingEvent(this IControlAcceptFilter icaf) {
+        icaf.FilterInput.RowsChanged -= icaf.FilterInput_RowsChanged;
+        icaf.FilterInput.DisposingEvent -= icaf.FilterInput_DispodingEvent;
+
+        if (!icaf.FilterInput.IsDisposed) {
+            icaf.FilterInput.Database = null;
+            icaf.FilterInput.Dispose();
         }
     }
 
@@ -171,6 +183,21 @@ public static class IControlAcceptSomethingExtension {
         }
 
         return fc;
+    }
+
+    /// <summary>
+    /// Verwirft den aktuellen InputFilter.
+    /// </summary>
+    public static void Invalidate_FilterInput(this IControlAcceptFilter item) {
+        if (item.IsDisposed) { return; }
+
+        item.FilterInputChangedHandled = false;
+    }
+
+    public static void RegisterEvents(this IControlAcceptFilter icaf) {
+        icaf.FilterInput.RowsChanged += icaf.FilterInput_RowsChanged;
+        //icaf.FilterInput.Changed += icaf.FilterOutput_Changed;
+        icaf.FilterInput.DisposingEvent += icaf.FilterInput_DispodingEvent;
     }
 
     #endregion

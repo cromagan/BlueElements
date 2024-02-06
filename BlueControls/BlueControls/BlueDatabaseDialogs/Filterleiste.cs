@@ -90,6 +90,12 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
     /// </summary>
     public List<IControlAcceptFilter> Childs { get; } = [];
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection FilterInput { get; } = new("FilterInput 01");
+
     /// <summary>
     /// Ist immer identisch mit den Filtern der Tableview.
     /// Er entspricht den Input-Filtern der einzelenen FlexControlForFiler
@@ -131,8 +137,6 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
     #region Methods
 
     public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
-
-    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
@@ -294,10 +298,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
         base.Dispose(disposing);
     }
 
-    protected override void DrawControl(Graphics gr, States state) {
-        Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
-        //Intiall();
-    }
+    protected override void DrawControl(Graphics gr, States state) => Skin.Draw_Back_Transparent(gr, ClientRectangle, this);//Intiall();
 
     private void _table_DatabaseChanged(object sender, System.EventArgs e) {
         GetÄhnlich();

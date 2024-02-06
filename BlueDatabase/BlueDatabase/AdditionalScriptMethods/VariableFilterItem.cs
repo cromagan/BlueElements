@@ -73,9 +73,7 @@ public class VariableFilterItem : Variable, IDisposable {
         return v;
     }
 
-    public void Dispose() {
-        _filter.Dispose();
-    }
+    public void Dispose() => _filter.Dispose();
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableFilterItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

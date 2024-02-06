@@ -45,11 +45,8 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     #region Fields
 
     private Bitmap? _bitmap;
-
     private string _filename = string.Empty;
-
     private string _originalText = string.Empty;
-
     private int _panelMoveDirection;
 
     #endregion
@@ -61,6 +58,8 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
+        //((IControlSendFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -92,6 +91,14 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection FilterInput { get; } = new FilterCollection("InputFilter 97");
+
+    public bool FilterInputChangedHandled { get; set; } = false;
+
     public string OriginalText {
         get => _originalText;
         set {
@@ -105,15 +112,15 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
-    public bool RowChangedHandled { get; set; } = false;
+    public List<RowItem>? RowsInput { get; set; }
+
+    public bool RowsInputChangedHandled { get; set; } = false;
 
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowManualSeted { get; set; } = false;
-
-    public List<RowItem>? RowsInput { get; set; }
+    public bool RowsInputManualSeted { get; set; } = false;
 
     [DefaultValue(0)]
     public new int TabIndex {
@@ -170,6 +177,10 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         return false;
     }
 
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
+
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
+
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
         hotItem = null;
         if (_bitmap != null) {
@@ -177,9 +188,9 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    public void HandleRowsNow() {
-        if (RowChangedHandled) { return; }
-        RowChangedHandled = true;
+    public void HandleRowsInputNow() {
+        if (RowsInputChangedHandled) { return; }
+        RowsInputChangedHandled = true;
         if (IsDisposed) { return; }
 
         this.DoRows(null, false);
@@ -197,13 +208,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void Rows_Changed() { }
-
-    public void Rows_Changing() { }
-
-    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
-
-    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
+    public void RowsInput_Changed() { }
 
     //Inherits Windows.Forms.UserControl
     //UserControl überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
@@ -220,7 +225,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     }
 
     protected override void DrawControl(Graphics gr, States vState) {
-        HandleRowsNow();
+        HandleRowsInputNow();
 
         if (vState.HasFlag(States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
         if (vState.HasFlag(States.Standard_MousePressed)) { vState ^= States.Standard_MousePressed; }

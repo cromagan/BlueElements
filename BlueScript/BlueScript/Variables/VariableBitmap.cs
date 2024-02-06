@@ -75,9 +75,7 @@ public class VariableBitmap : Variable, IDisposable {
         return v;
     }
 
-    public void Dispose() {
-        _bmp?.Dispose();
-    }
+    public void Dispose() => _bmp?.Dispose();
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableBitmap v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

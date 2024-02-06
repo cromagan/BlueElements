@@ -48,6 +48,7 @@ internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IContr
         _outputcolumn = outputcolumn;
         _type = type;
         ((IControlSendFilter)this).RegisterEvents();
+        ((IControlUsesFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -60,8 +61,14 @@ internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IContr
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; }
+    public FilterCollection FilterInput { get; } = new("FilterInput 05");
 
+    public bool FilterInputChangedHandled { get; set; } = false;
+
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection FilterOutput { get; } = new("FilterOutput 05");
 
     [Browsable(false)]
@@ -82,13 +89,19 @@ internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IContr
 
     #region Methods
 
-    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
 
-    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
+
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void ParentFilterOutput_Changed() {
+    public void HandleFilterInputNow() {
+        if (FilterInputChangedHandled) { return; }
+        FilterInputChangedHandled = true;
+        if (IsDisposed) { return; }
+
         this.DoInputFilter(null, false);
         Invalidate();
 
@@ -133,7 +146,7 @@ internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IContr
         FilterOutput.ChangeTo(f);
     }
 
-    public void ParentFilterOutput_Changing() { }
+    public void ParentFilterOutput_Changed() => HandleFilterInputNow();
 
     protected override void Dispose(bool disposing) {
         if (disposing) {

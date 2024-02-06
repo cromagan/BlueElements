@@ -33,6 +33,7 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
     public RowEntryControl(Database? database) : base() {
         this.DoOutputSettings(database, Name);
         ((IControlSendFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -41,24 +42,37 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
 
     public List<IControlAcceptFilter> Childs { get; } = [];
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection FilterInput { get; } = new("FilterInput 06");
+
+    public bool FilterInputChangedHandled { get; set; } = false;
     public FilterCollection FilterOutput { get; } = new("FilterOutput 06");
+
     public List<IControlSendFilter> Parents { get; } = [];
-    public bool RowChangedHandled { get; set; } = false;
-    public bool RowManualSeted { get; set; } = false;
+
     public List<RowItem>? RowsInput { get; set; }
+
+    public bool RowsInputChangedHandled { get; set; } = false;
+
+    public bool RowsInputManualSeted { get; set; } = false;
 
     #endregion
 
     #region Methods
 
-    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
 
-    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
+
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void HandleRowsNow() {
-        RowChangedHandled = true;
+    public void HandleRowsInputNow() {
+        RowsInputChangedHandled = true;
         this.DoRows(FilterOutput.Database, true);
 
         if (this.RowSingleOrNull() is RowItem r) {
@@ -68,13 +82,7 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
         }
     }
 
-    public void Rows_Changed() => HandleRowsNow();
-
-    public void Rows_Changing() { }
-
-    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
-
-    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
+    public void RowsInput_Changed() => HandleRowsInputNow();
 
     protected override void Dispose(bool disposing) {
         if (disposing) {

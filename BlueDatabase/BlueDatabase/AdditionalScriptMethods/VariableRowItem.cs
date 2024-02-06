@@ -73,9 +73,7 @@ public class VariableRowItem : Variable, IDisposable {
         return v;
     }
 
-    public void Dispose() {
-        _row = null;
-    }
+    public void Dispose() => _row = null;
 
     public override DoItFeedback GetValueFrom(Variable variable, LogData ld) {
         if (variable is not VariableRowItem v) { return DoItFeedback.VerschiedeneTypen(ld, this, variable); }

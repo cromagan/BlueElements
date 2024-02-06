@@ -55,6 +55,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         Page = page;
         InitFormula(null, null);
         ((IControlSendFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -75,7 +76,15 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
     }
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FilterCollection FilterInput { get; } = new("FilterInput 03");
+
+    public bool FilterInputChangedHandled { get; set; } = false;
     public FilterCollection FilterOutput { get; } = new("FilterOutput 03");
+
     public string Page { get; }
 
     [Browsable(false)]
@@ -83,9 +92,11 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
-    public bool RowChangedHandled { get; set; } = false;
-    public bool RowManualSeted { get; set; } = false;
     public List<RowItem>? RowsInput { get; set; }
+
+    public bool RowsInputChangedHandled { get; set; } = false;
+
+    public bool RowsInputManualSeted { get; set; } = false;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -96,9 +107,11 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     #region Methods
 
-    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
+    public void FilterInput_DispodingEvent(object sender, System.EventArgs e) => this.FilterInput_DispodingEvent();
 
-    public void FilterOutput_Changing(object sender, System.EventArgs e) => this.FilterOutput_Changing();
+    public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
+
+    public void FilterOutput_Changed(object sender, System.EventArgs e) => this.FilterOutput_Changed();
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
@@ -176,7 +189,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
 
         if (_generated) {
-            Rows_Changed();
+            RowsInput_Changed();
         }
     }
 
@@ -196,9 +209,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         ConnectedFormula = null;
     }
 
-    public void HandleRowsNow() {
-        if (RowChangedHandled) { return; }
-        RowChangedHandled = true;
+    public void HandleRowsInputNow() {
+        if (RowsInputChangedHandled) { return; }
+        RowsInputChangedHandled = true;
         if (IsDisposed) { return; }
 
         this.DoRows(FilterOutput.Database, false);
@@ -220,7 +233,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         SuspendLayout();
 
         this.Invalidate_FilterOutput();
-        this.Invalidate_Rows();
+        this.Invalidate_RowsInput();
 
         if (oldf != cf) {
             if (oldf != null) {
@@ -258,13 +271,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
-    public void Rows_Changed() { }
-
-    public void Rows_Changing() { }
-
-    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
-
-    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
+    public void RowsInput_Changed() { }
 
     public Control? SearchOrGenerate(IItemToControl? thisit) {
         if (thisit == null) { return null; }
@@ -306,7 +313,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
         GenerateView();
 
-        HandleRowsNow();
+        HandleRowsInputNow();
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
