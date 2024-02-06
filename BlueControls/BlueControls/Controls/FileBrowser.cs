@@ -111,6 +111,8 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         }
     }
 
+    public bool RowChangedHandled { get; set; } = false;
+
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -154,22 +156,28 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         return exekey.GetValue("").ToString();
     }
 
-    public bool ParseVariables(VariableCollection? list) {
-        if (IsDisposed) { return false; }
+    public void HandleRowsNow() {
+        if (RowChangedHandled) { return; }
+        RowChangedHandled = true;
+        if (IsDisposed) { return; }
+
+        RemoveWatcher();
+        this.DoRows(null, false);
 
         var ct = string.Empty;
 
-        if (list != null) {
+        if (this.RowSingleOrNull()?.LastCheckedEventArgs?.Variables is VariableCollection list) {
             ct = list.ReplaceInText(OriginalText);
         }
 
         Pfad = ct;
-        return ct == OriginalText;
+
+        CreateWatcher();
     }
 
     public void Reload() => ÖffnePfad(txbPfad.Text);
 
-    public void Rows_Changed() => this.Invalidate_Rows();
+    public void Rows_Changed() { }
 
     public void Rows_Changing() { }
 
@@ -191,16 +199,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        if (RowsInput == null) {
-            RemoveWatcher();
-            this.DoRows(null, false);
-        }
-
-        if (this.RowSingleOrNull() is RowItem r) {
-            ParseVariables(r.LastCheckedEventArgs?.Variables);
-        }
-        CreateWatcher();
-
+        HandleRowsNow();
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
     }
 

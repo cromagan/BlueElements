@@ -50,7 +50,7 @@ using static BlueBasics.Constants;
 namespace BlueControls.ItemCollectionPad;
 
 //TODO: IParseable implementieren
-public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName, IStringable {
+public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, IDisposableExtended, IHasKeyName, IStringable, ICanHaveVariables {
 
     #region Fields
 
@@ -536,32 +536,6 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         Changed?.Invoke(this, System.EventArgs.Empty);
     }
 
-    public bool ParseVariable(string name, string wert) => ParseVariable(new VariableString(name, wert));
-
-    public bool ParseVariable(Variable variable) {
-        var did = false;
-        foreach (var thisItem in this) {
-            if (thisItem is ICanHaveVariablesItemLevel variables) {
-                if (variables.ReplaceVariable(variable)) { did = true; }
-            }
-        }
-        return did;
-    }
-
-    public ScriptEndedFeedback ParseVariable(Database database, string rowkey) => ParseVariable(database.Row.SearchByKey(rowkey));
-
-    public ScriptEndedFeedback ParseVariable(RowItem? row) {
-        if (row == null || row.IsDisposed) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
-
-        var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0);
-        if (!script.AllOk || script.Variables == null) { return script; }
-        foreach (var thisV in script.Variables) {
-            _ = ParseVariable(thisV);
-        }
-
-        return script;
-    }
-
     public void Remove(string internalname) => Remove(this[internalname]);
 
     public new void Remove(AbstractPadItem? item) {
@@ -592,11 +566,36 @@ public sealed class ItemCollectionPad : ObservableCollection<AbstractPadItem>, I
         }
     }
 
+    public bool ReplaceVariable(string name, string wert) => ReplaceVariable(new VariableString(name, wert));
+
+    public bool ReplaceVariable(Variable variable) {
+        var did = false;
+        foreach (var thisItem in this) {
+            if (thisItem is ICanHaveVariables variables) {
+                if (variables.ReplaceVariable(variable)) { did = true; }
+            }
+        }
+        return did;
+    }
+
+    public ScriptEndedFeedback ReplaceVariables(RowItem? row) {
+        if (row == null || row.IsDisposed) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
+
+        var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, false, false, true, 0);
+        if (!script.AllOk) { return script; }
+
+         ((ICanHaveVariables)this).ParseVariables(script.Variables);
+
+        return script;
+    }
+
+    public ScriptEndedFeedback ReplaceVariables(Database database, string rowkey) => ReplaceVariables(database.Row.SearchByKey(rowkey));
+
     public bool ResetVariables() {
         if (IsDisposed) { return false; }
         var did = false;
         foreach (var thisItem in this) {
-            if (thisItem is ICanHaveVariablesItemLevel variables) {
+            if (thisItem is ICanHaveVariables variables) {
                 if (variables.ResetVariables()) { did = true; }
             }
         }

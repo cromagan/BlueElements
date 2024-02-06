@@ -557,7 +557,7 @@
     <Compile Include="Controls\GroupBox.Designer.cs">
       <DependentUpon>GroupBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Interfaces\ICanHaveVariablesItemLevel.cs" />
+    <Compile Include="Interfaces\ICanHaveVariables.cs" />
     <Compile Include="Interfaces\IContextMenu.cs" />
     <Compile Include="Interfaces\IMouseAndKeyHandle.cs" />
     <Compile Include="ItemCollectionList\AbstractListItem.cs" />

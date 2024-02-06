@@ -176,12 +176,12 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
                         cc = new ConnectedFormulaView(pg);
                         t.Controls.Add(cc);
-                        cc.InitFormula(cf, null);
+                        cc.InitFormula(cf, cc.Database());
                         cc.Dock = DockStyle.Fill;
                         cc.DoInputSettings(parentView, this);
                         cc.DoRows(cc.Database(), true);
                         cc.DoOutputSettings(cc.Database(), cc.Name);
-                        cc.GenerateView();
+                        //cc.GenerateView();
 
                         #endregion
                     } else {

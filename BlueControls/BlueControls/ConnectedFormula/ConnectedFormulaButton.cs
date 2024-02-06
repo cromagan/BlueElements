@@ -120,6 +120,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
+    public bool RowChangedHandled { get; set; } = false;
     public bool RowManualSeted { get; set; } = false;
     public List<RowItem>? RowsInput { get; set; }
 
@@ -127,23 +128,12 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
     #region Methods
 
-    public void Rows_Changed() => this.Invalidate_Rows();
+    public void HandleRowsNow() {
+        if (RowChangedHandled) { return; }
+        RowChangedHandled = true;
+        if (IsDisposed) { return; }
 
-    public void Rows_Changing() { }
-
-    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
-
-    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
-
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            this.DoDispose();
-        }
-        base.Dispose(disposing);
-    }
-
-    protected override void DrawControl(Graphics gr, States state) {
-        if (RowsInput == null) { this.DoRows(null, false); }
+        this.DoRows(null, false);
 
         bool enabled;
 
@@ -153,7 +143,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
                 break;
 
             case ButtonArgs.Keine_Zeile:
-                enabled = RowsInput == null || RowsInput.Count == 0;
+                enabled = RowsInput != null && RowsInput.Count == 0;
                 break;
 
             case ButtonArgs.Genau_eine_Zeile:
@@ -172,7 +162,25 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         if (string.IsNullOrEmpty(_action)) { enabled = false; }
 
         Enabled = enabled;
+    }
 
+    public void Rows_Changed() { }
+
+    public void Rows_Changing() { }
+
+    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
+
+    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
+
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            this.DoDispose();
+        }
+        base.Dispose(disposing);
+    }
+
+    protected override void DrawControl(Graphics gr, States state) {
+        HandleRowsNow();
         base.DrawControl(gr, state);
     }
 
@@ -200,9 +208,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
         VariableCollection vars;
         object? ai = null;
-        RowItem? row = null;
-
-        if (RowsInput != null && RowsInput.Count == 1) { row = RowsInput[0]; }
+        var row = this.RowSingleOrNull();
 
         if (row?.Database is Database db && !db.IsDisposed) {
             vars = db.CreateVariableCollection(row, true, false);

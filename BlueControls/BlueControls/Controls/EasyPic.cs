@@ -105,6 +105,8 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
+    public bool RowChangedHandled { get; set; } = false;
+
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -175,24 +177,27 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+    public void HandleRowsNow() {
+        if (RowChangedHandled) { return; }
+        RowChangedHandled = true;
+        if (IsDisposed) { return; }
 
-    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
-
-    public bool ParseVariables(VariableCollection? list) {
-        if (IsDisposed) { return false; }
+        this.DoRows(null, false);
 
         var ct = string.Empty;
 
-        if (list != null) {
+        if (this.RowSingleOrNull()?.LastCheckedEventArgs?.Variables is VariableCollection list) {
             ct = list.ReplaceInText(OriginalText);
         }
 
         FileName = ct;
-        return ct == OriginalText;
     }
 
-    public void Rows_Changed() => this.Invalidate_Rows();
+    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+
+    public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+    public void Rows_Changed() { }
 
     public void Rows_Changing() { }
 
@@ -215,11 +220,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     }
 
     protected override void DrawControl(Graphics gr, States vState) {
-        if (RowsInput == null) { this.DoRows(null, false); }
-
-        if (this.RowSingleOrNull() is RowItem r) {
-            ParseVariables(r.LastCheckedEventArgs?.Variables);
-        }
+        HandleRowsNow();
 
         if (vState.HasFlag(States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
         if (vState.HasFlag(States.Standard_MousePressed)) { vState ^= States.Standard_MousePressed; }

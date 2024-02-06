@@ -18,6 +18,7 @@
 #nullable enable
 
 using System.Collections.Generic;
+using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -29,6 +30,8 @@ namespace BlueControls.Interfaces;
 public interface IControlUsesRow : IDisposableExtendedWithEvent, IControlAcceptFilter {
 
     #region Properties
+
+    public bool RowChangedHandled { get; set; }
 
     /// <summary>
     /// Bedeutet, dass kein Parent vorhanden ist - und der Filter anderweitig gesetzt wurde. Z.B. durch SetRow
@@ -42,6 +45,8 @@ public interface IControlUsesRow : IDisposableExtendedWithEvent, IControlAcceptF
 
     #region Methods
 
+    public void HandleRowsNow();
+
     public void Rows_Changed();
 
     public void Rows_Changing();
@@ -54,25 +59,33 @@ public interface IControlUsesRow : IDisposableExtendedWithEvent, IControlAcceptF
 }
 
 public static class IControlUsesRowExtension {
+    //public static Database? Database(this IControlUsesRow icur) {
+    //    if (icur.IsDisposed) { return null; }
+
+    //    //if (icur.RowsInput == null) { icur.DoRows(mustbeDatabase, doEmptyFilterToo); }
+    //    if (icur.RowsInput == null || icur.RowsInput.Count == 0) { return null; }
+
+    //    return icur.RowsInput[0].Database;
+    //}
 
     #region Methods
 
     public static Database? Database(this IControlUsesRow icur) {
-        if (icur.IsDisposed) { return null; }
-
-        //if (icur.RowsInput == null) { icur.DoRows(mustbeDatabase, doEmptyFilterToo); }
-        if (icur.RowsInput == null || icur.RowsInput.Count == 0) { return null; }
-
-        return icur.RowsInput[0].Database;
+        if (icur.RowsInput != null && icur.RowsInput.Count > 0) { return icur.RowsInput[0].Database; }
+        var f = icur.GetInputFilter(null, false);
+        return f?.Database;
     }
 
-    public static void DoDispose(this IControlUsesRow child) {
-        child.Rows_Changing();
-        child.Invalidate_Rows();
-        child.DisconnectChildParents(child.Parents);
+    public static void DoDispose(this IControlUsesRow icur) {
+        icur.UnregisterEvents();
+        icur.Rows_Changing();
+        icur.Invalidate_Rows();
+        icur.DisconnectChildParents(icur.Parents);
     }
 
     public static void DoRows(this IControlUsesRow icur, Database? mustbeDatabase, bool doEmptyFilterToo) {
+        if (icur.RowManualSeted) { return; }
+
         var f = icur.GetInputFilter(mustbeDatabase, doEmptyFilterToo);
 
         if (f == null) {
@@ -86,24 +99,22 @@ public static class IControlUsesRowExtension {
             r.CheckRowDataIfNeeded();
         }
 
-        icur.RegisterEvents();
+        //icur.RegisterEvents();
     }
 
-    public static Database? FilterInput_Database(this IControlUsesRow icur) {
-        var f = icur.GetInputFilter(null, false);
-        return f?.Database;
+    public static void Invalidate_Rows(this IControlUsesRow icur) {
+        if (!icur.RowManualSeted) {
+            icur.RowsInput = null;
+        }
+
+        icur.RowChangedHandled = false;
+        icur.Invalidate();
     }
 
-    public static void Invalidate_Rows(this IControlUsesRow child) {
-        child.UnregisterEvents();
-        child.RowsInput = null;
-        child.Invalidate();
-    }
-
-    public static void RegisterEvents(this IControlUsesRow child) {
-        if (child.Database() is Database db) {
-            db.Row.RowAdded += child.RowsExternal_Added;
-            db.Row.RowRemoved += child.RowsExternal_Removed;
+    public static void RegisterEvents(this IControlUsesRow icur) {
+        if (icur.Database() is Database db) {
+            db.Row.RowAdded += icur.RowsExternal_Added;
+            db.Row.RowRemoved += icur.RowsExternal_Removed;
         }
     }
 
@@ -127,42 +138,30 @@ public static class IControlUsesRowExtension {
             Develop.DebugPrint(FehlerArt.Fehler, "Element wird von Parents gesteuert!");
         }
 
-        if (row != item.RowSingleOrNull()) { return; }
+        var doAtabaseAfter = Database == null;
+
+        if (row == item.RowSingleOrNull()) { return; }
 
         item.Rows_Changing();
-
+        item.Invalidate_Rows();
         item.RowManualSeted = true;
-
-        item.UnregisterEvents();
 
         item.RowsInput = [];
 
-        if (row?.Database == null) { return; }
+        if (row?.Database is Database db && !db.IsDisposed) {
+            item.RowsInput.Add(row);
+            row.CheckRowDataIfNeeded();
 
-        item.RowsInput.Add(row);
+            if (doAtabaseAfter) { item.RegisterEvents(); }
+        }
 
-        //if (row?.Database is Database db && !db.IsDisposed) {
-        //    var fc = new FilterCollection(db, "SetToRow");
-        //    fc.Database = db;
-        //    item.SetFilterInput(fc);
-        //}
-
-        //if (item.FilterInput != null) {
-        //    item.FilterInput.Clear();
-        //    if (row == null) {
-        //        item.FilterInput.ChangeTo(new FilterItem(item.FilterInput?.Database, "SetRow"));
-        //    } else {
-        //item.FilterInput.ChangeTo(new FilterItem(row));
-        //    }
-        //}
-        item.RegisterEvents();
         item.Rows_Changed();
     }
 
-    public static void UnregisterEvents(this IControlUsesRow child) {
-        if (child.Database() is Database db) {
-            db.Row.RowAdded -= child.RowsExternal_Added;
-            db.Row.RowRemoved -= child.RowsExternal_Removed;
+    public static void UnregisterEvents(this IControlUsesRow icur) {
+        if (icur.Database() is Database db) {
+            db.Row.RowAdded -= icur.RowsExternal_Added;
+            db.Row.RowRemoved -= icur.RowsExternal_Removed;
         }
     }
 

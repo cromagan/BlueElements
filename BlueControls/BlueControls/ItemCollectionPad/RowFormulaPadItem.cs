@@ -196,7 +196,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasDatabase {
         CreativePad pad = new(new ItemCollectionPad(lf));
         if (pad.Item is ItemCollectionPad icp) {
             icp.ResetVariables();
-            icp.ParseVariable(db, _rowKey);
+            icp.ReplaceVariables(db, _rowKey);
 
             var re = icp.MaxBounds(string.Empty);
 

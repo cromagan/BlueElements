@@ -66,6 +66,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         ShowInfoWhenDisabled = true;
         _origin = string.Empty;
         _fromInputFilter = false;
+        ((IControlSendFilter)this).RegisterEvents();
         OnValueChanged();
     }
 
@@ -97,7 +98,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
-    public FilterCollection FilterOutput { get; } = new("FilterOutput");
+    public FilterCollection FilterOutput { get; } = new("FilterOutput 02");
 
     public ColumnItem? FilterSingleColumn { get; }
 
@@ -172,7 +173,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         _doFilterDeleteButton = false;
 
         if (CaptionPosition == CaptionPosition.ohne) {
-            FilterOutput.Clear();
+            this.Invalidate_FilterOutput();
             return;
         }
 
@@ -270,7 +271,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         //    return; }
 
         if (e.Command != "Filter") {
-            FilterOutput.Clear();
+            this.Invalidate_FilterOutput();
             UpdateFilterData(null, false);
         } else {
             FilterOutput.ChangeTo(e.Filter);
@@ -370,7 +371,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         if (IsDisposed) { return; }
 
         if (FilterSingleColumn == null) {
-            FilterOutput.Clear();
+            this.Invalidate_FilterOutput();
         } else {
             FilterOutput.ChangeTo(filterSingle);
         }

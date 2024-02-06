@@ -34,7 +34,7 @@ using static BlueBasics.Constants;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariablesItemLevel {
+public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariables {
 
     #region Fields
 
@@ -258,7 +258,7 @@ public class ChildPadItem : RectanglePadItem, IMouseAndKeyHandle, ICanHaveVariab
     public bool ReplaceVariable(Variable variable) {
         if (IsDisposed) { return false; }
         if (PadInternal?.Item == null) { return false; }
-        var b = PadInternal.Item.ParseVariable(variable);
+        var b = PadInternal.Item.ReplaceVariable(variable);
         if (b) { OnChanged(); }
         return b;
     }

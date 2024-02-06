@@ -37,7 +37,7 @@ using MessageBox = BlueControls.Forms.MessageBox;
 
 namespace BlueControls.ItemCollectionPad;
 
-public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
+public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
 
     #region Fields
 

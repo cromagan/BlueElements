@@ -53,6 +53,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         if (string.IsNullOrEmpty(_showformat) && database != null && database.Column.Count > 0 && database.Column.First() is ColumnItem fc) {
             _showformat = "~" + fc.KeyName + "~";
         }
+        ((IControlSendFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -61,9 +62,11 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     public List<IControlAcceptFilter> Childs { get; } = [];
 
-    public FilterCollection FilterOutput { get; } = new("FilterOutput");
+    public FilterCollection FilterOutput { get; } = new("FilterOutput 04");
 
     public List<IControlSendFilter> Parents { get; } = [];
+
+    public bool RowChangedHandled { get; set; } = false;
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -83,46 +86,11 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void Rows_Changed() => this.Invalidate_Rows();
-
-    public void Rows_Changing() { }
-
-    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
-
-    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
-
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            ((IControlSendFilter)this).DoDispose();
-            ((IControlUsesRow)this).DoDispose();
-            Tag = null;
-        }
-
-        base.Dispose(disposing);
-    }
-
-    protected override void DrawControl(Graphics gr, States state) {
-        if (RowsInput == null) {
-            UpdateMyCollection();
-        }
-        base.DrawControl(gr, state);
-    }
-
-    protected override void OnValueChanged() {
-        base.OnValueChanged();
-
-        var row = RowsInput?.Get(Value);
-
-        if (row == null) {
-            FilterOutput.Clear();
-            return;
-        }
-
-        FilterOutput.ChangeTo(new FilterItem(row));
-    }
-
-    private void UpdateMyCollection() {
+    public void HandleRowsNow() {
+        if (RowChangedHandled) { return; }
+        RowChangedHandled = true;
         if (IsDisposed) { return; }
+
         if (!Allinitialized) { _ = CreateSubControls(); }
 
         this.DoRows(FilterOutput.Database, true);
@@ -142,7 +110,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         #region Zeilen erzeugen
 
-        if (RowsInput == null) { return; }
+        if (RowsInput == null || !RowChangedHandled) { return; }
 
         foreach (var thisR in RowsInput) {
             if (cb?.Item?[thisR.KeyName] == null) {
@@ -193,6 +161,42 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         }
 
         #endregion
+    }
+
+    public void Rows_Changed() { }
+
+    public void Rows_Changing() { }
+
+    public void RowsExternal_Added(object sender, RowChangedEventArgs e) => this.RowsExternal_Changed();
+
+    public void RowsExternal_Removed(object sender, System.EventArgs e) => this.RowsExternal_Changed();
+
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            ((IControlSendFilter)this).DoDispose();
+            ((IControlUsesRow)this).DoDispose();
+            Tag = null;
+        }
+
+        base.Dispose(disposing);
+    }
+
+    protected override void DrawControl(Graphics gr, States state) {
+        HandleRowsNow();
+        base.DrawControl(gr, state);
+    }
+
+    protected override void OnValueChanged() {
+        base.OnValueChanged();
+
+        var row = RowsInput?.Get(Value);
+
+        if (row == null) {
+            this.Invalidate_FilterOutput();
+            return;
+        }
+
+        FilterOutput.ChangeTo(new FilterItem(row));
     }
 
     #endregion

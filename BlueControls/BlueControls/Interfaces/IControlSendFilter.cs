@@ -75,14 +75,7 @@ public static class IControlSendSomethingExtension {
         dest.FilterOutput.Database = db;
     }
 
-    public static void DoOutputSettings(this IControlSendFilter dest, IItemSendSomething source) {
-        dest.Name = source.DefaultItemToControlName();
-        dest.FilterOutput.Database = source.DatabaseOutput;
-
-        dest.FilterOutput.Changing += dest.FilterOutput_Changing;
-        dest.FilterOutput.Changed += dest.FilterOutput_Changed;
-        dest.FilterOutput.DisposingEvent += dest.FilterOutput_DispodingEvent;
-    }
+    public static void DoOutputSettings(this IControlSendFilter dest, IItemSendSomething source) => dest.DoOutputSettings(source.DatabaseOutput, source.DefaultItemToControlName());
 
     public static void FilterOutput_Changed(this IControlSendFilter icsf) {
         foreach (var thisChild in icsf.Childs) {
@@ -121,6 +114,16 @@ public static class IControlSendSomethingExtension {
             icsf.FilterOutput.Database = null;
             icsf.FilterOutput.Dispose();
         }
+    }
+
+    public static void Invalidate_FilterOutput(this IControlSendFilter icsf) {
+        icsf.FilterOutput.Clear();
+    }
+
+    public static void RegisterEvents(this IControlSendFilter dest) {
+        dest.FilterOutput.Changing += dest.FilterOutput_Changing;
+        dest.FilterOutput.Changed += dest.FilterOutput_Changed;
+        dest.FilterOutput.DisposingEvent += dest.FilterOutput_DispodingEvent;
     }
 
     #endregion

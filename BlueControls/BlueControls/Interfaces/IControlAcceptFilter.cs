@@ -57,28 +57,27 @@ public static class IControlAcceptSomethingExtension {
 
         bool isnew = !child.Parents.Contains(parent);
         var newFilters = parent.FilterOutput.Count > 0;
+        var doDatabaseAfter = false;
 
-        if (newFilters && isnew) {
-            if (child is IControlUsesRow icur2) {
-                icur2.Rows_Changing();
-            }
-
-            if (child is IControlUsesFilter icuf2) {
-                icuf2.ParentFilterOutput_Changing();
-            }
+        if (child is IControlUsesRow icur4) {
+            doDatabaseAfter = icur4.Database() == null;
         }
 
-        if (isnew) { child.Parents.AddIfNotExists(parent); }
+        if (isnew) {
+            if (newFilters) {
+                if (child is IControlUsesRow icur2) {
+                    icur2.Rows_Changing();
+                }
+
+                if (child is IControlUsesFilter icuf2) {
+                    icuf2.ParentFilterOutput_Changing();
+                }
+            }
+
+            child.Parents.AddIfNotExists(parent);
+        }
 
         parent.Childs.AddIfNotExists(child);
-
-        //if (parent.Childs.AddIfNotExists(child)) {
-        //    parent.FilterOutput.Changing += child.ParentFilterOutput_Changing;
-        //    parent.FilterOutput.Changed += ParentFilterOutput_Changed;
-        //    parent.FilterOutput.DisposingEvent += ParentFilterOutput_DispodingEvent;
-        //    //child.DisposingEvent += Child_DisposingEvent;
-        //    //parent.DisposingEvent += Parent_DisposingEvent;
-        //}
 
         if (newFilters && isnew) {
             if (child is IControlUsesRow icur3) {
@@ -88,6 +87,12 @@ public static class IControlAcceptSomethingExtension {
             if (child is IControlUsesFilter icuf3) {
                 icuf3.ParentFilterOutput_Changed();
             };
+        }
+
+        if (doDatabaseAfter) {
+            if (child is IControlUsesRow icur5) {
+                icur5.RegisterEvents();
+            }
         }
     }
 

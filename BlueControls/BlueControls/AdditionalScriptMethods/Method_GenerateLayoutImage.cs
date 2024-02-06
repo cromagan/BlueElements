@@ -34,8 +34,8 @@ public class Method_GenerateLayoutImage : Method_Database {
     public override List<List<string>> Args => [StringVal, FloatVal];
     public override string Command => "generatelayoutimage";
     public override string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
-     public override int LastArgMinCount => -1;
     public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
     public override MethodType MethodType => MethodType.MyDatabaseRow | MethodType.IO | MethodType.NeedLongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;
@@ -76,7 +76,7 @@ public class Method_GenerateLayoutImage : Method_Database {
 
         var l = new ItemCollectionPad.ItemCollectionPad(ind);
         l.ResetVariables();
-        var scx = l.ParseVariable(r);
+        var scx = l.ReplaceVariables(r);
 
         if (!scx.AllOk) {
             infos.Data.Protocol.AddRange(scx.Protocol);

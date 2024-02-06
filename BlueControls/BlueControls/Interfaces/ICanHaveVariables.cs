@@ -17,6 +17,7 @@
 
 #nullable enable
 
+using BlueScript;
 using BlueScript.Variables;
 
 namespace BlueControls.Interfaces;
@@ -24,13 +25,29 @@ namespace BlueControls.Interfaces;
 /// <summary>
 /// Wird verwendet, wenn das PadItem mit Variablen umgehen kann und sich dadurch die Anzeige ändert.
 /// </summary>
-public interface ICanHaveVariablesItemLevel {
+public interface ICanHaveVariables {
 
     #region Methods
 
     bool ReplaceVariable(Variable variable);
 
     bool ResetVariables();
+
+    #endregion
+}
+
+public static class CanHaveVariables {
+
+    #region Methods
+
+    public static void ParseVariables(this ICanHaveVariables obj, VariableCollection? variables) {
+        obj.ResetVariables();
+        if (variables == null) { return; }
+
+        foreach (var thisV in variables) {
+            _ = obj.ReplaceVariable(thisV);
+        }
+    }
 
     #endregion
 }

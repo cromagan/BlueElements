@@ -203,9 +203,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (fi != null && _internal.Count == 1 && Exists(fi)) { return; }
         if (fi == null && _internal.Count == 0) { return; }
 
-        var fc = new FilterCollection((FilterItem?)(fi?.Clone()), "ChangeTo1");
+        using var fc = new FilterCollection((FilterItem?)(fi?.Clone()), "ChangeTo1");
         ChangeTo(fc);
-        fc.Dispose();
     }
 
     /// <summary>
@@ -223,7 +222,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (fc != null) {
             foreach (var thisf in fc) {
-                if (!Exists(thisf) && thisf.IsOk()) { AddAndRegisterEvents(thisf); }
+                if (!Exists(thisf) && thisf.IsOk() && thisf.Clone() is FilterItem nfi) { AddAndRegisterEvents(nfi); }
             }
 
             _rows = [];
@@ -467,6 +466,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (_internal.Count > 0 && _internal[0].Database != fi.Database) {
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken unterschiedlich");
         }
+
+        if (fi.Parent != null) { Develop.DebugPrint(FehlerArt.Fehler, "Doppelte Filterverwendung!"); }
+        fi.Parent = this;
 
         fi.Changing += Filter_Changing;
         fi.Changed += Filter_Changed;

@@ -151,6 +151,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         MouseHighlight = false;
         Filter.Changed += Filter_Changed;
         Filter.RowsChanged += Filter_Changed;
+        ((IControlSendFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -251,7 +252,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterOutput { get; } = new("FilterOutPt 4");
+    public FilterCollection FilterOutput { get; } = new("FilterOutPt 07");
 
     public Filterausgabe FilterOutputType { get; set; } = Filterausgabe.Gewähle_Zeile;
 

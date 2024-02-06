@@ -47,6 +47,7 @@ internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IContr
         _inputcolumn = inputcolumn;
         _outputcolumn = outputcolumn;
         _type = type;
+        ((IControlSendFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -61,7 +62,7 @@ internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IContr
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public FilterCollection? FilterInput { get; set; }
 
-    public FilterCollection FilterOutput { get; } = new("FilterIput 2");
+    public FilterCollection FilterOutput { get; } = new("FilterOutput 05");
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -92,13 +93,12 @@ internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IContr
         Invalidate();
 
         var lastInputRow = FilterInput?.RowSingleOrNull;
-        //lastInputRow?.CheckRowDataIfNeeded();
 
         if (lastInputRow == null || _outputcolumn == null || _inputcolumn == null) {
             if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
                 FilterOutput.ChangeTo(new FilterItem(FilterInput?.Database, "IO"));
             } else {
-                FilterOutput.Clear();
+                this.Invalidate_FilterOutput();
             }
             return;
         }

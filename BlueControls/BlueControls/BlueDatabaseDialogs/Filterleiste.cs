@@ -56,6 +56,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
     public Filterleiste() {
         InitializeComponent();
         FillFilters();
+        ((IControlSendFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -93,7 +94,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
     /// Ist immer identisch mit den Filtern der Tableview.
     /// Er entspricht den Input-Filtern der einzelenen FlexControlForFiler
     /// </summary>
-    public FilterCollection FilterOutput { get; } = new("FilterOutput");
+    public FilterCollection FilterOutput { get; } = new("FilterOutput 01");
 
     [DefaultValue(FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter)]
     public FilterTypesToShow Filtertypes { get; set; } = FilterTypesToShow.DefinierteAnsicht_Und_AktuelleAnsichtAktiveFilter;

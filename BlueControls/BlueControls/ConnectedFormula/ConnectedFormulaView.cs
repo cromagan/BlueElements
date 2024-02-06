@@ -54,6 +54,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         InitializeComponent();
         Page = page;
         InitFormula(null, null);
+        ((IControlSendFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -74,7 +75,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
     }
 
-    public FilterCollection FilterOutput { get; } = new("FilterOutput");
+    public FilterCollection FilterOutput { get; } = new("FilterOutput 03");
     public string Page { get; }
 
     [Browsable(false)]
@@ -82,7 +83,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<IControlSendFilter> Parents { get; } = [];
 
-    public bool RowManualSeted { get; set; }
+    public bool RowChangedHandled { get; set; } = false;
+    public bool RowManualSeted { get; set; } = false;
     public List<RowItem>? RowsInput { get; set; }
 
     [Browsable(false)]
@@ -194,6 +196,20 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         ConnectedFormula = null;
     }
 
+    public void HandleRowsNow() {
+        if (RowChangedHandled) { return; }
+        RowChangedHandled = true;
+        if (IsDisposed) { return; }
+
+        this.DoRows(FilterOutput.Database, false);
+
+        if (this.RowSingleOrNull() is RowItem r) {
+            FilterOutput.ChangeTo(new FilterItem(r));
+        } else {
+            FilterOutput.ChangeTo(new FilterItem(FilterOutput.Database, FilterType.AlwaysFalse, string.Empty));
+        }
+    }
+
     public void InitFormula(ConnectedFormula.ConnectedFormula? cf, Database? database) {
         if (IsDisposed) { return; }
 
@@ -203,7 +219,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
         SuspendLayout();
 
-        FilterOutput.Clear();
+        this.Invalidate_FilterOutput();
         this.Invalidate_Rows();
 
         if (oldf != cf) {
@@ -242,7 +258,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
-    public void Rows_Changed() => this.Invalidate_Rows();
+    public void Rows_Changed() { }
 
     public void Rows_Changing() { }
 
@@ -288,13 +304,9 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     protected override void DrawControl(Graphics gr, States state) {
         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
-        if (RowsInput == null) { this.DoRows(null, false); }
+        GenerateView();
 
-        if (this.RowSingleOrNull() is RowItem r) {
-            FilterOutput.ChangeTo(new FilterItem(r));
-        } else {
-            FilterOutput.ChangeTo(new FilterItem(null as Database, FilterType.AlwaysFalse, string.Empty));
-        }
+        HandleRowsNow();
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {

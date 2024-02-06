@@ -32,7 +32,7 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad;
 
-public class TextPadItem : RectanglePadItem, ICanHaveVariablesItemLevel {
+public class TextPadItem : RectanglePadItem, ICanHaveVariables {
 
     #region Fields
 

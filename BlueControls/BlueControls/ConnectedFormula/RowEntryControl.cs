@@ -30,7 +30,10 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
 
     #region Constructors
 
-    public RowEntryControl(Database? database) : base() => FilterOutput.Database = database;
+    public RowEntryControl(Database? database) : base() {
+        this.DoOutputSettings(database, Name);
+        ((IControlSendFilter)this).RegisterEvents();
+    }
 
     #endregion
 
@@ -38,14 +41,9 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
 
     public List<IControlAcceptFilter> Childs { get; } = [];
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection? FilterInput { get; set; }
-
-    public FilterCollection FilterOutput { get; } = new("FilterIput 3");
+    public FilterCollection FilterOutput { get; } = new("FilterOutput 06");
     public List<IControlSendFilter> Parents { get; } = [];
+    public bool RowChangedHandled { get; set; } = false;
     public bool RowManualSeted { get; set; } = false;
     public List<RowItem>? RowsInput { get; set; }
 
@@ -59,13 +57,18 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void Rows_Changed() {
+    public void HandleRowsNow() {
+        RowChangedHandled = true;
+        this.DoRows(FilterOutput.Database, true);
+
         if (this.RowSingleOrNull() is RowItem r) {
             FilterOutput.ChangeTo(new FilterItem(r));
         } else {
-            FilterOutput.ChangeTo(new FilterItem(null as Database, FilterType.AlwaysFalse, string.Empty));
+            FilterOutput.ChangeTo(new FilterItem(FilterOutput.Database, FilterType.AlwaysFalse, string.Empty));
         }
     }
+
+    public void Rows_Changed() => HandleRowsNow();
 
     public void Rows_Changing() { }
 

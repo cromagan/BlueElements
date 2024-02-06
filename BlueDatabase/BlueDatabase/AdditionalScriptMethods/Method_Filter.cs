@@ -60,7 +60,11 @@ public class Method_Filter : Method_Database {
             if (z > ab) {
                 if (fi.FilterItem.Database != allFi[0].Database) { return null; }// new DoItFeedback(infos.LogData, s, "Filter über verschiedene Datenbanken wird nicht unterstützt."); }
             }
-            allFi.Add(fi.FilterItem);
+
+            if (fi.FilterItem.Clone() is FilterItem fin) {
+                // Müssen Clone sein. Die  Routine kann mehrfach ausgelöst werden und dann gehört der Filter bereits einer Collection an
+                allFi.Add(fin);
+            }
         }
 
         if (allFi.Count < 1) { return null; }

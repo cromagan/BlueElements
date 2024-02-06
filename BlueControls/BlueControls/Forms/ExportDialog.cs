@@ -132,7 +132,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
         ItemCollectionPad.ItemCollectionPad tmp = new(layoutFileName);
         tmp.ResetVariables();
-        var scx = tmp.ParseVariable(rowsForExport[0]);
+        var scx = tmp.ReplaceVariables(rowsForExport[0]);
         if (!scx.AllOk) { return -1; }
 
         var oneItem = tmp.MaxBounds(string.Empty);
@@ -151,7 +151,7 @@ public sealed partial class ExportDialog : IHasDatabase {
 
                 if (it.PadInternal.Item is ItemCollectionPad.ItemCollectionPad icp) {
                     icp.ResetVariables();
-                    icp.ParseVariable(rowsForExport[startNr]);
+                    icp.ReplaceVariables(rowsForExport[startNr]);
                 }
 
                 pad.Item.Add(it);
@@ -253,7 +253,7 @@ public sealed partial class ExportDialog : IHasDatabase {
             padVorschau.ShowInPrintMode = true;
             padVorschau.Item = new ItemCollectionPad.ItemCollectionPad(cbxLayoutWahl.Text);
             padVorschau.Item.ResetVariables();
-            padVorschau.Item.ParseVariable(_rowsForExport[0]);
+            padVorschau.Item.ReplaceVariables(_rowsForExport[0]);
             padVorschau.ZoomFit();
         } else {
             padVorschau.Item.Clear();
