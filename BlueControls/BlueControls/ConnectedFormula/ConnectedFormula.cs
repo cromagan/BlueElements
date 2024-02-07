@@ -107,8 +107,8 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
         if (_padData != null) {
             //_padData.SheetSizeInMm = new SizeF(PixelToMm(500, ItemCollectionPad.Dpi), PixelToMm(850, ItemCollectionPad.Dpi));
-            _padData.GridShow = PixelToMm(IAutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
-            _padData.GridSnap = PixelToMm(IAutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
+            _padData.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
+            _padData.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPad.ItemCollectionPad.Dpi);
         }
         Repair();
         _saved = true;
@@ -289,7 +289,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
             if (thisIt.AutoSizeableHeight) {
                 if (!thisIt.CanChangeHeightTo(nh)) {
-                    nh = IAutosizableExtension.MinHeigthCapAndBox;
+                    nh = AutosizableExtension.MinHeigthCapAndBox;
                 }
             } else {
                 nh = thisIt.UsedArea.Height;
@@ -967,7 +967,7 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         _databaseFiles.Clear();
 
         //foreach (var thisit in PadData) {
-        //    if (thisit is IItemSendSomething rwf) {
+        //    if (thisit is IItemSendFilter rwf) {
         //        if (rwf.DatabaseOutput != null) {
         //            _ = _databaseFiles.AddIfNotExists(rwf.DatabaseOutput.ConnectionData.UniqueID);
         //            _id = Math.Max(_id, rwf.InputColorId);

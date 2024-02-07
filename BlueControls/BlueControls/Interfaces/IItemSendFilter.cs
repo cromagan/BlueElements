@@ -29,7 +29,7 @@ using static BlueDatabase.Database;
 
 namespace BlueControls.Interfaces;
 
-public interface IItemSendSomething : IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion, IHasKeyName, IItemToControl {
+public interface IItemSendFilter : IChangedFeedback, IReadableTextWithChangingAndKey, IHasVersion, IHasKeyName, IItemToControl {
 
     #region Properties
 
@@ -59,7 +59,7 @@ public static class ItemSendSomethingExtension {
 
     #region Methods
 
-    public static void Datenbank_wählen(this IItemSendSomething item) {
+    public static void Datenbank_wählen(this IItemSendFilter item) {
         var db = CommonDialogs.ChooseKnownDatabase("Ausgangs-Datenbank wählen: ", string.Empty);
         if (db == null) { return; }
         if (db == item.DatabaseOutput) { return; }
@@ -71,12 +71,12 @@ public static class ItemSendSomethingExtension {
         }
     }
 
-    public static void Datenbankkopf(this IItemSendSomething item) {
+    public static void Datenbankkopf(this IItemSendFilter item) {
         if (item.DatabaseOutput is not Database db || db.IsDisposed) { return; }
         TableView.OpenDatabaseHeadEditor(db);
     }
 
-    public static void DoChilds(this IItemSendSomething item) {
+    public static void DoChilds(this IItemSendFilter item) {
         //if (_childIds == null) { return; }
 
         if (item.Parent == null) { return; }
@@ -108,7 +108,7 @@ public sealed class ItemSendSomething {
 
     #region Methods
 
-    public void AddChild(IItemSendSomething item, IHasKeyName add) {
+    public void AddChild(IItemSendFilter item, IHasKeyName add) {
         var l = new List<string>();
         l.AddRange(item.ChildIds);
         l.Add(add.KeyName);
@@ -119,7 +119,7 @@ public sealed class ItemSendSomething {
 
     public ReadOnlyCollection<string> ChildIdsGet() => new(_childIds);
 
-    public void ChildIdsSet(ReadOnlyCollection<string> value, IItemSendSomething item) {
+    public void ChildIdsSet(ReadOnlyCollection<string> value, IItemSendFilter item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (!_childIds.IsDifferentTo(value)) { return; }
 
@@ -132,7 +132,7 @@ public sealed class ItemSendSomething {
 
     public Database? DatabaseOutputGet() => _databaseOutput;
 
-    public void DatabaseOutputSet(Database? value, IItemSendSomething item) {
+    public void DatabaseOutputSet(Database? value, IItemSendFilter item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (value == _databaseOutput) { return; }
 
@@ -143,7 +143,7 @@ public sealed class ItemSendSomething {
         item.UpdateSideOptionMenu();
     }
 
-    public void DoCreativePadAddedToCollection(IItemSendSomething item) {
+    public void DoCreativePadAddedToCollection(IItemSendFilter item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (item.Parent != null) {
             item.OutputColorId = -1;
@@ -153,7 +153,7 @@ public sealed class ItemSendSomething {
         item.OnChanged();
     }
 
-    public List<GenericControl> GetStyleOptions(IItemSendSomething item, int widthOfControl) {
+    public List<GenericControl> GetStyleOptions(IItemSendFilter item, int widthOfControl) {
         var l = new List<GenericControl> {
             new FlexiControl("Ausgang:", widthOfControl)
         };
@@ -172,7 +172,7 @@ public sealed class ItemSendSomething {
 
     public int OutputColorIdGet() => _outputColorId;
 
-    public void OutputColorIdSet(int value, IItemSendSomething item) {
+    public void OutputColorIdSet(int value, IItemSendFilter item) {
         if (item is IDisposableExtended ds && ds.IsDisposed) { return; }
         if (_outputColorId == value) { return; }
 
@@ -190,7 +190,7 @@ public sealed class ItemSendSomething {
         return result;
     }
 
-    public void ParseFinished(IItemSendSomething item) { }
+    public void ParseFinished(IItemSendFilter item) { }
 
     public bool ParseThis(string tag, string value) {
         switch (tag) {
@@ -218,7 +218,7 @@ public sealed class ItemSendSomething {
         return false;
     }
 
-    public void RemoveChild(IItemAcceptFilter remove, IItemSendSomething item) {
+    public void RemoveChild(IItemAcceptFilter remove, IItemSendFilter item) {
         var l = new List<string>();
         l.AddRange(_childIds);
         _ = l.Remove(remove.KeyName);
@@ -227,7 +227,7 @@ public sealed class ItemSendSomething {
         remove.CalculateInputColorIds();
     }
 
-    internal string ErrorReason(IItemSendSomething item) {
+    internal string ErrorReason(IItemSendFilter item) {
         var d = item.DatabaseOutput;
         if (d == null || d.IsDisposed) {
             return "Ausgehende Datenbank nicht angegeben.";

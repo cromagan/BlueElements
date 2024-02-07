@@ -50,7 +50,7 @@ public interface IInputFormat {
     //public enTranslationType Translate { get; set; }
 }
 
-public static class IInputFormatExtensions {
+public static class InputFormatExtensions {
 
     #region Methods
 

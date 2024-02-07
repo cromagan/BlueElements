@@ -22,7 +22,6 @@ using System.ComponentModel;
 using BlueControls.Interfaces;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 
 namespace BlueControls.Controls;
 

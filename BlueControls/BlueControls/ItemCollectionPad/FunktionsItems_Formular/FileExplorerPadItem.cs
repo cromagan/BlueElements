@@ -39,7 +39,7 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
 
     #region Fields
 
-    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemAcceptFilter _itemAccepts;
     private bool _bei_Bedarf_Erzeugen;
     private bool _leere_Ordner_Löschen;
     private string _pfad = string.Empty;

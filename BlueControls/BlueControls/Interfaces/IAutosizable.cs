@@ -39,7 +39,7 @@ public interface IAutosizable {
     #endregion
 }
 
-public static class IAutosizableExtension {
+public static class AutosizableExtension {
 
     #region Fields
 

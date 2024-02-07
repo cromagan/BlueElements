@@ -18,12 +18,10 @@
 #nullable enable
 
 using System.Collections.Generic;
-using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueDatabase;
-using BlueDatabase.EventArgs;
 
 namespace BlueControls.Interfaces;
 
@@ -49,7 +47,7 @@ public interface IControlUsesRow : IDisposableExtendedWithEvent, IControlAcceptF
     #endregion
 }
 
-public static class IControlUsesRowExtension {
+public static class ControlUsesRowExtension {
     //public static Database? Database(this IControlUsesRow icur) {
     //    if (icur.IsDisposed) { return null; }
 

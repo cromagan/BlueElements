@@ -167,8 +167,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         if (Parent == null) { return; }
 
         var x = UsedArea;
-        x.Width = (Parent.SheetSizeInPix.Width - (IAutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
-        x.X = (x.Width * (aufXPosition - 1)) + (IAutosizableExtension.GridSize * (aufXPosition - 1));
+        x.Width = (Parent.SheetSizeInPix.Width - (AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1))) / anzahlSpaltenImFormular;
+        x.X = (x.Width * (aufXPosition - 1)) + (AutosizableExtension.GridSize * (aufXPosition - 1));
         SetCoordinates(x, true);
     }
 

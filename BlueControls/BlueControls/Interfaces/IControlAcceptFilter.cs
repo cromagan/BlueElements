@@ -148,7 +148,7 @@ public static class ControlAcceptFilterExtension {
     }
 
     /// <summary>
-    /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom IItemAcceptSomething übernommen.
+    /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom IItemAcceptFilter übernommen.
     /// </summary>
     /// <param name="dest"></param>
     /// <param name="parent"></param>

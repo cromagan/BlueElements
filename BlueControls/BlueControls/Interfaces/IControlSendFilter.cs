@@ -47,7 +47,7 @@ public interface IControlSendFilter : IDisposableExtendedWithEvent {
     #endregion
 }
 
-public static class IControlSendSomethingExtension {
+public static class ControlSendSomethingExtension {
 
     #region Methods
 
@@ -73,7 +73,7 @@ public static class IControlSendSomethingExtension {
         dest.FilterOutput.Database = db;
     }
 
-    public static void DoOutputSettings(this IControlSendFilter dest, IItemSendSomething source) => dest.DoOutputSettings(source.DatabaseOutput, source.DefaultItemToControlName());
+    public static void DoOutputSettings(this IControlSendFilter dest, IItemSendFilter source) => dest.DoOutputSettings(source.DatabaseOutput, source.DefaultItemToControlName());
 
     public static void FilterOutput_Changed(this IControlSendFilter icsf) {
         foreach (var thisChild in icsf.Childs) {

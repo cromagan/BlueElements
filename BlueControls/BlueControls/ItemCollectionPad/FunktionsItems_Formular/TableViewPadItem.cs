@@ -38,11 +38,11 @@ namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 /// Per Tabellenansicht
 /// </summary>
 
-public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendSomething, IAutosizable {
+public class TableViewPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter, IAutosizable {
 
     #region Fields
 
-    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendSomething _itemSends;
     private string _defaultArrangement = string.Empty;
     private Filterausgabe _filterOutputType = Filterausgabe.Gewähle_Zeile;

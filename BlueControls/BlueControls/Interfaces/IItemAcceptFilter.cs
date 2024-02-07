@@ -80,7 +80,7 @@ public interface IItemAcceptFilter : IHasKeyName, IChangedFeedback, IHasVersion,
     #endregion
 }
 
-public static class ItemAcceptSomethingExtensions {
+public static class ItemAcceptFilterExtensions {
 
     #region Methods
 
@@ -88,7 +88,7 @@ public static class ItemAcceptSomethingExtensions {
         var l = new List<int>();
 
         foreach (var thisId in item.Parents) {
-            if (item?.Parent?[thisId] is IItemSendSomething i) {
+            if (item?.Parent?[thisId] is IItemSendFilter i) {
                 l.Add(i.OutputColorId);
             }
         }
@@ -103,7 +103,7 @@ public static class ItemAcceptSomethingExtensions {
         if (item.Parent is null) { return; }
 
         Database? outd = null;
-        if (item is IItemSendSomething iiss) {
+        if (item is IItemSendFilter iiss) {
             outd = iiss.DatabaseOutput;
         }
 
@@ -112,7 +112,7 @@ public static class ItemAcceptSomethingExtensions {
         }
 
         //if (sameDatabase && item.GetFilterFrom.Count > 0) {
-        //    if (item.Parent[item.GetFilterFrom[0]] is IItemSendSomething ir) {
+        //    if (item.Parent[item.GetFilterFrom[0]] is IItemSendFilter ir) {
         //        matchDB = ir.DatabaseOutput;
         //    }
         //}
@@ -121,7 +121,7 @@ public static class ItemAcceptSomethingExtensions {
 
         // Die Items, die man noch wählen könnte
         foreach (var thisR in item.Parent) {
-            if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendSomething rfp) {
+            if (thisR.IsVisibleOnPage(item.Page) && thisR is IItemSendFilter rfp) {
                 if (!item.Parents.Contains(rfp.KeyName) && item != rfp) {
                     if (outd == null || outd == rfp.DatabaseOutput) {
                         _ = x.Add("Hinzu: " + rfp.ReadableText(), "+|" + rfp.KeyName, rfp.SymbolForReadableText(), true, "1");
@@ -162,7 +162,7 @@ public static class ItemAcceptSomethingExtensions {
         if (ak[0] == "+") {
             var t = item.Parent[ak[1]];
 
-            if (t is IItemSendSomething rfp2) {
+            if (t is IItemSendFilter rfp2) {
                 var l = new List<string>();
                 l.AddRange(item.Parents);
                 l.Add(rfp2.KeyName);
@@ -183,8 +183,8 @@ public static class ItemAcceptSomethingExtensions {
     #endregion
 }
 
-public sealed class ItemAcceptSomething {
-    //public void InputColorIdSet(IItemAcceptSomething item, List<int> value) {
+public sealed class ItemAcceptFilter {
+    //public void InputColorIdSet(IItemAcceptFilter item, List<int> value) {
     //    if (!_inputColorId.IsDifferentTo(value)) { return; }
 
     //    _inputColorId = value;
@@ -195,7 +195,7 @@ public sealed class ItemAcceptSomething {
 
     private readonly List<string> _getFilterFromKeys = [];
 
-    private ReadOnlyCollection<IItemSendSomething>? _getFilterFrom;
+    private ReadOnlyCollection<IItemSendFilter>? _getFilterFrom;
 
     private List<int> _inputColorId = [];
 
@@ -215,7 +215,7 @@ public sealed class ItemAcceptSomething {
 
     public Database? DatabaseInput(IItemAcceptFilter item) {
         if (item.DatabaseInputMustMatchOutputDatabase) {
-            if (item is IItemSendSomething iiss) { return iiss.DatabaseOutput; }
+            if (item is IItemSendFilter iiss) { return iiss.DatabaseOutput; }
             return null;
         }
 
@@ -240,17 +240,17 @@ public sealed class ItemAcceptSomething {
         //}
         string.Empty;
 
-    public ReadOnlyCollection<IItemSendSomething> GetFilterFromGet(IItemAcceptFilter item) {
+    public ReadOnlyCollection<IItemSendFilter> GetFilterFromGet(IItemAcceptFilter item) {
         if (item.Parent == null) {
             Develop.DebugPrint(FehlerArt.Warnung, "Parent nicht initialisiert!");
-            return new ReadOnlyCollection<IItemSendSomething>(new List<IItemSendSomething>());
+            return new ReadOnlyCollection<IItemSendFilter>(new List<IItemSendFilter>());
         }
 
         if (_getFilterFrom == null || _getFilterFrom.Count != _getFilterFromKeys.Count) {
-            var l = new List<IItemSendSomething>();
+            var l = new List<IItemSendFilter>();
 
             foreach (var thisk in _getFilterFromKeys) {
-                if (item.Parent[thisk] is IItemSendSomething isf) {
+                if (item.Parent[thisk] is IItemSendFilter isf) {
                     l.Add(isf);
                 }
             }
@@ -334,7 +334,7 @@ public sealed class ItemAcceptSomething {
 
         Database? outp = null;
 
-        if (item is IItemSendSomething iiss) {
+        if (item is IItemSendFilter iiss) {
             outp = iiss.DatabaseOutput;
         }
 

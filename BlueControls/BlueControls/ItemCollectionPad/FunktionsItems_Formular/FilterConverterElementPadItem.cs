@@ -35,11 +35,11 @@ using static BlueBasics.Converter;
 
 namespace BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 
-public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendSomething {
+public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, IItemToControl, IItemAcceptFilter, IItemSendFilter {
 
     #region Fields
 
-    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemAcceptFilter _itemAccepts;
     private readonly ItemSendSomething _itemSends;
     private string _eingangsWertSpalte = string.Empty;
     private string _filterSpalte = string.Empty;

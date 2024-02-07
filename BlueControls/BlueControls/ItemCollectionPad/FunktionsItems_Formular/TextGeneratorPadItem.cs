@@ -41,7 +41,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
     #region Fields
 
-    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemAcceptFilter _itemAccepts;
 
     private string _auswahl1;
 

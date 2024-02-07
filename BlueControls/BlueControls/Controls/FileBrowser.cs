@@ -36,7 +36,6 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueDatabase;
-using BlueDatabase.EventArgs;
 using BlueScript.Variables;
 using Microsoft.Win32;
 using static BlueBasics.Generic;

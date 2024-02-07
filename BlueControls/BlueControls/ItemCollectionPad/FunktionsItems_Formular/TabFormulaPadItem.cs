@@ -52,7 +52,7 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
     #region Fields
 
     private readonly List<string> _childs = [];
-    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemAcceptFilter _itemAccepts;
 
     #endregion
 

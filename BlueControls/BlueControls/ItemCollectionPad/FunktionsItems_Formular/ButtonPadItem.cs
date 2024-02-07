@@ -45,7 +45,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
     #region Fields
 
-    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemAcceptFilter _itemAccepts;
     private string _action = string.Empty;
     private string _anzeige = string.Empty;
     private string _arg1 = string.Empty;

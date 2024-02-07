@@ -37,7 +37,7 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
 
     #region Fields
 
-    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemAcceptFilter _itemAccepts;
     private string _bild_Dateiname = string.Empty;
 
     #endregion

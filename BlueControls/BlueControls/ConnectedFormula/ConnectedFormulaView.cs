@@ -30,7 +30,6 @@ using BlueControls.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
 using BlueDatabase.Enums;
-using BlueDatabase.EventArgs;
 using static BlueControls.ConnectedFormula.ConnectedFormula;
 
 #nullable enable

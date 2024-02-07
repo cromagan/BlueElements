@@ -129,19 +129,19 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         Pad.AddCentered(x);
 
-        //if (l is IItemSendSomething isr && x is IItemAcceptSomething iar) {
+        //if (l is IItemSendFilter isr && x is IItemAcceptFilter iar) {
         //    iar.GetRowFrom = isr;
         //}
 
-        if (l is IItemSendSomething && x is IItemAcceptFilter iaf) {
+        if (l is IItemSendFilter && x is IItemAcceptFilter iaf) {
             iaf.Parents = new List<string> { l.KeyName }.AsReadOnly();
         }
 
-        //if (x is IItemSendSomething isr2) {
+        //if (x is IItemSendFilter isr2) {
         //    isr2.Datenbank_wählen();
         //}
 
-        //if (x is IItemSendSomething isf2) {
+        //if (x is IItemSendFilter isf2) {
         //    isf2.Datenbank_wählen();
         //}
 
@@ -153,13 +153,13 @@ public partial class ConnectedFormulaEditor : PadEditor {
     private void btnArbeitsbereich_Click(object sender, System.EventArgs e) {
         if (CFormula?.PadData == null) { return; }
 
-        var oldw = CFormula.PadData.SheetSizeInPix.Width / IAutosizableExtension.GridSize;
+        var oldw = CFormula.PadData.SheetSizeInPix.Width / AutosizableExtension.GridSize;
 
         var wi = InputBox.Show("Breite in Kästchen:", oldw.ToString(Constants.Format_Float1), FormatHolder.IntegerPositive);
 
         if (string.IsNullOrEmpty(wi)) { return; }
 
-        var oldh = CFormula.PadData.SheetSizeInPix.Height / IAutosizableExtension.GridSize;
+        var oldh = CFormula.PadData.SheetSizeInPix.Height / AutosizableExtension.GridSize;
 
         var he = InputBox.Show("Höhe in Kästchen:", oldh.ToString(Constants.Format_Float1), FormatHolder.IntegerPositive);
 
@@ -169,7 +169,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         if (op == 2) { return; }
 
-        CFormula.Resize(FloatParse(wi) * IAutosizableExtension.GridSize, FloatParse(he) * IAutosizableExtension.GridSize, op == 0);
+        CFormula.Resize(FloatParse(wi) * AutosizableExtension.GridSize, FloatParse(he) * AutosizableExtension.GridSize, op == 0);
     }
 
     private void btnBenutzerFilterWahl_Click(object sender, System.EventArgs e) {
@@ -357,7 +357,7 @@ public partial class ConnectedFormulaEditor : PadEditor {
             }
         }
 
-        if (from is IItemSendSomething) {
+        if (from is IItemSendFilter) {
             txt = txt + "<br> - Das Element kann Filter an andere Elemente <u>weitergeben</u>.";
         }
 

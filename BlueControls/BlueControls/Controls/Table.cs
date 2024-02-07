@@ -164,6 +164,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     public event EventHandler<CellEventArgs>? ButtonCellClicked;
 
+    public event EventHandler<CellChangedEventArgs>? CellValueChanged;
+
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     public event EventHandler<ContextMenuItemClickedEventArgs>? ContextMenuItemClicked;
@@ -177,6 +179,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     public event EventHandler<ButtonCellEventArgs>? NeedButtonArgs;
 
     public event EventHandler? PinnedChanged;
+
+    public event EventHandler<RowChangedEventArgs>? RowAdded;
 
     public event EventHandler<CellExtEventArgs>? SelectedCellChanged;
 
@@ -780,6 +784,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db1.ViewChanged -= _Database_ViewChanged;
             db1.Column.ColumnInternalChanged -= _Database_ColumnContentChanged;
             db1.SortParameterChanged -= _Database_SortParameterChanged;
+            db1.Row.RowAdded -= Row_RowAdded;
             db1.Row.RowRemoving -= Row_RowRemoving;
             db1.Row.RowGotData -= _Database_Row_RowGotData;
             db1.Column.ColumnRemoving -= Column_ItemRemoving;
@@ -807,6 +812,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             db2.ViewChanged += _Database_ViewChanged;
             db2.Column.ColumnInternalChanged += _Database_ColumnContentChanged;
             db2.SortParameterChanged += _Database_SortParameterChanged;
+            db2.Row.RowAdded += Row_RowAdded;
             db2.Row.RowRemoving += Row_RowRemoving;
             db2.Row.RowGotData += _Database_Row_RowGotData;
             db2.Column.ColumnAdded += _Database_ViewChanged;
@@ -2091,11 +2097,16 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         Invalidate_DrawWidth(e.Column);
         Invalidate();
+        OnCellValueChanged(e);
     }
 
-    private void _Database_ColumnContentChanged(object sender, ColumnEventArgs e) => Invalidate_AllColumnArrangements();
+    private void _Database_ColumnContentChanged(object sender, ColumnEventArgs e) {
+        if (IsDisposed) { return; }
+        Invalidate_AllColumnArrangements();
+    }
 
     private void _Database_DatabaseLoaded(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
         // Wird auch bei einem Reload ausgeführt.
         // Es kann aber sein, dass eine Ansicht zurückgeholt wurde, und die Werte stimmen.
         // Deswegen prüfen, ob wirklich alles gelöscht werden muss, oder weiter behalten werden kann.
@@ -2118,6 +2129,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //    _StoredView = ColumnCollection.ChangeKeysInString(_StoredView, e.KeyOld, e.KeyNew);
     //}
     private void _Database_ProgressbarInfo(object sender, ProgressbarEventArgs e) {
+        if (IsDisposed) { return; }
         if (e.Ends) {
             _pg?.Close();
             return;
@@ -2129,7 +2141,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         _pg?.Update(e.Current);
     }
 
-    private void _Database_Row_RowGotData(object sender, RowEventArgs e) => Invalidate_SortedRowData();
+    private void _Database_Row_RowGotData(object sender, RowEventArgs e) {
+        if (IsDisposed) { return; }
+        Invalidate_SortedRowData();
+    }
 
     private void _Database_SortParameterChanged(object sender, System.EventArgs e) => Invalidate_SortedRowData();
 
@@ -2138,6 +2153,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             _storedView = ViewToString();
 
     private void _Database_ViewChanged(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
         InitializeSkin(); // Sicher ist sicher, um die neuen Schrift-Größen zu haben.
         Invalidate_AllColumnArrangements();
         CursorPos_Set(CursorPosColumn, CursorPosRow, true);
@@ -2593,12 +2609,14 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         CursorPos_Set(newCol, newRow, richtung != Direction.Nichts);
     }
 
-    private void Database_InvalidateView(object sender, System.EventArgs e) => Invalidate();
-
-    //private void Database_IsTableVisibleForUser(object sender, VisibleEventArgs e) => e.IsVisible = true;
+    private void Database_InvalidateView(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        Invalidate();
+    }
 
     private Rectangle DisplayRectangleWithoutSlider() => new(DisplayRectangle.Left, DisplayRectangle.Left, DisplayRectangle.Width - SliderY.Width, DisplayRectangle.Height - SliderX.Height);
 
+    //private void Database_IsTableVisibleForUser(object sender, VisibleEventArgs e) => e.IsVisible = true;
     private void Draw_Border(Graphics gr, ColumnViewItem column, Rectangle displayRectangleWoSlider, bool onlyhead, ColumnViewCollection ca) {
         var yPos = displayRectangleWoSlider.Height;
         if (onlyhead) { yPos = ca.HeadSize(_columnFont); }
@@ -3111,20 +3129,28 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private void OnButtonCellClicked(CellEventArgs e) => ButtonCellClicked?.Invoke(this, e);
 
-    //private void OnCellValueChanged(CellChangedEventArgs e) => CellValueChanged?.Invoke(this, e);
+    private void OnCellValueChanged(CellChangedEventArgs e) {
+        if (IsDisposed) { return; }
+        CellValueChanged?.Invoke(this, e);
+    }
 
     private void OnDatabaseChanged() => DatabaseChanged?.Invoke(this, System.EventArgs.Empty);
 
+    //private void OnCellValueChanged(CellChangedEventArgs e) => CellValueChanged?.Invoke(this, e);
     private void OnFilterChanged() => FilterChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnNeedButtonArgs(ButtonCellEventArgs e) => NeedButtonArgs?.Invoke(this, e);
 
     private void OnPinnedChanged() => PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    //private void OnRowAdded(object sender, RowChangedEventArgs e) => RowAdded?.Invoke(sender, e);
+    private void OnRowAdded(RowChangedEventArgs e) {
+        if (IsDisposed) { return; }
+        RowAdded?.Invoke(this, e);
+    }
 
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
 
+    //private void OnRowAdded(object sender, RowChangedEventArgs e) => RowAdded?.Invoke(sender, e);
     private void OnSelectedRowChanged(RowEventArgs e) => SelectedRowChanged?.Invoke(this, e);
 
     private void OnViewChanged() {
@@ -3133,11 +3159,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     }
 
     private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
-
-    /// <summary>
-    /// Reset - Parse - CheckView
-    /// </summary>
-    /// <param name="toParse"></param>
 
     private void ParseView(string toParse) {
         ResetView();
@@ -3209,6 +3230,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         CheckView();
     }
 
+    /// <summary>
+    /// Reset - Parse - CheckView
+    /// </summary>
+    /// <param name="toParse"></param>
     private int Row_DrawHeight(ColumnViewCollection ca, RowItem row, Rectangle displayRectangleWoSlider) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return _pix18; }
 
@@ -3225,7 +3250,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         return tmp;
     }
 
+    private void Row_RowAdded(object sender, RowChangedEventArgs e) {
+        if (IsDisposed) { return; }
+        OnRowAdded(e);
+    }
+
     private void Row_RowRemoving(object sender, RowEventArgs e) {
+        if (IsDisposed) { return; }
         if (e.Row == CursorPosRow?.Row) { CursorPos_Reset(); }
         if (e.Row == _mouseOverRow?.Row) { _mouseOverRow = null; }
         if (PinnedRows.Contains(e.Row)) {

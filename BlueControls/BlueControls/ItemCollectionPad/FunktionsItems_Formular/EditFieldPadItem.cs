@@ -45,7 +45,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     #region Fields
 
-    private readonly ItemAcceptSomething _itemAccepts;
+    private readonly ItemAcceptFilter _itemAccepts;
     private bool _autoX = true;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
     private ColumnItem? _column;
@@ -68,14 +68,14 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public bool AutoSizeableHeight {
         get {
             if (_bearbeitung == EditTypeFormula.nur_als_Text_anzeigen) {
-                return (int)UsedArea.Height > IAutosizableExtension.MinHeigthCaption;
+                return (int)UsedArea.Height > AutosizableExtension.MinHeigthCaption;
             }
 
             if (_überschriftanordung is CaptionPosition.Links_neben_dem_Feld or CaptionPosition.ohne) {
-                return (int)UsedArea.Height > IAutosizableExtension.MinHeigthTextBox;
+                return (int)UsedArea.Height > AutosizableExtension.MinHeigthTextBox;
             }
 
-            return (int)UsedArea.Height > IAutosizableExtension.MinHeigthCapAndBox;
+            return (int)UsedArea.Height > AutosizableExtension.MinHeigthCapAndBox;
         }
     }
 

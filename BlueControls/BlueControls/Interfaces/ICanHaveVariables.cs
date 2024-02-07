@@ -17,7 +17,6 @@
 
 #nullable enable
 
-using BlueScript;
 using BlueScript.Variables;
 
 namespace BlueControls.Interfaces;
