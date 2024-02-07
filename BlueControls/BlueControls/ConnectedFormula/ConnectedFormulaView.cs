@@ -83,6 +83,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     public FilterCollection FilterInput { get; } = new("FilterInput 03");
 
     public bool FilterInputChangedHandled { get; set; } = false;
+
     public FilterCollection FilterOutput { get; } = new("FilterOutput 03");
 
     public string Page { get; }
@@ -209,11 +210,16 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         ConnectedFormula = null;
     }
 
-    public void HandleRowsInputNow() {
-        if (RowsInputChangedHandled) { return; }
-        RowsInputChangedHandled = true;
+    public void HandleChangesNow() {
         if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
+        if (!FilterInputChangedHandled) {
+            FilterInputChangedHandled = true;
+            this.DoInputFilter(FilterOutput.Database, false);
+        }
+
+        RowsInputChangedHandled = true;
         this.DoRows(FilterOutput.Database, false);
 
         if (this.RowSingleOrNull() is RowItem r) {
@@ -271,6 +277,8 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
+    public void ParentFilterOutput_Changed() { }
+
     public void RowsInput_Changed() { }
 
     public Control? SearchOrGenerate(IItemToControl? thisit) {
@@ -313,7 +321,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
         GenerateView();
 
-        HandleRowsInputNow();
+        HandleChangesNow();
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {

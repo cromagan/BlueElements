@@ -70,6 +70,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
     public FilterCollection FilterInput { get; } = new("FilterInput 04");
 
     public bool FilterInputChangedHandled { get; set; } = false;
+
     public FilterCollection FilterOutput { get; } = new("FilterOutput 04");
 
     public List<IControlSendFilter> Parents { get; } = [];
@@ -96,10 +97,16 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void HandleRowsInputNow() {
-        if (RowsInputChangedHandled) { return; }
-        RowsInputChangedHandled = true;
+    public void HandleChangesNow() {
         if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
+
+        if (!FilterInputChangedHandled) {
+            FilterInputChangedHandled = true;
+            this.DoInputFilter(FilterOutput.Database, false);
+        }
+
+        RowsInputChangedHandled = true;
 
         if (!Allinitialized) { _ = CreateSubControls(); }
 
@@ -173,6 +180,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         #endregion
     }
 
+    public void ParentFilterOutput_Changed() { }
+
     public void RowsInput_Changed() { }
 
     protected override void Dispose(bool disposing) {
@@ -186,7 +195,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        HandleRowsInputNow();
+        HandleChangesNow();
         base.DrawControl(gr, state);
     }
 

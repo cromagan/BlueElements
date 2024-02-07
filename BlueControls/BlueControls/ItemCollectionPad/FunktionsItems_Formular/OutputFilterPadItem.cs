@@ -198,13 +198,9 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
     public void CalculateInputColorIds() => _itemAccepts.CalculateInputColorIds(this);
 
     public override System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent) {
-        var con = new FlexiControlForFilter(Column) {
+        var con = new FlexiControlForFilter(Column, _überschriftanordung) {
             Standard_bei_keiner_Eingabe = _standard_bei_keiner_Eingabe,
             Filterart_bei_Texteingabe = _filterart_bei_texteingabe,
-            DefaultCaptionPosition = _überschriftanordung
-            //EditType = _bearbeitung,
-            //CaptionPosition = CaptionPosition,
-            //Name = DefaultItemToControlName()
         };
         //return con;
         con.DoOutputSettings(this);

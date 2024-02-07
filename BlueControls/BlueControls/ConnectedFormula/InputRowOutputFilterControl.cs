@@ -27,7 +27,7 @@ using BlueDatabase.Enums;
 
 namespace BlueControls.Controls;
 
-internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IControlSendFilter {
+internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, IControlSendFilter {
 
     #region Fields
 
@@ -48,7 +48,7 @@ internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IContr
         _outputcolumn = outputcolumn;
         _type = type;
         ((IControlSendFilter)this).RegisterEvents();
-        ((IControlUsesFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -97,10 +97,16 @@ internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IContr
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void HandleFilterInputNow() {
-        if (FilterInputChangedHandled) { return; }
-        FilterInputChangedHandled = true;
+    public void HandleChangesNow() {
         if (IsDisposed) { return; }
+        if (FilterInputChangedHandled) { return; }
+
+        if (!FilterInputChangedHandled) {
+            FilterInputChangedHandled = true;
+            this.DoInputFilter(null, false);
+        }
+
+        FilterInputChangedHandled = true;
 
         this.DoInputFilter(null, false);
         Invalidate();
@@ -146,12 +152,12 @@ internal class InputRowOutputFilterControl : Caption, IControlUsesFilter, IContr
         FilterOutput.ChangeTo(f);
     }
 
-    public void ParentFilterOutput_Changed() => HandleFilterInputNow();
+    public void ParentFilterOutput_Changed() => HandleChangesNow();
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
             ((IControlSendFilter)this).DoDispose();
-            ((IControlUsesFilter)this).DoDispose();
+            ((IControlAcceptFilter)this).DoDispose();
         }
         base.Dispose(disposing);
     }

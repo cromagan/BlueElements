@@ -40,10 +40,15 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
     #region Fields
 
     private string _action = string.Empty;
+
     private string _arg1 = string.Empty;
+
     private string _arg2 = string.Empty;
+
     private string _arg3 = string.Empty;
+
     private string _arg4 = string.Empty;
+
     private ButtonArgs _enabledwhenrows;
 
     #endregion
@@ -146,11 +151,16 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) => this.FilterInput_RowsChanged();
 
-    public void HandleRowsInputNow() {
-        if (RowsInputChangedHandled) { return; }
-        RowsInputChangedHandled = true;
+    public void HandleChangesNow() {
         if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
+        if (!FilterInputChangedHandled) {
+            FilterInputChangedHandled = true;
+            this.DoInputFilter(null, false);
+        }
+
+        RowsInputChangedHandled = true;
         this.DoRows(null, false);
 
         bool enabled;
@@ -182,6 +192,8 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         Enabled = enabled;
     }
 
+    public void ParentFilterOutput_Changed() { }
+
     public void RowsInput_Changed() { }
 
     protected override void Dispose(bool disposing) {
@@ -192,7 +204,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        HandleRowsInputNow();
+        HandleChangesNow();
         base.DrawControl(gr, state);
     }
 
@@ -231,7 +243,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         #region FilterVariablen erstellen und in fis speichern
 
         var fis = string.Empty;
-        var filterInput = this.GetInputFilter(null, false);
+        using var filterInput = this.GetInputFilter(null, false);
 
         if (filterInput is FilterCollection fi) {
             for (var fz = 0; fz < fi.Count; fz++) {

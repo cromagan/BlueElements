@@ -44,8 +44,6 @@ public interface IControlUsesRow : IDisposableExtendedWithEvent, IControlAcceptF
 
     #region Methods
 
-    public void HandleRowsInputNow();
-
     public void RowsInput_Changed();
 
     #endregion
@@ -65,7 +63,7 @@ public static class IControlUsesRowExtension {
 
     public static Database? Database(this IControlUsesRow icur) {
         if (icur.RowsInput != null && icur.RowsInput.Count > 0) { return icur.RowsInput[0].Database; }
-        var f = icur.GetInputFilter(null, false);
+        using var f = icur.GetInputFilter(null, false);
         return f?.Database;
     }
 
@@ -78,7 +76,7 @@ public static class IControlUsesRowExtension {
     public static void DoRows(this IControlUsesRow icur, Database? mustbeDatabase, bool doEmptyFilterToo) {
         if (icur.RowsInputManualSeted) { return; }
 
-        var f = icur.GetInputFilter(mustbeDatabase, doEmptyFilterToo);
+        using var f = icur.GetInputFilter(mustbeDatabase, doEmptyFilterToo);
 
         if (f == null) {
             icur.RowsInput = new List<RowItem>();

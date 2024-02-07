@@ -31,7 +31,7 @@ using BlueDatabase;
 
 namespace BlueControls.Controls;
 
-public partial class TextGenerator : GenericControl, IControlUsesFilter {
+public partial class TextGenerator : GenericControl, IControlAcceptFilter {
 
     #region Fields
 
@@ -53,7 +53,7 @@ public partial class TextGenerator : GenericControl, IControlUsesFilter {
 
     public TextGenerator() : base() {
         InitializeComponent();
-        ((IControlUsesFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
     }
 
     #endregion
@@ -125,17 +125,17 @@ public partial class TextGenerator : GenericControl, IControlUsesFilter {
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e) { }
 
-    public void HandleFilterInputNow() {
+    public void HandleChangesNow() {
+        if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
         FilterInputChangedHandled = true;
-        if (IsDisposed) { return; }
 
         this.DoInputFilter(null, false);
         GenerateColumns();// Wegen der Datenbank
         GenerateItemsAndText();
     }
 
-    public void ParentFilterOutput_Changed() => HandleFilterInputNow();
+    public void ParentFilterOutput_Changed() => HandleChangesNow();
 
     /// <summary>
     /// Verwendete Ressourcen bereinigen.
@@ -152,7 +152,7 @@ public partial class TextGenerator : GenericControl, IControlUsesFilter {
     }
 
     protected override void DrawControl(Graphics gr, States vState) {
-        HandleFilterInputNow();
+        HandleChangesNow();
         //if (vState.HasFlag(States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
         //if (vState.HasFlag(States.Standard_MousePressed)) { vState ^= States.Standard_MousePressed; }
 

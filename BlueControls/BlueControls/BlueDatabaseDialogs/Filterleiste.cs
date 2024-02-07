@@ -243,7 +243,7 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
                             _ = flexsToDelete.Remove(flx);
                         } else {
                             // Na gut, eben neuen Flex erstellen
-                            flx = new FlexiControlForFilter(thisColumn);
+                            flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld);
                             flx.DoOutputSettings(thisColumn.Database, flx.Name);
                             flx.ConnectChildParents(this);
                             flx.Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;

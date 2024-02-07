@@ -38,7 +38,9 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
     public FilterCollection FilterInput { get; }
 
     public bool FilterInputChangedHandled { get; set; }
+
     public string Name { get; set; }
+
     public List<IControlSendFilter> Parents { get; }
 
     #endregion
@@ -49,7 +51,16 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
 
     public void FilterInput_RowsChanged(object sender, System.EventArgs e);
 
+    public void HandleChangesNow();
+
     public void Invalidate();
+
+    /// <summary>
+    /// Wird ausgelöst, wenn eine relevante Änderung der eingehenen Filter(Daten) erfolgt ist.
+    /// Hier können die neuen temporären Filter(Daten) (FilterInput) berechnet werden und sollten auch angezeigt werden und ein Invalidate gesetzt werden
+    /// Events können gekoppelt werden
+    /// </summary>
+    public void ParentFilterOutput_Changed();
 
     #endregion
 }
@@ -85,9 +96,7 @@ public static class ControlAcceptFilterExtension {
                 icur3.RowsInput_Changed();
             }
 
-            if (child is IControlUsesFilter icuf3) {
-                icuf3.ParentFilterOutput_Changed();
-            };
+            child.ParentFilterOutput_Changed();
         }
 
         if (doDatabaseAfter) {
@@ -117,6 +126,25 @@ public static class ControlAcceptFilterExtension {
     public static void DoDispose(this IControlAcceptFilter child) {
         child.Invalidate_FilterInput();
         child.DisconnectChildParents(child.Parents);
+    }
+
+    /// <summary>
+    /// Verwirft den aktuellen InputFilter und erstellt einen neuen von allen Parents
+    /// </summary>
+    /// <param name="item"></param>
+    /// <param name="mustbeDatabase"></param>
+    /// <param name="doEmptyFilterToo"></param>
+    public static void DoInputFilter(this IControlAcceptFilter item, Database? mustbeDatabase, bool doEmptyFilterToo) {
+        if (item.IsDisposed) { return; }
+        //if (item.FilterManualSeted) { return; }
+
+        //item.Invalidate_FilterInput();
+
+        using var fc = item.GetInputFilter(mustbeDatabase, doEmptyFilterToo);
+
+        item.FilterInput.ChangeTo(fc);
+
+        //if (item.FilterInput.Database == null) { Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Datenbank Fehler"); }
     }
 
     /// <summary>
@@ -166,7 +194,7 @@ public static class ControlAcceptFilterExtension {
                 return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 1"), "Datenbanken inkonsitent");
             }
 
-            return fc2;
+            return (FilterCollection?)fc2.Clone("GetInputFilterClone 01");
         }
 
         FilterCollection? fc = null;

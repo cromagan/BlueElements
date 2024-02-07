@@ -57,7 +57,7 @@ namespace BlueControls.Controls;
 [DefaultEvent("SelectedRowChanged")]
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlUsesFilter, IControlSendFilter {
+public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITranslateable, IHasDatabase, IControlAcceptFilter, IControlSendFilter {
 
     #region Fields
 
@@ -1064,11 +1064,13 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         hotItem = CellCollection.KeyOfCell(_mouseOverColumn, _mouseOverRow?.Row);
     }
 
-    public void HandleFilterInputNow() {
-        if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
-        if (FilterInputChangedHandled) { return; }
-        FilterInputChangedHandled = true;
+    public void HandleChangesNow() {
         if (IsDisposed) { return; }
+        if (FilterInputChangedHandled) { return; }
+
+        FilterInputChangedHandled = true;
+
+        if (Database is not Database db || db.IsDisposed) { return; }
 
         this.DoInputFilter(FilterOutput.Database, false);
 
@@ -1133,7 +1135,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public void ParentFilterOutput_Changed() => HandleFilterInputNow();
+    public void ParentFilterOutput_Changed() => HandleChangesNow();
 
     public void Pin(List<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
@@ -1365,7 +1367,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 Filter.RowsChanged -= Filter_Changed;
                 DatabaseSet(null, string.Empty); // Wichtig (nicht _Database) um Events zu lösen
                 ((IControlSendFilter)this).DoDispose();
-                ((IControlUsesFilter)this).DoDispose();
+                ((IControlAcceptFilter)this).DoDispose();
                 //components?.Dispose();
             }
         } finally {

@@ -45,6 +45,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     #region Fields
 
     private string _columnName = string.Empty;
+
     private Database? _lastDB = null;
 
     #endregion
@@ -176,10 +177,9 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         hotItem = column;
     }
 
-    public void HandleRowsInputNow() {
-        if (RowsInputChangedHandled) { return; }
-        RowsInputChangedHandled = true;
+    public void HandleChangesNow() {
         if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
         if (this.Database() is Database db && db != _lastDB && !db.IsDisposed) {
             db.Cell.CellValueChanged -= Database_CellValueChanged;
@@ -189,6 +189,12 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
             db.Disposed -= _Database_Disposed;
         }
 
+        if (!FilterInputChangedHandled) {
+            FilterInputChangedHandled = true;
+            this.DoInputFilter(null, false);
+        }
+
+        RowsInputChangedHandled = true;
         this.DoRows(null, false);
 
         if (this.Database() is Database db2 && _lastDB != db2 && !db2.IsDisposed) {
@@ -216,6 +222,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+    public void ParentFilterOutput_Changed() { }
 
     public void RowsInput_Changed() { }
 
@@ -259,7 +267,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     }
 
     protected override void DrawControl(Graphics gr, States state) {
-        HandleRowsInputNow();
+        HandleChangesNow();
 
         base.DrawControl(gr, state);
     }

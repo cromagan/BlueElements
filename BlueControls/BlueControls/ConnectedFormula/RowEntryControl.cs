@@ -49,6 +49,7 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
     public FilterCollection FilterInput { get; } = new("FilterInput 06");
 
     public bool FilterInputChangedHandled { get; set; } = false;
+
     public FilterCollection FilterOutput { get; } = new("FilterOutput 06");
 
     public List<IControlSendFilter> Parents { get; } = [];
@@ -71,8 +72,17 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void HandleRowsInputNow() {
-        RowsInputChangedHandled = true;
+    public void HandleChangesNow() {
+        if (IsDisposed) { return; }
+        if (FilterInputChangedHandled) { return; }
+
+        if (!FilterInputChangedHandled) {
+            FilterInputChangedHandled = true;
+            this.DoInputFilter(FilterOutput.Database, false);
+        }
+
+        FilterInputChangedHandled = true;
+
         this.DoRows(FilterOutput.Database, true);
 
         if (this.RowSingleOrNull() is RowItem r) {
@@ -82,7 +92,9 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
         }
     }
 
-    public void RowsInput_Changed() => HandleRowsInputNow();
+    public void ParentFilterOutput_Changed() { }
+
+    public void RowsInput_Changed() => HandleChangesNow();
 
     protected override void Dispose(bool disposing) {
         if (disposing) {

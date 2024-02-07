@@ -85,24 +85,15 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (_database == value) { return; }
 
-            if (_database != null) {
-                _database.DisposingEvent -= _database_Disposing;
-                _database.Row.RowRemoving -= Row_RowRemoving;
-                _database.Row.RowAdded -= Row_Added;
-                _database.Cell.CellValueChanged -= _Database_CellValueChanged;
-                _database = null;
-            }
-
             OnChanging();
+            UnRegisterDatabaseEvents();
+
+            _database = null;
             _internal.Clear();
+
             _database = value;
 
-            if (_database != null) {
-                _database.DisposingEvent += _database_Disposing;
-                _database.Row.RowRemoving += Row_RowRemoving;
-                _database.Row.RowAdded += Row_Added;
-                _database.Cell.CellValueChanged += _Database_CellValueChanged;
-            }
+            RegisterDatabaseEvents();
 
             Invalidate_FilteredRows();
             OnChanged();
@@ -215,7 +206,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (!IsDifferentTo(fc)) { return; }
 
         OnChanging();
+
+        UnRegisterDatabaseEvents();
         _database = fc?.Database;
+        RegisterDatabaseEvents();
 
         UnRegisterEvents(_internal);
         _internal.Clear();
@@ -467,6 +461,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             Develop.DebugPrint(FehlerArt.Fehler, "Datenbanken unterschiedlich");
         }
 
+        if (fi.Database != Database && fi.FilterType != FilterType.AlwaysFalse) { Develop.DebugPrint(FehlerArt.Fehler, "Filter Fehler!"); }
+
         if (fi.Parent != null) { Develop.DebugPrint(FehlerArt.Fehler, "Doppelte Filterverwendung!"); }
         fi.Parent = this;
 
@@ -560,6 +556,15 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
+    private void RegisterDatabaseEvents() {
+        if (_database != null) {
+            _database.DisposingEvent += _database_Disposing;
+            _database.Row.RowRemoving += Row_RowRemoving;
+            _database.Row.RowAdded += Row_Added;
+            _database.Cell.CellValueChanged += _Database_CellValueChanged;
+        }
+    }
+
     private void Row_Added(object sender, RowChangedEventArgs e) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (_rows == null) { return; }
@@ -570,6 +575,15 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
         if (_rows == null) { return; }
         if (_rows.Contains(e.Row)) { Invalidate_FilteredRows(); }
+    }
+
+    private void UnRegisterDatabaseEvents() {
+        if (_database != null) {
+            _database.DisposingEvent -= _database_Disposing;
+            _database.Row.RowRemoving -= Row_RowRemoving;
+            _database.Row.RowAdded -= Row_Added;
+            _database.Cell.CellValueChanged -= _Database_CellValueChanged;
+        }
     }
 
     private void UnRegisterEvents(List<FilterItem> fi) {

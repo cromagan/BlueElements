@@ -45,8 +45,11 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     #region Fields
 
     private Bitmap? _bitmap;
+
     private string _filename = string.Empty;
+
     private string _originalText = string.Empty;
+
     private int _panelMoveDirection;
 
     #endregion
@@ -188,10 +191,16 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
         }
     }
 
-    public void HandleRowsInputNow() {
-        if (RowsInputChangedHandled) { return; }
-        RowsInputChangedHandled = true;
+    public void HandleChangesNow() {
         if (IsDisposed) { return; }
+        if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
+
+        if (!FilterInputChangedHandled) {
+            FilterInputChangedHandled = true;
+            this.DoInputFilter(null, false);
+        }
+
+        RowsInputChangedHandled = true;
 
         this.DoRows(null, false);
 
@@ -207,6 +216,8 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
+
+    public void ParentFilterOutput_Changed() { }
 
     public void RowsInput_Changed() { }
 
@@ -225,7 +236,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     }
 
     protected override void DrawControl(Graphics gr, States vState) {
-        HandleRowsInputNow();
+        HandleChangesNow();
 
         if (vState.HasFlag(States.Standard_MouseOver)) { vState ^= States.Standard_MouseOver; }
         if (vState.HasFlag(States.Standard_MousePressed)) { vState ^= States.Standard_MousePressed; }

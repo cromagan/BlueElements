@@ -77,14 +77,12 @@ public static class IControlSendSomethingExtension {
 
     public static void FilterOutput_Changed(this IControlSendFilter icsf) {
         foreach (var thisChild in icsf.Childs) {
+            thisChild.Invalidate_FilterInput();
+            thisChild.ParentFilterOutput_Changed();
+
             if (thisChild is IControlUsesRow icur) {
                 icur.Invalidate_RowsInput();
                 icur.RowsInput_Changed();
-            }
-
-            if (thisChild is IControlUsesFilter icuf) {
-                icuf.Invalidate_FilterInput();
-                icuf.ParentFilterOutput_Changed();
             }
 
             thisChild.Invalidate();

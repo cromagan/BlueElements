@@ -36,7 +36,7 @@ using BlueDatabase.Enums;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, IControlUsesFilter {
+public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, IControlAcceptFilter {
 
     #region Fields
 
@@ -54,7 +54,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     #region Constructors
 
-    public FlexiControlForFilter(ColumnItem? column) {
+    public FlexiControlForFilter(ColumnItem? column, CaptionPosition _defaultCaptionPosition) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
@@ -67,7 +67,8 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         _origin = string.Empty;
         _fromInputFilter = false;
         ((IControlSendFilter)this).RegisterEvents();
-        ((IControlUsesFilter)this).RegisterEvents();
+        ((IControlAcceptFilter)this).RegisterEvents();
+        DefaultCaptionPosition = _defaultCaptionPosition;
         OnValueChanged();
     }
 
@@ -78,10 +79,10 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     public List<IControlAcceptFilter> Childs { get; } = [];
 
     /// <summary>
-    /// Da die CaptionPosition von dem Steuerelemnt bei bedarf geämndert wird,
+    /// Da die CaptionPosition von dem Steuerelement bei bedarf geämndert wird,
     /// muss ein default angegeben werden - wie es normalerweise auszusehen hat.
     /// </summary>
-    public CaptionPosition DefaultCaptionPosition { get; set; } = CaptionPosition.Links_neben_dem_Feld;
+    public CaptionPosition DefaultCaptionPosition { get; private set; }
 
     public FlexiFilterDefaultFilter Filterart_bei_Texteingabe {
         get => _filterart_bei_texteingabe;
@@ -136,10 +137,10 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     public void FilterOutput_DispodingEvent(object sender, System.EventArgs e) => this.FilterOutput_DispodingEvent();
 
-    public void HandleFilterInputNow() {
+    public void HandleChangesNow() {
+        if (IsDisposed) { return; }
         if (FilterInputChangedHandled) { return; }
         FilterInputChangedHandled = true;
-        if (IsDisposed) { return; }
 
         this.DoInputFilter(null, false);
 
@@ -171,7 +172,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     //    return false;
     //}
 
-    public void ParentFilterOutput_Changed() => HandleFilterInputNow();
+    public void ParentFilterOutput_Changed() => HandleChangesNow();
 
     //public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) {
     //    hotItem = null;
@@ -203,7 +204,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     protected override void Dispose(bool disposing) {
         if (disposing) {
             ((IControlSendFilter)this).DoDispose();
-            ((IControlUsesFilter)this).DoDispose();
+            ((IControlAcceptFilter)this).DoDispose();
             Tag = null;
             Childs.Clear();
         }
