@@ -61,11 +61,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Destructors
 
-    // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    ~RowItem() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(false);
-    }
+    ~RowItem() { Dispose(disposing: false); }
 
     #endregion
 
@@ -402,7 +398,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -621,13 +616,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
+                _tmpQuickInfo = null;
             }
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-
+            // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
             Database = null;
-            _tmpQuickInfo = null;
+
             IsDisposed = true;
         }
     }

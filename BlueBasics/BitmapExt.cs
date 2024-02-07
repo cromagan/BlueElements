@@ -37,7 +37,7 @@ namespace BlueBasics;
 // Todo: Obselete Routinen:
 // Image_FromFile
 // Resize
-public class BitmapExt : IDisposableExtended {
+public class BitmapExt : IDisposable, IDisposableExtended {
 
     #region Fields
 
@@ -61,6 +61,12 @@ public class BitmapExt : IDisposableExtended {
     public BitmapExt(int width, int height) => EmptyBitmap(width, height);
 
     protected BitmapExt() => EmptyBitmap(1, 1);
+
+    #endregion
+
+    #region Destructors
+
+    ~BitmapExt() { Dispose(disposing: false); }
 
     #endregion
 
@@ -721,10 +727,9 @@ public class BitmapExt : IDisposableExtended {
     }
 
     public void Dispose() {
-        if (IsDisposed) { return; }
-        IsDisposed = true;
-        _bitmap?.Dispose();
-        BitsHandle.Free();
+        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
     public void FromFile(string dateiName, bool setDummyPicIfFails) {
@@ -743,6 +748,18 @@ public class BitmapExt : IDisposableExtended {
     public void MakeTransparent(Color color) => _bitmap?.MakeTransparent(color);
 
     public void Save(string name, ImageFormat imageFormat) => _bitmap?.Save(name, imageFormat);
+
+    protected virtual void Dispose(bool disposing) {
+        if (!IsDisposed) {
+            if (disposing) {
+                // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
+            }
+            // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
+            _bitmap?.Dispose();
+            BitsHandle.Free();
+            IsDisposed = true;
+        }
+    }
 
     protected void EmptyBitmap(int width, int height) {
         Width = width;

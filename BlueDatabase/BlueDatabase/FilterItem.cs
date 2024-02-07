@@ -39,7 +39,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     private Database? _database;
 
     private FilterType _filterType = FilterType.AlwaysFalse;
+
     private string _origin = string.Empty;
+
     private ReadOnlyCollection<string> _searchValue = new List<string>().AsReadOnly();
 
     #endregion
@@ -120,6 +122,12 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
 
         _column?.RefreshColumnsData();
     }
+
+    #endregion
+
+    #region Destructors
+
+    ~FilterItem() { Dispose(disposing: false); }
 
     #endregion
 
@@ -231,9 +239,9 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     }
 
     public void Dispose() {
-        IsDisposed = true;
-        Column = null;
-        Database = null;
+        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 
     public bool Equals(FilterItem? thisFilter) => !IsDisposed &&
@@ -428,6 +436,19 @@ public sealed class FilterItem : IReadableTextWithChangingAndKey, IParseable, IR
     }
 
     private void _database_Disposing(object sender, System.EventArgs e) => Dispose();
+
+    private void Dispose(bool disposing) {
+        if (!IsDisposed) {
+            if (disposing) {
+                // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
+                Column = null;
+                Database = null;
+            }
+            // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
+
+            IsDisposed = true;
+        }
+    }
 
     #endregion
 }

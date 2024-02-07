@@ -63,6 +63,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #endregion
 
+    #region Destructors
+
+    ~FilterCollection() { Dispose(disposing: false); }
+
+    #endregion
+
     #region Events
 
     public event EventHandler? Changed;
@@ -191,11 +197,24 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void AddIfNotExists(FilterCollection fc) => AddIfNotExists(fc.ToList());
 
     public void ChangeTo(FilterItem? fi) {
-        if (fi != null && _internal.Count == 1 && Exists(fi)) { return; }
-        if (fi == null && _internal.Count == 0) { return; }
+        if (fi != null && fi.Database == _database && _internal.Count == 1 && Exists(fi)) { return; }
+        if (fi == null && _database == null && _internal.Count == 0) { return; }
 
-        using var fc = new FilterCollection((FilterItem?)(fi?.Clone()), "ChangeTo1");
-        ChangeTo(fc);
+        OnChanging();
+
+        UnRegisterDatabaseEvents();
+        _database = fi?.Database;
+        RegisterDatabaseEvents();
+
+        UnRegisterEvents(_internal);
+        _internal.Clear();
+
+        if (fi != null) {
+            AddAndRegisterEvents(fi);
+        }
+        Invalidate_FilteredRows();
+
+        OnChanged();
     }
 
     /// <summary>
@@ -258,10 +277,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public bool Contains(FilterItem filter) => _internal.Contains(filter);
 
-    // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
-    public void Dispose() =>
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
-        Dispose(true);
+    public void Dispose() {
+        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
 
     IEnumerator IEnumerable.GetEnumerator() => _internal.GetEnumerator();
 
@@ -505,9 +525,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
+                // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
                 OnDisposingEvent();
-                //base.Dispose(disposing);
-
                 Database = null;
 
                 Invalidate_FilteredRows();
@@ -518,8 +537,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 _internal.Clear();
             }
 
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
+            // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
             IsDisposed = true;
         }
     }

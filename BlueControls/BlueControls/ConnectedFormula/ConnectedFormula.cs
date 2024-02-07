@@ -116,6 +116,12 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
     #endregion
 
+    #region Destructors
+
+    ~ConnectedFormula() { Dispose(disposing: false); }
+
+    #endregion
+
     #region Events
 
     public event EventHandler? Changed;
@@ -840,13 +846,13 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
-            _ = AllFiles.Remove(this);
             if (disposing) {
+                // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
                 _ = _muf?.Save(true);
                 _muf?.Dispose();
                 _muf = null;
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
             }
+            _ = AllFiles.Remove(this);
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen

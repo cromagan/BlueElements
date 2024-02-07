@@ -85,16 +85,6 @@ public sealed class MultiUserFile : IDisposableExtended {
 
     #endregion
 
-    #region Destructors
-
-    // TODO: Finalizer nur überschreiben, wenn Dispose(bool disposing) weiter oben Code für die Freigabe nicht verwalteter Ressourcen enthält.
-    ~MultiUserFile() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
-        Dispose(false);
-    }
-
-    #endregion
-
     #region Events
 
     public event EventHandler? DiscardPendingChanges;
@@ -207,7 +197,6 @@ public sealed class MultiUserFile : IDisposableExtended {
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
         Dispose(true);
-        // TODO: Auskommentierung der folgenden Zeile aufheben, wenn der Finalizer weiter oben überschrieben wird.
         GC.SuppressFinalize(this);
     }
 
@@ -215,15 +204,14 @@ public sealed class MultiUserFile : IDisposableExtended {
         if (!IsDisposed) {
             _ = AllFiles.Remove(this);
             if (disposing) {
-                // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
+                // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
+                _ = Save(false);
+                while (_pureBinSaver.IsBusy) { Pause(0.5, true); }
+                // https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
+                _pureBinSaver.Dispose();
+                _checker.Dispose();
             }
-            // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
-            // TODO: große Felder auf Null setzen.
-            _ = Save(false);
-            while (_pureBinSaver.IsBusy) { Pause(0.5, true); }
-            // https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
-            _pureBinSaver.Dispose();
-            _checker.Dispose();
+            // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
             IsDisposed = true;
         }
     }
