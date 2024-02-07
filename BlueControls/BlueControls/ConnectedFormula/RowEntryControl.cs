@@ -27,6 +27,12 @@ namespace BlueControls.Controls;
 
 internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFilter {
 
+    #region Fields
+
+    private FilterCollection? _filterInput = null;
+
+    #endregion
+
     #region Constructors
 
     public RowEntryControl(Database? database) : base() {
@@ -45,7 +51,15 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterInput { get; } = new("FilterInput 06");
+    public FilterCollection? FilterInput {
+        get => _filterInput;
+        set {
+            if (_filterInput == value) { return; }
+            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            _filterInput = value;
+            ((IControlAcceptFilter)this).RegisterEvents();
+        }
+    }
 
     public bool FilterInputChangedHandled { get; set; } = false;
 
@@ -77,12 +91,12 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
 
         if (!FilterInputChangedHandled) {
             FilterInputChangedHandled = true;
-            this.DoInputFilter(FilterOutput.Database, false);
+            this.DoInputFilter(FilterOutput.Database, true);
         }
 
         FilterInputChangedHandled = true;
 
-        this.DoRows(FilterOutput.Database, true);
+        this.DoRows();
 
         if (this.RowSingleOrNull() is RowItem r) {
             FilterOutput.ChangeTo(new FilterItem(r));

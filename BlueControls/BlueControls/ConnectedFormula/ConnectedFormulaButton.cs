@@ -50,6 +50,8 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
     private ButtonArgs _enabledwhenrows;
 
+    private FilterCollection? _filterInput = null;
+
     #endregion
 
     #region Constructors
@@ -127,7 +129,15 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterInput { get; } = new FilterCollection("InputFilter 95");
+    public FilterCollection? FilterInput {
+        get => _filterInput;
+        set {
+            if (_filterInput == value) { return; }
+            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            _filterInput = value;
+            ((IControlAcceptFilter)this).RegisterEvents();
+        }
+    }
 
     public bool FilterInputChangedHandled { get; set; } = false;
 
@@ -160,7 +170,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         }
 
         RowsInputChangedHandled = true;
-        this.DoRows(null, false);
+        this.DoRows();
 
         bool enabled;
 
@@ -229,6 +239,8 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
             return;
         }
 
+        HandleChangesNow();
+
         VariableCollection vars;
         object? ai = null;
         var row = this.RowSingleOrNull();
@@ -242,9 +254,8 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         #region FilterVariablen erstellen und in fis speichern
 
         var fis = string.Empty;
-        using var filterInput = this.GetInputFilter(null, false);
 
-        if (filterInput is FilterCollection fi) {
+        if (FilterInput is FilterCollection fi) {
             for (var fz = 0; fz < fi.Count; fz++) {
                 if (fi[fz] is FilterItem thisf) {
                     var nam = "Filter" + fz;

@@ -41,6 +41,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     #region Fields
 
+    private FilterCollection? _filterInput = null;
     private bool _generated;
 
     #endregion
@@ -79,7 +80,15 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterInput { get; } = new("FilterInput 03");
+    public FilterCollection? FilterInput {
+        get => _filterInput;
+        set {
+            if (_filterInput == value) { return; }
+            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            _filterInput = value;
+            ((IControlAcceptFilter)this).RegisterEvents();
+        }
+    }
 
     public bool FilterInputChangedHandled { get; set; } = false;
 
@@ -219,7 +228,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
 
         RowsInputChangedHandled = true;
-        this.DoRows(FilterOutput.Database, false);
+        this.DoRows();
 
         if (this.RowSingleOrNull() is RowItem r) {
             FilterOutput.ChangeTo(new FilterItem(r));

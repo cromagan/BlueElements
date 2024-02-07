@@ -44,6 +44,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
 
+    private FilterCollection? _filterInput = null;
     private bool _fromInputFilter = false;
 
     private string _origin;
@@ -98,7 +99,15 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterInput { get; } = new("FilterInput 02");
+    public FilterCollection? FilterInput {
+        get => _filterInput;
+        set {
+            if (_filterInput == value) { return; }
+            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            _filterInput = value;
+            ((IControlAcceptFilter)this).RegisterEvents();
+        }
+    }
 
     public bool FilterInputChangedHandled { get; set; } = false;
 

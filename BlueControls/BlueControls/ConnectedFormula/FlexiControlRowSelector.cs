@@ -38,6 +38,8 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     private readonly string _showformat;
 
+    private FilterCollection? _filterInput = null;
+
     #endregion
 
     #region Constructors
@@ -66,7 +68,15 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterInput { get; } = new("FilterInput 04");
+    public FilterCollection? FilterInput {
+        get => _filterInput;
+        set {
+            if (_filterInput == value) { return; }
+            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            _filterInput = value;
+            ((IControlAcceptFilter)this).RegisterEvents();
+        }
+    }
 
     public bool FilterInputChangedHandled { get; set; } = false;
 
@@ -102,14 +112,14 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
         if (!FilterInputChangedHandled) {
             FilterInputChangedHandled = true;
-            this.DoInputFilter(FilterOutput.Database, false);
+            this.DoInputFilter(FilterOutput.Database, true);
         }
 
         RowsInputChangedHandled = true;
 
         if (!Allinitialized) { _ = CreateSubControls(); }
 
-        this.DoRows(FilterOutput.Database, true);
+        this.DoRows();
 
         #region Combobox suchen
 

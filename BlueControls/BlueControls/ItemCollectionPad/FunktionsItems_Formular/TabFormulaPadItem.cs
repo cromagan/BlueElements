@@ -179,8 +179,9 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
                         cc.InitFormula(cf, cc.Database());
                         cc.Dock = DockStyle.Fill;
                         cc.DoInputSettings(parentView, this);
-                        cc.DoRows(cc.Database(), true);
                         cc.DoOutputSettings(cc.Database(), cc.Name);
+                        //cc.HandleChangesNow();
+
                         //cc.GenerateView();
 
                         #endregion

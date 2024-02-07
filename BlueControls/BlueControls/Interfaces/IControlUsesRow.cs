@@ -61,8 +61,8 @@ public static class ControlUsesRowExtension {
 
     public static Database? Database(this IControlUsesRow icur) {
         if (icur.RowsInput != null && icur.RowsInput.Count > 0) { return icur.RowsInput[0].Database; }
-        using var f = icur.GetInputFilter(null, false);
-        return f?.Database;
+        if (icur.FilterInput is FilterCollection fc) { return fc.Database; }
+        return null;
     }
 
     public static void DoDispose(this IControlUsesRow icur) {
@@ -71,23 +71,21 @@ public static class ControlUsesRowExtension {
         icur.DisconnectChildParents(icur.Parents);
     }
 
-    public static void DoRows(this IControlUsesRow icur, Database? mustbeDatabase, bool doEmptyFilterToo) {
+    public static void DoRows(this IControlUsesRow icur) {
         if (icur.RowsInputManualSeted) { return; }
 
-        using var f = icur.GetInputFilter(mustbeDatabase, doEmptyFilterToo);
+        if (!icur.FilterInputChangedHandled) { Develop.DebugPrint(FehlerArt.Fehler, "Filter unbehandelt!"); }
 
-        if (f == null) {
+        if (icur.FilterInput == null) {
             icur.RowsInput = new List<RowItem>();
             return;
         }
 
-        icur.RowsInput = [.. f.Rows];
+        icur.RowsInput = [.. icur.FilterInput.Rows];
 
         if (icur.RowSingleOrNull() is RowItem r) {
             r.CheckRowDataIfNeeded();
         }
-
-        //icur.RegisterEvents();
     }
 
     public static void FilterInput_RowsChanged(this IControlUsesRow icaf) {

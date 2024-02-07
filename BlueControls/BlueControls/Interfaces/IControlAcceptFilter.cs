@@ -35,7 +35,7 @@ public interface IControlAcceptFilter : IDisposableExtendedWithEvent {
     /// Zum Berechnen sollte die Routine DoInputFilter benutzt werden.
     /// Enthält die DatabaseInput und auch den berechnete Zeile.
     /// </summary>
-    public FilterCollection FilterInput { get; }
+    public FilterCollection? FilterInput { get; set; }
 
     public bool FilterInputChangedHandled { get; set; }
 
@@ -136,15 +136,10 @@ public static class ControlAcceptFilterExtension {
     /// <param name="doEmptyFilterToo"></param>
     public static void DoInputFilter(this IControlAcceptFilter item, Database? mustbeDatabase, bool doEmptyFilterToo) {
         if (item.IsDisposed) { return; }
-        //if (item.FilterManualSeted) { return; }
 
-        //item.Invalidate_FilterInput();
+        item.FilterInput = item.GetInputFilter(mustbeDatabase, doEmptyFilterToo);
 
-        using var fc = item.GetInputFilter(mustbeDatabase, doEmptyFilterToo);
-
-        item.FilterInput.ChangeTo(fc);
-
-        //if (item.FilterInput.Database == null) { Develop.DebugPrint(BlueBasics.Enums.FehlerArt.Fehler, "Datenbank Fehler"); }
+        if (item.FilterInput != null && item.FilterInput.Database == null) { Develop.DebugPrint(FehlerArt.Fehler, "Datenbank Fehler"); }
     }
 
     /// <summary>
@@ -170,10 +165,9 @@ public static class ControlAcceptFilterExtension {
     }
 
     public static void FilterInput_DispodingEvent(this IControlAcceptFilter icaf) {
-        icaf.FilterInput.RowsChanged -= icaf.FilterInput_RowsChanged;
-        icaf.FilterInput.DisposingEvent -= icaf.FilterInput_DispodingEvent;
+        icaf.UnRegisterEventsAndDispose();
 
-        if (!icaf.FilterInput.IsDisposed) {
+        if (icaf.FilterInput != null && !icaf.FilterInput.IsDisposed) {
             icaf.FilterInput.Database = null;
             icaf.FilterInput.Dispose();
         }
@@ -189,12 +183,13 @@ public static class ControlAcceptFilterExtension {
 
         if (item.Parents.Count == 1) {
             var fc2 = item.Parents[0].FilterOutput;
+            if (fc2.Count == 0) { return null; }
 
             if (mustbeDatabase != null && fc2.Database != mustbeDatabase) {
                 return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 1"), "Datenbanken inkonsitent");
             }
 
-            return (FilterCollection?)fc2.Clone("GetInputFilterClone 01");
+            return fc2;
         }
 
         FilterCollection? fc = null;
@@ -202,6 +197,7 @@ public static class ControlAcceptFilterExtension {
         foreach (var thiss in item.Parents) {
             if (!thiss.IsDisposed && thiss.FilterOutput is FilterCollection fi) {
                 if (mustbeDatabase != null && fi.Database != mustbeDatabase) {
+                    fc?.Dispose();
                     return new FilterCollection(new FilterItem(mustbeDatabase, "Datenbanken inkonsitent 2"), "Datenbanken inkonsitent");
                 }
 
@@ -223,9 +219,21 @@ public static class ControlAcceptFilterExtension {
     }
 
     public static void RegisterEvents(this IControlAcceptFilter icaf) {
+        if (icaf.FilterInput == null || icaf.FilterInput.IsDisposed) { return; }
         icaf.FilterInput.RowsChanged += icaf.FilterInput_RowsChanged;
         //icaf.FilterInput.Changed += icaf.FilterOutput_Changed;
         icaf.FilterInput.DisposingEvent += icaf.FilterInput_DispodingEvent;
+    }
+
+    public static void UnRegisterEventsAndDispose(this IControlAcceptFilter icaf) {
+        if (icaf.FilterInput == null) { return; }
+        icaf.FilterInput.RowsChanged -= icaf.FilterInput_RowsChanged;
+        //icaf.FilterInput.Changed -= icaf.FilterOutput_Changed;
+        icaf.FilterInput.DisposingEvent -= icaf.FilterInput_DispodingEvent;
+
+        if (icaf.Parents.Count != 1 && icaf.FilterInput != null) {
+            icaf.FilterInput.Dispose();
+        }
     }
 
     #endregion

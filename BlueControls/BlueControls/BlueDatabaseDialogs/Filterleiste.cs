@@ -90,12 +90,6 @@ public partial class Filterleiste : GenericControl, IControlSendFilter, IBackgro
     /// </summary>
     public List<IControlAcceptFilter> Childs { get; } = [];
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterInput { get; } = new("FilterInput 01");
-
     /// <summary>
     /// Ist immer identisch mit den Filtern der Tableview.
     /// Er entspricht den Input-Filtern der einzelenen FlexControlForFiler

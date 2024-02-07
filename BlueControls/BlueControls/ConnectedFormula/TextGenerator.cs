@@ -43,6 +43,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
 
     private string _auswahlSpalte1 = string.Empty;
 
+    private FilterCollection? _filterInput = null;
     private ColumnItem? _textc;
 
     private string _textSpalte = string.Empty;
@@ -97,7 +98,15 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterInput { get; } = new FilterCollection("InputFilter 99");
+    public FilterCollection? FilterInput {
+        get => _filterInput;
+        set {
+            if (_filterInput == value) { return; }
+            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            _filterInput = value;
+            ((IControlAcceptFilter)this).RegisterEvents();
+        }
+    }
 
     public bool FilterInputChangedHandled { get; set; } = false;
 

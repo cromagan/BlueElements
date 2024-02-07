@@ -47,6 +47,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
     private string _filename = string.Empty;
 
+    private FilterCollection? _filterInput = null;
     private string _originalText = string.Empty;
 
     private int _panelMoveDirection;
@@ -97,7 +98,15 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FilterCollection FilterInput { get; } = new FilterCollection("InputFilter 97");
+    public FilterCollection? FilterInput {
+        get => _filterInput;
+        set {
+            if (_filterInput == value) { return; }
+            ((IControlAcceptFilter)this).UnRegisterEventsAndDispose();
+            _filterInput = value;
+            ((IControlAcceptFilter)this).RegisterEvents();
+        }
+    }
 
     public bool FilterInputChangedHandled { get; set; } = false;
 
@@ -201,7 +210,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
 
         RowsInputChangedHandled = true;
 
-        this.DoRows(null, false);
+        this.DoRows();
 
         var ct = string.Empty;
 
