@@ -2498,10 +2498,16 @@ public sealed class ColumnItem : IReadableTextWithChangingAndKey, IDisposableExt
         if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                Database = null;
+                Invalidate_LinkedDatabase();
             }
 
-            Invalidate_LinkedDatabase();
-            Database = null;
+            _afterEditAutoReplace.Clear();
+            _dropDownItems.Clear();
+            _linkedCellFilter.Clear();
+            _opticalReplace.Clear();
+            _permissionGroupsChangeCell.Clear();
+            _tags.Clear();
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen

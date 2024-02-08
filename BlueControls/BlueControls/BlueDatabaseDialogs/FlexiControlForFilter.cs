@@ -396,7 +396,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         if (FilterSingleColumn == null) {
             this.Invalidate_FilterOutput();
         } else {
-            FilterOutput.ChangeTo(filterSingle);
+            FilterOutput.ChangeTo(((FilterItem?)filterSingle?.Clone()));
         }
 
         var nvalue = string.Empty;

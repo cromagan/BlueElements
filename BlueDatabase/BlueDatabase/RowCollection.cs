@@ -56,9 +56,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Destructors
 
-    // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
+    // TODO: Override a finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources.
     ~RowCollection() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(false);
     }
 
@@ -249,10 +249,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public bool Clear(string comment) => Remove(new FilterCollection(Database, "rowcol clear"), null, comment);
 
     public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
+    // TODO: Override a finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources.
 
     public void ExecuteExtraThread() {
         if (_pendingChangedRows.Count > 0) { return; }
@@ -659,12 +661,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                Database = null;
+                foreach (var thisR in _internal) { thisR.Value.Dispose(); }
             }
-            Database = null;
+
             _internal.Clear();
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
+            _pendingChangedBackgroundRow.Clear();
+            _pendingChangedRows.Clear();
+
             IsDisposed = true;
         }
     }

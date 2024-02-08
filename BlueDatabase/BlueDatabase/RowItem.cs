@@ -61,7 +61,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     #region Destructors
 
-    ~RowItem() { Dispose(disposing: false); }
+    ~RowItem() {
+        Dispose(false);
+    }
 
     #endregion
 
@@ -398,6 +400,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     }
 
     public void Dispose() {
+        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -617,10 +620,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (!IsDisposed) {
             if (disposing) {
                 // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
-                _tmpQuickInfo = null;
+                Database = null;
             }
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
-            Database = null;
+            _tmpQuickInfo = null;
+            LastCheckedEventArgs = null;
+            LastCheckedMessage = null;
+            LastCheckedRowFeedback?.Clear();
+            LastCheckedRowFeedback = null;
 
             IsDisposed = true;
         }

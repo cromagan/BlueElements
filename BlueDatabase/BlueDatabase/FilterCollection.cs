@@ -534,10 +534,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 foreach (var thisf in _internal) {
                     thisf.Dispose();
                 }
-                _internal.Clear();
             }
-
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
+            _internal.Clear();
             IsDisposed = true;
         }
     }

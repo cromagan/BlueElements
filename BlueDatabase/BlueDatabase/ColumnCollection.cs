@@ -527,8 +527,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (!IsDisposed) {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+                Database = null;
+                foreach (var thisc in _internal) { thisc.Value.Dispose(); }
             }
-            Database = null;
+
             _internal.Clear();
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
