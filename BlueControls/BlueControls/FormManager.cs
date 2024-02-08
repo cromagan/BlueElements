@@ -122,10 +122,11 @@ public class FormManager : ApplicationContext {
             Running = false;
             ExecuteAtEnd?.Invoke();
 
-            var a = Database.AllFiles.Clone();
-            foreach (var thisDb in a) {
-                thisDb.Dispose();
-            }
+            //var a = Database.AllFiles.Clone();
+            Database.ForceSaveAll();
+            //foreach (var thisDb in a) {
+            //    thisDb.Save();
+            //}
 
             MultiUserFile.SaveAll(false);
             MultiUserFile.SaveAll(true);

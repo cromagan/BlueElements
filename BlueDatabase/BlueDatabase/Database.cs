@@ -164,6 +164,12 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     #endregion
 
+    #region Destructors
+
+    ~Database() { Dispose(false); }
+
+    #endregion
+
     #region Delegates
 
     public delegate string NeedPassword();
@@ -2148,25 +2154,23 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
     protected virtual void Dispose(bool disposing) {
         if (IsDisposed) { return; }
-        IsDisposed = true;
-
-        OnDisposingEvent();
-        _ = AllFiles.Remove(this);
 
         //base.Dispose(disposing); // speichert und löscht die ganzen Worker. setzt auch disposedValue und ReadOnly auf true
         if (disposing) {
             // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
+            OnDisposingEvent();
+            Column.Dispose();
+            //Cell?.Dispose();
+            Row.Dispose();
         }
-
+        _ = AllFiles.Remove(this);
         _checker?.Dispose();
 
-        // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
-        // TODO: große Felder auf Null setzen.
+        IsDisposed = true;
 
-        Column.Dispose();
-        //Cell?.Dispose();
-        Row.Dispose();
-        OnDisposed();
+        if (disposing) {
+            OnDisposed();
+        }
     }
 
     /// <summary>
@@ -2277,8 +2281,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             }
 
             if (row == null) {
-                Develop.DebugPrint(FehlerArt.Warnung, "Zeile ist null! " + type);
-                return ("Wert nicht gesetzt!", null, null);
+                return (string.Empty, column, row);
             }
 
             column.Invalidate_ContentWidth();

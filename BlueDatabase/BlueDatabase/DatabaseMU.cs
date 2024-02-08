@@ -50,6 +50,12 @@ public class DatabaseMu : Database {
 
     #endregion
 
+    #region Destructors
+
+    ~DatabaseMu() { Dispose(false); }
+
+    #endregion
+
     #region Properties
 
     public new static string DatabaseId => nameof(DatabaseMu);
@@ -122,17 +128,23 @@ public class DatabaseMu : Database {
     }
 
     protected override void Dispose(bool disposing) {
+        if (IsDisposed) { return; }
+
         if (disposing) {
-            if (_writer != null) {
-                lock (_writer) {
+        }
+
+        if (_writer != null) {
+            lock (_writer) {
+                try {
                     _writer.WriteLine("- EOF");
                     _writer.Flush();
                     _writer.Close();
                     _writer.Dispose();
-                }
-                _writer = null;
+                } catch { }
             }
+            _writer = null;
         }
+
         base.Dispose(disposing);
     }
 

@@ -76,6 +76,8 @@ public static class ControlSendSomethingExtension {
     public static void DoOutputSettings(this IControlSendFilter dest, IItemSendFilter source) => dest.DoOutputSettings(source.DatabaseOutput, source.DefaultItemToControlName());
 
     public static void FilterOutput_Changed(this IControlSendFilter icsf) {
+        if (icsf.IsDisposed) { return; }
+
         foreach (var thisChild in icsf.Childs) {
             thisChild.Invalidate_FilterInput();
             thisChild.ParentFilterOutput_Changed();
@@ -90,6 +92,7 @@ public static class ControlSendSomethingExtension {
     }
 
     public static void FilterOutput_DispodingEvent(this IControlSendFilter icsf) {
+        if (icsf.IsDisposed) { return; }
         icsf.FilterOutput.Changed -= icsf.FilterOutput_Changed;
         icsf.FilterOutput.DisposingEvent -= icsf.FilterOutput_DispodingEvent;
 

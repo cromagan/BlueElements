@@ -251,16 +251,19 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public void Clear() {
         if (IsDisposed) { return; }
         if (_internal.Count == 0) { return; }
+
+        // Handeln
         OnChanging();
-
-        UnRegisterEvents(_internal);
-        foreach (var thisF in _internal) {
-            thisF.Dispose();
-        }
-
+        List<FilterItem> t = [.. _internal];
         _internal.Clear();
         Invalidate_FilteredRows();
         OnChanged();
+
+        // Aufräumen
+        UnRegisterEvents(t);
+        foreach (var thisF in t) {
+            thisF.Dispose();
+        }
     }
 
     /// <summary>

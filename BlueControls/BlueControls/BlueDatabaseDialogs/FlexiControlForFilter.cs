@@ -195,6 +195,14 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         //base.CommandButton_Click(); // Nope, keine Ereignisse und auch nicht auf + setzen
         _doFilterDeleteButton = false;
 
+        var filterSingle = FilterInput?[FilterSingleColumn];
+
+        if (filterSingle == null) {
+            this.Invalidate_FilterOutput();
+            ValueSet(string.Empty, true, true);
+            return;
+        }
+
         if (CaptionPosition == CaptionPosition.ohne) {
             this.Invalidate_FilterOutput();
             return;
@@ -219,6 +227,11 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         }
 
         base.Dispose(disposing);
+    }
+
+    protected override void DrawControl(Graphics gr, States state) {
+        HandleChangesNow();
+        base.DrawControl(gr, state);
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
@@ -345,7 +358,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
                 btn.Text = LanguageTool.DoTranslate("wählen ({0})", true, filterSingle.SearchValue.Count.ToString());
             } else {
                 btn.ImageCode = "Trichter|16";
-                btn.Text = LanguageTool.DoTranslate("wählen");
+                btn.Text = LanguageTool.DoTranslate("Gewählt:" + Value);
                 GenerateQickInfoText(null);
             }
         }
