@@ -17,6 +17,8 @@
 
 #nullable enable
 
+using System.Drawing;
+
 namespace BlueBasics.EventArgs;
 
 public class NeedImageEventArgs : System.EventArgs {
@@ -33,7 +35,7 @@ public class NeedImageEventArgs : System.EventArgs {
 
     #region Properties
 
-    public BitmapExt? Bmp { get; set; }
+    public Bitmap? Bmp { get; set; }
     public bool Done { get; set; }
     public string Name { get; }
 

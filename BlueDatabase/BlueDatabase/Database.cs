@@ -42,6 +42,8 @@ using static BlueBasics.IO;
 using static BlueBasics.Generic;
 using static BlueBasics.Constants;
 using Timer = System.Threading.Timer;
+using static BlueBasics.Extensions;
+using System.Drawing;
 
 namespace BlueDatabase;
 
@@ -3296,9 +3298,9 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
 
             var fullname = CachePfad.TrimEnd("\\") + "\\" + name + ".PNG";
 
-            if (FileExists(fullname)) {
+            if (FileExists(fullname) && Image_FromFile(fullname) is Bitmap bmp) {
                 e.Done = true;
-                e.Bmp = new BitmapExt(fullname);
+                e.Bmp = bmp;
             }
         } catch { }
     }

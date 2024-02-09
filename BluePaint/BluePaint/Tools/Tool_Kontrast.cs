@@ -37,20 +37,14 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
     public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
         if (originalPic == null) { return; }
-        if (sldKontrast.Value != 0) {
-            var picPreview = AdjustContrast(originalPic, sldKontrast.Value);
-            e.DrawImage(picPreview);
-            return;
-        }
-        if (Math.Abs(sldGamma.Value - 1) > 0.001) {
-            var picPreview = AdjustGamma(originalPic, sldGamma.Value);
-            e.DrawImage(picPreview);
-            return;
-        }
-        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) {
-            var picPreview = AdjustBrightness(originalPic, sldHelligkeit.Value);
-            e.DrawImage(picPreview);
-        }
+
+        var picPreview = new BitmapExt(originalPic);
+
+        if (sldKontrast.Value != 0) { picPreview.AdjustContrast(sldKontrast.Value); }
+        if (Math.Abs(sldGamma.Value - 1) > 0.001) { picPreview.AdjustGamma(sldGamma.Value); }
+        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { picPreview.AdjustBrightness(sldHelligkeit.Value); }
+
+        e.DrawImage(picPreview.CloneOfBitmap());
     }
 
     private void btnAlleFarbenSchwarz_Click(object? sender, System.EventArgs e) {
@@ -75,14 +69,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         OnDoInvalidate();
     }
 
-    private void btnGamma_Click(object? sender, System.EventArgs e) {
-        var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
-        OnOverridePic(AdjustGamma(pic, sldGamma.Value), false);
-        sldGamma.Value = 1f;
-        sldKontrast.Value = 0f;
-        sldHelligkeit.Value = 1f;
-    }
+    private void btnGamma_Click(object? sender, System.EventArgs e) => DoPic();
 
     private void btnGraustufen_Click(object? sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
@@ -93,22 +80,10 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldHelligkeit.Value = 1f;
     }
 
-    private void btnHelligkeit_Click(object? sender, System.EventArgs e) {
-        var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
-        OnOverridePic(AdjustBrightness(pic, sldHelligkeit.Value), false);
-        sldGamma.Value = 1f;
-        sldKontrast.Value = 0f;
-        sldHelligkeit.Value = 1f;
-    }
+    private void btnHelligkeit_Click(object? sender, System.EventArgs e) => DoPic();
 
     private void btnKontrastErhoehen_Click(object? sender, System.EventArgs e) {
-        var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
-        OnOverridePic(AdjustContrast(pic, sldKontrast.Value), false);
-        sldGamma.Value = 1f;
-        sldKontrast.Value = 0f;
-        sldHelligkeit.Value = 1f;
+        DoPic();
     }
 
     private void btnPixelHinzu_Click(object? sender, System.EventArgs e) {
@@ -126,6 +101,22 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldKontrast.Value = 0f;
         sldHelligkeit.Value = 1f;
         OnDoInvalidate();
+    }
+
+    private void DoPic() {
+        var pic = OnNeedCurrentPic();
+        if (pic == null) { return; }
+
+        var picPreview = new BitmapExt(pic);
+
+        if (sldKontrast.Value != 0) { picPreview.AdjustContrast(sldKontrast.Value); }
+        if (Math.Abs(sldGamma.Value - 1) > 0.001) { picPreview.AdjustGamma(sldGamma.Value); }
+        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { picPreview.AdjustBrightness(sldHelligkeit.Value); }
+
+        OnOverridePic(picPreview.CloneOfBitmap(), false);
+        sldGamma.Value = 1f;
+        sldKontrast.Value = 0f;
+        sldHelligkeit.Value = 1f;
     }
 
     private void sldGamma_ValueChanged(object sender, System.EventArgs e) {

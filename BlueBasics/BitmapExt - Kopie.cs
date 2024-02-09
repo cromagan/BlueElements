@@ -19,12 +19,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using BlueBasics.Enums;
@@ -45,18 +47,9 @@ public class BitmapExt : IDisposable, IDisposableExtended {
 
     private Bitmap? _bitmap;
 
-    private BitmapData bitmapData;
-    private bool isLocked;
-
     #endregion
 
     #region Constructors
-
-    /// <summary>
-    /// Erstellt das BitmapExt Element mit einem Clone der angegebenen Bitmaap
-    /// </summary>
-    /// <param name="bmp"></param>
-    public BitmapExt(Bitmap bmp) => CloneFromBitmap(bmp);
 
     public BitmapExt(string filename) {
         var p = Image_FromFile(filename);
@@ -66,6 +59,12 @@ public class BitmapExt : IDisposable, IDisposableExtended {
             EmptyBitmap(1, 1);
         }
     }
+
+    /// <summary>
+    /// Erstellt das BitmapExt Element mit einem Clone der angegebenen Bitmaap
+    /// </summary>
+    /// <param name="bmp"></param>
+    public BitmapExt(Bitmap bmp) => CloneFromBitmap(bmp);
 
     public BitmapExt(int width, int height) => EmptyBitmap(width, height);
 
@@ -84,7 +83,8 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     public int Height { get; private set; }
     public bool IsDisposed { get; private set; }
     public int Width { get; private set; }
-    private byte[]? Bits { get; set; }
+    private int[]? Bits { get; set; }
+    private GCHandle BitsHandle { get; set; }
 
     #endregion
 
@@ -101,6 +101,22 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         }
     }
 
+    //    // http://csharphelper.com/blog/2016/12/provide-gamma-correction-for-an-image-in-c/
+    //    // Set the ImageAttributes object's gamma value.
+    //    ImageAttributes attributes = new();
+    //    attributes.SetGamma(Math.Max(gamma, 0.001f));
+    //    // Draw the image onto the new bitmap
+    //    // while applying the new gamma value.
+    //    Point[] points = { new(0, 0), new(image.Width, 0), new(0, image.Height) };
+    //    Rectangle rect = new(0, 0, image.Width, image.Height);
+    //    // Make the result bitmap.
+    //    Bitmap bm = new(image.Width, image.Height);
+    //    using var gr = Graphics.FromImage(bm);
+    //    gr.DrawImage(image, points, rect,
+    //        GraphicsUnit.Pixel, attributes);
+    //    // Return the result.
+    //    return bm;
+    //}
     public static Bitmap? Area(Bitmap sourceBitmap, Rectangle r) {
         if (r.Width < 2 || r.Height < 2) { return null; }
         Bitmap clipedArea = new(r.Width, r.Height);
@@ -110,6 +126,8 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         return clipedArea;
     }
 
+    //public static Bitmap? AdjustGamma(Bitmap? image, float gamma) {
+    //    if (image == null) { return null; }
     public static void Ausdünnen(Bitmap? pic, int staerke) {
         if (pic == null) { return; }
         for (var x = 0; x < pic.Width - 1; x++) {
@@ -149,16 +167,83 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= pic.Width || y >= pic.Height || pic.GetPixel(x, y).IsNearWhite(0.9);
     }
 
+    //    value = (100.0f + value) / 100.0f;
+    //    value *= value;
+    //    var newBitmap = Image_Clone(image);
+    //    if (newBitmap == null) { return null; }
+    //    var data = newBitmap.LockBits(new Rectangle(0, 0, newBitmap.Width, newBitmap.Height), ImageLockMode.ReadWrite, newBitmap.PixelFormat);
+    //    var height = newBitmap.Height;
+    //    var width = newBitmap.Width;
+    //    unsafe {
+    //        for (var y = 0; y < height; ++y) {
+    //            var row = (byte*)data.Scan0 + (y * data.Stride);
+    //            var columnOffset = 0;
+    //            for (var x = 0; x < width; ++x) {
+    //                var b = row[columnOffset];
+    //                var g = row[columnOffset + 1];
+    //                var r = row[columnOffset + 2];
+    //                var red = r / 255.0f;
+    //                var green = g / 255.0f;
+    //                var blue = b / 255.0f;
+    //                red = (((red - 0.5f) * value) + 0.5f) * 255.0f;
+    //                green = (((green - 0.5f) * value) + 0.5f) * 255.0f;
+    //                blue = (((blue - 0.5f) * value) + 0.5f) * 255.0f;
+    //                var iR = (int)red;
+    //                iR = iR > 255 ? 255 : iR;
+    //                iR = iR < 0 ? 0 : iR;
+    //                var iG = (int)green;
+    //                iG = iG > 255 ? 255 : iG;
+    //                iG = iG < 0 ? 0 : iG;
+    //                var iB = (int)blue;
+    //                iB = iB > 255 ? 255 : iB;
+    //                iB = iB < 0 ? 0 : iB;
+    //                row[columnOffset] = (byte)iB;
+    //                row[columnOffset + 1] = (byte)iG;
+    //                row[columnOffset + 2] = (byte)iR;
+    //                columnOffset += 4;
+    //            }
+    //        }
+    //    }
+    //    newBitmap.UnlockBits(data);
+    //    return newBitmap;
+    //}
     public static Bitmap? AutoCrop(Bitmap? pic, double minBrightness) {
         var pa = GetAutoValuesForCrop(pic, minBrightness);
         return Crop(pic, pa.Left, pa.Right, pa.Top, pa.Bottom);
     }
 
+    //public static Bitmap? AdjustContrast(Bitmap? image, float value) {
+    //    if (image == null) { return null; }
     public static Bitmap? Crop(Bitmap? bmp, Rectangle r) {
         if (bmp == null) { return null; }
         return Crop(bmp, r.Left, -(bmp.Width - r.Right), r.Top, -(bmp.Height - r.Bottom));
     }
 
+    //    // http://csharphelper.com/blog/2014/10/use-an-imageattributes-object-to-adjust-an-images-brightness-in-c/
+    //    // Make the ColorMatrix.
+    //    var b = Math.Max(brightness, 0.001f);
+    //    ColorMatrix cm = new(new[]
+    //    {
+    //        new[] {b, 0, 0, 0, 0}, new[] {0, b, 0, 0, 0}, new[] {0, 0, b, 0, 0}, new[] {0, 0, 0, 1f, 0},
+    //        new[] {0, 0, 0, 0, 1f}
+    //    });
+    //    ImageAttributes attributes = new();
+    //    attributes.SetColorMatrix(cm);
+    //    // Draw the image onto the new bitmap while applying
+    //    // the new ColorMatrix.
+    //    Point[] points =
+    //    {
+    //        new(0, 0), new(image.Width, 0), new(0, image.Height)
+    //    };
+    //    Rectangle rect = new(0, 0, image.Width, image.Height);
+    //    // Make the result bitmap.
+    //    Bitmap bm = new(image.Width, image.Height);
+    //    using var gr = Graphics.FromImage(bm);
+    //    gr.DrawImage(image, points, rect,
+    //        GraphicsUnit.Pixel, attributes);
+    //    // Return the result.
+    //    return bm;
+    //}
     /// <summary>
     ///
     /// </summary>
@@ -182,6 +267,8 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         return bmp2;
     }
 
+    //public static Bitmap? AdjustBrightness(Bitmap? image, float brightness) {
+    //    if (image == null) { return null; }
     public static void FillCircle(Bitmap? bmp, Color c, int x, int y, int r) {
         if (bmp == null) { return; }
 
@@ -302,6 +389,98 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         return bmp;
     }
 
+    //// ReSharper disable once UnusedMember.Global
+    //public static Bitmap? ImageBlurFilter(Bitmap? bmp, BlurType blurType) {
+    //    if (bmp == null) { return null; }
+
+    //    Bitmap? resultBitmap = null;
+    //    switch (blurType) {
+    //        case BlurType.Mean3x3:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean3X3, 1.0 / 9.0, 0);
+    //            break;
+
+    //        case BlurType.Mean5x5:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean5X5, 1.0 / 25.0, 0);
+    //            break;
+
+    //        case BlurType.Mean7x7:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean7X7, 1.0 / 49.0, 0);
+    //            break;
+
+    //        case BlurType.Mean9x9:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.Mean9X9, 1.0 / 81.0, 0);
+
+    //            break;
+
+    //        case BlurType.GaussianBlur3x3:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.GaussianBlur3X3, 1.0 / 16.0, 0);
+    //            break;
+
+    //        case BlurType.GaussianBlur5x5:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.GaussianBlur5X5, 1.0 / 159.0, 0);
+    //            break;
+
+    //        case BlurType.MotionBlur5x5:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5, 1.0 / 10.0, 0);
+    //            break;
+
+    //        case BlurType.MotionBlur5x5At45Degrees:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5At45Degrees, 1.0 / 5.0, 0);
+    //            break;
+
+    //        case BlurType.MotionBlur5x5At135Degrees:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur5X5At135Degrees, 1.0 / 5.0, 0);
+    //            break;
+
+    //        case BlurType.MotionBlur7x7:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7, 1.0 / 14.0, 0);
+    //            break;
+
+    //        case BlurType.MotionBlur7x7At45Degrees:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7At45Degrees, 1.0 / 7.0, 0);
+    //            break;
+
+    //        case BlurType.MotionBlur7x7At135Degrees:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur7X7At135Degrees, 1.0 / 7.0, 0);
+    //            break;
+
+    //        case BlurType.MotionBlur9x9:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9, 1.0 / 18.0, 0);
+    //            break;
+
+    //        case BlurType.MotionBlur9x9At45Degrees:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9At45Degrees, 1.0 / 9.0, 0);
+    //            break;
+
+    //        case BlurType.MotionBlur9x9At135Degrees:
+    //            resultBitmap = ConvolutionFilter(bmp, ImageMatrix.MotionBlur9X9At135Degrees, 1.0 / 9.0, 0);
+    //            break;
+
+    //        case BlurType.Median3x3:
+    //            resultBitmap = MedianFilter(bmp, 3);
+    //            break;
+
+    //        case BlurType.Median5x5:
+    //            resultBitmap = MedianFilter(bmp, 5);
+    //            break;
+
+    //        case BlurType.Median7x7:
+    //            resultBitmap = MedianFilter(bmp, 7);
+    //            break;
+
+    //        case BlurType.Median9x9:
+    //            resultBitmap = MedianFilter(bmp, 9);
+    //            break;
+
+    //        case BlurType.Median11x11:
+    //            resultBitmap = MedianFilter(bmp, 11);
+    //            break;
+    //    }
+    //    return resultBitmap;
+    //}
+
+    public static implicit operator Bitmap?(BitmapExt? p) => p?._bitmap;
+
     public static void IntensifyBitmap(ref Bitmap bMp) {
         for (var x = 0; x < bMp.Width; x++) {
             for (var y = 0; y < bMp.Height; y++) {
@@ -392,6 +571,43 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         gR.DrawLine(Pens.Red, mitte.X - 6, mitte.Y, mitte.X + 5, mitte.Y);
     }
 
+    public static Bitmap MedianFilter(Bitmap sourceBitmap, int matrixSize) {
+        var sourceData =
+            sourceBitmap.LockBits(new Rectangle(0, 0,
+                    sourceBitmap.Width, sourceBitmap.Height),
+                ImageLockMode.ReadOnly,
+                PixelFormat.Format32bppArgb);
+        var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+        var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
+        Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
+        sourceBitmap.UnlockBits(sourceData);
+        var filterOffset = (matrixSize - 1) / 2;
+        List<int> neighbourPixels = [];
+        for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++) {
+            for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++) {
+                var byteOffset = (offsetY * sourceData.Stride) + (offsetX * 4);
+                neighbourPixels.Clear();
+                for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
+                    for (var filter = -filterOffset; filter <= filterOffset; filter++) {
+                        var calcOffset = byteOffset + (filter * 4) + (filterY * sourceData.Stride);
+                        neighbourPixels.Add(BitConverter.ToInt32(pixelBuffer, calcOffset));
+                    }
+                }
+                neighbourPixels.Sort();
+                var middlePixel = BitConverter.GetBytes(neighbourPixels[filterOffset]);
+                resultBuffer[byteOffset] = middlePixel[0];
+                resultBuffer[byteOffset + 1] = middlePixel[1];
+                resultBuffer[byteOffset + 2] = middlePixel[2];
+                resultBuffer[byteOffset + 3] = middlePixel[3];
+            }
+        }
+        Bitmap resultBitmap = new(sourceBitmap.Width, sourceBitmap.Height);
+        var resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+        Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
+        resultBitmap.UnlockBits(resultData);
+        return resultBitmap;
+    }
+
     public static unsafe Bitmap? ReplaceColor(Bitmap? source, Color toReplace, Color replacement) {
         if (source == null) { return null; }
 
@@ -469,130 +685,147 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         return l;
     }
 
-    public void AdjustBrightness(float value) {
-        if (!isLocked || Bits == null) {
-            Develop.DebugPrint("unlocked!");
-            return;
-        }
+    public void AdjustBrightness(float brightness) {
+        if (Bits == null) { return; }
 
-        int bytes = bitmapData.Stride * bitmapData.Height;
+        brightness = Math.Max(brightness, 0.001f); // Stellen Sie sicher, dass die Helligkeit nicht 0 ist
 
-        // Apply brightness adjustment
-        for (int i = 0; i < bytes; i += 4) {
-            Bits[i] = (byte)Math.Max(0, Math.Min(255, Bits[i] + value));
-            Bits[i + 1] = (byte)Math.Max(0, Math.Min(255, Bits[i + 1] + value));
-            Bits[i + 2] = (byte)Math.Max(0, Math.Min(255, Bits[i + 2] + value));
-            // Alpha channel remains unchanged (Bits[i + 3])
+        for (int i = 0; i < Bits.Length; i++) {
+            int argb = Bits[i];
+
+            // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
+            int a = (argb >> 24) & 0xff;
+            int r = (argb >> 16) & 0xff;
+            int g = (argb >> 8) & 0xff;
+            int b = argb & 0xff;
+
+            // Anpassen der Helligkeit für jede Farbkomponente
+            r = (int)Math.Min(255, r * brightness);
+            g = (int)Math.Min(255, g * brightness);
+            b = (int)Math.Min(255, b * brightness);
+
+            // Kombinieren der Komponenten zurück in ein Pixel
+            Bits[i] = (a << 24) | (r << 16) | (g << 8) | b;
         }
     }
 
     public void AdjustContrast(float value) {
-        if (!isLocked || Bits == null) {
-            Develop.DebugPrint("unlocked!");
-            return;
-        }
+        if (Bits == null) { return; }
 
         value = (100.0f + value) / 100.0f;
         value *= value;
 
-        int bytes = bitmapData.Stride * bitmapData.Height;
+        for (int i = 0; i < Bits.Length; i++) {
+            int argb = Bits[i];
 
-        // Apply contrast adjustment
-        for (int i = 0; i < bytes; i += 4) {
-            float b = Bits[i] / 255.0f;
-            float g = Bits[i + 1] / 255.0f;
-            float r = Bits[i + 2] / 255.0f;
+            // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
+            int a = (argb >> 24) & 0xff;
+            int r = (argb >> 16) & 0xff;
+            int g = (argb >> 8) & 0xff;
+            int b = argb & 0xff;
 
-            r = (((r - 0.5f) * value) + 0.5f) * 255.0f;
-            g = (((g - 0.5f) * value) + 0.5f) * 255.0f;
-            b = (((b - 0.5f) * value) + 0.5f) * 255.0f;
+            // Anpassen des Kontrasts für jede Farbkomponente und Begrenzen der Farbwerte
+            r = (int)Math.Max(0, Math.Min(255, (((r / 255f) - 0.5f) * value + 0.5f) * 255.0f));
+            g = (int)Math.Max(0, Math.Min(255, (((g / 255f) - 0.5f) * value + 0.5f) * 255.0f));
+            b = (int)Math.Max(0, Math.Min(255, (((b / 255f) - 0.5f) * value + 0.5f) * 255.0f));
 
-            Bits[i] = (byte)Math.Max(0, Math.Min(255, b));       // Blue
-            Bits[i + 1] = (byte)Math.Max(0, Math.Min(255, g));   // Green
-            Bits[i + 2] = (byte)Math.Max(0, Math.Min(255, r));     // Red
-                                                                   // Bits[i + 3] is Alpha and remains unchanged
+            // Kombinieren der Komponenten zurück in ein Pixel und direkt im Array aktualisieren
+            Bits[i] = (a << 24) | (r << 16) | (g << 8) | b;
         }
     }
 
     public void AdjustGamma(float gamma) {
-        if (!isLocked || Bits == null) {
-            Develop.DebugPrint("unlocked!");
-            return;
-        }
+        if (Bits == null) { return; }
 
-        // Create gamma correction table
-        byte[] gammaTable = new byte[256];
+        // Stellen Sie sicher, dass der Gamma-Wert gültig ist
+        gamma = Math.Max(gamma, 0.001f);
+
+        // Erstellen Sie eine Lookup-Tabelle für die Gamma-Korrektur
+        int[] gammaArray = new int[256];
         for (int i = 0; i < 256; ++i) {
-            gammaTable[i] = (byte)Math.Min(255, (int)((255.0 * Math.Pow(i / 255.0, 1.0 / gamma)) + 0.5));
+            gammaArray[i] = (int)Math.Min(255,
+                (int)((255.0 * Math.Pow(i / 255.0, 1.0 / gamma)) + 0.5));
         }
 
-        int bytes = bitmapData.Stride * bitmapData.Height;
+        // Anpassen des Gammas für jedes Pixel im Bits-Array
+        for (int i = 0; i < Bits.Length; i++) {
+            int argb = Bits[i];
+            int a = (argb >> 24) & 0xff; // Alpha-Komponente
+            int r = (argb >> 16) & 0xff; // Rot-Komponente
+            int g = (argb >> 8) & 0xff;  // Grün-Komponente
+            int b = argb & 0xff;         // Blau-Komponente
 
-        // Apply gamma correction
-        for (int i = 0; i < bytes; i += 4) {
-            Bits[i] = gammaTable[Bits[i]];         // Blue
-            Bits[i + 1] = gammaTable[Bits[i + 1]]; // Green
-            Bits[i + 2] = gammaTable[Bits[i + 2]]; // Red
-            Bits[i + 3] = Bits[i + 3];             // Alpha
+            // Gamma-Korrektur für jede Farbkomponente
+            r = gammaArray[r];
+            g = gammaArray[g];
+            b = gammaArray[b];
+
+            // Kombinieren der Komponenten zurück in ein Pixel und direkt im Array aktualisieren
+            Bits[i] = (a << 24) | (r << 16) | (g << 8) | b;
         }
     }
 
-    public void CloneFromBitmap(Bitmap? sourcebmp) {
-        UnlockBits(false);
-        _bitmap?.Dispose(); // Dispose of any existing bitmap
-        _bitmap = null;
-
-        if (sourcebmp == null) {
+    public void CloneFromBitmap(Bitmap? bmp) {
+        // Überprüfen, ob das übergebene Bitmap null ist
+        if (bmp == null) {
             Width = -1;
             Height = -1;
             return;
         }
 
-        var tim = DateTime.UtcNow;
+        // Initialisieren einer Stopwatch für die Zeitüberwachung
+        var stopwatch = Stopwatch.StartNew();
+
         do {
             try {
-                Width = sourcebmp.Width;
-                Height = sourcebmp.Height;
+                // Setzen der Bildabmessungen
+                Width = bmp.Width;
+                Height = bmp.Height;
+                Bits = new int[Width * Height];
 
-                _bitmap = new Bitmap(Width, Height, Pixelformat);
+                // Fixieren des Bits-Arrays im Speicher, damit es nicht von der Garbage Collection verschoben wird.
+                BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
+
+                // Erstellen eines neuen Bitmaps mit dem fixierten Bits-Array als Puffer
+                _bitmap = new Bitmap(Width, Height, Width * 4, Pixelformat, BitsHandle.AddrOfPinnedObject());
+
+                // Zeichnen des übergebenen Bitmaps auf das neue Bitmap.
+                // Dadurch werden die Pixel-Daten des Originalbildes in das Bits-Array kopiert.
                 using var gr = Graphics.FromImage(_bitmap);
-                gr.DrawImage(sourcebmp, new Rectangle(0, 0, Width, Height));
-
-                LockBits();
+                gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
             } catch (Exception ex) {
-                Width = -1;
-                Height = -1;
-                _bitmap = null;
+                // Freigeben des GCHandle, wenn eine Ausnahme auftritt
+                if (BitsHandle.IsAllocated) { BitsHandle.Free(); }
 
-                if (DateTime.UtcNow.Subtract(tim).TotalSeconds > 5) {
+                // Überprüfen, ob die Zeitüberschreitung erreicht ist
+                if (stopwatch.Elapsed.TotalSeconds > 5) {
+                    // Protokollieren des Fehlers
+                    stopwatch.Stop();
                     Develop.DebugPrint("Bild konnte nicht geklont werden", ex);
+                    Width = -1;
+                    Height = -1;
+                    _bitmap = null;
                     return;
                 }
+
+                // Kurze Pause vor dem nächsten Versuch
+                Thread.Sleep(100);
             }
         } while (_bitmap == null);
+
+        // Stopp der Stopwatch
+        stopwatch.Stop();
     }
 
-    public Bitmap? CloneOfBitmap() {
-        //public static explicit operator Bitmap?(BitmapExt? p) {
-        if (_bitmap == null) { return null; }
-        UnlockBits(true);
-        var bmp = _bitmap.Clone();
-        LockBits();
-        if (bmp is Bitmap bitmap) { return bitmap; }
-        return null;
-    }
+    public BitmapExt Crop(Rectangle re) {
+        BitmapExt newBmp = new(re.Width, re.Height);
+        if (newBmp._bitmap != null) {
+            using var gr = Graphics.FromImage(newBmp._bitmap);
+            gr.Clear(Color.Transparent);
+            gr.PixelOffsetMode = PixelOffsetMode.Half;
+            if (_bitmap != null) { gr.DrawImage(_bitmap, re with { X = 0, Y = 0 }, re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel); }
+        }
 
-    public Bitmap Crop(Rectangle re) {
-        UnlockBits(true);
-        Bitmap newBmp = new(re.Width, re.Height);
-
-        using var gr = Graphics.FromImage(newBmp);
-        gr.Clear(Color.Transparent);
-        gr.PixelOffsetMode = PixelOffsetMode.Half;
-        UnlockBits(true);
-        if (_bitmap != null) { gr.DrawImage(_bitmap, re with { X = 0, Y = 0 }, re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel); }
-
-        LockBits();
         return newBmp;
     }
 
@@ -611,195 +844,18 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     public Color GetPixel(int x, int y) {
-        if (!isLocked || Bits == null) {
-            Develop.DebugPrint("unlocked!");
-            return Color.Transparent;
-        }
-
-        int index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel in ARGB
-        byte blue = Bits[index];
-        byte green = Bits[index + 1];
-        byte red = Bits[index + 2];
-        byte alpha = Bits[index + 3];
-
-        return Color.FromArgb(alpha, red, green, blue);
+        if (Bits != null && x >= 0 && y >= 0 && x < Width && y < Height) { return Color.FromArgb(Bits[x + (y * Width)]); }
+        return Color.Transparent;
     }
 
-    public void ImageBlurFilter(BlurType blurType) {
-        if (!isLocked || Bits == null) {
-            Develop.DebugPrint("unlocked!");
-            return;
-        }
+    public void MakeTransparent(Color color) => _bitmap?.MakeTransparent(color);
 
-        switch (blurType) {
-            case BlurType.Mean3x3:
-                ConvolutionFilter(ImageMatrix.Mean3X3, 1.0 / 9.0, 0);
-                break;
-
-            case BlurType.Mean5x5:
-                ConvolutionFilter(ImageMatrix.Mean5X5, 1.0 / 25.0, 0);
-                break;
-
-            case BlurType.Mean7x7:
-                ConvolutionFilter(ImageMatrix.Mean7X7, 1.0 / 49.0, 0);
-                break;
-
-            case BlurType.Mean9x9:
-                ConvolutionFilter(ImageMatrix.Mean9X9, 1.0 / 81.0, 0);
-                break;
-
-            case BlurType.GaussianBlur3x3:
-                ConvolutionFilter(ImageMatrix.GaussianBlur3X3, 1.0 / 16.0, 0);
-                break;
-
-            case BlurType.GaussianBlur5x5:
-                ConvolutionFilter(ImageMatrix.GaussianBlur5X5, 1.0 / 159.0, 0);
-                break;
-
-            case BlurType.MotionBlur5x5:
-                ConvolutionFilter(ImageMatrix.MotionBlur5X5, 1.0 / 10.0, 0);
-                break;
-
-            case BlurType.MotionBlur5x5At45Degrees:
-                ConvolutionFilter(ImageMatrix.MotionBlur5X5At45Degrees, 1.0 / 5.0, 0);
-                break;
-
-            case BlurType.MotionBlur5x5At135Degrees:
-                ConvolutionFilter(ImageMatrix.MotionBlur5X5At135Degrees, 1.0 / 5.0, 0);
-                break;
-
-            case BlurType.MotionBlur7x7:
-                ConvolutionFilter(ImageMatrix.MotionBlur7X7, 1.0 / 14.0, 0);
-                break;
-
-            case BlurType.MotionBlur7x7At45Degrees:
-                ConvolutionFilter(ImageMatrix.MotionBlur7X7At45Degrees, 1.0 / 7.0, 0);
-                break;
-
-            case BlurType.MotionBlur7x7At135Degrees:
-                ConvolutionFilter(ImageMatrix.MotionBlur7X7At135Degrees, 1.0 / 7.0, 0);
-                break;
-
-            case BlurType.MotionBlur9x9:
-                ConvolutionFilter(ImageMatrix.MotionBlur9X9, 1.0 / 18.0, 0);
-                break;
-
-            case BlurType.MotionBlur9x9At45Degrees:
-                ConvolutionFilter(ImageMatrix.MotionBlur9X9At45Degrees, 1.0 / 9.0, 0);
-                break;
-
-            case BlurType.MotionBlur9x9At135Degrees:
-                ConvolutionFilter(ImageMatrix.MotionBlur9X9At135Degrees, 1.0 / 9.0, 0);
-                break;
-
-            case BlurType.Median3x3:
-                MedianFilter(3);
-                break;
-
-            case BlurType.Median5x5:
-                MedianFilter(5);
-                break;
-
-            case BlurType.Median7x7:
-                MedianFilter(7);
-                break;
-
-            case BlurType.Median9x9:
-                MedianFilter(9);
-                break;
-
-            case BlurType.Median11x11:
-                MedianFilter(11);
-                break;
-        }
-    }
-
-    public void LockBits() {
-        if (isLocked) { return; }
-        if (_bitmap == null) { return; }
-
-        // Definieren Sie den Bereich des Bitmaps, der gesperrt werden soll.
-        Rectangle lockArea = new Rectangle(0, 0, _bitmap.Width, _bitmap.Height);
-
-        // Sperren Sie den Bitmap-Bereich und erhalten Sie die BitmapData.
-        bitmapData = _bitmap.LockBits(lockArea, ImageLockMode.ReadWrite, Pixelformat);
-
-        Bits = new byte[bitmapData.Stride * bitmapData.Height];
-        Marshal.Copy(bitmapData.Scan0, Bits, 0, Bits.Length);
-
-        isLocked = true;
-    }
-
-    public void MakeTransparent(Color color) {
-        UnlockBits(true);
-        _bitmap?.MakeTransparent(color);
-        LockBits();
-    }
-
-    public void MedianFilter(int matrixSize) {
-        if (!isLocked || Bits == null) {
-            Develop.DebugPrint("unlocked!");
-            return;
-        }
-
-        var filterOffset = (matrixSize - 1) / 2;
-        List<int> neighbourPixels = [];
-        for (var offsetY = filterOffset; offsetY < Height - filterOffset; offsetY++) {
-            for (var offsetX = filterOffset; offsetX < Width - filterOffset; offsetX++) {
-                var byteOffset = (offsetY * bitmapData.Stride) + (offsetX * 4);
-                neighbourPixels.Clear();
-                for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
-                    for (var filter = -filterOffset; filter <= filterOffset; filter++) {
-                        var calcOffset = byteOffset + (filter * 4) + (filterY * bitmapData.Stride);
-                        neighbourPixels.Add(BitConverter.ToInt32(Bits, calcOffset));
-                    }
-                }
-                neighbourPixels.Sort();
-                var middlePixel = BitConverter.GetBytes(neighbourPixels[filterOffset]);
-                Bits[byteOffset] = middlePixel[0];
-                Bits[byteOffset + 1] = middlePixel[1];
-                Bits[byteOffset + 2] = middlePixel[2];
-                Bits[byteOffset + 3] = middlePixel[3];
-            }
-        }
-    }
-
-    public void Save(string name, ImageFormat imageFormat) {
-        UnlockBits(true);
-        _bitmap?.Save(name, imageFormat);
-        LockBits();
-    }
+    public void Save(string name, ImageFormat imageFormat) => _bitmap?.Save(name, imageFormat);
 
     public void SetPixel(int x, int y, Color color) {
-        if (!isLocked || Bits == null) {
-            Develop.DebugPrint("unlocked!");
-            return;
+        if (Bits != null && x >= 0 && y >= 0 && x < Width && y < Height) {
+            Bits[x + (y * Width)] = color.ToArgb();
         }
-
-        int index = (y * bitmapData.Stride) + (x * 4); // 4 bytes per pixel in ARGB
-        Bits[index] = color.B;
-        Bits[index + 1] = color.G;
-        Bits[index + 2] = color.R;
-        Bits[index + 3] = color.A;
-    }
-
-    public void UnlockBits(bool copyback) {
-        if (!isLocked) { return; }
-        if (_bitmap == null) {
-            isLocked = false;
-            return;
-        }
-
-        if (copyback && Bits != null) {
-            Marshal.Copy(Bits, 0, bitmapData.Scan0, Bits.Length);
-        }
-
-        try {
-            // Entsperren Sie den Bitmap-Bereich.
-            _bitmap.UnlockBits(bitmapData); // Finalizer kann Probleme machen
-        } catch { }
-
-        isLocked = false;
     }
 
     protected virtual void Dispose(bool disposing) {
@@ -808,77 +864,66 @@ public class BitmapExt : IDisposable, IDisposableExtended {
                 // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
             }
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
-            UnlockBits(false);
             _bitmap?.Dispose();
+            BitsHandle.Free();
             IsDisposed = true;
         }
     }
 
     protected void EmptyBitmap(int width, int height) {
-        // Entsperren Sie das vorhandene Bitmap, falls es gesperrt ist.
-        UnlockBits(false);
-
-        // Entsorgen Sie das vorhandene Bitmap, bevor Sie ein neues erstellen.
-        _bitmap?.Dispose();
-        _bitmap = null;
-
-        // Überprüfen Sie zuerst die Gültigkeit der Dimensionen.
-        if (width < 1 || height < 1) {
-            Width = 0;
-            Height = 0;
-            return;
-        }
-
-        // Setzen Sie die neuen Dimensionen.
         Width = width;
         Height = height;
+        Bits = new int[Width * Height];
+        BitsHandle = GCHandle.Alloc(Bits, GCHandleType.Pinned);
 
-        // Erstellen Sie ein neues Bitmap mit den angegebenen Dimensionen und dem Pixelformat.
-        _bitmap = new Bitmap(Width, Height, Pixelformat);
-
-        // Sperren Sie das neue Bitmap.
-        LockBits();
-    }
-
-    private void ConvolutionFilter(double[,] filterMatrix, double factor, int bias) {
-        if (!isLocked || Bits == null) {
-            Develop.DebugPrint("unlocked!");
+        if (Width < 1 || height < 1) {
+            _bitmap = null;
             return;
         }
+
+        _bitmap = new Bitmap(Width, Height, Width * 4, Pixelformat, BitsHandle.AddrOfPinnedObject());
+    }
+
+    private static Bitmap ConvolutionFilter(Bitmap sourceBitmap, double[,] filterMatrix, double factor, int bias) {
+        var sourceData = sourceBitmap.LockBits(new Rectangle(0, 0, sourceBitmap.Width, sourceBitmap.Height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        var pixelBuffer = new byte[sourceData.Stride * sourceData.Height];
+        var resultBuffer = new byte[sourceData.Stride * sourceData.Height];
+        Marshal.Copy(sourceData.Scan0, pixelBuffer, 0, pixelBuffer.Length);
+        sourceBitmap.UnlockBits(sourceData);
         var filterWidth = filterMatrix.GetLength(1);
+        // var filterHeight = filterMatrix.GetLength(0);
         var filterOffset = (filterWidth - 1) / 2;
-
-        for (var offsetY = filterOffset; offsetY < Height - filterOffset; offsetY++) {
-            for (var offsetX = filterOffset; offsetX < Width - filterOffset; offsetX++) {
-                double b = 0.0;
-                double g = 0.0;
-                double r = 0.0;
-
-                var byteOffset = (offsetY * bitmapData.Stride) + (offsetX * 4);
-
+        for (var offsetY = filterOffset; offsetY < sourceBitmap.Height - filterOffset; offsetY++) {
+            for (var offsetX = filterOffset; offsetX < sourceBitmap.Width - filterOffset; offsetX++) {
+                double blue = 0;
+                double green = 0;
+                double red = 0;
+                var byteOffset = (offsetY * sourceData.Stride) + (offsetX * 4);
                 for (var filterY = -filterOffset; filterY <= filterOffset; filterY++) {
-                    for (var filterX = -filterOffset; filterX <= filterOffset; filterX++) {
-                        var calcOffset = byteOffset + (filterX * 4) + (filterY * bitmapData.Stride);
-
-                        b += Bits[calcOffset] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
-                        g += Bits[calcOffset + 1] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
-                        r += Bits[calcOffset + 2] * filterMatrix[filterY + filterOffset, filterX + filterOffset];
+                    for (var filter = -filterOffset; filter <= filterOffset; filter++) {
+                        var calcOffset = byteOffset + (filter * 4) + (filterY * sourceData.Stride);
+                        blue += pixelBuffer[calcOffset] * filterMatrix[filterY + filterOffset, filter + filterOffset];
+                        green += pixelBuffer[calcOffset + 1] * filterMatrix[filterY + filterOffset, filter + filterOffset];
+                        red += pixelBuffer[calcOffset + 2] * filterMatrix[filterY + filterOffset, filter + filterOffset];
                     }
                 }
-                b = (factor * b) + bias;
-                g = (factor * g) + bias;
-                r = (factor * r) + bias;
-
-                b = Math.Max(0, Math.Min(255, b));
-                g = Math.Max(0, Math.Min(255, g));
-                r = Math.Max(0, Math.Min(255, r));
-
-                Bits[byteOffset] = (byte)b;
-                Bits[byteOffset + 1] = (byte)g;
-                Bits[byteOffset + 2] = (byte)r;
-                Bits[byteOffset + 3] = 255; // Set alpha to 255 (fully opaque)
+                blue = (factor * blue) + bias;
+                green = (factor * green) + bias;
+                red = (factor * red) + bias;
+                blue = blue > 255 ? 255 : blue < 0 ? 0 : blue;
+                green = green > 255 ? 255 : green < 0 ? 0 : green;
+                red = red > 255 ? 255 : red < 0 ? 0 : red;
+                resultBuffer[byteOffset] = (byte)blue;
+                resultBuffer[byteOffset + 1] = (byte)green;
+                resultBuffer[byteOffset + 2] = (byte)red;
+                resultBuffer[byteOffset + 3] = 255;
             }
         }
+        Bitmap resultBitmap = new(sourceBitmap.Width, sourceBitmap.Height);
+        var resultData = resultBitmap.LockBits(new Rectangle(0, 0, resultBitmap.Width, resultBitmap.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+        Marshal.Copy(resultBuffer, 0, resultData.Scan0, resultBuffer.Length);
+        resultBitmap.UnlockBits(resultData);
+        return resultBitmap;
     }
 
     #endregion

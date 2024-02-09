@@ -142,7 +142,7 @@ public partial class FontSelectDialog {
 
     private void UpdateSampleText() {
         if (_adding) { return; }
-        Sample.Image = Font.SampleText();
+        Sample.Image = Font?.SampleText()?.CloneFromBitmap();
     }
 
     #endregion

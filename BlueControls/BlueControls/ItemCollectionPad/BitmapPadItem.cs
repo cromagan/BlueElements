@@ -89,7 +89,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
         if (Bitmap != null) {
             if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
-        Bitmap = ScreenShot.GrabArea(null);
+        Bitmap = ScreenShot.GrabArea(null).CloneOfBitmap();
     }
 
     public void Datei_laden() {
@@ -111,8 +111,8 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables {
     public override List<GenericControl> GetStyleOptions(int widthOfControl) {
         List<GenericControl> l =
         [
-            new FlexiControlForDelegate( Bildschirmbereich_wählen, "Bildschirmbereich wählen",ImageCode.Bild),
-            new FlexiControlForDelegate( Datei_laden, "Bild laden", ImageCode.Ordner),
+            new FlexiControlForDelegate(Bildschirmbereich_wählen, "Bildschirmbereich wählen", ImageCode.Bild),
+            new FlexiControlForDelegate(Datei_laden, "Bild laden", ImageCode.Ordner),
             new FlexiControl(),
             new FlexiControlForProperty<string>(() => Platzhalter_Für_Layout, 2),
             new FlexiControl()

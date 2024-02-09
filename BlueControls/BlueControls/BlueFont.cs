@@ -58,7 +58,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     private QuickImage? _nameInStyleSym;
     private float _oberlänge = -1;
     private Pen _pen = new Pen(Brushes.Red);
-    private BitmapExt? _sampleTextSym;
+    private Bitmap? _sampleTextSym;
     private float _sizeTestedAndFailed = float.MaxValue;
     private float _sizeTestedAndOk = float.MinValue;
     private QuickImage? _symbolForReadableTextSym;
@@ -436,7 +436,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         return t.TrimEnd(", ");
     }
 
-    public BitmapExt? SampleText() {
+    public Bitmap? SampleText() {
         if (_sampleTextSym != null) { return _sampleTextSym; }
         _sampleTextSym = Symbol("AaBbCcÄä.,?!", false);
         return _sampleTextSym;
@@ -455,7 +455,7 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
     public QuickImage? SymbolOfLine() {
         if (_symbolOfLineSym != null) { return _symbolOfLineSym; }
 
-        BitmapExt bmp = new(32, 12);
+        Bitmap bmp = new(32, 12);
         using (var gr = Graphics.FromImage(bmp)) {
             gr.Clear(ColorMain.GetBrightness() > 0.9F ? Color.FromArgb(200, 200, 200) : Color.White);
             gr.SmoothingMode = SmoothingMode.HighQuality;
@@ -546,9 +546,9 @@ public sealed class BlueFont : IReadableTextWithChanging, IHasKeyName, IParseabl
         }
     }
 
-    private BitmapExt Symbol(string text, bool transparent) {
+    private Bitmap Symbol(string text, bool transparent) {
         var s = MeasureString(text);
-        BitmapExt bmp = new((int)(s.Width + 1), (int)(s.Height + 1));
+        Bitmap bmp = new((int)(s.Width + 1), (int)(s.Height + 1));
         using (var gr = Graphics.FromImage(bmp)) {
             if (transparent) {
                 gr.Clear(Color.FromArgb(180, 180, 180));

@@ -293,7 +293,7 @@ public sealed partial class EasyPic : GenericControl, IContextMenu, IBackgroundN
     private void btnScreenshot_Click(object sender, System.EventArgs e) {
         if (!DeleteImageInFileSystem()) { return; }
         if (!HasFileName()) { return; }
-        _bitmap = ScreenShot.GrabArea(ParentForm());
+        _bitmap = ScreenShot.GrabArea(ParentForm()).CloneOfBitmap();
 
         SaveNewPicToDisc();
         ZoomFitInvalidateAndCheckButtons();
