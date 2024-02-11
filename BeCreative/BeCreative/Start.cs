@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls;
@@ -23,6 +24,7 @@ using BlueControls.Forms;
 using BlueDatabase;
 using BluePaint;
 using System;
+using System.Diagnostics;
 using static BlueBasics.Develop;
 
 namespace BeCreative {
@@ -63,6 +65,21 @@ namespace BeCreative {
         }
 
         private void btnDatenbank_Click(object sender, EventArgs e) {
+            //var l = Stopwatch.StartNew();
+
+            //const ImageCode tempVar = (ImageCode)9999;
+            //for (ImageCode z = 0; z <= tempVar; z++) {
+            //    var w = Enum.GetName(z.GetType(), z);
+            //    if (!string.IsNullOrEmpty(w)) {
+            //        var x = QuickImage.Get(w + "|64||128");
+            //        var x2 = QuickImage.Get(w + "|60");
+            //        var x3 = QuickImage.Get(w + "|32|40||||50");
+            //    }
+            //}
+
+            //l.Stop();
+            //var l2 = l.ElapsedMilliseconds;
+
             DoForm(new TableView(null, true, true));
         }
 

@@ -445,7 +445,8 @@ public class BitmapExt : IDisposable, IDisposableExtended {
                 l.Clear();
                 Generic.CollectGarbage();
                 var x = (Bitmap?)Image_FromFile(fileName);
-                if (x != null) l.Add(x.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
+                if (x != null)
+                    l.Add(x.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
                 if (frames > 1) {
                     Bitmap x2 = new(200, 200);
                     var gr = Graphics.FromImage(x2);
@@ -806,10 +807,14 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         if (!IsDisposed) {
             if (disposing) {
                 // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
+
+                UnlockBits(false); // Stellen Sie sicher, dass die Bitmap freigegeben wird
+                _bitmap?.Dispose();
+                _bitmap = null;
             }
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
-            UnlockBits(false);
-            _bitmap?.Dispose();
+            //UnlockBits(false);
+            //_bitmap?.Dispose();
             IsDisposed = true;
         }
     }
