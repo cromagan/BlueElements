@@ -64,7 +64,7 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     /// <summary>
-    /// Erstellt das BitmapExt Element mit einem Clone der angegebenen Bitmaap
+    /// Erstellt das BitmapExt Element mit einem Clone des angegebenen Bitmaps
     /// </summary>
     /// <param name="bmp"></param>
     public BitmapExt(Bitmap bmp) => CloneFromBitmap(bmp);
@@ -241,11 +241,16 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     public static Bitmap? Image_Clone(Bitmap? sourceBmp) {
-        if (sourceBmp == null) { return null; }
-        Bitmap bmp = new(sourceBmp.Width, sourceBmp.Height, PixelFormat.Format32bppArgb);
-        using var g = Graphics.FromImage(bmp);
-        g.DrawImage(sourceBmp, 0, 0, sourceBmp.Width, sourceBmp.Height); // Unerklärlich, orgiImage.Width, orgiImage.Height muss stehen bleiben!
-        return bmp;
+        try {
+            if (sourceBmp == null || !sourceBmp.IsValid()) { return null; }
+            Bitmap bmp = new(sourceBmp.Width, sourceBmp.Height, PixelFormat.Format32bppArgb);
+            using var g = Graphics.FromImage(bmp);
+            g.DrawImage(sourceBmp, 0, 0, sourceBmp.Width, sourceBmp.Height); // Unerklärlich, orgiImage.Width, orgiImage.Height muss stehen bleiben!
+            return bmp;
+        } catch {
+        }
+
+        return null;
     }
 
     public static implicit operator Bitmap?(BitmapExt? p) => p?._bitmap;
@@ -413,6 +418,8 @@ public class BitmapExt : IDisposable, IDisposableExtended {
 
         do {
             try {
+                if (BitsHandle.IsAllocated) { BitsHandle.Free(); }
+
                 // Setzen der Bildabmessungen
                 Width = bmp.Width;
                 Height = bmp.Height;
@@ -509,6 +516,7 @@ public class BitmapExt : IDisposable, IDisposableExtended {
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
             _bitmap?.Dispose();
             BitsHandle.Free();
+            _bits = null;
             IsDisposed = true;
         }
     }

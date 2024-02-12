@@ -82,6 +82,21 @@ public static partial class Extensions {
         }
     }
 
+    public static bool IsValid(this Bitmap? bitmap) {
+        if (bitmap == null) { return false; }
+
+        try {
+            // Versuche auf einige Eigenschaften des Bitmaps zuzugreifen,
+            // um sicherzustellen, dass das Bitmap-Objekt gültig ist.
+            _ = bitmap.Width;
+            _ = bitmap.Height;
+            return true;
+        } catch {
+            // Wenn eine Ausnahme auftritt, ist das Bitmap nicht gültig.
+            return false;
+        }
+    }
+
     public static Bitmap Resize(this Bitmap bmp, int maxwidth, int maxheight, SizeModes sizeMode, InterpolationMode interpolationMode, bool collectGarbage) {
         if (collectGarbage) { Generic.CollectGarbage(); }
         if (maxwidth < 1) { maxwidth = 1; }

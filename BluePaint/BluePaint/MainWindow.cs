@@ -66,6 +66,7 @@ public partial class MainWindow {
     /// Filename wird entfernt!
     /// </summary>
     /// <param name="bmp"></param>
+    /// <param name="zoomfit"></param>
     public void SetPic(Bitmap? bmp, bool zoomfit) {
         CurrentTool_OverridePic(this, new ZoomBitmapEventArgs(bmp, zoomfit));
         _filename = string.Empty;
@@ -139,7 +140,7 @@ public partial class MainWindow {
 
     private void btnCopy_Click(object sender, System.EventArgs e) {
         SetTool(null); // um OnToolChangeAuszulösen
-        if (P.Bmp is Bitmap pic) {
+        if (P.Bmp is Bitmap pic && pic.IsValid()) {
             Clipboard.SetImage(pic);
             //System.Windows.Clipboard.SetDataObject(P.Bmp, false);
             Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", ImageCode.Clipboard);
@@ -206,33 +207,23 @@ public partial class MainWindow {
             _picUndo = null;
             GC.Collect();
         }
-        if (P.Bmp == null) {
+        if (P.Bmp?.Clone() is not Bitmap bmp) {
             btnRückgänig.Enabled = false;
             return;
         }
-        _picUndo = Image_Clone(P.Bmp);
+        _picUndo = bmp;
         btnRückgänig.Enabled = true;
     }
 
-    //private void CurrentTool_PicChangedByTool(object sender, System.EventArgs e)
-    //{
-    //    P.Invalidate();
-    //}
     private void CurrentTool_HideMainWindow(object sender, System.EventArgs e) => Hide();
 
     private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.Bmp = P.Bmp;
 
     private void CurrentTool_OverridePic(object sender, ZoomBitmapEventArgs e) {
         CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
-        P.Bmp = e.Bmp;
+        P.Bmp = e.Bmp?.Clone() as Bitmap;
         if (e.DoZoomFit) { P.ZoomFit(); }
-
-        //if (P.Bmp != null)
-        //{
-        //    P.OverlayBmp = new Bitmap(P.Bmp.Width, P.Bmp.Height);
-        //}
         P.Invalidate();
-        //if (CurrentTool != null) { CurrentTool.SetPics(P.Bmp, P.OverlayBmp); }
     }
 
     private void CurrentTool_ShowMainWindow(object sender, System.EventArgs e) => Show();
@@ -292,8 +283,8 @@ public partial class MainWindow {
 
     private void P_ImageMouseMove(object sender, MouseEventArgs1_1DownAndCurrent e) {
         _currentTool?.MouseMove(e, P.Bmp);
-        if (e.Current.IsInPic && P.Bmp != null) {
-            var c = P.Bmp.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
+        if (e.Current.IsInPic && P.Bmp is Bitmap bmp && bmp.IsValid()) {
+            var c = bmp.GetPixel(e.Current.TrimmedX, e.Current.TrimmedY);
             InfoText.Text = "X: " + e.Current.TrimmedX +
                             "<br>Y: " + e.Current.TrimmedY +
                             "<br>Farbe: " + c.ToHtmlCode().ToUpper();
@@ -333,7 +324,7 @@ public partial class MainWindow {
             return;
         }
 
-        if (P.Bmp is not Bitmap bmp) { return; }
+        if (P.Bmp is not Bitmap bmp || !bmp.IsValid()) { return; }
 
         try {
             switch (_filename.FileSuffix().ToUpper()) {

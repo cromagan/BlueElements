@@ -239,7 +239,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
     //            return PathOfPicture.TrimEnd(".PNG").TrimEnd(".JPG").TrimEnd(".JPG") + ".txt";
     private void DrawMittelLinien(AdditionalDrawing eg) {
-        if (Bmp == null) { return; }
+        if (Bmp == null || !Bmp.IsValid()) { return; }
         PositionEventArgs e = new(MousePos11.X, MousePos11.Y);
         OnOverwriteMouseImageData(e);
         ///// Punkte

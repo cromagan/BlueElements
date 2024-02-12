@@ -35,9 +35,9 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
     #region Methods
 
     public override void DoAdditionalDrawing(AdditionalDrawing e, Bitmap? originalPic) {
-        if (originalPic == null) { return; }
+        if (originalPic == null || !originalPic.IsValid()) { return; }
 
-        var picPreview = new BitmapExt(originalPic);
+        using var picPreview = new BitmapExt(originalPic);
 
         if (sldKontrast.Value != 0) { picPreview.ApplyFilter("Contrast", sldKontrast.Value); }
         if (Math.Abs(sldGamma.Value - 1) > 0.001) { picPreview.ApplyFilter("Gamma", sldGamma.Value); }

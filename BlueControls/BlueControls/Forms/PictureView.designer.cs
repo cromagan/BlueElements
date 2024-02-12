@@ -119,7 +119,6 @@ namespace BlueControls.Forms
             // Pad
             // 
             this.Pad.AlwaysSmooth = true;
-            this.Pad.Bmp = null;
             this.Pad.Dock = DockStyle.Fill;
             this.Pad.Location = new Point(0, 110);
             this.Pad.Name = "Pad";
