@@ -48,7 +48,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 {
     #region Fields
 
-    private FilterCollection? _filterInput = null;
+    private FilterCollection? _filterInput;
     private string _lastcheck = string.Empty;
 
     private string _originalText = string.Empty;
@@ -104,7 +104,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         }
     }
 
-    public bool FilterInputChangedHandled { get; set; } = false;
+    public bool FilterInputChangedHandled { get; set; }
 
     public string OriginalText {
         get => _originalText;
@@ -133,7 +133,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
 
     public List<RowItem>? RowsInput { get; set; }
 
-    public bool RowsInputChangedHandled { get; set; } = false;
+    public bool RowsInputChangedHandled { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -411,7 +411,7 @@ public partial class FileBrowser : GenericControl, IControlUsesRow   //UserContr
         List<string> files;
 
         try {
-            var dropped = ((string[])e.Data.GetData(DataFormats.FileDrop));
+            var dropped = (string[])e.Data.GetData(DataFormats.FileDrop);
             files = dropped.ToList();
         } catch {
             MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");

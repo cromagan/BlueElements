@@ -65,7 +65,6 @@ public class EasyPicPadItem : FakeControlPadItem, IItemToControl, IItemAcceptFil
             if (IsDisposed) { return; }
             if (value == _bild_Dateiname) { return; }
             _bild_Dateiname = value;
-            this.RaiseVersion();
             OnChanged();
         }
     }

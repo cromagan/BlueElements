@@ -29,7 +29,6 @@ using BlueDatabase;
 using BlueScript;
 using BlueScript.EventArgs;
 using BlueScript.Interfaces;
-using BlueScript.Methods;
 using BlueScript.Variables;
 
 namespace BlueControls.Controls;
@@ -50,7 +49,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
     private ButtonArgs _enabledwhenrows;
 
-    private FilterCollection? _filterInput = null;
+    private FilterCollection? _filterInput;
 
     #endregion
 
@@ -139,7 +138,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
         }
     }
 
-    public bool FilterInputChangedHandled { get; set; } = false;
+    public bool FilterInputChangedHandled { get; set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -148,7 +147,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
 
     public List<RowItem>? RowsInput { get; set; }
 
-    public bool RowsInputChangedHandled { get; set; } = false;
+    public bool RowsInputChangedHandled { get; set; }
 
     public bool RowsInputManualSeted { get; set; } = false;
 
@@ -227,7 +226,7 @@ internal class ConnectedFormulaButton : Button, IControlUsesRow {
             return;
         }
 
-        Method? m = Script.Commands.Get(_action);
+        var m = Script.Commands.Get(_action);
 
         if (m is not IUseableForButton ufb) {
             ButtonError("Aktion '" + _action + "' nicht gefunden.");

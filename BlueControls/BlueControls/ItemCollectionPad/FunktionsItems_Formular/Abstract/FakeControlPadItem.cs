@@ -89,7 +89,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         var anzbr = IntParse(doit[0]);
         var npos = IntParse(doit[1]);
         SetXPosition(anzbr, npos);
-        this.RaiseVersion();
+        OnChanged();
     }
 
     //public abstract int InputColorId { get; set; }
@@ -193,7 +193,6 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         }
 
         if (VisibleFor.Count == 0) { VisibleFor.Add(Constants.Administrator); }
-        this.RaiseVersion();
         OnChanged();
     }
 
@@ -206,8 +205,8 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         x.Height = (int)((x.Height / he1) + 0.99) * he1;
 
         if (x.Height < he) { x.Height = he; }
-        this.RaiseVersion();
         SetCoordinates(x, true);
+        OnChanged();
     }
 
     public abstract QuickImage? SymbolForReadableText();

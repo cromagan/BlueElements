@@ -2069,7 +2069,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
     //    if (!isLoading) { Variables = new VariableCollection(_variables); }
     //}
     internal void RefreshCellData(ColumnItem column, RowItem row, Reason reason) {
-        if (reason is Reason.InitialLoad or Reason.UpdateChanges or Reason.AdditionalWorkAfterComand) { return; }
+        if (reason is Reason.InitialLoad or Reason.UpdateChanges or Reason.AdditionalWorkAfterCommand) { return; }
 
         if (column.IsInCache != null || row.IsInCache != null) { return; }
 
@@ -2093,7 +2093,7 @@ public class Database : IDisposableExtendedWithEvent, IHasKeyName, ICanDropMessa
             ColumnViewCollection.Repair(x[z], z);
         }
 
-        if (reason is Reason.InitialLoad or Reason.UpdateChanges or Reason.AdditionalWorkAfterComand) {
+        if (reason is Reason.InitialLoad or Reason.UpdateChanges or Reason.AdditionalWorkAfterCommand) {
             SetValueInternal(DatabaseDataType.ColumnArrangement, null, null, x.ToString(false), UserName, DateTime.UtcNow, reason);
         } else {
             ColumnArrangements = x.AsReadOnly();

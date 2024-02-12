@@ -24,5 +24,5 @@ public enum Reason {
     InitialLoad = 1,
     SystemSet = 1, // Ebenfalls ein, soll sehr sanft behandelt werden.
     UpdateChanges = 2,
-    AdditionalWorkAfterComand = 3
+    AdditionalWorkAfterCommand = 3
 }

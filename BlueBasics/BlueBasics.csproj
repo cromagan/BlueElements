@@ -98,7 +98,18 @@
   <ItemGroup>
     <Compile Include="Accessor.cs" />
     <Compile Include="BackupVerwalter.cs" />
-    <Compile Include="BitmapExt.cs" />
+    <Compile Include="BitmapExt\BitmapExt.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Intensify.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Ausdünnen.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter_AllePixelZuSchwarz.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Grayscale.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Median.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Blur.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Brightness.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Contrast.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Gamma.cs" />
+    <Compile Include="BitmapExt\ImageFilters\ImageFilter_Invert.cs" />
     <Compile Include="Enums\AdditionalCheck.cs" />
     <Compile Include="Enums\ScriptEventTypes.cs" />
     <Compile Include="Enums\SortierTyp.cs" />
@@ -109,8 +120,6 @@
     <Compile Include="EventArgs\MultiUserHasPendingChangesEventArgs.cs" />
     <Compile Include="Extensions\FontExtensions.cs" />
     <Compile Include="FormatHolder.cs" />
-    <Compile Include="ImageMatrix.cs" />
-    <Compile Include="Enums\BlurType.cs" />
     <Compile Include="Enums\EditableErrorReasonType.cs" />
     <Compile Include="EventArgs\NeedImageEventArgs.cs" />
     <Compile Include="Extensions\RectangleFExtension.cs" />

@@ -41,7 +41,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     #region Fields
 
-    private FilterCollection? _filterInput = null;
+    private FilterCollection? _filterInput;
     private bool _generated;
 
     #endregion
@@ -90,7 +90,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
         }
     }
 
-    public bool FilterInputChangedHandled { get; set; } = false;
+    public bool FilterInputChangedHandled { get; set; }
 
     public FilterCollection FilterOutput { get; } = new("FilterOutput 03");
 
@@ -103,7 +103,7 @@ public partial class ConnectedFormulaView : GenericControl, IBackgroundNone, ICo
 
     public List<RowItem>? RowsInput { get; set; }
 
-    public bool RowsInputChangedHandled { get; set; } = false;
+    public bool RowsInputChangedHandled { get; set; }
 
     public bool RowsInputManualSeted { get; set; } = false;
 

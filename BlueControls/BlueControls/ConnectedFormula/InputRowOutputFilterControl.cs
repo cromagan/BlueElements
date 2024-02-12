@@ -37,7 +37,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
 
     private readonly FilterTypeRowInputItem _type;
 
-    private FilterCollection? _filterInput = null;
+    private FilterCollection? _filterInput;
     private FlexiFilterDefaultOutput _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
 
     #endregion
@@ -72,7 +72,7 @@ internal class InputRowOutputFilterControl : Caption, IControlAcceptFilter, ICon
         }
     }
 
-    public bool FilterInputChangedHandled { get; set; } = false;
+    public bool FilterInputChangedHandled { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]

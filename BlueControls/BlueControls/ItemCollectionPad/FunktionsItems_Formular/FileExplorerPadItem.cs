@@ -69,7 +69,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
             if (IsDisposed) { return; }
             if (value == _bei_Bedarf_Erzeugen) { return; }
             _bei_Bedarf_Erzeugen = value;
-            this.RaiseVersion();
             OnChanged();
         }
     }
@@ -87,7 +86,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
             if (IsDisposed) { return; }
             if (value == _leere_Ordner_Löschen) { return; }
             _leere_Ordner_Löschen = value;
-            this.RaiseVersion();
             OnChanged();
         }
     }
@@ -113,7 +111,6 @@ public class FileExplorerPadItem : FakeControlPadItem, IItemAcceptFilter, IAutos
             if (IsDisposed) { return; }
             if (value == _pfad) { return; }
             _pfad = value;
-            this.RaiseVersion();
             OnChanged();
         }
     }

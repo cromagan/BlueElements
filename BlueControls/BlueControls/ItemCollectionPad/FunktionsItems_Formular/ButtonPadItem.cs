@@ -326,7 +326,7 @@ public class ButtonPadItem : FakeControlPadItem, IReadableText, IItemToControl, 
 
         l.Add(new FlexiControlForProperty<string>(() => Aktion, co));
 
-        Method? m = Script.Commands.Get(_action);
+        var m = Script.Commands.Get(_action);
 
         if (m is IUseableForButton ufb) {
             if (ufb.ArgsForButton.Count > 0) { l.Add(new FlexiControlForProperty<string>(() => Arg1)); }

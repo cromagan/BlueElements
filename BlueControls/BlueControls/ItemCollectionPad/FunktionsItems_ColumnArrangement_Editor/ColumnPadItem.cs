@@ -64,7 +64,6 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
     }
 
     public override string Description => string.Empty;
-    public string Interner_Name => Column == null ? "?" : Column.KeyName;
 
     /// <summary>
     /// Wird von Flexoptions aufgerufen
@@ -96,11 +95,8 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem {
         if (Column == null || Column.IsDisposed) { return l; }
 
         l.Add(new FlexiControlForProperty<string>(() => Datenbank));
-        l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
         l.Add(new FlexiControl());
         l.Add(new FlexiControlForProperty<bool>(() => Permanent));
-        l.Add(new FlexiControl());
-        l.Add(new FlexiControlForDelegate(Spalte_bearbeiten, "Spalte bearbeiten", ImageCode.Spalte));
         l.Add(new FlexiControl());
         l.Add(new FlexiControlForProperty<string>(() => Column.Caption));
         l.Add(new FlexiControl());

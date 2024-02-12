@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
 using BlueControls;
@@ -24,7 +23,6 @@ using BlueControls.Forms;
 using BlueDatabase;
 using BluePaint;
 using System;
-using System.Diagnostics;
 using static BlueBasics.Develop;
 
 namespace BeCreative {

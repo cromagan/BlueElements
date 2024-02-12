@@ -44,8 +44,8 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
 
     private FlexiFilterDefaultFilter _filterart_bei_texteingabe = FlexiFilterDefaultFilter.Textteil;
 
-    private FilterCollection? _filterInput = null;
-    private bool _fromInputFilter = false;
+    private FilterCollection? _filterInput;
+    private bool _fromInputFilter;
 
     private string _origin;
 
@@ -109,7 +109,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         }
     }
 
-    public bool FilterInputChangedHandled { get; set; } = false;
+    public bool FilterInputChangedHandled { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -409,7 +409,7 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
         if (FilterSingleColumn == null) {
             this.Invalidate_FilterOutput();
         } else {
-            FilterOutput.ChangeTo(((FilterItem?)filterSingle?.Clone()));
+            FilterOutput.ChangeTo((FilterItem?)filterSingle?.Clone());
         }
 
         var nvalue = string.Empty;

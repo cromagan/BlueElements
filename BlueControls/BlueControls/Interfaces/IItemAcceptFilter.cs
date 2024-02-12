@@ -289,7 +289,6 @@ public sealed class ItemAcceptFilter {
         }
 
         item.CalculateInputColorIds();
-        item.RaiseVersion();
         item.OnChanged();
         item.UpdateSideOptionMenu();
     }

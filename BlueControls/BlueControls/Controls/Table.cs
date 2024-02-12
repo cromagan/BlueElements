@@ -83,7 +83,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
     private bool _drawing;
 
-    private FilterCollection? _filterInput = null;
+    private FilterCollection? _filterInput;
     private bool _isinClick;
 
     private bool _isinDoubleClick;
@@ -262,7 +262,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         }
     }
 
-    public bool FilterInputChangedHandled { get; set; } = false;
+    public bool FilterInputChangedHandled { get; set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -496,8 +496,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
                 rowsChecked++;
                 row = tableView.View_NextRow(row) ?? tableView.View_RowFirst();
             }
-            ColumnItem? contentHolderCellColumn = column;
-            RowItem? contentHolderCellRow = row?.Row;
+            var contentHolderCellColumn = column;
+            var contentHolderCellRow = row?.Row;
             if (column != null && column.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
                 (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, false, false);
             }
@@ -2024,8 +2024,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
 
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
-        ColumnItem? contentHolderCellColumn = cellInThisDatabaseColumn;
-        RowItem? contentHolderCellRow = cellInThisDatabaseRow?.Row;
+        var contentHolderCellColumn = cellInThisDatabaseColumn;
+        var contentHolderCellRow = cellInThisDatabaseRow?.Row;
         if (contentHolderCellRow != null && contentHolderCellColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
             if (contentHolderCellColumn == null || contentHolderCellRow == null) { return; } // Dummy prüfung
@@ -2346,8 +2346,8 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
         if (cellInThisDatabaseColumn == null) { return; }// Klick ins Leere
 
-        ColumnItem? contentHolderCellColumn = cellInThisDatabaseColumn;
-        RowItem? contentHolderCellRow = cellInThisDatabaseRow?.Row;
+        var contentHolderCellColumn = cellInThisDatabaseColumn;
+        var contentHolderCellRow = cellInThisDatabaseRow?.Row;
 
         if (cellInThisDatabaseColumn.Format == DataFormat.Verknüpfung_zu_anderer_Datenbank) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = CellCollection.LinkedCellData(contentHolderCellColumn, contentHolderCellRow, true, true);
@@ -2429,7 +2429,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     private void Cell_Edit_Color(ColumnItem cellInThisDatabaseColumn, RowData? cellInThisDatabaseRow) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
-        ColorDialog colDia = new ColorDialog();
+        var colDia = new ColorDialog();
 
         if (cellInThisDatabaseRow?.Row is RowItem r) {
             colDia.Color = r.CellGetColor(cellInThisDatabaseColumn);

@@ -630,7 +630,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             OnRowRemoving(new RowChangedEventArgs(row, reason));
             foreach (var thisColumn in db.Column) {
                 if (thisColumn != null) {
-                    db.Cell.SetValueInternal(thisColumn, row, string.Empty, Reason.AdditionalWorkAfterComand);
+                    db.Cell.SetValueInternal(thisColumn, row, string.Empty, Reason.AdditionalWorkAfterCommand);
                 }
             }
 

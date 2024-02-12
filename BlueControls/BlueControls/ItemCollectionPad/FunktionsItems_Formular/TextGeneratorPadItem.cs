@@ -247,7 +247,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
 
         if (col == col2) { return; }
         col = col2;
-        this.RaiseVersion();
+
         UpdateSideOptionMenu();
         OnChanged();
     }

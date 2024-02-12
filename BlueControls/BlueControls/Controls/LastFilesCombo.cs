@@ -38,7 +38,7 @@ public sealed class LastFilesCombo : ComboBox {
 
     #region Fields
 
-    private bool _loaded = false;
+    private bool _loaded;
     private int _maxCount = 20;
     private bool _mustExists = true;
     private List<string> _settings = [];
@@ -171,7 +171,6 @@ public sealed class LastFilesCombo : ComboBox {
             _settings.AddRange(t.SplitAndCutByCr());
             _loaded = true;
         }
-
     }
 
     private void SaveSettingsToDisk() {

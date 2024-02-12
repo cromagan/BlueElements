@@ -29,7 +29,7 @@ using static BlueBasics.Constants;
 
 namespace BlueScript.Methods;
 
-public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
+public abstract class Method : IReadableTextWithKey, IReadableText {
 
     #region Fields
 
@@ -37,12 +37,6 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     public static readonly List<string> FloatVal = [VariableFloat.ShortName_Plain];
     public static readonly List<string> ListStringVar = [VariableListString.ShortName_Variable];
     public static readonly List<string> StringVal = [VariableString.ShortName_Plain];
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler? Changed;
 
     #endregion
 
@@ -135,7 +129,7 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
     }
 
     public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, LogData ld, ScriptProperties scp) {
-        if (Script.Commands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert", ld); }
+        //if (Script.Commands == null) { return new GetEndFeedback("Interner Fehler: Befehle nicht initialisiert", ld); }
 
         List<string> toSearch = [];
 
@@ -389,17 +383,8 @@ public abstract class Method : IReadableTextWithChangingAndKey, IReadableText {
         return co;
     }
 
-    //        if (!ok) { return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, "Attribut " + (n + 1) + " ist nicht einer der erwarteten Typen '" + exceptetType.JoinWith("' oder '") + "', sondern " + v.MyClassId); }
-    public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
-
-    //        foreach (var thisAt in exceptetType) {
-    //            if (thisAt.TrimStart("*") == v.MyClassId) { ok = true; break; }
-    //            if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
-    //        }
     public string ReadableText() => Syntax;
 
-    //        // Den Typ der Variable checken
-    //        var ok = false;
     public QuickImage? SymbolForReadableText() => null;
 
     private static List<string>? SplitAttributeToString(string attributtext) {

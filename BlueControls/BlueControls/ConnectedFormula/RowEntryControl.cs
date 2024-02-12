@@ -29,7 +29,7 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
 
     #region Fields
 
-    private FilterCollection? _filterInput = null;
+    private FilterCollection? _filterInput;
 
     #endregion
 
@@ -61,7 +61,7 @@ internal class RowEntryControl : GenericControl, IControlUsesRow, IControlSendFi
         }
     }
 
-    public bool FilterInputChangedHandled { get; set; } = false;
+    public bool FilterInputChangedHandled { get; set; }
 
     public FilterCollection FilterOutput { get; } = new("FilterOutput 06");
 

@@ -38,7 +38,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     private readonly string _showformat;
 
-    private FilterCollection? _filterInput = null;
+    private FilterCollection? _filterInput;
 
     #endregion
 
@@ -78,7 +78,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
         }
     }
 
-    public bool FilterInputChangedHandled { get; set; } = false;
+    public bool FilterInputChangedHandled { get; set; }
 
     public FilterCollection FilterOutput { get; } = new("FilterOutput 04");
 
@@ -86,7 +86,7 @@ internal class FlexiControlRowSelector : FlexiControl, IControlSendFilter, ICont
 
     public List<RowItem>? RowsInput { get; set; }
 
-    public bool RowsInputChangedHandled { get; set; } = false;
+    public bool RowsInputChangedHandled { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]

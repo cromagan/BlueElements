@@ -19,14 +19,12 @@
 
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueDatabase;
@@ -109,17 +107,22 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
 
     public ColumnItem? Column {
         get {
-            _column ??= DatabaseInput?.Column.Exists(_columnName);
-
-            return _column;
+            var c = DatabaseInput?.Column.Exists(_columnName);
+            if (c == null || c.IsDisposed) {
+                return null;
+            }
+            return c;
         }
+    }
+
+    public string ColumnName {
+        get => _columnName;
         set {
             if (IsDisposed) { return; }
-            var tmpn = value?.KeyName ?? string.Empty;
-            if (_columnName == tmpn) { return; }
-            _columnName = tmpn;
-            _column = null;
+            if (_columnName == value) { return; }
+            _columnName = value;
             OnChanged();
+            UpdateSideOptionMenu();
         }
     }
 
@@ -145,13 +148,6 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
-    public string Interner_Name {
-        get {
-            if (Column == null || Column.IsDisposed) { return "?"; }
-            return Column.KeyName;
-        }
-    }
 
     public override bool MustBeInDrawingArea => true;
 
@@ -232,12 +228,10 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
         l.AddRange(_itemAccepts.GetStyleOptions(this, widthOfControl));
 
         if (DatabaseOutput is Database db && !db.IsDisposed) {
-            l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
+            var lst = new ItemCollectionList.ItemCollectionList(true);
+            lst.AddRange(db.Column, false);
 
-            if (Column != null && !Column.IsDisposed) {
-                l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
-                l.Add(new FlexiControlForDelegate(Spalte_bearbeiten, "Spalte bearbeiten", ImageCode.Spalte));
-            }
+            l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
         }
 
         l.AddRange(_itemSends.GetStyleOptions(this, widthOfControl));
@@ -314,40 +308,6 @@ public class OutputFilterPadItem : FakeControlPadItem, IReadableText, IItemToCon
     }
 
     public void RemoveChild(IItemAcceptFilter remove) => _itemSends.RemoveChild(remove, this);
-
-    public void Spalte_bearbeiten() {
-        if (IsDisposed) { return; }
-        if (Column == null || Column.IsDisposed) { return; }
-        TableView.OpenColumnEditor(Column, null, null);
-
-        OnChanged();
-    }
-
-    [Description("Wählt die Spalte, die angezeigt werden soll.\r\nDiese bestimmt maßgeblich die Eigenschaften")]
-    public void Spalte_wählen() {
-        if (IsDisposed) { return; }
-
-        if (DatabaseInput is not Database db || db.IsDisposed) {
-            MessageBox.Show("Quelle fehlerhaft!");
-            return;
-        }
-
-        var lst = new ItemCollectionList.ItemCollectionList(true);
-        lst.AddRange(db.Column, false);
-        //lst.Sort();
-
-        var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
-
-        if (sho == null || sho.Count != 1) { return; }
-
-        var col = db.Column.Exists(sho[0]);
-
-        if (col == Column) { return; }
-        Column = col;
-        this.RaiseVersion();
-        UpdateSideOptionMenu();
-        OnChanged();
-    }
 
     public override QuickImage SymbolForReadableText() {
         if (this.IsOk()) {

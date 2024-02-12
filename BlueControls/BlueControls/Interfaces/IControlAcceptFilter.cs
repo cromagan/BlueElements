@@ -77,7 +77,7 @@ public static class ControlAcceptFilterExtension {
         if (parent.IsDisposed) { return; }
         if (child.IsDisposed) { return; }
 
-        bool isnew = !child.Parents.Contains(parent);
+        var isnew = !child.Parents.Contains(parent);
         var newFilters = parent.FilterOutput.Count > 0;
         var doDatabaseAfter = false;
 

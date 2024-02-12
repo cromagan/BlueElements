@@ -46,8 +46,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     private string _columnName = string.Empty;
 
-    private FilterCollection? _filterInput = null;
-    private Database? _lastDB = null;
+    private FilterCollection? _filterInput;
+    private Database? _lastDB;
 
     #endregion
 
@@ -110,7 +110,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
         }
     }
 
-    public bool FilterInputChangedHandled { get; set; } = false;
+    public bool FilterInputChangedHandled { get; set; }
 
     [DefaultValue(false)]
     [Browsable(false)]
@@ -128,7 +128,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RowsInputChangedHandled { get; set; } = false;
+    public bool RowsInputChangedHandled { get; set; }
 
     [DefaultValue(false)]
     [Browsable(false)]

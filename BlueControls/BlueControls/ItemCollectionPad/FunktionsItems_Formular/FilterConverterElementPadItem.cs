@@ -93,7 +93,6 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
             if (IsDisposed) { return; }
             if (value == _eingangsWertSpalte) { return; }
             _eingangsWertSpalte = value;
-            this.RaiseVersion();
             this.DoChilds();
             OnChanged();
         }
@@ -107,7 +106,6 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
             if (IsDisposed) { return; }
             if (value == _filtertype) { return; }
             _filtertype = value;
-            this.RaiseVersion();
             this.DoChilds();
             OnChanged();
         }
@@ -121,7 +119,6 @@ public class FilterConverterElementPadItem : FakeControlPadItem, IReadableText, 
             if (IsDisposed) { return; }
             if (value == _filterSpalte) { return; }
             _filterSpalte = value;
-            this.RaiseVersion();
             this.DoChilds();
             OnChanged();
         }

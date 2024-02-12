@@ -27,7 +27,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Controls;
 using BlueControls.Enums;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionList;
 using BlueControls.ItemCollectionPad.FunktionsItems_Formular.Abstract;
@@ -48,8 +47,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     private readonly ItemAcceptFilter _itemAccepts;
     private bool _autoX = true;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
-    private ColumnItem? _column;
     private string _columnName = string.Empty;
+
     private CaptionPosition _überschriftanordung = CaptionPosition.Über_dem_Feld;
 
     #endregion
@@ -83,10 +82,8 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public bool AutoX {
         get => _autoX;
         set {
-            if (_autoX == value) { return; }
             if (IsDisposed) { return; }
             if (_autoX == value) { return; }
-            this.RaiseVersion();
             _autoX = value;
             OnChanged();
         }
@@ -97,7 +94,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         set {
             if (IsDisposed) { return; }
             if (_überschriftanordung == value) { return; }
-            this.RaiseVersion();
             _überschriftanordung = value;
             OnChanged();
         }
@@ -105,17 +101,22 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
     public ColumnItem? Column {
         get {
-            _column ??= DatabaseInput?.Column.Exists(_columnName);
-
-            return _column;
+            var c = DatabaseInput?.Column.Exists(_columnName);
+            if (c == null || c.IsDisposed) {
+                return null;
+            }
+            return c;
         }
+    }
+
+    public string ColumnName {
+        get => _columnName;
         set {
             if (IsDisposed) { return; }
-            var tmpn = value?.KeyName ?? string.Empty;
-            if (_columnName == tmpn) { return; }
-            _columnName = tmpn;
-            _column = null;
+            if (_columnName == value) { return; }
+            _columnName = value;
             OnChanged();
+            UpdateSideOptionMenu();
         }
     }
 
@@ -129,20 +130,12 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         set {
             if (IsDisposed) { return; }
             if (_bearbeitung == value) { return; }
-            this.RaiseVersion();
             _bearbeitung = value;
             OnChanged();
         }
     }
 
     public List<int> InputColorId => _itemAccepts.InputColorIdGet(this);
-
-    public string Interner_Name {
-        get {
-            if (Column == null || Column.IsDisposed) { return "?"; }
-            return Column.KeyName;
-        }
-    }
 
     public override bool MustBeInDrawingArea => true;
 
@@ -155,26 +148,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
     public ReadOnlyCollection<string> Parents {
         get => _itemAccepts.GetFilterFromKeysGet();
         set => _itemAccepts.GetFilterFromKeysSet(value, this);
-    }
-
-    public string Spalten_AdminInfo {
-        get {
-            if (Column != null && !Column.IsDisposed) { return Column.AdminInfo; }
-            return string.Empty;
-        }
-        set {
-            if (Column != null && !Column.IsDisposed) { Column.AdminInfo = value; }
-        }
-    }
-
-    public string Spalten_QuickInfo {
-        get {
-            if (Column != null && !Column.IsDisposed) { return Column.Quickinfo; }
-            return string.Empty;
-        }
-        set {
-            if (Column != null && !Column.IsDisposed) { Column.Quickinfo = value; }
-        }
     }
 
     #endregion
@@ -202,7 +175,7 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         //var ff = parent.SearchOrGenerate(rfw2);
 
         var con = new FlexiControlForCell {
-            ColumnName = Column?.KeyName ?? string.Empty,
+            ColumnName = _columnName,
             EditType = EditType,
             CaptionPosition = CaptionPosition
         };
@@ -234,11 +207,12 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
 
         if (DatabaseInput is not Database db || db.IsDisposed) { return l; }
 
-        l.Add(new FlexiControlForDelegate(Spalte_wählen, "Spalte wählen", ImageCode.Pfeil_Rechts));
+        var lst = new ItemCollectionList.ItemCollectionList(true);
+        lst.AddRange(db.Column, false);
+
+        l.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
 
         if (Column == null || Column.IsDisposed) { return l; }
-        l.Add(new FlexiControlForProperty<string>(() => Interner_Name));
-        l.Add(new FlexiControlForDelegate(Spalte_bearbeiten, "Spalte bearbeiten", ImageCode.Spalte));
 
         var u = new ItemCollectionList.ItemCollectionList(false);
         u.AddRange(typeof(CaptionPosition));
@@ -247,9 +221,9 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         var b = new ItemCollectionList.ItemCollectionList(false);
         b.AddRange(GetAllowedEditTypes(Column));
         l.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, b));
-        l.Add(new FlexiControl());
-        l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
-        l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
+        //l.Add(new FlexiControl());
+        //l.Add(new FlexiControlForProperty<string>(() => Spalten_QuickInfo, 5));
+        //l.Add(new FlexiControlForProperty<string>(() => Spalten_AdminInfo, 5));
 
         l.Add(new FlexiControl());
         l.AddRange(base.GetStyleOptions(widthOfControl));
@@ -298,40 +272,6 @@ public class EditFieldPadItem : FakeControlPadItem, IReadableText, IItemToContro
         }
 
         return txt + ErrorReason();
-    }
-
-    public void Spalte_bearbeiten() {
-        if (IsDisposed) { return; }
-        if (Column == null || Column.IsDisposed) { return; }
-        TableView.OpenColumnEditor(Column, null, null);
-
-        OnChanged();
-    }
-
-    [Description("Wählt die Spalte, die angezeigt werden soll.\r\nDiese bestimmt maßgeblich die Eigenschaften")]
-    public void Spalte_wählen() {
-        if (IsDisposed) { return; }
-
-        if (DatabaseInput is not Database db || db.IsDisposed) {
-            MessageBox.Show("Quelle fehlerhaft!");
-            return;
-        }
-
-        var lst = new ItemCollectionList.ItemCollectionList(true);
-        lst.AddRange(db.Column, false);
-        //lst.Sort();
-
-        var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, AddType.None, true);
-
-        if (sho == null || sho.Count != 1) { return; }
-
-        var col = db.Column.Exists(sho[0]);
-
-        if (col == Column) { return; }
-        Column = col;
-        this.RaiseVersion();
-        UpdateSideOptionMenu();
-        OnChanged();
     }
 
     public override QuickImage? SymbolForReadableText() {
