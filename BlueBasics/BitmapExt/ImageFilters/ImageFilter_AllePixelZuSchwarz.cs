@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace BlueBasics;
 
@@ -29,23 +30,27 @@ internal class ImageFilter_AllePixelZuSchwarz : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(int width, int height, ref int[] bits, float factor, int bias) {
-        // Schleife über alle Pixel im Array
-        for (var i = 0; i < bits.Length; i++) {
+    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
+        // Berechnung der Schwellenwerte für die Farben
+        var threshold = (int)(255 * factor);
+
+        // Schleife über alle Pixel im Bild
+        for (var i = 0; i < bits.Length; i += 4) {
             // Extrahieren der ARGB-Komponenten aus dem Integer-Wert
-            var argb = bits[i];
-            var a = (argb >> 24) & 0xff; // Alpha-Komponente
-            var r = (argb >> 16) & 0xff; // Rot-Komponente
-            var g = (argb >> 8) & 0xff;  // Grün-Komponente
-            var b = argb & 0xff;         // Blau-Komponente
+            //var a = bits[i + 3]; // Alpha-Komponente
+            var r = bits[i + 2]; // Rot-Komponente
+            var g = bits[i + 1]; // Grün-Komponente
+            var b = bits[i];     // Blau-Komponente
 
-            // Konvertieren der ARGB-Komponenten in ein Color-Objekt
-            var ca = Color.FromArgb(a, r, g, b);
+            // Berechnen der Helligkeit des Pixels
+            var brightness = (0.3f * r) + (0.59f * g) + (0.11f * b);
 
-            // Überprüfen, ob die Farbe nahe Weiß ist
-            if (!ca.IsNearWhite(factor)) {
-                // Wenn nicht, setze die Farbe auf Schwarz
-                bits[i] = Color.Black.ToArgb();
+            // Überprüfen, ob die Helligkeit nahe dem Weißwert liegt
+            if (brightness < threshold) {
+                // Wenn nicht, setzen Sie die Farbe auf Schwarz
+                bits[i] = 0;       // Blau
+                bits[i + 1] = 0;   // Grün
+                bits[i + 2] = 0;   // Rot
             }
         }
     }

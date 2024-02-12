@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Drawing.Imaging;
 
 namespace BlueBasics;
 
@@ -29,26 +30,30 @@ internal class ImageFilter_Contrast : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(int width, int height, ref int[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
         factor = (100.0f + factor) / 100.0f;
         factor *= factor;
 
-        for (var i = 0; i < bits.Length; i++) {
-            var argb = bits[i];
+        // Schleife über alle Pixel im Bild
+        unsafe {
+            for (var i = 0; i < bits.Length; i += 4) {
+                // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
+                var a = bits[i + 3];
+                var r = bits[i + 2];
+                var g = bits[i + 1];
+                var b = bits[i];
 
-            // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
-            var a = (argb >> 24) & 0xff;
-            var r = (argb >> 16) & 0xff;
-            var g = (argb >> 8) & 0xff;
-            var b = argb & 0xff;
+                // Anpassen des Kontrasts für jede Farbkomponente und Begrenzen der Farbwerte
+                r = (byte)Math.Max(0, Math.Min(255, ((((r / 255f) - 0.5f) * factor) + 0.5f) * 255.0f));
+                g = (byte)Math.Max(0, Math.Min(255, ((((g / 255f) - 0.5f) * factor) + 0.5f) * 255.0f));
+                b = (byte)Math.Max(0, Math.Min(255, ((((b / 255f) - 0.5f) * factor) + 0.5f) * 255.0f));
 
-            // Anpassen des Kontrasts für jede Farbkomponente und Begrenzen der Farbwerte
-            r = (int)Math.Max(0, Math.Min(255, ((((r / 255f) - 0.5f) * factor) + 0.5f) * 255.0f));
-            g = (int)Math.Max(0, Math.Min(255, ((((g / 255f) - 0.5f) * factor) + 0.5f) * 255.0f));
-            b = (int)Math.Max(0, Math.Min(255, ((((b / 255f) - 0.5f) * factor) + 0.5f) * 255.0f));
-
-            // Kombinieren der Komponenten zurück in ein Pixel und direkt im Array aktualisieren
-            bits[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                // Aktualisieren der Farbkomponenten im Array
+                bits[i + 2] = r;
+                bits[i + 1] = g;
+                bits[i] = b;
+                // Alpha-Kanal bleibt unverändert (bits[i + 3])
+            }
         }
     }
 

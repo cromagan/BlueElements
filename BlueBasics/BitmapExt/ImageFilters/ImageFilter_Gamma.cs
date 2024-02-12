@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Drawing.Imaging;
 
 namespace BlueBasics;
 
@@ -29,31 +30,31 @@ internal class ImageFilter_Gamma : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(int width, int height, ref int[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
         // Stellen Sie sicher, dass der Gamma-Wert gültig ist
         factor = Math.Max(factor, 0.001f);
 
         // Erstellen Sie eine Lookup-Tabelle für die Gamma-Korrektur
-        var gammaArray = new int[256];
+        var gammaArray = new byte[256];
         for (var i = 0; i < 256; ++i) {
-            gammaArray[i] = Math.Min(255, (int)((255.0 * Math.Pow(i / 255.0, 1.0 / factor)) + 0.5));
+            gammaArray[i] = (byte)Math.Min(255, (int)((255.0 * Math.Pow(i / 255.0, 1.0 / factor)) + 0.5));
         }
 
-        // Anpassen des Gammas für jedes Pixel im Bits-Array
-        for (var i = 0; i < bits.Length; i++) {
-            var argb = bits[i];
-            var a = (argb >> 24) & 0xff; // Alpha-Komponente
-            var r = (argb >> 16) & 0xff; // Rot-Komponente
-            var g = (argb >> 8) & 0xff;  // Grün-Komponente
-            var b = argb & 0xff;         // Blau-Komponente
+        // Schleife über alle Pixel im Bild
+        unsafe {
+            for (var i = 0; i < bits.Length; i += 4) {
+                // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
+                var a = bits[i + 3];
+                var r = bits[i + 2];
+                var g = bits[i + 1];
+                var b = bits[i];
 
-            // Gamma-Korrektur für jede Farbkomponente
-            r = gammaArray[r];
-            g = gammaArray[g];
-            b = gammaArray[b];
-
-            // Kombinieren der Komponenten zurück in ein Pixel und direkt im Array aktualisieren
-            bits[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                // Gamma-Korrektur für jede Farbkomponente
+                bits[i + 2] = gammaArray[r]; // Rot-Komponente
+                bits[i + 1] = gammaArray[g]; // Grün-Komponente
+                bits[i] = gammaArray[b];      // Blau-Komponente
+                // Alpha-Kanal bleibt unverändert (bits[i + 3])
+            }
         }
     }
 

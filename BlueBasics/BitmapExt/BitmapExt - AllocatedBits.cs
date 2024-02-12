@@ -45,11 +45,10 @@ public class BitmapExt : IDisposable, IDisposableExtended {
 
     private const PixelFormat Pixelformat = PixelFormat.Format32bppArgb;
     private static List<ImageFilter>? _imageFilter;
+
     private Bitmap? _bitmap;
 
-    private BitmapData _bitmapData;
-    private byte[]? _bits;
-    private bool _isLocked;
+    private int[]? _bits;
 
     #endregion
 
@@ -65,7 +64,7 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     /// <summary>
-    /// Erstellt das BitmapExt Element mit einem Clone der angegebenen Bitmaap
+    /// Erstellt das BitmapExt Element mit einem Clone des angegebenen Bitmaps
     /// </summary>
     /// <param name="bmp"></param>
     public BitmapExt(Bitmap bmp) => CloneFromBitmap(bmp);
@@ -92,8 +91,11 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     public int Height { get; private set; }
+
     public bool IsDisposed { get; private set; }
+
     public int Width { get; private set; }
+    private GCHandle BitsHandle { get; set; }
 
     #endregion
 
@@ -251,6 +253,8 @@ public class BitmapExt : IDisposable, IDisposableExtended {
         return null;
     }
 
+    public static implicit operator Bitmap?(BitmapExt? p) => p?._bitmap;
+
     /// <summary>
     /// Pixelgenaue Collisionsanalyse zweier Bitmaps
     /// </summary>
@@ -390,16 +394,11 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     public bool ApplyFilter(string name, float factor) {
-        if (IsDisposed) { return false; }
-        if (!_isLocked || _bits == null) {
-            Develop.DebugPrint("unlocked!");
-            return false;
-        }
-
+        if (IsDisposed || _bits == null) { return false; }
         var f = ImageFilters.Get(name);
         if (f == null) { return false; }
 
-        f.ProcessFilter(_bitmapData, ref _bits, factor, 0);
+        f.ProcessFilter(Width, Height, ref _bits, factor, 0);
 
         return true;
     }
@@ -407,10 +406,7 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     public void ApplyFilter(string name) => ApplyFilter(name, 0);
 
     public void CloneFromBitmap(Bitmap? bmp) {
-        UnlockBits(false);
-        _bitmap?.Dispose(); // Dispose of any existing bitmap
-        _bitmap = null;
-
+        // Überprüfen, ob das übergebene Bitmap null ist
         if (bmp == null) {
             Width = -1;
             Height = -1;
@@ -419,17 +415,30 @@ public class BitmapExt : IDisposable, IDisposableExtended {
 
         // Initialisieren einer Stopwatch für die Zeitüberwachung
         var stopwatch = Stopwatch.StartNew();
+
         do {
             try {
+                if (BitsHandle.IsAllocated) { BitsHandle.Free(); }
+
+                // Setzen der Bildabmessungen
                 Width = bmp.Width;
                 Height = bmp.Height;
+                _bits = new int[Width * Height];
 
-                _bitmap = new Bitmap(Width, Height, Pixelformat);
+                // Fixieren des Bits-Arrays im Speicher, damit es nicht von der Garbage Collection verschoben wird.
+                BitsHandle = GCHandle.Alloc(_bits, GCHandleType.Pinned);
+
+                // Erstellen eines neuen Bitmaps mit dem fixierten Bits-Array als Puffer
+                _bitmap = new Bitmap(Width, Height, Width * 4, Pixelformat, BitsHandle.AddrOfPinnedObject());
+
+                // Zeichnen des übergebenen Bitmaps auf das neue Bitmap.
+                // Dadurch werden die Pixel-Daten des Originalbildes in das Bits-Array kopiert.
                 using var gr = Graphics.FromImage(_bitmap);
                 gr.DrawImage(bmp, new Rectangle(0, 0, Width, Height));
-
-                LockBits();
             } catch (Exception ex) {
+                // Freigeben des GCHandle, wenn eine Ausnahme auftritt
+                if (BitsHandle.IsAllocated) { BitsHandle.Free(); }
+
                 // Überprüfen, ob die Zeitüberschreitung erreicht ist
                 if (stopwatch.Elapsed.TotalSeconds > 5) {
                     // Protokollieren des Fehlers
@@ -440,33 +449,33 @@ public class BitmapExt : IDisposable, IDisposableExtended {
                     _bitmap = null;
                     return;
                 }
+
                 // Kurze Pause vor dem nächsten Versuch
                 Thread.Sleep(100);
             }
         } while (_bitmap == null);
+
+        // Stopp der Stopwatch
+        stopwatch.Stop();
     }
 
     public Bitmap? CloneOfBitmap() {
         //public static explicit operator Bitmap?(BitmapExt? p) {
         if (_bitmap == null) { return null; }
-        UnlockBits(true);
         var bmp = _bitmap.Clone();
-        LockBits();
         if (bmp is Bitmap bitmap) { return bitmap; }
         return null;
     }
 
-    public Bitmap Crop(Rectangle re) {
-        UnlockBits(true);
-        Bitmap newBmp = new(re.Width, re.Height);
+    public BitmapExt Crop(Rectangle re) {
+        BitmapExt newBmp = new(re.Width, re.Height);
+        if (newBmp._bitmap != null) {
+            using var gr = Graphics.FromImage(newBmp._bitmap);
+            gr.Clear(Color.Transparent);
+            gr.PixelOffsetMode = PixelOffsetMode.Half;
+            if (_bitmap != null) { gr.DrawImage(_bitmap, re with { X = 0, Y = 0 }, re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel); }
+        }
 
-        using var gr = Graphics.FromImage(newBmp);
-        gr.Clear(Color.Transparent);
-        gr.PixelOffsetMode = PixelOffsetMode.Half;
-        UnlockBits(true);
-        if (_bitmap != null) { gr.DrawImage(_bitmap, re with { X = 0, Y = 0 }, re.Left, re.Top, re.Width, re.Height, GraphicsUnit.Pixel); }
-
-        LockBits();
         return newBmp;
     }
 
@@ -485,120 +494,45 @@ public class BitmapExt : IDisposable, IDisposableExtended {
     }
 
     public Color GetPixel(int x, int y) {
-        if (!_isLocked || _bits == null) {
-            Develop.DebugPrint("unlocked!");
-            return Color.Transparent;
-        }
-
-        var index = (y * _bitmapData.Stride) + (x * 4); // 4 bytes per pixel in ARGB
-        var blue = _bits[index];
-        var green = _bits[index + 1];
-        var red = _bits[index + 2];
-        var alpha = _bits[index + 3];
-
-        return Color.FromArgb(alpha, red, green, blue);
+        if (_bits != null && x >= 0 && y >= 0 && x < Width && y < Height) { return Color.FromArgb(_bits[x + (y * Width)]); }
+        return Color.Transparent;
     }
 
-    public void LockBits() {
-        if (_isLocked) { return; }
-        if (_bitmap == null) { return; }
+    public void MakeTransparent(Color color) => _bitmap?.MakeTransparent(color);
 
-        // Definieren Sie den Bereich des Bitmaps, der gesperrt werden soll.
-        var lockArea = new Rectangle(0, 0, _bitmap.Width, _bitmap.Height);
-
-        // Sperren Sie den Bitmap-Bereich und erhalten Sie die BitmapData.
-        _bitmapData = _bitmap.LockBits(lockArea, ImageLockMode.ReadWrite, Pixelformat);
-
-        _bits = new byte[_bitmapData.Stride * _bitmapData.Height];
-        Marshal.Copy(_bitmapData.Scan0, _bits, 0, _bits.Length);
-
-        _isLocked = true;
-    }
-
-    public void MakeTransparent(Color color) {
-        UnlockBits(true);
-        _bitmap?.MakeTransparent(color);
-        LockBits();
-    }
-
-    public void Save(string name, ImageFormat imageFormat) {
-        UnlockBits(true);
-        _bitmap?.Save(name, imageFormat);
-        LockBits();
-    }
+    public void Save(string name, ImageFormat imageFormat) => _bitmap?.Save(name, imageFormat);
 
     public void SetPixel(int x, int y, Color color) {
-        if (!_isLocked || _bits == null) {
-            Develop.DebugPrint("unlocked!");
-            return;
+        if (_bits != null && x >= 0 && y >= 0 && x < Width && y < Height) {
+            _bits[x + (y * Width)] = color.ToArgb();
         }
-
-        var index = (y * _bitmapData.Stride) + (x * 4); // 4 bytes per pixel in ARGB
-        _bits[index] = color.B;
-        _bits[index + 1] = color.G;
-        _bits[index + 2] = color.R;
-        _bits[index + 3] = color.A;
-    }
-
-    public void UnlockBits(bool copyback) {
-        if (!_isLocked) { return; }
-        if (_bitmap == null) {
-            _isLocked = false;
-            return;
-        }
-
-        if (copyback && _bits != null) {
-            Marshal.Copy(_bits, 0, _bitmapData.Scan0, _bits.Length);
-        }
-
-        try {
-            // Entsperren Sie den Bitmap-Bereich.
-            _bitmap.UnlockBits(_bitmapData); // Finalizer kann Probleme machen
-        } catch { }
-
-        _isLocked = false;
     }
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
                 // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
-
-                UnlockBits(false); // Stellen Sie sicher, dass die Bitmap freigegeben wird
-                _bitmap?.Dispose();
-                _bitmap = null;
             }
             // Nicht verwaltete Ressourcen (Bitmap, Datenbankverbindungen, ...)
-            //UnlockBits(false);
-            //_bitmap?.Dispose();
+            _bitmap?.Dispose();
+            BitsHandle.Free();
+            _bits = null;
             IsDisposed = true;
         }
     }
 
     protected void EmptyBitmap(int width, int height) {
-        // Entsperren Sie das vorhandene Bitmap, falls es gesperrt ist.
-        UnlockBits(false);
+        Width = width;
+        Height = height;
+        _bits = new int[Width * Height];
+        BitsHandle = GCHandle.Alloc(_bits, GCHandleType.Pinned);
 
-        // Entsorgen Sie das vorhandene Bitmap, bevor Sie ein neues erstellen.
-        _bitmap?.Dispose();
-        _bitmap = null;
-
-        // Überprüfen Sie zuerst die Gültigkeit der Dimensionen.
-        if (width < 1 || height < 1) {
-            Width = 0;
-            Height = 0;
+        if (Width < 1 || height < 1) {
+            _bitmap = null;
             return;
         }
 
-        // Setzen Sie die neuen Dimensionen.
-        Width = width;
-        Height = height;
-
-        // Erstellen Sie ein neues Bitmap mit den angegebenen Dimensionen und dem Pixelformat.
-        _bitmap = new Bitmap(Width, Height, Pixelformat);
-
-        // Sperren Sie das neue Bitmap.
-        LockBits();
+        _bitmap = new Bitmap(Width, Height, Width * 4, Pixelformat, BitsHandle.AddrOfPinnedObject());
     }
 
     #endregion

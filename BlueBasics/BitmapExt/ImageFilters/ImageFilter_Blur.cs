@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace BlueBasics;
 
@@ -29,47 +30,50 @@ internal class ImageFilter_Blur : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(int width, int height, ref int[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
         // Größe des Blur-Kernels basierend auf dem Faktor
         var kernelSize = (int)factor;
 
-        // Kopie des Eingabe-Arrays, um Änderungen vorzunehmen
-        var originalBits = (int[])bits.Clone();
-
         // Schleife über alle Pixel im Array
-        for (var x = 0; x < width; x++) {
-            for (var y = 0; y < height; y++) {
-                // Initialisierung der Summen für die Farbkanäle
-                int sumR = 0, sumG = 0, sumB = 0;
+        unsafe {
+            for (var x = 0; x < bitmapData.Width; x++) {
+                for (var y = 0; y < bitmapData.Height; y++) {
+                    // Initialisierung der Summen für die Farbkanäle
+                    int sumR = 0, sumG = 0, sumB = 0;
+                    var count = 0;
 
-                // Schleife über den Kernel um den aktuellen Pixel herum
-                for (var dx = -kernelSize; dx <= kernelSize; dx++) {
-                    for (var dy = -kernelSize; dy <= kernelSize; dy++) {
-                        // Berechnung der Koordinaten des aktuellen Pixels im Originalbild
-                        var newX = x + dx;
-                        var newY = y + dy;
+                    // Schleife über den Kernel um den aktuellen Pixel herum
+                    for (var dx = -kernelSize; dx <= kernelSize; dx++) {
+                        for (var dy = -kernelSize; dy <= kernelSize; dy++) {
+                            // Berechnung der Koordinaten des aktuellen Pixels im Originalbild
+                            var newX = x + dx;
+                            var newY = y + dy;
 
-                        // Überprüfen, ob der Pixel im Bereich des Bildes liegt
-                        if (newX >= 0 && newX < width && newY >= 0 && newY < height) {
-                            // Extrahieren der Farbwerte des Pixels
-                            var argb = originalBits[(newY * width) + newX];
-                            var color = Color.FromArgb(argb);
+                            // Überprüfen, ob der Pixel im Bereich des Bildes liegt
+                            if (newX >= 0 && newX < bitmapData.Width && newY >= 0 && newY < bitmapData.Height) {
+                                // Extrahieren der Farbwerte des Pixels
+                                var pixelPtr = (byte*)bitmapData.Scan0 + (newY * bitmapData.Stride) + (newX * 4);
 
-                            // Addieren der Farbwerte zum Summenkanal
-                            sumR += color.R;
-                            sumG += color.G;
-                            sumB += color.B;
+                                // Addieren der Farbwerte zum Summenkanal
+                                sumR += pixelPtr[2];
+                                sumG += pixelPtr[1];
+                                sumB += pixelPtr[0];
+                                count++;
+                            }
                         }
                     }
+
+                    // Berechnung des Durchschnitts für jeden Farbkanal
+                    var avgR = sumR / count;
+                    var avgG = sumG / count;
+                    var avgB = sumB / count;
+
+                    // Setzen des neuen Farbwerts für den aktuellen Pixel
+                    var currentPixelPtr = (byte*)bitmapData.Scan0 + (y * bitmapData.Stride) + (x * 4);
+                    currentPixelPtr[2] = (byte)avgR;
+                    currentPixelPtr[1] = (byte)avgG;
+                    currentPixelPtr[0] = (byte)avgB;
                 }
-
-                // Berechnung des Durchschnitts für jeden Farbkanal
-                var avgR = sumR / (((kernelSize * 2) + 1) * ((kernelSize * 2) + 1));
-                var avgG = sumG / (((kernelSize * 2) + 1) * ((kernelSize * 2) + 1));
-                var avgB = sumB / (((kernelSize * 2) + 1) * ((kernelSize * 2) + 1));
-
-                // Setzen des neuen Farbwerts für den aktuellen Pixel
-                bits[(y * width) + x] = Color.FromArgb(avgR, avgG, avgB).ToArgb();
             }
         }
     }

@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System.Drawing.Imaging;
+
 namespace BlueBasics;
 
 internal class ImageFilter_Grayscale : ImageFilter {
@@ -27,21 +29,25 @@ internal class ImageFilter_Grayscale : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(int width, int height, ref int[] bits, float factor, int bias) {
-        // Schleife über alle Pixel im Array
-        for (var i = 0; i < bits.Length; i++) {
-            // Extrahieren der ARGB-Komponenten aus dem Integer-Wert
-            var argb = bits[i];
-            var a = (argb >> 24) & 0xff; // Alpha-Komponente
-            var r = (argb >> 16) & 0xff; // Rot-Komponente
-            var g = (argb >> 8) & 0xff; // Grün-Komponente
-            var b = argb & 0xff; // Blau-Komponente
+    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
+        // Schleife über alle Pixel im Bild
+        unsafe {
+            for (var i = 0; i < bits.Length; i += 4) {
+                // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
+                var a = bits[i + 3];
+                var r = bits[i + 2];
+                var g = bits[i + 1];
+                var b = bits[i];
 
-            // Berechnung des Grauwerts mit der Luma-Formel
-            var gray = (int)((0.3 * r) + (0.59 * g) + (0.11 * b));
+                // Berechnung des Grauwerts mit der Luma-Formel
+                var gray = (byte)((0.3 * r) + (0.59 * g) + (0.11 * b));
 
-            // Setzen der Graustufenwerte für alle Farbkanäle
-            bits[i] = (a << 24) | (gray << 16) | (gray << 8) | gray;
+                // Setzen der Graustufenwerte für alle Farbkanäle
+                bits[i] = gray;       // Blau
+                bits[i + 1] = gray;   // Grün
+                bits[i + 2] = gray;   // Rot
+                // Alpha-Kanal bleibt unverändert (bits[i + 3])
+            }
         }
     }
 

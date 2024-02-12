@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Drawing.Imaging;
 
 namespace BlueBasics;
 
@@ -29,25 +30,23 @@ internal class ImageFilter_Brightness : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(int width, int height, ref int[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
         factor = Math.Max(factor, 0.001f); // Stellen Sie sicher, dass die Helligkeit nicht 0 ist
 
-        for (var i = 0; i < bits.Length; i++) {
-            var argb = bits[i];
+        // Schleife über alle Pixel im Bild
+        unsafe {
+            for (var y = 0; y < bitmapData.Height; y++) {
+                for (var x = 0; x < bitmapData.Width; x++) {
+                    // Berechnung des Index für den aktuellen Pixel im Byte-Array
+                    var index = (y * bitmapData.Stride) + (x * 4); // 4 Bytes pro Pixel (RGBA)
 
-            // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
-            var a = (argb >> 24) & 0xff;
-            var r = (argb >> 16) & 0xff;
-            var g = (argb >> 8) & 0xff;
-            var b = argb & 0xff;
-
-            // Anpassen der Helligkeit für jede Farbkomponente
-            r = (int)Math.Min(255, r * factor);
-            g = (int)Math.Min(255, g * factor);
-            b = (int)Math.Min(255, b * factor);
-
-            // Kombinieren der Komponenten zurück in ein Pixel
-            bits[i] = (a << 24) | (r << 16) | (g << 8) | b;
+                    // Anpassen der Helligkeit für jede Farbkomponente (RGB)
+                    bits[index] = (byte)Math.Max(0, Math.Min(255, bits[index] * factor)); // Blau
+                    bits[index + 1] = (byte)Math.Max(0, Math.Min(255, bits[index + 1] * factor)); // Grün
+                    bits[index + 2] = (byte)Math.Max(0, Math.Min(255, bits[index + 2] * factor)); // Rot
+                    // Alpha-Kanal bleibt unverändert (bits[index + 3])
+                }
+            }
         }
     }
 

@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Drawing;
+using System.Drawing.Imaging;
 
 namespace BlueBasics;
 
@@ -29,21 +30,27 @@ internal class ImageFilter_Intensify : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(int width, int height, ref int[] bits, float factor, int bias) {
-        // Schleife über alle Pixel im Array
-        for (var x = 0; x < width; x++) {
-            for (var y = 0; y < height; y++) {
-                // Extrahieren der ARGB-Komponenten aus dem Integer-Wert
-                var argb = bits[(y * width) + x];
-                var a = (argb >> 24) & 0xff; // Alpha-Komponente
-                var r = (argb >> 16) & 0xff; // Rot-Komponente
-                var g = (argb >> 8) & 0xff; // Grün-Komponente
-                var b = argb & 0xff; // Blau-Komponente
+    public override void ProcessFilter(BitmapData bitmapData, ref byte[] bits, float factor, int bias) {
+        // Schleife über alle Pixel im Bild
+        unsafe {
+            for (var y = 0; y < bitmapData.Height; y++) {
+                for (var x = 0; x < bitmapData.Width; x++) {
+                    // Berechnen des Index für den aktuellen Pixel im Byte-Array
+                    var index = (y * bitmapData.Stride) + (x * 4);
 
-                // Überprüfen, ob der Pixel intensiviert werden muss
-                if (a > 0.5 && GetBrightness(r, g, b) < 0.9) {
-                    // Setzen des Pixels auf Schwarz
-                    bits[(y * width) + x] = Color.Black.ToArgb();
+                    // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
+                    var a = bits[index + 3];
+                    var r = bits[index + 2];
+                    var g = bits[index + 1];
+                    var b = bits[index];
+
+                    // Überprüfen, ob der Pixel intensiviert werden muss
+                    if (a > 127 && GetBrightness(r, g, b) < 0.9) { // a > 127 entspricht etwa einem Alphawert von 0.5
+                        // Setzen des Pixels auf Schwarz
+                        bits[index] = 0;        // Blau
+                        bits[index + 1] = 0;    // Grün
+                        bits[index + 2] = 0;    // Rot
+                    }
                 }
             }
         }
