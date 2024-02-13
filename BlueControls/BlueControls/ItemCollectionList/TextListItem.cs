@@ -28,6 +28,8 @@ public class TextListItem : AbstractListItem {
 
     #region Constructors
 
+    public TextListItem(string readableText, string internalname, ImageCode symbol) : this(readableText, internalname, QuickImage.Get(symbol, 16), false, true, string.Empty) { }
+
     public TextListItem(string readableText, string internalname, QuickImage? symbol, bool isCaption, bool enabled, string userDefCompareKey) : base(internalname, enabled) {
         IsCaption = isCaption;
         Text = readableText;
