@@ -178,7 +178,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         ItemCollectionList.ItemCollectionList aa = new(true);
         aa.AddRange(db.Permission_AllUsed(false));
-        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, CheckBehavior.MultiSelection, ca.PermissionGroups_Show.ToList(), AddType.Text, true);
+        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, CheckBehavior.MultiSelection, ca.PermissionGroups_Show.ToList(), AddType.Text);
         if (b == null) { return; }
 
         if (IsDefaultView()) { b.Add(Constants.Everybody); }
@@ -292,7 +292,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
             return;
         }
 
-        var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, CheckBehavior.SingleSelection, null, AddType.None, true);
+        var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, CheckBehavior.SingleSelection, null, AddType.None);
         if (r == null || r.Count == 0) { return; }
         ca.Add(db.Column.Exists(r[0]), false);
         ChangeCurrentArrangementto(ca);

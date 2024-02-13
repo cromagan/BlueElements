@@ -239,7 +239,7 @@ public class TextGeneratorPadItem : FakeControlPadItem, IItemToControl, IItemAcc
         lst.Remove(_auswahl2);
         lst.Remove(_auswahl3);
 
-        var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, CheckBehavior.SingleSelection, null, AddType.None, true);
+        var sho = InputBoxListBoxStyle.Show("Spalte wählen:", lst, CheckBehavior.SingleSelection, null, AddType.None);
 
         if (sho == null || sho.Count != 1) { return; }
 

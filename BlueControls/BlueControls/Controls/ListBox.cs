@@ -20,12 +20,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -69,8 +67,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         Item = new ItemCollectionList.ItemCollectionList(true);
-        Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
-        Item.CollectionChanged += Item_CollectionChanged;
         Item.Changed += Item_Changed;
         _appearance = ListBoxAppearance.Listbox;
     }
@@ -80,8 +76,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     #region Events
 
     public event EventHandler? AddClicked;
-
-    public event EventHandler<NotifyCollectionChangedEventArgs>? CollectionChanged;
 
     public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
@@ -227,17 +221,17 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             return;
         }
 
-        var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, CheckBehavior.SingleSelection, null, AddType.None, true);
+        var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, CheckBehavior.SingleSelection, null, AddType.None);
 
         if (rück == null || rück.Count == 0) { return; }
 
         var sg = Suggestions[rück[0]];
         if (sg == null) { return; }
 
-        Item.Add(sg.Clone() as AbstractListItem);
+        AddAndCheck(sg.Clone() as AbstractListItem);
     }
 
-    public void Check(List<string> ali) {
+    public void Check(IEnumerable<string> ali) {
         foreach (var thiss in ali) {
             Check(thiss);
         }
@@ -251,6 +245,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         List<string> l = [.. _checked, name];
 
         ValidateCheckStates(l, name);
+        Invalidate();
     }
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
@@ -264,15 +259,13 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void GetContextMenuItems(MouseEventArgs? e, ItemCollectionList.ItemCollectionList items, out object? hotItem) => hotItem = e == null ? null : MouseOverNode(e.X, e.Y);
 
-    public void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
-
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
-    public void UnCheck(List<string> ali) {
+    public void UnCheck(IEnumerable<string> ali) {
         foreach (var thiss in ali) {
-            Check(thiss);
+            UnCheck(thiss);
         }
     }
 
@@ -285,9 +278,48 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         l.Remove(name);
 
         ValidateCheckStates(l, string.Empty);
+        Invalidate();
     }
 
     public void UncheckAll() => ValidateCheckStates([], string.Empty);
+
+    internal void AddAndCheck(AbstractListItem? ali) {
+        if (ali == null) { return; }
+
+        var tmp = _checkBehavior;
+        _checkBehavior = CheckBehavior.MultiSelection;
+
+        Item.Remove(ali.KeyName);
+
+        Item.Add(ali);
+        _checkBehavior = tmp;
+        Check(ali);
+    }
+
+    internal void SetValuesTo(List<string> values) {
+        var ist = Item.ToListOfString();
+        var zuviel = ist.Except(values).ToList();
+        var zuwenig = values.Except(ist).ToList();
+        // Zu viele im Mains aus der Liste löschen
+        foreach (var thisString in zuviel) {
+            if (!values.Contains(thisString)) {
+                Item.Remove(thisString);
+            }
+        }
+
+        // und die Mains auffüllen
+        foreach (var thisString in zuwenig) {
+            if (IO.FileExists(thisString)) {
+                if (thisString.FileType() == FileFormat.Image) {
+                    _ = Item.Add(thisString, thisString, thisString.FileNameWithoutSuffix());
+                } else {
+                    _ = Item.Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
+                }
+            } else {
+                _ = Item.Add(thisString);
+            }
+        }
+    }
 
     protected override void DrawControl(Graphics gr, States state) {
 
@@ -303,7 +335,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         #region  checkboxDesign
 
         var checkboxDesign = Design.Undefiniert;
-        if (_appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.NoSelection) {
+        if (_appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.AllSelected) {
             checkboxDesign = Design.CheckBox_TextStyle;
             if (_checkBehavior is CheckBehavior.AlwaysSingleSelection or CheckBehavior.SingleSelection) {
                 checkboxDesign = Design.OptionButton_TextStyle;
@@ -406,7 +438,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         switch (e.Button) {
             case MouseButtons.Left:
                 if (nd != null) {
-                    if (Appearance is ListBoxAppearance.Listbox or ListBoxAppearance.Autofilter or ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem) {
+                    if (Appearance is ListBoxAppearance.Listbox or
+                                      ListBoxAppearance.Listbox_Boxes or
+                                      ListBoxAppearance.Autofilter or
+                                      ListBoxAppearance.Gallery or
+                                      ListBoxAppearance.FileSystem) {
                         if (nd.IsClickable()) {
                             ChangeCheck(nd);
                         }
@@ -443,13 +479,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     protected override void OnVisibleChanged(System.EventArgs e) {
         CheckButtons();
         base.OnVisibleChanged(e);
-    }
-
-    private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        CheckButtons();
-        Invalidate();
-        OnItemCheckedChanged();
     }
 
     private bool ButtonsVisible() => Plus.Visible || Minus.Visible || Up.Visible || Down.Visible || FilterTxt.Visible;
@@ -513,12 +542,6 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         Invalidate();
     }
 
-    private void Item_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
-        OnCollectionChanged(e);
-    }
-
     private void Minus_Click(object sender, System.EventArgs e) => UnCheck(Checked.ToList());
 
     private AbstractListItem? MouseOverNode(int x, int y) => ButtonsVisible() && y >= Height - Plus.Height ? null : Item[x, (int)(y + SliderY.Value)];
@@ -577,8 +600,11 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         newCheckedItems = newCheckedItems.SortedDistinctList();
 
         switch (_checkBehavior) {
-            case CheckBehavior.NoSelection:
-                newCheckedItems.Clear();
+            case CheckBehavior.AllSelected:
+
+                SetValuesTo(newCheckedItems);
+
+                newCheckedItems = Item.ToListOfString();
                 break;
 
             case CheckBehavior.MultiSelection:
@@ -627,6 +653,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         } else {
             CheckButtons();
         }
+
+        Invalidate();
     }
 
     #endregion

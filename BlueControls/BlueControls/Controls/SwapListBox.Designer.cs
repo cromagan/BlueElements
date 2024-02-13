@@ -59,20 +59,20 @@ namespace BlueControls.Controls {
             // 
             this.Main.AddAllowed = AddType.Text;
             this.Main.AutoSort = true;
-            this.Main.CheckBehavior = CheckBehavior.NoSelection;
+            this.Main.CheckBehavior = CheckBehavior.AllSelected;
             this.Main.Dock = DockStyle.Fill;
             this.Main.Location = new Point(0, 0);
             this.Main.Name = "Main";
             this.Main.Size = new Size(345, 115);
             this.Main.TabIndex = 0;
             this.Main.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.Main_ItemClicked);
-            this.Main.CollectionChanged += Main_CollectionChanged; 
+            this.Main.ItemCheckedChanged += Main_ItemCheckedChanged;
             // 
             // Suggest
             // 
             this.Suggest.AddAllowed = AddType.None;
             this.Suggest.AutoSort = true;
-            this.Suggest.CheckBehavior = CheckBehavior.NoSelection;
+            this.Suggest.CheckBehavior = CheckBehavior.AllSelected;
             this.Suggest.Dock = DockStyle.Fill;
             this.Suggest.FilterAllowed = true;
             this.Suggest.Location = new Point(0, 0);

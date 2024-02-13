@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
@@ -68,8 +67,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         MouseHighlight = true;
         SetStyle(ControlStyles.ContainerControl, true);
-        Item.ItemCheckedChanged += _Item_ItemCheckedChanged;
-        Item.CollectionChanged += Item_CollectionChanged;
+        Item.Changed += Item_Changed;
         btnDropDown.Left = Width - btnDropDown.Width;
         btnDropDown.Top = 0;
         btnDropDown.Height = Height;
@@ -277,13 +275,6 @@ public partial class ComboBox : TextBox, ITranslateable {
         FloatingForm.Close(this);
     }
 
-    private void _Item_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        if (_btnDropDownIsIn) { return; }
-        FloatingForm.Close(this);
-        Invalidate();
-    }
-
     private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);
 
     //}
@@ -310,11 +301,11 @@ public partial class ComboBox : TextBox, ITranslateable {
         _ = Focus();
     }
 
-    private void Item_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    private void Item_Changed(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         if (_btnDropDownIsIn) { return; }
         FloatingForm.Close(this);
-        Invalidate();
+        //Invalidate();
     }
 
     private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);

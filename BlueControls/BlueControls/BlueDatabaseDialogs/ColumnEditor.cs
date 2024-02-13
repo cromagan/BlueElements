@@ -382,7 +382,7 @@ internal sealed partial class ColumnEditor {
         txbRegex.Text = _column.Regex;
         txbTags.Text = _column.Tags.JoinWithCr();
         lbxCellEditor.Item.Clear();
-        lbxCellEditor.Item.AddRange(_column.PermissionGroupsChangeCell);
+        lbxCellEditor.Check(_column.PermissionGroupsChangeCell);
         txbAllowedChars.Text = _column.AllowedChars;
         txbMaxTextLenght.Text = _column.MaxTextLenght.ToString();
         txbMaxCellLenght.Text = _column.MaxCellLenght.ToString();
@@ -486,7 +486,7 @@ internal sealed partial class ColumnEditor {
         //_Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) = AutoFilterErw.Checked;
         _column.FilterOptions = tmpf;
         _column.IgnoreAtRowFilter = btnZeilenFilterIgnorieren.Checked;
-        _column.PermissionGroupsChangeCell = new(lbxCellEditor.Item.ToListOfString());
+        _column.PermissionGroupsChangeCell = new(lbxCellEditor.Checked);
         _column.DropDownItems = txbAuswaehlbareWerte.Text.SplitAndCutByCrToList().SortedDistinctList().AsReadOnly();
         _column.OpticalReplace = new(txbReplacer.Text.SplitAndCutByCrToList());
         _column.AfterEditAutoReplace = new(txbAutoReplace.Text.SplitAndCutByCrToList());

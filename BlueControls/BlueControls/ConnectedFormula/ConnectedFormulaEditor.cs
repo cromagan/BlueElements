@@ -23,7 +23,6 @@ using System.ComponentModel;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueBasics.MultiUserFile;
-using BlueControls.ConnectedFormula;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueControls.ItemCollectionPad.Abstract;

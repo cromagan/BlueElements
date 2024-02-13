@@ -85,6 +85,7 @@ namespace BlueControls.BlueDatabaseDialogs
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lsbFilterItems.Appearance = BlueControls.Enums.ListBoxAppearance.Autofilter;
+            this.lsbFilterItems.CheckBehavior = CheckBehavior.MultiSelection;
             this.lsbFilterItems.Location = new System.Drawing.Point(8, 140);
             this.lsbFilterItems.Name = "lsbFilterItems";
             this.lsbFilterItems.Size = new System.Drawing.Size(150, 12);
@@ -98,6 +99,7 @@ namespace BlueControls.BlueDatabaseDialogs
             this.lsbStandardFilter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lsbStandardFilter.Appearance = BlueControls.Enums.ListBoxAppearance.Autofilter;
+            this.lsbStandardFilter.CheckBehavior = CheckBehavior.SingleSelection;
             this.lsbStandardFilter.Location = new System.Drawing.Point(8, 8);
             this.lsbStandardFilter.Name = "lsbStandardFilter";
             this.lsbStandardFilter.Size = new System.Drawing.Size(150, 72);

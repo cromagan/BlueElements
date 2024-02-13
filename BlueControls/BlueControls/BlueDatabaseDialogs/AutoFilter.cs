@@ -23,7 +23,6 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -164,26 +163,22 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
         #region Wenn ein Filter übergeben wurde, die Einträge markieren
 
-        if (fc != null) {
-            foreach (var thisfilter in fc) {
-                if (thisfilter != null && thisfilter.IsOk()) {
-                    if (thisfilter.Column == _column) {
-                        if (thisfilter.FilterType.HasFlag(FilterType.Istgleich)) {
-                            foreach (var thisValue in thisfilter.SearchValue) {
-                                if (lsbFilterItems.Item[thisValue] is AbstractListItem bli) {
-                                    lsbStandardFilter.Check(bli);
-                                } else if (string.IsNullOrEmpty(thisValue) && leere != null) {
-                                    lsbStandardFilter.Check(leere);
-                                }
-                            }
-                        } else if (thisfilter.FilterType.HasFlag(FilterType.Instr)) {
-                            txbEingabe.Text = thisfilter.SearchValue[0];
-                        } else if (Convert.ToBoolean((int)thisfilter.FilterType & 2)) {
-                            if (thisfilter.SearchValue.Count == 1 && string.IsNullOrEmpty(thisfilter.SearchValue[0]) && nichtleere != null) {
-                                lsbStandardFilter.Check(nichtleere);
-                            }
-                        }
-                    }
+        if (fc?[_column] is FilterItem myFilter) {
+            if (myFilter.FilterType.HasFlag(FilterType.Istgleich)) {
+                if (myFilter.SearchValue.Count == 0 || (myFilter.SearchValue.Count == 1 && string.IsNullOrEmpty(myFilter.SearchValue[0]))) {
+                    // Filter Leere anzeigen
+                    if (leere != null) { lsbStandardFilter.Check(leere); }
+                } else {
+                    // Items des Istgleich-Filters anzeigen
+                    lsbFilterItems.Check(myFilter.SearchValue);
+                }
+            } else if (myFilter.FilterType.HasFlag(FilterType.Instr)) {
+                // Textfiler anzeigen
+                txbEingabe.Text = myFilter.SearchValue[0];
+            } else if (Convert.ToBoolean((int)myFilter.FilterType & 2)) {
+                // Filter Nichtleere
+                if (myFilter.SearchValue.Count == 1 && string.IsNullOrEmpty(myFilter.SearchValue[0]) && nichtleere != null) {
+                    lsbStandardFilter.Check(nichtleere);
                 }
             }
         }

@@ -19,8 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Drawing;
 using BlueBasics;
 using BlueControls.Enums;
@@ -40,7 +38,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     #region Events
 
-    public event EventHandler<NotifyCollectionChangedEventArgs>? CollectionChanged;
+    public event EventHandler? ItemCheckedChanged;
 
     #endregion
 
@@ -51,26 +49,49 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         set => Main.AddAllowed = value;
     }
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public ItemCollectionList.ItemCollectionList Item => Main.Item;
+    public IReadOnlyCollection<string> Checked => Main.Checked;
 
     #endregion
 
     #region Methods
 
-    public void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
+    public void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
-    internal void Check(List<string> list) => Main.Check(list);
+    internal void Check(IEnumerable<string> toCheck) {
+        foreach (var thisCheck in toCheck) {
+            MoveItemBetweenList(Suggest, Main, thisCheck, true);
+        }
+
+        var l = Main.Checked;
+
+        foreach (var thisl in l) {
+            if (!toCheck.Contains(thisl, false)) {
+                MoveItemBetweenList(Main, Suggest, thisl, true);
+            }
+        }
+    }
 
     internal void SuggestionsAdd(ItemCollectionList.ItemCollectionList? item) {
         if (item == null) { return; }
 
         foreach (var thisi in item) {
             if (Main.Item[thisi.KeyName] == null && Suggest.Item[thisi.KeyName] == null) {
-                Suggest.Item.Add(thisi.Clone() as AbstractListItem);
+                Suggest.AddAndCheck(thisi.Clone() as AbstractListItem);
             }
+        }
+    }
+
+    internal void SuggestionsClear() {
+        Suggest.UncheckAll();
+    }
+
+    internal void UnCheck() {
+        UnCheck(Main.Checked);
+    }
+
+    internal void UnCheck(IEnumerable<string> list) {
+        foreach (var thisIt in list) {
+            MoveItemBetweenList(Main, Suggest, thisIt, true);
         }
     }
 
@@ -79,14 +100,15 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     protected void MoveItemBetweenList(ListBox source, ListBox target, string @internal, bool doRemove) {
         var sourceItem = source.Item[@internal];
         var targetItem = target.Item[@internal];
+
         if (sourceItem != null && targetItem == null) {
-            target.Item.Add(sourceItem.Clone() as AbstractListItem);
+            target.AddAndCheck(sourceItem.Clone() as AbstractListItem);
         } else if (sourceItem == null && targetItem == null) {
             targetItem = new TextListItem(@internal, @internal, null, false, true, string.Empty);
-            target.Item.Add(targetItem);
+            target.AddAndCheck(targetItem);
         }
 
-        if (sourceItem != null && doRemove) { source.Item.Remove(sourceItem); }
+        if (sourceItem != null && doRemove) { source.UnCheck(sourceItem); }
     }
 
     protected override void OnEnabledChanged(System.EventArgs e) {
@@ -95,26 +117,26 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         Suggest.Enabled = Enabled;
     }
 
-    private void Main_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    private void Main_ItemCheckedChanged(object sender, System.EventArgs e) {
         foreach (var thisn in Main.Item) {
-            Suggest.Item.Remove(thisn.KeyName);
+            Suggest.UnCheck(thisn.KeyName);
         }
 
-        if (e.OldItems != null) {
-            foreach (var thisit in e.OldItems) {
-                if (thisit is AbstractListItem bli) {
-                    if (Suggest.Item[bli.KeyName] == null) {
-                        Suggest.Item.Add(bli.Clone() as AbstractListItem);
-                    }
-                }
-            }
-        }
+        //if (e.OldItems != null) {
+        //    foreach (var thisit in e.OldItems) {
+        //        if (thisit is AbstractListItem bli) {
+        //            if (Suggest.Item[bli.KeyName] == null) {
+        //                Suggest.Item.Add(bli.Clone() as AbstractListItem);
+        //            }
+        //        }
+        //    }
+        //}
 
-        if (e.Action == NotifyCollectionChangedAction.Reset) {
-            Develop.DebugPrint_NichtImplementiert();
-        }
+        //if (e.Action == NotifyCollectionChangedAction.Reset) {
+        //    Develop.DebugPrint_NichtImplementiert();
+        //}
 
-        OnCollectionChanged(e);
+        OnItemCheckedChanged();
     }
 
     private void Main_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);

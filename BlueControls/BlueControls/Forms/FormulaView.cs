@@ -17,18 +17,12 @@
 
 #nullable enable
 
-using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using BlueBasics.MultiUserFile;
-using BlueControls.ConnectedFormula;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueDatabase;
 using static BlueBasics.Develop;
 using static BlueBasics.IO;
-using Button = BlueControls.Controls.Button;
 
 #nullable enable
 

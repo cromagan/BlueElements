@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Documents.DocumentStructures;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollectionList;

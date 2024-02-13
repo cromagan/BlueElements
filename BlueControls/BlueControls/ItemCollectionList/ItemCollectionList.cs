@@ -44,12 +44,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
     private bool _autoSort;
 
-    /// <summary>
-    /// Ist das Item markiert/selektiert?
-    /// </summary>
-    /// <remarks></remarks>
-    private bool _checked;
-
     private Design _controlDesign;
 
     private Design _itemDesign;
@@ -83,8 +77,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
     #region Events
 
     public event EventHandler? Changed;
-
-    public event EventHandler? ItemCheckedChanged;
 
     #endregion
 
@@ -818,6 +810,7 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
                 _controlDesign = Design.ListBox;
                 break;
 
+            case ListBoxAppearance.Listbox_Boxes:
             case ListBoxAppearance.Listbox:
                 _itemDesign = Design.Item_Listbox;
                 _controlDesign = Design.ListBox;
@@ -838,8 +831,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
     }
 
     private void Item_Changed(object sender, System.EventArgs e) => OnChanged();
-
-    private void OnItemCheckedChanged() => ItemCheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void PreComputeSize() {
         try {

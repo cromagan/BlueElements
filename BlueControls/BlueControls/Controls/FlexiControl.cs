@@ -19,7 +19,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -575,11 +574,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             case SwapListBox swapListBox:
                 //swapListBox.ItemAdded += SwapListBox_ItemAdded;
                 //swapListBox.ItemRemoved += SwapListBox_ItemRemoved;
-                swapListBox.CollectionChanged += SwapListBox_CollectionChanged;
+                swapListBox.ItemCheckedChanged += SwapListBox_ItemCheckedChanged;
                 break;
 
             case ListBox listBox:
-                listBox.CollectionChanged += ListBox_CollectionChanged;
+                listBox.ItemCheckedChanged += ListBox_ItemCheckedChanged;
                 //listBox.ItemRemoved += ListBox_ItemRemoved;
                 break;
 
@@ -628,14 +627,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 break;
 
             case ListBox listBox:
-                listBox.CollectionChanged -= ListBox_CollectionChanged;
+                listBox.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
                 //listBox.ItemRemoved -= ListBox_ItemRemoved;
                 break;
 
             case SwapListBox swapListBox:
                 //swapListBox.ItemAdded -= SwapListBox_ItemAdded;
                 //swapListBox.ItemRemoved -= SwapListBox_ItemRemoved;
-                swapListBox.CollectionChanged -= SwapListBox_CollectionChanged;
+                swapListBox.ItemCheckedChanged -= SwapListBox_ItemCheckedChanged;
                 break;
 
             case Button button:
@@ -882,7 +881,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         SwapListBox control = new() {
             Enabled = Enabled
         };
-        control.Item.RemoveAll();
+        control.UnCheck();
         StandardBehandlung(control);
         UpdateValueToControl();
         return control;
@@ -951,9 +950,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    private void ListBox_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    private void ListBox_ItemCheckedChanged(object sender, System.EventArgs e) {
         if (IsFilling) { return; }
-        ValueSet(((ListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
+        ValueSet(((ListBox)sender).Checked.JoinWithCr(), false, true);
     }
 
     private void ParentForm_FormClosing(object sender, FormClosingEventArgs e) => RaiseEventIfChanged();
@@ -1009,9 +1008,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //DoInfoTextCaption();
     }
 
-    private void SwapListBox_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    private void SwapListBox_ItemCheckedChanged(object sender, System.EventArgs e) {
         if (IsFilling) { return; }
-        ValueSet(((SwapListBox)sender).Item.ToListOfString().JoinWithCr(), false, true);
+        ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false, true);
     }
 
     //private void ListBox_ItemRemoved(object sender, System.EventArgs e) {

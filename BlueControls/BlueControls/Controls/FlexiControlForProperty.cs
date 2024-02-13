@@ -212,7 +212,14 @@ public class FlexiControlForProperty<T> : FlexiControl {
         //EditType = EditTypeFormula.Listbox;
         //var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, SteuerelementVerhalten.Text_Abschneiden, Design.Caption, null, Translate, -1);
 
-        //lb.Item.AddClonesFrom(list);
+        control.CheckBehavior = CheckBehavior.MultiSelection;
+        control.Appearance = ListBoxAppearance.Listbox_Boxes;
+        control.Item.AddClonesFrom(list);
+        control.AddAllowed = AddType.None;
+        control.RemoveAllowed = false;
+
+        ValueSet(string.Empty, true, true);
+        //control.Check(Value.SplitByCr());
 
         //control.Item.Clear();
         //control.CheckBehavior = CheckBehavior.MultiSelection;

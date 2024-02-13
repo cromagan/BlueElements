@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.IO;
@@ -374,7 +373,8 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
             AddAllowed = AddType.OnlySuggests,
             RemoveAllowed = true,
             MoveAllowed = true,
-            AutoSort = false
+            AutoSort = false,
+            CheckBehavior = CheckBehavior.AllSelected
         };
         childs.Suggestions.Clear();
 
@@ -405,24 +405,19 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
         }
 
         foreach (var thisf in _childs) {
-            _ = childs.Item.Add(thisf, File.Exists(thisf) ? ImageCode.Diskette : ImageCode.Formel);
+            if (File.Exists(thisf)) {
+                childs.AddAndCheck(new TextListItem(thisf, thisf, QuickImage.Get(ImageCode.Diskette, 16), false, true, string.Empty));
+            } else {
+                childs.AddAndCheck(new TextListItem(thisf.FileNameWithoutSuffix(), thisf, QuickImage.Get(ImageCode.Formel, 16), false, true, string.Empty));
+            }
         }
 
-        childs.CollectionChanged += Childs_CollectionChanged;
+        childs.ItemCheckedChanged += Childs_ItemCheckedChanged;
         childs.ContextMenuInit += Childs_ContextMenuInit;
         childs.ContextMenuItemClicked += Childs_ContextMenuItemClicked;
         childs.Disposed += Childs_Disposed;
 
         return childs;
-    }
-
-    private void Childs_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
-        if (IsDisposed) { return; }
-        _childs.Clear();
-        _childs.AddRange(((ListBox)sender).Item.ToListOfString());
-        OnChanged();
-        this.RaiseVersion();
-        UpdateSideOptionMenu();
     }
 
     private void Childs_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => e.UserMenu.Add(ContextMenuCommands.Bearbeiten);
@@ -442,11 +437,20 @@ public class TabFormulaPadItem : FakeControlPadItem, IHasConnectedFormula, IItem
 
     private void Childs_Disposed(object sender, System.EventArgs e) {
         if (sender is ListBox childs) {
-            childs.CollectionChanged -= Childs_CollectionChanged;
+            childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
             childs.ContextMenuInit -= Childs_ContextMenuInit;
             childs.ContextMenuItemClicked -= Childs_ContextMenuItemClicked;
             childs.Disposed -= Childs_Disposed;
         }
+    }
+
+    private void Childs_ItemCheckedChanged(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        _childs.Clear();
+        _childs.AddRange(((ListBox)sender).Checked);
+        OnChanged();
+        this.RaiseVersion();
+        UpdateSideOptionMenu();
     }
 
     private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {

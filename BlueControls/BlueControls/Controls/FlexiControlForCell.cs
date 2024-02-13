@@ -447,7 +447,8 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
 
     protected void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
         control.Enabled = Enabled;
-        control.Item.RemoveAll();
+        control.UnCheck();
+        control.SuggestionsClear();
         if (column == null || column.IsDisposed) { return; }
         ItemCollectionList.ItemCollectionList item = new(true);
         ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);

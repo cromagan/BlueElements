@@ -480,7 +480,7 @@ namespace BlueControls.Forms
             this.lstExported.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
                                                         | AnchorStyles.Left) 
                                                        | AnchorStyles.Right)));
-            this.lstExported.CheckBehavior = CheckBehavior.NoSelection;
+            this.lstExported.CheckBehavior = CheckBehavior.AllSelected;
             this.lstExported.FilterAllowed = true;
             this.lstExported.Location = new Point(8, 40);
             this.lstExported.Name = "lstExported";

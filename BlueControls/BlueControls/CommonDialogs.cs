@@ -17,7 +17,7 @@ internal static class CommonDialogs {
             _ = l2.Add(thisd);
         }
 
-        var x = InputBoxListBoxStyle.Show(caption, l2, CheckBehavior.SingleSelection, null, AddType.None, true);
+        var x = InputBoxListBoxStyle.Show(caption, l2, CheckBehavior.SingleSelection, null, AddType.None);
 
         if (x == null || x.Count != 1) { return null; }
 

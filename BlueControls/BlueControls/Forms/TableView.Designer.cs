@@ -294,7 +294,7 @@ namespace BlueControls.Forms {
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.lstAufgaben.AutoSort = false;
-            this.lstAufgaben.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
+            this.lstAufgaben.CheckBehavior = BlueControls.Enums.CheckBehavior.AllSelected;
             this.lstAufgaben.Location = new System.Drawing.Point(8, 2);
             this.lstAufgaben.Name = "lstAufgaben";
             this.lstAufgaben.Size = new System.Drawing.Size(208, 66);

@@ -33,11 +33,11 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList.ItemCollectionList(true), CheckBehavior.SingleSelection, null, AddType.None, true) { }
+    private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList.ItemCollectionList(true), CheckBehavior.SingleSelection, null, AddType.None) { }
 
-    private InputBoxListBoxStyle(string txt, ItemCollectionList.ItemCollectionList itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
+    private InputBoxListBoxStyle(string txt, ItemCollectionList.ItemCollectionList itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) : base(checkBehavior != CheckBehavior.AlwaysSingleSelection, true) {
         InitializeComponent();
-        if (itemsOriginal.Appearance != ListBoxAppearance.Listbox) {
+        if (itemsOriginal.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Listbox_Boxes) {
             Develop.DebugPrint("Design nicht Listbox");
         }
         //var itemsClone = (ItemCollectionList)itemsOriginal.Clone();
@@ -64,12 +64,12 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         ItemCollectionList.ItemCollectionList x = new(ListBoxAppearance.Listbox, true);
         x.AddRange(items);
         //x.Sort();
-        var erg = Show(txt, x, CheckBehavior.AlwaysSingleSelection, null, AddType.None, true);
+        var erg = Show(txt, x, CheckBehavior.AlwaysSingleSelection, null, AddType.None);
         return erg is null || erg.Count != 1 ? string.Empty : erg[0];
     }
 
-    public static List<string>? Show(string txt, ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed, bool cancelErl) {
-        InputBoxListBoxStyle mb = new(txt, items, checkBehavior, check, addNewAllowed, cancelErl);
+    public static List<string>? Show(string txt, ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {
+        InputBoxListBoxStyle mb = new(txt, items, checkBehavior, check, addNewAllowed);
         _ = mb.ShowDialog();
         return mb._giveBack;
     }

@@ -102,7 +102,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
                 hotItem,
                 control
             ];
-            var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, infos, (Control)control, translate);
+            var contextMenu = Show(thisContextMenu, CheckBehavior.AllSelected, null, infos, (Control)control, translate);
             contextMenu.ItemClicked += _ContextMenu_ItemClicked;
         } else {
             if (par != null) {
@@ -125,8 +125,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         lstbx.Translate = translate;
         lstbx.AutoSort = items.AutoSort;
 
-        if (check != null) { lstbx.Check(check); }
-
         //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
         //{
         //    He += Skin.PaddingSmal * 2;
@@ -148,9 +146,12 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             heightAdded = maxHe;
             biggestItemX += 20;
         }
+
         Size = new Size(biggestItemX + (lstbx.Left * 2), heightAdded + (lstbx.Top * 2));
-        lstbx.CheckBehavior = checkBehavior;
+        lstbx.CheckBehavior = CheckBehavior.MultiSelection;
         lstbx.Item.AddClonesFrom(items);
+        if (check != null) { lstbx.Check(check); }
+        lstbx.CheckBehavior = checkBehavior;
     }
 
     public override void Refresh() {
@@ -199,7 +200,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         // Einen Klick auf Überschriften einfach ignorieren, zB. kontextmenü
         if (!e.Item.IsClickable()) { return; }
 
-        if (lstbx.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Gallery and not ListBoxAppearance.FileSystem) {
+        if (lstbx.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Listbox_Boxes and not ListBoxAppearance.Gallery and not ListBoxAppearance.FileSystem) {
             OnItemClicked(new ContextMenuItemClickedEventArgs(e.Item.KeyName, Tag)); // Das Control.Tag hier ist eigentlich das HotItem
             if (!IsDisposed) { Close(); }
         }

@@ -80,7 +80,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
             }
         }
 
-        var x2 = InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, CheckBehavior.SingleSelection, null, AddType.None, true);
+        var x2 = InputBoxListBoxStyle.Show("Bitte Breite und Position wählen:", li, CheckBehavior.SingleSelection, null, AddType.None);
 
         if (x2 == null || x2.Count != 1) { return; }
 
@@ -178,7 +178,7 @@ public abstract class FakeControlPadItem : RectanglePadItemWithVersion, IItemToC
         aa.AddRange(Permission_AllUsed());
 
         if (aa[Constants.Administrator] == null) { _ = aa.Add(Constants.Administrator); }
-        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:", aa, CheckBehavior.MultiSelection, VisibleFor, AddType.Text, true);
+        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:", aa, CheckBehavior.MultiSelection, VisibleFor, AddType.Text);
         if (b == null) { return; }
         VisibleFor.Clear();
 

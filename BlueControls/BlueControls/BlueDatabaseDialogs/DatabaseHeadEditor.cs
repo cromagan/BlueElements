@@ -98,10 +98,10 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return; }
 
         PermissionGroups_NewRow.Item.Clear();
-        PermissionGroups_NewRow.Item.AddRange(db.PermissionGroupsNewRow);
+        PermissionGroups_NewRow.Check(db.PermissionGroupsNewRow);
 
         DatenbankAdmin.Item.Clear();
-        DatenbankAdmin.Item.AddRange(db.DatenbankAdmin);
+        DatenbankAdmin.Check(db.DatenbankAdmin);
 
         txbKennwort.Text = db.GlobalShowPass;
         lbxSortierSpalten.Item.Clear();
@@ -369,9 +369,9 @@ public sealed partial class DatabaseHeadEditor : FormWithStatusBar, IHasDatabase
 
         Database.Tags = new(txbTags.Text.SplitAndCutByCrToList());
 
-        Database.DatenbankAdmin = new(DatenbankAdmin.Item.ToListOfString());
+        Database.DatenbankAdmin = new(DatenbankAdmin.Checked);
 
-        var tmp = PermissionGroups_NewRow.Item.ToListOfString();
+        var tmp = PermissionGroups_NewRow.Checked.ToList();
         _ = tmp.Remove(Constants.Administrator);
         Database.PermissionGroupsNewRow = new(tmp);
 
