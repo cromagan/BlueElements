@@ -43,13 +43,13 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     private FloatingInputBoxListBoxStyle() : base(Design.Form_QuickInfo) => InitializeComponent();
 
-    private FloatingInputBoxListBoxStyle(ItemCollectionList.ItemCollectionList items, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
+    private FloatingInputBoxListBoxStyle(ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? hotitem, Control? connectedControl, bool translate) : base(connectedControl, items.ControlDesign) {
         InitializeComponent();
         Tag = hotitem;
         // Design = Items.ControlDesign;
         xpos -= Skin.PaddingSmal;
         ypos -= Skin.PaddingSmal;
-        Generate_ListBox1(items, steuerWi, AddType.None, translate);
+        Generate_ListBox1(items, checkBehavior, check, steuerWi, AddType.None, translate);
         //UnloadLostFocus = true;
         Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
         //Develop.DoEvents();
@@ -102,7 +102,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
                 hotItem,
                 control
             ];
-            var contextMenu = Show(thisContextMenu, infos, (Control)control, translate);
+            var contextMenu = Show(thisContextMenu, CheckBehavior.NoSelection, null, infos, (Control)control, translate);
             contextMenu.ItemClicked += _ContextMenu_ItemClicked;
         } else {
             if (par != null) {
@@ -111,19 +111,22 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         }
     }
 
-    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList.ItemCollectionList items, object tag, Control? connectedControl, bool translate) =>
-        new(items, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag,
+    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, object tag, Control? connectedControl, bool translate) =>
+        new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, tag,
             connectedControl, translate);
 
-    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList.ItemCollectionList items, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
-        new(items, xpos, ypos, steuerWi, tag, connectedControl, translate);
+    public static FloatingInputBoxListBoxStyle Show(ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, object? tag, Control? connectedControl, bool translate) =>
+        new(items, checkBehavior, check, xpos, ypos, steuerWi, tag, connectedControl, translate);
 
-    public void Generate_ListBox1(ItemCollectionList.ItemCollectionList items, int minWidth, AddType addNewAllowed, bool translate) {
+    public void Generate_ListBox1(ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate) {
         var (biggestItemX, _, heightAdded, _) = items.ItemData();
         if (addNewAllowed != AddType.None) { heightAdded += 24; }
         lstbx.Appearance = (ListBoxAppearance)items.ControlDesign;
         lstbx.Translate = translate;
         lstbx.AutoSort = items.AutoSort;
+
+        if (check != null) { lstbx.Check(check); }
+
         //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
         //{
         //    He += Skin.PaddingSmal * 2;
@@ -146,7 +149,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             biggestItemX += 20;
         }
         Size = new Size(biggestItemX + (lstbx.Left * 2), heightAdded + (lstbx.Top * 2));
-        lstbx.Item.CheckBehavior = items.CheckBehavior;
+        lstbx.CheckBehavior = checkBehavior;
         lstbx.Item.AddClonesFrom(items);
     }
 

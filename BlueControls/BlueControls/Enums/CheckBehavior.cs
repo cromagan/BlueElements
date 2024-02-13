@@ -20,8 +20,24 @@
 namespace BlueControls.Enums;
 
 public enum CheckBehavior {
+
+    /// <summary>
+    /// Erlaubt keine Selection von Items. Nur Mausklicks werden gewertet
+    /// </summary>
     NoSelection = 0,
+
+    /// <summary>
+    /// Erlaubt das Auswählen eines oder keines Eintrages. Sozusagen Cancel erlaubt.
+    /// </summary>
     SingleSelection = 1,
+
+    /// <summary>
+    /// Erlaubt das Auswählen einer beliebigen Anzahl an Einträgen. Sozusagen Cancel erlaubt.
+    /// </summary>
     MultiSelection = 2,
+
+    /// <summary>
+    /// Es muss genau ein Eintrag gewählt sein. Sozusagen -kein- Cancel erlaubt.
+    /// </summary>
     AlwaysSingleSelection = 3
 }

@@ -55,15 +55,12 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     public static readonly ObservableCollection<ConnectedFormula> AllFiles = [];
     private readonly List<string> _databaseFiles = [];
 
-    private readonly List<FormulaScriptDescription> _eventScript = [];
     private readonly List<string> _notAllowedChilds = [];
 
-    private readonly List<Variable> _variables = [];
     private string _createDate;
 
     private string _creator;
 
-    private string _eventScriptTmp = string.Empty;
     private int _id = -1;
 
     private string _loadedVersion = "0.00";
@@ -75,8 +72,6 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     private bool _saved;
 
     private bool _saving;
-
-    private string _variableTmp = string.Empty;
 
     #endregion
 
@@ -145,28 +140,6 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
     [DefaultValue(true)]
     public bool DropMessages => true;
 
-    public ReadOnlyCollection<FormulaScriptDescription> EventScript {
-        get => new(_eventScript);
-        set {
-            var l = new List<FormulaScriptDescription>();
-            l.AddRange(value);
-            l.Sort();
-
-            var tmp = l.ToString(true);
-
-            if (_eventScriptTmp == tmp) { return; }
-
-            _eventScriptTmp = tmp;
-            EventScript_RemoveAll(true);
-
-            foreach (var t in l) {
-                EventScript_Add(t, true);
-            }
-            _saved = false;
-            //CheckScriptError();
-        }
-    }
-
     public string Filename => _muf?.Filename ?? string.Empty;
 
     // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
@@ -205,39 +178,6 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
             }
 
             if (_saving || (_muf?.IsLoading ?? false)) { return; }
-
-            _saved = false;
-        }
-    }
-
-    public VariableCollection Variables {
-        get => new(_variables);
-        set {
-            var l = new List<VariableString>();
-            l.AddRange(value.ToListVariableString());
-            l.Sort();
-
-            var tmp = l.ToString(true);
-            if (_variableTmp == tmp) { return; }
-
-            _variableTmp = tmp;
-
-            #region Kritische Variablen Disposen
-
-            foreach (var thisVar in _variables) {
-                if (thisVar is IDisposable id && thisVar.MustDispose) { id.Dispose(); }
-            }
-
-            #endregion
-
-            _variables.Clear();
-
-            foreach (var t in value) {
-                if (t is VariableString ts) {
-                    ts.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
-                    _variables.Add(ts);
-                }
-            }
 
             _saved = false;
         }
@@ -494,117 +434,12 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         return erg;
     }
 
-    public string CheckScriptError() {
-        List<string> names = [];
-
-        foreach (var thissc in _eventScript) {
-            if (!thissc.IsOk()) {
-                return thissc.KeyName + ": " + thissc.ErrorReason();
-            }
-
-            if (names.Contains(thissc.KeyName, false)) {
-                return "Skriptname '" + thissc.KeyName + "' mehrfach vorhanden";
-            }
-
-            names.Add(thissc.KeyName);
-        }
-
-        var l = EventScript;
-        if (l.Get(ScriptEventTypes.export).Count > 1) {
-            return "Skript 'Export' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.loaded).Count > 1) {
-            return "Skript 'Datenank geladen' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.prepare_formula).Count > 1) {
-            return "Skript 'Formular Vorbereitung' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.value_changed_extra_thread).Count > 1) {
-            return "Skript 'Wert geändert Extra Thread' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.new_row).Count > 1) {
-            return "Skript 'Neue Zeile' mehrfach vorhanden";
-        }
-
-        if (l.Get(ScriptEventTypes.value_changed).Count > 1) {
-            return "Skript 'Wert geändert' mehrfach vorhanden";
-        }
-
-        return string.Empty;
-    }
-
     public void DiscardPendingChanges(object sender, System.EventArgs e) => _saved = true;
 
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
-    }
-
-    public void EventScript_Add(FormulaScriptDescription ev, bool isLoading) {
-        _eventScript.Add(ev);
-        ev.Changed += EventScript_Changed;
-
-        if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
-    }
-
-    public void EventScript_RemoveAll(bool isLoading) {
-        while (_eventScript.Count > 0) {
-            var ev = _eventScript[_eventScript.Count - 1];
-            ev.Changed -= EventScript_Changed;
-
-            _eventScript.RemoveAt(_eventScript.Count - 1);
-        }
-
-        if (!isLoading) { EventScript_Changed(this, System.EventArgs.Empty); }
-    }
-
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool changevalues, RowItem? row) {
-        try {
-            if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, false, "Allgemein"); }
-
-            //var m = EditableErrorReason(EditableErrorReasonType.EditCurrently);
-
-            //if (!string.IsNullOrEmpty(m)) { return new ScriptEndedFeedback("Automatische Prozesse nicht möglich: " + m, false, "Allgemein"); }
-
-            #region Script ermitteln
-
-            if (eventname != null && !string.IsNullOrEmpty(scriptname)) {
-                DebugPrint(FehlerArt.Fehler, "Event und Skript angekommen!");
-                return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
-            }
-
-            if (eventname == null && string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback("Kein Eventname oder Skript angekommen", false, false, "Allgemein"); }
-
-            if (string.IsNullOrEmpty(scriptname) && eventname != null) {
-                var l = EventScript.Get((ScriptEventTypes)eventname);
-                if (l.Count == 1) { scriptname = l[0].KeyName; }
-                if (string.IsNullOrEmpty(scriptname)) { return new ScriptEndedFeedback(string.Empty, false, false, string.Empty); }
-            }
-
-            if (scriptname == null || string.IsNullOrWhiteSpace(scriptname)) { return new ScriptEndedFeedback("Kein Skriptname angekommen", false, false, "Allgemein"); }
-
-            var script = EventScript.Get(scriptname);
-
-            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
-
-            //if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, scriptname); }
-
-            //if (!script.NeedRow) { row = null; }
-
-            #endregion
-
-            //if (!script.ChangeValues) { changevalues = false; }
-
-            return ExecuteScript(script);
-        } catch {
-            CheckStackForOverflow();
-            return ExecuteScript(eventname, scriptname, changevalues, row);
-        }
     }
 
     public void HasPendingChanges(object sender, MultiUserFileHasPendingChangesEventArgs e) {
@@ -690,78 +525,6 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
     //    if (!isLoading) { Variables_Changed(); }
     //}
-
-    internal ScriptEndedFeedback ExecuteScript(FormulaScriptDescription s) {
-        if (IsDisposed) { return new ScriptEndedFeedback("Formular verworfen", false, false, s.KeyName); }
-
-        var sce = CheckScriptError();
-        if (!string.IsNullOrEmpty(sce)) { return new ScriptEndedFeedback("Die Skripte enthalten Fehler: " + sce, false, true, "Allgemein"); }
-
-        try {
-
-            #region Variablen für Skript erstellen
-
-            VariableCollection vars = [];
-
-            foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("FRM_" + thisvar.KeyName, thisvar.ValueString, false, "Formular-Kopf-Variable\r\n" + thisvar.Comment);
-                vars.Add(v);
-            }
-
-            vars.Add(new VariableString("User", UserName, true, "ACHTUNG: Keinesfalls dürfen benutzerabhängig Werte verändert werden."));
-            vars.Add(new VariableString("Usergroup", UserGroup, true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."));
-            vars.Add(new VariableBool("Administrator", IsAdministrator(), true, "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden.\r\nDiese Variable gibt zurück, ob der Benutzer Admin für diese Datenbank ist."));
-
-            #endregion
-
-            #region  Erlaubte Methoden ermitteln
-
-            var allowedMethods = MethodType.Standard | MethodType.Database;
-
-            //if (row != null && !row.IsDisposed) { allowedMethods |= MethodType.MyDatabaseRow; }
-            if (!s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
-                allowedMethods |= MethodType.IO;
-                allowedMethods |= MethodType.NeedLongTime;
-            }
-
-            if (!s.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.prepare_formula) &&
-                !s.EventTypes.HasFlag(ScriptEventTypes.loaded)) {
-                allowedMethods |= MethodType.ManipulatesUser;
-            }
-
-            allowedMethods |= MethodType.ChangeAnyDatabaseOrRow;
-
-            #endregion
-
-            #region Script ausführen
-
-            var scp = new ScriptProperties(allowedMethods, true, s.Attributes(), this);
-            Script sc = new(vars, string.Empty, scp) {
-                ScriptText = s.ScriptText
-            };
-            var scf = sc.Parse(0, s.KeyName);
-
-            #endregion
-
-            #region Variablen zurückschreiben und Special Rules ausführen
-
-            if (sc.Properties.ChangeValues && scf.AllOk) {
-                Variables = VariableCollection.Combine(Variables, vars, "FRM_");
-            }
-
-            if (!scf.AllOk) {
-                OnDropMessage(FehlerArt.Info, "Das Skript '" + s.KeyName + "' hat einen Fehler verursacht\r\n" + scf.Protocol[0]);
-            }
-
-            #endregion
-
-            return scf;
-        } catch {
-            CheckStackForOverflow();
-            return ExecuteScript(s);
-        }
-    }
 
     /// <summary>
     /// Prüft, ob das Formular sichtbare Elemente hat.
@@ -860,8 +623,6 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         }
     }
 
-    private void EventScript_Changed(object sender, System.EventArgs e) => EventScript = _eventScript.AsReadOnly();
-
     private void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
 
     //private void NotAllowedChilds_Changed(object sender, System.EventArgs e) {
@@ -872,7 +633,6 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
         Repair();
 
         Loaded?.Invoke(this, e);
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null);
     }
 
     private void OnLoading(object sender, System.EventArgs e) => Loading?.Invoke(this, e);
@@ -937,25 +697,9 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
                     break;
 
                 case "events":
-                    _eventScriptTmp = pair.Value;
-                    EventScript_RemoveAll(true);
-                    List<string> ai = [.. pair.Value.FromNonCritical().SplitAndCutByCr()];
-                    foreach (var t in ai) {
-                        EventScript_Add(new FormulaScriptDescription(this, t.FromNonCritical()), true);
-                    }
-
                     break;
 
                 case "variables":
-                    _variableTmp = pair.Value;
-                    _variables.Clear();
-                    List<string> va = [.. pair.Value.FromNonCritical().SplitAndCutByCr()];
-                    foreach (var t in va) {
-                        var l = new VariableString("dummy");
-                        l.Parse(t.FromNonCritical());
-                        l.ReadOnly = true; // Weil kein onChangedEreigniss vorhanden ist
-                        _variables.Add(l);
-                    }
                     break;
             }
         }
@@ -996,14 +740,6 @@ public sealed class ConnectedFormula : IChangedFeedback, IDisposableExtended, IH
 
         if (PadData != null) {
             t.ParseableAdd("PadItemData", PadData.ToString());
-        }
-
-        if (Variables.Count > 0) {
-            t.ParseableAdd("Variables", Variables.ToList().ToString(true));
-        }
-
-        if (EventScript.Count > 0) {
-            t.ParseableAdd("Events", EventScript.ToString(true));
         }
 
         e.Data = t.Parseable().WIN1252_toByte();

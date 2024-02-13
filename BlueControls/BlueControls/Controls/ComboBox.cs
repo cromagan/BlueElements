@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
@@ -146,9 +147,10 @@ public partial class ComboBox : TextBox, ITranslateable {
             x = Cursor.Position.X - MousePos().X;
             y = Cursor.Position.Y - MousePos().Y + Height; //Identisch
         }
-        Item.UncheckAll();
-        if (_drawStyle != ComboboxStyle.RibbonBar && Item[Text] is AbstractListItem bli) { bli.Checked = true; }
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, x, y, Width, null, this, Translate);
+
+        List<string> itc = [];
+        if (_drawStyle != ComboboxStyle.RibbonBar) { itc.Add(Text); }
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(Item, CheckBehavior.SingleSelection, itc, x, y, Width, null, this, Translate);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         _btnDropDownIsIn = false;
@@ -294,13 +296,11 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     //private void _Item_ItemRemoved(object sender, System.EventArgs e) {
     private void DropDownMenu_Cancel(object sender, object mouseOver) {
-        Item.UncheckAll();
         FloatingForm.Close(this);
         _ = Focus();
     }
 
     private void DropDownMenu_ItemClicked(object sender, ContextMenuItemClickedEventArgs e) {
-        Item.UncheckAll();
         FloatingForm.Close(this);
         if (!string.IsNullOrEmpty(e.ClickedCommand) && Item[e.ClickedCommand] is AbstractListItem bli) {
             _lastClickedText = e.ClickedCommand;

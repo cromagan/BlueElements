@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -177,10 +178,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
 
         ItemCollectionList.ItemCollectionList aa = new(true);
         aa.AddRange(db.Permission_AllUsed(false));
-        //aa.Sort();
-        aa.CheckBehavior = CheckBehavior.MultiSelection;
-        aa.Check(ca.PermissionGroups_Show, true);
-        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, AddType.Text, true);
+        var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, CheckBehavior.MultiSelection, ca.PermissionGroups_Show.ToList(), AddType.Text, true);
         if (b == null) { return; }
 
         if (IsDefaultView()) { b.Add(Constants.Everybody); }
@@ -293,8 +291,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasDatabase {
             MessageBox.Show("Es werden bereits alle<br>Spalten angezeigt.", ImageCode.Information, "Ok");
             return;
         }
-        //ic.Sort();
-        var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, AddType.None, true);
+
+        var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, CheckBehavior.SingleSelection, null, AddType.None, true);
         if (r == null || r.Count == 0) { return; }
         ca.Add(db.Column.Exists(r[0]), false);
         ChangeCurrentArrangementto(ca);

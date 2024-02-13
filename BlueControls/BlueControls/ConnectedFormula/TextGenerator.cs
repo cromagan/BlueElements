@@ -203,7 +203,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
 
             #region Ermitteln, mit welchen String die Items anfangen müssen - die Stufe mit einbezogen (allowed)
 
-            var x = lstAuswahl.Item.Checked().ToListOfString();
+            var x = lstAuswahl.Checked;
 
             var allowed = new List<string>();
 
@@ -238,7 +238,7 @@ public partial class TextGenerator : GenericControl, IControlAcceptFilter {
 
         #region Gut, nun steht fest, welche Items wirklich erlaubt sind. die gewählten ermitteln (chk)
 
-        var chk = lstAuswahl.Item.Checked().ToListOfString();
+        var chk = lstAuswahl.Checked;
 
         #endregion
 

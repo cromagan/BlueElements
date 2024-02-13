@@ -169,7 +169,6 @@ namespace BlueControls.Forms {
             this.btnSkripteBearbeiten.Size = new System.Drawing.Size(56, 66);
             this.btnSkripteBearbeiten.TabIndex = 46;
             this.btnSkripteBearbeiten.Text = "Skripte";
-            this.btnSkripteBearbeiten.Click += new System.EventHandler(this.btnSkripteBearbeiten_Click);
             // 
             // grpVorschau
             // 

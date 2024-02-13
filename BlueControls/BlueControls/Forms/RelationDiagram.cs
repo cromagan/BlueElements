@@ -347,9 +347,7 @@ public partial class RelationDiagram : PadEditor, IHasDatabase {
 
         ItemCollectionList.ItemCollectionList il = new(true);
         il.AddRange(c.Contents());
-        //il.Sort();
-        il.CheckBehavior = CheckBehavior.SingleSelection;
-        var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, AddType.None, true);
+        var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, CheckBehavior.SingleSelection, null, AddType.None, true);
         if (i == null || i.Count != 1) { return; }
 
         _ = AddOne(i[0], 0, 0, string.Empty);

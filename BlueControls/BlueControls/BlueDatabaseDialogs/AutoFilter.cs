@@ -171,16 +171,16 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                         if (thisfilter.FilterType.HasFlag(FilterType.Istgleich)) {
                             foreach (var thisValue in thisfilter.SearchValue) {
                                 if (lsbFilterItems.Item[thisValue] is AbstractListItem bli) {
-                                    bli.Checked = true;
+                                    lsbStandardFilter.Check(bli);
                                 } else if (string.IsNullOrEmpty(thisValue) && leere != null) {
-                                    leere.Checked = true;
+                                    lsbStandardFilter.Check(leere);
                                 }
                             }
                         } else if (thisfilter.FilterType.HasFlag(FilterType.Instr)) {
                             txbEingabe.Text = thisfilter.SearchValue[0];
                         } else if (Convert.ToBoolean((int)thisfilter.FilterType & 2)) {
                             if (thisfilter.SearchValue.Count == 1 && string.IsNullOrEmpty(thisfilter.SearchValue[0]) && nichtleere != null) {
-                                nichtleere.Checked = true;
+                                lsbStandardFilter.Check(nichtleere);
                             }
                         }
                     }
@@ -202,7 +202,8 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     }
 
     private void butFertig_Click(object sender, System.EventArgs e) {
-        var searchValue = lsbFilterItems.Item.Checked().ToListOfString();
+        var searchValue = lsbFilterItems.Checked;
+        ;
         if (searchValue.Count == 0) {
             CloseAndDispose("FilterDelete", null);
             return;

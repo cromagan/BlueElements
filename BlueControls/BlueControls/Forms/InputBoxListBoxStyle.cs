@@ -33,16 +33,17 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList.ItemCollectionList(true), AddType.None, true) { }
+    private InputBoxListBoxStyle() : this(string.Empty, new ItemCollectionList.ItemCollectionList(true), CheckBehavior.SingleSelection, null, AddType.None, true) { }
 
-    private InputBoxListBoxStyle(string txt, ItemCollectionList.ItemCollectionList itemsOriginal, AddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
+    private InputBoxListBoxStyle(string txt, ItemCollectionList.ItemCollectionList itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed, bool cancelErl) : base(cancelErl, true) {
         InitializeComponent();
         if (itemsOriginal.Appearance != ListBoxAppearance.Listbox) {
             Develop.DebugPrint("Design nicht Listbox");
         }
         //var itemsClone = (ItemCollectionList)itemsOriginal.Clone();
-        txbText.Item.CheckBehavior = itemsOriginal.CheckBehavior;
+        txbText.CheckBehavior = checkBehavior;
         txbText.Item.AddClonesFrom(itemsOriginal);
+        if (check != null) { txbText.Check(check); }
         txbText.MoveAllowed = false;
         txbText.RemoveAllowed = false;
         txbText.AddAllowed = addNewAllowed;
@@ -59,22 +60,21 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         if (items == null || items.Count == 0) {
             return InputBox.Show(txt, string.Empty, FormatHolder.Text);
         }
-        ItemCollectionList.ItemCollectionList x = new(ListBoxAppearance.Listbox, true) {
-            CheckBehavior = CheckBehavior.AlwaysSingleSelection
-        };
+
+        ItemCollectionList.ItemCollectionList x = new(ListBoxAppearance.Listbox, true);
         x.AddRange(items);
         //x.Sort();
-        var erg = Show(txt, x, AddType.None, true);
+        var erg = Show(txt, x, CheckBehavior.AlwaysSingleSelection, null, AddType.None, true);
         return erg is null || erg.Count != 1 ? string.Empty : erg[0];
     }
 
-    public static List<string>? Show(string txt, ItemCollectionList.ItemCollectionList? items, AddType addNewAllowed, bool cancelErl) {
-        InputBoxListBoxStyle mb = new(txt, items, addNewAllowed, cancelErl);
+    public static List<string>? Show(string txt, ItemCollectionList.ItemCollectionList items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed, bool cancelErl) {
+        InputBoxListBoxStyle mb = new(txt, items, checkBehavior, check, addNewAllowed, cancelErl);
         _ = mb.ShowDialog();
         return mb._giveBack;
     }
 
-    protected override void SetValue(bool canceled) => _giveBack = canceled ? null : txbText.Item.Checked().ToListOfString();
+    protected override void SetValue(bool canceled) => _giveBack = canceled ? null : [.. txbText.Checked];
 
     private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
 

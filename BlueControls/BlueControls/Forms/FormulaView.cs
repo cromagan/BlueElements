@@ -46,24 +46,9 @@ public partial class FormulaView : FormWithStatusBar {
 
     #region Methods
 
-    public static void OpenScriptEditor(ConnectedFormula.ConnectedFormula? f) {
-        if (f == null || f.IsDisposed) { return; }
-
-        var se = new ConnectedFormulaScriptEditor(f);
-        _ = se.ShowDialog();
-    }
-
     protected override void OnLoad(System.EventArgs e) {
         base.OnLoad(e);
         CheckButtons();
-    }
-
-    private void Btb_Click(object sender, System.EventArgs e) {
-        if (CFormula.ConnectedFormula == null || CFormula.ConnectedFormula.IsDisposed) { return; }
-
-        if (sender is Button btb && btb.Tag is FormulaScriptDescription fs) {
-            CFormula.ConnectedFormula.ExecuteScript(fs);
-        }
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
@@ -86,11 +71,6 @@ public partial class FormulaView : FormWithStatusBar {
         MultiUserFile.SaveAll(false);
         Database.ForceSaveAll();
         _ = LoadTab.ShowDialog();
-    }
-
-    private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) {
-        OpenScriptEditor(CFormula.ConnectedFormula);
-        UpdateScripts(CFormula.ConnectedFormula?.EventScript, grpSkripte);
     }
 
     private void CheckButtons() {
@@ -122,7 +102,6 @@ public partial class FormulaView : FormWithStatusBar {
 
         CFormula.InitFormula(cf, null);
 
-        UpdateScripts(CFormula.ConnectedFormula?.EventScript, grpSkripte);
         CheckButtons();
 
         //var oldf = ConnectedFormula; // Zwischenspeichern wegen möglichen NULL verweisen
@@ -180,48 +159,6 @@ public partial class FormulaView : FormWithStatusBar {
         if (!FileExists(LoadTab.FileName)) { return; }
 
         FormulaSet(LoadTab.FileName);
-    }
-
-    private void UpdateScripts(ReadOnlyCollection<FormulaScriptDescription>? scripts, Control groupBox) {
-
-        #region Vorhanden Buttons löschen
-
-        foreach (var thisControl in groupBox.Controls) {
-            if (thisControl is Button btb) {
-                btb.Click -= Btb_Click;
-                btb.Dispose();
-            }
-        }
-        groupBox.Controls.Clear();
-
-        #endregion
-
-        if (scripts == null || scripts.Count == 0) {
-            groupBox.Visible = false;
-            return;
-        }
-
-        groupBox.Visible = true;
-
-        var l = Skin.PaddingSmal;
-
-        foreach (var script in scripts) {
-            if (script.ManualExecutable) {
-                var btb = new Button();
-                btb.Click += Btb_Click;
-                btb.Name = "BTB_" + script.KeyName;
-                groupBox.Controls.Add(btb);
-
-                btb.Text = script.KeyName;
-                btb.Tag = script;
-                btb.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-                btb.Size = new Size(56, 66);
-                btb.ImageCode = "Skript";
-                btb.Location = new Point(l, 2);
-                l = btb.Right;
-            }
-        }
-        groupBox.Width = l + Skin.PaddingSmal;
     }
 
     #endregion

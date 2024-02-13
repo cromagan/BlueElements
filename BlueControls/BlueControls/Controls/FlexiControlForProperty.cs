@@ -215,7 +215,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         //lb.Item.AddClonesFrom(list);
 
         //control.Item.Clear();
-        //control.Item.CheckBehavior = CheckBehavior.MultiSelection;
+        //control.CheckBehavior = CheckBehavior.MultiSelection;
         //if (column == null || column.IsDisposed) { return; }
 
         //ItemCollectionList.ItemCollectionList item = new(true);

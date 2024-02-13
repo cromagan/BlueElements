@@ -395,7 +395,7 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     protected void StyleListBox(ListBox control, ColumnItem? column) {
         control.Enabled = Enabled;
         control.Item.Clear();
-        control.Item.CheckBehavior = CheckBehavior.MultiSelection;
+        control.CheckBehavior = CheckBehavior.MultiSelection;
         if (column == null || column.IsDisposed) { return; }
 
         ItemCollectionList.ItemCollectionList item = new(true);
@@ -448,7 +448,6 @@ public partial class FlexiControlForCell : FlexiControl, IContextMenu, IControlU
     protected void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
         control.Enabled = Enabled;
         control.Item.RemoveAll();
-        control.Item.CheckBehavior = CheckBehavior.NoSelection;
         if (column == null || column.IsDisposed) { return; }
         ItemCollectionList.ItemCollectionList item = new(true);
         ItemCollectionList.ItemCollectionList.GetItemCollection(item, column, null, ShortenStyle.Replaced, 10000);

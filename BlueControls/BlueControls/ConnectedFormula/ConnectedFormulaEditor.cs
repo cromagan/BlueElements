@@ -100,13 +100,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
     #region Methods
 
-    public static void OpenScriptEditor(ConnectedFormula.ConnectedFormula? f) {
-        if (f == null || f.IsDisposed) { return; }
-
-        var se = new ConnectedFormulaScriptEditor(f);
-        _ = se.ShowDialog();
-    }
-
     /// <summary>
     /// Clean up any resources being used.
     /// </summary>
@@ -257,8 +250,6 @@ public partial class ConnectedFormulaEditor : PadEditor {
 
         //ChooseDatabaseAndId(it);
     }
-
-    private void btnSkripteBearbeiten_Click(object sender, System.EventArgs e) => FormulaView.OpenScriptEditor(CFormula);
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.ForceLoadSaveAll();
 

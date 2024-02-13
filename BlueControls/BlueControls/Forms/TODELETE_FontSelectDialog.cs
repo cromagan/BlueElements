@@ -91,16 +91,16 @@ public partial class FontSelectDialog {
     #region Properties
 
     public new BlueFont? Font {
-        get => BlueFont.Get(FName.Item.Checked()[0].KeyName, FloatParse(FSize.Item.Checked()[0].KeyName), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
+        get => BlueFont.Get(FName.Checked[0], FloatParse(FSize.Checked[0]), fFett.Checked, fKursiv.Checked, fUnterstrichen.Checked, fDurchge.Checked, fOutline.Checked, QuickImage.Get(cFarbe.ImageCode).ChangeGreenTo, QuickImage.Get(cRandF.ImageCode).ChangeGreenTo, fKap.Checked, OnlyUpper.Checked, OnlyLow.Checked);
         set {
             _adding = true;
             value ??= BlueFont.Get(Skin.DummyStandardFont);
             if (FName.Item[value.FontName] == null) { _ = FName.Item.Add(value.FontName, value.FontName, QuickImage.Get(ImageCode.Warnung, 20)); }
-            FName.Item.UncheckAll();
-            FName.Item[value.FontName].Checked = true;
+            FName.UncheckAll();
+            FName.Check(value.FontName);
             if (FSize.Item[value.Size.ToString(Constants.Format_Float1)] == null) { _ = FSize.Item.Add(value.Size.ToString(Constants.Format_Float1)); }
-            FSize.Item.UncheckAll();
-            FSize.Item[value.Size.ToString(Constants.Format_Float1)].Checked = true;
+            FSize.UncheckAll();
+            FSize.Check(value.Size.ToString(Constants.Format_Float1));
             fFett.Checked = value.Bold;
             fKursiv.Checked = value.Italic;
             fUnterstrichen.Checked = value.Underline;

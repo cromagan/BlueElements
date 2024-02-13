@@ -329,11 +329,11 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
 
         WriteInfosBack();
 
-        newScriptItem.Checked = true;
+        lstEventScripts.Check(newScriptItem);
     }
 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
-        if (lstEventScripts.Item.Checked().Count != 1) {
+        if (lstEventScripts.Checked.Count != 1) {
             Item = null;
             return;
         }
@@ -341,7 +341,7 @@ public sealed partial class DatabaseScriptEditor : IHasDatabase {
             Item = null;
             return;
         }
-        var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts.Item.Checked()[0]).Item;
+        var selectedlstEventScripts = (DatabaseScriptDescription)((ReadableListItem)lstEventScripts.Item[lstEventScripts.Checked[0]]).Item;
         Item = selectedlstEventScripts;
     }
 

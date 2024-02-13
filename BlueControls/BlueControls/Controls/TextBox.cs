@@ -819,7 +819,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             { "Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20) },
             { "Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20) }
         };
-        var r = InputBoxListBoxStyle.Show("Wählen sie:", i, AddType.None, true);
+        var r = InputBoxListBoxStyle.Show("Wählen sie:", i, CheckBehavior.SingleSelection, null, AddType.None, true);
         _cursorCharPos = x;
         if (r == null || r.Count != 1) { return; }
         Char_DelBereich(-1, -1);

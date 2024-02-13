@@ -44,7 +44,11 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
 
     private bool _autoSort;
 
-    private CheckBehavior _checkBehavior;
+    /// <summary>
+    /// Ist das Item markiert/selektiert?
+    /// </summary>
+    /// <remarks></remarks>
+    private bool _checked;
 
     private Design _controlDesign;
 
@@ -69,7 +73,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         _appearance = ListBoxAppearance.Listbox;
         _itemDesign = Design.Undefiniert;
         _controlDesign = Design.Undefiniert;
-        _checkBehavior = CheckBehavior.SingleSelection;
         _appearance = design;
         _autoSort = autosort;
         GetDesigns();
@@ -110,15 +113,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
     }
 
     public int BreakAfterItems { get; private set; }
-
-    public CheckBehavior CheckBehavior {
-        get => _checkBehavior;
-        set {
-            if (value == _checkBehavior) { return; }
-            _checkBehavior = value;
-            ValidateCheckStates(null);
-        }
-    }
 
     /// <summary>
     /// ControlDesign wird durch Appearance gesetzt
@@ -175,11 +169,10 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
     #region Methods
 
     public static void GetItemCollection(ItemCollectionList e, ColumnItem column, RowItem? checkedItemsAtRow, ShortenStyle style, int maxItems) {
-        List<string> marked = [];
         List<string> l = [];
 
         e.Clear();
-        e.CheckBehavior = CheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
+        //e.CheckBehavior = CheckBehavior.MultiSelection; // Es kann ja mehr als nur eines angewählt sein, auch wenn nicht erlaubt!
         if (column.IsDisposed) { return; }
 
         l.AddRange(column.DropDownItems);
@@ -213,27 +206,13 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         }
 
         if (checkedItemsAtRow?.Database is Database db && !db.IsDisposed) {
-            if (db.Row.Count > 0) {
-                if (!checkedItemsAtRow.CellIsNullOrEmpty(column)) {
-                    if (column.MultiLine) {
-                        marked = checkedItemsAtRow.CellGetList(column);
-                    } else {
-                        marked.Add(checkedItemsAtRow.CellGetString(column));
-                    }
-                }
-                l.AddRange(marked);
-            }
+            l.AddRange(checkedItemsAtRow.CellGetList(column));
             l = l.SortedDistinctList();
         }
 
         if (maxItems > 0 && l.Count > maxItems) { return; }
 
         e.AddRange(l, column, style, column.BehaviorOfImageAndText);
-        if (checkedItemsAtRow != null) {
-            foreach (var t in marked) {
-                if (e[t] is AbstractListItem bli) { bli.Checked = true; }
-            }
-        }
     }
 
     public TextListItem Add(string internalAndReadableText) => Add(internalAndReadableText, internalAndReadableText, null, false, true, string.Empty);
@@ -300,7 +279,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         base.Add(item);
 
         item.Changed += Item_Changed;
-        item.CheckedChanged += Item_CheckedChanged;
         item.CompareKeyChanged += Item_CompareKeyChangedChanged;
     }
 
@@ -575,20 +553,8 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         return ComputeAllItemPositions(new Size(1, 30), null, biggestItemX, heightAdded, orienation);
     }
 
-    public void Check(IList<string> itemnames, bool checkstate) {
-        foreach (var thisItem in itemnames) {
-            if (this[thisItem] is AbstractListItem bli) {
-                bli.Checked = checkstate;
-            }
-        }
-    }
-
-    public List<AbstractListItem> Checked() => this.Where(thisItem => thisItem != null && thisItem.Checked).ToList();
-
     public object Clone() {
-        ItemCollectionList x = new(_appearance, _autoSort) {
-            CheckBehavior = _checkBehavior
-        };
+        ItemCollectionList x = new(_appearance, _autoSort);
         foreach (var thisItem in this) {
             x.Add(thisItem.Clone() as AbstractListItem);   /* ThisItem.CloneToNewCollection(x);*/
         }
@@ -607,7 +573,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
     public new void Remove(AbstractListItem? item) {
         if (item == null || !Contains(item)) { return; }
         item.Changed -= Item_Changed;
-        item.CheckedChanged -= Item_CheckedChanged;
         item.CompareKeyChanged -= Item_CompareKeyChangedChanged;
         _ = base.Remove(item);
         OnChanged();
@@ -620,14 +585,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         _maxNeededItemSize = Size.Empty;
         _itemOrder = null;
         OnChanged();
-    }
-
-    public void UncheckAll() {
-        foreach (var thisItem in this) {
-            if (thisItem != null) {
-                thisItem.Checked = false;
-            }
-        }
     }
 
     internal Size ComputeAllItemPositions(Size controlDrawingArea, Slider? sliderY, int biggestItemX, int heightAdded, Orientation senkrechtAllowed) {
@@ -761,18 +718,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         }
     }
 
-    internal void Item_CheckedChanged(object sender, System.EventArgs e) {
-        if (sender is not AbstractListItem item) { return; }
-
-        if (item.Checked) {
-            ValidateCheckStates(item);
-        } else {
-            ValidateCheckStates(null);
-        }
-
-        OnItemCheckedChanged();
-    }
-
     internal void Item_CompareKeyChangedChanged(object sender, System.EventArgs e) {
         _maxNeededItemSize = Size.Empty;
         _itemOrder = null;
@@ -811,37 +756,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         } catch {
             Develop.CheckStackForOverflow();
             return ItemData();
-        }
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="values"></param>
-    /// <param name="checkmode"></param>
-
-    internal void SetValuesTo(List<string> values, bool checkmode) {
-        var ist = this.ToListOfString();
-        var zuviel = ist.Except(values).ToList();
-        var zuwenig = values.Except(ist).ToList();
-        // Zu viele im Mains aus der Liste löschen
-        foreach (var thisString in zuviel) {
-            if (!values.Contains(thisString)) {
-                Remove(thisString);
-            }
-        }
-
-        // und die Mains auffüllen
-        foreach (var thisString in zuwenig) {
-            if (IO.FileExists(thisString)) {
-                if (thisString.FileType() == FileFormat.Image) {
-                    _ = Add(thisString, thisString, thisString.FileNameWithoutSuffix());
-                } else {
-                    _ = Add(thisString.FileNameWithSuffix(), thisString, QuickImage.Get(thisString.FileType(), 48));
-                }
-            } else {
-                _ = Add(thisString);
-            }
         }
     }
 
@@ -935,41 +849,6 @@ public class ItemCollectionList : ObservableCollection<AbstractListItem>, IClone
         } catch {
             Develop.CheckStackForOverflow();
             PreComputeSize();
-        }
-    }
-
-    private void ValidateCheckStates(AbstractListItem? thisMustBeChecked) {
-        switch (_checkBehavior) {
-            case CheckBehavior.NoSelection:
-                UncheckAll();
-                break;
-
-            case CheckBehavior.MultiSelection:
-                break;
-
-            case CheckBehavior.SingleSelection:
-                if (Checked().Count > 1) {
-                    foreach (var thisItem in this) {
-                        if (thisItem != null && thisItem != thisMustBeChecked) { thisItem.Checked = false; }
-                    }
-                }
-                break;
-
-            case CheckBehavior.AlwaysSingleSelection:
-                if (Checked().Count != 1) {
-                    thisMustBeChecked ??= this.FirstOrDefault(thisp => thisp != null && !thisp.IsClickable());
-
-                    foreach (var thisItem in this) {
-                        if (thisItem != null && thisItem != thisMustBeChecked) { thisItem.Checked = false; }
-                    }
-
-                    if (thisMustBeChecked != null) { thisMustBeChecked.Checked = true; }
-                }
-                break;
-
-            default:
-                Develop.DebugPrint(_checkBehavior);
-                break;
         }
     }
 

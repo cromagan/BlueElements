@@ -137,13 +137,6 @@
     </Compile>
     <Compile Include="BlueFont.cs" />
     <Compile Include="CommonDialogs.cs" />
-    <Compile Include="ConnectedFormula\ConnectedFormulaScriptEditor.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="ConnectedFormula\ConnectedFormulaScriptEditor.Designer.cs">
-      <DependentUpon>ConnectedFormulaScriptEditor.cs</DependentUpon>
-    </Compile>
-    <Compile Include="ConnectedFormula\FormulaScriptDescription.cs" />
     <Compile Include="ConnectedFormula\InputRowOutputFilterControl.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -652,10 +645,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="BlueDatabaseDialogs\Filterleiste.resx">
       <DependentUpon>Filterleiste.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ConnectedFormula\ConnectedFormulaScriptEditor.resx">
-      <DependentUpon>ConnectedFormulaScriptEditor.cs</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\Caption.resx">

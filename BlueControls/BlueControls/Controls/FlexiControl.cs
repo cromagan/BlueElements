@@ -870,7 +870,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Enabled = Enabled
         };
         control.Item.Clear();
-        control.Item.CheckBehavior = CheckBehavior.MultiSelection;
+        control.CheckBehavior = CheckBehavior.MultiSelection;
         StandardBehandlung(control);
         UpdateValueToControl();
         return control;
@@ -883,7 +883,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Enabled = Enabled
         };
         control.Item.RemoveAll();
-        control.Item.CheckBehavior = CheckBehavior.NoSelection;
         StandardBehandlung(control);
         UpdateValueToControl();
         return control;
@@ -1091,7 +1090,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
     /// </summary>
-    private void UpdateValueTo_ListBox(ItemCollectionList.ItemCollectionList main) => main.SetValuesTo(Value.SplitAndCutByCrToList());
+    private void UpdateValueTo_ListBox(ListBox main) => main.Check(Value.SplitAndCutByCrToList());
+
+    private void UpdateValueTo_SwapListBox(SwapListBox main) => main.Check(Value.SplitAndCutByCrToList());
 
     /// <summary>
     /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Filling muss TRUE sein.
@@ -1118,11 +1119,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                     break;
 
                 case ListBox listBox:
-                    UpdateValueTo_ListBox(listBox.Item);
+                    UpdateValueTo_ListBox(listBox);
                     break;
 
                 case SwapListBox swapListBox:
-                    UpdateValueTo_ListBox(swapListBox.Item);
+                    UpdateValueTo_SwapListBox(swapListBox);
                     break;
 
                 case Button button:

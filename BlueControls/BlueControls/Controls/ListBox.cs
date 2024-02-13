@@ -18,11 +18,14 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Forms;
 using BlueBasics;
 using BlueBasics.Enums;
@@ -44,10 +47,10 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     #region Fields
 
     private AddType _addAlloweds = AddType.Text;
-
     private ListBoxAppearance _appearance;
-
     private bool _autosort = true;
+    private CheckBehavior _checkBehavior;
+    private List<string> _checked = [];
     private bool _filterAllowed;
 
     //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
@@ -127,9 +130,15 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     [DefaultValue(CheckBehavior.SingleSelection)]
     public CheckBehavior CheckBehavior {
-        get => Item.CheckBehavior;
-        set => Item.CheckBehavior = value;
+        get => _checkBehavior;
+        set {
+            if (value == _checkBehavior) { return; }
+            _checkBehavior = value;
+            ValidateCheckStates(_checked, string.Empty);
+        }
     }
+
+    public ReadOnlyCollection<string> Checked => _checked.AsReadOnly();
 
     [DefaultValue(false)]
     public bool FilterAllowed {
@@ -203,7 +212,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             return null;
         }
         var i = Item.Add(val, val);
-        i.Checked = true;
+        Check(i);
         return i;
     }
 
@@ -217,8 +226,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             MessageBox.Show("Keine (weiteren) Werte vorhanden.", ImageCode.Information, "OK");
             return;
         }
-        Suggestions.CheckBehavior = CheckBehavior.SingleSelection;
-        var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, AddType.None, true);
+
+        var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, CheckBehavior.SingleSelection, null, AddType.None, true);
 
         if (rück == null || rück.Count == 0) { return; }
 
@@ -226,6 +235,22 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         if (sg == null) { return; }
 
         Item.Add(sg.Clone() as AbstractListItem);
+    }
+
+    public void Check(List<string> ali) {
+        foreach (var thiss in ali) {
+            Check(thiss);
+        }
+    }
+
+    public void Check(AbstractListItem ali) => Check(ali.KeyName);
+
+    public void Check(string name) {
+        if (IsChecked(name)) { return; }
+
+        List<string> l = [.. _checked, name];
+
+        ValidateCheckStates(l, name);
     }
 
     public bool ContextMenuItemClickedInternalProcessig(object sender, ContextMenuItemClickedEventArgs e) => false;
@@ -245,6 +270,25 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public void OnContextMenuItemClicked(ContextMenuItemClickedEventArgs e) => ContextMenuItemClicked?.Invoke(this, e);
 
+    public void UnCheck(List<string> ali) {
+        foreach (var thiss in ali) {
+            Check(thiss);
+        }
+    }
+
+    public void UnCheck(AbstractListItem ali) => UnCheck(ali.KeyName);
+
+    public void UnCheck(string name) {
+        if (!IsChecked(name)) { return; }
+
+        List<string> l = [.. _checked];
+        l.Remove(name);
+
+        ValidateCheckStates(l, string.Empty);
+    }
+
+    public void UncheckAll() => ValidateCheckStates([], string.Empty);
+
     protected override void DrawControl(Graphics gr, States state) {
 
         #region  tmpDesign
@@ -259,9 +303,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         #region  checkboxDesign
 
         var checkboxDesign = Design.Undefiniert;
-        if (_appearance == ListBoxAppearance.Listbox_Boxes && Item.CheckBehavior != CheckBehavior.NoSelection) {
+        if (_appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.NoSelection) {
             checkboxDesign = Design.CheckBox_TextStyle;
-            if (Item.CheckBehavior is CheckBehavior.AlwaysSingleSelection or CheckBehavior.SingleSelection) {
+            if (_checkBehavior is CheckBehavior.AlwaysSingleSelection or CheckBehavior.SingleSelection) {
                 checkboxDesign = Design.OptionButton_TextStyle;
             }
         }
@@ -310,7 +354,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 var itemState = tmpState;
                 if (_mouseOverItem == currentItem && Enabled) { itemState |= States.Standard_MouseOver; }
                 if (!currentItem.Enabled) { itemState = States.Standard_Disabled; }
-                if (currentItem.Checked) { itemState |= States.Checked; }
+                if (IsChecked(currentItem)) { itemState |= States.Checked; }
                 lock (locker) {
                     currentItem.Draw(gr, 0, (int)SliderY.Value, Item.ControlDesign, Item.ItemDesign, itemState, true, FilterTxt.Text, false, checkboxDesign); // Items müssen beim Erstellen ersetzt werden!!!!
                 }
@@ -363,7 +407,9 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
             case MouseButtons.Left:
                 if (nd != null) {
                     if (Appearance is ListBoxAppearance.Listbox or ListBoxAppearance.Autofilter or ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem) {
-                        if (nd.IsClickable()) { nd.Checked = !nd.Checked; }
+                        if (nd.IsClickable()) {
+                            ChangeCheck(nd);
+                        }
                     }
                     OnItemClicked(new AbstractListItemEventArgs(nd));
                 }
@@ -408,10 +454,18 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private bool ButtonsVisible() => Plus.Visible || Minus.Visible || Up.Visible || Down.Visible || FilterTxt.Visible;
 
+    private void ChangeCheck(AbstractListItem ne) {
+        if (IsChecked(ne)) {
+            UnCheck(ne);
+        } else {
+            Check(ne);
+        }
+    }
+
     private void CheckButtons() {
         if (!Visible) { return; }
         if (Parent == null) { return; }
-        var nr = Item.Checked();
+        var nr = Checked;
         Down.Visible = _moveAllowed;
         Up.Visible = _moveAllowed;
         Plus.Visible = _addAlloweds != AddType.None;
@@ -429,8 +483,8 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
                 Up.Enabled = false;
                 Down.Enabled = false;
             } else {
-                Up.Enabled = Item[0] != nr[0];
-                Down.Enabled = Item[Item.Count - 1] != nr[0];
+                Up.Enabled = Item[0].KeyName != nr[0];
+                Down.Enabled = Item[Item.Count - 1].KeyName != nr[0];
             }
         }
     }
@@ -438,19 +492,21 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void Down_Click(object sender, System.EventArgs e) {
         var ln = -1;
         for (var z = Item.ItemOrder.Count - 1; z >= 0; z--) {
-            if (Item[z] != null) {
-                if (Item[z].Checked) {
-                    if (ln < 0) { return; }// Befehl verwerfen...
-                    Item.Swap(ln, z);
-                    CheckButtons();
-                    return;
-                }
-                ln = z;
+            if (Checked.Contains(Item[z].KeyName)) {
+                if (ln < 0) { return; }// Befehl verwerfen...
+                Item.Swap(ln, z);
+                CheckButtons();
+                return;
             }
+            ln = z;
         }
     }
 
     private void FilterTxt_TextChanged(object sender, System.EventArgs e) => Invalidate();
+
+    private bool IsChecked(AbstractListItem thisItem) => IsChecked(thisItem.KeyName);
+
+    private bool IsChecked(string name) => _checked.Contains(name);
 
     private void Item_Changed(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
@@ -463,12 +519,7 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
         OnCollectionChanged(e);
     }
 
-    private void Minus_Click(object sender, System.EventArgs e) {
-        foreach (var thisItem in Item.Checked()) {
-            Item.Remove(thisItem);
-        }
-        CheckButtons();
-    }
+    private void Minus_Click(object sender, System.EventArgs e) => UnCheck(Checked.ToList());
 
     private AbstractListItem? MouseOverNode(int x, int y) => ButtonsVisible() && y >= Height - Plus.Height ? null : Item[x, (int)(y + SliderY.Value)];
 
@@ -512,15 +563,69 @@ public partial class ListBox : GenericControl, IContextMenu, IBackgroundNone, IT
     private void Up_Click(object sender, System.EventArgs e) {
         AbstractListItem? ln = null;
         foreach (var thisItem in Item.ItemOrder) {
-            if (thisItem != null) {
-                if (thisItem.Checked) {
-                    if (ln == null) { return; }// Befehl verwerfen...
-                    Item.Swap(Item.IndexOf(ln), Item.IndexOf(thisItem));
-                    CheckButtons();
-                    return;
-                }
-                ln = thisItem;
+            if (IsChecked(thisItem)) {
+                if (ln == null) { return; }// Befehl verwerfen...
+                Item.Swap(Item.IndexOf(ln), Item.IndexOf(thisItem));
+                CheckButtons();
+                return;
             }
+            ln = thisItem;
+        }
+    }
+
+    private void ValidateCheckStates(List<string> newCheckedItems, string lastaddeditem) {
+        newCheckedItems = newCheckedItems.SortedDistinctList();
+
+        switch (_checkBehavior) {
+            case CheckBehavior.NoSelection:
+                newCheckedItems.Clear();
+                break;
+
+            case CheckBehavior.MultiSelection:
+                break;
+
+            case CheckBehavior.SingleSelection:
+                if (newCheckedItems.Count > 1) {
+                    if (string.IsNullOrEmpty(lastaddeditem)) { lastaddeditem = newCheckedItems[0]; }
+                    newCheckedItems.Clear();
+                    newCheckedItems.Add(lastaddeditem);
+                }
+                break;
+
+            case CheckBehavior.AlwaysSingleSelection:
+                if (newCheckedItems.Count > 1) {
+                    if (string.IsNullOrEmpty(lastaddeditem)) { lastaddeditem = newCheckedItems[0]; }
+                    newCheckedItems.Clear();
+                    newCheckedItems.Add(lastaddeditem);
+                }
+
+                if (newCheckedItems.Count == 0) {
+                    var it = Item.FirstOrDefault(thisp => thisp != null && !thisp.IsClickable());
+                    if (it != null) { newCheckedItems.Add(it.KeyName); }
+                }
+
+                break;
+
+            default:
+                Develop.DebugPrint(_checkBehavior);
+                break;
+        }
+
+        List<string> newList = [];
+
+        foreach (var thisit in newCheckedItems) {
+            var it = Item[thisit];
+            if (it != null && it.IsClickable()) {
+                newList.Add(thisit);
+            }
+        }
+
+        if (newList.IsDifferentTo(_checked)) {
+            _checked = newList;
+            CheckButtons();
+            OnItemCheckedChanged();
+        } else {
+            CheckButtons();
         }
     }
 

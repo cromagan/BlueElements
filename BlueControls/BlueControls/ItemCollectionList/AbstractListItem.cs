@@ -39,12 +39,6 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
     public object? Tag;
 
     /// <summary>
-    /// Ist das Item markiert/selektiert?
-    /// </summary>
-    /// <remarks></remarks>
-    private bool _checked;
-
-    /// <summary>
     /// Ist das Item enabled?
     /// </summary>
     /// <remarks></remarks>
@@ -65,7 +59,6 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
     protected AbstractListItem(string internalname, bool enabled) {
         Internal = string.IsNullOrEmpty(internalname) ? Generic.UniqueInternal() : internalname;
         if (string.IsNullOrEmpty(Internal)) { Develop.DebugPrint(FehlerArt.Fehler, "Interner Name nicht vergeben."); }
-        _checked = false;
         _enabled = enabled;
         Pos = Rectangle.Empty;
         _userDefCompareKey = string.Empty;
@@ -77,30 +70,11 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
 
     public event EventHandler? Changed;
 
-    public event EventHandler? CheckedChanged;
-
     public event EventHandler? CompareKeyChanged;
 
     #endregion
 
     #region Properties
-
-    public bool Checked {
-        get => _checked;
-        set {
-            if (!IsClickable()) { value = false; }
-            if (value == _checked) { return; }
-            _checked = value;
-            OnCheckedChanged();
-            OnChanged();
-
-            //if (Parent == null) {
-            //    _checked = value;
-            //} else {
-            //    Parent?.SetNewCheckState(this, value, ref _checked);
-            //}
-        }
-    }
 
     public bool Enabled {
         get => _enabled;
@@ -160,7 +134,6 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
     public abstract object? Clone();
 
     public void CloneBasicStatesFrom(AbstractListItem sourceItem) {
-        Checked = sourceItem.Checked;
         Enabled = sourceItem.Enabled;
         Tag = sourceItem.Tag;
         UserDefCompareKey = sourceItem.UserDefCompareKey;
@@ -227,8 +200,6 @@ public abstract class AbstractListItem : IComparable, ICloneable, IHasKeyName, I
     public virtual bool IsClickable() => !IsCaption;
 
     public void OnChanged() => Changed?.Invoke(this, System.EventArgs.Empty);
-
-    public void OnCheckedChanged() => CheckedChanged?.Invoke(this, System.EventArgs.Empty);
 
     public void OnCompareKeyChanged() => CompareKeyChanged?.Invoke(this, System.EventArgs.Empty);
 

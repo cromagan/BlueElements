@@ -327,11 +327,6 @@ public partial class FlexiControlForFilter : FlexiControl, IControlSendFilter, I
     private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
         var cbx = (ComboBox)sender;
         cbx.Item.Clear();
-        cbx.Item.CheckBehavior = CheckBehavior.MultiSelection;
-        //if (TableView == null) {
-        //    _ = cbx.Item.Add("Anzeigefehler", "|~", ImageCode.Kreuz, false);
-        //    return;
-        //}
         var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null);
         if (listFilterString.Count == 0) {
             _ = cbx.Item.Add("Keine weiteren Einträge vorhanden", "|~", ImageCode.Kreuz, false);

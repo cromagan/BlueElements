@@ -407,13 +407,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             return;
         }
         i.Appearance = ListBoxAppearance.Listbox;
-        var v = InputBoxListBoxStyle.Show("Vorherigen Eintrag wählen:", i, AddType.None, true);
+        var v = InputBoxListBoxStyle.Show("Vorherigen Eintrag wählen:", i, CheckBehavior.SingleSelection, ["Cancel"], AddType.None, true);
         if (v == null || v.Count != 1) { return; }
         if (v[0] == "Cancel") { return; } // =Aktueller Eintrag angeklickt
         row.CellSet(column, v[0].Substring(5));
-        //Database.Cell.Set(column, row, v[0].Substring(5), false);
-        //_ = row.ExecuteScript(EventTypes.value_changedx, string.Empty, true, true, true, 5);
-        //row.Database?.AddBackgroundWork(row);
         row.Database?.Row.ExecuteValueChangedEvent(true);
     }
 
@@ -541,9 +538,7 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
     //        delList.GenerateAndAdd(thisf);
     //    }
     public static ItemCollectionList.ItemCollectionList UndoItems(Database? db, string cellkey) {
-        ItemCollectionList.ItemCollectionList i = new(ListBoxAppearance.KontextMenu, false) {
-            CheckBehavior = CheckBehavior.AlwaysSingleSelection
-        };
+        ItemCollectionList.ItemCollectionList i = new(ListBoxAppearance.KontextMenu, false);
 
         if (db != null && !db.IsDisposed) {
             //database.GetUndoCache();
@@ -2484,10 +2479,15 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
             _ = t.Add("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1");
             _ = t.AddSeparator(FirstSortChar + "2");
-            //t.Sort();
         }
 
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(t, new CellExtEventArgs(cellInThisDatabaseColumn, cellInThisDatabaseRow), this, Translate);
+        List<string> toc = [];
+
+        if (contentHolderCellRow != null) {
+            t.AddRange(contentHolderCellRow.CellGetList(contentHolderCellColumn));
+        }
+
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(t, CheckBehavior.SingleSelection, toc, new CellExtEventArgs(cellInThisDatabaseColumn, cellInThisDatabaseRow), this, Translate);
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         Develop.Debugprint_BackgroundThread();
     }
@@ -2533,8 +2533,10 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
             }
         }
 
-        //if (string.IsNullOrEmpty(Box.Text)) {
-        //    Box.Text = CellCollection.AutomaticInitalValue(contentHolderCellColumn, contentHolderCellRow);
+        //List<string> toc = [];
+
+        //if (contentHolderCellColumn != null && contentHolderCellRow != null) {
+        //    t.AddRange(contentHolderCellRow.CellGetList(contentHolderCellColumn));
         //}
 
         box.Visible = true;
@@ -3239,10 +3241,6 @@ public partial class Table : GenericControl, IContextMenu, IBackgroundNone, ITra
         CheckView();
     }
 
-    /// <summary>
-    /// Reset - Parse - CheckView
-    /// </summary>
-    /// <param name="toParse"></param>
     private int Row_DrawHeight(ColumnViewCollection ca, RowItem row, Rectangle displayRectangleWoSlider) {
         if (IsDisposed || Database is not Database db || db.IsDisposed) { return _pix18; }
 

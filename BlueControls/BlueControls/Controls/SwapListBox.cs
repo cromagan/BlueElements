@@ -18,6 +18,7 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Drawing;
@@ -61,12 +62,13 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
 
     public void OnCollectionChanged(NotifyCollectionChangedEventArgs e) => CollectionChanged?.Invoke(this, e);
 
+    internal void Check(List<string> list) => Main.Check(list);
+
     internal void SuggestionsAdd(ItemCollectionList.ItemCollectionList? item) {
         if (item == null) { return; }
 
         foreach (var thisi in item) {
             if (Main.Item[thisi.KeyName] == null && Suggest.Item[thisi.KeyName] == null) {
-                thisi.Checked = false;
                 Suggest.Item.Add(thisi.Clone() as AbstractListItem);
             }
         }
@@ -83,23 +85,10 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
             targetItem = new TextListItem(@internal, @internal, null, false, true, string.Empty);
             target.Item.Add(targetItem);
         }
-        //var SourceItem = Source.Item[Internal];
-        //var TargetItem = Target.Item[Internal];
-        //if (SourceItem == null && TargetItem == null)
-        //{
-        //    TargetItem = new TextListItem(Internal);
-        //    Target.Item.Add(TargetItem);
-        //}
-        //target.Item.Sort();
+
         if (sourceItem != null && doRemove) { source.Item.Remove(sourceItem); }
     }
 
-    //private void Main_ContextMenuItemClicked(object sender, EventArgs.ContextMenuItemClickedEventArgs e) {
-    //    OnContextMenuItemClicked(e);
-    //}
-    //private void Main_ContextMenuInit(object sender, EventArgs.ContextMenuInitEventArgs e) {
-    //    OnContextMenuInit(e);
-    //}
     protected override void OnEnabledChanged(System.EventArgs e) {
         base.OnEnabledChanged(e);
         Main.Enabled = Enabled;
@@ -128,25 +117,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         OnCollectionChanged(e);
     }
 
-    //protected void OnItemAdded(ListEventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    ItemAdded?.Invoke(this, e);
-    //}
-
-    //protected void OnItemRemoved(System.EventArgs e) {
-    //    if (IsDisposed) { return; }
-    //    ItemRemoved?.Invoke(this, e);
-    //}
-    //private void Main_ItemAdded(object sender, ListEventArgs e) {
-    //    MoveItemBetweenList(Suggest, Main, ((AbstractListItem)e.Item).Internal, true);
-    //    OnItemAdded(e);
-    //}
-
     private void Main_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Main, Suggest, e.Item.KeyName, true);
-
-    //private void Main_ItemRemoved(object sender, System.EventArgs e) => OnItemRemoved(e);
-
-    //private void Main_ItemRemoving(object sender, ListEventArgs e) => MoveItemBetweenList(Main, Suggest, ((AbstractListItem)e.Item).Internal, false);
 
     private void Suggest_ItemClicked(object sender, AbstractListItemEventArgs e) => MoveItemBetweenList(Suggest, Main, e.Item.KeyName, true);
 

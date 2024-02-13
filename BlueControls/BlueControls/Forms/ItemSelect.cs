@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Documents.DocumentStructures;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.ItemCollectionList;
@@ -91,10 +92,10 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
         _giveBack = null;
         if (canceled) { return; }
 
-        var l = List.Item.Checked();
-        if (l == null || l.Count != 1) { return; }
+        var l = List.Checked;
+        if (l.Count != 1) { return; }
 
-        _giveBack = l[0];
+        _giveBack = List.Item[l[0]];
     }
 
     #endregion

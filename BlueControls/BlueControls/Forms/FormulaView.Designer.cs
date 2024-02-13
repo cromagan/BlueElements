@@ -37,7 +37,6 @@ namespace BlueControls.Forms {
             this.btnLastFormulas = new BlueControls.Controls.LastFilesCombo();
             this.btnOeffnen = new BlueControls.Controls.Button();
             this.tabAllgemein = new System.Windows.Forms.TabPage();
-            this.grpSkripte = new BlueControls.Controls.GroupBox();
             this.tabAdmin = new System.Windows.Forms.TabPage();
             this.grpAdminAllgemein = new BlueControls.Controls.GroupBox();
             this.btnSaveLoad = new BlueControls.Controls.Button();
@@ -138,25 +137,11 @@ namespace BlueControls.Forms {
             // tabAllgemein
             // 
             this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabAllgemein.Controls.Add(this.grpSkripte);
             this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
             this.tabAllgemein.Name = "tabAllgemein";
             this.tabAllgemein.Size = new System.Drawing.Size(1194, 81);
             this.tabAllgemein.TabIndex = 1;
             this.tabAllgemein.Text = "Allgemein";
-            // 
-            // grpSkripte
-            // 
-            this.grpSkripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpSkripte.CausesValidation = false;
-            this.grpSkripte.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpSkripte.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpSkripte.Location = new System.Drawing.Point(0, 0);
-            this.grpSkripte.Name = "grpSkripte";
-            this.grpSkripte.Size = new System.Drawing.Size(256, 81);
-            this.grpSkripte.TabIndex = 7;
-            this.grpSkripte.TabStop = false;
-            this.grpSkripte.Text = "Skripte";
             // 
             // tabAdmin
             // 
@@ -234,7 +219,6 @@ namespace BlueControls.Forms {
             this.btnSkripteBearbeiten.Size = new System.Drawing.Size(56, 66);
             this.btnSkripteBearbeiten.TabIndex = 45;
             this.btnSkripteBearbeiten.Text = "Skripte";
-            this.btnSkripteBearbeiten.Click += new System.EventHandler(this.btnSkripteBearbeiten_Click);
             // 
             // btnFormular
             // 
@@ -339,7 +323,6 @@ namespace BlueControls.Forms {
         private Button btnDatenbankKopf;
         private Button btnLayouts;
         private OpenFileDialog LoadTab;
-        private GroupBox grpSkripte;
         protected ConnectedFormulaView CFormula;
     }
 }

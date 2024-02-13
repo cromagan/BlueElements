@@ -89,9 +89,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
     private void btnHelligkeit_Click(object? sender, System.EventArgs e) => DoPic();
 
-    private void btnKontrastErhoehen_Click(object? sender, System.EventArgs e) {
-        DoPic();
-    }
+    private void btnKontrastErhoehen_Click(object? sender, System.EventArgs e) => DoPic();
 
     private void btnPixelHinzu_Click(object? sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();

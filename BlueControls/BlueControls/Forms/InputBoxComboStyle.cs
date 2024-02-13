@@ -38,7 +38,6 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
         InitializeComponent();
         cbxText.Text = vorschlagsText;
         if (suggestOriginal != null) {
-            cbxText.Item.CheckBehavior = suggestOriginal.CheckBehavior;
             cbxText.Item.AddClonesFrom(suggestOriginal);
         }
         cbxText.DropDownStyle = texteingabeErlaubt ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList;

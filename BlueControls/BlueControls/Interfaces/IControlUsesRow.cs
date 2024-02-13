@@ -88,9 +88,7 @@ public static class ControlUsesRowExtension {
         }
     }
 
-    public static void FilterInput_RowsChanged(this IControlUsesRow icaf) {
-        icaf.Invalidate_RowsInput();
-    }
+    public static void FilterInput_RowsChanged(this IControlUsesRow icaf) => icaf.Invalidate_RowsInput();
 
     public static void Invalidate_RowsInput(this IControlUsesRow icur) {
         if (!icur.RowsInputManualSeted) {
